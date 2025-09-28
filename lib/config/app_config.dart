@@ -1,40 +1,11 @@
-import 'package:flutter/services.dart' show rootBundle;
-
 /// アプリ全体の設定を管理するクラス
 class AppConfig {
   // 寄付者として登録されたメールアドレス
+  static const List<String> _defaultDonorEmails = [];
+
+  // 寄付者として登録されたメールアドレス
   static Future<List<String>> get donorEmails async {
-    try {
-      // 環境変数ファイルから寄付者メールアドレスを取得
-      final envContent = await rootBundle.loadString('assets/app_config.env');
-      final lines = envContent.split('\n');
-
-      final donorEmails = <String>[];
-
-      for (var line in lines) {
-        line = line.trim();
-        if (line.isEmpty || line.startsWith('#')) continue;
-
-        final parts = line.split('=');
-        if (parts.length == 2) {
-          final key = parts[0].trim();
-          final value = parts[1].trim();
-
-          if (key == 'DONOR_EMAILS') {
-            // カンマ区切りで複数のメールアドレスをサポート
-            donorEmails.addAll(value.split(',').map((email) => email.trim()));
-          }
-        }
-      }
-
-      return donorEmails;
-    } catch (e) {
-      // エラーが発生した場合は空のリストを返す
-      // デバッグログとして出力（本番環境では無効化される）
-      // ignore: avoid_print
-      print('寄付者メールアドレスの読み込みに失敗しました: $e');
-      return [];
-    }
+    return _defaultDonorEmails;
   }
 
   // アプリのバージョン情報
@@ -69,9 +40,7 @@ class AppConfig {
 
     // 開発者として登録されたメールアドレス
     const developerEmails = [
-      'developer@roastplus.com',
-      'admin@roastplus.com',
-      'support@roastplus.com',
+      'kensaku.ikeda04@gmail.com',
     ];
 
     return developerEmails.contains(email.toLowerCase());

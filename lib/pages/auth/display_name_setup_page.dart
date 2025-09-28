@@ -210,7 +210,7 @@ class _DisplayNameSetupPageState extends State<DisplayNameSetupPage> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'グループ内で表示される名前を設定します。\nGoogleアカウント名から名字への変更を推奨します。',
+                            'グループ内で表示される名前を設定します。\nGoogleアカウント名から変更を推奨します。',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,

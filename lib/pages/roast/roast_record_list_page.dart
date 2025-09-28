@@ -1228,7 +1228,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                     crossAxisCount: 3,
                                                     crossAxisSpacing: 12,
                                                     mainAxisSpacing: 12,
-                                                    mainAxisExtent: 176,
+                                                    mainAxisExtent: 160,
                                                   ),
                                               itemCount: filteredRecords.length,
                                               itemBuilder: (context, index) {

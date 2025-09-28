@@ -475,14 +475,6 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
       newRecords.add(bRecord);
     }
     if (newRecords.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('入力内容を確認してください'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
       return;
     }
 
@@ -524,19 +516,8 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
 
       // 入力フィールドをクリア
       _clearInputFields();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('焙煎記録を保存しました'), backgroundColor: Colors.green),
-        );
-      }
     } catch (e) {
       developer.log('焙煎記録保存エラー: $e', name: 'RoastRecordPage', error: e);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存に失敗しました: $e'), backgroundColor: Colors.red),
-        );
-      }
     }
   }
 

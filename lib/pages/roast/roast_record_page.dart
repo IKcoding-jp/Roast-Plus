@@ -642,9 +642,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
     if (!_canCreateRoastRecords) {
       return PermissionDeniedPage(
         title: '焙煎記録入力',
-        message: '焙煎記録を入力するには、管理者またはリーダーの権限が必要です。',
+        message: '焙煎記録を入力するには、管理者の権限が必要です。',
         additionalInfo:
-            'メンバーが焙煎記録を入力できる設定が有効になっている場合は、管理者またはリーダーに設定の確認を依頼してください。',
+            'メンバーが焙煎記録を入力できる設定が有効になっている場合は、管理者に設定の確認を依頼してください。',
         customIcon: Icons.edit_note,
       );
     }

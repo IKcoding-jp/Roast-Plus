@@ -695,11 +695,6 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
           appBar: AppBar(
             title: Row(
               children: [
-                Icon(
-                  Icons.list,
-                  color: Provider.of<ThemeSettings>(context).iconColor,
-                ),
-                SizedBox(width: 8),
                 Text('ドリップパック記録一覧'),
                 // グループ状態バッジを追加
                 if (groupProvider.groups.isNotEmpty)
@@ -717,33 +712,6 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
                       color: Colors.blue.shade700,
                     ),
                   ),
-                // デバッグ用権限状態表示
-                if (!_isCheckingPermissions)
-                  Container(
-                    margin: EdgeInsets.only(left: 8),
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: _canDeleteDripPackRecordsPermission
-                          ? Colors.green.shade100
-                          : Colors.red.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: _canDeleteDripPackRecordsPermission
-                            ? Colors.green.shade400
-                            : Colors.red.shade400,
-                      ),
-                    ),
-                    child: Text(
-                      _canDeleteDripPackRecordsPermission ? '削除可' : '削除不可',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: _canDeleteDripPackRecordsPermission
-                            ? Colors.green.shade700
-                            : Colors.red.shade700,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
               ],
             ),
             actions: [
@@ -759,18 +727,6 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () => _deleteRecords(_selectedIndexes.toList()),
-                ),
-              // グループ参加時のみ同期ボタンを表示
-              if (groupProvider.hasGroup)
-                IconButton(
-                  icon: Icon(Icons.sync),
-                  tooltip: 'グループデータと同期',
-                  onPressed: () async {
-                    setState(() {
-                      _isCheckingPermissions = true;
-                    });
-                    await _loadRecords();
-                  },
                 ),
             ],
           ),

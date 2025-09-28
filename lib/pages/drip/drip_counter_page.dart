@@ -284,9 +284,9 @@ class DripCounterPageState extends State<DripCounterPage>
     if (!_canUseDripCounter) {
       return PermissionDeniedPage(
         title: 'ドリップパックカウンター',
-        message: 'ドリップパックカウンターを使用するには、管理者またはリーダーの権限が必要です。',
+        message: 'ドリップパックカウンターを使用するには、\n管理者の権限が必要です。',
         additionalInfo:
-            'メンバーがドリップパックカウンターを使用できる設定が有効になっている場合は、管理者またはリーダーに設定の確認を依頼してください。',
+            'メンバーがドリップパックカウンターを使用できる設定が有効になっている場合は、管理者に設定の確認を依頼してください。',
         customIcon: Icons.coffee,
         onBackPressed: () {
           // ホームに戻る

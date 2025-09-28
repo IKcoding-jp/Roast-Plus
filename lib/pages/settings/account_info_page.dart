@@ -91,7 +91,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Googleアカウント名から名字への変更を推奨します。',
+              'Googleアカウント名から変更を推奨します。',
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
             SizedBox(height: 16),
@@ -99,7 +99,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
               controller: controller,
               decoration: InputDecoration(
                 hintText: '例: 田中、佐藤',
-                labelText: '表示名（名字）',
+                labelText: '表示名',
               ),
               maxLength: 30,
             ),

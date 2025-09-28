@@ -110,7 +110,11 @@ Future<bool> isDonorUser() async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) return false;
 
-  // 寄付者として登録されたメールアドレス（環境変数から取得）
+  if (AppConfig.isDeveloperEmail(user.email)) {
+    return true;
+  }
+
+  // 寄付者として登録されたメールアドレス
   final donorEmails = await AppConfig.donorEmails;
 
   if (donorEmails.contains(user.email)) return true;

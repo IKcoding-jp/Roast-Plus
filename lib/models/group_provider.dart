@@ -43,6 +43,8 @@ class GroupProvider extends ChangeNotifier {
   bool _showGroupDeletedPage = false;
   bool get showGroupDeletedPage => _showGroupDeletedPage;
 
+  bool? _hasActiveGroupFlag;
+
   GroupProvider() {
     // 初期化状態をリセット
     _initialized = false;
@@ -63,10 +65,7 @@ class GroupProvider extends ChangeNotifier {
       _groupGamificationProfiles;
 
   // 単一グループ対応のための追加getter
-  bool get hasGroup {
-    final hasGroup = _currentGroup != null;
-    return hasGroup;
-  }
+  bool get hasGroup => _currentGroup != null || (_hasActiveGroupFlag ?? false);
 
   Group? get singleGroup => _currentGroup;
 
@@ -91,7 +90,20 @@ class GroupProvider extends ChangeNotifier {
     try {
       // グループ読み込み開始
 
-      // タイムアウト付きでグループ読み込みを実行
+      // まず参加状態フラグを確認
+      final hasActiveGroup = await GroupFirestoreService.userHasActiveGroup();
+
+      if (!hasActiveGroup) {
+        // 参加状態フラグが false の場合はグループなしとして処理
+        _groups = [];
+        _currentGroup = null;
+        _hasActiveGroupFlag = false;
+        _initialized = true;
+        _safeNotifyListeners();
+        return;
+      }
+
+      // 参加状態フラグが true の場合はグループデータを取得
       _groups = await GroupFirestoreService.getUserGroups().timeout(
         Duration(seconds: 20),
         onTimeout: () {
@@ -102,11 +114,17 @@ class GroupProvider extends ChangeNotifier {
       // 単一グループ制限: 最初のグループのみをcurrentGroupに設定
       if (_groups.isNotEmpty) {
         _currentGroup = _groups.first;
+        _hasActiveGroupFlag = true;
 
         // グループの監視を開始
         watchGroup(_currentGroup!.id);
       } else {
+        // グループデータが取得できなかった場合は参加状態をリセット
         _currentGroup = null;
+        _hasActiveGroupFlag = false;
+        GroupFirestoreService.updateUserParticipationFlag(
+          hasActiveGroup: false,
+        );
       }
 
       // 初期化完了フラグを設定

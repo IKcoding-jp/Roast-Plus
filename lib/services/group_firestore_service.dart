@@ -265,6 +265,14 @@ class GroupFirestoreService {
         }
 
         developer.log('グループ作成完了', name: 'GroupFirestoreService');
+
+        updateUserParticipationFlag(
+          hasActiveGroup: true,
+          groupId: groupId,
+          groupName: name,
+          role: GroupRole.admin,
+        );
+
         return group;
       } catch (e) {
         developer.log('グループ作成エラー: $e', name: 'GroupFirestoreService', error: e);
@@ -341,12 +349,28 @@ class GroupFirestoreService {
             'グループドキュメントが存在しません: $groupId',
             name: 'GroupFirestoreService',
           );
+          try {
+            await _firestore
+                .collection('users')
+                .doc(_uid)
+                .collection('userGroups')
+                .doc(groupId)
+                .delete();
+          } catch (cleanupError, cleanupStack) {
+            developer.log(
+              'ユーザーグループの孤立ドキュメント削除に失敗しました: $cleanupError',
+              name: 'GroupFirestoreService',
+              error: cleanupError,
+              stackTrace: cleanupStack,
+            );
+          }
         }
         return null;
       });
 
       final results = await Future.wait(futures);
       final groups = results.whereType<Group>().toList();
+
       developer.log(
         '取得したグループ数: ${groups.length}',
         name: 'GroupFirestoreService',
@@ -445,6 +469,8 @@ class GroupFirestoreService {
         'グループ削除完了 - groupId: $groupId',
         name: 'GroupFirestoreService',
       );
+
+      updateUserParticipationFlag(hasActiveGroup: false);
     } catch (e) {
       developer.log('グループ削除エラー: $e', name: 'GroupFirestoreService', error: e);
       rethrow;
@@ -789,6 +815,13 @@ class GroupFirestoreService {
       name: 'GroupFirestoreService',
     );
 
+    updateUserParticipationFlag(
+      hasActiveGroup: true,
+      groupId: group.id,
+      groupName: group.name,
+      role: GroupRole.member,
+    );
+
     // 招待を更新
     await _firestore.collection('invitations').doc(invitationId).update({
       'isAccepted': true,
@@ -1079,6 +1112,8 @@ class GroupFirestoreService {
         .collection('userGroups')
         .doc(groupId)
         .delete();
+
+    updateUserParticipationFlag(hasActiveGroup: false);
   }
 
   /// グループのデータを同期（グループメンバー間でデータを共有）
@@ -1314,6 +1349,72 @@ class GroupFirestoreService {
         return true;
       }
       return true;
+    }
+  }
+
+  /// ユーザーがアクティブなグループを持っているかチェック
+  static Future<bool> userHasActiveGroup() async {
+    if (_uid == null || _uid!.isEmpty) return false;
+
+    try {
+      final doc = await _firestore.collection('users').doc(_uid).get();
+      if (!doc.exists) return false;
+
+      final data = doc.data();
+      if (data == null) return false;
+
+      return (data['hasActiveGroup'] as bool?) ?? false;
+    } catch (e, st) {
+      developer.log(
+        'グループ参加状態取得に失敗しました: $e',
+        name: 'GroupFirestoreService',
+        error: e,
+        stackTrace: st,
+      );
+      return false;
+    }
+  }
+
+  /// ユーザーのグループ参加状態を更新
+  static Future<void> updateUserParticipationFlag({
+    required bool hasActiveGroup,
+    String? groupId,
+    String? groupName,
+    GroupRole? role,
+  }) async {
+    if (_uid == null) return;
+
+    final payload = <String, dynamic>{
+      'hasActiveGroup': hasActiveGroup,
+      'hasActiveGroupUpdatedAt': FieldValue.serverTimestamp(),
+    };
+
+    if (hasActiveGroup && groupId != null) {
+      payload['activeGroupId'] = groupId;
+      if (groupName != null) {
+        payload['activeGroupName'] = groupName;
+      }
+      if (role != null) {
+        payload['activeGroupRole'] = role.name;
+      }
+    } else {
+      payload['activeGroupId'] = FieldValue.delete();
+      payload['activeGroupName'] = FieldValue.delete();
+      payload['activeGroupRole'] = FieldValue.delete();
+    }
+
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_uid)
+          .set(payload, SetOptions(merge: true));
+    } catch (e, st) {
+      developer.log(
+        'グループ参加状態の更新に失敗しました: $e',
+        name: 'GroupFirestoreService',
+        error: e,
+        stackTrace: st,
+      );
     }
   }
 }

@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "330871937318",
+    "project_id": "roastplus-app",
+    "storage_bucket": "roastplus-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330871937318:android:f9f18c41f7aa541ad0c9e7",
+        "android_client_info": {
+          "package_name": "com.ikcoding.roastplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330871937318-1ogultlfljpv7f5hlvdktoc5q3s7d7rc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ikcoding.roastplus",
+            "certificate_hash": "338c639f673bfd43de07612f2dfd0e338bd34baf"
+          }
+        },
+        {
+          "client_id": "330871937318-e3jmodk9vr5ell4nuq0dnic3na0qd0ru.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ikcoding.roastplus",
+            "certificate_hash": "2bd3f09cc49114270284128bebfea96f7d8e848f"
+          }
+        },
+        {
+          "client_id": "330871937318-tofmig3lifv78brac91eucdfmfucs4nc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ikcoding.roastplus",
+            "certificate_hash": "33b446e0ecc4ae2bd47ae5a3b8d58710d2194183"
+          }
+        },
+        {
+          "client_id": "330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvEoRO0iUbKLtaBhqUxJG7vic6CNjU-R4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -418,6 +418,7 @@ class DripCounterPageState extends State<DripCounterPage>
       horizontal: 14,
       vertical: 10,
     ),
+    int? maxLength,
   }) {
     final themeSettings = Provider.of<ThemeSettings>(context);
 
@@ -466,6 +467,7 @@ class DripCounterPageState extends State<DripCounterPage>
           ),
           child: TextField(
             controller: controller,
+            maxLength: maxLength,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.transparent,
@@ -479,6 +481,7 @@ class DripCounterPageState extends State<DripCounterPage>
                 color: Colors.grey.shade500,
                 fontSize: fontSize,
               ),
+              counterText: maxLength != null ? '' : null,
             ),
             style: TextStyle(
               fontSize: fontSize,
@@ -1094,7 +1097,7 @@ class DripCounterPageState extends State<DripCounterPage>
                           label: '豆の種類',
                           controller: _beanController,
                           icon: Icons.coffee,
-                          hint: '例: グアテマラ',
+                          hint: '例: ブラジル、コロンビア',
                           fontSize: 15,
                           iconSize: 18,
                           labelFontSize: 13,
@@ -1102,6 +1105,7 @@ class DripCounterPageState extends State<DripCounterPage>
                             horizontal: 14,
                             vertical: 10,
                           ),
+                          maxLength: 10,
                         ),
                       ),
                       SizedBox(width: 16),
@@ -1274,7 +1278,9 @@ class DripCounterPageState extends State<DripCounterPage>
                                                     shadows: [
                                                       WebCompatibility.createShadow(
                                                         color: Colors.black
-                                                            .withValues(alpha: 0.1),
+                                                            .withValues(
+                                                              alpha: 0.1,
+                                                            ),
                                                         blurRadius: 8,
                                                         offset: const Offset(
                                                           2,
@@ -1283,7 +1289,9 @@ class DripCounterPageState extends State<DripCounterPage>
                                                       ),
                                                       WebCompatibility.createShadow(
                                                         color: Colors.white
-                                                            .withValues(alpha: 0.8),
+                                                            .withValues(
+                                                              alpha: 0.8,
+                                                            ),
                                                         blurRadius: 2,
                                                         offset: const Offset(
                                                           0,
@@ -1490,7 +1498,7 @@ class DripCounterPageState extends State<DripCounterPage>
                                     label: '豆の種類',
                                     controller: _beanController,
                                     icon: Icons.coffee,
-                                    hint: '例: グアテマラ',
+                                    hint: '例: ブラジル、コロンビア',
                                     fontSize: 17,
                                     iconSize: 22,
                                     labelFontSize: 16,
@@ -1498,6 +1506,7 @@ class DripCounterPageState extends State<DripCounterPage>
                                       horizontal: 14,
                                       vertical: 10,
                                     ),
+                                    maxLength: 10,
                                   ),
                                 ),
                                 SizedBox(width: 14),

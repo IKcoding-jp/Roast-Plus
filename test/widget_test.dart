@@ -6,7 +6,7 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/app.dart';
+import 'package:roastplus/app.dart';
 
 void main() {
   testWidgets('App launches without crashing', (WidgetTester tester) async {

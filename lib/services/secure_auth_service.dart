@@ -56,7 +56,7 @@ class SecureAuthService {
         '  - プラットフォーム: ${kIsWeb ? 'Web' : 'Mobile'}',
         name: _logName,
       );
-      developer.log('  - デバッグモード: ${kDebugMode}', name: _logName);
+      developer.log('  - デバッグモード: $kDebugMode', name: _logName);
       developer.log('  - 現在のURL: ${Uri.base}', name: _logName);
 
       // Web版でのFirebase初期化状態を確認
@@ -967,7 +967,7 @@ class SecureAuthService {
         '  - プラットフォーム: ${kIsWeb ? 'Web' : 'Mobile'}',
         name: _logName,
       );
-      developer.log('  - デバッグモード: ${kDebugMode}', name: _logName);
+      developer.log('  - デバッグモード: $kDebugMode', name: _logName);
       developer.log('  - 現在のURL: ${Uri.base}', name: _logName);
 
       // Google Sign-In設定の確認

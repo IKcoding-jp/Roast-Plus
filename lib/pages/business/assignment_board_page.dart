@@ -2032,7 +2032,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -2044,30 +2044,28 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: themeSettings.backgroundColor.withOpacity(0.5),
+              color: themeSettings.backgroundColor.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(width: 120), // 左ラベル用スペース
-                ...teams
-                    .map<Widget>(
-                      (team) => SizedBox(
-                        width: 160,
-                        child: Center(
-                          child: Text(
-                            team.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24 * themeSettings.fontSizeScale,
-                              color: themeSettings.fontColor1,
-                            ),
-                          ),
+                ...teams.map<Widget>(
+                  (team) => SizedBox(
+                    width: 160,
+                    child: Center(
+                      child: Text(
+                        team.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24 * themeSettings.fontSizeScale,
+                          color: themeSettings.fontColor1,
                         ),
                       ),
-                    )
-                    ,
+                    ),
+                  ),
+                ),
                 SizedBox(width: 120), // 右ラベル用スペース
               ],
             ),
@@ -2107,24 +2105,22 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               children: [
                 SizedBox(width: 60), // 左ラベル用スペース
                 SizedBox(width: 4), // スペーサー
-                ...teams
-                    .map<Widget>(
-                      (team) => Container(
-                        width: 85, // カードと同じ幅に調整
-                        margin: EdgeInsets.symmetric(horizontal: 2),
-                        child: Text(
-                          team.name,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16 * themeSettings.fontSizeScale,
-                            color: themeSettings.fontColor1,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                ...teams.map<Widget>(
+                  (team) => Container(
+                    width: 85, // カードと同じ幅に調整
+                    margin: EdgeInsets.symmetric(horizontal: 2),
+                    child: Text(
+                      team.name,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16 * themeSettings.fontSizeScale,
+                        color: themeSettings.fontColor1,
                       ),
-                    )
-                    ,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
                 SizedBox(width: 4), // スペーサー
                 SizedBox(width: 60), // 右ラベル用スペース
               ],
@@ -2161,7 +2157,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
             color: i % 2 == 0
-                ? themeSettings.backgroundColor.withOpacity(0.3)
+                ? themeSettings.backgroundColor.withValues(alpha: 0.3)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -2183,34 +2179,30 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 ),
               ),
               // メンバーカード
-              ...teams
-                  .map<Widget>(
-                    (team) => SizedBox(
-                      width: 160,
-                      child: Center(
-                        child: MemberCard(
-                          name:
-                              i < team.members.length &&
-                                  team.members[i].isNotEmpty
-                              ? team.members[i]
-                              : '未設定',
-                          attendanceStatus: _getMemberAttendanceStatus(
-                            i < team.members.length &&
-                                    team.members[i].isNotEmpty
-                                ? team.members[i]
-                                : '未設定',
-                          ),
-                          onTap: () {
-                            if (i < team.members.length &&
-                                team.members[i].isNotEmpty) {
-                              _showAttendanceDialog(team.members[i]);
-                            }
-                          },
-                        ),
+              ...teams.map<Widget>(
+                (team) => SizedBox(
+                  width: 160,
+                  child: Center(
+                    child: MemberCard(
+                      name:
+                          i < team.members.length && team.members[i].isNotEmpty
+                          ? team.members[i]
+                          : '未設定',
+                      attendanceStatus: _getMemberAttendanceStatus(
+                        i < team.members.length && team.members[i].isNotEmpty
+                            ? team.members[i]
+                            : '未設定',
                       ),
+                      onTap: () {
+                        if (i < team.members.length &&
+                            team.members[i].isNotEmpty) {
+                          _showAttendanceDialog(team.members[i]);
+                        }
+                      },
                     ),
-                  )
-                  ,
+                  ),
+                ),
+              ),
               // 右ラベル
               SizedBox(
                 width: 120,
@@ -2267,33 +2259,27 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               ),
               SizedBox(width: 4), // ラベルとカードの間の小さなスペース
               // メンバーカード
-              ...teams
-                  .map<Widget>(
-                    (team) => Container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 2,
-                      ), // カード間の小さなスペース
-                      child: MemberCard(
-                        name:
-                            i < team.members.length &&
-                                team.members[i].isNotEmpty
-                            ? team.members[i]
-                            : '未設定',
-                        attendanceStatus: _getMemberAttendanceStatus(
-                          i < team.members.length && team.members[i].isNotEmpty
-                              ? team.members[i]
-                              : '未設定',
-                        ),
-                        onTap: () {
-                          if (i < team.members.length &&
-                              team.members[i].isNotEmpty) {
-                            _showAttendanceDialog(team.members[i]);
-                          }
-                        },
-                      ),
+              ...teams.map<Widget>(
+                (team) => Container(
+                  margin: EdgeInsets.symmetric(horizontal: 2), // カード間の小さなスペース
+                  child: MemberCard(
+                    name: i < team.members.length && team.members[i].isNotEmpty
+                        ? team.members[i]
+                        : '未設定',
+                    attendanceStatus: _getMemberAttendanceStatus(
+                      i < team.members.length && team.members[i].isNotEmpty
+                          ? team.members[i]
+                          : '未設定',
                     ),
-                  )
-                  ,
+                    onTap: () {
+                      if (i < team.members.length &&
+                          team.members[i].isNotEmpty) {
+                        _showAttendanceDialog(team.members[i]);
+                      }
+                    },
+                  ),
+                ),
+              ),
               SizedBox(width: 4), // カードとラベルの間の小さなスペース
               // 右ラベル
               SizedBox(

@@ -127,9 +127,14 @@ class _GroupQRScannerPageState extends State<GroupQRScannerPage> {
         final groupProvider = context.read<GroupProvider>();
         await groupProvider.loadUserGroups();
         // 成功メッセージを表示
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('グループに参加しました'), backgroundColor: Colors.green),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('グループに参加しました'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
 
         if (mounted) {
           // 状態更新を確実にするため、少し待機
@@ -152,12 +157,14 @@ class _GroupQRScannerPageState extends State<GroupQRScannerPage> {
             }
           } else {
             // 状態が更新されていない場合はエラーメッセージを表示
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('グループ参加状態の更新に失敗しました。再試行してください'),
-                backgroundColor: Colors.orange,
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('グループ参加状態の更新に失敗しました。再試行してください'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
             setState(() {
               _isScanning = true;
             });

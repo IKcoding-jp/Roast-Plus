@@ -100,17 +100,40 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                         ),
                         stickerSize: 16.0,
                       ),
-                      Text(
-                        '（${record.weight}g）',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Provider.of<ThemeSettings>(
-                            context,
-                          ).fontColor1.withValues(alpha: 0.7),
-                        ),
-                      ),
                       SizedBox(height: 8),
                       // 詳細情報
+                      // 重さ
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 16,
+                            height: 16,
+                            margin: EdgeInsets.only(top: 1),
+                            child: Icon(
+                              Icons.scale,
+                              size: 16,
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).iconColor,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              '重さ：${record.weight}g',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontColor1,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      // 焙煎時間
                       Row(
                         children: [
                           Icon(

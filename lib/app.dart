@@ -563,8 +563,27 @@ class _GroupRequiredWrapperState extends State<GroupRequiredWrapper> {
           return const LoadingScreen(title: 'Loading...');
         }
 
+        // 状態が安定するまで少し待機してから判定を行う
+        // グループ参加処理直後の不安定な状態を避けるため
+        if (groupProvider.initialized && !groupProvider.loading) {
+          // 状態が更新されたばかりの場合は少し待機
+          Future.delayed(Duration(milliseconds: 300), () {
+            if (mounted && !_isInitialized) {
+              setState(() {
+                _isInitialized = true;
+              });
+            }
+          });
+        }
+
+        // グループ参加状態の判定をより慎重に行う
+        final hasGroup = groupProvider.hasGroup;
+        debugPrint(
+          'GroupRequiredWrapper: 状態判定 - initialized: ${groupProvider.initialized}, loading: ${groupProvider.loading}, hasGroup: $hasGroup, currentGroup: ${groupProvider.currentGroup?.name}',
+        );
+
         // グループに参加していない場合はグループ参加ページを表示
-        if (!groupProvider.hasGroup) {
+        if (!hasGroup) {
           debugPrint('GroupRequiredWrapper: グループ未参加 - GroupRequiredPageを表示');
           return const GroupRequiredPage();
         }

@@ -458,6 +458,12 @@ class GroupProvider extends ChangeNotifier {
       // 状態更新を確実に通知
       _safeNotifyListeners();
 
+      // デバッグログを追加して状態確認
+      developer.log(
+        '招待コード参加処理完了 - currentGroup: ${_currentGroup?.name}, hasGroup: $hasGroup',
+        name: 'GroupProvider',
+      );
+
       // 招待コード参加処理完了
       return true;
     } catch (e) {

@@ -11,14 +11,14 @@ class GroupInvitationService {
   static String? get _uid => _auth.currentUser?.uid;
   static String? get _userDisplayName =>
       _auth.currentUser?.displayName ?? '匿名ユーザー';
-      
+
   static String? get _photoUrl {
     final photoURL = _auth.currentUser?.photoURL;
     developer.log(
       'GroupInvitationService: _photoUrl取得 - $photoURL',
       name: 'GroupInvitationService',
     );
-    
+
     // プロフィール画像URLが有効かチェック
     if (photoURL != null && photoURL.isNotEmpty) {
       developer.log(
@@ -173,19 +173,38 @@ class GroupInvitationService {
         throw Exception('この招待コードは既に使用済みです');
       }
 
-      // 招待コードの使用履歴を先に更新
-      await _firestore
-          .collection('group_invitations')
-          .doc(invitationCode)
-          .update({
-            'currentUses': FieldValue.increment(1),
-            'usedBy': FieldValue.arrayUnion([_uid]),
-            'lastUsedAt': FieldValue.serverTimestamp(),
-            'lastUsedBy': _uid,
-            'lastUsedByName': _userDisplayName,
-          });
+      // グループの現在のメンバーを取得
+      final groupDoc = await _firestore.collection('groups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('グループが見つかりません');
+      }
+      final groupData = groupDoc.data()!;
+      final members = List<Map<String, dynamic>>.from(
+        groupData['members'] ?? [],
+      );
 
-      // グループに参加
+      // 既にメンバーではない場合のみ招待コードの使用履歴を更新
+      final isAlreadyMember = members.any((member) => member['uid'] == _uid);
+      if (!isAlreadyMember) {
+        // 招待コードの使用履歴を先に更新
+        await _firestore
+            .collection('group_invitations')
+            .doc(invitationCode)
+            .update({
+              'currentUses': FieldValue.increment(1),
+              'usedBy': FieldValue.arrayUnion([_uid]),
+              'lastUsedAt': FieldValue.serverTimestamp(),
+              'lastUsedBy': _uid,
+              'lastUsedByName': _userDisplayName,
+            });
+      } else {
+        developer.log(
+          '既にグループのメンバーであるため、招待コードの使用履歴は更新しません',
+          name: 'GroupInvitationService',
+        );
+      }
+
+      // グループに参加（既にメンバーの場合も参加状態フラグを更新）
       await _addUserToGroup(groupId);
 
       developer.log(
@@ -229,6 +248,31 @@ class GroupInvitationService {
           '既にグループのメンバーです - groupId: $groupId, uid: $_uid',
           name: 'GroupInvitationService',
         );
+
+        // 既にメンバーの場合も参加状態フラグを更新
+        try {
+          final groupName = groupData['name'] as String? ?? '';
+          await _firestore.collection('users').doc(_uid).update({
+            'hasActiveGroup': true,
+            'activeGroupId': groupId,
+            'activeGroupName': groupName,
+            'activeGroupRole': 'member',
+            'hasActiveGroupUpdatedAt': FieldValue.serverTimestamp(),
+          });
+
+          developer.log(
+            '既存メンバーでもグループ参加状態フラグを更新しました - groupId: $groupId, groupName: $groupName',
+            name: 'GroupInvitationService',
+          );
+        } catch (flagError) {
+          developer.log(
+            '既存メンバーのグループ参加状態フラグの更新に失敗: $flagError',
+            name: 'GroupInvitationService',
+            error: flagError,
+          );
+          // 参加状態フラグの更新に失敗しても続行
+        }
+
         // 既にメンバーの場合は成功として扱う（エラーを投げない）
         return;
       }
@@ -276,6 +320,30 @@ class GroupInvitationService {
               'joinedAt': DateTime.now().toIso8601String(),
               'isActive': true,
             });
+      }
+
+      // 参加状態フラグを更新
+      try {
+        final groupName = groupData['name'] as String? ?? '';
+        await _firestore.collection('users').doc(_uid).update({
+          'hasActiveGroup': true,
+          'activeGroupId': groupId,
+          'activeGroupName': groupName,
+          'activeGroupRole': 'member',
+          'hasActiveGroupUpdatedAt': FieldValue.serverTimestamp(),
+        });
+
+        developer.log(
+          'グループ参加状態フラグを更新しました - groupId: $groupId, groupName: $groupName',
+          name: 'GroupInvitationService',
+        );
+      } catch (flagError) {
+        developer.log(
+          'グループ参加状態フラグの更新に失敗: $flagError',
+          name: 'GroupInvitationService',
+          error: flagError,
+        );
+        // 参加状態フラグの更新に失敗してもグループ参加は成功として処理
       }
 
       developer.log(

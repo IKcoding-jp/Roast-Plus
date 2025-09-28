@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 import '../../models/group_provider.dart';
 import '../../models/theme_settings.dart';
 import '../../services/qr_code_service.dart';
@@ -122,25 +123,44 @@ class _GroupQRScannerPageState extends State<GroupQRScannerPage> {
       );
 
       if (success && mounted) {
+        // グループ参加状態を即座に更新
+        final groupProvider = context.read<GroupProvider>();
+        await groupProvider.loadUserGroups();
         // 成功メッセージを表示
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('グループに参加しました'), backgroundColor: Colors.green),
         );
 
-        // グループプロバイダーを更新
-        final groupProvider = context.read<GroupProvider>();
-        await groupProvider.loadUserGroups();
-
         if (mounted) {
-          // 少し待ってからホームページに自動遷移（状態更新の確実性のため）
-          await Future.delayed(Duration(milliseconds: 500));
+          // 状態更新を確実にするため、少し待機
+          await Future.delayed(Duration(milliseconds: 800));
 
-          // ホームページに自動遷移
-          if (mounted) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              '/',
-              (route) => false, // すべてのページをクリア
+          // グループ参加状態を再確認してから遷移
+          final hasGroup = groupProvider.hasGroup;
+          developer.log(
+            'グループ参加後状態確認 - hasGroup: $hasGroup',
+            name: 'GroupQRScannerPage',
+          );
+
+          if (hasGroup) {
+            // ホームページに自動遷移
+            if (mounted) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                '/',
+                (route) => false, // すべてのページをクリア
+              );
+            }
+          } else {
+            // 状態が更新されていない場合はエラーメッセージを表示
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('グループ参加状態の更新に失敗しました。再試行してください'),
+                backgroundColor: Colors.orange,
+              ),
             );
+            setState(() {
+              _isScanning = true;
+            });
           }
         }
       }

@@ -203,12 +203,12 @@ android {
 
         // 環境変数からAPIキーを取得
         // Google Sign-In クライアントIDは環境設定を優先し、無ければPlay署名用のフォールバックを使用
-        val fallbackPlayGoogleSignInClientId = "330871937318-1ogultlfljpv7f5hlvdktoc5q3s7d7rc.apps.googleusercontent.com"
+        val fallbackWebGoogleSignInClientId = "330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com"
         val googleSignInClientId = System.getenv("GOOGLE_SIGN_IN_CLIENT_ID")?.trim()?.takeIf { it.isNotEmpty() }
             ?: signingEnvVars["GOOGLE_SIGN_IN_CLIENT_ID"]?.trim()?.takeIf { it.isNotEmpty() }
-            ?: fallbackPlayGoogleSignInClientId
-        if (googleSignInClientId == fallbackPlayGoogleSignInClientId) {
-            println("Using fallback Google Play signing client ID for Google Sign-In")
+            ?: fallbackWebGoogleSignInClientId
+        if (googleSignInClientId == fallbackWebGoogleSignInClientId) {
+            println("Using fallback web client ID for Google Sign-In")
         }
         buildConfigField("String", "GOOGLE_SIGN_IN_CLIENT_ID", "\"$googleSignInClientId\"")
         manifestPlaceholders["googleSignInClientId"] = googleSignInClientId

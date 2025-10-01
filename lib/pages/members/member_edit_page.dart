@@ -395,15 +395,16 @@ class _MemberEditPageState extends State<MemberEditPage> {
   }
 
   void _deleteTeam(int index) {
-    // コントローラーを破棄してからチームを削除
     final team = teams[index];
+
+    // コントローラーを破棄してからチームを削除
     _teamNameControllers[team.id]?.dispose();
     _teamNameControllers.remove(team.id);
 
     setState(() {
       teams.removeAt(index);
     });
-    _adjustLabelsToTeams();
+    // ラベルは保持するため、_adjustLabelsToTeams()は呼ばない
   }
 
   void _updateTeamName(int index, String name) {
@@ -450,7 +451,7 @@ class _MemberEditPageState extends State<MemberEditPage> {
       newMembers.removeAt(memberIndex);
       teams[teamIndex] = teams[teamIndex].copyWith(members: newMembers);
     });
-    _adjustLabelsToTeams();
+    // ラベルは保持するため、_adjustLabelsToTeams()は呼ばない
   }
 
   void _updateMember(int teamIndex, int memberIndex, String value) {
@@ -614,21 +615,17 @@ class _MemberEditPageState extends State<MemberEditPage> {
       (max, team) => team.members.length > max ? team.members.length : max,
     );
 
-    // 左ラベルを調整
+    // 左ラベルを調整（ラベルは保持し、不足分のみ追加）
     while (leftLabels.length < maxTeamSize) {
       leftLabels.add('');
     }
-    if (leftLabels.length > maxTeamSize) {
-      leftLabels = leftLabels.take(maxTeamSize).toList();
-    }
+    // ラベルを削除しない（保持する）
 
-    // 右ラベルを調整
+    // 右ラベルを調整（ラベルは保持し、不足分のみ追加）
     while (rightLabels.length < maxTeamSize) {
       rightLabels.add('');
     }
-    if (rightLabels.length > maxTeamSize) {
-      rightLabels = rightLabels.take(maxTeamSize).toList();
-    }
+    // ラベルを削除しない（保持する）
   }
 
   Widget _buildTeamCard(Team team, int teamIndex) {
@@ -675,7 +672,7 @@ class _MemberEditPageState extends State<MemberEditPage> {
                   icon: Icon(Icons.add, color: Colors.green),
                   onPressed: () => _addMember(teamIndex),
                 ),
-                if (teams.length > 1)
+                if (teams.length > 1 && team.name != 'A班' && team.name != 'B班')
                   IconButton(
                     icon: Icon(Icons.delete, color: Colors.red),
                     onPressed: () => _deleteTeam(teamIndex),
@@ -759,10 +756,12 @@ class _MemberEditPageState extends State<MemberEditPage> {
                         ),
                       ),
                       SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteMember(teamIndex, memberIndex),
-                      ),
+                      if (team.members.length > 1)
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () =>
+                              _deleteMember(teamIndex, memberIndex),
+                        ),
                     ],
                   ),
                 );
@@ -806,10 +805,12 @@ class _MemberEditPageState extends State<MemberEditPage> {
                         ),
                       ),
                       SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteMember(teamIndex, memberIndex),
-                      ),
+                      if (team.members.length > 1)
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () =>
+                              _deleteMember(teamIndex, memberIndex),
+                        ),
                     ],
                   ),
                 );

@@ -1,6 +1,6 @@
 import '../settings/assignment_settings_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
@@ -1809,77 +1809,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         });
   }
 
-  /// デバッグ用：サンプルメンバーを追加
-  Future<void> _addSampleMembers() async {
-    try {
-      debugPrint('デバッグ: サンプルメンバーの追加を開始');
-
-      // サンプルメンバー名のリスト
-      final sampleNames = [
-        '田中太郎',
-        '佐藤花子',
-        '鈴木一郎',
-        '高橋美咲',
-        '渡辺健太',
-        '伊藤さくら',
-        '山本大輔',
-        '中村愛',
-      ];
-
-      // 既存のチームにサンプルメンバーを追加
-      List<Team> updatedTeams = [];
-      for (int i = 0; i < teams.length; i++) {
-        List<String> newMembers = List<String>.from(teams[i].members);
-
-        // 各チームに4人ずつ追加（既存メンバーと重複しないように）
-        int membersToAdd = 4;
-        int sampleIndex = i * membersToAdd;
-
-        for (
-          int j = 0;
-          j < membersToAdd && sampleIndex < sampleNames.length;
-          j++
-        ) {
-          String candidate = sampleNames[sampleIndex];
-          if (!newMembers.contains(candidate)) {
-            newMembers.add(candidate);
-          }
-          sampleIndex++;
-        }
-
-        updatedTeams.add(teams[i].copyWith(members: newMembers));
-      }
-
-      setState(() {
-        teams = updatedTeams;
-      });
-
-      // データを保存
-      await _updateLocalData();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('デバッグ: サンプルメンバーを追加しました'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-
-      debugPrint('デバッグ: サンプルメンバーの追加完了');
-    } catch (e) {
-      debugPrint('デバッグ: サンプルメンバーの追加エラー: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('エラー: サンプルメンバーの追加に失敗しました'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    }
-  }
-
   /// 表示名の変更を監視
   void _startDisplayNameMonitoring() {
     debugPrint('AssignmentBoard: 表示名監視を開始');
@@ -2184,12 +2113,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 );
               },
             ),
-          if (kDebugMode)
-            IconButton(
-              icon: Icon(Icons.bug_report, color: Colors.orange),
-              tooltip: 'デバッグ: サンプルメンバーを追加',
-              onPressed: _addSampleMembers,
-            ),
         ],
       ),
       body: Container(
@@ -2310,12 +2233,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   ),
                 );
               },
-            ),
-          if (kDebugMode)
-            IconButton(
-              icon: Icon(Icons.bug_report, color: Colors.orange),
-              tooltip: 'デバッグ: サンプルメンバーを追加',
-              onPressed: _addSampleMembers,
             ),
         ],
       ),

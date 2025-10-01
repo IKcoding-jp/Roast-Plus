@@ -455,21 +455,30 @@ class LabelEditPageState extends State<LabelEditPage> {
   }
 
   void _deleteLabel(int i) {
-    // 削除するコントローラーを破棄
-    _leftLabelControllers[i].dispose();
-    _rightLabelControllers[i].dispose();
-    _leftLabelControllers.removeAt(i);
-    _rightLabelControllers.removeAt(i);
+    // 最低1行は残す
+    if (leftLabels.length <= 1) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('最低1行のラベルが必要です')));
+      return;
+    }
 
     setState(() {
+      // コントローラーを破棄
+      _leftLabelControllers[i].dispose();
+      _rightLabelControllers[i].dispose();
+
+      // ラベル行を削除
       leftLabels.removeAt(i);
       rightLabels.removeAt(i);
+      _leftLabelControllers.removeAt(i);
+      _rightLabelControllers.removeAt(i);
 
-      // メンバー数が多い場合のみ削除
-      if (aMembers.length > leftLabels.length) {
+      // メンバーも対応する行を削除
+      if (aMembers.length > i) {
         aMembers.removeAt(i);
       }
-      if (bMembers.length > leftLabels.length) {
+      if (bMembers.length > i) {
         bMembers.removeAt(i);
       }
     });
@@ -625,10 +634,11 @@ class LabelEditPageState extends State<LabelEditPage> {
                                   ),
                                 ),
                                 SizedBox(width: kIsWeb ? 12 : 8),
-                                IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () => _deleteLabel(i),
-                                ),
+                                if (leftLabels.length > 1)
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _deleteLabel(i),
+                                  ),
                               ],
                             ),
                           );

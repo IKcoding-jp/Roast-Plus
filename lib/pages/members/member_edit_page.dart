@@ -34,6 +34,27 @@ class _MemberEditPageState extends State<MemberEditPage> {
   // グループメンバーリスト
   List<GroupMember> _groupMembers = [];
 
+  /// 安全な文字列リスト変換
+  List<String> _safeStringListFromDynamic(dynamic data) {
+    if (data == null) return [];
+    if (data is List) {
+      try {
+        return data.map((item) => item?.toString() ?? '').toList();
+      } catch (e) {
+        developer.log(
+          'MemberEditPage: リスト変換エラー: $e, data: $data',
+          name: 'MemberEditPage',
+        );
+        return [];
+      }
+    }
+    developer.log(
+      'MemberEditPage: 予期しないデータ型: ${data.runtimeType}, data: $data',
+      name: 'MemberEditPage',
+    );
+    return [];
+  }
+
   @override
   void initState() {
     super.initState();
@@ -203,14 +224,32 @@ class _MemberEditPageState extends State<MemberEditPage> {
         'teams',
       ]);
 
-      leftLabels = settings['leftLabels'] ?? [];
-      rightLabels = settings['rightLabels'] ?? [];
+      // 安全な文字列リスト変換を使用
+      leftLabels = _safeStringListFromDynamic(settings['leftLabels']);
+      rightLabels = _safeStringListFromDynamic(settings['rightLabels']);
 
       // 班のデータを読み込み
-      final teamsJson = settings['teams'];
-      if (teamsJson != null) {
-        final teamsList = teamsJson;
-        teams = teamsList.map((teamMap) => Team.fromMap(teamMap)).toList();
+      final teamsData = settings['teams'];
+      if (teamsData != null) {
+        try {
+          // teamsDataがListかどうかチェック
+          if (teamsData is List) {
+            teams = teamsData.map((teamMap) => Team.fromMap(teamMap)).toList();
+          } else if (teamsData is String) {
+            // 文字列として保存されている場合はJSONパース
+            final teamsList = jsonDecode(teamsData) as List;
+            teams = teamsList.map((teamMap) => Team.fromMap(teamMap)).toList();
+          } else {
+            teams = [];
+          }
+        } catch (e) {
+          developer.log(
+            'teamsデータのパースエラー: $e',
+            name: 'MemberEditPage',
+            error: e,
+          );
+          teams = [];
+        }
       } else {
         teams = [];
       }
@@ -267,18 +306,19 @@ class _MemberEditPageState extends State<MemberEditPage> {
             'rightLabels',
           ]);
 
-      final currentLeftLabels = List<String>.from(
-        currentSettings['leftLabels'] ?? [],
+      // 安全な文字列リスト変換を使用
+      final currentLeftLabels = _safeStringListFromDynamic(
+        currentSettings['leftLabels'],
       );
-      final currentRightLabels = List<String>.from(
-        currentSettings['rightLabels'] ?? [],
+      final currentRightLabels = _safeStringListFromDynamic(
+        currentSettings['rightLabels'],
       );
 
       // 新しい形式で保存（ラベルは既存のデータを保持）
-      final teamsJson = teams.map((team) => team.toMap()).toList();
+      final teamsData = teams.map((team) => team.toMap()).toList();
       final currentTime = DateTime.now().toIso8601String();
       await UserSettingsFirestoreService.saveMultipleSettings({
-        'teams': teamsJson,
+        'teams': teamsData, // Listとして保存
         'leftLabels': currentLeftLabels,
         'rightLabels': currentRightLabels,
         'teams_savedAt': currentTime, // ローカル保存時刻を記録
@@ -293,24 +333,6 @@ class _MemberEditPageState extends State<MemberEditPage> {
       }
     } catch (e) {
       developer.log('メンバー保存エラー: $e', name: 'MemberEditPage', error: e);
-    }
-
-    // 新しい形式でローカルに保存
-    final teamsJson = jsonEncode(teams.map((team) => team.toMap()).toList());
-    final currentTime = DateTime.now().toIso8601String();
-    await UserSettingsFirestoreService.saveMultipleSettings({
-      'teams': teamsJson,
-      'leftLabels': leftLabels,
-      'rightLabels': rightLabels,
-      'teams_savedAt': currentTime, // ローカル保存時刻を記録
-    });
-
-    // 後方互換性のため、最初の2つの班をA班、B班としても保存
-    if (teams.isNotEmpty) {
-      await UserSettingsFirestoreService.saveMultipleSettings({
-        'assignment_team_a': teams[0].members,
-        'assignment_team_b': teams.length > 1 ? teams[1].members : [],
-      });
     }
 
     // Firestoreにも保存（新しい形式でteamsデータを保存）

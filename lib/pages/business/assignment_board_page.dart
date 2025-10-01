@@ -382,7 +382,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       final groupProvider = context.read<GroupProvider>();
 
       // 新しい形式で保存
-      final teamsJson = jsonEncode(teams.map((team) => team.toMap()).toList());
+      final teamsData = teams.map((team) => team.toMap()).toList();
 
       if (groupProvider.hasGroup) {
         // グループ状態の場合はグループに同期
@@ -390,9 +390,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         debugPrint('AssignmentBoard: グループデータ同期開始 - groupId: ${group.id}');
 
         final assignmentData = {
-          'teams': teams.map((team) => team.toMap()).toList(),
-          'leftLabels': leftLabels,
-          'rightLabels': rightLabels,
+          'teams': teamsData, // Listとして保存
+          'leftLabels': leftLabels, // Listとして保存
+          'rightLabels': rightLabels, // Listとして保存
           'savedAt': DateTime.now().toIso8601String(),
         };
 
@@ -405,9 +405,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         // 個人状態の場合はローカルに保存
         final currentTime = DateTime.now().toIso8601String();
         await UserSettingsFirestoreService.saveMultipleSettings({
-          'teams': teamsJson,
-          'leftLabels': leftLabels,
-          'rightLabels': rightLabels,
+          'teams': teamsData, // Listとして保存
+          'leftLabels': leftLabels, // Listとして保存
+          'rightLabels': rightLabels, // Listとして保存
           'teams_savedAt': currentTime, // ローカル保存時刻を記録
         });
 
@@ -592,9 +592,13 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         ];
       }
 
-      // ラベルデータを確実に読み込み
-      final loadedLeftLabels = settings['leftLabels'] ?? [];
-      final loadedRightLabels = settings['rightLabels'] ?? [];
+      // ラベルデータを確実に読み込み（安全な変換を使用）
+      final loadedLeftLabels = _safeStringListFromDynamic(
+        settings['leftLabels'],
+      );
+      final loadedRightLabels = _safeStringListFromDynamic(
+        settings['rightLabels'],
+      );
 
       // ローカルデータ読み込み完了
 
@@ -1391,8 +1395,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
       if (mounted) {
         setState(() {
-          leftLabels = List<String>.from(settings['leftLabels'] ?? []);
-          rightLabels = List<String>.from(settings['rightLabels'] ?? []);
+          // 安全な文字列リスト変換を使用
+          leftLabels = _safeStringListFromDynamic(settings['leftLabels']);
+          rightLabels = _safeStringListFromDynamic(settings['rightLabels']);
         });
         debugPrint(
           'AssignmentBoard: ラベル再読み込み完了 - leftLabels: $leftLabels, rightLabels: $rightLabels',

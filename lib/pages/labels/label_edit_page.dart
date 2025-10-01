@@ -23,6 +23,27 @@ class LabelEditPageState extends State<LabelEditPage> {
   List<String> aMembers = [];
   List<String> bMembers = [];
 
+  /// 安全な文字列リスト変換
+  List<String> _safeStringListFromDynamic(dynamic data) {
+    if (data == null) return [];
+    if (data is List) {
+      try {
+        return data.map((item) => item?.toString() ?? '').toList();
+      } catch (e) {
+        developer.log(
+          'LabelEditPage: リスト変換エラー: $e, data: $data',
+          name: 'LabelEditPage',
+        );
+        return [];
+      }
+    }
+    developer.log(
+      'LabelEditPage: 予期しないデータ型: ${data.runtimeType}, data: $data',
+      name: 'LabelEditPage',
+    );
+    return [];
+  }
+
   // コントローラーを管理
   final List<TextEditingController> _leftLabelControllers = [];
   final List<TextEditingController> _rightLabelControllers = [];
@@ -118,10 +139,11 @@ class LabelEditPageState extends State<LabelEditPage> {
 
       if (mounted) {
         setState(() {
-          leftLabels = List<String>.from(settings['leftLabels'] ?? []);
-          rightLabels = List<String>.from(settings['rightLabels'] ?? []);
-          aMembers = List<String>.from(settings['a班'] ?? []);
-          bMembers = List<String>.from(settings['b班'] ?? []);
+          // 安全な文字列リスト変換を使用
+          leftLabels = _safeStringListFromDynamic(settings['leftLabels']);
+          rightLabels = _safeStringListFromDynamic(settings['rightLabels']);
+          aMembers = _safeStringListFromDynamic(settings['a班']);
+          bMembers = _safeStringListFromDynamic(settings['b班']);
           // デフォルトで空の状態にする
           if (leftLabels.isEmpty && rightLabels.isEmpty) {
             leftLabels = [''];
@@ -354,21 +376,21 @@ class LabelEditPageState extends State<LabelEditPage> {
 
       developer.log('UserSettings保存開始', name: 'LabelEditPage');
       await UserSettingsFirestoreService.saveMultipleSettings({
-        'leftLabels': leftLabels,
-        'rightLabels': rightLabels,
-        'a班': currentAMembers,
-        'b班': currentBMembers,
+        'leftLabels': leftLabels, // Listとして保存
+        'rightLabels': rightLabels, // Listとして保存
+        'a班': currentAMembers, // Listとして保存
+        'b班': currentBMembers, // Listとして保存
       });
       developer.log('UserSettings保存完了', name: 'LabelEditPage');
 
       // 新しい形式でも保存（後方互換性のため）
       try {
-        final teamsJson = jsonEncode([
+        final teamsData = [
           {'id': 'team_a', 'name': 'A班', 'members': currentAMembers},
           {'id': 'team_b', 'name': 'B班', 'members': currentBMembers},
-        ]);
+        ];
         await UserSettingsFirestoreService.saveMultipleSettings({
-          'teams': teamsJson,
+          'teams': teamsData, // Listとして保存
         });
         developer.log('新しい形式での保存完了', name: 'LabelEditPage');
       } catch (e) {
@@ -401,9 +423,9 @@ class LabelEditPageState extends State<LabelEditPage> {
           ];
 
           final assignmentData = {
-            'teams': teamsData,
-            'leftLabels': leftLabels,
-            'rightLabels': rightLabels,
+            'teams': teamsData, // Listとして保存
+            'leftLabels': leftLabels, // Listとして保存
+            'rightLabels': rightLabels, // Listとして保存
             'savedAt': DateTime.now().toIso8601String(),
           };
 

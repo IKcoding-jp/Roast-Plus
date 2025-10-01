@@ -36,6 +36,16 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}"/>
+        
+        <!-- Google Play Services メタデータ -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        
+        <!-- Google Sign-In 設定 -->
+        <meta-data
+            android:name="com.google.android.gms.auth.GOOGLE_SIGN_IN"
+            android:value="${googleSignInClientId}" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
@@ -56,14 +66,4 @@
     <!-- Google Play Services -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    
-    <!-- Google Play Services メタデータ -->
-    <meta-data
-        android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version" />
-    
-    <!-- Google Sign-In 設定 -->
-    <meta-data
-        android:name="com.google.android.gms.auth.GOOGLE_SIGN_IN"
-        android:value="${googleSignInClientId}" />
 </manifest>

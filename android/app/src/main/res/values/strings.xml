@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Google Sign-In 用のデフォルト Web クライアント ID -->
+    <string name="default_web_client_id">330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com</string>
+</resources>
+

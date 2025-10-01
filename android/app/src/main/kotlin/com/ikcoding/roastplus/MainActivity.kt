@@ -7,6 +7,7 @@ import com.google.android.gms.common.GoogleApiAvailability
 
 class MainActivity : FlutterFragmentActivity() {
     private val CHANNEL = "com.ikcoding.roastplus/firebase_config"
+    private val CHANNEL_GOOGLE_SIGN_IN = "com.ikcoding.roastplus/build_config"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -31,6 +32,19 @@ class MainActivity : FlutterFragmentActivity() {
                 else -> {
                     result.notImplemented()
                 }
+            }
+        }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_GOOGLE_SIGN_IN).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getGoogleSignInClientId" -> {
+                    try {
+                        result.success(BuildConfig.GOOGLE_SIGN_IN_CLIENT_ID)
+                    } catch (e: Exception) {
+                        result.error("CONFIG_ERROR", "Failed to get Google Sign-In client ID", e.message)
+                    }
+                }
+                else -> result.notImplemented()
             }
         }
     }

@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../utils/common_utils.dart';
 import '../utils/app_logger.dart';
 import 'secure_storage_service.dart';
+import 'package:flutter/services.dart';
 
 /// セキュアな認証サービス
 /// Google認証のトークンを安全に管理し、セキュリティを強化するサービス
@@ -186,7 +187,28 @@ class SecureAuthService {
           GoogleSignInAccount? googleUser;
           try {
             await _ensureGoogleSignInInitialized();
-            googleUser = await GoogleSignIn().signIn();
+            // Android: Firebase連携のため、Web client IDをserverClientIdとして指定
+            String serverClientId =
+                '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
+            if (defaultTargetPlatform == TargetPlatform.android) {
+              serverClientId = await _getAndroidServerClientId();
+              developer.log(
+                'Android: 使用するserverClientId = $serverClientId',
+                name: _logName,
+              );
+            }
+
+            final googleSignIn = GoogleSignIn(
+              serverClientId: serverClientId,
+              scopes: ['email', 'profile'],
+            );
+
+            developer.log(
+              'Google Sign-In 初期化完了 - serverClientId: ${serverClientId.substring(0, 20)}...',
+              name: _logName,
+            );
+
+            googleUser = await googleSignIn.signIn();
             if (googleUser == null) {
               developer.log(
                 'Mobile: Google Sign-In canceled by user',
@@ -226,10 +248,65 @@ class SecureAuthService {
           developer.log('ネイティブ版: Google Sign-Inでエラー: $e', name: _logName);
           developer.log('ネイティブ版: エラータイプ: ${e.runtimeType}', name: _logName);
 
+          // PlatformExceptionの詳細情報を表示
+          if (e is PlatformException) {
+            developer.log('❌ PlatformException詳細:', name: _logName);
+            developer.log('  - コード: ${e.code}', name: _logName);
+            developer.log('  - メッセージ: ${e.message}', name: _logName);
+            developer.log('  - 詳細: ${e.details}', name: _logName);
+
+            // エラーコード12500の詳細な対処法
+            if (e.message?.contains('12500') ?? false) {
+              developer.log('', name: _logName);
+              developer.log('【エラーコード12500の解決方法】', name: _logName);
+              developer.log('このエラーは以下の原因で発生します：', name: _logName);
+              developer.log('1. FirebaseコンソールにSHA証明書が登録されていない', name: _logName);
+              developer.log('2. google-services.jsonが最新でない', name: _logName);
+              developer.log(
+                '3. エミュレーターにGoogle Playストアがインストールされていない',
+                name: _logName,
+              );
+              developer.log('', name: _logName);
+              developer.log('【対処法】', name: _logName);
+              developer.log('A. 実機で試す場合:', name: _logName);
+              developer.log(
+                '   1. Firebaseコンソールで以下のSHA証明書を確認:',
+                name: _logName,
+              );
+              developer.log(
+                '      - デバッグ: 33:B4:46:E0:EC:C4:AE:2B:D4:7A:E5:A3:B8:D5:87:10:D2:19:41:83',
+                name: _logName,
+              );
+              developer.log(
+                '      - リリース: 2B:D3:F0:9C:C4:91:14:27:02:84:12:8B:EB:FE:A9:6F:7D:8E:84:8F',
+                name: _logName,
+              );
+              developer.log(
+                '      - Play署名: 33:8C:63:9F:67:3B:FD:43:DE:07:61:2F:2D:FD:0E:33:8B:D3:4B:AF',
+                name: _logName,
+              );
+              developer.log(
+                '   2. Firebaseコンソールでgoogle-services.jsonを再ダウンロード',
+                name: _logName,
+              );
+              developer.log('   3. アプリを完全にアンインストールして再インストール', name: _logName);
+              developer.log('', name: _logName);
+              developer.log('B. エミュレーターで試す場合:', name: _logName);
+              developer.log(
+                '   1. Google Play Store付きのエミュレーターを使用',
+                name: _logName,
+              );
+              developer.log('   2. エミュレーターでGoogleアカウントにログイン', name: _logName);
+              developer.log('   3. エミュレーターをコールドブートで再起動', name: _logName);
+              developer.log('', name: _logName);
+            }
+          }
+
           // Play Store版での詳細エラー情報を記録
           if (e.toString().contains('sign_in_failed') ||
               e.toString().contains('network_error') ||
-              e.toString().contains('invalid_client')) {
+              e.toString().contains('invalid_client') ||
+              e.toString().contains('12500')) {
             developer.log(
               'Play Store版: Google Sign-In認証エラーを検出',
               name: _logName,
@@ -324,11 +401,11 @@ class SecureAuthService {
         );
         developer.log('現在のアプリID: com.ikcoding.roastplus', name: _logName);
         developer.log(
-          'デバッグ署名SHA1ハッシュ: 33:8C:63:9F:67:3B:FD:43:DE:07:61:2F:2D:FD:0E:33:8B:D3:4B:AF',
+          'デバッグ署名SHA1ハッシュ: 33:B4:46:E0:EC:C4:AE:2B:D4:7A:E5:A3:B8:D5:87:10:D2:19:41:83',
           name: _logName,
         );
         developer.log(
-          'リリース署名SHA1ハッシュ: 61:A5:38:70:20:14:B4:4B:9C:75:5F:64:02:EE:AD:34:B4:14:F0:C9',
+          'リリース署名SHA1ハッシュ: 2B:D3:F0:9C:C4:91:14:27:02:84:12:8B:EB:FE:A9:6F:7D:8E:84:8F',
           name: _logName,
         );
         developer.log(
@@ -720,8 +797,23 @@ class SecureAuthService {
           // 既存のセッションをクリアしてアカウント選択を強制
           // Google Sign-Inのセッションをクリアして強制的にアカウント選択を促す
           await _ensureGoogleSignInInitialized();
+          // Android: Firebase連携のため、Web client IDをserverClientIdとして指定
+          String serverClientId =
+              '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
+          if (defaultTargetPlatform == TargetPlatform.android) {
+            serverClientId = await _getAndroidServerClientId();
+            developer.log(
+              'Android: 使用するserverClientId = $serverClientId',
+              name: _logName,
+            );
+          }
+
+          final googleSignIn = GoogleSignIn(
+            serverClientId: serverClientId,
+            scopes: ['email', 'profile'],
+          );
           try {
-            await GoogleSignIn().signOut();
+            await googleSignIn.signOut();
           } catch (signOutError) {
             developer.log(
               'Mobile: Google Sign-In pre sign-out failed: $signOutError',
@@ -731,8 +823,7 @@ class SecureAuthService {
 
           GoogleSignInAccount? googleUser;
           try {
-            await _ensureGoogleSignInInitialized();
-            googleUser = await GoogleSignIn().signIn();
+            googleUser = await googleSignIn.signIn();
             if (googleUser == null) {
               developer.log(
                 'Mobile: Google Sign-In canceled by user (force select)',
@@ -824,7 +915,7 @@ class SecureAuthService {
               name: _logName,
             );
             developer.log(
-              '本番環境の署名証明書ハッシュ: 61:A5:38:70:20:14:B4:4B:9C:75:5F:64:02:EE:AD:34:B4:14:F0:C9',
+              '本番環境の署名証明書ハッシュ: 2B:D3:F0:9C:C4:91:14:27:02:84:12:8B:EB:FE:A9:6F:7D:8E:84:8F',
               name: _logName,
             );
           }
@@ -981,6 +1072,39 @@ class SecureAuthService {
       developer.log('本番環境設定の確認が完了', name: _logName);
     } catch (e) {
       developer.log('本番環境設定の確認でエラー: $e', name: _logName);
+    }
+  }
+
+  /// アンドロイドのserverClientIdを取得
+  static Future<String> _getAndroidServerClientId() async {
+    const methodChannel = MethodChannel('com.ikcoding.roastplus/build_config');
+    final fallback =
+        '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
+    try {
+      final clientId = await methodChannel.invokeMethod<String>(
+        'getGoogleSignInClientId',
+      );
+      if (clientId == null || clientId.isEmpty) {
+        developer.log(
+          'Android: BuildConfigからGoogle Sign-In client IDを取得できませんでした。フォールバック値を使用します',
+          name: _logName,
+        );
+        return fallback;
+      }
+      developer.log(
+        'Android: BuildConfigからGoogle Sign-In client IDを取得しました',
+        name: _logName,
+      );
+      return clientId;
+    } on PlatformException catch (e) {
+      developer.log(
+        'Android: BuildConfig取得でPlatformException: ${e.message}',
+        name: _logName,
+      );
+      return fallback;
+    } catch (e) {
+      developer.log('Android: BuildConfig取得で予期しないエラー: $e', name: _logName);
+      return fallback;
     }
   }
 }

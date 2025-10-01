@@ -1,6 +1,6 @@
 import '../settings/assignment_settings_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
@@ -75,6 +75,28 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     }
     debugPrint('AssignmentBoard: 予期しないデータ型: ${data.runtimeType}, data: $data');
     return [];
+  }
+
+  /// 2つのTeamリストが等しいかチェック
+  bool _areTeamsEqual(List<Team> a, List<Team> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id ||
+          a[i].name != b[i].name ||
+          !_areLabelsEqual(a[i].members, b[i].members)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// 2つのStringリストが等しいかチェック
+  bool _areLabelsEqual(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   /// グループデータとローカルデータをマージ（publicメソッド）
@@ -168,10 +190,27 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       }
     }
 
-    // ローカルデータが既に存在する場合は更新をスキップ（ちらつき防止）
+    // グループデータが変更されている場合は常に反映（ちらつき防止のため変更チェック）
     if (mounted) {
-      // ローカルデータが空の場合のみ更新
+      bool hasChanges = false;
+
+      // データが空の場合は必ず更新
       if (teams.isEmpty && leftLabels.isEmpty) {
+        hasChanges = true;
+        debugPrint('AssignmentBoard: ローカルデータが空のため、グループデータで更新');
+      } else {
+        // データの変更をチェック
+        if (!_areTeamsEqual(teams, newTeams) ||
+            !_areLabelsEqual(leftLabels, newLeftLabels) ||
+            !_areLabelsEqual(rightLabels, newRightLabels)) {
+          hasChanges = true;
+          debugPrint('AssignmentBoard: グループデータの変更を検知 - 更新します');
+        } else {
+          debugPrint('AssignmentBoard: グループデータに変更なし - 更新をスキップ');
+        }
+      }
+
+      if (hasChanges) {
         setState(() {
           teams = newTeams;
           leftLabels = newLeftLabels;
@@ -183,17 +222,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             isAssignedToday = true;
           }
         });
-        debugPrint('AssignmentBoard: ローカルデータが空のため、グループデータで更新');
-      } else {
-        debugPrint('AssignmentBoard: ローカルデータが存在するため、グループデータの更新をスキップ');
-      }
-    }
-
-    // グループ状態でない場合のみローカルデータを更新
-    if (mounted) {
-      final groupProvider = context.read<GroupProvider>();
-      if (!groupProvider.hasGroup) {
-        _updateLocalData();
+        debugPrint('AssignmentBoard: グループデータの更新完了');
       }
     }
 
@@ -280,32 +309,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         });
         // 強制クリーンアップ完了
 
-        // クリーンアップ後のデータを保存
+        // クリーンアップ後のデータを保存（グループまたはローカル）
         await _updateLocalData();
-
-        // Firestoreにも保存
-        try {
-          final teamsJson = jsonEncode(
-            teams.map((team) => team.toMap()).toList(),
-          );
-          await UserSettingsFirestoreService.saveMultipleSettings({
-            'teams': teamsJson,
-            'leftLabels': leftLabels,
-            'rightLabels': rightLabels,
-          });
-
-          // 後方互換性のため、最初の2つの班をA班、B班としても保存
-          if (teams.isNotEmpty) {
-            await UserSettingsFirestoreService.saveMultipleSettings({
-              'assignment_team_a': teams[0].members,
-              'assignment_team_b': teams.length > 1 ? teams[1].members : [],
-            });
-          }
-
-          debugPrint('AssignmentBoard: Firestoreデータ更新完了');
-        } catch (e) {
-          debugPrint('AssignmentBoard: Firestoreデータ更新エラー: $e');
-        }
       } else {
         // 強制クリーンアップ: 変更なし
       }
@@ -317,30 +322,46 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   /// ローカルデータを更新
   Future<void> _updateLocalData() async {
     try {
-      // グループ状態の場合はローカルデータを保存しない
       final groupProvider = context.read<GroupProvider>();
-      if (groupProvider.hasGroup) {
-        // グループ状態のため、ローカルデータ保存をスキップ
-        return;
-      }
 
       // 新しい形式で保存
       final teamsJson = jsonEncode(teams.map((team) => team.toMap()).toList());
-      await UserSettingsFirestoreService.saveMultipleSettings({
-        'teams': teamsJson,
-        'leftLabels': leftLabels,
-        'rightLabels': rightLabels,
-      });
 
-      // 後方互換性のため、最初の2つの班をA班、B班としても保存
-      if (teams.isNotEmpty) {
+      if (groupProvider.hasGroup) {
+        // グループ状態の場合はグループに同期
+        final group = groupProvider.currentGroup!;
+        debugPrint('AssignmentBoard: グループデータ同期開始 - groupId: ${group.id}');
+
+        final assignmentData = {
+          'teams': teams.map((team) => team.toMap()).toList(),
+          'leftLabels': leftLabels,
+          'rightLabels': rightLabels,
+          'savedAt': DateTime.now().toIso8601String(),
+        };
+
+        await GroupDataSyncService.syncAssignmentBoard(
+          group.id,
+          assignmentData,
+        );
+        debugPrint('AssignmentBoard: グループデータ同期完了');
+      } else {
+        // 個人状態の場合はローカルに保存
         await UserSettingsFirestoreService.saveMultipleSettings({
-          'assignment_team_a': teams[0].members,
-          'assignment_team_b': teams.length > 1 ? teams[1].members : [],
+          'teams': teamsJson,
+          'leftLabels': leftLabels,
+          'rightLabels': rightLabels,
         });
-      }
 
-      debugPrint('AssignmentBoard: Firebaseデータ更新完了');
+        // 後方互換性のため、最初の2つの班をA班、B班としても保存
+        if (teams.isNotEmpty) {
+          await UserSettingsFirestoreService.saveMultipleSettings({
+            'assignment_team_a': teams[0].members,
+            'assignment_team_b': teams.length > 1 ? teams[1].members : [],
+          });
+        }
+
+        debugPrint('AssignmentBoard: Firebaseデータ更新完了');
+      }
     } catch (e) {
       debugPrint('AssignmentBoard: Firebaseデータ更新エラー: $e');
     }
@@ -1191,6 +1212,39 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     }
   }
 
+  /// グループに担当履歴を同期
+  Future<void> _syncAssignmentHistoryToGroup(
+    String dateKey,
+    List<String> assignments,
+  ) async {
+    try {
+      final groupProvider = context.read<GroupProvider>();
+      if (groupProvider.hasGroup) {
+        final group = groupProvider.currentGroup!;
+        debugPrint(
+          'AssignmentBoard: 担当履歴をグループに同期開始 - groupId: ${group.id}, dateKey: $dateKey',
+        );
+
+        final assignmentHistoryData = {
+          dateKey: {
+            'assignments': assignments,
+            'leftLabels': leftLabels,
+            'rightLabels': rightLabels,
+            'savedAt': DateTime.now().toIso8601String(),
+          },
+        };
+
+        await GroupDataSyncService.syncAssignmentHistory(
+          group.id,
+          assignmentHistoryData,
+        );
+        debugPrint('AssignmentBoard: 担当履歴同期完了');
+      }
+    } catch (e) {
+      debugPrint('AssignmentBoard: 担当履歴同期エラー: $e');
+    }
+  }
+
   Future<void> _loadState() async {
     if (!mounted) return;
 
@@ -1256,6 +1310,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         debugPrint(
           'AssignmentBoard: ラベル再読み込み完了 - leftLabels: $leftLabels, rightLabels: $rightLabels',
         );
+
+        // グループに参加している場合は同期
+        _updateLocalData();
       }
     } catch (e) {
       debugPrint('AssignmentBoard: ラベル再読み込みエラー: $e');
@@ -1290,6 +1347,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         }
         setState(() {});
         debugPrint('AssignmentBoard: メンバー再読み込み完了');
+
+        // グループに参加している場合は同期
+        await _updateLocalData();
       }
     } catch (e) {
       debugPrint('AssignmentBoard: メンバー再読み込みエラー: $e');
@@ -1406,24 +1466,100 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     }
   }
 
-  void _shuffleAssignments() {
-    final count = leftLabels.length;
+  /// 過去N日分の担当履歴を取得
+  Future<Map<String, List<String>>> _getRecentAssignmentHistory(
+    int days,
+  ) async {
+    final history = <String, List<String>>{};
+    for (int i = 1; i <= days; i++) {
+      final dateKey = _dayKeyAgo(i);
+      try {
+        final assignments = await UserSettingsFirestoreService.getSetting(
+          'assignment_$dateKey',
+        );
+        if (assignments != null &&
+            assignments is List &&
+            assignments.isNotEmpty) {
+          history[dateKey] = _safeStringListFromDynamic(assignments);
+        }
+      } catch (e) {
+        debugPrint('AssignmentBoard: 履歴取得エラー ($dateKey): $e');
+      }
+    }
+    return history;
+  }
 
-    // すべての班のメンバー数が十分かチェック
-    bool hasEnoughMembers = true;
-    for (int i = 0; i < teams.length; i++) {
-      if (teams[i].members.length < count) {
-        hasEnoughMembers = false;
-        break;
+  /// 新しい配置の重複スコアを計算（低いほど良い）
+  int _calculateAssignmentScore(
+    List<String> newPairs,
+    Map<String, List<String>> recentHistory,
+  ) {
+    int score = 0;
+
+    // 各メンバーの担当位置とペア相手を抽出
+    final memberAssignments = <String, List<MapEntry<int, String>>>{};
+
+    for (var i = 0; i < newPairs.length; i++) {
+      final members = newPairs[i].split('-');
+      for (var teamIndex = 0; teamIndex < members.length; teamIndex++) {
+        final memberName = members[teamIndex];
+        if (memberName.isNotEmpty && memberName != '未設定') {
+          final partnerNames = List<String>.from(members)..removeAt(teamIndex);
+          if (!memberAssignments.containsKey(memberName)) {
+            memberAssignments[memberName] = [];
+          }
+          memberAssignments[memberName]!.add(
+            MapEntry(i, partnerNames.join('-')),
+          );
+        }
       }
     }
 
-    if (teams.length < 2 || !hasEnoughMembers) {
+    // 過去の履歴と比較してスコアを計算
+    int dayIndex = 1;
+    for (var entry in recentHistory.entries) {
+      final historyPairs = entry.value;
+      final weight = dayIndex == 1 ? 2 : 1; // 直近1日は重み2倍
+
+      for (var memberName in memberAssignments.keys) {
+        final newAssignments = memberAssignments[memberName]!;
+
+        // 過去の履歴から同じメンバーの担当位置とペア相手を抽出
+        for (var i = 0; i < historyPairs.length; i++) {
+          final members = historyPairs[i].split('-');
+          for (var teamIndex = 0; teamIndex < members.length; teamIndex++) {
+            if (members[teamIndex] == memberName) {
+              // 担当位置の重複チェック
+              for (var newAssignment in newAssignments) {
+                if (newAssignment.key == i) {
+                  score += 10 * weight; // 同じ担当位置
+                }
+
+                // ペア相手の重複チェック
+                final oldPartners = List<String>.from(members)
+                  ..removeAt(teamIndex);
+                final oldPartnerStr = oldPartners.join('-');
+                if (newAssignment.value == oldPartnerStr) {
+                  score += 10 * weight; // 同じペア相手
+                }
+              }
+            }
+          }
+        }
+      }
+      dayIndex++;
+    }
+
+    return score;
+  }
+
+  void _shuffleAssignments() {
+    if (teams.length < 2) {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text('エラー'),
-          content: Text('メンバー数が担当数に足りません。編集画面で調整してください。'),
+          content: Text('シャッフルするには2つ以上の班が必要です。'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -1438,19 +1574,16 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     setState(() => isShuffling = true);
     int cnt = 0;
     const dur = Duration(milliseconds: 100);
-    // ローカルでシャッフルを行い、UI更新は間引いて行う
     List<List<String>> shuffledMembers = List.generate(
       teams.length,
       (i) => List.from(teams[i].members),
     );
     shuffleTimer = Timer.periodic(dur, (_) async {
       try {
-        // 各チームのメンバーをシャッフル（ローカル配列）
         for (int i = 0; i < shuffledMembers.length; i++) {
           shuffledMembers[i].shuffle(Random());
         }
 
-        // UI更新は間引いて行う（5回に1回）
         if (cnt % 5 == 0) {
           if (!mounted) return;
           setState(() {
@@ -1466,42 +1599,67 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           shuffleTimer?.cancel();
 
           final today = _todayKey();
-          final y1 = _dayKeyAgo(1), y2 = _dayKeyAgo(2);
-          List<String> pairs = _makePairs();
-          final p1Data = await UserSettingsFirestoreService.getSetting(
-            'assignment_$y1',
-          );
-          final p2Data = await UserSettingsFirestoreService.getSetting(
-            'assignment_$y2',
-          );
 
-          final p1 = _safeStringListFromDynamic(p1Data);
-          final p2 = _safeStringListFromDynamic(p2Data);
+          final recentHistory = await _getRecentAssignmentHistory(2);
+
+          debugPrint('AssignmentBoard: 担当履歴を参照してシャッフル開始');
+
+          List<List<String>> bestShuffledMembers = List.generate(
+            teams.length,
+            (i) => List.from(shuffledMembers[i]),
+          );
+          List<String> bestPairs = _makePairs();
+          int bestScore = _calculateAssignmentScore(bestPairs, recentHistory);
 
           int retry = 0;
-          // 重い同期ループを避けるため、再シャッフルは非同期に行い、UI更新は最小化する
-          while ((_isDuplicate(pairs, p1) || _isDuplicate(pairs, p2)) &&
-              retry < 100) {
-            // 再シャッフル（ローカル配列のみ）
+          const maxRetries = 100;
+
+          while (retry < maxRetries) {
             for (int i = 0; i < shuffledMembers.length; i++) {
               shuffledMembers[i].shuffle(Random());
             }
 
-            // 最終結果のみUIに反映
-            final newPairs = _makePairs();
-            if (!_isDuplicate(newPairs, p1) && !_isDuplicate(newPairs, p2)) {
-              // pairs を更新してループを抜ける
-              pairs = newPairs;
+            for (int i = 0; i < teams.length; i++) {
+              teams[i] = teams[i].copyWith(
+                members: List.from(shuffledMembers[i]),
+              );
+            }
+
+            final candidatePairs = _makePairs();
+            final candidateScore = _calculateAssignmentScore(
+              candidatePairs,
+              recentHistory,
+            );
+
+            if (candidateScore < bestScore) {
+              bestPairs = candidatePairs;
+              bestScore = candidateScore;
+              bestShuffledMembers = List.generate(
+                teams.length,
+                (i) => List.from(shuffledMembers[i]),
+              );
+              debugPrint('AssignmentBoard: より良い配置を発見 (スコア: $bestScore)');
+            }
+
+            if (bestScore == 0) {
+              debugPrint('AssignmentBoard: 完璧な配置を発見しました');
               break;
             }
 
             retry++;
-            // 小さく待機してUIスレッドへの負担を分散
             await Future.delayed(Duration(milliseconds: 5));
           }
 
+          for (int i = 0; i < teams.length; i++) {
+            teams[i] = teams[i].copyWith(
+              members: List.from(bestShuffledMembers[i]),
+            );
+          }
+
+          debugPrint('AssignmentBoard: 最終配置決定 (スコア: $bestScore, 試行回数: $retry)');
+
           await UserSettingsFirestoreService.saveMultipleSettings({
-            'assignment_$today': pairs,
+            'assignment_$today': bestPairs,
             'assignedDate': today,
           });
 
@@ -1510,22 +1668,24 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             isAssignedToday = true;
           });
 
-          // Firestoreに必ず保存（グループ未参加時も）
           try {
             await AssignmentFirestoreService.saveAssignmentHistory(
               dateKey: today,
-              assignments: pairs,
-              leftLabels: leftLabels, // 追加
-              rightLabels: rightLabels, // 追加
+              assignments: bestPairs,
+              leftLabels: leftLabels,
+              rightLabels: rightLabels,
             );
             debugPrint('AssignmentBoard: 担当履歴をFirestoreに保存完了');
           } catch (e) {
             debugPrint('AssignmentBoard: 担当履歴のFirestore保存エラー: $e');
           }
 
-          // グループに同期（グループ参加時のみ）
-          _syncTodayAssignmentToGroup(pairs);
-          // 担当決定後に広告を表示
+          // グループに今日の担当を同期
+          _syncTodayAssignmentToGroup(bestPairs);
+
+          // グループに担当履歴を同期
+          await _syncAssignmentHistoryToGroup(today, bestPairs);
+
           _showInterstitialAdAfterAssignment();
         }
       } catch (e) {
@@ -1572,6 +1732,77 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             });
           }
         });
+  }
+
+  /// デバッグ用：サンプルメンバーを追加
+  Future<void> _addSampleMembers() async {
+    try {
+      debugPrint('デバッグ: サンプルメンバーの追加を開始');
+
+      // サンプルメンバー名のリスト
+      final sampleNames = [
+        '田中太郎',
+        '佐藤花子',
+        '鈴木一郎',
+        '高橋美咲',
+        '渡辺健太',
+        '伊藤さくら',
+        '山本大輔',
+        '中村愛',
+      ];
+
+      // 既存のチームにサンプルメンバーを追加
+      List<Team> updatedTeams = [];
+      for (int i = 0; i < teams.length; i++) {
+        List<String> newMembers = List<String>.from(teams[i].members);
+
+        // 各チームに4人ずつ追加（既存メンバーと重複しないように）
+        int membersToAdd = 4;
+        int sampleIndex = i * membersToAdd;
+
+        for (
+          int j = 0;
+          j < membersToAdd && sampleIndex < sampleNames.length;
+          j++
+        ) {
+          String candidate = sampleNames[sampleIndex];
+          if (!newMembers.contains(candidate)) {
+            newMembers.add(candidate);
+          }
+          sampleIndex++;
+        }
+
+        updatedTeams.add(teams[i].copyWith(members: newMembers));
+      }
+
+      setState(() {
+        teams = updatedTeams;
+      });
+
+      // データを保存
+      await _updateLocalData();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('デバッグ: サンプルメンバーを追加しました'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+
+      debugPrint('デバッグ: サンプルメンバーの追加完了');
+    } catch (e) {
+      debugPrint('デバッグ: サンプルメンバーの追加エラー: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('エラー: サンプルメンバーの追加に失敗しました'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 
   /// 表示名の変更を監視
@@ -1878,6 +2109,12 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 );
               },
             ),
+          if (kDebugMode)
+            IconButton(
+              icon: Icon(Icons.bug_report, color: Colors.orange),
+              tooltip: 'デバッグ: サンプルメンバーを追加',
+              onPressed: _addSampleMembers,
+            ),
         ],
       ),
       body: Container(
@@ -1998,6 +2235,12 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   ),
                 );
               },
+            ),
+          if (kDebugMode)
+            IconButton(
+              icon: Icon(Icons.bug_report, color: Colors.orange),
+              tooltip: 'デバッグ: サンプルメンバーを追加',
+              onPressed: _addSampleMembers,
             ),
         ],
       ),

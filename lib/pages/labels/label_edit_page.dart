@@ -385,7 +385,7 @@ class LabelEditPageState extends State<LabelEditPage> {
       );
       developer.log('Firestore保存完了', name: 'LabelEditPage');
 
-      // グループに同期
+      // グループに同期（新しい形式で）
       try {
         if (groupProvider.groups.isNotEmpty) {
           final group = groupProvider.groups.first;
@@ -394,9 +394,14 @@ class LabelEditPageState extends State<LabelEditPage> {
             name: 'LabelEditPage',
           );
 
+          // 新しい形式（teams）でデータを構築
+          final teamsData = [
+            {'id': 'team_a', 'name': 'A班', 'members': currentAMembers},
+            {'id': 'team_b', 'name': 'B班', 'members': currentBMembers},
+          ];
+
           final assignmentData = {
-            'aMembers': currentAMembers,
-            'bMembers': currentBMembers,
+            'teams': teamsData,
             'leftLabels': leftLabels,
             'rightLabels': rightLabels,
             'savedAt': DateTime.now().toIso8601String(),
@@ -406,7 +411,7 @@ class LabelEditPageState extends State<LabelEditPage> {
             group.id,
             assignmentData,
           );
-          developer.log('担当表データ同期完了', name: 'LabelEditPage');
+          developer.log('担当表データ同期完了（新しい形式）', name: 'LabelEditPage');
         }
       } catch (e) {
         developer.log('担当表データ同期エラー: $e', name: 'LabelEditPage', error: e);

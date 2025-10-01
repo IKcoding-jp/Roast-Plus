@@ -62,6 +62,30 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   StreamSubscription<dynamic>? _displayNameSubscription;
   Timer? _autoSyncTimer;
 
+  String? _activeGroupId;
+  String? _monitoredGroupId;
+  bool _initialLocalDataLoaded = false;
+  bool _initialGroupDataLoaded = false;
+  VoidCallback? _groupProviderListener;
+  bool _isApplyingRemoteUpdate = false;
+  int _remoteUpdateDepth = 0;
+
+  bool get _isSyncLocked => _isApplyingRemoteUpdate || !_initialLocalDataLoaded;
+
+  void _beginRemoteUpdate() {
+    _remoteUpdateDepth++;
+    _isApplyingRemoteUpdate = true;
+  }
+
+  void _endRemoteUpdate() {
+    if (_remoteUpdateDepth > 0) {
+      _remoteUpdateDepth--;
+    }
+    if (_remoteUpdateDepth == 0) {
+      _isApplyingRemoteUpdate = false;
+    }
+  }
+
   /// 安全な文字列リスト変換
   List<String> _safeStringListFromDynamic(dynamic data) {
     if (data == null) return [];
@@ -101,132 +125,162 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
   /// グループデータとローカルデータをマージ（publicメソッド）
   void mergeGroupDataWithLocal(Map<String, dynamic> groupAssignmentData) {
-    _mergeGroupDataWithLocal(groupAssignmentData);
+    _mergeGroupDataWithLocal(groupAssignmentData, source: 'external');
   }
 
   /// グループデータとローカルデータをマージ（ローカルデータ優先）
   void _mergeGroupDataWithLocal(
-    Map<String, dynamic> groupAssignmentData,
-  ) async {
+    Map<String, dynamic> groupAssignmentData, {
+    String source = 'group',
+  }) async {
     if (!mounted) return;
     debugPrint('AssignmentBoard: グループデータとローカルデータをマージ開始');
     debugPrint('AssignmentBoard: 受信データ: $groupAssignmentData');
 
-    // グループメンバーの有効性をチェックしてクリーンアップ
-    await _cleanupInvalidMembers();
+    final isFirstRemoteMerge = !_initialGroupDataLoaded;
+    _beginRemoteUpdate();
+    try {
+      // グループメンバーの有効性をチェックしてクリーンアップ
+      await _cleanupInvalidMembers();
 
-    // 今日の担当が既に決定されているかチェック
-    final today = _todayKey();
-    final todayAssignedPairs = await UserSettingsFirestoreService.getSetting(
-      'assignment_$today',
-    );
-    final savedDate = await UserSettingsFirestoreService.getSetting(
-      'assignedDate',
-    );
-    final lastResetDate = await UserSettingsFirestoreService.getSetting(
-      'lastResetDate',
-    );
-
-    final hasTodayAssignment =
-        todayAssignedPairs != null &&
-        todayAssignedPairs is List &&
-        todayAssignedPairs.isNotEmpty &&
-        savedDate == today &&
-        lastResetDate != today;
-
-    debugPrint(
-      'AssignmentBoard: 今日の担当状態チェック - hasTodayAssignment: $hasTodayAssignment',
-    );
-
-    // データを一旦変数に格納してから一括更新
-    List<Team> newTeams = [];
-    List<String> newLeftLabels = leftLabels;
-    List<String> newRightLabels = rightLabels;
-
-    // 新しい形式（teams）または古い形式（aMembers, bMembers）に対応
-    if (groupAssignmentData['teams'] != null) {
-      final teamsList = groupAssignmentData['teams'] as List;
-      newTeams = teamsList.map((teamMap) => Team.fromMap(teamMap)).toList();
-    } else {
-      // 古い形式の場合は新しい形式に変換
-      final aMembers = _safeStringListFromDynamic(
-        groupAssignmentData['aMembers'],
+      // ローカルデータの保存時刻をチェック（メンバー編集後の上書きを防ぐため）
+      final localSavedAt = await UserSettingsFirestoreService.getSetting(
+        'teams_savedAt',
       );
-      final bMembers = _safeStringListFromDynamic(
-        groupAssignmentData['bMembers'],
-      );
-      newTeams = [
-        Team(id: 'team_a', name: 'A班', members: aMembers),
-        Team(id: 'team_b', name: 'B班', members: bMembers),
-      ];
-    }
+      final groupSavedAt = groupAssignmentData['savedAt'];
 
-    // グループ状態では、グループデータを完全に使用（ローカルデータは保持しない）
-    newLeftLabels = _safeStringListFromDynamic(
-      groupAssignmentData['leftLabels'],
-    );
-    newRightLabels = _safeStringListFromDynamic(
-      groupAssignmentData['rightLabels'],
-    );
-
-    // 今日の担当が決定済みの場合は、基本構成を今日の担当で上書き
-    if (hasTodayAssignment) {
-      debugPrint('AssignmentBoard: 今日の担当決定済み - 基本構成に担当データを適用');
-      try {
-        final assignedPairs = todayAssignedPairs;
-        if (assignedPairs.length == newLeftLabels.length &&
-            newTeams.length >= 2) {
-          // 基本構成を今日の担当で上書き
-          for (int i = 0; i < newTeams.length; i++) {
-            final newTeamMembers = assignedPairs
-                .map((e) => e.toString().split('-')[i])
-                .toList();
-            newTeams[i] = newTeams[i].copyWith(members: newTeamMembers);
+      // ローカルデータがグループデータより新しい場合は上書きしない
+      if (localSavedAt != null && groupSavedAt != null) {
+        try {
+          final localTime = DateTime.parse(localSavedAt);
+          final groupTime = DateTime.parse(groupSavedAt);
+          if (localTime.isAfter(groupTime)) {
+            debugPrint('AssignmentBoard: ローカルデータが新しいため、グループデータでの上書きをスキップ');
+            return;
           }
-          debugPrint('AssignmentBoard: 基本構成に今日の担当を適用完了');
+        } catch (e) {
+          debugPrint('AssignmentBoard: 時刻比較エラー: $e');
         }
-      } catch (e) {
-        debugPrint('AssignmentBoard: 今日の担当適用エラー: $e');
       }
-    }
 
-    // グループデータが変更されている場合は常に反映（ちらつき防止のため変更チェック）
-    if (mounted) {
-      bool hasChanges = false;
+      // 今日の担当が既に決定されているかチェック
+      final today = _todayKey();
+      final todayAssignedPairs = await UserSettingsFirestoreService.getSetting(
+        'assignment_$today',
+      );
+      final savedDate = await UserSettingsFirestoreService.getSetting(
+        'assignedDate',
+      );
+      final lastResetDate = await UserSettingsFirestoreService.getSetting(
+        'lastResetDate',
+      );
 
-      // データが空の場合は必ず更新
-      if (teams.isEmpty && leftLabels.isEmpty) {
-        hasChanges = true;
-        debugPrint('AssignmentBoard: ローカルデータが空のため、グループデータで更新');
+      final hasTodayAssignment =
+          todayAssignedPairs != null &&
+          todayAssignedPairs is List &&
+          todayAssignedPairs.isNotEmpty &&
+          savedDate == today &&
+          lastResetDate != today;
+
+      debugPrint(
+        'AssignmentBoard: 今日の担当状態チェック - hasTodayAssignment: $hasTodayAssignment',
+      );
+
+      // データを一旦変数に格納してから一括更新
+      List<Team> newTeams = [];
+      List<String> newLeftLabels = leftLabels;
+      List<String> newRightLabels = rightLabels;
+
+      // 新しい形式（teams）または古い形式（aMembers, bMembers）に対応
+      if (groupAssignmentData['teams'] != null) {
+        final teamsList = groupAssignmentData['teams'] as List;
+        newTeams = teamsList.map((teamMap) => Team.fromMap(teamMap)).toList();
       } else {
-        // データの変更をチェック
-        if (!_areTeamsEqual(teams, newTeams) ||
-            !_areLabelsEqual(leftLabels, newLeftLabels) ||
-            !_areLabelsEqual(rightLabels, newRightLabels)) {
-          hasChanges = true;
-          debugPrint('AssignmentBoard: グループデータの変更を検知 - 更新します');
-        } else {
-          debugPrint('AssignmentBoard: グループデータに変更なし - 更新をスキップ');
+        // 古い形式の場合は新しい形式に変換
+        final aMembers = _safeStringListFromDynamic(
+          groupAssignmentData['aMembers'],
+        );
+        final bMembers = _safeStringListFromDynamic(
+          groupAssignmentData['bMembers'],
+        );
+        newTeams = [
+          Team(id: 'team_a', name: 'A班', members: aMembers),
+          Team(id: 'team_b', name: 'B班', members: bMembers),
+        ];
+      }
+
+      // グループ状態では、グループデータを完全に使用（ローカルデータは保持しない）
+      newLeftLabels = _safeStringListFromDynamic(
+        groupAssignmentData['leftLabels'],
+      );
+      newRightLabels = _safeStringListFromDynamic(
+        groupAssignmentData['rightLabels'],
+      );
+
+      // 今日の担当が決定済みの場合は、基本構成を今日の担当で上書き
+      if (hasTodayAssignment) {
+        debugPrint('AssignmentBoard: 今日の担当決定済み - 基本構成に担当データを適用');
+        try {
+          final assignedPairs = todayAssignedPairs;
+          if (assignedPairs.length == newLeftLabels.length &&
+              newTeams.length >= 2) {
+            // 基本構成を今日の担当で上書き
+            for (int i = 0; i < newTeams.length; i++) {
+              final newTeamMembers = assignedPairs
+                  .map((e) => e.toString().split('-')[i])
+                  .toList();
+              newTeams[i] = newTeams[i].copyWith(members: newTeamMembers);
+            }
+            debugPrint('AssignmentBoard: 基本構成に今日の担当を適用完了');
+          }
+        } catch (e) {
+          debugPrint('AssignmentBoard: 今日の担当適用エラー: $e');
         }
       }
 
-      if (hasChanges) {
-        setState(() {
-          teams = newTeams;
-          leftLabels = newLeftLabels;
-          rightLabels = newRightLabels;
-          _isLoading = false;
-          _isDataInitialized = true;
-          // 担当決定状態も同時に更新
-          if (hasTodayAssignment) {
-            isAssignedToday = true;
+      // グループデータが変更されている場合は常に反映（ちらつき防止のため変更チェック）
+      if (mounted) {
+        bool hasChanges = false;
+
+        // データが空の場合は必ず更新
+        if (teams.isEmpty && leftLabels.isEmpty) {
+          hasChanges = true;
+          debugPrint('AssignmentBoard: ローカルデータが空のため、グループデータで更新');
+        } else {
+          // データの変更をチェック
+          if (!_areTeamsEqual(teams, newTeams) ||
+              !_areLabelsEqual(leftLabels, newLeftLabels) ||
+              !_areLabelsEqual(rightLabels, newRightLabels)) {
+            hasChanges = true;
+            debugPrint('AssignmentBoard: グループデータの変更を検知 - 更新します');
+          } else {
+            debugPrint('AssignmentBoard: グループデータに変更なし - 更新をスキップ');
           }
-        });
-        debugPrint('AssignmentBoard: グループデータの更新完了');
+        }
+
+        if (hasChanges) {
+          setState(() {
+            teams = newTeams;
+            leftLabels = newLeftLabels;
+            rightLabels = newRightLabels;
+            _isLoading = false;
+            _isDataInitialized = true;
+            // 担当決定状態も同時に更新
+            if (hasTodayAssignment) {
+              isAssignedToday = true;
+            }
+          });
+          debugPrint('AssignmentBoard: グループデータの更新完了');
+        }
+      }
+
+      // マージ完了
+    } finally {
+      _endRemoteUpdate();
+      if (isFirstRemoteMerge) {
+        _initialGroupDataLoaded = true;
       }
     }
-
-    // マージ完了
   }
 
   /// 無効なメンバーをクリーンアップ
@@ -321,6 +375,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
   /// ローカルデータを更新
   Future<void> _updateLocalData() async {
+    if (_isSyncLocked) {
+      return;
+    }
     try {
       final groupProvider = context.read<GroupProvider>();
 
@@ -346,10 +403,12 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         debugPrint('AssignmentBoard: グループデータ同期完了');
       } else {
         // 個人状態の場合はローカルに保存
+        final currentTime = DateTime.now().toIso8601String();
         await UserSettingsFirestoreService.saveMultipleSettings({
           'teams': teamsJson,
           'leftLabels': leftLabels,
           'rightLabels': rightLabels,
+          'teams_savedAt': currentTime, // ローカル保存時刻を記録
         });
 
         // 後方互換性のため、最初の2つの班をA班、B班としても保存
@@ -430,6 +489,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     Map<String, dynamic> assignmentMembers,
   ) {
     if (mounted) {
+      final isFirstRemoteMerge = !_initialGroupDataLoaded;
+      _beginRemoteUpdate();
       setState(() {
         // 新しい形式（teams）または古い形式（aMembers, bMembers）に対応
         if (assignmentMembers['teams'] != null) {
@@ -457,6 +518,10 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           assignmentMembers['rightLabels'],
         );
       });
+      _endRemoteUpdate();
+      if (isFirstRemoteMerge) {
+        _initialGroupDataLoaded = true;
+      }
     }
   }
 
@@ -480,6 +545,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     _loadDeveloperMode();
     _startDeveloperModeListener();
     _startDisplayNameMonitoring();
+
+    _setupGroupProviderListener();
 
     // 初期権限チェックを実行
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -573,6 +640,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
       // データを即座に表示（ちらつき防止）
       if (mounted) {
+        _initialLocalDataLoaded = true;
         setState(() {
           teams = loadedTeams;
           leftLabels = loadedLeftLabels;
@@ -657,12 +725,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         );
 
         if (groupData != null && mounted) {
-          // グループデータがローカルデータより新しい場合のみ更新
-          final groupSavedAt = groupData['savedAt'];
-          if (groupSavedAt != null) {
-            // 必要に応じてデータを更新（ここでは簡略化）
-            debugPrint('AssignmentBoard: グループデータ同期完了');
-          }
+          // グループデータが取得できた場合はローカルに反映
+          _mergeGroupDataWithLocal(Map<String, dynamic>.from(groupData));
         }
       }
     } catch (e) {
@@ -879,15 +943,37 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     if (!mounted) return;
     // グループ監視初期化開始
     // 既に監視中の場合は何もしない
-    if (_groupAssignmentSubscription != null) {
-      // 既にグループ監視中です
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final groupProvider = context.read<GroupProvider>();
+      _handleGroupProviderUpdate(groupProvider);
+    });
+  }
+
+  void _setupGroupProviderListener() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final groupProvider = context.read<GroupProvider>();
+      if (_groupProviderListener != null) {
+        groupProvider.removeListener(_groupProviderListener!);
+      }
+      _groupProviderListener = () {
+        _handleGroupProviderUpdate(groupProvider);
+      };
+      groupProvider.addListener(_groupProviderListener!);
+      _handleGroupProviderUpdate(groupProvider);
+    });
+  }
+
+  void _handleGroupProviderUpdate(GroupProvider groupProvider) {
+    if (!mounted) return;
+
+    final groupId = groupProvider.currentGroup?.id;
+    if (_activeGroupId == groupId && _groupAssignmentSubscription != null) {
       return;
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final groupProvider = context.read<GroupProvider>();
-      _startGroupMonitoring(groupProvider);
-    });
+    _activeGroupId = groupId;
+    _startGroupMonitoring(groupProvider);
   }
 
   /// グループ監視を開始
@@ -903,6 +989,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
     if (groupProvider.hasGroup) {
       final group = groupProvider.currentGroup!;
+      _monitoredGroupId = group.id;
       // グループ監視開始
 
       // グループの担当表データを監視（基本構成）
@@ -1452,18 +1539,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       pairs.add(rowMembers.join('-'));
     }
     return pairs;
-  }
-
-  bool _isDuplicate(List<String> newPairs, List<String>? old) {
-    if (old == null || old.isEmpty) return false;
-    try {
-      return newPairs.any((pair) => old.contains(pair));
-    } catch (e) {
-      debugPrint(
-        'AssignmentBoard: _isDuplicateエラー: $e, newPairs: $newPairs, old: $old',
-      );
-      return false;
-    }
   }
 
   /// 過去N日分の担当履歴を取得

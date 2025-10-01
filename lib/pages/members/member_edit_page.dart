@@ -276,10 +276,12 @@ class _MemberEditPageState extends State<MemberEditPage> {
 
       // 新しい形式で保存（ラベルは既存のデータを保持）
       final teamsJson = teams.map((team) => team.toMap()).toList();
+      final currentTime = DateTime.now().toIso8601String();
       await UserSettingsFirestoreService.saveMultipleSettings({
         'teams': teamsJson,
         'leftLabels': currentLeftLabels,
         'rightLabels': currentRightLabels,
+        'teams_savedAt': currentTime, // ローカル保存時刻を記録
       });
 
       // 後方互換性のため、最初の2つの班をA班、B班としても保存
@@ -295,10 +297,12 @@ class _MemberEditPageState extends State<MemberEditPage> {
 
     // 新しい形式でローカルに保存
     final teamsJson = jsonEncode(teams.map((team) => team.toMap()).toList());
+    final currentTime = DateTime.now().toIso8601String();
     await UserSettingsFirestoreService.saveMultipleSettings({
       'teams': teamsJson,
       'leftLabels': leftLabels,
       'rightLabels': rightLabels,
+      'teams_savedAt': currentTime, // ローカル保存時刻を記録
     });
 
     // 後方互換性のため、最初の2つの班をA班、B班としても保存

@@ -479,16 +479,15 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                 dashboardStatsProvider
                                                     .clearOnLogout();
 
-                                                // GoogleSignIn は使用しない（FirebaseAuth のみでサインアウト）
-                                                await FirebaseAuth.instance
-                                                    .signOut();
+                                                // セキュアなサインアウトを実行（Google Sign-Inとセキュアストレージもクリア）
+                                                await SecureAuthService.signOutSecurely();
                                                 if (!mounted) return;
                                                 setState(() {
                                                   _userName = null;
                                                   _loginProvider = null;
                                                   _userPhotoUrl = null;
                                                 });
-                                                // 設定画面を閉じてホームに戻る（AuthGateが即座にログイン画面を表示）
+                                                // 設定画面を閉じてホームに戻る（AuthGateが認証状態の変化を検知してログイン画面を表示）
                                                 navigator.popUntil(
                                                   (route) => route.isFirst,
                                                 );
@@ -607,9 +606,8 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                 // 注: UserSettingsFirestoreServiceにはclearAllSettingsメソッドがないため、
                                                 // 個別に削除するか、暗号化されたローカルストレージを使用
                                                 await EncryptedLocalStorageService.clear();
-                                                // サインアウト（FirebaseAuth のみ）
-                                                await FirebaseAuth.instance
-                                                    .signOut();
+                                                // セキュアなサインアウトを実行（Google Sign-Inとセキュアストレージもクリア）
+                                                await SecureAuthService.signOutSecurely();
                                                 if (!mounted) return;
                                                 setState(() {
                                                   _userName = null;

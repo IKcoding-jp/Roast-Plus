@@ -25,6 +25,7 @@ import 'package:roastplus/utils/app_performance_config.dart';
 import '../../services/user_settings_firestore_service.dart';
 import '../../services/first_login_service.dart';
 import '../../widgets/lottie_animation_widget.dart';
+import '../../utils/web_ui_utils.dart';
 import 'package:lottie/lottie.dart';
 
 class AssignmentBoard extends StatefulWidget {
@@ -2032,6 +2033,157 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     bool isButtonDisabled,
     bool todayIsWeekend,
   ) {
+    // Web版ではレスポンシブ対応を適用
+    if (WebUIUtils.isWeb) {
+      return _buildWebResponsiveUI(
+        context,
+        groupProvider,
+        themeSettings,
+        isButtonDisabled,
+        todayIsWeekend,
+      );
+    } else {
+      // 従来のWeb版UI（後方互換性）
+      return _buildWebLegacyUI(
+        context,
+        groupProvider,
+        themeSettings,
+        isButtonDisabled,
+        todayIsWeekend,
+      );
+    }
+  }
+
+  /// Web版レスポンシブUIを構築
+  Widget _buildWebResponsiveUI(
+    BuildContext context,
+    GroupProvider groupProvider,
+    ThemeSettings themeSettings,
+    bool isButtonDisabled,
+    bool todayIsWeekend,
+  ) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Icon(Icons.group, color: themeSettings.iconColor),
+            SizedBox(width: 8),
+            Flexible(child: Text('担当表', overflow: TextOverflow.ellipsis)),
+            // グループ状態バッジを追加
+            if (groupProvider.groups.isNotEmpty)
+              Container(
+                margin: EdgeInsets.only(left: 12),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.shade400),
+                ),
+                child: Icon(
+                  Icons.groups,
+                  size: 18,
+                  color: Colors.blue.shade700,
+                ),
+              ),
+          ],
+        ),
+        backgroundColor: themeSettings.appBarColor,
+        foregroundColor: themeSettings.appBarTextColor,
+        actions: [
+          if (_canEditAssignment == true) ...[
+            IconButton(
+              icon: Icon(Icons.person_add),
+              tooltip: 'メンバー編集',
+              onPressed: () async {
+                final currentLeftLabels = List<String>.from(leftLabels);
+                final currentRightLabels = List<String>.from(rightLabels);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => MemberEditPage()),
+                );
+                await _reloadMembersOnly();
+                setState(() {
+                  leftLabels = currentLeftLabels;
+                  rightLabels = currentRightLabels;
+                });
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.label),
+              tooltip: 'ラベル編集',
+              onPressed: () async {
+                final currentTeams = List<Team>.from(teams);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => LabelEditPage()),
+                );
+                await _reloadLabelsOnly();
+                setState(() {
+                  teams = currentTeams;
+                });
+              },
+            ),
+          ],
+          IconButton(
+            icon: Icon(Icons.list),
+            tooltip: '担当履歴',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => AssignmentHistoryPage()),
+              );
+            },
+          ),
+          if (_canEditAssignment == true)
+            IconButton(
+              icon: Icon(Icons.settings),
+              tooltip: '設定',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        SettingsPage(onReset: _resetTodayAssignment),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+      body: Container(
+        color: themeSettings.backgroundColor,
+        child: WebUIUtils.responsiveContainer(
+          context: context,
+          child: SingleChildScrollView(
+            padding: WebUIUtils.getResponsivePadding(context),
+            child: Column(
+              children: [
+                SizedBox(height: 24),
+                // レスポンシブ対応の担当表レイアウト
+                _buildWebResponsiveAssignmentTable(themeSettings),
+                SizedBox(height: 40),
+                // レスポンシブ対応のボタンレイアウト
+                _buildWebResponsiveButtonLayout(
+                  isButtonDisabled,
+                  todayIsWeekend,
+                ),
+                SizedBox(height: 32),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Web版従来UIを構築（後方互換性）
+  Widget _buildWebLegacyUI(
+    BuildContext context,
+    GroupProvider groupProvider,
+    ThemeSettings themeSettings,
+    bool isButtonDisabled,
+    bool todayIsWeekend,
+  ) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -2326,6 +2478,230 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     );
   }
 
+  /// Web版レスポンシブ対応の担当表テーブル
+  Widget _buildWebResponsiveAssignmentTable(ThemeSettings themeSettings) {
+    final isDesktop = WebUIUtils.isDesktop(context);
+    final isTablet = WebUIUtils.isTablet(context);
+
+    // デスクトップの場合
+    if (isDesktop) {
+      return Container(
+        padding: EdgeInsets.all(32),
+        constraints: BoxConstraints(maxWidth: WebUIUtils.getMaxWidth(context)),
+        decoration: BoxDecoration(
+          color: themeSettings.cardBackgroundColor,
+          border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Web版ヘッダー行
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: themeSettings.backgroundColor.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(width: 120), // 左ラベル用スペース
+                  ...teams.map<Widget>(
+                    (team) => SizedBox(
+                      width: 160,
+                      child: Center(
+                        child: Text(
+                          team.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24 * WebUIUtils.getFontSizeScale(context),
+                            color: themeSettings.fontColor1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 120), // 右ラベル用スペース
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+            // データ表示部分
+            if (_isLoading)
+              _buildLoadingWidget(themeSettings)
+            else if (_isDataInitialized &&
+                _isRemoteSyncCompleted &&
+                leftLabels.isEmpty &&
+                teams.every((t) => t.members.isEmpty))
+              _buildEmptyStateWidget()
+            else
+              _buildWebResponsiveDataRows(themeSettings),
+          ],
+        ),
+      );
+    } else {
+      // タブレットの場合
+      return Container(
+        padding: EdgeInsets.all(24),
+        constraints: BoxConstraints(maxWidth: WebUIUtils.getMaxWidth(context)),
+        decoration: BoxDecoration(
+          color: themeSettings.cardBackgroundColor,
+          border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // タブレット版ヘッダー行
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: themeSettings.backgroundColor.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(width: 100), // 左ラベル用スペース（小さめ）
+                  ...teams.map<Widget>(
+                    (team) => SizedBox(
+                      width: 140,
+                      child: Center(
+                        child: Text(
+                          team.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20 * WebUIUtils.getFontSizeScale(context),
+                            color: themeSettings.fontColor1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 100), // 右ラベル用スペース（小さめ）
+                ],
+              ),
+            ),
+            SizedBox(height: 12),
+            // データ表示部分
+            if (_isLoading)
+              _buildLoadingWidget(themeSettings)
+            else if (_isDataInitialized &&
+                _isRemoteSyncCompleted &&
+                leftLabels.isEmpty &&
+                teams.every((t) => t.members.isEmpty))
+              _buildEmptyStateWidget()
+            else
+              _buildWebResponsiveDataRows(themeSettings),
+          ],
+        ),
+      );
+    }
+  }
+
+  /// Web版レスポンシブ対応のデータ行
+  Widget _buildWebResponsiveDataRows(ThemeSettings themeSettings) {
+    final isDesktop = WebUIUtils.isDesktop(context);
+
+    return Column(
+      children: List.generate(
+        leftLabels.isNotEmpty
+            ? leftLabels.length
+            : teams.fold<int>(
+                0,
+                (max, team) =>
+                    team.members.length > max ? team.members.length : max,
+              ),
+        (i) => Container(
+          margin: EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            color: i % 2 == 0
+                ? themeSettings.backgroundColor.withValues(alpha: 0.3)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // 左ラベル
+              SizedBox(
+                width: isDesktop ? 120 : 100,
+                child: Text(
+                  leftLabels.isNotEmpty && i < leftLabels.length
+                      ? leftLabels[i]
+                      : '',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize:
+                        (isDesktop ? 18 : 16) *
+                        WebUIUtils.getFontSizeScale(context),
+                    color: themeSettings.fontColor1,
+                  ),
+                ),
+              ),
+              // メンバーカード
+              ...teams.map<Widget>(
+                (team) => SizedBox(
+                  width: isDesktop ? 160 : 140,
+                  child: Center(
+                    child: MemberCard(
+                      name:
+                          i < team.members.length && team.members[i].isNotEmpty
+                          ? team.members[i]
+                          : '未設定',
+                      attendanceStatus: _getMemberAttendanceStatus(
+                        i < team.members.length && team.members[i].isNotEmpty
+                            ? team.members[i]
+                            : '未設定',
+                      ),
+                      onTap: () {
+                        if (i < team.members.length &&
+                            team.members[i].isNotEmpty) {
+                          _showAttendanceDialog(team.members[i]);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              // 右ラベル
+              SizedBox(
+                width: isDesktop ? 120 : 100,
+                child: Text(
+                  rightLabels.isNotEmpty && i < rightLabels.length
+                      ? rightLabels[i]
+                      : '',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize:
+                        (isDesktop ? 18 : 16) *
+                        WebUIUtils.getFontSizeScale(context),
+                    color: themeSettings.fontColor1,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   /// スマホ版専用の担当表テーブル
   Widget _buildMobileAssignmentTable(ThemeSettings themeSettings) {
     return Container(
@@ -2578,6 +2954,57 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     return '今日の担当を決める';
                   }(),
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Web版レスポンシブ対応のボタンレイアウト
+  Widget _buildWebResponsiveButtonLayout(
+    bool isButtonDisabled,
+    bool todayIsWeekend,
+  ) {
+    final isDesktop = WebUIUtils.isDesktop(context);
+
+    return Container(
+      constraints: BoxConstraints(maxWidth: isDesktop ? 800 : 600),
+      child: Column(
+        children: [
+          if (_canEditAssignment == true) ...[
+            if (isDeveloperMode)
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text(
+                  'デバッグ: 編集権限=$_canEditAssignment',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ),
+            SizedBox(
+              width: isDesktop ? 400 : 300,
+              height: isDesktop ? 60 : 50,
+              child: ElevatedButton(
+                onPressed: isButtonDisabled ? null : _shuffleAssignments,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(isDesktop ? 30 : 25),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: isDesktop ? 20 : 16),
+                ),
+                child: Text(
+                  () {
+                    if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
+                    if (isAssignedToday) return '今日はすでに決定済み';
+                    if (isShuffling) return 'シャッフル中...';
+                    return '今日の担当を決める';
+                  }(),
+                  style: TextStyle(
+                    fontSize: isDesktop ? 18 : 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

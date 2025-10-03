@@ -10,14 +10,14 @@ class WebUIUtils {
   static bool isDesktop(BuildContext context) {
     if (!isWeb) return false;
     final size = MediaQuery.of(context).size;
-    return size.width > 1200;
+    return size.width > 1024;
   }
 
   /// タブレットサイズかどうかを判定
   static bool isTablet(BuildContext context) {
     if (!isWeb) return false;
     final size = MediaQuery.of(context).size;
-    return size.width > 768 && size.width <= 1200;
+    return size.width > 768 && size.width <= 1024;
   }
 
   /// モバイルサイズかどうかを判定
@@ -49,9 +49,9 @@ class WebUIUtils {
     }
 
     if (isDesktop(context)) {
-      return 1800;
+      return 1980; // PCの1980x1080に合わせる
     } else if (isTablet(context)) {
-      return 1200;
+      return 1024; // iPadなどのタブレットサイズに合わせる
     } else {
       return double.infinity;
     }
@@ -64,11 +64,11 @@ class WebUIUtils {
     }
 
     if (isDesktop(context)) {
-      return 5;
+      return 5; // PC向けの十分な列数
     } else if (isTablet(context)) {
-      return 4;
+      return 3; // iPadなどのタブレットに適した列数
     } else {
-      return 3;
+      return 2; // モバイル向け
     }
   }
 
@@ -79,9 +79,9 @@ class WebUIUtils {
     }
 
     if (isDesktop(context)) {
-      return 1.3;
+      return 1.3; // PC向けのサイズ
     } else if (isTablet(context)) {
-      return 1.15;
+      return 1.1; // iPadなどのタブレットに適したサイズ
     } else {
       return 1.0;
     }
@@ -228,7 +228,9 @@ class WebUIUtils {
                       margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
+                            ? Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 0.1)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected

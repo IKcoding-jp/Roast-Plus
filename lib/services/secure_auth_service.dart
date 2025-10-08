@@ -1016,6 +1016,78 @@ class SecureAuthService {
     }
   }
 
+  static Future<void> tryRestoreSessionSilently() async {
+    if (kIsWeb) {
+      developer.log('Silent restore skipped on web', name: _logName);
+      return;
+    }
+
+    try {
+      if (_auth.currentUser != null) {
+        developer.log(
+          'Silent restore skipped: user already signed in',
+          name: _logName,
+        );
+        return;
+      }
+
+      await _ensureGoogleSignInInitialized();
+
+      String serverClientId =
+          '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        serverClientId = await _getAndroidServerClientId();
+        developer.log(
+          'Silent restore: using Android serverClientId',
+          name: _logName,
+        );
+      }
+
+      final googleSignIn = GoogleSignIn(
+        serverClientId: serverClientId,
+        scopes: ['email', 'profile'],
+      );
+
+      final googleUser = await googleSignIn.signInSilently();
+      if (googleUser == null) {
+        developer.log('Silent restore: no cached Google user', name: _logName);
+        return;
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final hasIdToken =
+          googleAuth.idToken != null && googleAuth.idToken!.isNotEmpty;
+      final hasAccessToken =
+          googleAuth.accessToken != null && googleAuth.accessToken!.isNotEmpty;
+
+      if (!hasIdToken && !hasAccessToken) {
+        developer.log('Silent restore: missing Google tokens', name: _logName);
+        return;
+      }
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
+      );
+
+      final userCredential = await _auth.signInWithCredential(credential);
+      final firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
+        final firebaseIdToken = await firebaseUser.getIdToken();
+        await _saveIdTokenSecurely(firebaseIdToken);
+        await _saveUserToFirestore(firebaseUser);
+      }
+
+      developer.log('Silent Google sign-in restored session', name: _logName);
+    } catch (e) {
+      developer.log(
+        'Silent Google sign-in failed: ' + e.toString(),
+        name: _logName,
+      );
+    }
+  }
+
   /// Googleサインインの状態をリセット
   static Future<void> resetGoogleSignInState() async {
     try {

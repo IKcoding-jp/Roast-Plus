@@ -314,6 +314,8 @@ Future<void> _initializeFirebase() async {
     try {
       await EncryptedFirebaseConfigService.initializeFirebase();
       developer.log('暗号化されたFirebase設定で初期化完了', name: 'Main');
+
+      await SecureAuthService.tryRestoreSessionSilently();
     } catch (e) {
       developer.log('暗号化Firebase設定エラー: $e', name: 'Main');
       // フォールバック: デフォルト設定で初期化

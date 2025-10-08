@@ -1023,12 +1023,39 @@ class SecureAuthService {
     }
 
     try {
-      if (_auth.currentUser != null) {
+      // Firebase Authに既存のユーザーがいる場合は、それを優先
+      final currentUser = _auth.currentUser;
+      if (currentUser != null) {
         developer.log(
-          'Silent restore skipped: user already signed in',
+          'Silent restore: Firebase Authに既存ユーザーが存在 - ${currentUser.email}',
           name: _logName,
         );
-        return;
+
+        // トークンの有効性をチェック
+        try {
+          await currentUser.getIdToken(true); // 強制リフレッシュ
+          developer.log(
+            'Silent restore: Firebase Authユーザーのトークンが有効',
+            name: _logName,
+          );
+
+          // セキュアストレージにトークンを保存
+          final idToken = await currentUser.getIdToken();
+          await _saveIdTokenSecurely(idToken);
+          await _saveUserToFirestore(currentUser);
+
+          developer.log(
+            'Silent restore: Firebase Authユーザーでセッション復元完了',
+            name: _logName,
+          );
+          return;
+        } catch (tokenError) {
+          developer.log(
+            'Silent restore: Firebase Authユーザーのトークンが無効: $tokenError',
+            name: _logName,
+          );
+          // トークンが無効な場合はGoogle Sign-Inで復元を試行
+        }
       }
 
       await _ensureGoogleSignInInitialized();

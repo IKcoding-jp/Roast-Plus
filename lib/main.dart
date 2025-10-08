@@ -315,6 +315,18 @@ Future<void> _initializeFirebase() async {
       await EncryptedFirebaseConfigService.initializeFirebase();
       developer.log('暗号化されたFirebase設定で初期化完了', name: 'Main');
 
+      // Android版でもFirebase Auth永続化を明示的に設定
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        try {
+          await fb_auth.FirebaseAuth.instance.setPersistence(
+            fb_auth.Persistence.LOCAL,
+          );
+          developer.log('Android版: FirebaseAuth永続化をLOCALに設定', name: 'Main');
+        } catch (persistError) {
+          developer.log('Android版: 永続化設定に失敗: $persistError', name: 'Main');
+        }
+      }
+
       await SecureAuthService.tryRestoreSessionSilently();
     } catch (e) {
       developer.log('暗号化Firebase設定エラー: $e', name: 'Main');
@@ -323,6 +335,24 @@ Future<void> _initializeFirebase() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       developer.log('フォールバックFirebase初期化完了', name: 'Main');
+
+      // フォールバック時もAndroid版で永続化を設定
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        try {
+          await fb_auth.FirebaseAuth.instance.setPersistence(
+            fb_auth.Persistence.LOCAL,
+          );
+          developer.log(
+            'Android版: フォールバックFirebaseAuth永続化をLOCALに設定',
+            name: 'Main',
+          );
+        } catch (persistError) {
+          developer.log(
+            'Android版: フォールバック永続化設定に失敗: $persistError',
+            name: 'Main',
+          );
+        }
+      }
     }
   } catch (e) {
     developer.log('Firebase初期化エラー: $e', name: 'Main');

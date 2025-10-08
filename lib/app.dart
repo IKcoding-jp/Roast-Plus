@@ -289,6 +289,7 @@ class _AuthGateState extends State<AuthGate> {
   bool _isCheckingRedirect = false;
   bool _forceRefresh = false;
   User? _currentUser;
+  bool _isInitializing = true;
 
   @override
   void initState() {
@@ -305,8 +306,7 @@ class _AuthGateState extends State<AuthGate> {
       }
     });
 
-    _checkRedirectResult();
-    _checkCurrentUser();
+    _initializeAuthState();
 
     // 認証状態のリスナーを追加（エラーハンドリング付き）
     try {
@@ -314,6 +314,7 @@ class _AuthGateState extends State<AuthGate> {
         if (mounted) {
           setState(() {
             _currentUser = user;
+            _isInitializing = false;
           });
           developer.log(
             'AuthGate: 認証状態リスナー - user: ${user?.email}',
@@ -323,6 +324,31 @@ class _AuthGateState extends State<AuthGate> {
       });
     } catch (e) {
       developer.log('AuthGate: 認証状態リスナーの設定でエラー: $e', name: 'AuthGate');
+    }
+  }
+
+  // 認証状態の初期化
+  Future<void> _initializeAuthState() async {
+    try {
+      // Firebase Authの初期化を待機
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      _checkRedirectResult();
+      _checkCurrentUser();
+
+      // 初期化完了をマーク
+      if (mounted) {
+        setState(() {
+          _isInitializing = false;
+        });
+      }
+    } catch (e) {
+      developer.log('AuthGate: 認証状態初期化エラー: $e', name: 'AuthGate');
+      if (mounted) {
+        setState(() {
+          _isInitializing = false;
+        });
+      }
     }
   }
 
@@ -373,6 +399,11 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
+    // 初期化中はローディング表示
+    if (_isInitializing) {
+      return const LoadingScreen(title: '認証状態を確認中...');
+    }
+
     // すべてのプラットフォームでFirebase Authの状態をチェック
     try {
       return StreamBuilder<User?>(

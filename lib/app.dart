@@ -320,6 +320,14 @@ class _AuthGateState extends State<AuthGate> {
             'AuthGate: 認証状態リスナー - user: ${user?.email}',
             name: 'AuthGate',
           );
+
+          // ログアウト後の状態変化を確実に検知
+          if (user == null) {
+            developer.log(
+              'AuthGate: ユーザーがログアウトされました - ログイン画面を表示',
+              name: 'AuthGate',
+            );
+          }
         }
       });
     } catch (e) {
@@ -335,6 +343,16 @@ class _AuthGateState extends State<AuthGate> {
 
       _checkRedirectResult();
       _checkCurrentUser();
+
+      // ネイティブ版ではセッション復元を試行
+      if (!kIsWeb) {
+        try {
+          await SecureAuthService.tryRestoreSessionSilently();
+          developer.log('AuthGate: セッション復元を試行しました', name: 'AuthGate');
+        } catch (e) {
+          developer.log('AuthGate: セッション復元エラー: $e', name: 'AuthGate');
+        }
+      }
 
       // 初期化完了をマーク
       if (mounted) {
@@ -445,6 +463,41 @@ class _AuthGateState extends State<AuthGate> {
           if (user.email == null || user.email!.isEmpty) {
             developer.log('AuthGate: メールアドレスが空 - ログイン画面を表示', name: 'AuthGate');
             return GoogleSignInScreen();
+          }
+
+          // ネイティブ版では追加の認証状態チェック（非同期処理のため、FutureBuilderで処理）
+          if (!kIsWeb) {
+            return FutureBuilder<bool>(
+              future: SecureAuthService.isUserAuthenticated(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const LoadingScreen(title: '認証状態を確認中...');
+                }
+
+                if (snapshot.hasError) {
+                  developer.log(
+                    'AuthGate: ネイティブ版認証状態チェックエラー: ${snapshot.error}',
+                    name: 'AuthGate',
+                  );
+                  return GoogleSignInScreen();
+                }
+
+                final isAuthenticated = snapshot.data ?? false;
+                if (!isAuthenticated) {
+                  developer.log(
+                    'AuthGate: ネイティブ版認証状態チェック失敗 - ログイン画面を表示',
+                    name: 'AuthGate',
+                  );
+                  return GoogleSignInScreen();
+                }
+
+                developer.log(
+                  'AuthGate: 認証成功 - 初回ログインチェックに進む',
+                  name: 'AuthGate',
+                );
+                return FirstLoginWrapper(child: widget.child);
+              },
+            );
           }
 
           developer.log('AuthGate: 認証成功 - 初回ログインチェックに進む', name: 'AuthGate');

@@ -487,6 +487,22 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                   _loginProvider = null;
                                                   _userPhotoUrl = null;
                                                 });
+
+                                                // ログアウト完了のメッセージを表示
+                                                scaffoldMessenger.showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('ログアウトしました'),
+                                                    duration: Duration(
+                                                      seconds: 2,
+                                                    ),
+                                                  ),
+                                                );
+
+                                                // 少し待機してから画面遷移（認証状態の変化を確実に検知させるため）
+                                                await Future.delayed(
+                                                  Duration(milliseconds: 500),
+                                                );
+
                                                 // 設定画面を閉じてホームに戻る（AuthGateが認証状態の変化を検知してログイン画面を表示）
                                                 navigator.popUntil(
                                                   (route) => route.isFirst,
@@ -614,16 +630,27 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                   _loginProvider = null;
                                                   _userPhotoUrl = null;
                                                 });
-                                                navigator.popUntil(
-                                                  (route) => route.isFirst,
-                                                );
+
+                                                // アカウント削除完了のメッセージを表示
                                                 scaffoldMessenger.showSnackBar(
                                                   SnackBar(
                                                     content: Text(
                                                       'アカウントデータを削除しました',
                                                     ),
                                                     backgroundColor: Colors.red,
+                                                    duration: Duration(
+                                                      seconds: 2,
+                                                    ),
                                                   ),
+                                                );
+
+                                                // 少し待機してから画面遷移（認証状態の変化を確実に検知させるため）
+                                                await Future.delayed(
+                                                  Duration(milliseconds: 500),
+                                                );
+
+                                                navigator.popUntil(
+                                                  (route) => route.isFirst,
                                                 );
                                               } catch (e) {
                                                 scaffoldMessenger.showSnackBar(

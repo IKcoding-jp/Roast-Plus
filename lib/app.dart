@@ -1467,29 +1467,33 @@ class MainScaffoldState extends State<MainScaffold> {
   /// WEB版用のレイアウトを構築
   Widget _buildWebLayout() {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final isSmallMobile = WebUIUtils.isSmallMobile(context);
+    final isMediumMobile = WebUIUtils.isMediumMobile(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(isSmallMobile ? 6 : 8),
               decoration: BoxDecoration(
                 color: themeSettings.appBarColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(isSmallMobile ? 6 : 8),
               ),
               child: Icon(
                 Icons.local_cafe,
                 color: themeSettings.appBarTextColor,
-                size: 24,
+                size: isSmallMobile ? 20 : 24,
               ),
             ),
-            SizedBox(width: 12),
+            SizedBox(width: isSmallMobile ? 8 : 12),
             Text(
               'ローストプラス',
               style: TextStyle(
                 color: themeSettings.appBarTextColor,
-                fontSize: 22 * WebUIUtils.getFontSizeScale(context),
+                fontSize:
+                    (isSmallMobile ? 18 : (isMediumMobile ? 20 : 22)) *
+                    WebUIUtils.getFontSizeScale(context),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1498,9 +1502,11 @@ class MainScaffoldState extends State<MainScaffold> {
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
         elevation: 0,
-        toolbarHeight: 70,
+        toolbarHeight: isSmallMobile ? 56 : (isMediumMobile ? 63 : 70),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(isSmallMobile ? 12 : 16),
+          ),
         ),
       ),
       body: WebUIUtils.responsiveContainer(

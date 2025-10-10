@@ -27,6 +27,20 @@ class WebUIUtils {
     return size.width <= 768;
   }
 
+  /// 小さなスマホサイズかどうかを判定（iPhone SE等）
+  static bool isSmallMobile(BuildContext context) {
+    if (!isWeb) return false;
+    final size = MediaQuery.of(context).size;
+    return size.width <= 480 || size.height <= 600;
+  }
+
+  /// 中程度のスマホサイズかどうかを判定
+  static bool isMediumMobile(BuildContext context) {
+    if (!isWeb) return false;
+    final size = MediaQuery.of(context).size;
+    return size.width > 480 && size.width <= 768 && size.height > 600;
+  }
+
   /// 画面サイズに応じたパディングを取得
   static EdgeInsets getResponsivePadding(BuildContext context) {
     if (!isWeb) {
@@ -37,6 +51,10 @@ class WebUIUtils {
       return EdgeInsets.symmetric(horizontal: 20, vertical: 0);
     } else if (isTablet(context)) {
       return EdgeInsets.symmetric(horizontal: 24, vertical: 0);
+    } else if (isSmallMobile(context)) {
+      return EdgeInsets.symmetric(horizontal: 12, vertical: 0);
+    } else if (isMediumMobile(context)) {
+      return EdgeInsets.symmetric(horizontal: 16, vertical: 0);
     } else {
       return EdgeInsets.symmetric(horizontal: 16, vertical: 0);
     }

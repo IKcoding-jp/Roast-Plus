@@ -43,6 +43,8 @@ class _HomeBodyState extends State<HomeBody> {
   Widget _buildWebLayout() {
     final isDesktop = WebUIUtils.isDesktop(context);
     final isMobile = WebUIUtils.isMobile(context);
+    final isSmallMobile = WebUIUtils.isSmallMobile(context);
+    final isMediumMobile = WebUIUtils.isMediumMobile(context);
 
     return SingleChildScrollView(
       child: Column(
@@ -105,12 +107,17 @@ class _HomeBodyState extends State<HomeBody> {
               ),
             ),
           ] else if (isMobile) ...[
-            // スマホ: 折り畳み可能な1列レイアウト
+            // スマホ: 画面サイズに応じた最適化されたレイアウト
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: WebUIUtils.getResponsivePadding(context),
               child: Column(
                 children: [
-                  // 業務セクション（折り畳み可能）
+                  // ヘッダーメッセージ
+                  HomeHeader(themeSettings: widget.themeSettings),
+                  SizedBox(
+                    height: isSmallMobile ? 16 : (isMediumMobile ? 20 : 24),
+                  ),
+                  // 業務セクション（スマホでは折りたたみ）
                   HomeFeatureSection(
                     themeSettings: widget.themeSettings,
                     title: '業務',
@@ -120,9 +127,11 @@ class _HomeBodyState extends State<HomeBody> {
                     onToggle: () => _toggleSection('business'),
                     children: _buildBusinessFeatures(),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(
+                    height: isSmallMobile ? 8 : (isMediumMobile ? 12 : 16),
+                  ),
 
-                  // 記録セクション（折り畳み可能）
+                  // 記録セクション（スマホでは折りたたみ）
                   HomeFeatureSection(
                     themeSettings: widget.themeSettings,
                     title: '記録',
@@ -132,9 +141,11 @@ class _HomeBodyState extends State<HomeBody> {
                     onToggle: () => _toggleSection('record'),
                     children: _buildRecordFeatures(),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(
+                    height: isSmallMobile ? 8 : (isMediumMobile ? 12 : 16),
+                  ),
 
-                  // 功績と成長セクション（折り畳み可能）
+                  // 功績と成長セクション（スマホでは折りたたみ）
                   HomeFeatureSection(
                     themeSettings: widget.themeSettings,
                     title: '功績と成長',
@@ -144,9 +155,11 @@ class _HomeBodyState extends State<HomeBody> {
                     onToggle: () => _toggleSection('growth'),
                     children: _buildGrowthFeatures(),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(
+                    height: isSmallMobile ? 8 : (isMediumMobile ? 12 : 16),
+                  ),
 
-                  // サポート・設定セクション（折り畳み可能）
+                  // サポート・設定セクション（スマホでは折りたたみ）
                   HomeFeatureSection(
                     themeSettings: widget.themeSettings,
                     title: 'サポート・設定',
@@ -203,7 +216,7 @@ class _HomeBodyState extends State<HomeBody> {
               ),
             ),
           ],
-          SizedBox(height: 20),
+          SizedBox(height: isSmallMobile ? 12 : (isMediumMobile ? 16 : 20)),
         ],
       ),
     );

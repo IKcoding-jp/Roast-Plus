@@ -42,6 +42,7 @@ class _HomeBodyState extends State<HomeBody> {
   /// WEB版用のレイアウトを構築
   Widget _buildWebLayout() {
     final isDesktop = WebUIUtils.isDesktop(context);
+    final isMobile = WebUIUtils.isMobile(context);
 
     return SingleChildScrollView(
       child: Column(
@@ -103,8 +104,63 @@ class _HomeBodyState extends State<HomeBody> {
                 ],
               ),
             ),
+          ] else if (isMobile) ...[
+            // スマホ: 折り畳み可能な1列レイアウト
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  // 業務セクション（折り畳み可能）
+                  HomeFeatureSection(
+                    themeSettings: widget.themeSettings,
+                    title: '業務',
+                    icon: Icons.work,
+                    accentColor: Color(0xFF8B4513),
+                    isExpanded: _expandedSections['business']!,
+                    onToggle: () => _toggleSection('business'),
+                    children: _buildBusinessFeatures(),
+                  ),
+                  SizedBox(height: 20),
+
+                  // 記録セクション（折り畳み可能）
+                  HomeFeatureSection(
+                    themeSettings: widget.themeSettings,
+                    title: '記録',
+                    icon: Icons.assignment,
+                    accentColor: Colors.blue.shade700,
+                    isExpanded: _expandedSections['record']!,
+                    onToggle: () => _toggleSection('record'),
+                    children: _buildRecordFeatures(),
+                  ),
+                  SizedBox(height: 20),
+
+                  // 功績と成長セクション（折り畳み可能）
+                  HomeFeatureSection(
+                    themeSettings: widget.themeSettings,
+                    title: '功績と成長',
+                    icon: Icons.emoji_events,
+                    accentColor: Color(0xFFD4AF37),
+                    isExpanded: _expandedSections['growth']!,
+                    onToggle: () => _toggleSection('growth'),
+                    children: _buildGrowthFeatures(),
+                  ),
+                  SizedBox(height: 20),
+
+                  // サポート・設定セクション（折り畳み可能）
+                  HomeFeatureSection(
+                    themeSettings: widget.themeSettings,
+                    title: 'サポート・設定',
+                    icon: Icons.settings,
+                    accentColor: Color(0xFF757575),
+                    isExpanded: _expandedSections['support']!,
+                    onToggle: () => _toggleSection('support'),
+                    children: _buildSupportFeatures(),
+                  ),
+                ],
+              ),
+            ),
           ] else ...[
-            // タブレット・モバイル: 1列レイアウト
+            // タブレット: 1列レイアウト（折り畳みなし）
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(

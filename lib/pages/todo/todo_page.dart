@@ -72,8 +72,8 @@ class TodoPageState extends State<TodoPage>
         backgroundColor: themeSettings.appBarColor,
         iconTheme: IconThemeData(color: themeSettings.todoColor),
         actions: [
-          // メモタブが選択されている時のみメモ一覧アイコンを表示（モバイル版のみ）
-          if (!WebUIUtils.isWeb && _tabController.index == 0)
+          // メモタブが選択されている時のみメモ一覧アイコンを表示
+          if (_shouldShowTabBar(context) && _tabController.index == 0)
             IconButton(
               icon: Icon(Icons.list),
               tooltip: '保存されたメモ一覧',
@@ -85,9 +85,8 @@ class TodoPageState extends State<TodoPage>
               },
             ),
         ],
-        bottom: WebUIUtils.isWeb
-            ? null
-            : PreferredSize(
+        bottom: _shouldShowTabBar(context)
+            ? PreferredSize(
                 preferredSize: Size.fromHeight(kToolbarHeight),
                 child: Container(
                   decoration: BoxDecoration(
@@ -134,18 +133,49 @@ class TodoPageState extends State<TodoPage>
                     indicatorWeight: 3,
                   ),
                 ),
-              ),
+              )
+            : null,
       ),
-      body: WebUIUtils.isWeb
-          ? _buildWebLayout(themeSettings)
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                MemoTab(),
-                TodoListTab(key: _todoListTabKey),
-              ],
-            ),
+      body: _buildBody(themeSettings),
     );
+  }
+
+  /// タブバーを表示するかどうかを判定
+  bool _shouldShowTabBar(BuildContext context) {
+    // モバイルアプリでは常にタブバーを表示
+    if (!WebUIUtils.isWeb) return true;
+
+    // web版ではスマホ解像度の場合のみタブバーを表示
+    return WebUIUtils.isMobile(context);
+  }
+
+  /// ボディの構築
+  Widget _buildBody(ThemeSettings themeSettings) {
+    if (!WebUIUtils.isWeb) {
+      // モバイルアプリでは常にタブビューを使用
+      return TabBarView(
+        controller: _tabController,
+        children: [
+          MemoTab(),
+          TodoListTab(key: _todoListTabKey),
+        ],
+      );
+    }
+
+    // web版では解像度に応じてレイアウトを切り替え
+    if (WebUIUtils.isMobile(context)) {
+      // スマホ解像度ではタブビューを使用
+      return TabBarView(
+        controller: _tabController,
+        children: [
+          MemoTab(),
+          TodoListTab(key: _todoListTabKey),
+        ],
+      );
+    } else {
+      // タブレット・デスクトップ解像度では横並びレイアウトを使用
+      return _buildWebLayout(themeSettings);
+    }
   }
 
   Widget _buildWebLayout(ThemeSettings themeSettings) {

@@ -42,6 +42,8 @@ class _HomeBodyState extends State<HomeBody> {
   /// WEB版用のレイアウトを構築
   Widget _buildWebLayout() {
     final isDesktop = WebUIUtils.isDesktop(context);
+    final isLargeTablet = WebUIUtils.isLargeTablet(context);
+    final isTablet = WebUIUtils.isTablet(context);
     final isMobile = WebUIUtils.isMobile(context);
     final isSmallMobile = WebUIUtils.isSmallMobile(context);
     final isMediumMobile = WebUIUtils.isMediumMobile(context);
@@ -50,58 +52,63 @@ class _HomeBodyState extends State<HomeBody> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isDesktop) ...[
-            // デスクトップ: 縦4列レイアウト
+          if (isDesktop || isLargeTablet || isTablet) ...[
+            // デスクトップ・タブレット: 2列2行レイアウト
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
                 children: [
-                  // 第1列: 業務セクション
-                  Expanded(
-                    child: _buildWebSection(
-                      title: '業務',
-                      subtitle: '焙煎とスケジュール管理',
-                      icon: Icons.work,
-                      accentColor: Color(0xFF8B4513),
-                      children: _buildBusinessFeatures(),
-                    ),
+                  // 上段: 業務と記録
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildTabletSection(
+                          title: '業務',
+                          subtitle: '焙煎とスケジュール管理',
+                          icon: Icons.work,
+                          accentColor: Color(0xFF8B4513),
+                          children: _buildBusinessFeatures(),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTabletSection(
+                          title: '記録',
+                          subtitle: '作業記録',
+                          icon: Icons.assignment,
+                          accentColor: Colors.blue.shade700,
+                          children: _buildRecordFeatures(),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(height: 12),
 
-                  // 第2列: 記録セクション
-                  Expanded(
-                    child: _buildWebSection(
-                      title: '記録',
-                      subtitle: '作業記録',
-                      icon: Icons.assignment,
-                      accentColor: Colors.blue.shade700,
-                      children: _buildRecordFeatures(),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-
-                  // 第3列: 功績と成長セクション
-                  Expanded(
-                    child: _buildWebSection(
-                      title: '功績と成長',
-                      subtitle: 'バッジとグループ情報',
-                      icon: Icons.emoji_events,
-                      accentColor: Color(0xFFD4AF37),
-                      children: _buildGrowthFeatures(),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-
-                  // 第4列: サポート・設定セクション
-                  Expanded(
-                    child: _buildWebSection(
-                      title: 'サポート・設定',
-                      subtitle: '設定とヘルプ',
-                      icon: Icons.settings,
-                      accentColor: Color(0xFF757575),
-                      children: _buildSupportFeatures(),
-                    ),
+                  // 下段: 功績と成長とサポート・設定
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildTabletSection(
+                          title: '功績と成長',
+                          subtitle: 'バッジとグループ情報',
+                          icon: Icons.emoji_events,
+                          accentColor: Color(0xFFD4AF37),
+                          children: _buildGrowthFeatures(),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTabletSection(
+                          title: 'サポート・設定',
+                          subtitle: '設定とヘルプ',
+                          icon: Icons.settings,
+                          accentColor: Color(0xFF757575),
+                          children: _buildSupportFeatures(),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -173,7 +180,7 @@ class _HomeBodyState extends State<HomeBody> {
               ),
             ),
           ] else ...[
-            // タブレット: 1列レイアウト（折り畳みなし）
+            // その他のサイズ（フォールバック）
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -186,7 +193,6 @@ class _HomeBodyState extends State<HomeBody> {
                     children: _buildBusinessFeatures(),
                   ),
                   SizedBox(height: 20),
-
                   _buildWebSection(
                     title: '記録',
                     subtitle: '作業記録',
@@ -195,7 +201,6 @@ class _HomeBodyState extends State<HomeBody> {
                     children: _buildRecordFeatures(),
                   ),
                   SizedBox(height: 20),
-
                   _buildWebSection(
                     title: '功績と成長',
                     subtitle: 'バッジとグループ情報',
@@ -204,7 +209,6 @@ class _HomeBodyState extends State<HomeBody> {
                     children: _buildGrowthFeatures(),
                   ),
                   SizedBox(height: 20),
-
                   _buildWebSection(
                     title: 'サポート・設定',
                     subtitle: '設定とヘルプ',
@@ -231,58 +235,48 @@ class _HomeBodyState extends State<HomeBody> {
     required List<HomeFeatureCard> children,
   }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // セクションヘッダー
-        Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: accentColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: accentColor.withValues(alpha: 0.2),
-              width: 1,
+        SizedBox(
+          width: double.infinity,
+          child: Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: accentColor.withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16 * WebUIUtils.getFontSizeScale(context),
+                    fontWeight: FontWeight.bold,
+                    color: widget.themeSettings.fontColor1,
+                    fontFamily: widget.themeSettings.fontFamily,
+                  ),
                 ),
-                child: Icon(icon, color: accentColor, size: 20),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16 * WebUIUtils.getFontSizeScale(context),
-                        fontWeight: FontWeight.bold,
-                        color: widget.themeSettings.fontColor1,
-                        fontFamily: widget.themeSettings.fontFamily,
-                      ),
+                SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12 * WebUIUtils.getFontSizeScale(context),
+                    color: widget.themeSettings.fontColor1.withValues(
+                      alpha: 0.7,
                     ),
-                    SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12 * WebUIUtils.getFontSizeScale(context),
-                        color: widget.themeSettings.fontColor1.withValues(
-                          alpha: 0.7,
-                        ),
-                        fontFamily: widget.themeSettings.fontFamily,
-                      ),
-                    ),
-                  ],
+                    fontFamily: widget.themeSettings.fontFamily,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         SizedBox(height: 12),
@@ -294,6 +288,78 @@ class _HomeBodyState extends State<HomeBody> {
           childAspectRatio: 1.1,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
+          children: children,
+        ),
+      ],
+    );
+  }
+
+  /// タブレット用のセクションを構築（オーバーフロー対策付き）
+  Widget _buildTabletSection({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color accentColor,
+    required List<HomeFeatureCard> children,
+  }) {
+    // iPad Miniなどの小さいタブレット向けの調整
+    final isSmallTablet = WebUIUtils.isTablet(context);
+    final cardAspectRatio = isSmallTablet ? 0.9 : 1.2;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // セクションヘッダー
+        SizedBox(
+          width: double.infinity,
+          child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: accentColor.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13 * WebUIUtils.getFontSizeScale(context),
+                    fontWeight: FontWeight.bold,
+                    color: widget.themeSettings.fontColor1,
+                    fontFamily: widget.themeSettings.fontFamily,
+                  ),
+                ),
+                SizedBox(height: 1),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 10 * WebUIUtils.getFontSizeScale(context),
+                    color: widget.themeSettings.fontColor1.withValues(
+                      alpha: 0.7,
+                    ),
+                    fontFamily: widget.themeSettings.fontFamily,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        // グリッドレイアウトでカードを表示（3列2行）
+        GridView.count(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          crossAxisCount: 3,
+          childAspectRatio: cardAspectRatio,
+          crossAxisSpacing: 6,
+          mainAxisSpacing: 6,
           children: children,
         ),
       ],

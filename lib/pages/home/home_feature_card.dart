@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/theme_settings.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import '../../utils/web_ui_utils.dart';
 
 /// 機能カード（新しいデザイン）
 class HomeFeatureCard extends StatelessWidget {
@@ -65,12 +66,8 @@ class HomeFeatureCard extends StatelessWidget {
               Stack(
                 children: [
                   Container(
-                    width: isWeb
-                        ? (isImportant ? 56 : 48)
-                        : (isImportant ? 48 : 40),
-                    height: isWeb
-                        ? (isImportant ? 56 : 48)
-                        : (isImportant ? 48 : 40),
+                    width: _getIconContainerSize(context),
+                    height: _getIconContainerSize(context),
                     decoration: BoxDecoration(
                       color: cardColor,
                       borderRadius: BorderRadius.circular(isWeb ? 14 : 10),
@@ -87,9 +84,7 @@ class HomeFeatureCard extends StatelessWidget {
                     child: Icon(
                       icon,
                       color: iconColor,
-                      size: isWeb
-                          ? (isImportant ? 28 : 24)
-                          : (isImportant ? 24 : 20),
+                      size: _getIconSize(context),
                     ),
                   ),
                   if (badge != null)
@@ -104,9 +99,7 @@ class HomeFeatureCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: isWeb
-                        ? (isImportant ? 14 : 13) * themeSettings.fontSizeScale
-                        : (isImportant ? 12 : 11) * themeSettings.fontSizeScale,
+                    fontSize: _getFontSize(context),
                     fontWeight: isImportant ? FontWeight.bold : FontWeight.w600,
                     color: themeSettings.fontColor1,
                     fontFamily: themeSettings.fontFamily,
@@ -119,6 +112,64 @@ class HomeFeatureCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// フォントサイズを取得（画面サイズに応じて調整）
+  double _getFontSize(BuildContext context) {
+    final isWeb = kIsWeb;
+
+    if (!isWeb) {
+      return (isImportant ? 12 : 11) * themeSettings.fontSizeScale;
+    }
+
+    // iPad Miniなどの小さいタブレット向けの調整
+    final isSmallTablet = WebUIUtils.isTablet(context);
+
+    if (isSmallTablet) {
+      // iPad Mini: かなり小さいフォントサイズ
+      return (isImportant ? 9.5 : 9) * themeSettings.fontSizeScale;
+    } else {
+      // iPad Air/Pro以上: 通常のフォントサイズ
+      return (isImportant ? 14 : 13) * themeSettings.fontSizeScale;
+    }
+  }
+
+  /// アイコンコンテナのサイズを取得
+  double _getIconContainerSize(BuildContext context) {
+    final isWeb = kIsWeb;
+
+    if (!isWeb) {
+      return 40; // 重要機能と通常機能で統一
+    }
+
+    final isSmallTablet = WebUIUtils.isTablet(context);
+
+    if (isSmallTablet) {
+      // iPad Mini: 小さいアイコンコンテナ
+      return 36; // 重要機能と通常機能で統一
+    } else {
+      // iPad Air/Pro以上: 通常サイズ
+      return 48; // 重要機能と通常機能で統一
+    }
+  }
+
+  /// アイコンのサイズを取得
+  double _getIconSize(BuildContext context) {
+    final isWeb = kIsWeb;
+
+    if (!isWeb) {
+      return 20; // 重要機能と通常機能で統一
+    }
+
+    final isSmallTablet = WebUIUtils.isTablet(context);
+
+    if (isSmallTablet) {
+      // iPad Mini: 小さいアイコン
+      return 18; // 重要機能と通常機能で統一
+    } else {
+      // iPad Air/Pro以上: 通常サイズ
+      return 24; // 重要機能と通常機能で統一
+    }
   }
 
   /// カードの背景色を取得

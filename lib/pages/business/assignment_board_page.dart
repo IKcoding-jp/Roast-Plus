@@ -743,18 +743,27 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // ページ切り替え時にローディング状態を開始
-    if (!_isLoading) {
-      setState(() {
-        _isLoading = true;
-        _isDataInitialized = false;
+    // 解像度変更時はローディング状態を開始しない
+    // データが既に初期化済みの場合は、ラベルのみ再読み込み
+    if (_isDataInitialized) {
+      // ラベルデータを再読み込み（データは保持）
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _reloadLabelsOnly();
+      });
+    } else {
+      // 初回読み込み時のみローディング状態を開始
+      if (!_isLoading) {
+        setState(() {
+          _isLoading = true;
+          _isDataInitialized = false;
+        });
+      }
+
+      // ラベルデータを再読み込み
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _reloadLabelsOnly();
       });
     }
-
-    // ラベルデータを再読み込み
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _reloadLabelsOnly();
-    });
   }
 
   /// 今日の出勤退勤記録を読み込み
@@ -2276,9 +2285,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         color: themeSettings.backgroundColor,
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 1200), // Web版はより広い幅
+            constraints: BoxConstraints(maxWidth: 900), // 内容に合わせた適切な幅 - 拡大版
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 8),
               child: Column(
                 children: [
                   SizedBox(height: 24),
@@ -2416,8 +2425,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   /// Web版専用の担当表テーブル
   Widget _buildWebAssignmentTable(ThemeSettings themeSettings) {
     return Container(
-      padding: EdgeInsets.all(32),
-      constraints: BoxConstraints(maxWidth: 1000),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+      constraints: BoxConstraints(maxWidth: 700), // 内容に合わせた適切な幅 - 拡大版
       decoration: BoxDecoration(
         color: themeSettings.cardBackgroundColor,
         border: Border.all(color: Colors.black26),
@@ -2434,7 +2443,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         children: [
           // Web版ヘッダー行
           Container(
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               color: themeSettings.backgroundColor.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
@@ -2442,10 +2451,10 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(width: 120), // 左ラベル用スペース
+                SizedBox(width: 150), // 左ラベル用スペース
                 ...teams.map<Widget>(
                   (team) => SizedBox(
-                    width: 160,
+                    width: 200,
                     child: Center(
                       child: Text(
                         team.name,
@@ -2458,11 +2467,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     ),
                   ),
                 ),
-                SizedBox(width: 120), // 右ラベル用スペース
+                SizedBox(width: 150), // 右ラベル用スペース
               ],
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
           // データ表示部分
           if (_isLoading)
             _buildLoadingWidget(themeSettings)
@@ -2480,14 +2489,170 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
   /// Web版レスポンシブ対応の担当表テーブル
   Widget _buildWebResponsiveAssignmentTable(ThemeSettings themeSettings) {
-    final isDesktop = WebUIUtils.isDesktop(context);
-    final isTablet = WebUIUtils.isTablet(context);
+    // 解像度判定を一度だけ実行してキャッシュ
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet =
+        screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一（Mini、Air、Pro）
+    final isMobile = screenWidth <= 768;
+    final isSmallMobile =
+        screenWidth <= 480 || MediaQuery.of(context).size.height <= 600;
 
-    // デスクトップの場合
-    if (isDesktop) {
+    // 担当表の横幅を画面幅に応じて動的に設定（はみ出し防止）
+    final double dynamicMaxWidth = screenWidth * 0.95; // 画面幅の95%を使用
+
+    // 動的サイズ計算（将来的な拡張用）
+    // 現在は固定値を使用し、将来的に画面幅に応じた動的調整を実装予定
+
+    // スマホ版の場合（縦画面最適化）
+    if (isMobile) {
       return Container(
-        padding: EdgeInsets.all(32),
-        constraints: BoxConstraints(maxWidth: WebUIUtils.getMaxWidth(context)),
+        padding: EdgeInsets.symmetric(
+          vertical: isSmallMobile ? 8 : 12,
+          horizontal: isSmallMobile ? 12 : 16,
+        ),
+        constraints: BoxConstraints(maxWidth: dynamicMaxWidth), // 画面幅の95%に制限
+        decoration: BoxDecoration(
+          color: themeSettings.cardBackgroundColor,
+          border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // スマホ版ヘッダー行（縦スクロール対応）
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+              decoration: BoxDecoration(
+                color: themeSettings.backgroundColor.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(width: isSmallMobile ? 60 : 80), // 左ラベル用スペース
+                    ...teams.map<Widget>(
+                      (team) => Container(
+                        width: isSmallMobile ? 70 : 85,
+                        margin: EdgeInsets.symmetric(horizontal: 2),
+                        child: Center(
+                          child: Text(
+                            team.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize:
+                                  (isSmallMobile ? 18 : 20) *
+                                  (screenWidth > 1024
+                                      ? 1.3
+                                      : screenWidth > 768
+                                      ? 1.1
+                                      : 1.0),
+                              color: themeSettings.fontColor1,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: isSmallMobile ? 60 : 80), // 右ラベル用スペース
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 4),
+            // データ表示部分
+            if (_isLoading)
+              _buildLoadingWidget(themeSettings)
+            else if (_isDataInitialized &&
+                _isRemoteSyncCompleted &&
+                leftLabels.isEmpty &&
+                teams.every((t) => t.members.isEmpty))
+              _buildEmptyStateWidget()
+            else
+              _buildWebResponsiveDataRows(themeSettings),
+          ],
+        ),
+      );
+    }
+    // タブレット版の場合（横画面最適化）
+    else if (isTablet) {
+      return Container(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        constraints: BoxConstraints(
+          maxWidth:
+              700, // 内容に合わせた固定幅（左ラベル100px + メンバーカード180px×2 + 右ラベル100px + パディング等）- 拡大版
+        ),
+        decoration: BoxDecoration(
+          color: themeSettings.cardBackgroundColor,
+          border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // タブレット版ヘッダー行
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: themeSettings.backgroundColor.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 100), // 左ラベル用スペース（タブレット版）
+                  ...teams.map<Widget>(
+                    (team) => SizedBox(
+                      width: 180, // iPad解像度統一の列幅（メンバーカードサイズに合わせて調整）- 拡大版
+                      child: Center(
+                        child: Text(
+                          team.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20 * WebUIUtils.getFontSizeScale(context),
+                            color: themeSettings.fontColor1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 100), // 右ラベル用スペース（タブレット版）
+                ],
+              ),
+            ),
+            SizedBox(height: 6),
+            // データ表示部分
+            if (_isLoading)
+              _buildLoadingWidget(themeSettings)
+            else if (_isDataInitialized &&
+                _isRemoteSyncCompleted &&
+                leftLabels.isEmpty &&
+                teams.every((t) => t.members.isEmpty))
+              _buildEmptyStateWidget()
+            else
+              _buildWebResponsiveDataRows(themeSettings),
+          ],
+        ),
+      );
+    }
+    // デスクトップ版の場合（PC最適化）
+    else {
+      return Container(
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+        constraints: BoxConstraints(maxWidth: dynamicMaxWidth), // 画面幅の95%に制限
         decoration: BoxDecoration(
           color: themeSettings.cardBackgroundColor,
           border: Border.all(color: Colors.black26),
@@ -2502,9 +2667,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         ),
         child: Column(
           children: [
-            // Web版ヘッダー行
+            // デスクトップ版ヘッダー行
             Container(
-              padding: EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: themeSettings.backgroundColor.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
@@ -2512,10 +2677,10 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox(width: 120), // 左ラベル用スペース
+                  SizedBox(width: isSmallMobile ? 60 : 80), // 左ラベル用スペース
                   ...teams.map<Widget>(
                     (team) => SizedBox(
-                      width: 160,
+                      width: isSmallMobile ? 70 : 85,
                       child: Center(
                         child: Text(
                           team.name,
@@ -2528,74 +2693,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 120), // 右ラベル用スペース
+                  SizedBox(width: isSmallMobile ? 60 : 80), // 右ラベル用スペース
                 ],
               ),
             ),
-            SizedBox(height: 16),
-            // データ表示部分
-            if (_isLoading)
-              _buildLoadingWidget(themeSettings)
-            else if (_isDataInitialized &&
-                _isRemoteSyncCompleted &&
-                leftLabels.isEmpty &&
-                teams.every((t) => t.members.isEmpty))
-              _buildEmptyStateWidget()
-            else
-              _buildWebResponsiveDataRows(themeSettings),
-          ],
-        ),
-      );
-    } else {
-      // タブレットの場合
-      return Container(
-        padding: EdgeInsets.all(24),
-        constraints: BoxConstraints(maxWidth: WebUIUtils.getMaxWidth(context)),
-        decoration: BoxDecoration(
-          color: themeSettings.cardBackgroundColor,
-          border: Border.all(color: Colors.black26),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // タブレット版ヘッダー行
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                color: themeSettings.backgroundColor.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(width: 100), // 左ラベル用スペース（小さめ）
-                  ...teams.map<Widget>(
-                    (team) => SizedBox(
-                      width: 140,
-                      child: Center(
-                        child: Text(
-                          team.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20 * WebUIUtils.getFontSizeScale(context),
-                            color: themeSettings.fontColor1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 100), // 右ラベル用スペース（小さめ）
-                ],
-              ),
-            ),
-            SizedBox(height: 12),
+            SizedBox(height: 8),
             // データ表示部分
             if (_isLoading)
               _buildLoadingWidget(themeSettings)
@@ -2614,7 +2716,13 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
   /// Web版レスポンシブ対応のデータ行
   Widget _buildWebResponsiveDataRows(ThemeSettings themeSettings) {
-    final isDesktop = WebUIUtils.isDesktop(context);
+    // 解像度判定を一度だけ実行してキャッシュ
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 1400; // デスクトップは1400px以上
+    final isTablet = screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
+    final isMobile = screenWidth <= 768;
+    final isSmallMobile =
+        screenWidth <= 480 || MediaQuery.of(context).size.height <= 600;
 
     return Column(
       children: List.generate(
@@ -2626,79 +2734,189 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     team.members.length > max ? team.members.length : max,
               ),
         (i) => Container(
-          margin: EdgeInsets.symmetric(vertical: 8),
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          margin: EdgeInsets.symmetric(vertical: isMobile ? 2 : 4),
+          padding: EdgeInsets.symmetric(
+            vertical: isMobile ? 6 : 8,
+            horizontal: isMobile ? 8 : 16,
+          ),
           decoration: BoxDecoration(
             color: i % 2 == 0
                 ? themeSettings.backgroundColor.withValues(alpha: 0.3)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // 左ラベル
-              SizedBox(
-                width: isDesktop ? 120 : 100,
-                child: Text(
-                  leftLabels.isNotEmpty && i < leftLabels.length
-                      ? leftLabels[i]
-                      : '',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize:
-                        (isDesktop ? 18 : 16) *
-                        WebUIUtils.getFontSizeScale(context),
-                    color: themeSettings.fontColor1,
-                  ),
-                ),
-              ),
-              // メンバーカード
-              ...teams.map<Widget>(
-                (team) => SizedBox(
-                  width: isDesktop ? 160 : 140,
-                  child: Center(
-                    child: MemberCard(
-                      name:
-                          i < team.members.length && team.members[i].isNotEmpty
-                          ? team.members[i]
-                          : '未設定',
-                      attendanceStatus: _getMemberAttendanceStatus(
-                        i < team.members.length && team.members[i].isNotEmpty
-                            ? team.members[i]
-                            : '未設定',
-                      ),
-                      onTap: () {
-                        if (i < team.members.length &&
-                            team.members[i].isNotEmpty) {
-                          _showAttendanceDialog(team.members[i]);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              // 右ラベル
-              SizedBox(
-                width: isDesktop ? 120 : 100,
-                child: Text(
-                  rightLabels.isNotEmpty && i < rightLabels.length
-                      ? rightLabels[i]
-                      : '',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize:
-                        (isDesktop ? 18 : 16) *
-                        WebUIUtils.getFontSizeScale(context),
-                    color: themeSettings.fontColor1,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          child: isMobile
+              ? _buildMobileDataRow(themeSettings, i, isSmallMobile)
+              : _buildDesktopDataRow(themeSettings, i, isDesktop, isTablet),
         ),
       ),
+    );
+  }
+
+  /// スマホ版データ行
+  Widget _buildMobileDataRow(
+    ThemeSettings themeSettings,
+    int i,
+    bool isSmallMobile,
+  ) {
+    // 解像度判定を一度だけ実行してキャッシュ
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 1400; // デスクトップは1400px以上
+    final isTablet = screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // 左ラベル
+          SizedBox(
+            width: isSmallMobile ? 60 : 80,
+            child: Text(
+              leftLabels.isNotEmpty && i < leftLabels.length
+                  ? leftLabels[i]
+                  : '',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize:
+                    (isSmallMobile ? 14 : 16) *
+                    (isDesktop
+                        ? 1.3
+                        : isTablet
+                        ? 1.1
+                        : 1.0),
+                color: themeSettings.fontColor1,
+              ),
+            ),
+          ),
+          // メンバーカード
+          ...teams.map<Widget>(
+            (team) => Container(
+              width: isSmallMobile ? 70 : 85,
+              margin: EdgeInsets.symmetric(horizontal: 2),
+              child: MemberCard(
+                name: i < team.members.length && team.members[i].isNotEmpty
+                    ? team.members[i]
+                    : '未設定',
+                attendanceStatus: _getMemberAttendanceStatus(
+                  i < team.members.length && team.members[i].isNotEmpty
+                      ? team.members[i]
+                      : '未設定',
+                ),
+                onTap: () {
+                  if (i < team.members.length && team.members[i].isNotEmpty) {
+                    _showAttendanceDialog(team.members[i]);
+                  }
+                },
+              ),
+            ),
+          ),
+          // 右ラベル
+          SizedBox(
+            width: isSmallMobile ? 60 : 80,
+            child: Text(
+              rightLabels.isNotEmpty && i < rightLabels.length
+                  ? rightLabels[i]
+                  : '',
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize:
+                    (isSmallMobile ? 14 : 16) *
+                    (isDesktop
+                        ? 1.3
+                        : isTablet
+                        ? 1.1
+                        : 1.0),
+                color: themeSettings.fontColor1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// デスクトップ・タブレット版データ行
+  Widget _buildDesktopDataRow(
+    ThemeSettings themeSettings,
+    int i,
+    bool isDesktop,
+    bool isTablet,
+  ) {
+    // 解像度判定を一度だけ実行してキャッシュ
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktopLocal = screenWidth > 1400; // デスクトップは1400px以上
+    final isTabletLocal =
+        screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // 左ラベル
+        SizedBox(
+          width: isDesktop ? 150 : 100, // タブレット版を100に調整（ヘッダーと一致）
+          child: Text(
+            leftLabels.isNotEmpty && i < leftLabels.length ? leftLabels[i] : '',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize:
+                  (isDesktop ? 18 : 20) * // タブレット版を16から20に拡大
+                  (isDesktopLocal
+                      ? 1.3
+                      : isTabletLocal
+                      ? 1.1
+                      : 1.0),
+              color: themeSettings.fontColor1,
+            ),
+          ),
+        ),
+        SizedBox(width: 2), // 左ラベルとメンバーカードの間隔
+        // メンバーカード
+        ...teams.map<Widget>(
+          (team) => Container(
+            width: isDesktop ? 200 : 180, // iPad解像度統一の列幅（メンバーカードサイズに合わせて）- 拡大版
+            margin: EdgeInsets.symmetric(horizontal: 0), // カード間の間隔を0に調整
+            child: Center(
+              child: MemberCard(
+                name: i < team.members.length && team.members[i].isNotEmpty
+                    ? team.members[i]
+                    : '未設定',
+                attendanceStatus: _getMemberAttendanceStatus(
+                  i < team.members.length && team.members[i].isNotEmpty
+                      ? team.members[i]
+                      : '未設定',
+                ),
+                onTap: () {
+                  if (i < team.members.length && team.members[i].isNotEmpty) {
+                    _showAttendanceDialog(team.members[i]);
+                  }
+                },
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 2), // メンバーカードと右ラベルの間隔
+        // 右ラベル
+        SizedBox(
+          width: isDesktop ? 150 : 100, // タブレット版を100に調整（ヘッダーと一致）
+          child: Text(
+            rightLabels.isNotEmpty && i < rightLabels.length
+                ? rightLabels[i]
+                : '',
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize:
+                  (isDesktop ? 18 : 20) * // タブレット版を16から20に拡大
+                  (isDesktopLocal
+                      ? 1.3
+                      : isTabletLocal
+                      ? 1.1
+                      : 1.0),
+              color: themeSettings.fontColor1,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -2720,11 +2938,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(width: 60), // 左ラベル用スペース
-                SizedBox(width: 4), // スペーサー
+                // SizedBox(width: 2), // スペーサーを削除（間隔をさらに狭く）
                 ...teams.map<Widget>(
                   (team) => Container(
                     width: 85, // カードと同じ幅に調整
-                    margin: EdgeInsets.symmetric(horizontal: 2),
+                    margin: EdgeInsets.symmetric(horizontal: 1), // 間隔を狭く
                     child: Text(
                       team.name,
                       textAlign: TextAlign.center,
@@ -2737,7 +2955,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     ),
                   ),
                 ),
-                SizedBox(width: 4), // スペーサー
+                // SizedBox(width: 2), // スペーサーを削除（間隔をさらに狭く）
                 SizedBox(width: 60), // 右ラベル用スペース
               ],
             ),
@@ -2782,7 +3000,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             children: [
               // 左ラベル
               SizedBox(
-                width: 120,
+                width: 150,
                 child: Text(
                   leftLabels.isNotEmpty && i < leftLabels.length
                       ? leftLabels[i]
@@ -2797,7 +3015,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               // メンバーカード
               ...teams.map<Widget>(
                 (team) => SizedBox(
-                  width: 160,
+                  width: 200,
                   child: Center(
                     child: MemberCard(
                       name:
@@ -2821,7 +3039,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               ),
               // 右ラベル
               SizedBox(
-                width: 120,
+                width: 150,
                 child: Text(
                   rightLabels.isNotEmpty && i < rightLabels.length
                       ? rightLabels[i]
@@ -2873,11 +3091,13 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   maxLines: 2,
                 ),
               ),
-              SizedBox(width: 4), // ラベルとカードの間の小さなスペース
+              SizedBox(width: 2), // ラベルとカードの間の小さなスペース（間隔を狭く）
               // メンバーカード
               ...teams.map<Widget>(
                 (team) => Container(
-                  margin: EdgeInsets.symmetric(horizontal: 2), // カード間の小さなスペース
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 1,
+                  ), // カード間の小さなスペース（間隔を狭く）
                   child: MemberCard(
                     name: i < team.members.length && team.members[i].isNotEmpty
                         ? team.members[i]
@@ -2896,7 +3116,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   ),
                 ),
               ),
-              SizedBox(width: 4), // カードとラベルの間の小さなスペース
+              SizedBox(width: 2), // カードとラベルの間の小さなスペース（間隔を狭く）
               // 右ラベル
               SizedBox(
                 width: 60,
@@ -3236,6 +3456,11 @@ class _MemberCardState extends State<MemberCard> {
 
   @override
   Widget build(BuildContext context) {
+    // 画面サイズに基づく解像度判定
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
+    final isDesktop = screenWidth > 1400; // デスクトップは1400px以上
+
     // 表示名を決定（カスタム表示名を優先）
     String displayName;
     if (_isLoadingDisplayName) {
@@ -3333,16 +3558,50 @@ class _MemberCardState extends State<MemberCard> {
       }
     }
 
+    // 解像度に応じたサイズ設定
+    double cardWidth;
+    double cardHeight;
+    double fontSize;
+    double verticalPadding;
+    double horizontalMargin;
+    double borderRadius;
+
+    if (isTablet) {
+      // iPad解像度統一のサイズ設定（Mini、Air、Pro共通）- 拡大版
+      cardWidth = 180; // 140 -> 180 (大きく調整)
+      cardHeight = 75; // 60 -> 75 (大きく調整)
+      fontSize = 24; // 16 -> 18 (さらに大きく調整)
+      verticalPadding = 14; // 10 -> 14 (大きく調整)
+      horizontalMargin = 4; // 2 -> 4 (大きく調整)
+      borderRadius = 14; // 10 -> 14 (大きく調整)
+    } else if (isDesktop) {
+      // デスクトップ版のサイズ設定
+      cardWidth = 120;
+      cardHeight = 55;
+      fontSize = 16;
+      verticalPadding = 12;
+      horizontalMargin = 2;
+      borderRadius = 12;
+    } else {
+      // モバイル版のサイズ設定
+      cardWidth = 85;
+      cardHeight = 50;
+      fontSize = 12;
+      verticalPadding = 10;
+      horizontalMargin = 2;
+      borderRadius = 12;
+    }
+
     return GestureDetector(
       onTap: isUnset ? null : widget.onTap,
       child: Container(
-        width: kIsWeb ? 120 : 85,
-        height: kIsWeb ? 60 : 50, // Web版は高さを固定
-        padding: EdgeInsets.symmetric(vertical: kIsWeb ? 12 : 10),
-        margin: EdgeInsets.symmetric(horizontal: kIsWeb ? 2 : 2),
+        width: cardWidth,
+        height: cardHeight,
+        padding: EdgeInsets.symmetric(vertical: verticalPadding),
+        margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(borderRadius),
           border: Border.all(
             color: borderColor,
             width: isMyCard ? 3 : 2, // 自分のカードは太い枠線
@@ -3357,7 +3616,7 @@ class _MemberCardState extends State<MemberCard> {
               displayName,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: kIsWeb ? 16 : 12,
+                fontSize: fontSize,
                 fontWeight: FontWeight.bold,
                 color: textColor,
               ),

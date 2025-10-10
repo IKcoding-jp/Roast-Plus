@@ -67,7 +67,7 @@ class _HomeBodyState extends State<HomeBody> {
                           title: '業務',
                           subtitle: '焙煎とスケジュール管理',
                           icon: Icons.work,
-                          accentColor: Color(0xFF8B4513),
+                          accentColor: _getThemeBasedColor('business'),
                           children: _buildBusinessFeatures(),
                         ),
                       ),
@@ -77,7 +77,7 @@ class _HomeBodyState extends State<HomeBody> {
                           title: '記録',
                           subtitle: '作業記録',
                           icon: Icons.assignment,
-                          accentColor: Colors.blue.shade700,
+                          accentColor: _getThemeBasedColor('record'),
                           children: _buildRecordFeatures(),
                         ),
                       ),
@@ -94,7 +94,7 @@ class _HomeBodyState extends State<HomeBody> {
                           title: '功績と成長',
                           subtitle: 'バッジとグループ情報',
                           icon: Icons.emoji_events,
-                          accentColor: Color(0xFFD4AF37),
+                          accentColor: _getThemeBasedColor('growth'),
                           children: _buildGrowthFeatures(),
                         ),
                       ),
@@ -104,7 +104,7 @@ class _HomeBodyState extends State<HomeBody> {
                           title: 'サポート・設定',
                           subtitle: '設定とヘルプ',
                           icon: Icons.settings,
-                          accentColor: Color(0xFF757575),
+                          accentColor: _getThemeBasedColor('support'),
                           children: _buildSupportFeatures(),
                         ),
                       ),
@@ -129,7 +129,7 @@ class _HomeBodyState extends State<HomeBody> {
                     themeSettings: widget.themeSettings,
                     title: '業務',
                     icon: Icons.work,
-                    accentColor: Color(0xFF8B4513),
+                    accentColor: _getThemeBasedColor('business'),
                     isExpanded: _expandedSections['business']!,
                     onToggle: () => _toggleSection('business'),
                     children: _buildBusinessFeatures(),
@@ -143,7 +143,7 @@ class _HomeBodyState extends State<HomeBody> {
                     themeSettings: widget.themeSettings,
                     title: '記録',
                     icon: Icons.assignment,
-                    accentColor: Colors.blue.shade700,
+                    accentColor: _getThemeBasedColor('record'),
                     isExpanded: _expandedSections['record']!,
                     onToggle: () => _toggleSection('record'),
                     children: _buildRecordFeatures(),
@@ -157,7 +157,7 @@ class _HomeBodyState extends State<HomeBody> {
                     themeSettings: widget.themeSettings,
                     title: '功績と成長',
                     icon: Icons.emoji_events,
-                    accentColor: Color(0xFFD4AF37),
+                    accentColor: _getThemeBasedColor('growth'),
                     isExpanded: _expandedSections['growth']!,
                     onToggle: () => _toggleSection('growth'),
                     children: _buildGrowthFeatures(),
@@ -171,7 +171,7 @@ class _HomeBodyState extends State<HomeBody> {
                     themeSettings: widget.themeSettings,
                     title: 'サポート・設定',
                     icon: Icons.settings,
-                    accentColor: Color(0xFF757575),
+                    accentColor: _getThemeBasedColor('support'),
                     isExpanded: _expandedSections['support']!,
                     onToggle: () => _toggleSection('support'),
                     children: _buildSupportFeatures(),
@@ -189,7 +189,7 @@ class _HomeBodyState extends State<HomeBody> {
                     title: '業務',
                     subtitle: '焙煎とスケジュール管理',
                     icon: Icons.work,
-                    accentColor: Color(0xFF8B4513),
+                    accentColor: _getThemeBasedColor('business'),
                     children: _buildBusinessFeatures(),
                   ),
                   SizedBox(height: 20),
@@ -197,7 +197,7 @@ class _HomeBodyState extends State<HomeBody> {
                     title: '記録',
                     subtitle: '作業記録',
                     icon: Icons.assignment,
-                    accentColor: Colors.blue.shade700,
+                    accentColor: _getThemeBasedColor('record'),
                     children: _buildRecordFeatures(),
                   ),
                   SizedBox(height: 20),
@@ -205,7 +205,7 @@ class _HomeBodyState extends State<HomeBody> {
                     title: '功績と成長',
                     subtitle: 'バッジとグループ情報',
                     icon: Icons.emoji_events,
-                    accentColor: Color(0xFFD4AF37),
+                    accentColor: _getThemeBasedColor('growth'),
                     children: _buildGrowthFeatures(),
                   ),
                   SizedBox(height: 20),
@@ -213,7 +213,7 @@ class _HomeBodyState extends State<HomeBody> {
                     title: 'サポート・設定',
                     subtitle: '設定とヘルプ',
                     icon: Icons.settings,
-                    accentColor: Color(0xFF757575),
+                    accentColor: _getThemeBasedColor('support'),
                     children: _buildSupportFeatures(),
                   ),
                 ],
@@ -381,7 +381,7 @@ class _HomeBodyState extends State<HomeBody> {
             themeSettings: widget.themeSettings,
             title: '業務',
             icon: Icons.work,
-            accentColor: Color(0xFF8B4513), // 中煎りのコーヒー豆のようなブラウン
+            accentColor: _getThemeBasedColor('business'),
             isExpanded: _expandedSections['business']!,
             onToggle: () => _toggleSection('business'),
             children: _buildBusinessFeatures(),
@@ -393,7 +393,7 @@ class _HomeBodyState extends State<HomeBody> {
             themeSettings: widget.themeSettings,
             title: '記録',
             icon: Icons.assessment,
-            accentColor: Colors.blue.shade600,
+            accentColor: _getThemeBasedColor('record'),
             isExpanded: _expandedSections['record']!,
             onToggle: () => _toggleSection('record'),
             children: _buildRecordFeatures(),
@@ -405,7 +405,7 @@ class _HomeBodyState extends State<HomeBody> {
             themeSettings: widget.themeSettings,
             title: '功績と成長',
             icon: Icons.emoji_events,
-            accentColor: Color(0xFFD4AF37), // 王冠やトロフィーを連想するゴールド
+            accentColor: _getThemeBasedColor('growth'),
             isExpanded: _expandedSections['growth']!,
             onToggle: () => _toggleSection('growth'),
             children: _buildGrowthFeatures(),
@@ -417,7 +417,7 @@ class _HomeBodyState extends State<HomeBody> {
             themeSettings: widget.themeSettings,
             title: 'サポート・設定',
             icon: Icons.settings,
-            accentColor: Color(0xFF757575), // より濃いグレーに変更
+            accentColor: _getThemeBasedColor('support'),
             isExpanded: _expandedSections['support']!,
             onToggle: () => _toggleSection('support'),
             children: _buildSupportFeatures(),
@@ -437,8 +437,8 @@ class _HomeBodyState extends State<HomeBody> {
 
   /// 業務機能カードを構築
   List<HomeFeatureCard> _buildBusinessFeatures() {
-    // 業務セクション統一色（オレンジ系）
-    const businessColor = Color(0xFFE65100); // オレンジ（火・熱を表現）
+    // 基本テーマ以外ではテーマ色を使用
+    final businessColor = _getThemeBasedColor('business');
 
     return [
       HomeFeatureCard(
@@ -500,8 +500,8 @@ class _HomeBodyState extends State<HomeBody> {
 
   /// 記録機能カードを構築
   List<HomeFeatureCard> _buildRecordFeatures() {
-    // 記録セクション統一色（ブルー系）
-    const recordColor = Color(0xFF1976D2); // ブルー（記録・データを表現）
+    // 基本テーマ以外ではテーマ色を使用
+    final recordColor = _getThemeBasedColor('record');
 
     return [
       HomeFeatureCard(
@@ -552,8 +552,8 @@ class _HomeBodyState extends State<HomeBody> {
 
   /// 功績と成長カードを構築
   List<HomeFeatureCard> _buildGrowthFeatures() {
-    // 功績と成長セクション統一色（ゴールド系）
-    const growthColor = Color(0xFFD4AF37); // ゴールド（達成・栄誉を表現）
+    // 基本テーマ以外ではテーマ色を使用
+    final growthColor = _getThemeBasedColor('growth');
 
     return [
       HomeFeatureCard(
@@ -575,8 +575,8 @@ class _HomeBodyState extends State<HomeBody> {
 
   /// サポート・設定カードを構築
   List<HomeFeatureCard> _buildSupportFeatures() {
-    // サポート・設定セクション統一色（グレー系）
-    const supportColor = Color(0xFF757575); // グレー（サポート・設定を表現）
+    // 基本テーマ以外ではテーマ色を使用
+    final supportColor = _getThemeBasedColor('support');
 
     return [
       HomeFeatureCard(
@@ -636,6 +636,43 @@ class _HomeBodyState extends State<HomeBody> {
           records.any((record) => record.status == AttendanceStatus.present);
     } catch (e) {
       return false;
+    }
+  }
+
+  /// テーマに基づいた色を取得
+  Color _getThemeBasedColor(String sectionType) {
+    // 基本テーマかどうかを色で判定（基本テーマの特徴的な色を使用）
+    final isBasicTheme =
+        widget.themeSettings.appBarColor.value == 0xFF8B4513; // 基本テーマのブラウン色
+
+    // 基本テーマの場合は従来の固定色を使用
+    if (isBasicTheme) {
+      switch (sectionType) {
+        case 'business':
+          return Color(0xFF8B4513); // ブラウン
+        case 'record':
+          return Colors.blue.shade700;
+        case 'growth':
+          return Color(0xFFD4AF37); // ゴールド
+        case 'support':
+          return Color(0xFF757575); // グレー
+        default:
+          return widget.themeSettings.iconColor;
+      }
+    }
+
+    // 基本以外のテーマではテーマの色を使用
+    switch (sectionType) {
+      case 'business':
+        return widget.themeSettings.buttonColor;
+      case 'record':
+        return widget.themeSettings.iconColor;
+      case 'growth':
+        return widget.themeSettings.timerCircleColor;
+      case 'support':
+        return widget.themeSettings.settingsColor;
+      default:
+        return widget.themeSettings.iconColor;
     }
   }
 }

@@ -440,7 +440,7 @@ class _HomeBodyState extends State<HomeBody> {
     return [
       HomeFeatureCard(
         themeSettings: widget.themeSettings,
-        title: 'ドリップカウンター',
+        title: 'カウンター',
         icon: Icons.add_circle_outline,
         onTap: () => Navigator.pushNamed(context, '/drip'),
         isImportant: true, // 重要機能

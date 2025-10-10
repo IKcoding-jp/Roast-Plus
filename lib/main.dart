@@ -22,6 +22,7 @@ import 'services/security_monitor_service.dart';
 import 'services/encrypted_local_storage_service.dart';
 import 'services/network_security_service.dart';
 import 'services/session_management_service.dart';
+import 'services/web_settings_persistence_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:developer' as developer;
 import 'utils/performance_monitor.dart';
@@ -285,6 +286,14 @@ Future<void> _initializeFirebase() async {
           developer.log('Web版: FirebaseAuth永続化をLOCALに設定', name: 'Main');
         } catch (persistError) {
           developer.log('Web版: 永続化設定に失敗: $persistError', name: 'Main');
+        }
+
+        // Web版設定永続化サービスを初期化
+        try {
+          await WebSettingsPersistenceService.initialize();
+          developer.log('Web版設定永続化サービスを初期化しました', name: 'Main');
+        } catch (e) {
+          developer.log('Web版設定永続化サービス初期化エラー: $e', name: 'Main');
         }
 
         // Web版でFirestoreの初期化を確実に行う（ネットワーク有効化はスキップ）

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
+import 'web_settings_persistence_service.dart';
 
 /// ユーザー設定をFirestoreに保存・取得するサービス
 class UserSettingsFirestoreService {
@@ -40,6 +42,17 @@ class UserSettingsFirestoreService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
       _logInfo('設定を保存しました: $key = $value');
+
+      // Web版ではローカル永続化も実行
+      if (kIsWeb) {
+        try {
+          await WebSettingsPersistenceService.saveSetting(key, value);
+          _logInfo('Web版ローカル永続化も完了: $key');
+        } catch (e) {
+          _logError('Web版ローカル永続化エラー', e);
+          // ローカル永続化の失敗はFirestore保存を阻害しない
+        }
+      }
     } catch (e, st) {
       _logError('設定保存エラー', e, st);
       rethrow;
@@ -51,6 +64,22 @@ class UserSettingsFirestoreService {
     if (_uid == null) throw Exception('未ログイン');
 
     try {
+      // Web版ではまずローカル永続化から取得を試行
+      if (kIsWeb) {
+        try {
+          final localValue = await WebSettingsPersistenceService.getSetting(
+            key,
+          );
+          if (localValue != null && localValue != defaultValue) {
+            _logInfo('Web版ローカル永続化から設定を取得: $key = $localValue');
+            return localValue;
+          }
+        } catch (e) {
+          _logError('Web版ローカル永続化取得エラー', e);
+          // ローカル取得に失敗した場合はFirestoreから取得
+        }
+      }
+
       final doc = await _userSettingsCollection.doc(key).get();
       if (!doc.exists) return defaultValue;
 
@@ -82,6 +111,17 @@ class UserSettingsFirestoreService {
 
       await batch.commit();
       _logInfo('複数設定を保存しました: ${settings.keys.join(', ')}');
+
+      // Web版ではローカル永続化も実行
+      if (kIsWeb) {
+        try {
+          await WebSettingsPersistenceService.saveMultipleSettings(settings);
+          _logInfo('Web版複数設定ローカル永続化も完了');
+        } catch (e) {
+          _logError('Web版複数設定ローカル永続化エラー', e);
+          // ローカル永続化の失敗はFirestore保存を阻害しない
+        }
+      }
     } catch (e, st) {
       _logError('複数設定保存エラー', e, st);
       rethrow;

@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 import 'dart:developer' as developer;
 import '../services/encrypted_local_storage_service.dart';
+import '../services/web_settings_persistence_service.dart';
 
 class ThemeSettings extends ChangeNotifier {
   Color appBarColor; // アプリバーの背景色
@@ -1187,6 +1188,35 @@ class ThemeSettings extends ChangeNotifier {
   // バックグラウンドでFirebaseから設定を非同期取得
   static Future<void> _loadSettingsFromFirebaseAsync() async {
     try {
+      // Web版ではまずローカル永続化から設定を取得
+      if (kIsWeb) {
+        try {
+          final webSettings =
+              await WebSettingsPersistenceService.getAllSettings();
+          if (webSettings.isNotEmpty) {
+            developer.log(
+              'Web版ローカル永続化から設定を読み込みました: ${webSettings.keys.length}個',
+              name: 'ThemeSettings',
+            );
+
+            // フォント設定を優先的に読み込み
+            final fontSettings =
+                await WebSettingsPersistenceService.getFontSettings();
+            if (fontSettings['fontSizeScale'] != null) {
+              _instance!.fontSizeScale = (fontSettings['fontSizeScale'] as num)
+                  .toDouble();
+            }
+            if (fontSettings['fontFamily'] != null) {
+              _instance!.fontFamily = fontSettings['fontFamily'] as String;
+            }
+
+            _instance!.notifyListeners();
+          }
+        } catch (e) {
+          developer.log('Web版ローカル永続化設定読み込みエラー: $e', name: 'ThemeSettings');
+        }
+      }
+
       // Firebaseからテーマ設定を取得
       final settings = await UserSettingsFirestoreService.getMultipleSettings([
         'theme_appBarColor',
@@ -1560,6 +1590,19 @@ class ThemeSettings extends ChangeNotifier {
         fontSizeScale,
       );
       await EncryptedLocalStorageService.setString('fontFamily', fontFamily);
+
+      // Web版では追加でWebSettingsPersistenceServiceにも保存
+      if (kIsWeb) {
+        try {
+          await WebSettingsPersistenceService.saveFontSettings(
+            fontSizeScale: fontSizeScale,
+            fontFamily: fontFamily,
+          );
+          developer.log('Web版フォント設定を永続化しました', name: 'ThemeSettings');
+        } catch (e) {
+          developer.log('Web版フォント設定永続化エラー: $e', name: 'ThemeSettings');
+        }
+      }
     } catch (e, st) {
       developer.log(
         'ローカル保存エラー',
@@ -1876,6 +1919,28 @@ class ThemeSettings extends ChangeNotifier {
   }
 
   Future<void> loadFontSettingsFromFirestore() async {
+    // Web版ではまずローカル永続化から読み込み
+    if (kIsWeb) {
+      try {
+        final fontSettings =
+            await WebSettingsPersistenceService.getFontSettings();
+        if (fontSettings['fontSizeScale'] != null) {
+          fontSizeScale = (fontSettings['fontSizeScale'] as num).toDouble();
+        }
+        if (fontSettings['fontFamily'] != null) {
+          fontFamily = fontSettings['fontFamily'] as String;
+        }
+        if (fontSettings.isNotEmpty) {
+          developer.log('Web版ローカル永続化からフォント設定を読み込みました', name: 'ThemeSettings');
+          notifyListeners();
+          return;
+        }
+      } catch (e) {
+        developer.log('Web版ローカル永続化フォント設定読み込みエラー: $e', name: 'ThemeSettings');
+      }
+    }
+
+    // Firestoreから読み込み
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     final doc = await FirebaseFirestore.instance

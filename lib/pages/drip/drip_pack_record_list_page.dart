@@ -1110,66 +1110,10 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
                                       ),
                                     ),
                                   )
-                                : (kIsWeb
-                                      ? GridView.builder(
-                                          padding: EdgeInsets.only(
-                                            left: 8,
-                                            right: 8,
-                                            bottom:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).padding.bottom +
-                                                16,
-                                          ),
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: 3,
-                                                crossAxisSpacing: 12,
-                                                mainAxisSpacing: 12,
-                                                mainAxisExtent: 110,
-                                              ),
-                                          itemCount: filteredRecords.length,
-                                          itemBuilder: (context, index) {
-                                            final record =
-                                                filteredRecords[index];
-                                            final selected = _selectedIndexes
-                                                .contains(
-                                                  _records.indexOf(record),
-                                                );
-                                            return _buildRecordItem(
-                                              record,
-                                              selected,
-                                              _records.indexOf(record),
-                                            );
-                                          },
-                                        )
-                                      : ListView.builder(
-                                          padding: EdgeInsets.only(
-                                            left: 8,
-                                            right: 8,
-                                            bottom:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).padding.bottom +
-                                                16,
-                                          ),
-                                          itemCount: filteredRecords.length,
-                                          physics:
-                                              AlwaysScrollableScrollPhysics(),
-                                          itemBuilder: (context, index) {
-                                            final record =
-                                                filteredRecords[index];
-                                            final selected = _selectedIndexes
-                                                .contains(
-                                                  _records.indexOf(record),
-                                                );
-                                            return _buildRecordItem(
-                                              record,
-                                              selected,
-                                              _records.indexOf(record),
-                                            );
-                                          },
-                                        )),
+                                : _buildResponsiveRecordList(
+                                    filteredRecords,
+                                    context,
+                                  ),
                           ),
                         ],
                       ),
@@ -1179,5 +1123,53 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
         );
       },
     );
+  }
+
+  // レスポンシブなレコードリストを構築
+  Widget _buildResponsiveRecordList(
+    List<Map<String, dynamic>> filteredRecords,
+    BuildContext context,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobileWidth = screenWidth < 768; // スマホ解像度の判定（768px未満）
+
+    if (isMobileWidth) {
+      // スマホ解像度の場合は1列のリストビュー
+      return ListView.builder(
+        padding: EdgeInsets.only(
+          left: 8,
+          right: 8,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+        ),
+        itemCount: filteredRecords.length,
+        physics: AlwaysScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          final record = filteredRecords[index];
+          final selected = _selectedIndexes.contains(_records.indexOf(record));
+          return _buildRecordItem(record, selected, _records.indexOf(record));
+        },
+      );
+    } else {
+      // デスクトップ解像度の場合は3列のグリッドビュー
+      return GridView.builder(
+        padding: EdgeInsets.only(
+          left: 8,
+          right: 8,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          mainAxisExtent: 110,
+        ),
+        itemCount: filteredRecords.length,
+        itemBuilder: (context, index) {
+          final record = filteredRecords[index];
+          final selected = _selectedIndexes.contains(_records.indexOf(record));
+          return _buildRecordItem(record, selected, _records.indexOf(record));
+        },
+      );
+    }
   }
 }

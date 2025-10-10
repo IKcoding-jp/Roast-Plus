@@ -264,7 +264,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             teams = newTeams;
             leftLabels = newLeftLabels;
             rightLabels = newRightLabels;
-            _isLoading = false;
+            // メンバーやラベルが空の場合はローディングを継続
+            _isLoading =
+                newTeams.isEmpty ||
+                newTeams.every((t) => t.members.isEmpty) ||
+                newLeftLabels.isEmpty;
             _isDataInitialized = true;
             // 担当決定状態も同時に更新
             if (hasTodayAssignment) {
@@ -650,7 +654,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           teams = loadedTeams;
           leftLabels = loadedLeftLabels;
           rightLabels = loadedRightLabels;
-          _isLoading = false;
+          // メンバーやラベルが空の場合はローディングを継続
+          _isLoading =
+              loadedTeams.isEmpty ||
+              loadedTeams.every((t) => t.members.isEmpty) ||
+              loadedLeftLabels.isEmpty;
           _isDataInitialized = true;
           // 担当決定状態も同時に更新
           if (hasTodayAssignment) {
@@ -663,6 +671,12 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           if (mounted) {
             setState(() {
               _isRemoteSyncCompleted = true;
+              // リモート同期完了後、データが存在する場合はローディングを終了
+              if (teams.isNotEmpty &&
+                  !teams.every((t) => t.members.isEmpty) &&
+                  leftLabels.isNotEmpty) {
+                _isLoading = false;
+              }
             });
           }
         });
@@ -671,7 +685,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       debugPrint('AssignmentBoard: ローカルデータ読み込みエラー: $e');
       if (mounted) {
         setState(() {
-          _isLoading = false;
+          // エラー時もデータが存在しない場合はローディングを継続
+          _isLoading =
+              teams.isEmpty ||
+              teams.every((t) => t.members.isEmpty) ||
+              leftLabels.isEmpty;
           _isDataInitialized = true;
         });
       }
@@ -698,12 +716,17 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       }
     } catch (e) {
       debugPrint('AssignmentBoard: バックグラウンド同期エラー: $e');
+      // エラーが発生しても同期完了フラグを立てる（UIのちらつきを防ぐ）
+      if (mounted) {
+        _isRemoteSyncCompleted = true;
+      }
     }
   }
 
   /// Firestoreデータと同期
   Future<void> _syncWithFirestoreData() async {
     try {
+      debugPrint('AssignmentBoard: Firestoreデータ同期開始');
       final assignmentData =
           await AssignmentFirestoreService.loadAssignmentMembers();
       if (assignmentData != null && mounted) {
@@ -712,10 +735,21 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         if (firestoreSavedAt != null) {
           // 必要に応じてデータを更新（ここでは簡略化）
           debugPrint('AssignmentBoard: Firestoreデータ同期完了');
+
+          // Firestoreデータが存在する場合はローディングを終了
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+          }
         }
+      } else {
+        debugPrint('AssignmentBoard: Firestoreデータが取得できませんでした');
+        // データが存在しない場合はローディングを継続
       }
     } catch (e) {
       debugPrint('AssignmentBoard: Firestore同期エラー: $e');
+      // エラーが発生しても処理を継続（UIのちらつきを防ぐ）
     }
   }
 
@@ -1979,7 +2013,15 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           });
         }
 
-        if (_isLoading) {
+        // ローディング条件: データが初期化されていない、またはメンバー・ラベルが空
+        final shouldShowLoading =
+            _isLoading ||
+            !_isDataInitialized ||
+            teams.isEmpty ||
+            teams.every((t) => t.members.isEmpty) ||
+            leftLabels.isEmpty;
+
+        if (shouldShowLoading) {
           return Scaffold(
             backgroundColor: Provider.of<ThemeSettings>(
               context,
@@ -3382,7 +3424,10 @@ class _MemberCardState extends State<MemberCard> {
   @override
   void initState() {
     super.initState();
-    _loadCustomDisplayName();
+    // カスタム表示名の読み込みを非同期で実行（UIのブロックを防ぐ）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCustomDisplayName();
+    });
     _startDisplayNameMonitoring();
   }
 
@@ -3410,8 +3455,8 @@ class _MemberCardState extends State<MemberCard> {
 
   /// 表示名の変更を監視
   void _startDisplayNameMonitoring() {
-    // 定期的に表示名をチェック
-    Timer.periodic(Duration(seconds: 3), (timer) async {
+    // 定期的に表示名をチェック（頻度を下げてパフォーマンス向上）
+    Timer.periodic(Duration(seconds: 10), (timer) async {
       if (!mounted) {
         timer.cancel();
         return;
@@ -3444,10 +3489,11 @@ class _MemberCardState extends State<MemberCard> {
 
     // 表示名を決定（カスタム表示名を優先）
     String displayName;
-    if (_isLoadingDisplayName) {
-      displayName = '読み込み中...';
-    } else if (widget.name.isEmpty) {
+    if (widget.name.isEmpty) {
       displayName = '未設定';
+    } else if (_isLoadingDisplayName) {
+      // 読み込み中でも元の名前を表示（カスタム表示名の読み込み中は非表示）
+      displayName = widget.name;
     } else {
       // 現在のユーザーのカードの場合、カスタム表示名を使用
       final currentUser = FirebaseAuth.instance.currentUser;
@@ -3484,7 +3530,7 @@ class _MemberCardState extends State<MemberCard> {
       }
     }
 
-    final isUnset = displayName == '未設定' || displayName == '読み込み中...';
+    final isUnset = displayName == '未設定';
 
     // 現在のユーザー名を取得
     final currentUser = FirebaseAuth.instance.currentUser;

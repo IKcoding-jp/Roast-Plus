@@ -567,12 +567,16 @@ class _CalendarPageState extends State<CalendarPage> {
     ThemeSettings themeSettings,
     DateFormat dateFormatter,
   ) {
+    // 画面幅を取得してレスポンシブ対応
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768; // 768px未満をスマホ解像度とする
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: Colors.white,
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: EdgeInsets.all(isMobile ? 16 : 24), // スマホではパディングを小さく
         child: Column(
           children: [
             // 選択された日付の表示
@@ -582,37 +586,78 @@ class _CalendarPageState extends State<CalendarPage> {
                 Icon(
                   Icons.calendar_today,
                   color: themeSettings.iconColor,
-                  size: 24,
+                  size: isMobile ? 20 : 24, // スマホではアイコンサイズを小さく
                 ),
-                SizedBox(width: 12),
-                Text(
-                  dateFormatter.format(_selectedDate),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: themeSettings.fontColor1,
+                SizedBox(width: isMobile ? 8 : 12), // スマホでは間隔を狭く
+                Flexible(
+                  // テキストが長い場合の対応
+                  child: Text(
+                    dateFormatter.format(_selectedDate),
+                    style: TextStyle(
+                      fontSize: isMobile ? 18 : 22, // スマホではフォントサイズを小さく
+                      fontWeight: FontWeight.bold,
+                      color: themeSettings.fontColor1,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 24),
-            // 日付選択ボタン（中央配置）
+            SizedBox(height: isMobile ? 16 : 24), // スマホでは間隔を狭く
+            // 日付選択ボタン（1行表示を維持、左右の幅を最大活用）
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 左右の幅を最大活用
               children: [
-                _buildDateButton(context, -3, '3日前', themeSettings),
-                SizedBox(width: 12),
-                _buildDateButton(context, -2, '2日前', themeSettings),
-                SizedBox(width: 12),
-                _buildDateButton(context, -1, '昨日', themeSettings),
-                SizedBox(width: 12),
-                _buildDateButton(context, 0, '今日', themeSettings),
-                SizedBox(width: 12),
-                _buildDateButton(context, 1, '明日', themeSettings),
-                SizedBox(width: 12),
-                _buildDateButton(context, 2, '2日後', themeSettings),
-                SizedBox(width: 12),
-                _buildDateButton(context, 3, '3日後', themeSettings),
+                _buildDateButton(
+                  context,
+                  -3,
+                  '3日前',
+                  themeSettings,
+                  isMobile: isMobile,
+                ),
+                _buildDateButton(
+                  context,
+                  -2,
+                  '2日前',
+                  themeSettings,
+                  isMobile: isMobile,
+                ),
+                _buildDateButton(
+                  context,
+                  -1,
+                  '昨日',
+                  themeSettings,
+                  isMobile: isMobile,
+                ),
+                _buildDateButton(
+                  context,
+                  0,
+                  '今日',
+                  themeSettings,
+                  isMobile: isMobile,
+                ),
+                _buildDateButton(
+                  context,
+                  1,
+                  '明日',
+                  themeSettings,
+                  isMobile: isMobile,
+                ),
+                _buildDateButton(
+                  context,
+                  2,
+                  '2日後',
+                  themeSettings,
+                  isMobile: isMobile,
+                ),
+                _buildDateButton(
+                  context,
+                  3,
+                  '3日後',
+                  themeSettings,
+                  isMobile: isMobile,
+                ),
               ],
             ),
           ],
@@ -622,44 +667,76 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Widget _buildWebDataLayout(ThemeSettings themeSettings) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 本日のスケジュール
-        Expanded(
-          child: Column(
-            children: [
-              if (_todaySchedule != null)
-                _buildTodayScheduleSection(themeSettings),
-              if (_todaySchedule != null) SizedBox(height: 16),
-              if (_dripPackRecords.isNotEmpty)
-                _buildDripPackSection(themeSettings),
-              if (_dripPackRecords.isNotEmpty) SizedBox(height: 16),
-              if (_workProgressRecords.isNotEmpty)
-                _buildWorkProgressSection(themeSettings),
-            ],
+    // 画面幅を取得してレスポンシブ対応
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768; // 768px未満をスマホ解像度とする
+
+    if (isMobile) {
+      // スマホ解像度では1列表示
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_todaySchedule != null) _buildTodayScheduleSection(themeSettings),
+          if (_todaySchedule != null) SizedBox(height: 16),
+          _buildRoastScheduleSection(themeSettings),
+          SizedBox(height: 16),
+          if (_assignmentHistoryWithLabels != null &&
+              _assignmentHistoryWithLabels!['assignments'] != null &&
+              (_assignmentHistoryWithLabels!['assignments'] as List).isNotEmpty)
+            _buildAssignmentSection(themeSettings),
+          if (_assignmentHistoryWithLabels != null &&
+              _assignmentHistoryWithLabels!['assignments'] != null &&
+              (_assignmentHistoryWithLabels!['assignments'] as List).isNotEmpty)
+            SizedBox(height: 16),
+          if (_dripPackRecords.isNotEmpty) _buildDripPackSection(themeSettings),
+          if (_dripPackRecords.isNotEmpty) SizedBox(height: 16),
+          if (_workProgressRecords.isNotEmpty)
+            _buildWorkProgressSection(themeSettings),
+        ],
+      );
+    } else {
+      // デスクトップ解像度では3列表示
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 本日のスケジュール
+          Expanded(
+            child: Column(
+              children: [
+                if (_todaySchedule != null)
+                  _buildTodayScheduleSection(themeSettings),
+                if (_todaySchedule != null) SizedBox(height: 16),
+                if (_dripPackRecords.isNotEmpty)
+                  _buildDripPackSection(themeSettings),
+                if (_dripPackRecords.isNotEmpty) SizedBox(height: 16),
+                if (_workProgressRecords.isNotEmpty)
+                  _buildWorkProgressSection(themeSettings),
+              ],
+            ),
           ),
-        ),
-        SizedBox(width: 16),
-        // ローストスケジュール
-        Expanded(
-          child: Column(children: [_buildRoastScheduleSection(themeSettings)]),
-        ),
-        SizedBox(width: 16),
-        // 担当
-        Expanded(
-          child: Column(
-            children: [
-              if (_assignmentHistoryWithLabels != null &&
-                  _assignmentHistoryWithLabels!['assignments'] != null &&
-                  (_assignmentHistoryWithLabels!['assignments'] as List)
-                      .isNotEmpty)
-                _buildAssignmentSection(themeSettings),
-            ],
+          SizedBox(width: 16),
+          // ローストスケジュール
+          Expanded(
+            child: Column(
+              children: [_buildRoastScheduleSection(themeSettings)],
+            ),
           ),
-        ),
-      ],
-    );
+          SizedBox(width: 16),
+          // 担当
+          Expanded(
+            child: Column(
+              children: [
+                if (_assignmentHistoryWithLabels != null &&
+                    _assignmentHistoryWithLabels!['assignments'] != null &&
+                    (_assignmentHistoryWithLabels!['assignments'] as List)
+                        .isNotEmpty)
+                  _buildAssignmentSection(themeSettings),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   Widget _buildMobileLayout(ThemeSettings themeSettings) {
@@ -1313,8 +1390,9 @@ class _CalendarPageState extends State<CalendarPage> {
     BuildContext context,
     int dayOffset,
     String label,
-    ThemeSettings themeSettings,
-  ) {
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+  }) {
     final targetDate = DateTime.now().add(Duration(days: dayOffset));
     final isSelected =
         _selectedDate.year == targetDate.year &&
@@ -1339,14 +1417,17 @@ class _CalendarPageState extends State<CalendarPage> {
         });
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 6 : 8, // スマホではパディングを小さく
+          vertical: isMobile ? 4 : 6, // スマホではパディングを小さく
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? themeSettings.buttonColor
               : (isToday
                     ? themeSettings.buttonColor.withValues(alpha: 0.3)
                     : Colors.transparent),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(isMobile ? 6 : 8), // スマホでは角丸を小さく
           border: Border.all(
             color: isSelected
                 ? themeSettings.buttonColor
@@ -1362,7 +1443,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 color: isSelected
                     ? themeSettings.fontColor2
                     : themeSettings.fontColor1,
-                fontSize: 16,
+                fontSize: isMobile ? 14 : 16, // スマホではフォントサイズを小さく
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1372,7 +1453,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 color: isSelected
                     ? themeSettings.fontColor2
                     : themeSettings.fontColor1.withValues(alpha: 0.7),
-                fontSize: 10,
+                fontSize: isMobile ? 8 : 10, // スマホではフォントサイズを小さく
                 fontWeight: FontWeight.w500,
               ),
             ),

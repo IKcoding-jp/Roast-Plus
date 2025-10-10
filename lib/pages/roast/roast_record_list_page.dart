@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:developer' as developer;
 import 'package:intl/intl.dart';
 import 'package:roastplus/models/roast_record.dart';
@@ -53,7 +52,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
 
   Widget _buildRecordItem(RoastRecord record, bool selected, int index) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: kIsWeb ? 0 : 8),
+      padding: EdgeInsets.symmetric(vertical: _isMobileLayout(context) ? 8 : 0),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -71,7 +70,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
               children: [
                 // アイコン部分
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(_isMobileLayout(context) ? 6 : 8),
                   decoration: BoxDecoration(
                     color: Provider.of<ThemeSettings>(
                       context,
@@ -81,10 +80,10 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                   child: Icon(
                     Icons.coffee,
                     color: Provider.of<ThemeSettings>(context).iconColor,
-                    size: 24,
+                    size: _isMobileLayout(context) ? 20 : 24,
                   ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: _isMobileLayout(context) ? 12 : 16),
                 // メインコンテンツ部分
                 Expanded(
                   child: Column(
@@ -95,35 +94,35 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                         beanName: record.bean,
                         textStyle: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: _isMobileLayout(context) ? 14 : 16,
                           color: Provider.of<ThemeSettings>(context).fontColor1,
                         ),
-                        stickerSize: 16.0,
+                        stickerSize: _isMobileLayout(context) ? 14.0 : 16.0,
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: _isMobileLayout(context) ? 6 : 8),
                       // 詳細情報
                       // 重さ
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 16,
-                            height: 16,
+                            width: _isMobileLayout(context) ? 14 : 16,
+                            height: _isMobileLayout(context) ? 14 : 16,
                             margin: EdgeInsets.only(top: 1),
                             child: Icon(
                               Icons.scale,
-                              size: 16,
+                              size: _isMobileLayout(context) ? 14 : 16,
                               color: Provider.of<ThemeSettings>(
                                 context,
                               ).iconColor,
                             ),
                           ),
-                          SizedBox(width: 6),
+                          SizedBox(width: _isMobileLayout(context) ? 4 : 6),
                           Expanded(
                             child: Text(
                               '重さ：${record.weight}g',
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: _isMobileLayout(context) ? 12 : 13,
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1,
@@ -132,85 +131,93 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 6),
+                      SizedBox(height: _isMobileLayout(context) ? 4 : 6),
                       // 焙煎時間
                       Row(
                         children: [
                           Icon(
                             Icons.timer,
-                            size: 16,
+                            size: _isMobileLayout(context) ? 14 : 16,
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).iconColor,
                           ),
-                          SizedBox(width: 4),
+                          SizedBox(width: _isMobileLayout(context) ? 3 : 4),
                           Flexible(
                             child: Text(
                               '焙煎時間: ${record.time}',
+                              style: TextStyle(
+                                fontSize: _isMobileLayout(context) ? 12 : 13,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 4),
+                      SizedBox(height: _isMobileLayout(context) ? 3 : 4),
                       Row(
                         children: [
                           Icon(
                             Icons.local_fire_department,
-                            size: 16,
+                            size: _isMobileLayout(context) ? 14 : 16,
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).iconColor,
                           ),
-                          SizedBox(width: 4),
+                          SizedBox(width: _isMobileLayout(context) ? 3 : 4),
                           Flexible(
                             child: Text(
                               '煎り度: ${record.roast}',
+                              style: TextStyle(
+                                fontSize: _isMobileLayout(context) ? 12 : 13,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
                       if (record.memo.trim().isNotEmpty) ...[
-                        SizedBox(height: 4),
+                        SizedBox(height: _isMobileLayout(context) ? 3 : 4),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.note,
-                              size: 16,
+                              size: _isMobileLayout(context) ? 14 : 16,
                               color: Provider.of<ThemeSettings>(
                                 context,
                               ).iconColor,
                             ),
-                            SizedBox(width: 4),
+                            SizedBox(width: _isMobileLayout(context) ? 3 : 4),
                             Expanded(
                               child: Text(
                                 record.memo,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 13),
+                                style: TextStyle(
+                                  fontSize: _isMobileLayout(context) ? 12 : 13,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ],
-                      SizedBox(height: 4),
+                      SizedBox(height: _isMobileLayout(context) ? 3 : 4),
                       Row(
                         children: [
                           Icon(
                             Icons.calendar_today,
-                            size: 16,
+                            size: _isMobileLayout(context) ? 14 : 16,
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).iconColor,
                           ),
-                          SizedBox(width: 4),
+                          SizedBox(width: _isMobileLayout(context) ? 3 : 4),
                           Flexible(
                             child: Text(
                               _formatTimestamp(record.timestamp),
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: _isMobileLayout(context) ? 12 : 13,
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1.withValues(alpha: 0.7),
@@ -238,8 +245,10 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             ).iconColor,
                           ),
                           onPressed: () => _editRecord(record),
-                          iconSize: 24,
-                          padding: EdgeInsets.all(8),
+                          iconSize: _isMobileLayout(context) ? 20 : 24,
+                          padding: EdgeInsets.all(
+                            _isMobileLayout(context) ? 6 : 8,
+                          ),
                           tooltip: '編集',
                         ),
                       // 削除ボタン
@@ -253,8 +262,10 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             ).iconColor,
                           ),
                           onPressed: () => _deleteRecords([index]),
-                          iconSize: 24,
-                          padding: EdgeInsets.all(8),
+                          iconSize: _isMobileLayout(context) ? 20 : 24,
+                          padding: EdgeInsets.all(
+                            _isMobileLayout(context) ? 6 : 8,
+                          ),
                           tooltip: '削除',
                         ),
                     ],
@@ -289,6 +300,23 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
   // リスナー管理用
   GroupProvider? _groupProvider;
   VoidCallback? _groupProviderListener;
+
+  // レスポンシブレイアウトの判定
+  bool _isMobileLayout(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 768; // 768px未満をモバイルレイアウトとする
+  }
+
+  bool _isTabletLayout(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth >= 768 &&
+        screenWidth < 1024; // 768px以上1024px未満をタブレットレイアウトとする
+  }
+
+  bool _isDesktopLayout(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth >= 1024; // 1024px以上をデスクトップレイアウトとする
+  }
 
   @override
   void initState() {
@@ -738,6 +766,69 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
     return DateFormat('yyyy/MM/dd HH:mm').format(timestamp);
   }
 
+  // レスポンシブなレコードリストを構築
+  Widget _buildResponsiveRecordList(List<RoastRecord> filteredRecords) {
+    if (_isMobileLayout(context)) {
+      // スマホ縦画面: ListView（1列）
+      return ListView.builder(
+        padding: EdgeInsets.only(
+          left: 8,
+          right: 8,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+        ),
+        itemCount: filteredRecords.length,
+        physics: AlwaysScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          final record = filteredRecords[index];
+          final selected = _selectedIndexes.contains(index);
+          return _buildRecordItem(record, selected, index);
+        },
+      );
+    } else if (_isTabletLayout(context)) {
+      // タブレット横画面: GridView（2列）
+      return GridView.builder(
+        padding: EdgeInsets.only(
+          left: 8,
+          right: 8,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          mainAxisExtent: 180,
+        ),
+        itemCount: filteredRecords.length,
+        itemBuilder: (context, index) {
+          final record = filteredRecords[index];
+          final selected = _selectedIndexes.contains(index);
+          return _buildRecordItem(record, selected, index);
+        },
+      );
+    } else {
+      // PC: GridView（3列）
+      return GridView.builder(
+        padding: EdgeInsets.only(
+          left: 8,
+          right: 8,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          mainAxisExtent: 160,
+        ),
+        itemCount: filteredRecords.length,
+        itemBuilder: (context, index) {
+          final record = filteredRecords[index];
+          final selected = _selectedIndexes.contains(index);
+          return _buildRecordItem(record, selected, index);
+        },
+      );
+    }
+  }
+
   void _toggleSelection(int index) {
     setState(() {
       if (_selectedIndexes.contains(index)) {
@@ -891,13 +982,17 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                       child: Center(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            maxWidth: kIsWeb ? 1200 : double.infinity,
+                            maxWidth: _isDesktopLayout(context)
+                                ? 1200
+                                : double.infinity,
                           ),
                           child: Column(
                             children: [
                               // 検索・フィルターカード
                               Card(
-                                margin: EdgeInsets.all(16),
+                                margin: EdgeInsets.all(
+                                  _isMobileLayout(context) ? 12 : 16,
+                                ),
                                 elevation: 6,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -906,7 +1001,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                   context,
                                 ).cardBackgroundColor,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(20),
+                                  padding: EdgeInsets.all(
+                                    _isMobileLayout(context) ? 16 : 20,
+                                  ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -924,14 +1021,23 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                               color: Provider.of<ThemeSettings>(
                                                 context,
                                               ).iconColor,
-                                              size: 24,
+                                              size: _isMobileLayout(context)
+                                                  ? 20
+                                                  : 24,
                                             ),
-                                            SizedBox(width: 10),
+                                            SizedBox(
+                                              width: _isMobileLayout(context)
+                                                  ? 8
+                                                  : 10,
+                                            ),
                                             Expanded(
                                               child: Text(
                                                 '検索・フィルター',
                                                 style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize:
+                                                      _isMobileLayout(context)
+                                                      ? 16
+                                                      : 18,
                                                   fontWeight: FontWeight.bold,
                                                   color:
                                                       Provider.of<
@@ -1235,66 +1341,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                           ),
                                         ),
                                       )
-                                    : (kIsWeb
-                                          ? GridView.builder(
-                                              padding: EdgeInsets.only(
-                                                left: 8,
-                                                right: 8,
-                                                bottom:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).padding.bottom +
-                                                    16,
-                                              ),
-                                              gridDelegate:
-                                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                                    crossAxisCount: 3,
-                                                    crossAxisSpacing: 12,
-                                                    mainAxisSpacing: 12,
-                                                    mainAxisExtent: 160,
-                                                  ),
-                                              itemCount: filteredRecords.length,
-                                              itemBuilder: (context, index) {
-                                                final record =
-                                                    filteredRecords[index];
-                                                final selected =
-                                                    _selectedIndexes.contains(
-                                                      index,
-                                                    );
-                                                return _buildRecordItem(
-                                                  record,
-                                                  selected,
-                                                  index,
-                                                );
-                                              },
-                                            )
-                                          : ListView.builder(
-                                              padding: EdgeInsets.only(
-                                                left: 8,
-                                                right: 8,
-                                                bottom:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).padding.bottom +
-                                                    16,
-                                              ),
-                                              itemCount: filteredRecords.length,
-                                              physics:
-                                                  AlwaysScrollableScrollPhysics(),
-                                              itemBuilder: (context, index) {
-                                                final record =
-                                                    filteredRecords[index];
-                                                final selected =
-                                                    _selectedIndexes.contains(
-                                                      index,
-                                                    );
-                                                return _buildRecordItem(
-                                                  record,
-                                                  selected,
-                                                  index,
-                                                );
-                                              },
-                                            )),
+                                    : _buildResponsiveRecordList(
+                                        filteredRecords,
+                                      ),
                               ),
                             ],
                           ),

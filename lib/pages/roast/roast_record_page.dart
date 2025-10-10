@@ -86,7 +86,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
       color: themeSettings.cardBackgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: EdgeInsets.all(kIsWeb ? 28.0 : 20.0),
+        padding: EdgeInsets.all(_isMobileLayout(context) ? 20.0 : 28.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -94,7 +94,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(kIsWeb ? 12.0 : 8.0),
+                  padding: EdgeInsets.all(
+                    _isMobileLayout(context) ? 8.0 : 12.0,
+                  ),
                   decoration: BoxDecoration(
                     color: iconColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -102,15 +104,15 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                   child: Icon(
                     Icons.coffee_maker,
                     color: iconColor,
-                    size: kIsWeb ? 28 : 24,
+                    size: _isMobileLayout(context) ? 24 : 28,
                   ),
                 ),
-                SizedBox(width: kIsWeb ? 14.0 : 10.0),
+                SizedBox(width: _isMobileLayout(context) ? 10.0 : 14.0),
                 Expanded(
                   child: Text(
                     title,
                     style: TextStyle(
-                      fontSize: kIsWeb ? 22 : 18,
+                      fontSize: _isMobileLayout(context) ? 18 : 22,
                       fontWeight: FontWeight.bold,
                       color: accentColor,
                     ),
@@ -118,7 +120,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 ),
               ],
             ),
-            SizedBox(height: kIsWeb ? 24.0 : 18.0),
+            SizedBox(height: _isMobileLayout(context) ? 18.0 : 24.0),
 
             // 1. 豆の種類
             _buildInputField(
@@ -128,20 +130,22 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
               icon: Icons.coffee,
               iconColor: iconColor,
             ),
-            SizedBox(height: kIsWeb ? 18.0 : 14.0),
+            SizedBox(height: _isMobileLayout(context) ? 14.0 : 18.0),
 
             // 2. 重さ
             _buildWeightDropdown(
               controller: weightController,
               iconColor: iconColor,
             ),
-            SizedBox(height: kIsWeb ? 18.0 : 14.0),
+            SizedBox(height: _isMobileLayout(context) ? 14.0 : 18.0),
 
             // 3. 煎り度
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(kIsWeb ? 12.0 : 8.0),
+                  padding: EdgeInsets.all(
+                    _isMobileLayout(context) ? 8.0 : 12.0,
+                  ),
                   decoration: BoxDecoration(
                     color: iconColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -149,15 +153,15 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                   child: Icon(
                     Icons.local_fire_department,
                     color: iconColor,
-                    size: kIsWeb ? 24 : 20,
+                    size: _isMobileLayout(context) ? 20 : 24,
                   ),
                 ),
-                SizedBox(width: kIsWeb ? 14.0 : 10.0),
+                SizedBox(width: _isMobileLayout(context) ? 10.0 : 14.0),
                 Expanded(
                   child: Text(
                     '煎り度',
                     style: TextStyle(
-                      fontSize: kIsWeb ? 18 : 15,
+                      fontSize: _isMobileLayout(context) ? 15 : 18,
                       fontWeight: FontWeight.w600,
                       color: accentColor,
                     ),
@@ -165,7 +169,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 ),
               ],
             ),
-            SizedBox(height: kIsWeb ? 8.0 : 6.0),
+            SizedBox(height: _isMobileLayout(context) ? 6.0 : 8.0),
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
@@ -194,7 +198,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(kIsWeb ? 12.0 : 8.0),
+                  padding: EdgeInsets.all(
+                    _isMobileLayout(context) ? 8.0 : 12.0,
+                  ),
                   decoration: BoxDecoration(
                     color: iconColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -202,15 +208,15 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                   child: Icon(
                     Icons.timer,
                     color: iconColor,
-                    size: kIsWeb ? 24 : 20,
+                    size: _isMobileLayout(context) ? 20 : 24,
                   ),
                 ),
-                SizedBox(width: kIsWeb ? 14.0 : 10.0),
+                SizedBox(width: _isMobileLayout(context) ? 10.0 : 14.0),
                 Expanded(
                   child: Text(
                     '焙煎時間',
                     style: TextStyle(
-                      fontSize: kIsWeb ? 18 : 15,
+                      fontSize: _isMobileLayout(context) ? 15 : 18,
                       fontWeight: FontWeight.w600,
                       color: accentColor,
                     ),
@@ -218,7 +224,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 ),
               ],
             ),
-            SizedBox(height: kIsWeb ? 8.0 : 6.0),
+            SizedBox(height: _isMobileLayout(context) ? 6.0 : 8.0),
             Row(
               children: [
                 Expanded(
@@ -228,16 +234,16 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                     iconColor: iconColor,
                   ),
                 ),
-                SizedBox(width: kIsWeb ? 16.0 : 12.0),
+                SizedBox(width: _isMobileLayout(context) ? 12.0 : 16.0),
                 Text(
                   ':',
                   style: TextStyle(
-                    fontSize: kIsWeb ? 28 : 22,
+                    fontSize: _isMobileLayout(context) ? 22 : 28,
                     fontWeight: FontWeight.bold,
                     color: accentColor,
                   ),
                 ),
-                SizedBox(width: kIsWeb ? 16.0 : 12.0),
+                SizedBox(width: _isMobileLayout(context) ? 12.0 : 16.0),
                 Expanded(
                   child: _buildTimeInputField(
                     controller: secController,
@@ -247,7 +253,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 ),
               ],
             ),
-            SizedBox(height: kIsWeb ? 18.0 : 14.0),
+            SizedBox(height: _isMobileLayout(context) ? 14.0 : 18.0),
           ],
         ),
       ),
@@ -269,19 +275,23 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
         Row(
           children: [
             Container(
-              padding: EdgeInsets.all(kIsWeb ? 12.0 : 8.0),
+              padding: EdgeInsets.all(_isMobileLayout(context) ? 8.0 : 12.0),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, color: iconColor, size: kIsWeb ? 24 : 20),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: _isMobileLayout(context) ? 20 : 24,
+              ),
             ),
-            SizedBox(width: kIsWeb ? 14.0 : 10.0),
+            SizedBox(width: _isMobileLayout(context) ? 10.0 : 14.0),
             Expanded(
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: kIsWeb ? 18 : 15,
+                  fontSize: _isMobileLayout(context) ? 15 : 18,
                   fontWeight: FontWeight.w600,
                   color: accentColor,
                 ),
@@ -289,7 +299,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             ),
           ],
         ),
-        SizedBox(height: kIsWeb ? 8.0 : 6.0),
+        SizedBox(height: _isMobileLayout(context) ? 6.0 : 8.0),
         Container(
           decoration: BoxDecoration(
             color: Colors.grey.shade50,
@@ -302,8 +312,8 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
-                horizontal: kIsWeb ? 18.0 : 14.0,
-                vertical: kIsWeb ? 16.0 : 12.0,
+                horizontal: _isMobileLayout(context) ? 14.0 : 18.0,
+                vertical: _isMobileLayout(context) ? 12.0 : 16.0,
               ),
               hintText: hint,
               hintStyle: TextStyle(color: accentColor.withValues(alpha: 0.6)),
@@ -349,8 +359,8 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
         decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
-            horizontal: kIsWeb ? 18.0 : 14.0,
-            vertical: kIsWeb ? 16.0 : 12.0,
+            horizontal: _isMobileLayout(context) ? 14.0 : 18.0,
+            vertical: _isMobileLayout(context) ? 12.0 : 16.0,
           ),
           hintText: label,
           hintStyle: TextStyle(color: Colors.grey[400]),
@@ -382,7 +392,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
         Row(
           children: [
             Container(
-              padding: EdgeInsets.all(kIsWeb ? 12.0 : 8.0),
+              padding: EdgeInsets.all(_isMobileLayout(context) ? 8.0 : 12.0),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
@@ -390,15 +400,15 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
               child: Icon(
                 Icons.scale,
                 color: iconColor,
-                size: kIsWeb ? 24 : 20,
+                size: _isMobileLayout(context) ? 20 : 24,
               ),
             ),
-            SizedBox(width: kIsWeb ? 14.0 : 10.0),
+            SizedBox(width: _isMobileLayout(context) ? 10.0 : 14.0),
             Expanded(
               child: Text(
                 '重さ（g）',
                 style: TextStyle(
-                  fontSize: kIsWeb ? 18 : 15,
+                  fontSize: _isMobileLayout(context) ? 15 : 18,
                   fontWeight: FontWeight.w600,
                   color: accentColor,
                 ),
@@ -406,7 +416,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             ),
           ],
         ),
-        SizedBox(height: kIsWeb ? 8.0 : 6.0),
+        SizedBox(height: _isMobileLayout(context) ? 6.0 : 8.0),
         Container(
           decoration: BoxDecoration(
             color: Colors.grey.shade50,
@@ -418,8 +428,8 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
-                horizontal: kIsWeb ? 18.0 : 14.0,
-                vertical: kIsWeb ? 16.0 : 12.0,
+                horizontal: _isMobileLayout(context) ? 14.0 : 18.0,
+                vertical: _isMobileLayout(context) ? 12.0 : 16.0,
               ),
               hintText: '重さを選択',
               hintStyle: TextStyle(color: accentColor.withValues(alpha: 0.6)),
@@ -598,6 +608,12 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
     super.dispose();
   }
 
+  // レスポンシブレイアウトの判定
+  bool _isMobileLayout(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 768; // 768px未満をモバイルレイアウトとする
+  }
+
   @override
   Widget build(BuildContext context) {
     // 権限チェック中
@@ -643,8 +659,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
       return PermissionDeniedPage(
         title: '焙煎記録入力',
         message: '焙煎記録を入力するには、管理者の権限が必要です。',
-        additionalInfo:
-            'メンバーが焙煎記録を入力できる設定が有効になっている場合は、管理者に設定の確認を依頼してください。',
+        additionalInfo: 'メンバーが焙煎記録を入力できる設定が有効になっている場合は、管理者に設定の確認を依頼してください。',
         customIcon: Icons.edit_note,
       );
     }
@@ -677,9 +692,46 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                     // スクロール可能なコンテンツ部分
                     Expanded(
                       child: SingleChildScrollView(
-                        padding: EdgeInsets.all(kIsWeb ? 24.0 : 16.0),
-                        child: kIsWeb
-                            ? Row(
+                        padding: EdgeInsets.all(
+                          _isMobileLayout(context) ? 16.0 : 24.0,
+                        ),
+                        child: _isMobileLayout(context)
+                            ? Column(
+                                children: [
+                                  // A台の記録
+                                  _buildRoastForm(
+                                    title: 'A台の記録',
+                                    beanController: _beanAController,
+                                    weightController: _weightAController,
+                                    minController: _minuteAController,
+                                    secController: _secondAController,
+                                    roastLevel: _roastLevelA,
+                                    onRoastLevelChanged: (val) {
+                                      if (val != null) {
+                                        setState(() => _roastLevelA = val);
+                                      }
+                                    },
+                                  ),
+                                  SizedBox(height: 20.0),
+
+                                  // B台の記録
+                                  _buildRoastForm(
+                                    title: 'B台の記録',
+                                    beanController: _beanBController,
+                                    weightController: _weightBController,
+                                    minController: _minuteBController,
+                                    secController: _secondBController,
+                                    roastLevel: _roastLevelB,
+                                    onRoastLevelChanged: (val) {
+                                      if (val != null) {
+                                        setState(() => _roastLevelB = val);
+                                      }
+                                    },
+                                  ),
+                                  SizedBox(height: 20.0), // 保存ボタンとの間隔を調整
+                                ],
+                              )
+                            : Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // A台の記録（左側）
@@ -716,48 +768,15 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                                     ),
                                   ),
                                 ],
-                              )
-                            : Column(
-                                children: [
-                                  // A台の記録
-                                  _buildRoastForm(
-                                    title: 'A台の記録',
-                                    beanController: _beanAController,
-                                    weightController: _weightAController,
-                                    minController: _minuteAController,
-                                    secController: _secondAController,
-                                    roastLevel: _roastLevelA,
-                                    onRoastLevelChanged: (val) {
-                                      if (val != null) {
-                                        setState(() => _roastLevelA = val);
-                                      }
-                                    },
-                                  ),
-                                  SizedBox(height: 20.0),
-
-                                  // B台の記録
-                                  _buildRoastForm(
-                                    title: 'B台の記録',
-                                    beanController: _beanBController,
-                                    weightController: _weightBController,
-                                    minController: _minuteBController,
-                                    secController: _secondBController,
-                                    roastLevel: _roastLevelB,
-                                    onRoastLevelChanged: (val) {
-                                      if (val != null) {
-                                        setState(() => _roastLevelB = val);
-                                      }
-                                    },
-                                  ),
-                                  SizedBox(height: 20.0), // 保存ボタンとの間隔を調整
-                                ],
                               ),
                       ),
                     ),
 
                     // 保存ボタン（下部に固定）
                     Container(
-                      padding: EdgeInsets.all(kIsWeb ? 24.0 : 16.0),
+                      padding: EdgeInsets.all(
+                        _isMobileLayout(context) ? 16.0 : 24.0,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).scaffoldBackgroundColor,
                         boxShadow: [
@@ -772,11 +791,14 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: _saveBothRoasts,
-                          icon: Icon(Icons.save, size: kIsWeb ? 24 : 20),
+                          icon: Icon(
+                            Icons.save,
+                            size: _isMobileLayout(context) ? 20 : 24,
+                          ),
                           label: Text(
                             '記録を保存',
                             style: TextStyle(
-                              fontSize: kIsWeb ? 18 : 16,
+                              fontSize: _isMobileLayout(context) ? 16 : 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -796,7 +818,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                                     ?.resolve({}) ??
                                 Colors.white,
                             padding: EdgeInsets.symmetric(
-                              vertical: kIsWeb ? 18.0 : 15.0,
+                              vertical: _isMobileLayout(context) ? 15.0 : 18.0,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),

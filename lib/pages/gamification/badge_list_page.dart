@@ -215,136 +215,157 @@ class _BadgeListPageState extends State<BadgeListPage>
           ],
         ),
       ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 1400),
-          child: Consumer2<GroupProvider, GamificationProvider>(
-            builder: (context, groupProvider, gamificationProvider, child) {
-              if (!groupProvider.hasGroup) {
-                return Center(
-                  child: Container(
-                    padding: EdgeInsets.all(40),
-                    decoration: BoxDecoration(
-                      color: themeSettings.cardBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // 画面幅に応じてレスポンシブ対応
+          final screenWidth = constraints.maxWidth;
+          final isMobile = screenWidth < 768;
+          final isTablet = screenWidth >= 768 && screenWidth < 1024;
+
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isMobile ? double.infinity : 1400,
+              ),
+              child: Consumer2<GroupProvider, GamificationProvider>(
+                builder: (context, groupProvider, gamificationProvider, child) {
+                  if (!groupProvider.hasGroup) {
+                    return Center(
+                      child: Container(
+                        padding: EdgeInsets.all(isMobile ? 20 : 40),
+                        margin: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 16 : 0,
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: themeSettings.iconColor.withValues(
-                              alpha: 0.1,
+                        decoration: BoxDecoration(
+                          color: themeSettings.cardBackgroundColor,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
                             ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.groups_outlined,
-                            size: 48,
-                            color: themeSettings.iconColor,
-                          ),
+                          ],
                         ),
-                        SizedBox(height: 24),
-                        Text(
-                          'グループに参加すると\nバッジを確認できます',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: themeSettings.fontColor1,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: themeSettings.fontFamily,
-                          ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(isMobile ? 16 : 20),
+                              decoration: BoxDecoration(
+                                color: themeSettings.iconColor.withValues(
+                                  alpha: 0.1,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.groups_outlined,
+                                size: isMobile ? 40 : 48,
+                                color: themeSettings.iconColor,
+                              ),
+                            ),
+                            SizedBox(height: isMobile ? 16 : 24),
+                            Text(
+                              'グループに参加すると\nバッジを確認できます',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: isMobile ? 16 : 18,
+                                color: themeSettings.fontColor1,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: themeSettings.fontFamily,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'チームで協力してバッジを獲得しましょう',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: isMobile ? 12 : 14,
+                                color: themeSettings.fontColor2,
+                                fontFamily: themeSettings.fontFamily,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'チームで協力してバッジを獲得しましょう',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: themeSettings.fontColor2,
-                            fontFamily: themeSettings.fontFamily,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              final groupId = groupProvider.currentGroup!.id;
-
-              // リアルタイムでプロフィールを取得（キャッシュも使用）
-              GroupGamificationProfile? profile = _cachedProfile;
-              profile ??= groupProvider.getGroupGamificationProfile(groupId);
-
-              if (profile == null) {
-                return Center(
-                  child: Container(
-                    padding: EdgeInsets.all(40),
-                    decoration: BoxDecoration(
-                      color: themeSettings.cardBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(
-                          color: themeSettings.iconColor,
-                          strokeWidth: 3,
-                        ),
-                        SizedBox(height: 24),
-                        Text(
-                          'バッジデータを読み込み中...',
-                          style: TextStyle(
-                            color: themeSettings.fontColor2,
-                            fontSize: 16,
-                            fontFamily: themeSettings.fontFamily,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return FadeTransition(
-                opacity: _fadeAnimation,
-                child: Column(
-                  children: [
-                    // カテゴリフィルター
-                    _buildCategoryFilter(themeSettings),
-
-                    SizedBox(height: 24),
-
-                    // バッジグリッド
-                    Expanded(
-                      child: _buildBadgeGrid(
-                        profile,
-                        themeSettings,
-                        isWeb: true,
                       ),
+                    );
+                  }
+
+                  final groupId = groupProvider.currentGroup!.id;
+
+                  // リアルタイムでプロフィールを取得（キャッシュも使用）
+                  GroupGamificationProfile? profile = _cachedProfile;
+                  profile ??= groupProvider.getGroupGamificationProfile(
+                    groupId,
+                  );
+
+                  if (profile == null) {
+                    return Center(
+                      child: Container(
+                        padding: EdgeInsets.all(isMobile ? 20 : 40),
+                        margin: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 16 : 0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: themeSettings.cardBackgroundColor,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(
+                              color: themeSettings.iconColor,
+                              strokeWidth: 3,
+                            ),
+                            SizedBox(height: isMobile ? 16 : 24),
+                            Text(
+                              'バッジデータを読み込み中...',
+                              style: TextStyle(
+                                color: themeSettings.fontColor2,
+                                fontSize: isMobile ? 14 : 16,
+                                fontFamily: themeSettings.fontFamily,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Column(
+                      children: [
+                        // カテゴリフィルター
+                        _buildCategoryFilter(themeSettings, isMobile: isMobile),
+
+                        SizedBox(height: isMobile ? 16 : 24),
+
+                        // バッジグリッド
+                        Expanded(
+                          child: _buildBadgeGrid(
+                            profile,
+                            themeSettings,
+                            isWeb: true,
+                            isMobile: isMobile,
+                            isTablet: isTablet,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -421,9 +442,16 @@ class _BadgeListPageState extends State<BadgeListPage>
   }
 
   /// カテゴリフィルター
-  Widget _buildCategoryFilter(ThemeSettings themeSettings) {
+  Widget _buildCategoryFilter(
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+  }) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
+      margin: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 16),
+      padding: EdgeInsets.symmetric(
+        vertical: isMobile ? 12 : 16,
+        horizontal: isMobile ? 4 : 8,
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -433,7 +461,7 @@ class _BadgeListPageState extends State<BadgeListPage>
             final isSelected = _selectedCategory == category;
 
             return Container(
-              margin: EdgeInsets.only(right: 12),
+              margin: EdgeInsets.only(right: isMobile ? 8 : 12),
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -442,12 +470,15 @@ class _BadgeListPageState extends State<BadgeListPage>
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 200),
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 16 : 20,
+                    vertical: isMobile ? 10 : 12,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? themeSettings.iconColor
                         : themeSettings.cardBackgroundColor,
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(isMobile ? 20 : 25),
                     border: Border.all(
                       color: isSelected
                           ? themeSettings.iconColor
@@ -460,7 +491,7 @@ class _BadgeListPageState extends State<BadgeListPage>
                               color: themeSettings.iconColor.withValues(
                                 alpha: 0.3,
                               ),
-                              blurRadius: 8,
+                              blurRadius: isMobile ? 6 : 8,
                               offset: Offset(0, 4),
                             ),
                           ]
@@ -476,8 +507,12 @@ class _BadgeListPageState extends State<BadgeListPage>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (isSelected) ...[
-                        Icon(Icons.check_circle, color: Colors.white, size: 16),
-                        SizedBox(width: 8),
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.white,
+                          size: isMobile ? 14 : 16,
+                        ),
+                        SizedBox(width: isMobile ? 6 : 8),
                       ],
                       Text(
                         label,
@@ -488,7 +523,7 @@ class _BadgeListPageState extends State<BadgeListPage>
                           fontWeight: isSelected
                               ? FontWeight.bold
                               : FontWeight.w500,
-                          fontSize: 14,
+                          fontSize: isMobile ? 12 : 14,
                           fontFamily: themeSettings.fontFamily,
                         ),
                       ),
@@ -508,19 +543,46 @@ class _BadgeListPageState extends State<BadgeListPage>
     GroupGamificationProfile profile,
     ThemeSettings themeSettings, {
     required bool isWeb,
+    bool isMobile = false,
+    bool isTablet = false,
   }) {
     final filteredBadges = _getFilteredBadges();
     final earnedBadgeIds = profile.badges.map((b) => b.id).toSet();
 
-    // バッジ一覧を表示
+    // 画面サイズに応じたグリッド列数の動的調整
+    int crossAxisCount;
+    double childAspectRatio;
+    double spacing;
+    double horizontalPadding;
 
-    // WEB版では6列、モバイル版では2列
-    final crossAxisCount = isWeb ? 6 : 2;
-    final childAspectRatio = isWeb ? 0.8 : 0.85;
-    final spacing = isWeb ? 16.0 : 16.0;
+    if (isMobile) {
+      // スマホ: 2列
+      crossAxisCount = 2;
+      childAspectRatio = 0.85;
+      spacing = 12.0;
+      horizontalPadding = 8.0;
+    } else if (isTablet) {
+      // タブレット: 4列
+      crossAxisCount = 4;
+      childAspectRatio = 0.8;
+      spacing = 14.0;
+      horizontalPadding = 12.0;
+    } else if (isWeb) {
+      // デスクトップ: 6列
+      crossAxisCount = 6;
+      childAspectRatio = 0.8;
+      spacing = 16.0;
+      horizontalPadding = 16.0;
+    } else {
+      // モバイル版（ネイティブ）: 2列
+      crossAxisCount = 2;
+      childAspectRatio = 0.85;
+      spacing = 16.0;
+      horizontalPadding = 16.0;
+    }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: GridView.builder(
         cacheExtent: 1000,
         addAutomaticKeepAlives: false,
@@ -561,6 +623,8 @@ class _BadgeListPageState extends State<BadgeListPage>
             description: _getBadgeDescription(condition),
             progressText: _getBadgeProgressText(condition),
             isWeb: isWeb,
+            isMobile: isMobile,
+            isTablet: isTablet,
           );
         },
       ),
@@ -894,6 +958,8 @@ class BadgeCard extends StatefulWidget {
   final String description;
   final String progressText;
   final bool isWeb;
+  final bool isMobile;
+  final bool isTablet;
 
   const BadgeCard({
     super.key,
@@ -906,6 +972,8 @@ class BadgeCard extends StatefulWidget {
     required this.description,
     required this.progressText,
     required this.isWeb,
+    this.isMobile = false,
+    this.isTablet = false,
   });
 
   @override
@@ -1001,7 +1069,15 @@ class _BadgeCardState extends State<BadgeCard>
             ),
           ),
           child: Container(
-            padding: EdgeInsets.all(widget.isWeb ? 12 : 16),
+            padding: EdgeInsets.all(
+              widget.isMobile
+                  ? 12
+                  : widget.isTablet
+                  ? 14
+                  : widget.isWeb
+                  ? 12
+                  : 16,
+            ),
             child: Column(
               children: [
                 // バッジアイコン
@@ -1012,8 +1088,20 @@ class _BadgeCardState extends State<BadgeCard>
                     children: [
                       // グラデーション背景
                       Container(
-                        width: widget.isWeb ? 70 : 80,
-                        height: widget.isWeb ? 70 : 80,
+                        width: widget.isMobile
+                            ? 60
+                            : widget.isTablet
+                            ? 65
+                            : widget.isWeb
+                            ? 70
+                            : 80,
+                        height: widget.isMobile
+                            ? 60
+                            : widget.isTablet
+                            ? 65
+                            : widget.isWeb
+                            ? 70
+                            : 80,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: widget.isEarned
@@ -1046,8 +1134,20 @@ class _BadgeCardState extends State<BadgeCard>
                                     color: widget.condition.color.withValues(
                                       alpha: 0.5,
                                     ),
-                                    blurRadius: widget.isWeb ? 15 : 25,
-                                    spreadRadius: widget.isWeb ? 3 : 5,
+                                    blurRadius: widget.isMobile
+                                        ? 12
+                                        : widget.isTablet
+                                        ? 15
+                                        : widget.isWeb
+                                        ? 15
+                                        : 25,
+                                    spreadRadius: widget.isMobile
+                                        ? 2
+                                        : widget.isTablet
+                                        ? 3
+                                        : widget.isWeb
+                                        ? 3
+                                        : 5,
                                     offset: Offset(0, 4),
                                   ),
                                 ]
@@ -1069,14 +1169,32 @@ class _BadgeCardState extends State<BadgeCard>
                                     .star // デフォルトアイコンを使用
                               : Icons.lock,
                           color: Colors.white,
-                          size: widget.isWeb ? 28 : 40,
+                          size: widget.isMobile
+                              ? 24
+                              : widget.isTablet
+                              ? 26
+                              : widget.isWeb
+                              ? 28
+                              : 40,
                         ),
                       ),
                       // 進捗リング（未獲得の場合）
                       if (!widget.isEarned)
                         SizedBox(
-                          width: widget.isWeb ? 80 : 90,
-                          height: widget.isWeb ? 80 : 90,
+                          width: widget.isMobile
+                              ? 70
+                              : widget.isTablet
+                              ? 75
+                              : widget.isWeb
+                              ? 80
+                              : 90,
+                          height: widget.isMobile
+                              ? 70
+                              : widget.isTablet
+                              ? 75
+                              : widget.isWeb
+                              ? 80
+                              : 90,
                           child: CircularProgressIndicator(
                             value: widget.progress,
                             backgroundColor: widget.themeSettings.borderColor
@@ -1084,7 +1202,13 @@ class _BadgeCardState extends State<BadgeCard>
                             valueColor: AlwaysStoppedAnimation<Color>(
                               widget.condition.color,
                             ),
-                            strokeWidth: widget.isWeb ? 3 : 4,
+                            strokeWidth: widget.isMobile
+                                ? 3
+                                : widget.isTablet
+                                ? 3.5
+                                : widget.isWeb
+                                ? 3
+                                : 4,
                             strokeCap: StrokeCap.round,
                           ),
                         ),
@@ -1092,7 +1216,15 @@ class _BadgeCardState extends State<BadgeCard>
                   ),
                 ),
 
-                SizedBox(height: widget.isWeb ? 8 : 12),
+                SizedBox(
+                  height: widget.isMobile
+                      ? 6
+                      : widget.isTablet
+                      ? 8
+                      : widget.isWeb
+                      ? 8
+                      : 12,
+                ),
 
                 // バッジ名
                 Expanded(
@@ -1106,24 +1238,50 @@ class _BadgeCardState extends State<BadgeCard>
                               alpha: 0.6,
                             ),
                       fontSize:
-                          (widget.isWeb ? 14 : 14) *
+                          (widget.isMobile
+                              ? 12
+                              : widget.isTablet
+                              ? 13
+                              : widget.isWeb
+                              ? 14
+                              : 14) *
                           widget.themeSettings.fontSizeScale,
                       fontWeight: FontWeight.bold,
                       fontFamily: widget.themeSettings.fontFamily,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: widget.isWeb ? 2 : 2,
+                    maxLines: widget.isMobile
+                        ? 2
+                        : widget.isTablet
+                        ? 2
+                        : widget.isWeb
+                        ? 2
+                        : 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
 
                 // 進捗ゲージとテキスト
                 if (!widget.isEarned) ...[
-                  SizedBox(height: widget.isWeb ? 4 : 8),
+                  SizedBox(
+                    height: widget.isMobile
+                        ? 4
+                        : widget.isTablet
+                        ? 6
+                        : widget.isWeb
+                        ? 4
+                        : 8,
+                  ),
                   // 進捗バー
                   Container(
                     width: double.infinity,
-                    height: widget.isWeb ? 2 : 4,
+                    height: widget.isMobile
+                        ? 3
+                        : widget.isTablet
+                        ? 3.5
+                        : widget.isWeb
+                        ? 2
+                        : 4,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(2),
@@ -1139,14 +1297,28 @@ class _BadgeCardState extends State<BadgeCard>
                       ),
                     ),
                   ),
-                  SizedBox(height: widget.isWeb ? 2 : 4),
+                  SizedBox(
+                    height: widget.isMobile
+                        ? 2
+                        : widget.isTablet
+                        ? 3
+                        : widget.isWeb
+                        ? 2
+                        : 4,
+                  ),
                   // 進捗テキスト
                   Text(
                     widget.progressText,
                     style: TextStyle(
                       color: widget.condition.color,
                       fontSize:
-                          (widget.isWeb ? 12 : 12) *
+                          (widget.isMobile
+                              ? 10
+                              : widget.isTablet
+                              ? 11
+                              : widget.isWeb
+                              ? 12
+                              : 12) *
                           widget.themeSettings.fontSizeScale,
                       fontWeight: FontWeight.bold,
                       fontFamily: widget.themeSettings.fontFamily,
@@ -1161,7 +1333,13 @@ class _BadgeCardState extends State<BadgeCard>
                     style: TextStyle(
                       color: Colors.black54,
                       fontSize:
-                          (widget.isWeb ? 10 : 10) *
+                          (widget.isMobile
+                              ? 9
+                              : widget.isTablet
+                              ? 9.5
+                              : widget.isWeb
+                              ? 10
+                              : 10) *
                           widget.themeSettings.fontSizeScale,
                       fontFamily: widget.themeSettings.fontFamily,
                     ),

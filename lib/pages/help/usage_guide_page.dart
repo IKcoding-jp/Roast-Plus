@@ -186,6 +186,186 @@ class _UsageGuidePageState extends State<UsageGuidePage>
   }
 
   Widget _buildWebLayout(ThemeSettings themeSettings) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final isMobile = screenWidth < 768;
+        final isTablet = screenWidth >= 768 && screenWidth < 1024;
+
+        if (isMobile) {
+          // スマホ解像度: 縦並びレイアウト
+          return _buildMobileWebLayout(themeSettings);
+        } else if (isTablet) {
+          // タブレット解像度: サイドバーを狭く
+          return _buildTabletWebLayout(themeSettings);
+        } else {
+          // デスクトップ解像度: 通常のレイアウト
+          return _buildDesktopWebLayout(themeSettings);
+        }
+      },
+    );
+  }
+
+  Widget _buildMobileWebLayout(ThemeSettings themeSettings) {
+    return Container(
+      color: themeSettings.backgroundColor,
+      child: Column(
+        children: [
+          // カテゴリ選択タブ（横スクロール）
+          Container(
+            height: 60,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              children: [
+                _buildMobileCategoryTab(
+                  themeSettings,
+                  '基本',
+                  Icons.play_arrow,
+                  0,
+                ),
+                _buildMobileCategoryTab(themeSettings, '焙煎', Icons.timer, 1),
+                _buildMobileCategoryTab(themeSettings, '管理', Icons.schedule, 2),
+                _buildMobileCategoryTab(themeSettings, 'グループ', Icons.group, 3),
+                _buildMobileCategoryTab(
+                  themeSettings,
+                  'ゲーム',
+                  Icons.emoji_events,
+                  4,
+                ),
+                _buildMobileCategoryTab(themeSettings, '設定', Icons.settings, 5),
+              ],
+            ),
+          ),
+          // コンテンツエリア
+          Expanded(
+            child: IndexedStack(
+              index: _tabController.index,
+              children: [
+                _buildBasicTab(themeSettings, isMobile: true),
+                _buildRoastingTab(themeSettings, isMobile: true),
+                _buildManagementTab(themeSettings, isMobile: true),
+                _buildGroupTab(themeSettings, isMobile: true),
+                _buildGamificationTab(themeSettings, isMobile: true),
+                _buildSettingsTab(themeSettings, isMobile: true),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabletWebLayout(ThemeSettings themeSettings) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 1200),
+        child: Container(
+          color: themeSettings.backgroundColor,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 左側のカテゴリナビゲーション（狭く）
+              Container(
+                width: 180,
+                decoration: BoxDecoration(
+                  color: themeSettings.cardBackgroundColor,
+                  border: Border(
+                    right: BorderSide(color: Colors.grey.shade300, width: 1),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // カテゴリヘッダー
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      child: Text(
+                        'カテゴリ',
+                        style: TextStyle(
+                          fontSize: 16 * themeSettings.fontSizeScale,
+                          fontWeight: FontWeight.bold,
+                          color: themeSettings.fontColor1,
+                          fontFamily: themeSettings.fontFamily,
+                        ),
+                      ),
+                    ),
+                    // カテゴリリスト
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          _buildWebCategoryItem(
+                            themeSettings,
+                            '基本',
+                            Icons.play_arrow,
+                            0,
+                            isTablet: true,
+                          ),
+                          _buildWebCategoryItem(
+                            themeSettings,
+                            '焙煎',
+                            Icons.timer,
+                            1,
+                            isTablet: true,
+                          ),
+                          _buildWebCategoryItem(
+                            themeSettings,
+                            '管理',
+                            Icons.schedule,
+                            2,
+                            isTablet: true,
+                          ),
+                          _buildWebCategoryItem(
+                            themeSettings,
+                            'グループ',
+                            Icons.group,
+                            3,
+                            isTablet: true,
+                          ),
+                          _buildWebCategoryItem(
+                            themeSettings,
+                            'ゲーム',
+                            Icons.emoji_events,
+                            4,
+                            isTablet: true,
+                          ),
+                          _buildWebCategoryItem(
+                            themeSettings,
+                            '設定',
+                            Icons.settings,
+                            5,
+                            isTablet: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // 右側のコンテンツエリア
+              Expanded(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height - 120,
+                  child: IndexedStack(
+                    index: _tabController.index,
+                    children: [
+                      _buildBasicTab(themeSettings, isTablet: true),
+                      _buildRoastingTab(themeSettings, isTablet: true),
+                      _buildManagementTab(themeSettings, isTablet: true),
+                      _buildGroupTab(themeSettings, isTablet: true),
+                      _buildGamificationTab(themeSettings, isTablet: true),
+                      _buildSettingsTab(themeSettings, isTablet: true),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopWebLayout(ThemeSettings themeSettings) {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 1400),
@@ -288,7 +468,7 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     );
   }
 
-  Widget _buildWebCategoryItem(
+  Widget _buildMobileCategoryTab(
     ThemeSettings themeSettings,
     String title,
     IconData icon,
@@ -297,7 +477,63 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     final isSelected = _tabController.index == index;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      margin: EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _tabController.animateTo(index);
+          });
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? themeSettings.buttonColor
+                : themeSettings.cardBackgroundColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected
+                  ? themeSettings.buttonColor
+                  : themeSettings.borderColor.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected ? Colors.white : themeSettings.iconColor,
+              ),
+              SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12 * themeSettings.fontSizeScale,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.white : themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebCategoryItem(
+    ThemeSettings themeSettings,
+    String title,
+    IconData icon,
+    int index, {
+    bool isTablet = false,
+  }) {
+    final isSelected = _tabController.index == index;
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: isTablet ? 4 : 8, vertical: 2),
       child: Card(
         elevation: isSelected ? 4 : 1,
         color: isSelected
@@ -306,19 +542,15 @@ class _UsageGuidePageState extends State<UsageGuidePage>
         child: ListTile(
           leading: Icon(
             icon,
-            color: isSelected
-                ? themeSettings.fontColor2
-                : themeSettings.iconColor,
-            size: 24,
+            color: isSelected ? Colors.white : themeSettings.iconColor,
+            size: isTablet ? 20 : 24,
           ),
           title: Text(
             title,
             style: TextStyle(
-              fontSize: 16 * themeSettings.fontSizeScale,
+              fontSize: (isTablet ? 14 : 16) * themeSettings.fontSizeScale,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected
-                  ? themeSettings.fontColor2
-                  : themeSettings.fontColor1,
+              color: isSelected ? Colors.white : themeSettings.fontColor1,
               fontFamily: themeSettings.fontFamily,
             ),
           ),
@@ -332,7 +564,11 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     );
   }
 
-  Widget _buildBasicTab(ThemeSettings themeSettings) {
+  Widget _buildBasicTab(
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+    bool isTablet = false,
+  }) {
     return Container(
       color: themeSettings.backgroundColor,
       child: WebUIUtils.isWeb
@@ -345,6 +581,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'アプリの基本的な使い方を説明',
                   Icons.play_arrow,
                   () => _showBasicOperationDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -352,6 +590,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'メニューの開き方と項目の説明',
                   Icons.menu,
                   () => _showDrawerMenuDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -359,10 +599,14 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'データの自動保存とクラウド同期',
                   Icons.sync,
                   () => _showDataSyncDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
               ],
               '基本',
               'アプリの基本的な使い方について説明します',
+              isMobile,
+              isTablet,
             )
           : ListView(
               padding: EdgeInsets.all(16),
@@ -400,46 +644,43 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     List<Widget> items, [
     String title = '基本',
     String description = 'アプリの基本的な使い方について説明します',
+    bool isMobile = false,
+    bool isTablet = false,
   ]) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.all(
+        isMobile
+            ? 12
+            : isTablet
+            ? 16
+            : 24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // タブタイトル
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 24 * themeSettings.fontSizeScale,
-              fontWeight: FontWeight.bold,
-              color: themeSettings.fontColor1,
-              fontFamily: themeSettings.fontFamily,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 16 * themeSettings.fontSizeScale,
-              color: themeSettings.fontColor2,
-              fontFamily: themeSettings.fontFamily,
-            ),
-          ),
-          SizedBox(height: 24),
           // アイテムグリッド
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: items
-                .map((item) => SizedBox(width: 350, child: item))
-                .toList(),
-          ),
+          isMobile
+              ? Column(children: items)
+              : Wrap(
+                  spacing: isTablet ? 12 : 16,
+                  runSpacing: isTablet ? 12 : 16,
+                  children: items
+                      .map(
+                        (item) =>
+                            SizedBox(width: isTablet ? 300 : 350, child: item),
+                      )
+                      .toList(),
+                ),
         ],
       ),
     );
   }
 
-  Widget _buildRoastingTab(ThemeSettings themeSettings) {
+  Widget _buildRoastingTab(
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+    bool isTablet = false,
+  }) {
     return Container(
       color: themeSettings.backgroundColor,
       child: WebUIUtils.isWeb
@@ -452,6 +693,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '焙煎作業の時間管理をサポート',
                   Icons.timer,
                   () => _showRoastingTimerDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -459,10 +702,14 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '焙煎作業の詳細を記録',
                   Icons.note_add,
                   () => _showRoastingRecordDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
               ],
               '焙煎',
               '焙煎作業に関する機能の使い方を説明します',
+              isMobile,
+              isTablet,
             )
           : ListView(
               padding: EdgeInsets.all(16),
@@ -487,7 +734,11 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     );
   }
 
-  Widget _buildManagementTab(ThemeSettings themeSettings) {
+  Widget _buildManagementTab(
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+    bool isTablet = false,
+  }) {
     return Container(
       color: themeSettings.backgroundColor,
       child: WebUIUtils.isWeb
@@ -500,6 +751,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '作業スケジュールの管理と自動作成',
                   Icons.schedule,
                   () => _showScheduleDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -507,6 +760,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'タスク管理と通知機能',
                   Icons.checklist,
                   () => _showTodoDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -514,6 +769,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'ドリップパックのカウントと記録',
                   Icons.filter_list,
                   () => _showDripCounterDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -521,6 +778,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'コーヒーの試飲評価と記録',
                   Icons.local_cafe,
                   () => _showTastingDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -528,6 +787,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '作業の進捗管理と記録',
                   Icons.work,
                   () => _showWorkProgressDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -535,10 +796,14 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '日付別のデータ表示と管理',
                   Icons.calendar_today,
                   () => _showCalendarDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
               ],
               '管理',
               'スケジュール、TODO、記録などの管理機能について説明します',
+              isMobile,
+              isTablet,
             )
           : ListView(
               padding: EdgeInsets.all(16),
@@ -595,7 +860,11 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     );
   }
 
-  Widget _buildGroupTab(ThemeSettings themeSettings) {
+  Widget _buildGroupTab(
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+    bool isTablet = false,
+  }) {
     return Container(
       color: themeSettings.backgroundColor,
       child: WebUIUtils.isWeb
@@ -608,6 +877,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '新しいグループを作成する方法',
                   Icons.group_add,
                   () => _showGroupCreateDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -615,6 +886,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'グループにメンバーを招待する方法',
                   Icons.person_add,
                   () => _showMemberInviteDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -622,6 +895,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'データをグループ内で共有する方法',
                   Icons.share,
                   () => _showGroupShareDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -629,6 +904,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'メンバーの出勤退勤状態を管理',
                   Icons.access_time,
                   () => _showAttendanceDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -636,10 +913,14 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'チームの担当を自動で決める機能',
                   Icons.assignment,
                   () => _showAssignmentDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
               ],
               'グループ',
               'チームでの協力作業とデータ共有について説明します',
+              isMobile,
+              isTablet,
             )
           : ListView(
               padding: EdgeInsets.all(16),
@@ -688,7 +969,11 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     );
   }
 
-  Widget _buildGamificationTab(ThemeSettings themeSettings) {
+  Widget _buildGamificationTab(
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+    bool isTablet = false,
+  }) {
     return Container(
       color: themeSettings.backgroundColor,
       child: WebUIUtils.isWeb
@@ -701,6 +986,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'バッジの獲得条件と種類について',
                   Icons.emoji_events,
                   () => _showBadgeSystemDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -708,10 +995,14 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '経験値とレベルアップの仕組み',
                   Icons.trending_up,
                   () => _showLevelSystemDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
               ],
               'ゲーミフィケーション',
               'バッジシステムとレベルアップ機能について説明します',
+              isMobile,
+              isTablet,
             )
           : ListView(
               padding: EdgeInsets.all(16),
@@ -736,7 +1027,11 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     );
   }
 
-  Widget _buildSettingsTab(ThemeSettings themeSettings) {
+  Widget _buildSettingsTab(
+    ThemeSettings themeSettings, {
+    bool isMobile = false,
+    bool isTablet = false,
+  }) {
     return Container(
       color: themeSettings.backgroundColor,
       child: WebUIUtils.isWeb
@@ -749,6 +1044,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'アプリの見た目をカスタマイズ',
                   Icons.palette,
                   () => _showThemeSettingsDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -756,6 +1053,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'アラーム音と音量の調整',
                   Icons.volume_up,
                   () => _showSoundSettingsDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -763,6 +1062,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'アラームと通知の設定',
                   Icons.notifications,
                   () => _showNotificationSettingsDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -770,6 +1071,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'パスコードロックと生体認証',
                   Icons.security,
                   () => _showSecuritySettingsDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -777,6 +1080,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'データのエクスポート・インポート',
                   Icons.storage,
                   () => _showDataManagementDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -784,6 +1089,8 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   '要望やバグ報告を送信',
                   Icons.feedback,
                   () => _showFeedbackDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
                 _buildListItem(
                   themeSettings,
@@ -791,10 +1098,14 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                   'アプリを効率的に使うためのヒント',
                   Icons.lightbulb,
                   () => _showUsageTipsDetail(context, themeSettings),
+                  isMobile: isMobile,
+                  isTablet: isTablet,
                 ),
               ],
               '設定',
               'アプリの設定とカスタマイズについて説明します',
+              isMobile,
+              isTablet,
             )
           : ListView(
               padding: EdgeInsets.all(16),
@@ -864,26 +1175,61 @@ class _UsageGuidePageState extends State<UsageGuidePage>
     String title,
     String subtitle,
     IconData icon,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    bool isMobile = false,
+    bool isTablet = false,
+  }) {
     return Card(
       elevation: 2,
       color: themeSettings.cardBackgroundColor,
       child: ListTile(
-        leading: Icon(icon, color: Colors.blue, size: 28),
+        leading: Icon(
+          icon,
+          color: Colors.blue,
+          size: isMobile
+              ? 24
+              : isTablet
+              ? 26
+              : 28,
+        ),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 18,
+            fontSize:
+                (isMobile
+                    ? 16
+                    : isTablet
+                    ? 17
+                    : 18) *
+                themeSettings.fontSizeScale,
             fontWeight: FontWeight.bold,
             color: Colors.black,
+            fontFamily: themeSettings.fontFamily,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(fontSize: 14, color: Colors.black54),
+          style: TextStyle(
+            fontSize:
+                (isMobile
+                    ? 12
+                    : isTablet
+                    ? 13
+                    : 14) *
+                themeSettings.fontSizeScale,
+            color: Colors.black54,
+            fontFamily: themeSettings.fontFamily,
+          ),
         ),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.grey,
+          size: isMobile
+              ? 16
+              : isTablet
+              ? 18
+              : 20,
+        ),
         onTap: onTap,
       ),
     );

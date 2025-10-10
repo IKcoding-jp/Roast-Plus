@@ -6,25 +6,32 @@ class WebUIUtils {
   /// WEB版かどうかを判定
   static bool get isWeb => kIsWeb;
 
-  /// デスクトップサイズかどうかを判定
+  /// デスクトップサイズかどうかを判定（1200px以上）
   static bool isDesktop(BuildContext context) {
     if (!isWeb) return false;
     final size = MediaQuery.of(context).size;
-    return size.width > 1024;
+    return size.width >= 1200;
   }
 
-  /// タブレットサイズかどうかを判定
+  /// 大画面タブレットサイズかどうかを判定（1024px-1199px）
+  static bool isLargeTablet(BuildContext context) {
+    if (!isWeb) return false;
+    final size = MediaQuery.of(context).size;
+    return size.width >= 1024 && size.width < 1200;
+  }
+
+  /// タブレットサイズかどうかを判定（768px-1023px）
   static bool isTablet(BuildContext context) {
     if (!isWeb) return false;
     final size = MediaQuery.of(context).size;
-    return size.width > 768 && size.width <= 1024;
+    return size.width >= 768 && size.width < 1024;
   }
 
-  /// モバイルサイズかどうかを判定
+  /// モバイルサイズかどうかを判定（768px未満）
   static bool isMobile(BuildContext context) {
     if (!isWeb) return true;
     final size = MediaQuery.of(context).size;
-    return size.width <= 768;
+    return size.width < 768;
   }
 
   /// 小さなスマホサイズかどうかを判定（iPhone SE等）
@@ -48,15 +55,17 @@ class WebUIUtils {
     }
 
     if (isDesktop(context)) {
-      return EdgeInsets.symmetric(horizontal: 20, vertical: 0);
+      return EdgeInsets.symmetric(horizontal: 32, vertical: 16);
+    } else if (isLargeTablet(context)) {
+      return EdgeInsets.symmetric(horizontal: 24, vertical: 12);
     } else if (isTablet(context)) {
-      return EdgeInsets.symmetric(horizontal: 24, vertical: 0);
+      return EdgeInsets.symmetric(horizontal: 20, vertical: 8);
     } else if (isSmallMobile(context)) {
-      return EdgeInsets.symmetric(horizontal: 12, vertical: 0);
+      return EdgeInsets.symmetric(horizontal: 12, vertical: 8);
     } else if (isMediumMobile(context)) {
-      return EdgeInsets.symmetric(horizontal: 16, vertical: 0);
+      return EdgeInsets.symmetric(horizontal: 16, vertical: 8);
     } else {
-      return EdgeInsets.symmetric(horizontal: 16, vertical: 0);
+      return EdgeInsets.symmetric(horizontal: 16, vertical: 8);
     }
   }
 
@@ -67,7 +76,9 @@ class WebUIUtils {
     }
 
     if (isDesktop(context)) {
-      return 1980; // PCの1980x1080に合わせる
+      return 1400; // PC向けの適切な最大幅
+    } else if (isLargeTablet(context)) {
+      return 1200; // 大画面タブレット向け
     } else if (isTablet(context)) {
       return 1024; // iPadなどのタブレットサイズに合わせる
     } else {
@@ -97,11 +108,40 @@ class WebUIUtils {
     }
 
     if (isDesktop(context)) {
-      return 1.3; // PC向けのサイズ
+      return 1.2; // PC向けのサイズ
+    } else if (isLargeTablet(context)) {
+      return 1.1; // 大画面タブレット向け
     } else if (isTablet(context)) {
-      return 1.1; // iPadなどのタブレットに適したサイズ
+      return 1.05; // iPadなどのタブレットに適したサイズ
     } else {
       return 1.0;
+    }
+  }
+
+  /// スケジュール管理用のレスポンシブレイアウト判定
+  static bool shouldUseColumnLayout(BuildContext context) {
+    if (!isWeb) return false;
+    return isDesktop(context) || isLargeTablet(context);
+  }
+
+  /// スマホ解像度でAndroid版UIを使用するかどうかの判定
+  static bool shouldUseMobileUI(BuildContext context) {
+    if (!isWeb) return true; // モバイルアプリでは常にAndroid版UI
+    return isMobile(context);
+  }
+
+  /// スケジュール管理用のカード間隔を取得
+  static double getScheduleCardSpacing(BuildContext context) {
+    if (!isWeb) return 16.0;
+
+    if (isDesktop(context)) {
+      return 32.0;
+    } else if (isLargeTablet(context)) {
+      return 24.0;
+    } else if (isTablet(context)) {
+      return 20.0;
+    } else {
+      return 16.0;
     }
   }
 

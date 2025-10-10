@@ -11,6 +11,8 @@ import 'package:roastplus/widgets/roast_schedule_memo_dialog.dart';
 import 'package:roastplus/utils/permission_utils.dart';
 import 'dart:developer' as developer;
 import 'package:roastplus/widgets/bean_name_with_sticker.dart';
+import 'package:roastplus/utils/web_ui_utils.dart';
+import 'package:flutter/foundation.dart';
 
 class RoastSchedulerTab extends StatefulWidget {
   final List<dynamic> breakTimes;
@@ -517,80 +519,169 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
     super.build(context);
     final themeSettings = Provider.of<ThemeSettings>(context);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        onPressed: _canEditRoastSchedule ? _addMemo : null,
-        backgroundColor: themeSettings.appButtonColor,
-        foregroundColor: themeSettings.fontColor2,
-        elevation: 6,
-        child: Icon(Icons.add),
-      ),
-      body: Column(
-        children: [
-          // ヘッダー
-          Container(
-            padding: EdgeInsets.all(16),
-            child: Row(children: []),
-          ),
-
-          // メモリスト
-          Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : ChangeNotifierProvider.value(
-                    value: _memoProvider,
-                    child: Consumer<RoastScheduleMemoProvider>(
-                      builder: (context, provider, child) {
-                        if (provider.memos.isEmpty) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.note_add,
-                                  size: 64,
-                                  color: themeSettings.fontColor1.withValues(
-                                    alpha: 0.5,
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  'メモがありません',
-                                  style: TextStyle(
-                                    color: themeSettings.fontColor1,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  '右下の「+」ボタンから新しいメモを作成してください',
-                                  style: TextStyle(
-                                    color: themeSettings.fontColor1.withValues(
-                                      alpha: 0.7,
-                                    ),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-
-                        return ListView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: provider.memos.length,
-                          itemBuilder: (context, index) {
-                            return _buildMemoCard(provider.memos[index]);
-                          },
-                        );
-                      },
+    return kIsWeb
+        ? Stack(
+            children: [
+              Scaffold(
+                backgroundColor: Colors.white,
+                body: Column(
+                  children: [
+                    // ヘッダー
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      child: Row(children: []),
                     ),
+
+                    // メモリスト
+                    Expanded(
+                      child: _isLoading
+                          ? Center(child: CircularProgressIndicator())
+                          : ChangeNotifierProvider.value(
+                              value: _memoProvider,
+                              child: Consumer<RoastScheduleMemoProvider>(
+                                builder: (context, provider, child) {
+                                  if (provider.memos.isEmpty) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.note_add,
+                                            size: 64,
+                                            color: themeSettings.fontColor1
+                                                .withValues(alpha: 0.5),
+                                          ),
+                                          SizedBox(height: 16),
+                                          Text(
+                                            'メモがありません',
+                                            style: TextStyle(
+                                              color: themeSettings.fontColor1,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            '右下の「+」ボタンから新しいメモを作成してください',
+                                            style: TextStyle(
+                                              color: themeSettings.fontColor1
+                                                  .withValues(alpha: 0.7),
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  return ListView.builder(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    itemCount: provider.memos.length,
+                                    itemBuilder: (context, index) {
+                                      return _buildMemoCard(
+                                        provider.memos[index],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              // レスポンシブFABボタン
+              Positioned(
+                bottom: WebUIUtils.isMobile(context) ? 16 : 24,
+                right: WebUIUtils.isMobile(context) ? 16 : 24,
+                child: FloatingActionButton(
+                  onPressed: _canEditRoastSchedule ? _addMemo : null,
+                  backgroundColor: themeSettings.appButtonColor,
+                  foregroundColor: themeSettings.fontColor2,
+                  elevation: 6,
+                  mini: WebUIUtils.isMobile(context),
+                  child: Icon(
+                    Icons.add,
+                    size: WebUIUtils.isMobile(context) ? 20 : 24,
                   ),
-          ),
-        ],
-      ),
-    );
+                ),
+              ),
+            ],
+          )
+        : Scaffold(
+            backgroundColor: Colors.white,
+            floatingActionButton: FloatingActionButton(
+              onPressed: _canEditRoastSchedule ? _addMemo : null,
+              backgroundColor: themeSettings.appButtonColor,
+              foregroundColor: themeSettings.fontColor2,
+              elevation: 6,
+              child: Icon(Icons.add),
+            ),
+            body: Column(
+              children: [
+                // ヘッダー
+                Container(
+                  padding: EdgeInsets.all(16),
+                  child: Row(children: []),
+                ),
+
+                // メモリスト
+                Expanded(
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : ChangeNotifierProvider.value(
+                          value: _memoProvider,
+                          child: Consumer<RoastScheduleMemoProvider>(
+                            builder: (context, provider, child) {
+                              if (provider.memos.isEmpty) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.note_add,
+                                        size: 64,
+                                        color: themeSettings.fontColor1
+                                            .withValues(alpha: 0.5),
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'メモがありません',
+                                        style: TextStyle(
+                                          color: themeSettings.fontColor1,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        '右下の「+」ボタンから新しいメモを作成してください',
+                                        style: TextStyle(
+                                          color: themeSettings.fontColor1
+                                              .withValues(alpha: 0.7),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              return ListView.builder(
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                itemCount: provider.memos.length,
+                                itemBuilder: (context, index) {
+                                  return _buildMemoCard(provider.memos[index]);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          );
   }
 
   @override

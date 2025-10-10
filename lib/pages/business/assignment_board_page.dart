@@ -2648,56 +2648,58 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         ),
       );
     }
-    // デスクトップ版の場合（PC最適化）
+    // デスクトップ版の場合（PCでもタブレットと同じレイアウトを使用）
     else {
       return Container(
-        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-        constraints: BoxConstraints(maxWidth: dynamicMaxWidth), // 画面幅の95%に制限
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        constraints: BoxConstraints(
+          maxWidth: 700, // タブレットと同じ固定幅を使用
+        ),
         decoration: BoxDecoration(
           color: themeSettings.cardBackgroundColor,
           border: Border.all(color: Colors.black26),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: Offset(0, 4),
+              blurRadius: 8,
+              offset: Offset(0, 3),
             ),
           ],
         ),
         child: Column(
           children: [
-            // デスクトップ版ヘッダー行
+            // PCでもタブレットと同じヘッダー行
             Container(
               padding: EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: themeSettings.backgroundColor.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(width: isSmallMobile ? 60 : 80), // 左ラベル用スペース
+                  SizedBox(width: 100), // 左ラベル用スペース（タブレット版）
                   ...teams.map<Widget>(
                     (team) => SizedBox(
-                      width: isSmallMobile ? 70 : 85,
+                      width: 180, // iPad解像度統一の列幅（メンバーカードサイズに合わせて調整）- 拡大版
                       child: Center(
                         child: Text(
                           team.name,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 24 * WebUIUtils.getFontSizeScale(context),
+                            fontSize: 20 * WebUIUtils.getFontSizeScale(context),
                             color: themeSettings.fontColor1,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: isSmallMobile ? 60 : 80), // 右ラベル用スペース
+                  SizedBox(width: 100), // 右ラベル用スペース（タブレット版）
                 ],
               ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 6),
             // データ表示部分
             if (_isLoading)
               _buildLoadingWidget(themeSettings)
@@ -2718,8 +2720,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   Widget _buildWebResponsiveDataRows(ThemeSettings themeSettings) {
     // 解像度判定を一度だけ実行してキャッシュ
     final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 1400; // デスクトップは1400px以上
-    final isTablet = screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
+    // PCでもタブレットレイアウトを使用
+    final isTablet = screenWidth > 768; // タブレット解像度以上（PC含む）
     final isMobile = screenWidth <= 768;
     final isSmallMobile =
         screenWidth <= 480 || MediaQuery.of(context).size.height <= 600;
@@ -2747,7 +2749,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           ),
           child: isMobile
               ? _buildMobileDataRow(themeSettings, i, isSmallMobile)
-              : _buildDesktopDataRow(themeSettings, i, isDesktop, isTablet),
+              : _buildDesktopDataRow(themeSettings, i, false, isTablet),
         ),
       ),
     );
@@ -2761,8 +2763,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   ) {
     // 解像度判定を一度だけ実行してキャッシュ
     final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 1400; // デスクトップは1400px以上
-    final isTablet = screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
+    // PCでもタブレットレイアウトを使用
+    final isTablet = screenWidth > 768; // タブレット解像度以上（PC含む）
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -2777,13 +2779,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   : '',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize:
-                    (isSmallMobile ? 14 : 16) *
-                    (isDesktop
-                        ? 1.3
-                        : isTablet
-                        ? 1.1
-                        : 1.0),
+                fontSize: (isSmallMobile ? 14 : 16) * (isTablet ? 1.1 : 1.0),
                 color: themeSettings.fontColor1,
               ),
             ),
@@ -2820,13 +2816,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               textAlign: TextAlign.right,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize:
-                    (isSmallMobile ? 14 : 16) *
-                    (isDesktop
-                        ? 1.3
-                        : isTablet
-                        ? 1.1
-                        : 1.0),
+                fontSize: (isSmallMobile ? 14 : 16) * (isTablet ? 1.1 : 1.0),
                 color: themeSettings.fontColor1,
               ),
             ),
@@ -2845,26 +2835,21 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   ) {
     // 解像度判定を一度だけ実行してキャッシュ
     final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktopLocal = screenWidth > 1400; // デスクトップは1400px以上
-    final isTabletLocal =
-        screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
+    // PCでもタブレットレイアウトを使用
+    final isTabletLocal = screenWidth > 768; // タブレット解像度以上（PC含む）
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // 左ラベル
         SizedBox(
-          width: isDesktop ? 150 : 100, // タブレット版を100に調整（ヘッダーと一致）
+          width: 100, // タブレット版レイアウトを統一使用
           child: Text(
             leftLabels.isNotEmpty && i < leftLabels.length ? leftLabels[i] : '',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize:
-                  (isDesktop ? 18 : 20) * // タブレット版を16から20に拡大
-                  (isDesktopLocal
-                      ? 1.3
-                      : isTabletLocal
-                      ? 1.1
-                      : 1.0),
+                  20 * // タブレット版レイアウトを統一使用
+                  (isTabletLocal ? 1.1 : 1.0),
               color: themeSettings.fontColor1,
             ),
           ),
@@ -2873,7 +2858,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         // メンバーカード
         ...teams.map<Widget>(
           (team) => Container(
-            width: isDesktop ? 200 : 180, // iPad解像度統一の列幅（メンバーカードサイズに合わせて）- 拡大版
+            width: 180, // タブレット版レイアウトを統一使用
             margin: EdgeInsets.symmetric(horizontal: 0), // カード間の間隔を0に調整
             child: Center(
               child: MemberCard(
@@ -2897,7 +2882,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         SizedBox(width: 2), // メンバーカードと右ラベルの間隔
         // 右ラベル
         SizedBox(
-          width: isDesktop ? 150 : 100, // タブレット版を100に調整（ヘッダーと一致）
+          width: 100, // タブレット版レイアウトを統一使用
           child: Text(
             rightLabels.isNotEmpty && i < rightLabels.length
                 ? rightLabels[i]
@@ -2906,12 +2891,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize:
-                  (isDesktop ? 18 : 20) * // タブレット版を16から20に拡大
-                  (isDesktopLocal
-                      ? 1.3
-                      : isTabletLocal
-                      ? 1.1
-                      : 1.0),
+                  20 * // タブレット版レイアウトを統一使用
+                  (isTabletLocal ? 1.1 : 1.0),
               color: themeSettings.fontColor1,
             ),
           ),
@@ -3188,10 +3169,10 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     bool isButtonDisabled,
     bool todayIsWeekend,
   ) {
-    final isDesktop = WebUIUtils.isDesktop(context);
+    // PCでもタブレットレイアウトを使用
 
     return Container(
-      constraints: BoxConstraints(maxWidth: isDesktop ? 800 : 600),
+      constraints: BoxConstraints(maxWidth: 600), // タブレット版レイアウトを統一使用
       child: Column(
         children: [
           if (_canEditAssignment == true) ...[
@@ -3204,15 +3185,15 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 ),
               ),
             SizedBox(
-              width: isDesktop ? 400 : 300,
-              height: isDesktop ? 60 : 50,
+              width: 300, // タブレット版レイアウトを統一使用
+              height: 50,
               child: ElevatedButton(
                 onPressed: isButtonDisabled ? null : _shuffleAssignments,
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(isDesktop ? 30 : 25),
+                    borderRadius: BorderRadius.circular(25), // タブレット版レイアウトを統一使用
                   ),
-                  padding: EdgeInsets.symmetric(vertical: isDesktop ? 20 : 16),
+                  padding: EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: Text(
                   () {
@@ -3222,7 +3203,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     return '今日の担当を決める';
                   }(),
                   style: TextStyle(
-                    fontSize: isDesktop ? 18 : 16,
+                    fontSize: 16, // タブレット版レイアウトを統一使用
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -3458,8 +3439,8 @@ class _MemberCardState extends State<MemberCard> {
   Widget build(BuildContext context) {
     // 画面サイズに基づく解像度判定
     final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 768 && screenWidth <= 1400; // iPad解像度を統一
-    final isDesktop = screenWidth > 1400; // デスクトップは1400px以上
+    final isTablet = screenWidth > 768; // タブレット解像度以上（PC含む）
+    // PCでもタブレットレイアウトを使用
 
     // 表示名を決定（カスタム表示名を優先）
     String displayName;
@@ -3574,14 +3555,7 @@ class _MemberCardState extends State<MemberCard> {
       verticalPadding = 14; // 10 -> 14 (大きく調整)
       horizontalMargin = 4; // 2 -> 4 (大きく調整)
       borderRadius = 14; // 10 -> 14 (大きく調整)
-    } else if (isDesktop) {
-      // デスクトップ版のサイズ設定
-      cardWidth = 120;
-      cardHeight = 55;
-      fontSize = 16;
-      verticalPadding = 12;
-      horizontalMargin = 2;
-      borderRadius = 12;
+      // PCでもタブレットレイアウトを使用するため、デスクトップ専用設定は削除
     } else {
       // モバイル版のサイズ設定
       cardWidth = 85;

@@ -2513,7 +2513,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: themeSettings.backgroundColor.withValues(alpha: 0.5),
+              color: themeSettings.cardBackgroundColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -2677,7 +2677,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: themeSettings.backgroundColor.withValues(alpha: 0.5),
+                color: themeSettings.cardBackgroundColor,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -2744,7 +2744,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: themeSettings.backgroundColor.withValues(alpha: 0.5),
+                color: themeSettings.cardBackgroundColor,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(

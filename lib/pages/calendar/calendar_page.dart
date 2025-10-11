@@ -933,24 +933,44 @@ class _CalendarPageState extends State<CalendarPage> {
                     (_todaySchedule!['labels'] as List).isEmpty ||
                     _todaySchedule!['contents'] == null ||
                     (_todaySchedule!['contents'] as Map).isEmpty)
-                  Text(
-                    'スケジュールがありません',
-                    style: TextStyle(
-                      color: themeSettings.fontColor1.withValues(alpha: 0.6),
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
+                  _buildEmptyScheduleMessage(themeSettings),
               ],
             )
-          : Text(
-              'スケジュールがありません',
-              style: TextStyle(
-                color: themeSettings.fontColor1.withValues(alpha: 0.6),
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-              ),
+          : _buildEmptyScheduleMessage(themeSettings),
+    );
+  }
+
+  Widget _buildEmptyScheduleMessage(ThemeSettings themeSettings) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.event_busy,
+            size: 48,
+            color: themeSettings.iconColor.withValues(alpha: 0.5),
+          ),
+          SizedBox(height: 12),
+          Text(
+            '本日のスケジュールはありません',
+            style: TextStyle(
+              color: themeSettings.fontColor1.withValues(alpha: 0.6),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'スケジュールを設定して作業を効率化しましょう',
+            style: TextStyle(
+              color: themeSettings.fontColor1.withValues(alpha: 0.5),
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -1058,13 +1078,41 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }).toList(),
             )
-          : Text(
-              'ローストスケジュールがありません',
-              style: TextStyle(
-                color: themeSettings.fontColor1.withValues(alpha: 0.6),
-                fontStyle: FontStyle.italic,
-              ),
+          : _buildEmptyRoastScheduleMessage(themeSettings),
+    );
+  }
+
+  Widget _buildEmptyRoastScheduleMessage(ThemeSettings themeSettings) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.local_fire_department_outlined,
+            size: 48,
+            color: themeSettings.iconColor.withValues(alpha: 0.5),
+          ),
+          SizedBox(height: 12),
+          Text(
+            'ローストスケジュールがありません',
+            style: TextStyle(
+              color: themeSettings.fontColor1.withValues(alpha: 0.6),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '焙煎作業のスケジュールを設定しましょう',
+            style: TextStyle(
+              color: themeSettings.fontColor1.withValues(alpha: 0.5),
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 

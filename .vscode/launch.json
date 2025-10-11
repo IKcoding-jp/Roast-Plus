@@ -1,0 +1,66 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [],
+      "flutterMode": "debug",
+      "toolArgs": [
+        "--verbose"
+      ],
+      "console": "debugConsole",
+      "showDebugToolbar": true,
+      "debuggerSettings": {
+        "showDebugToolbar": true,
+        "showDebugConsole": true,
+        "showVariables": true,
+        "showCallStack": true,
+        "showBreakpoints": true
+      }
+    },
+    {
+      "name": "Flutter (Profile)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [],
+      "flutterMode": "profile",
+      "toolArgs": [
+        "--verbose"
+      ],
+      "console": "debugConsole",
+      "showDebugToolbar": true
+    },
+    {
+      "name": "Flutter (Release)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [],
+      "flutterMode": "release",
+      "toolArgs": [
+        "--verbose"
+      ],
+      "console": "debugConsole",
+      "showDebugToolbar": true
+    },
+    {
+      "name": "Flutter Web (Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": [],
+      "flutterMode": "debug",
+      "deviceId": "web-server",
+      "toolArgs": [
+        "--web-port=8080",
+        "--web-hostname=localhost"
+      ],
+      "console": "debugConsole",
+      "showDebugToolbar": true
+    }
+  ]
+}

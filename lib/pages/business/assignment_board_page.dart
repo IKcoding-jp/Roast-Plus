@@ -550,6 +550,17 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
     _setupGroupProviderListener();
 
+    // タイムアウト処理を追加 - 10秒後には必ずローディングを終了
+    Future.delayed(Duration(seconds: 10), () {
+      if (mounted && _isLoading) {
+        debugPrint('AssignmentBoard: タイムアウト - 強制的にローディングを終了');
+        setState(() {
+          _isLoading = false;
+          _isDataInitialized = true;
+        });
+      }
+    });
+
     // 初期権限チェックを実行
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkEditPermission();
@@ -651,11 +662,17 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           teams = loadedTeams;
           leftLabels = loadedLeftLabels;
           rightLabels = loadedRightLabels;
-          // メンバーやラベルが空の場合はローディングを継続
+          // 一人グループの場合はデータが空でもローディングを終了
+          final groupProvider = context.read<GroupProvider>();
+          final isSingleMember =
+              groupProvider.hasGroup &&
+              groupProvider.currentGroup != null &&
+              groupProvider.currentGroup!.members.length == 1;
           _isLoading =
-              loadedTeams.isEmpty ||
-              loadedTeams.every((t) => t.members.isEmpty) ||
-              loadedLeftLabels.isEmpty;
+              !isSingleMember &&
+              (loadedTeams.isEmpty ||
+                  loadedTeams.every((t) => t.members.isEmpty) ||
+                  loadedLeftLabels.isEmpty);
           _isDataInitialized = true;
           // 担当決定状態も同時に更新
           if (hasTodayAssignment) {
@@ -668,10 +685,16 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           if (mounted) {
             setState(() {
               _isRemoteSyncCompleted = true;
-              // リモート同期完了後、データが存在する場合はローディングを終了
-              if (teams.isNotEmpty &&
-                  !teams.every((t) => t.members.isEmpty) &&
-                  leftLabels.isNotEmpty) {
+              // リモート同期完了後、データが存在する場合、または一人グループの場合はローディングを終了
+              final groupProvider = context.read<GroupProvider>();
+              final isSingleMember =
+                  groupProvider.hasGroup &&
+                  groupProvider.currentGroup != null &&
+                  groupProvider.currentGroup!.members.length == 1;
+              if (isSingleMember ||
+                  (teams.isNotEmpty &&
+                      !teams.every((t) => t.members.isEmpty) &&
+                      leftLabels.isNotEmpty)) {
                 _isLoading = false;
               }
             });
@@ -682,11 +705,17 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       debugPrint('AssignmentBoard: ローカルデータ読み込みエラー: $e');
       if (mounted) {
         setState(() {
-          // エラー時もデータが存在しない場合はローディングを継続
+          // エラー時も一人グループの場合はローディングを終了
+          final groupProvider = context.read<GroupProvider>();
+          final isSingleMember =
+              groupProvider.hasGroup &&
+              groupProvider.currentGroup != null &&
+              groupProvider.currentGroup!.members.length == 1;
           _isLoading =
-              teams.isEmpty ||
-              teams.every((t) => t.members.isEmpty) ||
-              leftLabels.isEmpty;
+              !isSingleMember &&
+              (teams.isEmpty ||
+                  teams.every((t) => t.members.isEmpty) ||
+                  leftLabels.isEmpty);
           _isDataInitialized = true;
         });
       }
@@ -710,12 +739,20 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       // 同期完了フラグを立てる（nil安全）
       if (mounted) {
         _isRemoteSyncCompleted = true;
+        // バックグラウンド同期完了後、確実にローディングを終了
+        setState(() {
+          _isLoading = false;
+        });
       }
     } catch (e) {
       debugPrint('AssignmentBoard: バックグラウンド同期エラー: $e');
       // エラーが発生しても同期完了フラグを立てる（UIのちらつきを防ぐ）
       if (mounted) {
         _isRemoteSyncCompleted = true;
+        // エラー時も確実にローディングを終了
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -742,11 +779,22 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         }
       } else {
         debugPrint('AssignmentBoard: Firestoreデータが取得できませんでした');
-        // データが存在しない場合はローディングを継続
+        // データが存在しない場合もローディングを終了
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
       debugPrint('AssignmentBoard: Firestore同期エラー: $e');
       // エラーが発生しても処理を継続（UIのちらつきを防ぐ）
+      // エラー時もローディングを終了
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -764,9 +812,22 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           // グループデータが取得できた場合はローカルに反映
           _mergeGroupDataWithLocal(Map<String, dynamic>.from(groupData));
         }
+
+        // データ取得の成否に関わらずローディング状態を解除
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
       debugPrint('AssignmentBoard: グループ同期エラー: $e');
+      // エラー時もローディング状態を解除
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -843,13 +904,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         ).showSnackBar(SnackBar(content: Text('出勤退勤記録の読み込みに失敗しました')));
       }
     } finally {
-      // ローディング状態を確実に解除
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isDataInitialized = true;
-        });
-      }
+      // 出勤データの読み込みは独立して行い、ローディング状態は変更しない
+      // ローディング状態の変更を削除
     }
   }
 
@@ -881,11 +937,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
       // 出勤退勤状態更新開始
 
-      // ローディング状態を設定
-      setState(() {
-        _isLoading = true;
-        _isDataInitialized = false;
-      });
+      // 出勤状態更新時のローディング表示は削除
+      // UIの不要な再描画を防止
 
       await AttendanceFirestoreService.updateMemberAttendance(
         userId,
@@ -922,21 +975,12 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         }
       }
 
-      // ローディング状態を解除
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isDataInitialized = true;
-        });
-      }
+      // 出勤状態更新時のローディング表示は削除
+      // UIの不要な再描画を防止
     } catch (e) {
       // 出勤退勤状態更新エラー
-      // エラー時もローディング状態を解除
+      // エラー時もローディング状態の変更は行わない
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isDataInitialized = true;
-        });
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('出勤退勤状態の更新に失敗しました')));
@@ -1488,6 +1532,15 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     }
   }
 
+  /// グループメンバー数が1人かどうかをチェック
+  bool _isSingleMemberGroup() {
+    final groupProvider = context.read<GroupProvider>();
+    if (!groupProvider.hasGroup) return false;
+
+    final group = groupProvider.currentGroup;
+    return group != null && group.members.length == 1;
+  }
+
   String _todayKey() => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
   String _dayKeyAgo(int d) => DateFormat(
@@ -1985,13 +2038,14 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           });
         }
 
-        // ローディング条件: データが初期化されていない、またはメンバー・ラベルが空
+        // ローディング条件: データが初期化されていない、またはメンバー・ラベルが空（一人グループは除外）
         final shouldShowLoading =
-            _isLoading ||
-            !_isDataInitialized ||
-            teams.isEmpty ||
-            teams.every((t) => t.members.isEmpty) ||
-            leftLabels.isEmpty;
+            _isLoading &&
+            !_isSingleMemberGroup() &&
+            (!_isDataInitialized ||
+                teams.isEmpty ||
+                teams.every((t) => t.members.isEmpty) ||
+                leftLabels.isEmpty);
 
         if (shouldShowLoading) {
           return Scaffold(
@@ -2491,8 +2545,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             _buildLoadingWidget(themeSettings)
           else if (_isDataInitialized &&
               _isRemoteSyncCompleted &&
-              leftLabels.isEmpty &&
-              teams.every((t) => t.members.isEmpty))
+              (_isSingleMemberGroup() ||
+                  (leftLabels.isEmpty &&
+                      teams.every((t) => t.members.isEmpty))))
             _buildEmptyStateWidget()
           else
             _buildWebDataRows(themeSettings),
@@ -2586,8 +2641,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               _buildLoadingWidget(themeSettings)
             else if (_isDataInitialized &&
                 _isRemoteSyncCompleted &&
-                leftLabels.isEmpty &&
-                teams.every((t) => t.members.isEmpty))
+                (_isSingleMemberGroup() ||
+                    (leftLabels.isEmpty &&
+                        teams.every((t) => t.members.isEmpty))))
               _buildEmptyStateWidget()
             else
               _buildWebResponsiveDataRows(themeSettings),
@@ -2653,8 +2709,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               _buildLoadingWidget(themeSettings)
             else if (_isDataInitialized &&
                 _isRemoteSyncCompleted &&
-                leftLabels.isEmpty &&
-                teams.every((t) => t.members.isEmpty))
+                (_isSingleMemberGroup() ||
+                    (leftLabels.isEmpty &&
+                        teams.every((t) => t.members.isEmpty))))
               _buildEmptyStateWidget()
             else
               _buildWebResponsiveDataRows(themeSettings),
@@ -2719,8 +2776,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               _buildLoadingWidget(themeSettings)
             else if (_isDataInitialized &&
                 _isRemoteSyncCompleted &&
-                leftLabels.isEmpty &&
-                teams.every((t) => t.members.isEmpty))
+                (_isSingleMemberGroup() ||
+                    (leftLabels.isEmpty &&
+                        teams.every((t) => t.members.isEmpty))))
               _buildEmptyStateWidget()
             else
               _buildWebResponsiveDataRows(themeSettings),
@@ -2960,8 +3018,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             _buildLoadingWidget(themeSettings)
           else if (_isDataInitialized &&
               _isRemoteSyncCompleted &&
-              leftLabels.isEmpty &&
-              teams.every((t) => t.members.isEmpty))
+              (_isSingleMemberGroup() ||
+                  (leftLabels.isEmpty &&
+                      teams.every((t) => t.members.isEmpty))))
             _buildEmptyStateWidget()
           else
             _buildMobileDataRows(themeSettings),
@@ -3286,16 +3345,19 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
   /// 空状態ウィジェット
   Widget _buildEmptyStateWidget() {
+    final isSingleMember = _isSingleMemberGroup();
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0),
       child: Center(
         child: Text(
-          'メンバーとラベルを追加してください',
+          isSingleMember ? 'グループに一人しかいないので、担当表は使えません。' : 'メンバーとラベルを追加してください',
           style: TextStyle(
-            color: Colors.red,
-            fontSize: 18,
+            color: isSingleMember ? Colors.grey[600] : Colors.red,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
+          textAlign: TextAlign.center,
         ),
       ),
     );

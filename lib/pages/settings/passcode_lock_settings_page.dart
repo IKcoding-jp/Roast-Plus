@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
 import '../../services/user_settings_firestore_service.dart';
 import '../../services/app_settings_firestore_service.dart';
+import '../../services/secure_storage_service.dart';
+import '../../services/passcode_recovery_service.dart';
+import 'passcode_recovery_setup_page.dart';
+import 'passcode_recovery_page.dart';
 
 class PasscodeLockSettingsPage extends StatefulWidget {
   const PasscodeLockSettingsPage({super.key});
@@ -15,11 +19,12 @@ class PasscodeLockSettingsPage extends StatefulWidget {
 class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
   final TextEditingController _passcodeController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
-  String? _savedPasscode;
+  String? _savedPasscode; // 表示用（実際の検証はストレージから実行）
   bool _isLoading = true;
   bool _isSaving = false;
   bool _isLockEnabled = false;
   String? _error;
+  bool _hasSecurityQuestions = false;
 
   @override
   void initState() {
@@ -29,13 +34,58 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
 
   Future<void> _loadPasscode() async {
     try {
-      final settings = await UserSettingsFirestoreService.getMultipleSettings([
-        'passcode',
-        'isLockEnabled',
-      ]);
+      // 複数のソースからパスコード設定を取得
+      String? passcode;
+      bool isLockEnabled = false;
+
+      // 1. UserSettingsFirestoreServiceから取得を試行
+      try {
+        final userSettings =
+            await UserSettingsFirestoreService.getMultipleSettings([
+              'passcode',
+              'isLockEnabled',
+            ]);
+        passcode = userSettings['passcode'];
+        isLockEnabled = userSettings['isLockEnabled'] ?? false;
+      } catch (e) {
+        debugPrint('UserSettingsFirestoreServiceからの取得に失敗: $e');
+      }
+
+      // 2. AppSettingsFirestoreServiceから取得を試行（フォールバック）
+      if (passcode == null && !isLockEnabled) {
+        try {
+          final appSettings =
+              await AppSettingsFirestoreService.getPasscodeSettings();
+          if (appSettings != null) {
+            passcode = appSettings['passcode'];
+            isLockEnabled = appSettings['passcodeEnabled'] ?? false;
+          }
+        } catch (e) {
+          debugPrint('AppSettingsFirestoreServiceからの取得に失敗: $e');
+        }
+      }
+
+      // 3. Web版ではSecureStorageServiceからも取得を試行
+      if (passcode == null && !isLockEnabled) {
+        try {
+          final hasStoredPasscode = await SecureStorageService.hasPasscode();
+          if (hasStoredPasscode) {
+            // パスコードが存在する場合は有効とみなす
+            isLockEnabled = true;
+            passcode = '***'; // 実際のパスコードは表示しない
+          }
+        } catch (e) {
+          debugPrint('SecureStorageServiceからの取得に失敗: $e');
+        }
+      }
+
+      // セキュリティ質問の存在確認
+      final hasQuestions = await PasscodeRecoveryService.hasSecurityQuestions();
+
       setState(() {
-        _savedPasscode = settings['passcode'];
-        _isLockEnabled = settings['isLockEnabled'] ?? false;
+        _savedPasscode = passcode;
+        _isLockEnabled = isLockEnabled;
+        _hasSecurityQuestions = hasQuestions;
         _isLoading = false;
       });
     } catch (e) {
@@ -67,30 +117,65 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
     });
 
     try {
-      await UserSettingsFirestoreService.saveMultipleSettings({
-        'passcode': _passcodeController.text,
-        'isLockEnabled': true,
-      });
+      final passcode = _passcodeController.text;
+      bool allSaved = true;
+      String? lastError;
 
-      // Firestoreにも保存
-      await AppSettingsFirestoreService.savePasscodeSettings(
-        passcodeEnabled: true,
-        passcode: _passcodeController.text,
-      );
+      // 1. UserSettingsFirestoreServiceに保存
+      try {
+        await UserSettingsFirestoreService.saveMultipleSettings({
+          'passcode': passcode,
+          'isLockEnabled': true,
+        });
+        debugPrint('UserSettingsFirestoreServiceに保存完了');
+      } catch (e) {
+        debugPrint('UserSettingsFirestoreService保存エラー: $e');
+        allSaved = false;
+        lastError = e.toString();
+      }
 
-      setState(() {
-        _savedPasscode = _passcodeController.text;
-        _isLockEnabled = true;
-        _isSaving = false;
-      });
+      // 2. AppSettingsFirestoreServiceに保存
+      try {
+        await AppSettingsFirestoreService.savePasscodeSettings(
+          passcodeEnabled: true,
+          passcode: passcode,
+        );
+        debugPrint('AppSettingsFirestoreServiceに保存完了');
+      } catch (e) {
+        debugPrint('AppSettingsFirestoreService保存エラー: $e');
+        allSaved = false;
+        lastError = e.toString();
+      }
 
-      _passcodeController.clear();
-      _confirmController.clear();
+      // 3. SecureStorageServiceにも保存（Web版・ネイティブ版共通）
+      try {
+        await SecureStorageService.savePasscode(passcode);
+        debugPrint('SecureStorageServiceに保存完了');
+      } catch (e) {
+        debugPrint('SecureStorageService保存エラー: $e');
+        // SecureStorageServiceの失敗は致命的ではない
+      }
 
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('パスコードを設定しました')));
+      if (allSaved) {
+        setState(() {
+          _savedPasscode = passcode;
+          _isLockEnabled = true;
+          _isSaving = false;
+        });
+
+        _passcodeController.clear();
+        _confirmController.clear();
+
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('パスコードを設定しました')));
+        }
+      } else {
+        setState(() {
+          _error = '一部の保存に失敗しました: $lastError';
+          _isSaving = false;
+        });
       }
     } catch (e) {
       setState(() {
@@ -106,27 +191,61 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
     });
 
     try {
-      await UserSettingsFirestoreService.saveMultipleSettings({
-        'passcode': null,
-        'isLockEnabled': false,
-      });
+      bool allDisabled = true;
+      String? lastError;
 
-      // Firestoreも無効化
-      await AppSettingsFirestoreService.savePasscodeSettings(
-        passcodeEnabled: false,
-        passcode: null,
-      );
+      // 1. UserSettingsFirestoreServiceから無効化
+      try {
+        await UserSettingsFirestoreService.saveMultipleSettings({
+          'passcode': null,
+          'isLockEnabled': false,
+        });
+        debugPrint('UserSettingsFirestoreService無効化完了');
+      } catch (e) {
+        debugPrint('UserSettingsFirestoreService無効化エラー: $e');
+        allDisabled = false;
+        lastError = e.toString();
+      }
 
-      setState(() {
-        _savedPasscode = null;
-        _isLockEnabled = false;
-        _isSaving = false;
-      });
+      // 2. AppSettingsFirestoreServiceから無効化
+      try {
+        await AppSettingsFirestoreService.savePasscodeSettings(
+          passcodeEnabled: false,
+          passcode: null,
+        );
+        debugPrint('AppSettingsFirestoreService無効化完了');
+      } catch (e) {
+        debugPrint('AppSettingsFirestoreService無効化エラー: $e');
+        allDisabled = false;
+        lastError = e.toString();
+      }
 
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('パスコードロックを無効にしました')));
+      // 3. SecureStorageServiceからも削除
+      try {
+        await SecureStorageService.deleteSecureData('app_passcode');
+        debugPrint('SecureStorageService削除完了');
+      } catch (e) {
+        debugPrint('SecureStorageService削除エラー: $e');
+        // SecureStorageServiceの失敗は致命的ではない
+      }
+
+      if (allDisabled) {
+        setState(() {
+          _savedPasscode = null;
+          _isLockEnabled = false;
+          _isSaving = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('パスコードロックを無効にしました')));
+        }
+      } else {
+        setState(() {
+          _error = '一部の無効化に失敗しました: $lastError';
+          _isSaving = false;
+        });
       }
     } catch (e) {
       setState(() {
@@ -177,8 +296,10 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                       child: Text('キャンセル'),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        if (input == (_savedPasscode ?? '')) {
+                      onPressed: () async {
+                        // パスコード検証を実行
+                        final isValid = await _verifyPasscode(input);
+                        if (isValid) {
                           Navigator.pop(context, true);
                         } else {
                           setState(() => error = 'パスコードが違います');
@@ -193,6 +314,56 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
           },
         ) ??
         false;
+  }
+
+  // パスコード検証
+  Future<bool> _verifyPasscode(String inputPasscode) async {
+    try {
+      // 1. SecureStorageServiceで検証（最優先）
+      final secureVerification = await SecureStorageService.verifyPasscode(
+        inputPasscode,
+      );
+      if (secureVerification) {
+        debugPrint('SecureStorageServiceでパスコード検証成功');
+        return true;
+      }
+
+      // 2. UserSettingsFirestoreServiceから取得して検証
+      try {
+        final userSettings =
+            await UserSettingsFirestoreService.getMultipleSettings([
+              'passcode',
+            ]);
+        final storedPasscode = userSettings['passcode'];
+        if (storedPasscode != null && inputPasscode == storedPasscode) {
+          debugPrint('UserSettingsFirestoreServiceでパスコード検証成功');
+          return true;
+        }
+      } catch (e) {
+        debugPrint('UserSettingsFirestoreService検証エラー: $e');
+      }
+
+      // 3. AppSettingsFirestoreServiceから取得して検証
+      try {
+        final appSettings =
+            await AppSettingsFirestoreService.getPasscodeSettings();
+        if (appSettings != null) {
+          final storedPasscode = appSettings['passcode'];
+          if (storedPasscode != null && inputPasscode == storedPasscode) {
+            debugPrint('AppSettingsFirestoreServiceでパスコード検証成功');
+            return true;
+          }
+        }
+      } catch (e) {
+        debugPrint('AppSettingsFirestoreService検証エラー: $e');
+      }
+
+      debugPrint('パスコード検証失敗: すべてのソースで不一致');
+      return false;
+    } catch (e) {
+      debugPrint('パスコード検証エラー: $e');
+      return false;
+    }
   }
 
   Future<void> _requestDisableLock() async {
@@ -288,6 +459,66 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                     ? null
                                     : _requestDisableLock,
                               ),
+                            ),
+                            SizedBox(height: 12),
+                            // リカバリー機能のボタン
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    icon: Icon(Icons.security),
+                                    label: Text(
+                                      _hasSecurityQuestions
+                                          ? 'セキュリティ質問を管理'
+                                          : 'セキュリティ質問を設定',
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PasscodeRecoverySetupPage(),
+                                        ),
+                                      );
+                                      if (result == true) {
+                                        _loadPasscode(); // ページを再読み込み
+                                      }
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    icon: Icon(Icons.lock_reset),
+                                    label: Text('パスコードをリセット'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: _hasSecurityQuestions
+                                        ? () async {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PasscodeRecoveryPage(),
+                                              ),
+                                            );
+                                          }
+                                        : null,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

@@ -11,6 +11,8 @@ import 'pages/gamification/badge_list_page.dart';
 import 'services/sync_firestore_all.dart';
 import 'services/todo_notification_service.dart';
 import 'services/secure_auth_service.dart';
+import 'services/secure_storage_service.dart';
+import 'services/app_settings_firestore_service.dart';
 import 'services/session_management_service.dart';
 import 'services/encrypted_firebase_config_service.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +20,7 @@ import 'models/theme_settings.dart';
 import 'models/group_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/data_sync_service.dart';
+import 'pages/settings/passcode_recovery_page.dart';
 import 'services/assignment_firestore_service.dart';
 import 'services/user_settings_firestore_service.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -1071,12 +1074,49 @@ class _PasscodeGateState extends State<PasscodeGate>
   }
 
   Future<void> _checkPasscodeOnResume() async {
-    final code = await UserSettingsFirestoreService.getSetting('app_passcode');
-    final isLockEnabled =
-        await UserSettingsFirestoreService.getSetting(
-          'passcode_lock_enabled',
-        ) ??
-        false;
+    // 複数のソースからパスコード設定を取得
+    String? code;
+    bool isLockEnabled = false;
+
+    // 1. UserSettingsFirestoreServiceから取得を試行
+    try {
+      final userSettings =
+          await UserSettingsFirestoreService.getMultipleSettings([
+            'passcode',
+            'isLockEnabled',
+          ]);
+      code = userSettings['passcode'];
+      isLockEnabled = userSettings['isLockEnabled'] ?? false;
+    } catch (e) {
+      debugPrint('UserSettingsFirestoreServiceからの取得に失敗: $e');
+    }
+
+    // 2. AppSettingsFirestoreServiceから取得を試行（フォールバック）
+    if (code == null && !isLockEnabled) {
+      try {
+        final appSettings =
+            await AppSettingsFirestoreService.getPasscodeSettings();
+        if (appSettings != null) {
+          code = appSettings['passcode'];
+          isLockEnabled = appSettings['passcodeEnabled'] ?? false;
+        }
+      } catch (e) {
+        debugPrint('AppSettingsFirestoreServiceからの取得に失敗: $e');
+      }
+    }
+
+    // 3. SecureStorageServiceからも取得を試行
+    if (code == null && !isLockEnabled) {
+      try {
+        final hasStoredPasscode = await SecureStorageService.hasPasscode();
+        if (hasStoredPasscode) {
+          isLockEnabled = true;
+          code = '***'; // 実際のパスコードは表示しない
+        }
+      } catch (e) {
+        debugPrint('SecureStorageServiceからの取得に失敗: $e');
+      }
+    }
 
     // パスコードが設定されているかチェック
     bool needsAuth = false;
@@ -1094,12 +1134,49 @@ class _PasscodeGateState extends State<PasscodeGate>
   }
 
   Future<void> _checkPasscode() async {
-    final code = await UserSettingsFirestoreService.getSetting('app_passcode');
-    final isLockEnabled =
-        await UserSettingsFirestoreService.getSetting(
-          'passcode_lock_enabled',
-        ) ??
-        false;
+    // 複数のソースからパスコード設定を取得
+    String? code;
+    bool isLockEnabled = false;
+
+    // 1. UserSettingsFirestoreServiceから取得を試行
+    try {
+      final userSettings =
+          await UserSettingsFirestoreService.getMultipleSettings([
+            'passcode',
+            'isLockEnabled',
+          ]);
+      code = userSettings['passcode'];
+      isLockEnabled = userSettings['isLockEnabled'] ?? false;
+    } catch (e) {
+      debugPrint('UserSettingsFirestoreServiceからの取得に失敗: $e');
+    }
+
+    // 2. AppSettingsFirestoreServiceから取得を試行（フォールバック）
+    if (code == null && !isLockEnabled) {
+      try {
+        final appSettings =
+            await AppSettingsFirestoreService.getPasscodeSettings();
+        if (appSettings != null) {
+          code = appSettings['passcode'];
+          isLockEnabled = appSettings['passcodeEnabled'] ?? false;
+        }
+      } catch (e) {
+        debugPrint('AppSettingsFirestoreServiceからの取得に失敗: $e');
+      }
+    }
+
+    // 3. SecureStorageServiceからも取得を試行
+    if (code == null && !isLockEnabled) {
+      try {
+        final hasStoredPasscode = await SecureStorageService.hasPasscode();
+        if (hasStoredPasscode) {
+          isLockEnabled = true;
+          code = '***'; // 実際のパスコードは表示しない
+        }
+      } catch (e) {
+        debugPrint('SecureStorageServiceからの取得に失敗: $e');
+      }
+    }
 
     // パスコードが設定されているかチェック
     bool needsAuth = false;
@@ -1163,7 +1240,7 @@ class _PasscodeInputScreenState extends State<PasscodeInputScreen> {
   String? _error;
   bool _checking = false;
 
-  void _check() {
+  void _check() async {
     final input = _controller.text.trim();
     if (input.length != 4 || int.tryParse(input) == null) {
       if (mounted) {
@@ -1178,121 +1255,223 @@ class _PasscodeInputScreenState extends State<PasscodeInputScreen> {
         _checking = true;
       });
     }
-    Future.delayed(Duration(milliseconds: 300), () {
-      if (input == widget.correctPasscode) {
+
+    // パスコード検証を実行
+    final isValid = await _verifyPasscode(input);
+
+    if (mounted) {
+      if (isValid) {
         widget.onUnlock();
       } else {
-        if (mounted) {
-          setState(() {
-            _error = 'パスコードが違います';
-            _checking = false;
-          });
-        }
+        setState(() {
+          _error = 'パスコードが違います';
+          _checking = false;
+        });
       }
-    });
+    }
+  }
+
+  // パスコード検証
+  Future<bool> _verifyPasscode(String inputPasscode) async {
+    try {
+      // 1. SecureStorageServiceで検証（最優先）
+      final secureVerification = await SecureStorageService.verifyPasscode(
+        inputPasscode,
+      );
+      if (secureVerification) {
+        debugPrint('SecureStorageServiceでパスコード検証成功');
+        return true;
+      }
+
+      // 2. UserSettingsFirestoreServiceから取得して検証
+      try {
+        final userSettings =
+            await UserSettingsFirestoreService.getMultipleSettings([
+              'passcode',
+            ]);
+        final storedPasscode = userSettings['passcode'];
+        if (storedPasscode != null && inputPasscode == storedPasscode) {
+          debugPrint('UserSettingsFirestoreServiceでパスコード検証成功');
+          return true;
+        }
+      } catch (e) {
+        debugPrint('UserSettingsFirestoreService検証エラー: $e');
+      }
+
+      // 3. AppSettingsFirestoreServiceから取得して検証
+      try {
+        final appSettings =
+            await AppSettingsFirestoreService.getPasscodeSettings();
+        if (appSettings != null) {
+          final storedPasscode = appSettings['passcode'];
+          if (storedPasscode != null && inputPasscode == storedPasscode) {
+            debugPrint('AppSettingsFirestoreServiceでパスコード検証成功');
+            return true;
+          }
+        }
+      } catch (e) {
+        debugPrint('AppSettingsFirestoreService検証エラー: $e');
+      }
+
+      debugPrint('パスコード検証失敗: すべてのソースで不一致');
+      return false;
+    } catch (e) {
+      debugPrint('パスコード検証エラー: $e');
+      return false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // デバイスサイズに応じた設定
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 900;
+
+    // レスポンシブな値の設定
+    final cardMaxWidth = 500.0;
+    final horizontalPadding = isMobile ? 16.0 : (isTablet ? 32.0 : 48.0);
+    final cardPadding = isMobile ? 24.0 : 32.0;
+    final cardElevation = isMobile ? 4.0 : 8.0;
+    final iconSize = isMobile ? 48.0 : (isTablet ? 56.0 : 64.0);
+    final titleFontSize = isMobile ? 16.0 : (isTablet ? 17.0 : 18.0);
+    final inputFontSize = isMobile ? 16.0 : (isTablet ? 17.0 : 18.0);
+    final buttonHeight = isMobile ? 48.0 : 52.0;
+    final spacing = isMobile ? 16.0 : (isTablet ? 20.0 : 24.0);
+
     return Scaffold(
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Center(
-          child: Card(
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            color: Provider.of<ThemeSettings>(context).cardBackgroundColor,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: cardMaxWidth),
             child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.lock_outline,
-                    size: 64,
-                    color: Provider.of<ThemeSettings>(context).iconColor,
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    'パスコードを入力してください',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Provider.of<ThemeSettings>(context).fontColor1,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _controller,
-                    keyboardType: TextInputType.numberWithOptions(
-                      decimal: false,
-                      signed: false,
-                    ),
-                    maxLength: 4,
-                    obscureText: true,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Provider.of<ThemeSettings>(context).fontColor1,
-                    ),
-                    decoration: InputDecoration(
-                      labelText: 'パスコード',
-                      labelStyle: TextStyle(
-                        color: Provider.of<ThemeSettings>(context).fontColor1,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      errorText: _error,
-                      filled: true,
-                      fillColor: Provider.of<ThemeSettings>(
-                        context,
-                      ).inputBackgroundColor,
-                      prefixIcon: Icon(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Card(
+                elevation: cardElevation,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                color: Provider.of<ThemeSettings>(context).cardBackgroundColor,
+                child: Padding(
+                  padding: EdgeInsets.all(cardPadding),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
                         Icons.lock_outline,
+                        size: iconSize,
                         color: Provider.of<ThemeSettings>(context).iconColor,
                       ),
-                    ),
-                    onSubmitted: (_) => _check(),
-                    enabled: !_checking,
-                  ),
-                  SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _checking ? null : _check,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Provider.of<ThemeSettings>(
-                          context,
-                        ).appButtonColor,
-                        foregroundColor: Provider.of<ThemeSettings>(
-                          context,
-                        ).fontColor2,
-                        textStyle: const TextStyle(fontSize: 16),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      SizedBox(height: spacing),
+                      Text(
+                        'パスコードを入力してください',
+                        style: TextStyle(
+                          fontSize: titleFontSize,
+                          color: Provider.of<ThemeSettings>(context).fontColor1,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: spacing),
+                      TextField(
+                        controller: _controller,
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: false,
+                          signed: false,
+                        ),
+                        maxLength: 4,
+                        obscureText: true,
+                        style: TextStyle(
+                          fontSize: inputFontSize,
+                          color: Provider.of<ThemeSettings>(context).fontColor1,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'パスコード',
+                          labelStyle: TextStyle(
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          errorText: _error,
+                          filled: true,
+                          fillColor: Provider.of<ThemeSettings>(
+                            context,
+                          ).inputBackgroundColor,
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).iconColor,
+                          ),
+                        ),
+                        onSubmitted: (_) => _check(),
+                        enabled: !_checking,
+                      ),
+                      SizedBox(height: spacing),
+                      SizedBox(
+                        width: double.infinity,
+                        height: buttonHeight,
+                        child: ElevatedButton(
+                          onPressed: _checking ? null : _check,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Provider.of<ThemeSettings>(
+                              context,
+                            ).appButtonColor,
+                            foregroundColor: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor2,
+                            textStyle: TextStyle(fontSize: isMobile ? 14 : 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: _checking
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  '解除',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 14 : 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
-                      child: _checking
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(
-                              '解除',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () async {
+                          // パスコードリカバリーページに遷移
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PasscodeRecoveryPage(),
                             ),
-                    ),
+                          );
+                        },
+                        child: Text(
+                          'パスコードを忘れた場合',
+                          style: TextStyle(
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1,
+                            decoration: TextDecoration.underline,
+                            fontSize: isMobile ? 13 : 14,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

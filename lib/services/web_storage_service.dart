@@ -20,7 +20,7 @@ class WebStorageService {
       final bytes = utf8.encode(data);
       final hmacSha256 = Hmac(sha256, key);
       final digest = hmacSha256.convert(bytes);
-      return base64.encode(utf8.encode(data + '|' + digest.toString()));
+      return base64.encode(utf8.encode('$data|$digest'));
     } catch (e) {
       _logError('データ暗号化エラー: $e');
       return data; // 暗号化に失敗した場合は平文を返す

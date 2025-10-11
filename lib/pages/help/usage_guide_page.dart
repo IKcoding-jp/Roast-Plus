@@ -212,7 +212,7 @@ class _UsageGuidePageState extends State<UsageGuidePage>
       child: Column(
         children: [
           // カテゴリ選択タブ（横スクロール）
-          Container(
+          SizedBox(
             height: 60,
             child: ListView(
               scrollDirection: Axis.horizontal,

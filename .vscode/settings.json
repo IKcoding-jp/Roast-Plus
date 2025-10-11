@@ -1,0 +1,12 @@
+{
+  "dart.debugExtensionBackendProtocol": "ws",
+  "dart.debugSdkLibraries": false,
+  "dart.debugExternalPackageLibraries": false,
+  "dart.flutterSdkPath": null,
+  "dart.showDebuggerNumbersAsHex": false,
+  "debug.toolBarLocation": "floating",
+  "debug.showInStatusBar": "always",
+  "dart.previewFlutterUiGuides": true,
+  "dart.previewFlutterUiGuidesCustomTracking": true
+}
+

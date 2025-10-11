@@ -1,7 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart'; // Added for kDebugMode
-import '../config/app_config.dart';
 
 /// アプリ全体のパフォーマンス設定を管理するクラス
 class AppPerformanceConfig {

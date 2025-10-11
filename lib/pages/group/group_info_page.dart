@@ -502,17 +502,42 @@ class _GroupInfoPageState extends State<GroupInfoPage>
     final groupProvider = context.read<GroupProvider>();
     final group = groupProvider.currentGroup;
 
-    if (user == null || group == null) return false;
+    developer.log(
+      '_isUserLeader判定開始 - user: ${user?.uid}, group: ${group?.id}',
+      name: 'GroupInfoPage',
+    );
+
+    if (user == null || group == null) {
+      developer.log(
+        '_isUserLeader: false (userまたはgroupがnull)',
+        name: 'GroupInfoPage',
+      );
+      return false;
+    }
 
     // 管理者は常に編集可能
     final memberRole = group.getMemberRole(user.uid);
-    if (memberRole == GroupRole.admin) return true;
+    developer.log(
+      '_isUserLeader: メンバーロール = $memberRole',
+      name: 'GroupInfoPage',
+    );
+
+    if (memberRole == GroupRole.admin) {
+      developer.log('_isUserLeader: true (管理者)', name: 'GroupInfoPage');
+      return true;
+    }
 
     // リーダーの場合は設定を確認
     if (memberRole == GroupRole.leader) {
-      return _groupSettings?.allowLeaderManageGroup ?? false;
+      final canManage = _groupSettings?.allowLeaderManageGroup ?? false;
+      developer.log(
+        '_isUserLeader: リーダー権限チェック - allowLeaderManageGroup: $canManage',
+        name: 'GroupInfoPage',
+      );
+      return canManage;
     }
 
+    developer.log('_isUserLeader: false (権限なし)', name: 'GroupInfoPage');
     return false;
   }
 
@@ -641,6 +666,16 @@ class _GroupInfoPageState extends State<GroupInfoPage>
         iconTheme: IconThemeData(color: themeSettings.iconColor),
         actions: [
           if (groupProvider.hasGroup) ...[
+            // デバッグログ: アイコン表示条件を確認
+            Builder(
+              builder: (context) {
+                developer.log(
+                  'アイコン表示条件チェック - hasGroup: ${groupProvider.hasGroup}, _isUserLeader: $_isUserLeader, _isEditing: $_isEditing',
+                  name: 'GroupInfoPage',
+                );
+                return SizedBox.shrink();
+              },
+            ),
             if (_isEditing && _isUserLeader) ...[
               if (_isSaving)
                 SizedBox(
@@ -678,6 +713,7 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                 IconButton(
                   icon: Icon(Icons.vpn_key, color: themeSettings.iconColor),
                   onPressed: () {
+                    developer.log('招待コード表示ボタンがタップされました', name: 'GroupInfoPage');
                     _showInvitationCodeDialog(context, themeSettings);
                   },
                   tooltip: '招待コード表示',

@@ -470,7 +470,7 @@ class _SchedulePageState extends State<SchedulePage>
                                           ),
                                         ),
                                         // 本日のスケジュールコンテンツ
-                                        Container(
+                                        SizedBox(
                                           height: 300,
                                           child: TodaySchedule(
                                             onEditTimeLabels: (callback) {

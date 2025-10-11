@@ -259,4 +259,25 @@ class SecureStorageService {
       return false;
     }
   }
+
+  /// セキュアデータを保存
+  static Future<void> saveSecureData(String key, String value) async {
+    try {
+      await _write(key, value);
+      developer.log('セキュアデータを保存しました: $key', name: _logName);
+    } catch (e) {
+      developer.log('セキュアデータの保存に失敗しました: $e', name: _logName);
+      rethrow;
+    }
+  }
+
+  /// セキュアデータを取得
+  static Future<String?> getSecureData(String key) async {
+    try {
+      return await _read(key);
+    } catch (e) {
+      developer.log('セキュアデータの取得に失敗しました: $e', name: _logName);
+      return null;
+    }
+  }
 }

@@ -1,5 +1,4 @@
 
-import 'dart:html' as html;
 import 'dart:developer' as developer;
 import 'web_notification_service.dart';
 

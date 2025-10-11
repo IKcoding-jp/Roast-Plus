@@ -1109,7 +1109,7 @@ class SecureAuthService {
       developer.log('Silent Google sign-in restored session', name: _logName);
     } catch (e) {
       developer.log(
-        'Silent Google sign-in failed: ' + e.toString(),
+        'Silent Google sign-in failed: $e',
         name: _logName,
       );
     }

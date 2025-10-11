@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
 import 'group_create_page.dart';
-import 'group_qr_scanner_page.dart';
 
 class GroupRequiredPage extends StatelessWidget {
   const GroupRequiredPage({super.key});
@@ -139,41 +138,6 @@ class GroupRequiredPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GroupQRScannerPage(),
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.qr_code_scanner, size: 20),
-                            label: Text(
-                              'QR読み取り',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: themeSettings.iconColor,
-                              side: BorderSide(
-                                color: themeSettings.iconColor.withValues(
-                                  alpha: 0.5,
-                                ),
-                                width: 2,
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ] else ...[
@@ -210,41 +174,6 @@ class GroupRequiredPage extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 12),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const GroupQRScannerPage(),
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.qr_code_scanner, size: 22),
-                        label: Text(
-                          'QRコードを読み取る',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: themeSettings.iconColor,
-                          side: BorderSide(
-                            color: themeSettings.iconColor.withValues(
-                              alpha: 0.5,
-                            ),
-                            width: 2,
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
 
                   const SizedBox(height: 20),

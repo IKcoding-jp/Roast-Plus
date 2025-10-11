@@ -13,8 +13,6 @@ import '../../services/group_firestore_service.dart';
 import '../../services/group_data_sync_service.dart';
 import '../../widgets/group_level_display_widget.dart';
 
-import 'group_qr_generate_page.dart';
-
 class GroupInfoPage extends StatefulWidget {
   const GroupInfoPage({super.key});
 
@@ -525,23 +523,6 @@ class _GroupInfoPageState extends State<GroupInfoPage>
     return memberRole == GroupRole.admin;
   }
 
-  bool get _canShowQRCode {
-    final user = FirebaseAuth.instance.currentUser;
-    final groupProvider = context.read<GroupProvider>();
-    final group = groupProvider.currentGroup;
-
-    if (user == null || group == null) return false;
-
-    // 管理者またはリーダーは常に表示
-    final memberRole = group.getMemberRole(user.uid);
-    if (memberRole == GroupRole.admin || memberRole == GroupRole.leader) {
-      return true;
-    }
-
-    // メンバーの場合も常に表示（設定に関係なく）
-    return true;
-  }
-
   void _showSettingsBottomSheet() {
     if (_groupSettings == null) return;
 
@@ -689,19 +670,6 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                       setState(() => _isEditing = true);
                     }
                   },
-                ),
-              if (_canShowQRCode)
-                IconButton(
-                  icon: Icon(Icons.qr_code, color: themeSettings.iconColor),
-                  onPressed: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const GroupQRGeneratePage(),
-                      ),
-                    );
-                  },
-                  tooltip: 'QRコード生成',
                 ),
               if (_isUserLeader)
                 PopupMenuButton<String>(
@@ -2051,7 +2019,7 @@ class _GroupInfoPageState extends State<GroupInfoPage>
         SizedBox(height: 16),
         _buildPermissionSwitch(
           title: 'メンバーが招待できる',
-          description: 'メンバーがQRコードを生成して他のユーザーを招待できる',
+          description: 'メンバーが他のユーザーを招待できる',
           value: _groupSettings!.allowMemberInvite,
           onChanged: (value) {
             developer.log(

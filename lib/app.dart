@@ -33,8 +33,6 @@ import 'pages/group/group_list_page.dart';
 import 'pages/group/group_info_page.dart';
 import 'pages/help/usage_guide_page.dart';
 import 'pages/settings/app_settings_page.dart';
-import 'pages/group/group_qr_generate_page.dart';
-import 'pages/group/group_qr_scanner_page.dart';
 import 'dart:developer' as developer;
 import 'utils/web_ui_utils.dart';
 import 'utils/web_compatibility.dart';
@@ -265,8 +263,6 @@ class _WorkAssignmentAppState extends State<WorkAssignmentApp> {
             '/assignment_board': (context) => AssignmentBoard(),
             '/todo': (context) => TodoPage(),
             '/calculator': (context) => CalculatorPage(),
-            '/group_qr_generate': (context) => const GroupQRGeneratePage(),
-            '/group_qr_scanner': (context) => const GroupQRScannerPage(),
           },
         );
       },

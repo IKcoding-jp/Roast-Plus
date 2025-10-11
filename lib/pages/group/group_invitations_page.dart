@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../models/group_provider.dart';
 import '../../models/group_models.dart';
 import '../../models/theme_settings.dart';
-import 'group_qr_scanner_page.dart';
 
 class GroupInvitationsPage extends StatefulWidget {
   const GroupInvitationsPage({super.key});
@@ -42,20 +41,7 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
         ),
         backgroundColor: themeSettings.appBarColor,
         iconTheme: IconThemeData(color: themeSettings.iconColor),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.qr_code_scanner, color: themeSettings.iconColor),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const GroupQRScannerPage(),
-                ),
-              );
-            },
-            tooltip: 'QRコード読み取り',
-          ),
-        ],
+        actions: [],
       ),
       body: Consumer<GroupProvider>(
         builder: (context, groupProvider, child) {
@@ -87,7 +73,7 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    '新しい招待が届くとここに表示されます\nまたは、QRコードを読み取ってグループに参加しましょう',
+                    '新しい招待が届くとここに表示されます',
                     style: TextStyle(
                       color: themeSettings.fontColor1,
                       fontSize: 14 * themeSettings.fontSizeScale,
@@ -107,13 +93,13 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
                       child: Column(
                         children: [
                           Icon(
-                            Icons.qr_code_scanner,
+                            Icons.person_add,
                             size: 48,
                             color: themeSettings.buttonColor,
                           ),
                           SizedBox(height: 16),
                           Text(
-                            'QRコードでグループ参加',
+                            'グループに参加',
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontSize: 16 * themeSettings.fontSizeScale,
@@ -123,7 +109,7 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            '他のメンバーからQRコードをもらって\nグループに参加できます',
+                            '他のメンバーから招待を受けて\nグループに参加できます',
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontSize: 14 * themeSettings.fontSizeScale,
@@ -132,30 +118,6 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GroupQRScannerPage(),
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.qr_code_scanner),
-                            label: Text('QRコードを読み取る'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: themeSettings.buttonColor,
-                              foregroundColor: themeSettings.fontColor2,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -356,7 +318,7 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
                         Row(
                           children: [
                             Icon(
-                              Icons.qr_code_scanner,
+                              Icons.person_add,
                               size: 32,
                               color: themeSettings.buttonColor,
                             ),
@@ -366,7 +328,7 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'QRコードでグループ参加',
+                                    'グループに参加',
                                     style: TextStyle(
                                       color: themeSettings.fontColor1,
                                       fontSize:
@@ -390,30 +352,6 @@ class _GroupInvitationsPageState extends State<GroupInvitationsPage> {
                           ],
                         ),
                         SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const GroupQRScannerPage(),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.qr_code_scanner),
-                          label: Text('QRコードを読み取る'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: themeSettings.buttonColor,
-                            foregroundColor: themeSettings.fontColor2,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

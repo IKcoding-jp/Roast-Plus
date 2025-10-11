@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 import 'dart:developer' as developer;
 
-/// グループ招待コード・QRコード管理サービス
+/// グループ招待コード管理サービス
 class GroupInvitationService {
   static final _firestore = FirebaseFirestore.instance;
   static final _auth = FirebaseAuth.instance;
@@ -463,8 +463,8 @@ class GroupInvitationService {
     }
   }
 
-  /// QRコード用のURL生成
-  static String generateQRCodeUrl(String invitationCode) {
+  /// 招待用のURL生成
+  static String generateInvitationUrl(String invitationCode) {
     // 実際のアプリでは適切なディープリンクURLを使用
     return 'https://yourapp.com/join?code=$invitationCode';
   }

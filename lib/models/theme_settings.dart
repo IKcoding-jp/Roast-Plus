@@ -1145,6 +1145,139 @@ class ThemeSettings extends ChangeNotifier {
         tastingColor: defaultTheme['tastingColor']!,
       );
 
+      // Web版では即座にローカル永続化設定を読み込み
+      if (kIsWeb) {
+        try {
+          // Web版ローカル永続化からフォント設定を読み込み
+          final fontSettings =
+              await WebSettingsPersistenceService.getFontSettings();
+          if (fontSettings['fontSizeScale'] != null) {
+            _instance!.fontSizeScale = (fontSettings['fontSizeScale'] as num)
+                .toDouble();
+            developer.log(
+              'Web版: フォントサイズをローカル永続化から読み込み: ${_instance!.fontSizeScale}',
+              name: 'ThemeSettings',
+            );
+          }
+          if (fontSettings['fontFamily'] != null) {
+            _instance!.fontFamily = fontSettings['fontFamily'] as String;
+            developer.log(
+              'Web版: フォントファミリーをローカル永続化から読み込み: ${_instance!.fontFamily}',
+              name: 'ThemeSettings',
+            );
+          }
+
+          // Web版ローカル永続化からテーマ設定を読み込み
+          final themeSettings =
+              await WebSettingsPersistenceService.getThemeSettings();
+          if (themeSettings.isNotEmpty) {
+            // テーマ設定を適用
+            if (themeSettings['appBarColor'] != null) {
+              _instance!.appBarColor = Color(themeSettings['appBarColor']);
+            }
+            if (themeSettings['backgroundColor'] != null) {
+              _instance!.backgroundColor = Color(
+                themeSettings['backgroundColor'],
+              );
+            }
+            if (themeSettings['buttonColor'] != null) {
+              _instance!.buttonColor = Color(themeSettings['buttonColor']);
+            }
+            if (themeSettings['appButtonColor'] != null) {
+              _instance!.appButtonColor = Color(
+                themeSettings['appButtonColor'],
+              );
+            }
+            if (themeSettings['cardBackgroundColor'] != null) {
+              _instance!.cardBackgroundColor = Color(
+                themeSettings['cardBackgroundColor'],
+              );
+            }
+            if (themeSettings['fontColor1'] != null) {
+              _instance!.fontColor1 = Color(themeSettings['fontColor1']);
+            }
+            if (themeSettings['fontColor2'] != null) {
+              _instance!.fontColor2 = Color(themeSettings['fontColor2']);
+            }
+            if (themeSettings['iconColor'] != null) {
+              _instance!.iconColor = Color(themeSettings['iconColor']);
+            }
+            if (themeSettings['timerCircleColor'] != null) {
+              _instance!.timerCircleColor = Color(
+                themeSettings['timerCircleColor'],
+              );
+            }
+            if (themeSettings['bottomNavigationColor'] != null) {
+              _instance!.bottomNavigationColor = Color(
+                themeSettings['bottomNavigationColor'],
+              );
+            }
+            if (themeSettings['inputBackgroundColor'] != null) {
+              _instance!.inputBackgroundColor = Color(
+                themeSettings['inputBackgroundColor'],
+              );
+            }
+            if (themeSettings['memberBackgroundColor'] != null) {
+              _instance!.memberBackgroundColor = Color(
+                themeSettings['memberBackgroundColor'],
+              );
+            }
+            if (themeSettings['appBarTextColor'] != null) {
+              _instance!.appBarTextColor = Color(
+                themeSettings['appBarTextColor'],
+              );
+            }
+            if (themeSettings['bottomNavigationTextColor'] != null) {
+              _instance!.bottomNavigationTextColor = Color(
+                themeSettings['bottomNavigationTextColor'],
+              );
+            }
+            if (themeSettings['dialogBackgroundColor'] != null) {
+              _instance!.dialogBackgroundColor = Color(
+                themeSettings['dialogBackgroundColor'],
+              );
+            }
+            if (themeSettings['dialogTextColor'] != null) {
+              _instance!.dialogTextColor = Color(
+                themeSettings['dialogTextColor'],
+              );
+            }
+            if (themeSettings['inputTextColor'] != null) {
+              _instance!.inputTextColor = Color(
+                themeSettings['inputTextColor'],
+              );
+            }
+            if (themeSettings['borderColor'] != null) {
+              _instance!.borderColor = Color(themeSettings['borderColor']);
+            }
+            if (themeSettings['calculatorColor'] != null) {
+              _instance!.calculatorColor = Color(
+                themeSettings['calculatorColor'],
+              );
+            }
+            if (themeSettings['settingsColor'] != null) {
+              _instance!.settingsColor = Color(themeSettings['settingsColor']);
+            }
+            if (themeSettings['todoColor'] != null) {
+              _instance!.todoColor = Color(themeSettings['todoColor']);
+            }
+            if (themeSettings['tastingColor'] != null) {
+              _instance!.tastingColor = Color(themeSettings['tastingColor']);
+            }
+
+            developer.log(
+              'Web版: テーマ設定をローカル永続化から読み込みました: ${themeSettings.keys.length}個',
+              name: 'ThemeSettings',
+            );
+          }
+
+          // 設定を読み込んだ後に通知
+          _instance!.notifyListeners();
+        } catch (e) {
+          developer.log('Web版ローカル永続化設定読み込みエラー: $e', name: 'ThemeSettings');
+        }
+      }
+
       // バックグラウンドでFirebaseから設定を非同期取得
       _loadSettingsFromFirebaseAsync();
 
@@ -1188,33 +1321,12 @@ class ThemeSettings extends ChangeNotifier {
   // バックグラウンドでFirebaseから設定を非同期取得
   static Future<void> _loadSettingsFromFirebaseAsync() async {
     try {
-      // Web版ではまずローカル永続化から設定を取得
+      // Web版では既にローカル永続化設定を読み込んでいるため、Firebaseから取得のみ実行
       if (kIsWeb) {
-        try {
-          final webSettings =
-              await WebSettingsPersistenceService.getAllSettings();
-          if (webSettings.isNotEmpty) {
-            developer.log(
-              'Web版ローカル永続化から設定を読み込みました: ${webSettings.keys.length}個',
-              name: 'ThemeSettings',
-            );
-
-            // フォント設定を優先的に読み込み
-            final fontSettings =
-                await WebSettingsPersistenceService.getFontSettings();
-            if (fontSettings['fontSizeScale'] != null) {
-              _instance!.fontSizeScale = (fontSettings['fontSizeScale'] as num)
-                  .toDouble();
-            }
-            if (fontSettings['fontFamily'] != null) {
-              _instance!.fontFamily = fontSettings['fontFamily'] as String;
-            }
-
-            _instance!.notifyListeners();
-          }
-        } catch (e) {
-          developer.log('Web版ローカル永続化設定読み込みエラー: $e', name: 'ThemeSettings');
-        }
+        developer.log(
+          'Web版: ローカル永続化設定は既に読み込み済みのため、Firebase取得のみ実行',
+          name: 'ThemeSettings',
+        );
       }
 
       // Firebaseからテーマ設定を取得
@@ -1421,6 +1533,16 @@ class ThemeSettings extends ChangeNotifier {
         'theme_fontFamily': fontFamily,
         'custom_themes': themeData,
       });
+
+      // Web版では追加でローカル永続化にも保存
+      if (kIsWeb) {
+        try {
+          await WebSettingsPersistenceService.saveThemeSettings(themeData);
+          developer.log('Web版テーマ設定をローカル永続化しました', name: 'ThemeSettings');
+        } catch (e) {
+          developer.log('Web版テーマ設定ローカル永続化エラー: $e', name: 'ThemeSettings');
+        }
+      }
 
       developer.log(
         'ThemeSettings: Firebaseにテーマ設定を保存しました',

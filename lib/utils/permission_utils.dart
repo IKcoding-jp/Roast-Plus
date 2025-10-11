@@ -3,6 +3,8 @@ import '../models/group_models.dart';
 import '../services/group_firestore_service.dart';
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PermissionUtils {
   static const String _logName = 'PermissionUtils';
@@ -174,6 +176,51 @@ class PermissionUtils {
         return '丸シール設定';
       default:
         return dataType;
+    }
+  }
+
+  /// カメラ権限をリクエスト
+  static Future<bool> requestCameraPermission() async {
+    try {
+      _logInfo('カメラ権限リクエスト開始');
+
+      // Web版では常にtrueを返す（実際の権限チェックはmobile_scannerが行う）
+      if (kIsWeb) {
+        _logInfo('Web版: カメラ権限を許可として扱います');
+        return true;
+      }
+
+      // モバイル版ではmobile_scannerが自動的に権限をリクエストするため、
+      // ここでは常にtrueを返す（実際の権限チェックはmobile_scannerが行う）
+      _logInfo('モバイル版: カメラ権限を許可として扱います（mobile_scannerが自動処理）');
+      return true;
+    } catch (e, st) {
+      _logError('カメラ権限リクエストエラー', e, st);
+      return false;
+    }
+  }
+
+  /// アプリ設定画面を開く
+  static Future<void> openAppSettings() async {
+    try {
+      _logInfo('アプリ設定画面を開く');
+
+      // Web版では設定画面を開けない
+      if (kIsWeb) {
+        _logInfo('Web版: 設定画面を開けません');
+        return;
+      }
+
+      // モバイル版では設定画面のURLを開く
+      const url = 'app-settings:';
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
+        _logInfo('設定画面を開きました');
+      } else {
+        _logError('設定画面を開けませんでした');
+      }
+    } catch (e, st) {
+      _logError('設定画面を開くエラー', e, st);
     }
   }
 }

@@ -219,6 +219,32 @@ class LoadingAnimationWidget extends StatelessWidget {
           width: width ?? 200,
           height: height ?? 200,
           fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            // Web環境でのアセット読み込みエラーのフォールバック
+            return Container(
+              width: width ?? 200,
+              height: height ?? 200,
+              decoration: BoxDecoration(
+                color: Colors.brown.shade50,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.coffee, size: 60, color: Colors.brown.shade400),
+                  SizedBox(height: 10),
+                  Text(
+                    'Loading...',
+                    style: TextStyle(
+                      color: Colors.brown.shade600,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

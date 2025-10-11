@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:html' as html;
 import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
 import '../../models/group_models.dart';
 import '../../models/group_gamification_models.dart';
+import '../../services/group_invitation_service.dart';
 import 'dart:developer' as developer;
 
 import '../../services/group_statistics_service.dart';
@@ -670,6 +673,14 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                       setState(() => _isEditing = true);
                     }
                   },
+                ),
+              if (_isUserLeader)
+                IconButton(
+                  icon: Icon(Icons.vpn_key, color: themeSettings.iconColor),
+                  onPressed: () {
+                    _showInvitationCodeDialog(context, themeSettings);
+                  },
+                  tooltip: '招待コード表示',
                 ),
               if (_isUserLeader)
                 PopupMenuButton<String>(
@@ -3025,5 +3036,237 @@ class _GroupInfoPageState extends State<GroupInfoPage>
         ],
       ),
     );
+  }
+
+  /// 招待コード表示ダイアログを表示
+  void _showInvitationCodeDialog(
+    BuildContext context,
+    ThemeSettings themeSettings,
+  ) async {
+    try {
+      final groupProvider = context.read<GroupProvider>();
+      final currentGroup = groupProvider.currentGroup;
+
+      if (currentGroup == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('グループ情報を取得できませんでした')));
+        return;
+      }
+
+      // 招待コードを生成
+      final invitationCode =
+          await GroupInvitationService.createGroupInvitationCode(
+            currentGroup.id,
+            expiresIn: Duration(days: 30), // 30日間有効
+            maxUses: null, // 使用回数制限なし
+          );
+
+      // 招待コードの詳細情報を取得
+      final invitationInfo = await GroupInvitationService.getInvitationInfo(
+        invitationCode,
+      );
+
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.vpn_key, color: themeSettings.iconColor),
+              SizedBox(width: 8),
+              Text(
+                '招待コード',
+                style: TextStyle(
+                  color: themeSettings.fontColor1,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'このコードを他のメンバーに共有してください',
+                style: TextStyle(color: themeSettings.fontColor1, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: themeSettings.memberBackgroundColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: themeSettings.iconColor.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      '招待コード',
+                      style: TextStyle(
+                        color: themeSettings.fontColor1,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SelectableText(
+                            invitationCode,
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'monospace',
+                              letterSpacing: 2,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.copy, size: 20),
+                          onPressed: () =>
+                              _copyInvitationCode(context, invitationCode),
+                          tooltip: '招待コードをコピー',
+                          style: IconButton.styleFrom(
+                            backgroundColor: themeSettings.appButtonColor
+                                .withValues(alpha: 0.1),
+                            foregroundColor: themeSettings.appButtonColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (invitationInfo != null) ...[
+                SizedBox(height: 16),
+                _buildInfoRow(
+                  '有効期限',
+                  _formatDate(invitationInfo['expiresAt']),
+                  themeSettings,
+                ),
+                _buildInfoRow(
+                  '使用回数',
+                  '${invitationInfo['currentUses'] ?? 0}回',
+                  themeSettings,
+                ),
+                if (invitationInfo['maxUses'] != null)
+                  _buildInfoRow(
+                    '使用上限',
+                    '${invitationInfo['maxUses']}回',
+                    themeSettings,
+                  ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('閉じる'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('招待コードの生成に失敗しました: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// 招待コードをクリップボードにコピー
+  Future<void> _copyInvitationCode(
+    BuildContext context,
+    String invitationCode,
+  ) async {
+    try {
+      if (kIsWeb) {
+        // Web版: Clipboard APIを使用
+        await html.window.navigator.clipboard?.writeText(invitationCode);
+      } else {
+        // モバイル版: 既存の実装を使用
+        // Clipboard.setData(ClipboardData(text: invitationCode));
+      }
+
+      // 成功メッセージを表示
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('招待コードをコピーしました'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('コピーに失敗しました'), duration: Duration(seconds: 2)),
+        );
+      }
+    }
+  }
+
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    ThemeSettings themeSettings,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: themeSettings.fontColor1,
+              fontSize: 13,
+              fontFamily: themeSettings.fontFamily,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: themeSettings.fontColor1,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              fontFamily: themeSettings.fontFamily,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(dynamic timestamp) {
+    try {
+      if (timestamp == null) return '不明';
+
+      DateTime date;
+      if (timestamp is DateTime) {
+        date = timestamp;
+      } else {
+        // Firestore Timestamp の場合
+        date = timestamp.toDate();
+      }
+
+      return DateFormat('yyyy年MM月dd日').format(date);
+    } catch (e) {
+      return '不明';
+    }
   }
 }

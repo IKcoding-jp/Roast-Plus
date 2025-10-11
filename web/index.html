@@ -24,12 +24,13 @@
   <!-- Content Security Policy for Google Login / Flutter Web -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://apis.google.com https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https://securetoken.googleapis.com https://*.google.com https://*.googleapis.com https://*.gstatic.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://apis.google.com https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https://securetoken.googleapis.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://cdn.jsdelivr.net;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://*.googleapis.com;
     font-src 'self' data: https://fonts.gstatic.com https://*.gstatic.com;
     img-src 'self' data: https: blob: https://www.gstatic.com https://accounts.google.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://*.google.com https://*.googleapis.com https://*.gstatic.com;
     connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://*.firebaseio.com https://*.google.com https://accounts.google.com https://www.gstatic.com https://fonts.gstatic.com https://oauth2.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://www.googleapis.com https://*.gstatic.com ws: wss: http: https:;
     frame-src 'self' https://accounts.google.com https://*.google.com https://roastplus-app.web.app https://*.firebaseapp.com http://localhost:* https://localhost:* https://www.google.com https://*.gstatic.com;
+    media-src 'self' https: mediastream:;
     object-src 'none';
     base-uri 'self';
     form-action 'self' https://accounts.google.com https://www.google.com https://*.google.com;
@@ -105,6 +106,9 @@
   
   <!-- Flutter Web 最適化 -->
   <link rel="stylesheet" href="styles.css">
+  
+  <!-- jsQRライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
 <body>
   <!-- Flutter Web スクリプト -->

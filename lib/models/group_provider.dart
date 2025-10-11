@@ -586,6 +586,8 @@ class GroupProvider extends ChangeNotifier {
       if (_currentGroup?.id == groupId) {
         // 現在のグループを脱退中
         _currentGroup = null;
+        // グループ参加フラグをfalseに設定
+        _hasActiveGroupFlag = false;
 
         // 監視を停止
         unwatchGroup(groupId);
@@ -838,6 +840,11 @@ class GroupProvider extends ChangeNotifier {
     // 現在のグループが脱退した場合、nullに設定
     if (_currentGroup?.id == groupId) {
       _currentGroup = null;
+      // グループ参加フラグをfalseに設定
+      _hasActiveGroupFlag = false;
+
+      // Firestoreの参加フラグも更新
+      GroupFirestoreService.updateUserParticipationFlag(hasActiveGroup: false);
     }
 
     // 監視を停止

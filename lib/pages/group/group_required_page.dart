@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
+import '../../models/group_provider.dart';
+import '../../services/group_invitation_service.dart';
 import 'group_create_page.dart';
+import '../../app.dart';
 
 class GroupRequiredPage extends StatelessWidget {
   const GroupRequiredPage({super.key});
@@ -138,6 +141,31 @@ class GroupRequiredPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              _showInvitationCodeDialog(context, themeSettings);
+                            },
+                            icon: Icon(Icons.vpn_key, size: 20),
+                            label: Text(
+                              '招待コード入力',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: themeSettings.appButtonColor,
+                              foregroundColor: themeSettings.fontColor2,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 2,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ] else ...[
@@ -174,6 +202,33 @@ class GroupRequiredPage extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 12),
+
+                    // 招待コード入力ボタン
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          _showInvitationCodeDialog(context, themeSettings);
+                        },
+                        icon: Icon(Icons.vpn_key, size: 22),
+                        label: Text(
+                          '招待コードでグループに参加',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: themeSettings.appButtonColor,
+                          foregroundColor: themeSettings.fontColor2,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 2,
+                        ),
+                      ),
+                    ),
                   ],
 
                   const SizedBox(height: 20),
@@ -261,6 +316,147 @@ class GroupRequiredPage extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  /// 招待コード入力ダイアログを表示
+  void _showInvitationCodeDialog(
+    BuildContext context,
+    ThemeSettings themeSettings,
+  ) {
+    final TextEditingController codeController = TextEditingController();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.vpn_key, color: themeSettings.iconColor),
+              SizedBox(width: 8),
+              Text(
+                '招待コード入力',
+                style: TextStyle(
+                  color: themeSettings.fontColor1,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'グループの招待コードを入力してください',
+                style: TextStyle(color: themeSettings.fontColor1, fontSize: 14),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: codeController,
+                decoration: InputDecoration(
+                  labelText: '招待コード',
+                  hintText: '8文字の英数字',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: Icon(Icons.vpn_key),
+                ),
+                style: TextStyle(fontFamily: 'monospace', letterSpacing: 1),
+                textAlign: TextAlign.center,
+                maxLength: 8,
+                textCapitalization: TextCapitalization.characters,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.of(context).pop(),
+              child: Text('キャンセル'),
+            ),
+            ElevatedButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      final code = codeController.text.trim().toUpperCase();
+                      if (code.isEmpty || code.length != 8) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('8文字の招待コードを入力してください')),
+                        );
+                        return;
+                      }
+
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      try {
+                        final success =
+                            await GroupInvitationService.joinGroupWithInvitationCode(
+                              code,
+                            );
+
+                        if (success) {
+                          // ダイアログを閉じる
+                          Navigator.of(context).pop();
+
+                          // GroupProviderの状態を明示的に更新
+                          final groupProvider = context.read<GroupProvider>();
+                          await groupProvider.loadUserGroups();
+
+                          // スナックバーを表示
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('グループに参加しました！'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+
+                          // 状態の更新を確実に反映させるため少し待機
+                          await Future.delayed(Duration(milliseconds: 500));
+
+                          // MainScaffoldに直接遷移（GroupRequiredWrapperを経由しない）
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MainScaffold(key: mainScaffoldKey),
+                            ),
+                            (route) => false,
+                          );
+                        } else if (!success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('招待コードが無効です'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('エラーが発生しました: ${e.toString()}'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    },
+              child: isLoading
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text('参加'),
+            ),
+          ],
         ),
       ),
     );

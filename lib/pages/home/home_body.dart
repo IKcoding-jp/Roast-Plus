@@ -641,15 +641,19 @@ class _HomeBodyState extends State<HomeBody> {
 
   /// テーマに基づいた色を取得
   Color _getThemeBasedColor(String sectionType) {
-    // 基本テーマかどうかを色で判定（基本テーマの特徴的な色を使用）
-    final isBasicTheme =
-        widget.themeSettings.appBarColor.value == 0xFF8B4513; // 基本テーマのブラウン色
+    // デフォルト、ダーク、ライトテーマの場合は従来の固定色を使用
+    final isDefaultTheme =
+        widget.themeSettings.appBarColor.value == 0xFF2C1810; // デフォルトテーマの色
+    final isDarkTheme =
+        widget.themeSettings.appBarColor.value == 0xFF121212; // ダークテーマの色
+    final isLightTheme =
+        widget.themeSettings.appBarColor.value == 0xFFFAFAFA; // ライトテーマの色
 
-    // 基本テーマの場合は従来の固定色を使用
-    if (isBasicTheme) {
+    // デフォルト、ダーク、ライトテーマの場合は従来の固定色を使用
+    if (isDefaultTheme || isDarkTheme || isLightTheme) {
       switch (sectionType) {
         case 'business':
-          return Color(0xFF8B4513); // ブラウン
+          return Color(0xFFE65100); // 焙煎をイメージした暖色のオレンジ（火・熱を表現）
         case 'record':
           return Colors.blue.shade700;
         case 'growth':
@@ -661,7 +665,7 @@ class _HomeBodyState extends State<HomeBody> {
       }
     }
 
-    // 基本以外のテーマではテーマの色を使用
+    // その他のテーマ（パステル、暖色系、寒色系、コーヒー、エレガント）ではテーマの色を使用
     switch (sectionType) {
       case 'business':
         return widget.themeSettings.buttonColor;

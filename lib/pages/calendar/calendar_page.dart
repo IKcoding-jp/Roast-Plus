@@ -43,11 +43,44 @@ class _CalendarPageState extends State<CalendarPage> {
   // グループデータ監視用
   StreamSubscription<Map<String, dynamic>?>? _groupScheduleSubscription;
 
+  // 土日判定
+  bool _isWeekend(DateTime date) {
+    return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
+  }
+
+  // 直近の平日を取得（土日の場合は直前の金曜日を返す）
+  DateTime _getRecentWeekday(DateTime date) {
+    if (date.weekday == DateTime.saturday) {
+      return date.subtract(Duration(days: 1)); // 土曜→金曜
+    } else if (date.weekday == DateTime.sunday) {
+      return date.subtract(Duration(days: 2)); // 日曜→金曜
+    }
+    return date;
+  }
+
+  // 過去N営業日分の日付リストを取得（最新の営業日を含む）
+  List<DateTime> _getRecentWeekdays(int count) {
+    final List<DateTime> weekdays = [];
+    DateTime current = _getRecentWeekday(DateTime.now());
+
+    while (weekdays.length < count) {
+      weekdays.add(current);
+      current = current.subtract(Duration(days: 1));
+      // 土日をスキップ
+      while (_isWeekend(current)) {
+        current = current.subtract(Duration(days: 1));
+      }
+    }
+
+    return weekdays.reversed.toList(); // 古い順に並べ替え
+  }
+
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.initialDate ?? DateTime.now();
-    _focusedDate = widget.initialDate ?? DateTime.now();
+    final initialDate = widget.initialDate ?? DateTime.now();
+    _selectedDate = _getRecentWeekday(initialDate);
+    _focusedDate = _getRecentWeekday(initialDate);
 
     // 初期データ読み込みを遅延実行
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -393,6 +426,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     focusedDay: _focusedDate,
                     selectedDayPredicate: (day) =>
                         isSameDay(_selectedDate, day),
+                    enabledDayPredicate: (day) => !_isWeekend(day),
                     onDaySelected: (selectedDay, focusedDay) {
                       _onDateSelected(selectedDay, focusedDay);
                       Navigator.of(context).pop();
@@ -434,13 +468,18 @@ class _CalendarPageState extends State<CalendarPage> {
                     calendarStyle: CalendarStyle(
                       outsideDaysVisible: false,
                       weekendTextStyle: TextStyle(
-                        color: themeSettings.fontColor1,
+                        color: themeSettings.fontColor1.withValues(alpha: 0.3),
+                        decoration: TextDecoration.lineThrough,
                       ),
                       holidayTextStyle: TextStyle(
                         color: themeSettings.fontColor1,
                       ),
                       defaultTextStyle: TextStyle(
                         color: themeSettings.fontColor1,
+                      ),
+                      disabledTextStyle: TextStyle(
+                        color: themeSettings.fontColor1.withValues(alpha: 0.3),
+                        decoration: TextDecoration.lineThrough,
                       ),
                       selectedDecoration: BoxDecoration(
                         color: themeSettings.buttonColor,
@@ -459,7 +498,10 @@ class _CalendarPageState extends State<CalendarPage> {
                         fontWeight: FontWeight.bold,
                       ),
                       defaultDecoration: BoxDecoration(shape: BoxShape.circle),
-                      weekendDecoration: BoxDecoration(shape: BoxShape.circle),
+                      weekendDecoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: themeSettings.fontColor1.withValues(alpha: 0.1),
+                      ),
                     ),
                   ),
                 ),
@@ -605,60 +647,17 @@ class _CalendarPageState extends State<CalendarPage> {
               ],
             ),
             SizedBox(height: isMobile ? 16 : 24), // スマホでは間隔を狭く
-            // 日付選択ボタン（1行表示を維持、左右の幅を最大活用）
+            // 日付選択ボタン（直近の平日7営業日を表示）
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 左右の幅を最大活用
-              children: [
-                _buildDateButton(
+              children: _getRecentWeekdays(7).map((date) {
+                return _buildWeekdayDateButton(
                   context,
-                  -3,
-                  '3日前',
+                  date,
                   themeSettings,
                   isMobile: isMobile,
-                ),
-                _buildDateButton(
-                  context,
-                  -2,
-                  '2日前',
-                  themeSettings,
-                  isMobile: isMobile,
-                ),
-                _buildDateButton(
-                  context,
-                  -1,
-                  '昨日',
-                  themeSettings,
-                  isMobile: isMobile,
-                ),
-                _buildDateButton(
-                  context,
-                  0,
-                  '今日',
-                  themeSettings,
-                  isMobile: isMobile,
-                ),
-                _buildDateButton(
-                  context,
-                  1,
-                  '明日',
-                  themeSettings,
-                  isMobile: isMobile,
-                ),
-                _buildDateButton(
-                  context,
-                  2,
-                  '2日後',
-                  themeSettings,
-                  isMobile: isMobile,
-                ),
-                _buildDateButton(
-                  context,
-                  3,
-                  '3日後',
-                  themeSettings,
-                  isMobile: isMobile,
-                ),
-              ],
+                );
+              }).toList(),
             ),
           ],
         ),
@@ -680,14 +679,8 @@ class _CalendarPageState extends State<CalendarPage> {
           if (_todaySchedule != null) SizedBox(height: 16),
           _buildRoastScheduleSection(themeSettings),
           SizedBox(height: 16),
-          if (_assignmentHistoryWithLabels != null &&
-              _assignmentHistoryWithLabels!['assignments'] != null &&
-              (_assignmentHistoryWithLabels!['assignments'] as List).isNotEmpty)
-            _buildAssignmentSection(themeSettings),
-          if (_assignmentHistoryWithLabels != null &&
-              _assignmentHistoryWithLabels!['assignments'] != null &&
-              (_assignmentHistoryWithLabels!['assignments'] as List).isNotEmpty)
-            SizedBox(height: 16),
+          _buildAssignmentSection(themeSettings),
+          SizedBox(height: 16),
           if (_dripPackRecords.isNotEmpty) _buildDripPackSection(themeSettings),
           if (_dripPackRecords.isNotEmpty) SizedBox(height: 16),
           if (_workProgressRecords.isNotEmpty)
@@ -724,15 +717,7 @@ class _CalendarPageState extends State<CalendarPage> {
           SizedBox(width: 16),
           // 担当
           Expanded(
-            child: Column(
-              children: [
-                if (_assignmentHistoryWithLabels != null &&
-                    _assignmentHistoryWithLabels!['assignments'] != null &&
-                    (_assignmentHistoryWithLabels!['assignments'] as List)
-                        .isNotEmpty)
-                  _buildAssignmentSection(themeSettings),
-              ],
-            ),
+            child: Column(children: [_buildAssignmentSection(themeSettings)]),
           ),
         ],
       );
@@ -770,18 +755,12 @@ class _CalendarPageState extends State<CalendarPage> {
                 ],
               ),
               SizedBox(height: 12),
-              // 日付選択ボタン
+              // 日付選択ボタン（直近の平日7営業日を表示）
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildDateButton(context, -3, '3日前', themeSettings),
-                  _buildDateButton(context, -2, '2日前', themeSettings),
-                  _buildDateButton(context, -1, '昨日', themeSettings),
-                  _buildDateButton(context, 0, '今日', themeSettings),
-                  _buildDateButton(context, 1, '明日', themeSettings),
-                  _buildDateButton(context, 2, '2日後', themeSettings),
-                  _buildDateButton(context, 3, '3日後', themeSettings),
-                ],
+                children: _getRecentWeekdays(7).map((date) {
+                  return _buildWeekdayDateButton(context, date, themeSettings);
+                }).toList(),
               ),
             ],
           ),
@@ -847,18 +826,8 @@ class _CalendarPageState extends State<CalendarPage> {
                       if (_todaySchedule != null) SizedBox(height: 16),
                       _buildRoastScheduleSection(themeSettings),
                       SizedBox(height: 16),
-                      if (_assignmentHistoryWithLabels != null &&
-                          _assignmentHistoryWithLabels!['assignments'] !=
-                              null &&
-                          (_assignmentHistoryWithLabels!['assignments'] as List)
-                              .isNotEmpty)
-                        _buildAssignmentSection(themeSettings),
-                      if (_assignmentHistoryWithLabels != null &&
-                          _assignmentHistoryWithLabels!['assignments'] !=
-                              null &&
-                          (_assignmentHistoryWithLabels!['assignments'] as List)
-                              .isNotEmpty)
-                        SizedBox(height: 16),
+                      _buildAssignmentSection(themeSettings),
+                      SizedBox(height: 16),
                       if (_dripPackRecords.isNotEmpty)
                         _buildDripPackSection(themeSettings),
                       if (_dripPackRecords.isNotEmpty) SizedBox(height: 16),
@@ -1206,13 +1175,41 @@ class _CalendarPageState extends State<CalendarPage> {
                   })
                   .toList(),
             )
-          : Text(
-              '担当が設定されていません',
-              style: TextStyle(
-                color: themeSettings.fontColor1.withValues(alpha: 0.6),
-                fontStyle: FontStyle.italic,
-              ),
+          : _buildEmptyAssignmentMessage(themeSettings),
+    );
+  }
+
+  Widget _buildEmptyAssignmentMessage(ThemeSettings themeSettings) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.group_outlined,
+            size: 48,
+            color: themeSettings.iconColor.withValues(alpha: 0.5),
+          ),
+          SizedBox(height: 12),
+          Text(
+            '担当が設定されていません',
+            style: TextStyle(
+              color: themeSettings.fontColor1.withValues(alpha: 0.6),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '担当表を設定して作業を効率化しましょう',
+            style: TextStyle(
+              color: themeSettings.fontColor1.withValues(alpha: 0.5),
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -1434,27 +1431,46 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  Widget _buildDateButton(
+  Widget _buildWeekdayDateButton(
     BuildContext context,
-    int dayOffset,
-    String label,
+    DateTime date,
     ThemeSettings themeSettings, {
     bool isMobile = false,
   }) {
-    final targetDate = DateTime.now().add(Duration(days: dayOffset));
     final isSelected =
-        _selectedDate.year == targetDate.year &&
-        _selectedDate.month == targetDate.month &&
-        _selectedDate.day == targetDate.day;
-    final isToday = dayOffset == 0;
+        _selectedDate.year == date.year &&
+        _selectedDate.month == date.month &&
+        _selectedDate.day == date.day;
+    final isToday =
+        date.day == DateTime.now().day &&
+        date.month == DateTime.now().month &&
+        date.year == DateTime.now().year;
+
+    // ラベルを動的に生成
+    String label;
+    if (isToday) {
+      label = '今日';
+    } else {
+      final today = DateTime.now();
+      final difference = date.difference(today).inDays;
+      if (difference == -1) {
+        label = '昨日';
+      } else {
+        label = '${-difference}日前';
+      }
+    }
+
+    // 曜日表示
+    final weekdayNames = ['月', '火', '水', '木', '金', '土', '日'];
+    final weekdayName = weekdayNames[date.weekday - 1];
 
     return GestureDetector(
       onTap: () {
         if (!mounted) return;
 
         setState(() {
-          _selectedDate = targetDate;
-          _focusedDate = targetDate;
+          _selectedDate = date;
+          _focusedDate = date;
         });
 
         // データ読み込みを遅延実行
@@ -1486,7 +1502,7 @@ class _CalendarPageState extends State<CalendarPage> {
         child: Column(
           children: [
             Text(
-              targetDate.day.toString(),
+              date.day.toString(),
               style: TextStyle(
                 color: isSelected
                     ? themeSettings.fontColor2
@@ -1496,12 +1512,22 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
             ),
             Text(
+              weekdayName,
+              style: TextStyle(
+                color: isSelected
+                    ? themeSettings.fontColor2
+                    : themeSettings.fontColor1.withValues(alpha: 0.7),
+                fontSize: isMobile ? 8 : 10,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
               label,
               style: TextStyle(
                 color: isSelected
                     ? themeSettings.fontColor2
                     : themeSettings.fontColor1.withValues(alpha: 0.7),
-                fontSize: isMobile ? 8 : 10, // スマホではフォントサイズを小さく
+                fontSize: isMobile ? 6 : 8, // スマホではフォントサイズを小さく
                 fontWeight: FontWeight.w500,
               ),
             ),

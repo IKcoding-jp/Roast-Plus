@@ -465,6 +465,9 @@ class GroupFirestoreService {
         }
       }
 
+      // 全メンバーの担当履歴を削除（失敗しても続行）
+      await _deleteAllMembersAssignmentHistory(group.members);
+
       developer.log(
         'グループ削除完了 - groupId: $groupId',
         name: 'GroupFirestoreService',
@@ -1415,6 +1418,78 @@ class GroupFirestoreService {
         error: e,
         stackTrace: st,
       );
+    }
+  }
+
+  /// 全メンバーの担当履歴を削除
+  static Future<void> _deleteAllMembersAssignmentHistory(
+    List<GroupMember> members,
+  ) async {
+    developer.log(
+      '全メンバーの担当履歴削除開始 - メンバー数: ${members.length}',
+      name: 'GroupFirestoreService',
+    );
+
+    for (final member in members) {
+      try {
+        await _deleteMemberAssignmentHistory(member.uid);
+        developer.log(
+          '担当履歴削除完了 - uid: ${member.uid}',
+          name: 'GroupFirestoreService',
+        );
+      } catch (e) {
+        developer.log(
+          '担当履歴削除エラー - uid: ${member.uid}, error: $e',
+          name: 'GroupFirestoreService',
+          error: e,
+        );
+        // 個別のエラーは無視して続行
+      }
+    }
+
+    developer.log(
+      '全メンバーの担当履歴削除完了',
+      name: 'GroupFirestoreService',
+    );
+  }
+
+  /// 特定メンバーの担当履歴を削除
+  static Future<void> _deleteMemberAssignmentHistory(String uid) async {
+    try {
+      final assignmentHistoryRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('assignmentHistory');
+
+      // 担当履歴の全ドキュメントを取得
+      final querySnapshot = await assignmentHistoryRef.get();
+
+      if (querySnapshot.docs.isEmpty) {
+        developer.log(
+          '担当履歴なし - uid: $uid',
+          name: 'GroupFirestoreService',
+        );
+        return;
+      }
+
+      // バッチ処理で全ドキュメントを削除
+      final batch = _firestore.batch();
+      for (final doc in querySnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+      developer.log(
+        '担当履歴削除完了 - uid: $uid, docs: ${querySnapshot.docs.length}',
+        name: 'GroupFirestoreService',
+      );
+    } catch (e) {
+      developer.log(
+        '担当履歴削除エラー - uid: $uid, error: $e',
+        name: 'GroupFirestoreService',
+        error: e,
+      );
+      rethrow;
     }
   }
 }

@@ -284,8 +284,12 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                           children: [
                                             // ユーザー名と編集ボタン
                                             Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
                                               children: [
-                                                Expanded(
+                                                Flexible(
                                                   child: Text(
                                                     _userName!,
                                                     style: TextStyle(
@@ -302,7 +306,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                         TextOverflow.ellipsis,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 4),
+                                                const SizedBox(width: 8),
                                                 IconButton(
                                                   icon: Icon(
                                                     Icons.edit,
@@ -315,6 +319,11 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                   ),
                                                   tooltip: '表示名を編集',
                                                   onPressed: _editDisplayName,
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: BoxConstraints(
+                                                    minWidth: 32,
+                                                    minHeight: 32,
+                                                  ),
                                                 ),
                                               ],
                                             ),

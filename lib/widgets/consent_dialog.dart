@@ -49,6 +49,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
           color: themeSettings.fontColor1,
           fontSize: 18 * themeSettings.fontSizeScale,
           fontWeight: FontWeight.bold,
+          fontFamily: themeSettings.fontFamily,
         ),
       ),
       content: SizedBox(
@@ -75,6 +76,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
                   style: TextStyle(
                     color: themeSettings.fontColor1,
                     fontSize: 14 * themeSettings.fontSizeScale,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ),
@@ -103,6 +105,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
               style: TextStyle(
                 color: themeSettings.fontColor2,
                 fontSize: 14 * themeSettings.fontSizeScale,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ),
@@ -128,6 +131,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
                   style: TextStyle(
                     fontSize: 14 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
         ),
@@ -178,6 +182,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
                         color: themeSettings.fontColor1,
                         fontSize: 16 * themeSettings.fontSizeScale,
                         fontWeight: FontWeight.bold,
+                        fontFamily: themeSettings.fontFamily,
                       ),
                     ),
                     if (isRequired) ...[
@@ -197,6 +202,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
                             color: Colors.white,
                             fontSize: 10 * themeSettings.fontSizeScale,
                             fontWeight: FontWeight.bold,
+                            fontFamily: themeSettings.fontFamily,
                           ),
                         ),
                       ),
@@ -215,6 +221,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
               style: TextStyle(
                 color: themeSettings.fontColor2,
                 fontSize: 14 * themeSettings.fontSizeScale,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ),
@@ -229,6 +236,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
                   style: TextStyle(
                     color: themeSettings.buttonColor,
                     fontSize: 12 * themeSettings.fontSizeScale,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
                 children: [
@@ -239,6 +247,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
                       style: TextStyle(
                         color: themeSettings.fontColor2,
                         fontSize: 12 * themeSettings.fontSizeScale,
+                        fontFamily: themeSettings.fontFamily,
                       ),
                     ),
                   ),
@@ -269,6 +278,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
               style: TextStyle(
                 color: themeSettings.fontColor2,
                 fontSize: 12 * themeSettings.fontSizeScale,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ),
@@ -283,6 +293,7 @@ class _ConsentDialogState extends State<ConsentDialog> {
                 color: themeSettings.buttonColor,
                 fontSize: 12 * themeSettings.fontSizeScale,
                 fontWeight: FontWeight.bold,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ),
@@ -311,9 +322,16 @@ class _ConsentDialogState extends State<ConsentDialog> {
       }
     } catch (e) {
       if (mounted) {
+        final themeSettings = Provider.of<ThemeSettings>(
+          context,
+          listen: false,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('同意の記録に失敗しました: $e'),
+            content: Text(
+              '同意の記録に失敗しました: $e',
+              style: TextStyle(fontFamily: themeSettings.fontFamily),
+            ),
             backgroundColor: Colors.red,
           ),
         );

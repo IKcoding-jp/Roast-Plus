@@ -500,11 +500,13 @@ class _RoastTimerPageState extends State<RoastTimerPage>
           fontSize: (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
               .clamp(16.0, 28.0),
           fontWeight: FontWeight.bold,
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
         ),
         contentTextStyle: TextStyle(
           color: Provider.of<ThemeSettings>(context).dialogTextColor,
           fontSize: (16 * Provider.of<ThemeSettings>(context).fontSizeScale)
               .clamp(12.0, 24.0),
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
         ),
         title: Text(
           _mode == RoastMode.preheating

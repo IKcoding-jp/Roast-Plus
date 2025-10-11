@@ -3147,8 +3147,9 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                       '招待コード',
                       style: TextStyle(
                         color: themeSettings.fontColor1,
-                        fontSize: 12,
+                        fontSize: 12 * themeSettings.fontSizeScale,
                         fontWeight: FontWeight.w600,
+                        fontFamily: themeSettings.fontFamily,
                       ),
                     ),
                     SizedBox(height: 8),
@@ -3159,9 +3160,9 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                             invitationCode,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
-                              fontSize: 24,
+                              fontSize: 24 * themeSettings.fontSizeScale,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'monospace',
+                              fontFamily: themeSettings.fontFamily,
                               letterSpacing: 2,
                             ),
                             textAlign: TextAlign.center,
@@ -3249,8 +3250,18 @@ class _GroupInfoPageState extends State<GroupInfoPage>
       }
     } catch (e) {
       if (mounted) {
+        final themeSettings = Provider.of<ThemeSettings>(
+          context,
+          listen: false,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('コピーに失敗しました'), duration: Duration(seconds: 2)),
+          SnackBar(
+            content: Text(
+              'コピーに失敗しました',
+              style: TextStyle(fontFamily: themeSettings.fontFamily),
+            ),
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     }

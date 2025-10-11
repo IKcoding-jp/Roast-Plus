@@ -229,6 +229,73 @@ class _WorkAssignmentAppState extends State<WorkAssignmentApp> {
                 ),
               ),
             ),
+            // 追加: ダイアログテーマ
+            dialogTheme: DialogThemeData(
+              backgroundColor: themeSettings.dialogBackgroundColor,
+              titleTextStyle: TextStyle(
+                fontSize: 18 * themeSettings.fontSizeScale,
+                fontWeight: FontWeight.bold,
+                color: themeSettings.dialogTextColor,
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
+              ),
+              contentTextStyle: TextStyle(
+                fontSize: 14 * themeSettings.fontSizeScale,
+                color: themeSettings.dialogTextColor,
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
+              ),
+            ),
+            // 追加: SnackBarテーマ
+            snackBarTheme: SnackBarThemeData(
+              backgroundColor: themeSettings.cardBackgroundColor,
+              contentTextStyle: TextStyle(
+                fontSize: 14 * themeSettings.fontSizeScale,
+                color: themeSettings.fontColor1,
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
+              ),
+            ),
+            // 追加: InputDecorationテーマ
+            inputDecorationTheme: InputDecorationTheme(
+              labelStyle: TextStyle(
+                color: themeSettings.fontColor1,
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
+              ),
+              hintStyle: TextStyle(
+                color: themeSettings.fontColor1.withValues(alpha: 0.6),
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
+              ),
+              filled: true,
+              fillColor: themeSettings.inputBackgroundColor,
+            ),
+            // 追加: ListTileテーマ
+            listTileTheme: ListTileThemeData(
+              titleTextStyle: TextStyle(
+                color: themeSettings.fontColor1,
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
+              ),
+              subtitleTextStyle: TextStyle(
+                color: themeSettings.fontColor1.withValues(alpha: 0.7),
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
+              ),
+            ),
+            // 追加: Cardテーマ
+            cardTheme: CardThemeData(
+              color: themeSettings.cardBackgroundColor,
+              elevation: 2,
+            ),
             iconTheme: IconThemeData(color: themeSettings.iconColor, size: 24),
             drawerTheme: DrawerThemeData(
               backgroundColor: themeSettings.backgroundColor,

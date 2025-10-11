@@ -38,13 +38,16 @@ class AutoSyncService {
     _logInfo('初期化開始');
     _isInitialized = true;
 
+    // Web版では同期間隔を調整（バッテリー消費を考慮）
+    final syncInterval = Duration(minutes: 5);
+    
     // 初回同期はスキップ（グループ作成直後は重すぎるため）
     // 代わりに定期的な同期のみ開始
-    _syncTimer = Timer.periodic(Duration(minutes: 5), (timer) async {
+    _syncTimer = Timer.periodic(syncInterval, (timer) async {
       await _performSync();
     });
 
-    _logInfo('初期化完了（初回同期はスキップ）');
+    _logInfo('初期化完了（初回同期はスキップ、同期間隔: ${syncInterval.inMinutes}分）');
   }
 
   static Future<void> _performSync() async {

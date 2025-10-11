@@ -1,0 +1,15 @@
+{
+  "name": "roastplus-migration",
+  "version": "1.0.0",
+  "description": "Firestore migration scripts for RoastPlus",
+  "main": "remove_donation_data.js",
+  "scripts": {
+    "remove-donation": "node remove_donation_data.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

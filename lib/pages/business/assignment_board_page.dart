@@ -20,8 +20,6 @@ import '../../models/dashboard_stats_provider.dart';
 import '../../models/attendance_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:roastplus/utils/app_performance_config.dart';
 import '../../services/user_settings_firestore_service.dart';
 import '../../services/first_login_service.dart';
 import '../../widgets/lottie_animation_widget.dart';
@@ -64,7 +62,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   Timer? _autoSyncTimer;
 
   String? _activeGroupId;
-  String? _monitoredGroupId;
   bool _initialLocalDataLoaded = false;
   bool _initialGroupDataLoaded = false;
   VoidCallback? _groupProviderListener;
@@ -1037,7 +1034,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
     if (groupProvider.hasGroup) {
       final group = groupProvider.currentGroup!;
-      _monitoredGroupId = group.id;
       // グループ監視開始
 
       // グループの担当表データを監視（基本構成）
@@ -1809,8 +1805,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
           // グループに担当履歴を同期
           await _syncAssignmentHistoryToGroup(today, bestPairs);
-
-          _showInterstitialAdAfterAssignment();
         }
       } catch (e) {
         debugPrint('AssignmentBoard: シャッフル処理エラー: $e');
@@ -1959,28 +1953,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     await _verifyResetState();
 
     debugPrint('AssignmentBoard: 今日の担当リセット完了');
-  }
-
-  void _showInterstitialAdAfterAssignment() async {
-    if (await isDonorUser()) return; // 寄付者は広告を表示しない
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // テスト用ID
-      request: AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-            },
-          );
-          ad.show();
-        },
-        onAdFailedToLoad: (error) {},
-      ),
-    );
   }
 
   @override

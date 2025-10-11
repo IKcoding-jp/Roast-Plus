@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'secure_auth_service.dart';
 import 'secure_storage_service.dart';
 
@@ -22,8 +23,11 @@ class SecurityMonitorService {
       developer.log('セキュリティ監視を開始', name: _logName);
       _isMonitoring = true;
 
-      // 定期的なセキュリティチェック（30分間隔に変更）
-      _monitoringTimer = Timer.periodic(Duration(minutes: 30), (timer) {
+      // Web版では監視間隔を調整（リソース消費を考慮）
+      final monitoringInterval = kIsWeb ? Duration(hours: 1) : Duration(minutes: 30);
+      
+      // 定期的なセキュリティチェック
+      _monitoringTimer = Timer.periodic(monitoringInterval, (timer) {
         _performSecurityCheck();
       });
 

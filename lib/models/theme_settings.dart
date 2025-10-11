@@ -1321,12 +1321,13 @@ class ThemeSettings extends ChangeNotifier {
   // バックグラウンドでFirebaseから設定を非同期取得
   static Future<void> _loadSettingsFromFirebaseAsync() async {
     try {
-      // Web版では既にローカル永続化設定を読み込んでいるため、Firebaseから取得のみ実行
+      // Web版では既にローカル永続化設定を読み込んでいるため、Firebase取得をスキップ
       if (kIsWeb) {
         developer.log(
-          'Web版: ローカル永続化設定は既に読み込み済みのため、Firebase取得のみ実行',
+          'Web版: ローカル永続化設定は既に読み込み済みのため、Firebase取得をスキップ',
           name: 'ThemeSettings',
         );
+        return; // Web版ではFirebase取得をスキップ
       }
 
       // Firebaseからテーマ設定を取得

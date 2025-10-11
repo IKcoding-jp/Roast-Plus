@@ -105,28 +105,3 @@ class AppPerformanceConfig {
     return config[key] as T? ?? defaultValue;
   }
 }
-
-Future<bool> isDonorUser() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return false;
-
-  if (AppConfig.isDeveloperEmail(user.email)) {
-    return true;
-  }
-
-  // 寄付者として登録されたメールアドレス
-  final donorEmails = await AppConfig.donorEmails;
-
-  if (donorEmails.contains(user.email)) return true;
-
-  final doc = await FirebaseFirestore.instance
-      .collection('users')
-      .doc(user.uid)
-      .collection('settings')
-      .doc('donation')
-      .get();
-  if (doc.exists && doc.data() != null) {
-    return doc.data()!['isDonor'] == true;
-  }
-  return false;
-}

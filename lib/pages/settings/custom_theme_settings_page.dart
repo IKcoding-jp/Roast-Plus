@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
-import '../../utils/app_performance_config.dart';
-import 'donation_page.dart';
 
 class CustomThemeSettingsPage extends StatefulWidget {
   const CustomThemeSettingsPage({super.key});
@@ -30,66 +28,29 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
       ),
-      body: FutureBuilder<bool>(
-        future: isDonorUser(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.data != true) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: Container(
+        color: themeSettings.backgroundColor,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600, // Web版での最大幅を制限
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: ListView(
                 children: [
-                  Icon(Icons.volunteer_activism, size: 48, color: Colors.amber),
-                  SizedBox(height: 16),
-                  Text(
-                    'この機能は寄付者限定です',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '300円以上の寄付でテーマカスタマイズが解放されます',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const DonationPage()),
-                    ),
-                    child: Text('寄付して応援する'),
-                  ),
+                  _buildBasicColorsSection(context, themeSettings),
+                  const SizedBox(height: 24),
+                  _buildTextColorsSection(context, themeSettings),
+                  const SizedBox(height: 24),
+                  _buildUIColorsSection(context, themeSettings),
+                  const SizedBox(height: 24),
+                  _buildSaveButton(context, themeSettings),
                 ],
               ),
-            );
-          }
-          // 寄付者は従来UI
-          return Container(
-            color: themeSettings.backgroundColor,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 600, // Web版での最大幅を制限
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: ListView(
-                    children: [
-                      _buildBasicColorsSection(context, themeSettings),
-                      const SizedBox(height: 24),
-                      _buildTextColorsSection(context, themeSettings),
-                      const SizedBox(height: 24),
-                      _buildUIColorsSection(context, themeSettings),
-                      const SizedBox(height: 24),
-                      _buildSaveButton(context, themeSettings),
-                    ],
-                  ),
-                ),
-              ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

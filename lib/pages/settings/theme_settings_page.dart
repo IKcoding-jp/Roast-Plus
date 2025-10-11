@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
 import 'custom_theme_settings_page.dart';
 import 'dart:async'; // Added for Timer
-import '../../utils/app_performance_config.dart';
-import 'donation_page.dart';
 
 class ThemeSettingsPage extends StatefulWidget {
   const ThemeSettingsPage({super.key});
@@ -17,7 +15,6 @@ class ThemeSettingsPage extends StatefulWidget {
 class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
   Map<String, Map<String, Color>> _customThemes = {};
   bool _isLoading = true;
-  bool? _isDonorUser;
 
   @override
   void dispose() {
@@ -28,16 +25,6 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
   void initState() {
     super.initState();
     _loadCustomThemes();
-    _checkDonorStatus();
-  }
-
-  Future<void> _checkDonorStatus() async {
-    final isDonor = await isDonorUser();
-    if (mounted) {
-      setState(() {
-        _isDonorUser = isDonor;
-      });
-    }
   }
 
   @override
@@ -76,51 +63,43 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
         title: const Text('テーマ設定'),
         backgroundColor: themeSettings.appBarColor,
         actions: [
-          if (_isDonorUser == true)
-            IconButton(
-              icon: Icon(Icons.tune, color: themeSettings.appBarTextColor),
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CustomThemeSettingsPage(),
-                  ),
-                );
-                if (result == true) {
-                  await _loadCustomThemes();
-                }
-              },
-              tooltip: 'カスタム設定',
-            ),
+          IconButton(
+            icon: Icon(Icons.tune, color: themeSettings.appBarTextColor),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CustomThemeSettingsPage(),
+                ),
+              );
+              if (result == true) {
+                await _loadCustomThemes();
+              }
+            },
+            tooltip: 'カスタム設定',
+          ),
         ],
       ),
-      body: _isDonorUser == null
-          ? Center(child: CircularProgressIndicator())
-          : Container(
-              color: themeSettings.backgroundColor,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 600, // Web版での最大幅を制限
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: ListView(
-                      children: [
-                        _buildPresetSection(context, themeSettings),
-                        if (_isDonorUser == true) ...[
-                          const SizedBox(height: 24),
-                          _buildCustomThemesSection(context, themeSettings),
-                        ] else ...[
-                          const SizedBox(height: 24),
-                          _buildDonationSection(context, themeSettings),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
+      body: Container(
+        color: themeSettings.backgroundColor,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600, // Web版での最大幅を制限
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: ListView(
+                children: [
+                  _buildPresetSection(context, themeSettings),
+                  const SizedBox(height: 24),
+                  _buildCustomThemesSection(context, themeSettings),
+                ],
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -218,56 +197,6 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               'ゴールド',
               'シルバー',
             ], Icons.auto_awesome),
-
-            // 非寄付者向けの案内
-            if (_isDonorUser == false) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.amber.withValues(alpha: 0.3),
-                    width: 2,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.amber, size: 24),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'カラーテーマは寄付者限定です。300円以上の寄付で解放されます。',
-                        style: TextStyle(
-                          fontSize: 16 * themeSettings.fontSizeScale,
-                          color: themeSettings.fontColor1,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const DonationPage(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        '寄付する',
-                        style: TextStyle(
-                          fontSize: 16 * themeSettings.fontSizeScale,
-                          color: Colors.amber,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ],
         ),
       ),
@@ -301,14 +230,9 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
             return _PresetButton(
               presetName: presetName,
               onPressed: () {
-                // 基本テーマは全員利用可能、カラーテーマは寄付者のみ
-                if (isBasic || _isDonorUser == true) {
-                  themeSettings.applyPreset(presetName);
-                } else {
-                  _showDonorRequiredDialog(context, themeSettings);
-                }
+                themeSettings.applyPreset(presetName);
               },
-              isDisabled: !isBasic && _isDonorUser != true,
+              isDisabled: false,
             );
           }).toList(),
         ),
@@ -373,133 +297,6 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDonationSection(
-    BuildContext context,
-    ThemeSettings themeSettings,
-  ) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: themeSettings.cardBackgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.volunteer_activism, color: Colors.amber),
-                const SizedBox(width: 8),
-                Text(
-                  'カスタムテーマ機能',
-                  style: TextStyle(
-                    fontSize: 18 * themeSettings.fontSizeScale,
-                    fontWeight: FontWeight.bold,
-                    color: themeSettings.fontColor1,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'この機能は寄付者限定です',
-              style: TextStyle(
-                fontSize: 16 * themeSettings.fontSizeScale,
-                fontWeight: FontWeight.bold,
-                color: themeSettings.fontColor1,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '300円以上の寄付でテーマカスタマイズが解放されます',
-              style: TextStyle(
-                fontSize: 14 * themeSettings.fontSizeScale,
-                color: themeSettings.fontColor1,
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const DonationPage()),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: themeSettings.appButtonColor,
-                  foregroundColor: themeSettings.fontColor2,
-                  textStyle: const TextStyle(fontSize: 16),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('寄付して応援する'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showDonorRequiredDialog(
-    BuildContext context,
-    ThemeSettings themeSettings,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          '寄付者限定機能',
-          style: TextStyle(
-            fontSize: 20 * themeSettings.fontSizeScale,
-            fontWeight: FontWeight.bold,
-            color: themeSettings.fontColor1,
-          ),
-        ),
-        content: Text(
-          'この機能は寄付者限定です。300円以上の寄付で解放されます。',
-          style: TextStyle(
-            fontSize: 16 * themeSettings.fontSizeScale,
-            color: themeSettings.fontColor1,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'キャンセル',
-              style: TextStyle(
-                fontSize: 16 * themeSettings.fontSizeScale,
-                color: themeSettings.fontColor1,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const DonationPage()),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: themeSettings.appButtonColor,
-              foregroundColor: themeSettings.fontColor2,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: Text(
-              '寄付する',
-              style: TextStyle(
-                fontSize: 16 * themeSettings.fontSizeScale,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

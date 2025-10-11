@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
-import '../../utils/app_performance_config.dart';
 import '../../services/encrypted_local_storage_service.dart';
-import 'donation_page.dart';
 
 class FontSizeSettingsPage extends StatefulWidget {
   const FontSizeSettingsPage({super.key});
@@ -15,13 +13,10 @@ class FontSizeSettingsPage extends StatefulWidget {
 class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
   double _fontSizeScale = 1.0;
   String _selectedFontFamily = 'HannariMincho';
-  bool? _isDonorUser;
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _checkDonorStatus();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
       setState(() {
@@ -36,16 +31,6 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
         }
       });
     });
-  }
-
-  Future<void> _checkDonorStatus() async {
-    final isDonor = await isDonorUser();
-    if (mounted) {
-      setState(() {
-        _isDonorUser = isDonor;
-        _isLoading = false;
-      });
-    }
   }
 
   void _onFontSizeScaleChanged(double value) {
@@ -169,248 +154,209 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
         foregroundColor: themeSettings.appBarTextColor,
       ),
       body: SafeArea(
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : _isDonorUser != true
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.volunteer_activism,
-                      size: 48,
-                      color: Colors.amber,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600, // Web版での最大幅を制限
+            ),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    SizedBox(height: 16),
-                    Text(
-                      'この機能は寄付者限定です',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '300円以上の寄付でフォントカスタマイズが解放されます',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const DonationPage()),
-                      ),
-                      child: Text('寄付して応援する'),
-                    ),
-                  ],
-                ),
-              )
-            : Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 600, // Web版での最大幅を制限
-                  ),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                    color: themeSettings.cardBackgroundColor,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'フォントファミリー',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: themeSettings.fontColor1,
+                            ),
                           ),
-                          color: themeSettings.cardBackgroundColor,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'フォントファミリー',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: themeSettings.fontColor1,
-                                  ),
+                          SizedBox(height: 8),
+                          Text(
+                            'アプリ内で使用するフォントを選択できます',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: themeSettings.fontColor1,
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              const spacing = 12.0;
+                              final availableWidth =
+                                  constraints.maxWidth.isFinite
+                                  ? constraints.maxWidth
+                                  : 360.0;
+                              final columns = availableWidth >= 540
+                                  ? 3
+                                  : availableWidth >= 360
+                                  ? 2
+                                  : 1;
+                              final totalSpacing = spacing * (columns - 1);
+                              final widthForItems =
+                                  (availableWidth - totalSpacing)
+                                      .clamp(0, double.infinity)
+                                      .toDouble();
+                              final itemWidth = columns > 0
+                                  ? widthForItems / columns
+                                  : availableWidth;
+                              return Wrap(
+                                spacing: spacing,
+                                runSpacing: spacing,
+                                children: ThemeSettings.availableFonts.map((
+                                  font,
+                                ) {
+                                  final isSelected =
+                                      font == _selectedFontFamily;
+                                  final cardWidth = columns == 1
+                                      ? availableWidth
+                                      : itemWidth;
+                                  return SizedBox(
+                                    width: cardWidth,
+                                    child: _buildFontOptionCard(
+                                      font: font,
+                                      isSelected: isSelected,
+                                      themeSettings: themeSettings,
+                                      onTap: () => _onFontFamilyChanged(font),
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 16),
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: themeSettings.inputBackgroundColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'サンプルテキスト\nこれは現在のフォントのサンプルです。',
+                              style: TextStyle(
+                                fontFamily: _selectedFontFamily,
+                                fontSize: 16,
+                                color: themeSettings.fontColor1,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    color: themeSettings.cardBackgroundColor,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'フォントサイズ',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: themeSettings.fontColor1,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'アプリ内の文字サイズを調整できます',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: themeSettings.fontColor1,
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Text(
+                                '小',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: themeSettings.fontColor1,
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'アプリ内で使用するフォントを選択できます',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: themeSettings.fontColor1,
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    const spacing = 12.0;
-                                    final availableWidth =
-                                        constraints.maxWidth.isFinite
-                                        ? constraints.maxWidth
-                                        : 360.0;
-                                    final columns = availableWidth >= 540
-                                        ? 3
-                                        : availableWidth >= 360
-                                        ? 2
-                                        : 1;
-                                    final totalSpacing =
-                                        spacing * (columns - 1);
-                                    final widthForItems =
-                                        (availableWidth - totalSpacing)
-                                            .clamp(0, double.infinity)
-                                            .toDouble();
-                                    final itemWidth = columns > 0
-                                        ? widthForItems / columns
-                                        : availableWidth;
-                                    return Wrap(
-                                      spacing: spacing,
-                                      runSpacing: spacing,
-                                      children: ThemeSettings.availableFonts
-                                          .map((font) {
-                                            final isSelected =
-                                                font == _selectedFontFamily;
-                                            final cardWidth = columns == 1
-                                                ? availableWidth
-                                                : itemWidth;
-                                            return SizedBox(
-                                              width: cardWidth,
-                                              child: _buildFontOptionCard(
-                                                font: font,
-                                                isSelected: isSelected,
-                                                themeSettings: themeSettings,
-                                                onTap: () =>
-                                                    _onFontFamilyChanged(font),
-                                              ),
-                                            );
-                                          })
-                                          .toList(),
-                                    );
+                              ),
+                              Expanded(
+                                child: Slider(
+                                  value: _fontSizeScale,
+                                  min: 0.8,
+                                  max: 1.5,
+                                  divisions: 14, // 0.8から1.5まで0.05刻みで14分割
+                                  label: '${(_fontSizeScale * 100).round()}%',
+                                  activeColor: themeSettings.buttonColor,
+                                  inactiveColor: themeSettings.buttonColor
+                                      .withValues(alpha: 0.3),
+                                  onChanged: (value) {
+                                    _onFontSizeScaleChanged(value);
+                                  },
+                                  onChangeEnd: (value) {
+                                    _onFontSizeScaleChangedEnd(value);
                                   },
                                 ),
-                                SizedBox(height: 16),
-                                Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: themeSettings.inputBackgroundColor,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    'サンプルテキスト\nこれは現在のフォントのサンプルです。',
-                                    style: TextStyle(
-                                      fontFamily: _selectedFontFamily,
-                                      fontSize: 16,
-                                      color: themeSettings.fontColor1,
-                                    ),
-                                  ),
+                              ),
+                              Text(
+                                '大',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: themeSettings.fontColor1,
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              '${(_fontSizeScale * 100).round()}%',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: themeSettings.fontColor1,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 16),
-                        Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          color: themeSettings.cardBackgroundColor,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'フォントサイズ',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: themeSettings.fontColor1,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'アプリ内の文字サイズを調整できます',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: themeSettings.fontColor1,
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Text(
-                                      '小',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: themeSettings.fontColor1,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Slider(
-                                        value: _fontSizeScale,
-                                        min: 0.8,
-                                        max: 1.5,
-                                        divisions: 14, // 0.8から1.5まで0.05刻みで14分割
-                                        label:
-                                            '${(_fontSizeScale * 100).round()}%',
-                                        activeColor: themeSettings.buttonColor,
-                                        inactiveColor: themeSettings.buttonColor
-                                            .withValues(alpha: 0.3),
-                                        onChanged: (value) {
-                                          _onFontSizeScaleChanged(value);
-                                        },
-                                        onChangeEnd: (value) {
-                                          _onFontSizeScaleChangedEnd(value);
-                                        },
-                                      ),
-                                    ),
-                                    Text(
-                                      '大',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: themeSettings.fontColor1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                Center(
-                                  child: Text(
-                                    '${(_fontSizeScale * 100).round()}%',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: themeSettings.fontColor1,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: themeSettings.inputBackgroundColor,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    'サンプルテキスト\nこれは現在のフォントサイズのサンプルです。',
-                                    style: TextStyle(
-                                      fontFamily: _selectedFontFamily,
-                                      fontSize: 16 * _fontSizeScale,
-                                      color: themeSettings.fontColor1,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          SizedBox(height: 16),
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: themeSettings.inputBackgroundColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'サンプルテキスト\nこれは現在のフォントサイズのサンプルです。',
+                              style: TextStyle(
+                                fontFamily: _selectedFontFamily,
+                                fontSize: 16 * _fontSizeScale,
+                                color: themeSettings.fontColor1,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
+            ),
+          ),
+        ),
       ),
     );
   }

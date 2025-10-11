@@ -12,8 +12,6 @@ import '../../models/roast_record.dart';
 import '../../services/roast_record_firestore_service.dart';
 import '../../services/roast_timer_notification_service.dart';
 import '../../services/user_settings_firestore_service.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../../utils/app_performance_config.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 enum RoastMode {
@@ -70,32 +68,8 @@ class _RoastTimerPageState extends State<RoastTimerPage>
   int? _coolingMinutes;
 
   void _loadInterstitialAdAndShow(VoidCallback onAdClosed) async {
-    if (await isDonorUser()) {
-      onAdClosed();
-      return;
-    }
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // テスト用ID
-      request: AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              onAdClosed();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              onAdClosed();
-            },
-          );
-          ad.show();
-        },
-        onAdFailedToLoad: (error) {
-          onAdClosed();
-        },
-      ),
-    );
+    // 広告機能を削除したため、直接コールバックを実行
+    onAdClosed();
   }
 
   // Firestoreから記録を取得しておすすめ条件の組み合わせを抽出

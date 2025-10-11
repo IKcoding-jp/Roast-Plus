@@ -23,7 +23,6 @@ import 'services/encrypted_local_storage_service.dart';
 import 'services/network_security_service.dart';
 import 'services/session_management_service.dart';
 import 'services/web_settings_persistence_service.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:developer' as developer;
 import 'utils/performance_monitor.dart';
 import 'utils/web_compatibility.dart';
@@ -96,12 +95,7 @@ void main() async {
       PerformanceMonitor.measureAsync('テーマ設定初期化', _initializeThemeSettings),
     ];
 
-    // Web版ではシステム設定初期化を除外
-    if (!kIsWeb) {
-      initializationTasks.add(
-        PerformanceMonitor.measureAsync('システム設定初期化', _initializeSystemSettings),
-      );
-    }
+    // Web版ではシステム設定初期化は不要
 
     await Future.wait(initializationTasks);
 
@@ -195,65 +189,7 @@ void main() async {
   }
 }
 
-// システム設定の初期化
-Future<void> _initializeSystemSettings() async {
-  // Web版ではシステム設定をスキップ
-  if (kIsWeb) {
-    return;
-  }
-
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-
-  // システムUIの設定
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-    ),
-  );
-
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.edgeToEdge,
-    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
-  );
-
-  // エラーハンドリングを設定
-  FlutterError.onError = (FlutterErrorDetails details) {
-    // キーボードイベントのエラーを無視
-    if (details.exception.toString().contains('KeyUpEvent') ||
-        details.exception.toString().contains('physical key is not pressed') ||
-        details.exception.toString().contains('_pressedKeys.containsKey') ||
-        details.exception.toString().contains('HardwareKeyboard') ||
-        details.exception.toString().contains('KeyUpEvent#') ||
-        details.exception.toString().contains('PhysicalKeyboardKey#')) {
-      return;
-    }
-
-    // オーバーフローエラーを非表示にする
-    if (details.exception is FlutterError &&
-        details.exception.toString().contains('overflowed')) {
-      return;
-    }
-
-    // INTERNAL ASSERTION FAILEDエラーのログを強化
-    if (details.exception.toString().contains('INTERNAL ASSERTION FAILED')) {
-      developer.log(
-        '重大なFirestoreエラー検出: INTERNAL ASSERTION FAILED',
-        name: 'Main',
-        error: details.exception,
-        stackTrace: details.stack,
-      );
-      developer.log('Firestore接続のリセットを推奨します', name: 'Main');
-    }
-
-    // その他のエラーは通常通り処理
-    FlutterError.presentError(details);
-  };
-}
+// Web版ではシステム設定は不要
 
 // Firebase初期化
 Future<void> _initializeFirebase() async {
@@ -491,64 +427,15 @@ void _initializeBackgroundServices() async {
     ),
   );
 
-  // 非必須サービスを並列で初期化
+  // Web版ではAutoSyncのみ初期化
   final backgroundTasks = <Future<void>>[
     PerformanceMonitor.measureAsync('AutoSync初期化', _initializeAutoSync),
   ];
 
-  // Web版ではネイティブ機能を除外
-  if (!kIsWeb) {
-    backgroundTasks.addAll([
-      PerformanceMonitor.measureAsync(
-        '通知サービス初期化',
-        _initializeNotificationServices,
-      ),
-      PerformanceMonitor.measureAsync('広告初期化', _initializeAds),
-      PerformanceMonitor.measureAsync(
-        'セキュリティサービス初期化',
-        _initializeSecurityServices,
-      ),
-      PerformanceMonitor.measureAsync(
-        'ストレージサービス初期化',
-        _initializeStorageServices,
-      ),
-    ]);
-  }
-
   await Future.wait(backgroundTasks);
 }
 
-// 通知サービス初期化
-Future<void> _initializeNotificationServices() async {
-  // Web版では通知サービスをスキップ
-  if (kIsWeb) {
-    return;
-  }
-
-  try {
-    await RoastTimerNotificationService.initialize();
-    await RoastTimerNotificationService.requestPermissions();
-
-    TodoNotificationService().setNavigatorKey(navigatorKey);
-    TodoNotificationService().startNotificationService();
-  } catch (e) {
-    developer.log('通知サービス初期化エラー: $e', name: 'Main');
-  }
-}
-
-// 広告初期化
-Future<void> _initializeAds() async {
-  // Web版では広告をスキップ
-  if (kIsWeb) {
-    return;
-  }
-
-  try {
-    await MobileAds.instance.initialize();
-  } catch (e) {
-    developer.log('広告初期化エラー: $e', name: 'Main');
-  }
-}
+// Web版では通知サービスはWeb Notifications APIで実装
 
 // AutoSync初期化
 Future<void> _initializeAutoSync() async {
@@ -565,36 +452,9 @@ Future<void> _initializeAutoSync() async {
   }
 }
 
-// セキュリティサービス初期化
-Future<void> _initializeSecurityServices() async {
-  // Web版ではセキュリティサービスをスキップ
-  if (kIsWeb) {
-    return;
-  }
+// Web版ではセキュリティサービスはWeb APIで実装
 
-  try {
-    await SecurityMonitorService.startMonitoring();
-    await NetworkSecurityService.initialize();
-    await SessionManagementService.initialize();
-    await SessionManagementService.recordUserActivity();
-  } catch (e) {
-    developer.log('セキュリティサービス初期化エラー: $e', name: 'Main');
-  }
-}
-
-// ストレージサービス初期化
-Future<void> _initializeStorageServices() async {
-  // Web版ではストレージサービスをスキップ
-  if (kIsWeb) {
-    return;
-  }
-
-  try {
-    await EncryptedLocalStorageService.initialize();
-  } catch (e) {
-    developer.log('ストレージサービス初期化エラー: $e', name: 'Main');
-  }
-}
+// Web版ではストレージサービスはLocalStorage/IndexedDBで実装
 
 // ライフサイクルイベントハンドラー
 class LifecycleEventHandler extends WidgetsBindingObserver {
@@ -605,17 +465,6 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
-      case AppLifecycleState.resumed:
-        // アプリが再開された時にキーボード状態をリセット
-        try {
-          await SystemChrome.setEnabledSystemUIMode(
-            SystemUiMode.edgeToEdge,
-            overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
-          );
-        } catch (e) {
-          developer.log('システムUI設定エラー: $e', name: 'Main');
-        }
-        break;
       case AppLifecycleState.detached:
         if (detachedCallBack != null) {
           await detachedCallBack!();

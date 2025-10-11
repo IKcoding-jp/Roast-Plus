@@ -35,9 +35,7 @@ import 'pages/help/usage_guide_page.dart';
 import 'pages/settings/app_settings_page.dart';
 import 'pages/group/group_qr_generate_page.dart';
 import 'pages/group/group_qr_scanner_page.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:developer' as developer;
-import 'utils/app_performance_config.dart';
 import 'utils/web_ui_utils.dart';
 import 'utils/web_compatibility.dart';
 import 'widgets/lottie_animation_widget.dart';
@@ -1329,13 +1327,6 @@ class MainScaffoldState extends State<MainScaffold> {
   int _selectedIndex = 2; // デフォルトでホーム画面を表示
   final PageController _pageController = PageController(initialPage: 2);
 
-  InterstitialAd? _interstitialAd;
-
-  // バナー広告用
-  BannerAd? _bannerAd;
-  bool _isBannerAdLoaded = false;
-  static const double _bannerHeight = 50.0;
-
   // ページを遅延読み込みするためのリスト
   final List<Widget> _pages = [
     RoastTimerPage(showBackButton: false), // 焙煎タイマー
@@ -1352,12 +1343,6 @@ class MainScaffoldState extends State<MainScaffold> {
     _initializeWebCompatibility();
     // 自動同期サービスを初期化
     _initializeAutoSync();
-    // Web版では広告を読み込まない
-    if (!kIsWeb) {
-      // 起動時のインタースティシャル広告を無効化
-      // _loadInterstitialAd();
-      _loadBannerAd();
-    }
   }
 
   // フォントファミリーを動的に設定する関数（フォールバック付き）
@@ -1385,32 +1370,9 @@ class MainScaffoldState extends State<MainScaffold> {
     }
   }
 
-  void _loadBannerAd() {
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // テスト用バナーID
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _isBannerAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          setState(() {
-            _isBannerAdLoaded = false;
-          });
-        },
-      ),
-    )..load();
-  }
-
   @override
   void dispose() {
     _pageController.dispose();
-    _interstitialAd?.dispose();
-    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -1540,60 +1502,15 @@ class MainScaffoldState extends State<MainScaffold> {
         child: Stack(
           children: [
             // Web版では寄付者チェックをスキップ
-            FutureBuilder<bool>(
-              future: kIsWeb ? Future.value(true) : isDonorUser(),
-              builder: (context, snapshot) {
-                // Web版では広告のパディングを適用しない
-                // 寄付者や未判定の間は余計な余白を付けない
-                // バナー広告が実際に読み込まれている場合のみ余白を確保
-                final adPadding = kIsWeb
-                    ? 0.0
-                    : (snapshot.connectionState == ConnectionState.done &&
-                              snapshot.data != true &&
-                              _isBannerAdLoaded
-                          ? _bannerHeight
-                          : 0.0);
-
-                // 下部広告分のみ余白を確保（ボトムナビ分はScaffoldが処理）
-                final bottomPadding = adPadding;
-
-                // 画面サイズに応じてパディングを調整
-                return Padding(
-                  padding: EdgeInsets.only(bottom: bottomPadding),
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    children: _pages,
-                  ),
-                );
+            PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
               },
+              children: _pages,
             ),
-            // Web版では広告を表示しない
-            if (!kIsWeb)
-              FutureBuilder<bool>(
-                future: isDonorUser(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return SizedBox.shrink();
-                  }
-                  if (snapshot.data == true) return SizedBox.shrink();
-                  if (_isBannerAdLoaded && _bannerAd != null) {
-                    return Align(
-                      alignment: Alignment.bottomCenter,
-                      child: SizedBox(
-                        width: _bannerAd!.size.width.toDouble(),
-                        height: _bannerAd!.size.height.toDouble(),
-                        child: AdWidget(ad: _bannerAd!),
-                      ),
-                    );
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
           ],
         ),
       ),

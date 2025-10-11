@@ -8,7 +8,6 @@ import '../../services/encrypted_local_storage_service.dart';
 import '../../services/first_login_service.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
-import '../../utils/app_performance_config.dart';
 import '../../config/app_config.dart';
 import '../../models/group_provider.dart';
 import '../../models/gamification_provider.dart';
@@ -359,44 +358,6 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                       ),
                                                     ),
                                                   ),
-                                                FutureBuilder<bool>(
-                                                  future: isDonorUser(),
-                                                  builder: (context, snapshot) {
-                                                    if (_userEmail ==
-                                                        'kensaku.ikeda04@gmail.com') {
-                                                      return const SizedBox.shrink();
-                                                    }
-                                                    if (snapshot.connectionState !=
-                                                            ConnectionState
-                                                                .done ||
-                                                        snapshot.data != true) {
-                                                      return const SizedBox.shrink();
-                                                    }
-                                                    return Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 2,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.amber,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              12,
-                                                            ),
-                                                      ),
-                                                      child: const Text(
-                                                        '寄付者',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
                                               ],
                                             ),
                                           ],

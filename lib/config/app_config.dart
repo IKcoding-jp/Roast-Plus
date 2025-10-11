@@ -1,13 +1,5 @@
 /// アプリ全体の設定を管理するクラス
 class AppConfig {
-  // 寄付者として登録されたメールアドレス
-  static const List<String> _defaultDonorEmails = [];
-
-  // 寄付者として登録されたメールアドレス
-  static Future<List<String>> get donorEmails async {
-    return _defaultDonorEmails;
-  }
-
   // アプリのバージョン情報
   static const String appVersion = '0.7.10+23';
 
@@ -39,9 +31,7 @@ class AppConfig {
     if (email == null || email.isEmpty) return false;
 
     // 開発者として登録されたメールアドレス
-    const developerEmails = [
-      'kensaku.ikeda04@gmail.com',
-    ];
+    const developerEmails = ['kensaku.ikeda04@gmail.com'];
 
     return developerEmails.contains(email.toLowerCase());
   }

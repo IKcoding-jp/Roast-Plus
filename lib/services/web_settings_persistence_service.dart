@@ -1,21 +1,20 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Web版専用の設定永続化サービス
-/// サイトを閉じても設定が保持されるように、localStorageを使用して設定を保存
+/// サイトを閉じても設定が保持されるように、ブラウザのlocalStorageを使用して設定を保存
 class WebSettingsPersistenceService {
   static const String _logName = 'WebSettingsPersistenceService';
-  static SharedPreferences? _prefs;
 
   /// 初期化
   static Future<void> initialize() async {
     if (!kIsWeb) return;
 
     try {
-      _prefs = await SharedPreferences.getInstance();
-      developer.log('Web版設定永続化サービスを初期化しました', name: _logName);
+      // Web版ではブラウザのlocalStorageを直接使用
+      developer.log('Web版設定永続化サービスを初期化しました（localStorage使用）', name: _logName);
     } catch (e) {
       developer.log('Web版設定永続化サービスの初期化に失敗しました: $e', name: _logName);
       rethrow;
@@ -27,8 +26,6 @@ class WebSettingsPersistenceService {
     if (!kIsWeb) return false;
 
     try {
-      if (_prefs == null) await initialize();
-
       String valueString;
       if (value is String) {
         valueString = value;
@@ -38,9 +35,13 @@ class WebSettingsPersistenceService {
         valueString = value.toString();
       }
 
-      final result = await _prefs!.setString('web_setting_$key', valueString);
-      developer.log('Web版設定を保存しました: $key = $value', name: _logName);
-      return result;
+      // ブラウザのlocalStorageに直接保存
+      html.window.localStorage['web_setting_$key'] = valueString;
+      developer.log(
+        'Web版設定をlocalStorageに保存しました: $key = $value',
+        name: _logName,
+      );
+      return true;
     } catch (e) {
       developer.log('Web版設定保存エラー: $key, $e', name: _logName);
       return false;
@@ -52,9 +53,8 @@ class WebSettingsPersistenceService {
     if (!kIsWeb) return defaultValue;
 
     try {
-      if (_prefs == null) await initialize();
-
-      final valueString = _prefs!.getString('web_setting_$key');
+      // ブラウザのlocalStorageから直接取得
+      final valueString = html.window.localStorage['web_setting_$key'];
       if (valueString == null) return defaultValue;
 
       // JSONとして解析を試行
@@ -77,8 +77,6 @@ class WebSettingsPersistenceService {
     if (!kIsWeb) return false;
 
     try {
-      if (_prefs == null) await initialize();
-
       bool allSuccess = true;
       for (final entry in settings.entries) {
         final success = await saveSetting(entry.key, entry.value);
@@ -86,7 +84,7 @@ class WebSettingsPersistenceService {
       }
 
       developer.log(
-        'Web版複数設定を保存しました: ${settings.keys.join(', ')}',
+        'Web版複数設定をlocalStorageに保存しました: ${settings.keys.join(', ')}',
         name: _logName,
       );
       return allSuccess;
@@ -121,11 +119,10 @@ class WebSettingsPersistenceService {
     if (!kIsWeb) return false;
 
     try {
-      if (_prefs == null) await initialize();
-
-      final result = await _prefs!.remove('web_setting_$key');
-      developer.log('Web版設定を削除しました: $key', name: _logName);
-      return result;
+      // ブラウザのlocalStorageから直接削除
+      html.window.localStorage.remove('web_setting_$key');
+      developer.log('Web版設定をlocalStorageから削除しました: $key', name: _logName);
+      return true;
     } catch (e) {
       developer.log('Web版設定削除エラー: $key, $e', name: _logName);
       return false;
@@ -137,11 +134,10 @@ class WebSettingsPersistenceService {
     if (!kIsWeb) return {};
 
     try {
-      if (_prefs == null) await initialize();
-
       final Map<String, dynamic> result = {};
-      final keys = _prefs!.getKeys();
 
+      // ブラウザのlocalStorageからすべてのキーを取得
+      final keys = html.window.localStorage.keys;
       for (final key in keys) {
         if (key.startsWith('web_setting_')) {
           final settingKey = key.substring('web_setting_'.length);
@@ -161,18 +157,20 @@ class WebSettingsPersistenceService {
     if (!kIsWeb) return false;
 
     try {
-      if (_prefs == null) await initialize();
-
-      final keys = _prefs!.getKeys();
-      final webSettingKeys = keys
-          .where((key) => key.startsWith('web_setting_'))
-          .toList();
-
-      for (final key in webSettingKeys) {
-        await _prefs!.remove(key);
+      // ブラウザのlocalStorageからweb_setting_で始まるキーをすべて削除
+      final keysToRemove = <String>[];
+      final keys = html.window.localStorage.keys;
+      for (final key in keys) {
+        if (key.startsWith('web_setting_')) {
+          keysToRemove.add(key);
+        }
       }
 
-      developer.log('Web版全設定をクリアしました', name: _logName);
+      for (final key in keysToRemove) {
+        html.window.localStorage.remove(key);
+      }
+
+      developer.log('Web版全設定をlocalStorageからクリアしました', name: _logName);
       return true;
     } catch (e) {
       developer.log('Web版全設定クリアエラー: $e', name: _logName);

@@ -16,7 +16,6 @@ import 'passcode_lock_settings_page.dart';
 // import 'firebase_security_settings_page.dart';
 import 'creator_message_page.dart';
 import 'upcoming_features_page.dart';
-import 'donation_page.dart';
 import 'terms_of_service_page.dart';
 import 'privacy_policy_page.dart';
 
@@ -139,18 +138,6 @@ class AppSettingsPage extends StatelessWidget {
 
       // サポート・情報セクション
       _buildSectionHeader(context, 'サポート・情報'),
-      _buildSettingsCard(
-        context,
-        icon: Icons.volunteer_activism,
-        title: '寄付で応援する',
-        subtitle: '300円から任意の金額で寄付できます。寄付者は広告非表示＆カスタマイズ解放',
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const DonationPage()),
-          );
-        },
-      ),
       _buildSettingsCard(
         context,
         icon: Icons.feedback,

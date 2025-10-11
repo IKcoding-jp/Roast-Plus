@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
+import 'dart:async';
 import '../../models/group_provider.dart';
 import '../../models/theme_settings.dart';
 import '../../services/qr_code_service.dart';
 import '../../services/group_invitation_service.dart';
+import '../../utils/web_ui_utils.dart';
+import '../../widgets/web_responsive_widget.dart';
 
 class GroupQRScannerPage extends StatefulWidget {
   const GroupQRScannerPage({super.key});
@@ -16,30 +18,44 @@ class GroupQRScannerPage extends StatefulWidget {
 }
 
 class _GroupQRScannerPageState extends State<GroupQRScannerPage> {
-  MobileScannerController? controller;
+  StreamSubscription<String>? _qrCodeSubscription;
   bool _isScanning = true;
   bool _isJoining = false;
 
   @override
   void initState() {
     super.initState();
-    // Web版ではスキャナーを初期化しない
-    if (!kIsWeb) {
-      controller = MobileScannerController();
-    }
+    _initializeScanner();
   }
 
   @override
   void dispose() {
-    controller?.dispose();
+    _qrCodeSubscription?.cancel();
     super.dispose();
   }
 
-  void _onDetect(BarcodeCapture capture) {
-    if (_isScanning && capture.barcodes.isNotEmpty) {
-      final barcode = capture.barcodes.first;
-      if (barcode.rawValue != null) {
-        _processQRCode(barcode.rawValue!);
+  Future<void> _initializeScanner() async {
+    if (kIsWeb) {
+      try {
+        // カメラが利用可能かチェック
+        if (!QRCodeService.isWebSuitableForQRScanning) {
+          developer.log('カメラが利用できません。手動入力モードに切り替えます。');
+          return;
+        }
+
+        // Web版でQRコードスキャンを開始
+        final qrCodeStream = await QRCodeService.startWebScanning();
+        _qrCodeSubscription = qrCodeStream.listen((qrData) {
+          if (_isScanning) {
+            _processQRCode(qrData);
+          }
+        });
+      } catch (e) {
+        developer.log('Web版QRスキャナー初期化エラー: $e');
+        // エラーが発生した場合は手動入力モードに切り替え
+        setState(() {
+          _isScanning = false;
+        });
       }
     }
   }
@@ -214,100 +230,512 @@ class _GroupQRScannerPageState extends State<GroupQRScannerPage> {
         backgroundColor: themeSettings.appBarColor,
         iconTheme: IconThemeData(color: themeSettings.iconColor),
       ),
-      body: Stack(
+      body: WebResponsiveBuilder(
+        builder: (context, isMobile, isTablet, isDesktop) {
+          return _buildResponsiveContent(
+            context,
+            themeSettings,
+            isMobile,
+            isTablet,
+            isDesktop,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildResponsiveContent(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+  ) {
+    // デバイス判定とカメラ利用可能性の確認
+    final canUseCamera = _canUseCameraForQRScanning();
+
+    return Stack(
+      children: [
+        // メインコンテンツ
+        _buildMainContent(
+          context,
+          themeSettings,
+          isMobile,
+          isTablet,
+          isDesktop,
+          canUseCamera,
+        ),
+
+        // ローディングオーバーレイ
+        if (_isJoining)
+          Container(
+            color: Colors.black54,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      themeSettings.buttonColor,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'グループに参加中...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16 * themeSettings.fontSizeScale,
+                      fontFamily: themeSettings.fontFamily,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMainContent(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+    bool canUseCamera,
+  ) {
+    if (kIsWeb) {
+      return _buildWebContent(
+        context,
+        themeSettings,
+        isMobile,
+        isTablet,
+        isDesktop,
+        canUseCamera,
+      );
+    } else {
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: Text(
+            'ネイティブ版はサポートされていません',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildWebContent(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+    bool canUseCamera,
+  ) {
+    return WebUIUtils.responsiveContainer(
+      context: context,
+      child: Column(
         children: [
-          // Web版ではスキャナーを表示せず、メッセージを表示
-          if (kIsWeb)
-            Center(
+          // ヘッダー部分
+          _buildHeader(context, themeSettings, isMobile, isTablet, isDesktop),
+
+          // メインコンテンツ
+          Expanded(
+            child: _buildMainContentArea(
+              context,
+              themeSettings,
+              isMobile,
+              isTablet,
+              isDesktop,
+              canUseCamera,
+            ),
+          ),
+
+          // フッター部分
+          _buildFooter(
+            context,
+            themeSettings,
+            isMobile,
+            isTablet,
+            isDesktop,
+            canUseCamera,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+  ) {
+    final iconSize = isMobile ? 48.0 : (isTablet ? 64.0 : 80.0);
+    final titleSize = isMobile ? 18.0 : (isTablet ? 20.0 : 24.0);
+
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+      child: Column(
+        children: [
+          Icon(
+            Icons.qr_code_scanner,
+            size: iconSize,
+            color: themeSettings.iconColor,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'QRコード読み取り',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: titleSize * themeSettings.fontSizeScale,
+              fontFamily: themeSettings.fontFamily,
+              color: themeSettings.fontColor1,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainContentArea(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+    bool canUseCamera,
+  ) {
+    if (canUseCamera) {
+      return _buildCameraContent(
+        context,
+        themeSettings,
+        isMobile,
+        isTablet,
+        isDesktop,
+      );
+    } else {
+      return _buildAlternativeContent(
+        context,
+        themeSettings,
+        isMobile,
+        isTablet,
+        isDesktop,
+      );
+    }
+  }
+
+  Widget _buildCameraContent(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // カメラプレビューエリア（実際の実装ではカメラビューを表示）
+          Container(
+            width: double.infinity,
+            height: isMobile ? 200.0 : (isTablet ? 300.0 : 400.0),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: themeSettings.buttonColor, width: 2),
+            ),
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.qr_code_scanner,
-                    size: 64,
-                    color: themeSettings.iconColor,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'QRコードスキャンは\nモバイルアプリでのみ利用可能です',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16 * themeSettings.fontSizeScale,
-                      fontFamily: themeSettings.fontFamily,
-                      color: themeSettings.fontColor1,
-                    ),
+                    Icons.camera_alt,
+                    size: isMobile ? 48.0 : 64.0,
+                    color: Colors.white70,
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Web版では利用できません',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14 * themeSettings.fontSizeScale,
-                      fontFamily: themeSettings.fontFamily,
-                      color: themeSettings.fontColor1.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            MobileScanner(controller: controller, onDetect: _onDetect),
-          if (_isJoining)
-            Container(
-              color: Colors.black54,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        themeSettings.buttonColor,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'グループに参加中...',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16 * themeSettings.fontSizeScale,
-                        fontFamily: themeSettings.fontFamily,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.all(16),
-              color: Colors.black54,
-              child: Column(
-                children: [
-                  Text(
-                    'QRコードをカメラで読み取って\nグループに参加しましょう',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14 * themeSettings.fontSizeScale,
-                      fontFamily: themeSettings.fontFamily,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '※ グループ参加用のQRコードのみ読み取り可能です',
+                    'QRコードをカメラで読み取ってください',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: 12 * themeSettings.fontSizeScale,
+                      fontSize: 14 * themeSettings.fontSizeScale,
                       fontFamily: themeSettings.fontFamily,
                     ),
                   ),
                 ],
               ),
             ),
+          ),
+
+          SizedBox(height: 24),
+
+          // カメラ権限ボタン
+          ElevatedButton.icon(
+            onPressed: () async {
+              try {
+                final hasPermission =
+                    await QRCodeService.requestWebCameraPermission();
+                if (hasPermission) {
+                  // 権限が取得できた場合はスキャンを開始
+                  await _initializeScanner();
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('カメラが起動しました'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                } else {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('カメラの権限が取得できませんでした'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('カメラの起動に失敗しました: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            icon: Icon(Icons.camera_alt),
+            label: Text('カメラを起動'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: themeSettings.buttonColor,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 24.0 : 32.0,
+                vertical: isMobile ? 12.0 : 16.0,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAlternativeContent(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.qr_code,
+            size: isMobile ? 64.0 : (isTablet ? 80.0 : 96.0),
+            color: themeSettings.iconColor,
+          ),
+
+          SizedBox(height: 24),
+
+          Text(
+            'QRコード読み取りが利用できません',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: (isMobile ? 16.0 : 18.0) * themeSettings.fontSizeScale,
+              fontFamily: themeSettings.fontFamily,
+              color: themeSettings.fontColor1,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          Text(
+            'デスクトップPCではカメラが利用できません。\n招待コードを手動で入力してください。',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14 * themeSettings.fontSizeScale,
+              fontFamily: themeSettings.fontFamily,
+              color: themeSettings.fontColor1.withValues(alpha: 0.7),
+            ),
+          ),
+
+          SizedBox(height: 32),
+
+          // 手動入力ボタン
+          ElevatedButton.icon(
+            onPressed: () {
+              _showManualInputDialog(context, themeSettings);
+            },
+            icon: Icon(Icons.edit),
+            label: Text('招待コードを手動入力'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: themeSettings.buttonColor,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 24.0 : 32.0,
+                vertical: isMobile ? 12.0 : 16.0,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooter(
+    BuildContext context,
+    ThemeSettings themeSettings,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+    bool canUseCamera,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            canUseCamera
+                ? 'QRコードをカメラで読み取って\nグループに参加しましょう'
+                : 'デスクトップPCではカメラが利用できません\n招待コードを手動で入力してください',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14 * themeSettings.fontSizeScale,
+              fontFamily: themeSettings.fontFamily,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '※ グループ参加用のQRコードのみ読み取り可能です',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 12 * themeSettings.fontSizeScale,
+              fontFamily: themeSettings.fontFamily,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _canUseCameraForQRScanning() {
+    if (!kIsWeb) return false;
+
+    // 画面サイズとデバイス判定を組み合わせて判定
+    final screenSize = MediaQuery.of(context).size;
+    final isMobileSize = screenSize.width < 768;
+    final isTabletSize = screenSize.width >= 768 && screenSize.width < 1400;
+    final isDesktopSize = screenSize.width >= 1400;
+
+    // UserAgentベースのデバイス判定も考慮
+    final isMobileDevice = QRCodeService.isWebMobileDevice;
+    final isTabletDevice = QRCodeService.isWebTabletDevice;
+    final isSuitableForScanning = QRCodeService.isWebSuitableForQRScanning;
+
+    // デバッグ情報をログに出力
+    developer.log('QRコードカメラ判定デバッグ:', name: 'GroupQRScannerPage');
+    developer.log(
+      '画面サイズ: ${screenSize.width}x${screenSize.height}',
+      name: 'GroupQRScannerPage',
+    );
+    developer.log(
+      'isMobileSize: $isMobileSize, isTabletSize: $isTabletSize, isDesktopSize: $isDesktopSize',
+      name: 'GroupQRScannerPage',
+    );
+    developer.log(
+      'isMobileDevice: $isMobileDevice, isTabletDevice: $isTabletDevice',
+      name: 'GroupQRScannerPage',
+    );
+    developer.log(
+      'isSuitableForScanning: $isSuitableForScanning',
+      name: 'GroupQRScannerPage',
+    );
+
+    // iPadやタブレットの場合は画面サイズに関係なくカメラ利用可能
+    if (isMobileDevice || isTabletDevice) {
+      developer.log('モバイル/タブレットデバイスとして判定: カメラ利用可能', name: 'GroupQRScannerPage');
+      return isSuitableForScanning && !_isJoining;
+    }
+
+    // デスクトップサイズ（1400px以上）の場合はカメラ利用不可
+    if (isDesktopSize) {
+      developer.log('デスクトップサイズとして判定: カメラ利用不可', name: 'GroupQRScannerPage');
+      return false;
+    }
+
+    // モバイルまたはタブレットサイズの場合
+    if (isMobileSize || isTabletSize) {
+      developer.log('モバイル/タブレットサイズとして判定: カメラ利用可能', name: 'GroupQRScannerPage');
+      return isSuitableForScanning && !_isJoining;
+    }
+
+    // その他の場合はカメラ利用不可
+    developer.log('その他のデバイスとして判定: カメラ利用不可', name: 'GroupQRScannerPage');
+    return false;
+  }
+
+  void _showManualInputDialog(
+    BuildContext context,
+    ThemeSettings themeSettings,
+  ) {
+    final TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('招待コード入力'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('グループの招待コードを入力してください'),
+            SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: '招待コード',
+                border: OutlineInputBorder(),
+                hintText: '例: ABC123',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('キャンセル'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final inviteCode = controller.text.trim();
+              if (inviteCode.isNotEmpty) {
+                Navigator.pop(context);
+                await _joinGroup('', inviteCode);
+              }
+            },
+            child: Text('参加する'),
           ),
         ],
       ),

@@ -2,6 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import '../utils/security_config.dart';
+import 'web_storage_service.dart';
+import 'package:flutter/foundation.dart';
 
 /// 暗号化されたローカルストレージサービス
 /// SharedPreferencesの代わりに使用し、すべてのデータを暗号化して保存
@@ -349,6 +351,70 @@ class EncryptedLocalStorageService {
         'lastChecked': DateTime.now().toIso8601String(),
         'error': e.toString(),
       };
+    }
+  }
+
+  /// Web版でデータを保存
+  static Future<bool> setStringWeb(String key, String value) async {
+    if (!kIsWeb) {
+      return await setString(key, value);
+    }
+    
+    try {
+      await WebStorageService.saveData(key, value);
+      developer.log('Web版で文字列を保存しました: $key', name: _logName);
+      return true;
+    } catch (e) {
+      developer.log('Web版文字列保存エラー: $key, $e', name: _logName);
+      return false;
+    }
+  }
+
+  /// Web版でデータを取得
+  static Future<String?> getStringWeb(String key) async {
+    if (!kIsWeb) {
+      return await getString(key);
+    }
+    
+    try {
+      final value = await WebStorageService.getData(key);
+      developer.log('Web版で文字列を取得しました: $key', name: _logName);
+      return value;
+    } catch (e) {
+      developer.log('Web版文字列取得エラー: $key, $e', name: _logName);
+      return null;
+    }
+  }
+
+  /// Web版でデータを削除
+  static Future<bool> removeWeb(String key) async {
+    if (!kIsWeb) {
+      return await remove(key);
+    }
+    
+    try {
+      await WebStorageService.deleteData(key);
+      developer.log('Web版でデータを削除しました: $key', name: _logName);
+      return true;
+    } catch (e) {
+      developer.log('Web版データ削除エラー: $key, $e', name: _logName);
+      return false;
+    }
+  }
+
+  /// Web版で全データをクリア
+  static Future<bool> clearWeb() async {
+    if (!kIsWeb) {
+      return await clear();
+    }
+    
+    try {
+      await WebStorageService.clearAllData();
+      developer.log('Web版で全データをクリアしました', name: _logName);
+      return true;
+    } catch (e) {
+      developer.log('Web版全データクリアエラー: $e', name: _logName);
+      return false;
     }
   }
 }

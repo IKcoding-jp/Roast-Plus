@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../utils/sound_utils.dart';
 import '../models/theme_settings.dart';
 import 'user_settings_firestore_service.dart';
+import 'web_notification_service.dart';
 
 class TodoNotificationService {
   static final TodoNotificationService _instance =
@@ -424,4 +425,30 @@ class TodoNotificationService {
     _notifiedTodos.remove(todoKey);
     _saveNotificationHistory();
   }
+
+  /// Web版通知サービスを初期化
+  static Future<void> initializeWebNotifications() async {
+    await WebNotificationService.initialize();
+    _logInfo('Web版通知サービスを初期化しました');
+  }
+
+  /// Web版でTODO通知を表示
+  static Future<void> showWebTodoNotification({
+    required String title,
+    required String body,
+  }) async {
+    await WebNotificationService.showTodoNotification(
+      title: title,
+      body: body,
+    );
+  }
+
+  /// Web版で通知権限をリクエスト
+  static Future<bool> requestWebNotificationPermission() async {
+    return await WebNotificationService.requestPermission();
+  }
+
+  /// Web版で通知が有効かチェック
+  static bool get isWebNotificationEnabled => 
+      WebNotificationService.isPermissionGranted;
 }

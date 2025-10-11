@@ -1,49 +1,48 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
 import '../utils/security_config.dart';
+import 'web_storage_service.dart';
 
 /// セキュアストレージサービス
 /// 機密情報を安全に保存・取得するためのサービス
 class SecureStorageService {
-  static const _storage = FlutterSecureStorage();
   static const String _logName = 'SecureStorageService';
 
-  /// Web版ではSharedPreferencesを使用、ネイティブ版ではFlutterSecureStorageを使用
+  /// Web版ではWebStorageServiceを使用、ネイティブ版ではSharedPreferencesを使用
   static Future<void> _write(String key, String value) async {
     if (kIsWeb) {
+      await WebStorageService.saveData(key, value);
+    } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(key, value);
-    } else {
-      await _storage.write(key: key, value: value);
     }
   }
 
   static Future<String?> _read(String key) async {
     if (kIsWeb) {
+      return await WebStorageService.getData(key);
+    } else {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(key);
-    } else {
-      return await _storage.read(key: key);
     }
   }
 
   static Future<void> _delete(String key) async {
     if (kIsWeb) {
+      await WebStorageService.deleteData(key);
+    } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(key);
-    } else {
-      await _storage.delete(key: key);
     }
   }
 
   static Future<void> _deleteAll() async {
     if (kIsWeb) {
+      await WebStorageService.clearAllData();
+    } else {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-    } else {
-      await _storage.deleteAll();
     }
   }
 

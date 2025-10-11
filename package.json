@@ -1,4 +1,12 @@
 {
+  "name": "roast_plus",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "flutter build web",
+    "dev": "flutter run -d web-server --web-port 3000",
+    "clean": "flutter clean",
+    "get": "flutter pub get"
+  },
   "dependencies": {
     "firebase": "^12.3.0"
   }

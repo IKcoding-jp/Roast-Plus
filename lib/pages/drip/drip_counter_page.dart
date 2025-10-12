@@ -264,14 +264,14 @@ class DripCounterPageState extends State<DripCounterPage>
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: kIsWeb ? 500 : double.infinity,
+              maxWidth: kIsWeb ? 680 : double.infinity,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // カウンターカード
                 Card(
-                  margin: EdgeInsets.symmetric(horizontal: kIsWeb ? 40 : 16),
+                  margin: EdgeInsets.symmetric(horizontal: kIsWeb ? 24 : 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -313,11 +313,15 @@ class DripCounterPageState extends State<DripCounterPage>
                           ),
                         ),
                         SizedBox(height: 24),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: _createButtons(themeSettings),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: _createButtons(themeSettings),
+                            ),
+                          ),
                         ),
                         SizedBox(height: 24),
                         _buildInputs(themeSettings),
@@ -365,24 +369,27 @@ class DripCounterPageState extends State<DripCounterPage>
     const increments = [-10, -5, -1, 1, 5, 10];
     return increments
         .map(
-          (value) => SizedBox(
-            width: 72,
-            child: ElevatedButton(
-              onPressed: () => _addToCounter(value),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: themeSettings.buttonColor,
-                foregroundColor: themeSettings.fontColor2,
-                padding: EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+          (value) => Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6),
+            child: SizedBox(
+              width: 72,
+              child: ElevatedButton(
+                onPressed: () => _addToCounter(value),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: themeSettings.buttonColor,
+                  foregroundColor: themeSettings.fontColor2,
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-              ),
-              child: Text(
-                '${value > 0 ? '+' : ''}$value',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: themeSettings.fontFamily,
+                child: Text(
+                  '${value > 0 ? '+' : ''}$value',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: themeSettings.fontFamily,
+                  ),
                 ),
               ),
             ),
@@ -1031,9 +1038,7 @@ class DripCounterPageState extends State<DripCounterPage>
                         ),
                       ),
                       SizedBox(width: 16),
-                      Expanded(
-                        child: _buildRoastLevelField(themeSettings),
-                      ),
+                      Expanded(child: _buildRoastLevelField(themeSettings)),
                     ],
                   ),
                   SizedBox(height: 20),
@@ -1085,8 +1090,9 @@ class DripCounterPageState extends State<DripCounterPage>
             ),
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
   /// モバイル版専用レイアウト
   Widget _buildMobileLayout(
@@ -1360,10 +1366,14 @@ class DripCounterPageState extends State<DripCounterPage>
                                     child: ElevatedButton(
                                       onPressed: () => _addToCounter(v),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: themeSettings.buttonColor,
-                                        foregroundColor: themeSettings.fontColor2,
+                                        backgroundColor:
+                                            themeSettings.buttonColor,
+                                        foregroundColor:
+                                            themeSettings.fontColor2,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
                                       ),
                                       child: Text(
@@ -1430,9 +1440,7 @@ class DripCounterPageState extends State<DripCounterPage>
                                 ),
                                 SizedBox(width: 14),
                                 Expanded(
-                                  child: _buildRoastLevelField(
-                                    themeSettings,
-                                  ),
+                                  child: _buildRoastLevelField(themeSettings),
                                 ),
                               ],
                             ),

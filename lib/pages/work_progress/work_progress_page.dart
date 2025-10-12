@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/work_progress_models.dart';
 import '../../models/theme_settings.dart';
+import '../../utils/theme_font_utils.dart';
 import '../../widgets/bean_name_with_sticker.dart';
 import 'work_progress_edit_page.dart';
 import '../../models/group_provider.dart';
@@ -1063,89 +1064,95 @@ class _WorkProgressPageState extends State<WorkProgressPage>
     final groupProvider = context.watch<GroupProvider>();
 
     final canEdit = _canEdit;
+    final baseTheme = Theme.of(context);
+    final themedData = buildThemeWithFontFamily(baseTheme, themeSettings);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Text(
-              '作業状況記録',
-              style: TextStyle(
-                fontFamily: themeSettings.fontFamily,
-                fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+    return Theme(
+      data: themedData,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            children: [
+              Text(
+                '作業状況記録',
+                style: TextStyle(
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize:
+                      (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+                ),
               ),
-            ),
-            Consumer<GroupProvider>(
-              builder: (context, groupProvider, _) {
-                if (groupProvider.groups.isNotEmpty) {
-                  return Container(
-                    margin: EdgeInsets.only(left: 12),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: themeSettings.iconColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: themeSettings.iconColor),
-                    ),
-                    child: Icon(
-                      Icons.groups,
-                      size: 18,
-                      color: themeSettings.iconColor,
-                    ),
-                  );
-                } else {
-                  return SizedBox.shrink();
-                }
-              },
-            ),
-          ],
-        ),
-        backgroundColor: themeSettings.appBarColor,
-        foregroundColor: themeSettings.appBarTextColor,
-      ),
-      body: kIsWeb
-          ? _buildWebLayout(
-              themeSettings,
-              workProgressProvider,
-              groupProvider,
-              canEdit,
-            )
-          : _buildMobileLayout(
-              themeSettings,
-              workProgressProvider,
-              groupProvider,
-              canEdit,
-            ),
-      floatingActionButton: canEdit
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WorkProgressEditPage(
-                      groupId: groupProvider.currentGroup?.id,
-                    ),
-                  ),
-                ).then((result) {
-                  if (result == true) {
-                    if (groupProvider.hasGroup) {
-                      workProgressProvider.loadWorkProgress(
-                        groupId: groupProvider.currentGroup!.id,
-                      );
-                    } else if (groupProvider.groups.isNotEmpty) {
-                      workProgressProvider.loadWorkProgress(
-                        groupId: groupProvider.groups.first.id,
-                      );
-                    } else {
-                      workProgressProvider.loadWorkProgress();
-                    }
+              Consumer<GroupProvider>(
+                builder: (context, groupProvider, _) {
+                  if (groupProvider.groups.isNotEmpty) {
+                    return Container(
+                      margin: EdgeInsets.only(left: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: themeSettings.iconColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: themeSettings.iconColor),
+                      ),
+                      child: Icon(
+                        Icons.groups,
+                        size: 18,
+                        color: themeSettings.iconColor,
+                      ),
+                    );
+                  } else {
+                    return SizedBox.shrink();
                   }
-                });
-              },
-              backgroundColor: themeSettings.buttonColor,
-              foregroundColor: themeSettings.fontColor2,
-              child: Icon(Icons.add),
-            )
-          : null,
+                },
+              ),
+            ],
+          ),
+          backgroundColor: themeSettings.appBarColor,
+          foregroundColor: themeSettings.appBarTextColor,
+        ),
+        body: kIsWeb
+            ? _buildWebLayout(
+                themeSettings,
+                workProgressProvider,
+                groupProvider,
+                canEdit,
+              )
+            : _buildMobileLayout(
+                themeSettings,
+                workProgressProvider,
+                groupProvider,
+                canEdit,
+              ),
+        floatingActionButton: canEdit
+            ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WorkProgressEditPage(
+                        groupId: groupProvider.currentGroup?.id,
+                      ),
+                    ),
+                  ).then((result) {
+                    if (result == true) {
+                      if (groupProvider.hasGroup) {
+                        workProgressProvider.loadWorkProgress(
+                          groupId: groupProvider.currentGroup!.id,
+                        );
+                      } else if (groupProvider.groups.isNotEmpty) {
+                        workProgressProvider.loadWorkProgress(
+                          groupId: groupProvider.groups.first.id,
+                        );
+                      } else {
+                        workProgressProvider.loadWorkProgress();
+                      }
+                    }
+                  });
+                },
+                backgroundColor: themeSettings.buttonColor,
+                foregroundColor: themeSettings.fontColor2,
+                child: Icon(Icons.add),
+              )
+            : null,
+      ),
     );
   }
 }

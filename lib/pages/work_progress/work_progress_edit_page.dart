@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/work_progress_models.dart';
 import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
+import '../../utils/theme_font_utils.dart';
 
 class WorkProgressEditPage extends StatefulWidget {
   final WorkProgress? workProgress;
@@ -183,13 +184,23 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
     final isEditing = widget.workProgress != null;
+    final baseTheme = Theme.of(context);
+    final themedData = buildThemeWithFontFamily(baseTheme, themeSettings);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? '作業状況記録を編集' : '作業状況記録を作成'),
-        backgroundColor: themeSettings.appBarColor,
-        foregroundColor: themeSettings.appBarTextColor,
-      ),
+    return Theme(
+      data: themedData,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            isEditing ? '作業状況記録を編集' : '作業状況記録を作成',
+            style: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+            ),
+          ),
+          backgroundColor: themeSettings.appBarColor,
+          foregroundColor: themeSettings.appBarTextColor,
+        ),
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(color: themeSettings.iconColor),
@@ -424,6 +435,7 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
                 ),
               ),
             ),
+      ),
     );
   }
 }

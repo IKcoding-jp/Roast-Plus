@@ -241,373 +241,289 @@ class DripCounterPageState extends State<DripCounterPage>
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final fontFamily = themeSettings.fontFamily;
 
-    // 権限チェック中
-    if (_isCheckingPermission) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Row(
-            children: [
-              Icon(
-                Icons.coffee,
-                color: Provider.of<ThemeSettings>(context).iconColor,
-              ),
-              SizedBox(width: 8),
-              Text('ドリップパックカウンター'),
-            ],
-          ),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Provider.of<ThemeSettings>(context).buttonColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Loading...',
-                style: TextStyle(
-                  color: Provider.of<ThemeSettings>(context).fontColor1,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // 権限がない場合
-    if (!_canUseDripCounter) {
-      return PermissionDeniedPage(
-        title: 'ドリップパックカウンター',
-        message: 'ドリップパックカウンターを使用するには、\n管理者の権限が必要です。',
-        additionalInfo:
-            'メンバーがドリップパックカウンターを使用できる設定が有効になっている場合は、管理者に設定の確認を依頼してください。',
-        customIcon: Icons.coffee,
-        onBackPressed: () {
-          // ホームに戻る
-          Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-        },
-      );
-    }
-
-    // 美しいグラデーションカラーパレット
-    final primaryGradient = LinearGradient(
-      colors: [
-        themeSettings.buttonColor,
-        themeSettings.buttonColor.withValues(alpha: 0.8),
-      ],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    );
-
-    final cardGradient = LinearGradient(
-      colors: [
-        themeSettings.cardBackgroundColor,
-        themeSettings.cardBackgroundColor.withValues(alpha: 0.95),
-      ],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    );
-
-    // Web版とモバイル版でレイアウトを分岐
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: themeSettings.backgroundColor,
       appBar: AppBar(
         title: Text(
           'ドリップパックカウンター',
-          style: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1.2),
+          style: TextStyle(
+            color: themeSettings.appBarTextColor,
+            fontFamily: fontFamily,
+          ),
         ),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
-        actions: [
-          if (_canUseDripCounter)
-            IconButton(
-              icon: Icon(Icons.list, color: themeSettings.iconColor),
-              tooltip: '記録一覧',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => DripPackRecordListPage()),
-                );
-              },
-            ),
-        ],
+        backgroundColor: themeSettings.appBarColor,
+        iconTheme: IconThemeData(color: themeSettings.appBarTextColor),
       ),
-      body: kIsWeb
-          ? _buildWebLayout(themeSettings, primaryGradient, cardGradient)
-          : _buildMobileLayout(themeSettings, primaryGradient, cardGradient),
+      body: DefaultTextStyle.merge(
+        style: TextStyle(
+          color: themeSettings.fontColor1,
+          fontFamily: fontFamily,
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: kIsWeb ? 500 : double.infinity,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // カウンターカード
+                Card(
+                  margin: EdgeInsets.symmetric(horizontal: kIsWeb ? 40 : 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  color: themeSettings.cardBackgroundColor,
+                  elevation: 6,
+                  child: Padding(
+                    padding: EdgeInsets.all(kIsWeb ? 32 : 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.refresh,
+                              color: themeSettings.iconColor,
+                            ),
+                            tooltip: 'リセット',
+                            onPressed: () => _addToCounter(-_counter),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          _counter.toString(),
+                          style: TextStyle(
+                            fontSize: kIsWeb ? 64 : 48,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: fontFamily,
+                            color: themeSettings.fontColor1,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '袋',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: fontFamily,
+                          ),
+                        ),
+                        SizedBox(height: 24),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: _createButtons(themeSettings),
+                        ),
+                        SizedBox(height: 24),
+                        _buildInputs(themeSettings),
+                        SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.save),
+                            label: Text(
+                              '記録を保存',
+                              style: TextStyle(
+                                fontFamily: fontFamily,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: themeSettings.appButtonColor,
+                              foregroundColor: themeSettings.fontColor2,
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: _hasInput ? _addRecord : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildCountButton(
-    int value, {
-    double fontSize = 22,
-    LinearGradient? primaryGradient,
-  }) {
-    final themeSettings = Provider.of<ThemeSettings>(context);
-    final isPositive = value > 0;
+  bool get _hasInput {
+    final bean = _beanController.text.trim();
+    return _counter > 0 && bean.isNotEmpty && _selectedRoast != null;
+  }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient:
-            primaryGradient ??
-            LinearGradient(
-              colors: [
-                themeSettings.buttonColor,
-                themeSettings.buttonColor.withValues(alpha: 0.8),
-              ],
-            ),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: themeSettings.buttonColor.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: Offset(0, 3),
-          ),
-          BoxShadow(
-            color: Colors.white.withValues(alpha: 0.8),
-            blurRadius: 1,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _addToCounter(value),
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              isPositive ? '+$value' : '$value',
-              style: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1.5,
-                shadows: [
-                  Shadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 2,
-                    offset: Offset(1, 1),
-                  ),
-                ],
+  List<Widget> _createButtons(ThemeSettings themeSettings) {
+    const increments = [-10, -5, -1, 1, 5, 10];
+    return increments
+        .map(
+          (value) => SizedBox(
+            width: 72,
+            child: ElevatedButton(
+              onPressed: () => _addToCounter(value),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeSettings.buttonColor,
+                foregroundColor: themeSettings.fontColor2,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Text(
+                '${value > 0 ? '+' : ''}$value',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: themeSettings.fontFamily,
+                ),
               ),
             ),
           ),
+        )
+        .toList();
+  }
+
+  Widget _buildInputs(ThemeSettings themeSettings) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _buildLabeledField(
+                themeSettings,
+                label: '豆の種類',
+                icon: Icons.coffee,
+                hintText: '例: ブラジル、コロンビア',
+                controller: _beanController,
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(child: _buildRoastLevelField(themeSettings)),
+          ],
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildInputField({
+  Widget _buildLabeledField(
+    ThemeSettings themeSettings, {
     required String label,
-    required TextEditingController controller,
     required IconData icon,
-    required String hint,
-    double fontSize = 17,
-    double iconSize = 22,
-    double labelFontSize = 16,
-    EdgeInsetsGeometry contentPadding = const EdgeInsets.symmetric(
-      horizontal: 14,
-      vertical: 10,
-    ),
-    int? maxLength,
+    required String hintText,
+    required TextEditingController controller,
   }) {
-    final themeSettings = Provider.of<ThemeSettings>(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    themeSettings.iconColor.withValues(alpha: 0.1),
-                    themeSettings.iconColor.withValues(alpha: 0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: themeSettings.iconColor, size: iconSize),
-            ),
-            const SizedBox(width: 8),
+            Icon(icon, size: 18, color: themeSettings.iconColor),
+            SizedBox(width: 4),
             Text(
               label,
               style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: labelFontSize,
-                color: themeSettings.fontColor1,
-                letterSpacing: 1.1,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: themeSettings.inputBackgroundColor,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
+        SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: 15,
+            color: themeSettings.fontColor1,
           ),
-          child: TextField(
-            controller: controller,
-            maxLength: maxLength,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: contentPadding,
-              hintText: hint,
-              hintStyle: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: fontSize,
-              ),
-              counterText: maxLength != null ? '' : null,
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              color: themeSettings.fontColor1.withValues(alpha: 0.5),
             ),
-            style: TextStyle(
-              fontSize: fontSize,
-              color: themeSettings.fontColor1,
-              fontWeight: FontWeight.w500,
+            filled: true,
+            fillColor: themeSettings.inputBackgroundColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
             ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildRoastDropdown({
-    double fontSize = 17,
-    double iconSize = 22,
-    double labelFontSize = 16,
-    EdgeInsetsGeometry contentPadding = const EdgeInsets.symmetric(
-      horizontal: 14,
-      vertical: 10,
-    ),
-  }) {
-    final themeSettings = Provider.of<ThemeSettings>(context);
-
+  Widget _buildRoastLevelField(ThemeSettings themeSettings) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    themeSettings.iconColor.withValues(alpha: 0.1),
-                    themeSettings.iconColor.withValues(alpha: 0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.local_fire_department,
-                color: themeSettings.iconColor,
-                size: iconSize,
-              ),
+            Icon(
+              Icons.local_fire_department,
+              size: 18,
+              color: themeSettings.iconColor,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 4),
             Text(
               '煎り度',
               style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: labelFontSize,
-                color: themeSettings.fontColor1,
-                letterSpacing: 1.1,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: themeSettings.inputBackgroundColor,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
+        SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          initialValue: _selectedRoast,
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: 15,
+            color: themeSettings.fontColor1,
           ),
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedRoast,
-            items: _roastLevels
-                .map(
-                  (level) => DropdownMenuItem(
-                    value: level,
-                    child: Text(
-                      level,
-                      style: TextStyle(
-                        fontSize: fontSize,
-                        color: themeSettings.fontColor1,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-            onChanged: (val) {
-              setState(() {
-                _selectedRoast = val;
-              });
-            },
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: contentPadding,
-              hintText: '煎り度を選択',
-              hintStyle: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: fontSize,
-              ),
+          decoration: InputDecoration(
+            hintText: '煎り度を選択',
+            hintStyle: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              color: themeSettings.fontColor1.withValues(alpha: 0.5),
             ),
-            style: TextStyle(
-              fontSize: fontSize,
-              color: themeSettings.fontColor1,
-              fontWeight: FontWeight.w500,
+            filled: true,
+            fillColor: themeSettings.inputBackgroundColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
             ),
-            dropdownColor: themeSettings.cardBackgroundColor,
-            icon: Icon(Icons.arrow_drop_down, color: themeSettings.iconColor),
-            selectedItemBuilder: (BuildContext context) {
-              return _roastLevels.map<Widget>((String item) {
-                return Text(
-                  item,
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    color: themeSettings.fontColor1,
-                    fontWeight: FontWeight.w500,
-                  ),
-                );
-              }).toList();
-            },
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
+          items: _roastLevels
+              .map(
+                (level) => DropdownMenuItem(
+                  value: level,
+                  child: Text(
+                    level,
+                    style: TextStyle(fontFamily: themeSettings.fontFamily),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedRoast = value;
+            });
+          },
         ),
       ],
     );
@@ -1078,10 +994,23 @@ class DripCounterPageState extends State<DripCounterPage>
                             padding: EdgeInsets.symmetric(horizontal: 3),
                             child: SizedBox(
                               height: 44,
-                              child: _buildCountButton(
-                                v,
-                                fontSize: 16,
-                                primaryGradient: primaryGradient,
+                              child: ElevatedButton(
+                                onPressed: () => _addToCounter(v),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: themeSettings.buttonColor,
+                                  foregroundColor: themeSettings.fontColor2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  '${v > 0 ? '+' : ''}$v',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: themeSettings.fontFamily,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -1093,32 +1022,17 @@ class DripCounterPageState extends State<DripCounterPage>
                   Row(
                     children: [
                       Expanded(
-                        child: _buildInputField(
+                        child: _buildLabeledField(
+                          themeSettings,
                           label: '豆の種類',
-                          controller: _beanController,
                           icon: Icons.coffee,
-                          hint: '例: ブラジル、コロンビア',
-                          fontSize: 15,
-                          iconSize: 18,
-                          labelFontSize: 13,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                          maxLength: 10,
+                          hintText: '例: ブラジル、コロンビア',
+                          controller: _beanController,
                         ),
                       ),
                       SizedBox(width: 16),
                       Expanded(
-                        child: _buildRoastDropdown(
-                          fontSize: 15,
-                          iconSize: 18,
-                          labelFontSize: 13,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                        ),
+                        child: _buildRoastLevelField(themeSettings),
                       ),
                     ],
                   ),
@@ -1171,9 +1085,8 @@ class DripCounterPageState extends State<DripCounterPage>
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
   /// モバイル版専用レイアウト
   Widget _buildMobileLayout(
@@ -1444,10 +1357,23 @@ class DripCounterPageState extends State<DripCounterPage>
                                   padding: EdgeInsets.symmetric(horizontal: 4),
                                   child: SizedBox(
                                     height: sectionHeight * 0.7,
-                                    child: _buildCountButton(
-                                      v,
-                                      fontSize: buttonFont,
-                                      primaryGradient: primaryGradient,
+                                    child: ElevatedButton(
+                                      onPressed: () => _addToCounter(v),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: themeSettings.buttonColor,
+                                        foregroundColor: themeSettings.fontColor2,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '${v > 0 ? '+' : ''}$v',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: themeSettings.fontFamily,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1494,31 +1420,18 @@ class DripCounterPageState extends State<DripCounterPage>
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Expanded(
-                                  child: _buildInputField(
+                                  child: _buildLabeledField(
+                                    themeSettings,
                                     label: '豆の種類',
-                                    controller: _beanController,
                                     icon: Icons.coffee,
-                                    hint: '例: ブラジル、コロンビア',
-                                    fontSize: 17,
-                                    iconSize: 22,
-                                    labelFontSize: 16,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 10,
-                                    ),
-                                    maxLength: 10,
+                                    hintText: '例: ブラジル、コロンビア',
+                                    controller: _beanController,
                                   ),
                                 ),
                                 SizedBox(width: 14),
                                 Expanded(
-                                  child: _buildRoastDropdown(
-                                    fontSize: 17,
-                                    iconSize: 22,
-                                    labelFontSize: 16,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 10,
-                                    ),
+                                  child: _buildRoastLevelField(
+                                    themeSettings,
                                   ),
                                 ),
                               ],

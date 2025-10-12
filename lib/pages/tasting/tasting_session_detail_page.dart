@@ -327,14 +327,32 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: _roastLevel,
+                style: TextStyle(
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                ),
                 items: roasts
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .map(
+                      (e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(
+                          e,
+                          style: TextStyle(
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
+                        ),
+                      ),
+                    )
                     .toList(),
                 onChanged: (v) =>
                     setState(() => _roastLevel = v ?? _roastLevel),
                 decoration: InputDecoration(
                   labelText: '焙煎度合い *',
                   border: OutlineInputBorder(),
+                  labelStyle: TextStyle(
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
                 ),
               ),
               SizedBox(height: 12),

@@ -519,7 +519,13 @@ class _CalendarPageState extends State<CalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('カレンダー'),
+        title: Text(
+          'カレンダー',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
         actions: [

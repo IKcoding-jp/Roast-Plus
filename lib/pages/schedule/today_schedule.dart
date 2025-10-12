@@ -1330,6 +1330,9 @@ class _TodayScheduleState extends State<TodaySchedule>
                                   color: Provider.of<ThemeSettings>(
                                     context,
                                   ).fontColor1.withValues(alpha: 0.7),
+                                  fontFamily: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).fontFamily,
                                 ),
                               ),
                             ],
@@ -1360,6 +1363,9 @@ class _TodayScheduleState extends State<TodaySchedule>
                                   color: Provider.of<ThemeSettings>(
                                     context,
                                   ).fontColor1.withValues(alpha: 0.7),
+                                  fontFamily: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).fontFamily,
                                 ),
                               ),
                             ],
@@ -1393,6 +1399,7 @@ class _TodayScheduleState extends State<TodaySchedule>
     );
     debugPrint('TodaySchedule: 表示するラベル: $_scheduleLabels');
 
+    final themeSettings = Provider.of<ThemeSettings>(context);
     List<Widget> widgets = [];
     for (int i = 0; i < _scheduleLabels.length; i++) {
       debugPrint('TodaySchedule: ラベル $i を処理中: ${_scheduleLabels[i]}');
@@ -1402,7 +1409,7 @@ class _TodayScheduleState extends State<TodaySchedule>
       final isBetweenRange = _arrowRanges.any((r) => r.contains(i));
 
       // タイムライン用アイコン
-      final themeButtonColor = Provider.of<ThemeSettings>(context).buttonColor;
+      final themeButtonColor = themeSettings.buttonColor;
       Widget timelineIcon;
       if (isRangeStart) {
         timelineIcon = Icon(
@@ -1467,11 +1474,12 @@ class _TodayScheduleState extends State<TodaySchedule>
                     child: Text(
                       _scheduleLabels[i],
                       style: TextStyle(
-                        fontSize: kIsWeb ? 16 : 12, // WEB版は16、モバイル版は12
+                        fontSize: kIsWeb ? 16 : 12,
                         fontWeight: FontWeight.bold,
                         color: inAnyRange
                             ? Colors.grey.shade700
-                            : Provider.of<ThemeSettings>(context).fontColor1,
+                            : themeSettings.fontColor1,
+                        fontFamily: themeSettings.fontFamily,
                       ),
                     ),
                   ),
@@ -1575,10 +1583,10 @@ class _TodayScheduleState extends State<TodaySchedule>
                             style: TextStyle(
                               fontSize:
                                   (kIsWeb ? 18 : 14) *
-                                  Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontSizeScale, // WEB版は18、モバイル版は14
+                                  themeSettings.fontSizeScale,
                               fontWeight: FontWeight.bold,
+                              fontFamily: themeSettings.fontFamily,
+                              color: themeSettings.fontColor1,
                             ),
                             decoration: InputDecoration(
                               filled: false,
@@ -1594,9 +1602,7 @@ class _TodayScheduleState extends State<TodaySchedule>
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).buttonColor,
+                                  color: themeSettings.buttonColor,
                                   width: 2,
                                 ),
                               ),
@@ -1609,10 +1615,10 @@ class _TodayScheduleState extends State<TodaySchedule>
                           ),
                         )
                       : Container(
-                          height: 52, // TextFieldと同じ高さに固定（52に調整）
+                          height: 52,
                           padding: EdgeInsets.symmetric(
                             horizontal: 0,
-                            vertical: 8, // 10から8に調整
+                            vertical: 8,
                           ),
                           decoration: BoxDecoration(
                             border: Border(
@@ -1626,13 +1632,10 @@ class _TodayScheduleState extends State<TodaySchedule>
                               style: TextStyle(
                                 fontSize:
                                     (kIsWeb ? 17 : 13) *
-                                    Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontSizeScale, // WEB版は17、モバイル版は13
+                                    themeSettings.fontSizeScale,
                                 fontWeight: FontWeight.bold,
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).fontColor1,
+                                color: themeSettings.fontColor1,
+                                fontFamily: themeSettings.fontFamily,
                               ),
                             ),
                           ),

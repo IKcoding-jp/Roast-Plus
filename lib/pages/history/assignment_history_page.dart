@@ -294,6 +294,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
     final groupProvider = context.read<GroupProvider>();
     final isInGroup = groupProvider.groups.isNotEmpty;
     final navigator = Navigator.of(context);
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+    final fontFamily = themeSettings.fontFamily;
 
     List<TextEditingController> controllers = original
         .map((e) => TextEditingController(text: e))
@@ -314,7 +316,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
         title: Text(
           isInGroup ? '担当編集 ($dateKey) - グループ同期' : '担当編集 ($dateKey)',
           style: TextStyle(
-            color: Provider.of<ThemeSettings>(context).fontColor1,
+            color: themeSettings.fontColor1,
+            fontFamily: fontFamily,
           ),
         ),
         content: Column(
@@ -325,12 +328,14 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
             return TextFormField(
               controller: controllers[i],
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor1,
+                color: themeSettings.fontColor1,
+                fontFamily: fontFamily,
               ),
               decoration: InputDecoration(
                 labelText: label,
                 labelStyle: TextStyle(
-                  color: Provider.of<ThemeSettings>(context).fontColor1,
+                  color: themeSettings.fontColor1,
+                  fontFamily: fontFamily,
                 ),
               ),
             );
@@ -342,7 +347,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
             child: Text(
               'キャンセル',
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor1,
+                color: themeSettings.fontColor1,
+                fontFamily: fontFamily,
               ),
             ),
           ),
@@ -393,7 +399,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
             child: Text(
               '保存',
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor2,
+                color: themeSettings.fontColor2,
+                fontFamily: fontFamily,
               ),
             ),
           ),
@@ -405,6 +412,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
   Future<void> _deleteAssignment(String dateKey) async {
     final groupProvider = context.read<GroupProvider>();
     final isInGroup = groupProvider.groups.isNotEmpty;
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+    final fontFamily = themeSettings.fontFamily;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -412,7 +421,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
         title: Text(
           '削除の確認',
           style: TextStyle(
-            color: Provider.of<ThemeSettings>(context).fontColor1,
+            color: themeSettings.fontColor1,
+            fontFamily: fontFamily,
           ),
         ),
         content: Text(
@@ -420,7 +430,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
               ? 'この日の担当を削除してもよろしいですか？\n($dateKey)\n\n※グループメンバー全員に反映されます'
               : 'この日の担当を削除してもよろしいですか？\n($dateKey)',
           style: TextStyle(
-            color: Provider.of<ThemeSettings>(context).fontColor1,
+            color: themeSettings.fontColor1,
+            fontFamily: fontFamily,
           ),
         ),
         actions: [
@@ -429,7 +440,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
             child: Text(
               'キャンセル',
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor1,
+                color: themeSettings.fontColor1,
+                fontFamily: fontFamily,
               ),
             ),
           ),
@@ -438,7 +450,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
             child: Text(
               '削除',
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor2,
+                color: themeSettings.fontColor2,
+                fontFamily: fontFamily,
               ),
             ),
           ),
@@ -576,10 +589,11 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context, listen: true);
+    final fontFamily = themeSettings.fontFamily;
     if (!isReady) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('担当履歴'),
+          title: Text('担当履歴', style: TextStyle(fontFamily: fontFamily)),
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         ),
         body: const LoadingAnimationWidget(),
@@ -687,9 +701,7 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                             children: [
                               Icon(
                                 Icons.calendar_today,
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).iconColor,
+                                color: themeSettings.iconColor,
                               ),
                               SizedBox(width: 8),
                               Expanded(
@@ -698,9 +710,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontColor1,
+                                    color: themeSettings.fontColor1,
+                                    fontFamily: fontFamily,
                                   ),
                                 ),
                               ),
@@ -709,9 +720,7 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.edit,
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).iconColor,
+                                    color: themeSettings.iconColor,
                                   ),
                                   tooltip: '編集',
                                   onPressed: () =>
@@ -732,7 +741,12 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                             final label = leftLabels.length > index
                                 ? leftLabels[index]
                                 : '担当${index + 1}';
-                            return _buildAssignmentRow(label, assignment);
+                            return _buildAssignmentRow(
+                              label,
+                              assignment,
+                              themeSettings,
+                              fontFamily,
+                            );
                           }),
                         ],
                       ),
@@ -748,7 +762,7 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('担当履歴'),
+            title: Text('担当履歴', style: TextStyle(fontFamily: fontFamily)),
             backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           ),
           body: items.isEmpty
@@ -759,9 +773,7 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                       Icon(
                         Icons.history,
                         size: kIsWeb ? 80 : 64,
-                        color: Provider.of<ThemeSettings>(
-                          context,
-                        ).iconColor.withValues(alpha: 0.5),
+                        color: themeSettings.iconColor.withValues(alpha: 0.5),
                       ),
                       SizedBox(height: kIsWeb ? 20 : 16),
                       Text(
@@ -769,7 +781,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                         style: TextStyle(
                           fontSize: kIsWeb ? 22 : 18,
                           fontWeight: FontWeight.bold,
-                          color: Provider.of<ThemeSettings>(context).fontColor1,
+                          color: themeSettings.fontColor1,
+                          fontFamily: fontFamily,
                         ),
                       ),
                       SizedBox(height: kIsWeb ? 12 : 8),
@@ -777,9 +790,10 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                         '担当表で記録した履歴がここに表示されます',
                         style: TextStyle(
                           fontSize: kIsWeb ? 16 : 14,
-                          color: Provider.of<ThemeSettings>(
-                            context,
-                          ).fontColor1.withValues(alpha: 0.7),
+                          color: themeSettings.fontColor1.withValues(
+                            alpha: 0.7,
+                          ),
+                          fontFamily: fontFamily,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -805,22 +819,24 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
     );
   }
 
-  Widget _buildAssignmentRow(String label, String value) {
+  Widget _buildAssignmentRow(
+    String label,
+    String value,
+    ThemeSettings themeSettings,
+    String fontFamily,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Icon(
-            Icons.label_outline,
-            size: 18,
-            color: Provider.of<ThemeSettings>(context).iconColor,
-          ),
+          Icon(Icons.label_outline, size: 18, color: themeSettings.iconColor),
           SizedBox(width: 6),
           Text(
             '$label：',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Provider.of<ThemeSettings>(context).fontColor1,
+              color: themeSettings.fontColor1,
+              fontFamily: fontFamily,
             ),
           ),
           SizedBox(width: 4),
@@ -829,7 +845,8 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
               value,
               style: TextStyle(
                 fontSize: 15,
-                color: Provider.of<ThemeSettings>(context).fontColor1,
+                color: themeSettings.fontColor1,
+                fontFamily: fontFamily,
               ),
               overflow: TextOverflow.ellipsis,
             ),

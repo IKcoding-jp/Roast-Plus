@@ -35,13 +35,13 @@ class WebStorageService {
       if (parts.length == 2) {
         final data = parts[0];
         final hash = parts[1];
-        
+
         // ハッシュを検証
         final key = utf8.encode(_encryptionKey);
         final bytes = utf8.encode(data);
         final hmacSha256 = Hmac(sha256, key);
         final digest = hmacSha256.convert(bytes);
-        
+
         if (hash == digest.toString()) {
           return data;
         }
@@ -103,7 +103,7 @@ class WebStorageService {
         'auth_tokens',
         'user_preferences',
       ];
-      
+
       for (final key in knownKeys) {
         html.window.localStorage.remove(_storagePrefix + key);
       }
@@ -137,13 +137,13 @@ class WebStorageService {
         'auth_tokens',
         'user_preferences',
       ];
-      
+
       for (final key in knownKeys) {
         if (await hasData(key)) {
           keys.add(key);
         }
       }
-      
+
       return keys;
     } catch (e) {
       _logError('キー一覧取得エラー: $e');
@@ -152,7 +152,10 @@ class WebStorageService {
   }
 
   /// JSONデータを保存
-  static Future<void> saveJsonData(String key, Map<String, dynamic> data) async {
+  static Future<void> saveJsonData(
+    String key,
+    Map<String, dynamic> data,
+  ) async {
     try {
       final jsonString = json.encode(data);
       await saveData(key, jsonString);

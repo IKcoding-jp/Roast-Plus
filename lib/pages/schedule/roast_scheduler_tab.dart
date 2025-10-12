@@ -268,16 +268,34 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
       try {
         await RoastScheduleMemoService.deleteMemo(memoId, groupId: _groupId);
         if (mounted) {
-          ScaffoldMessenger.of(
+          final fontFamily = Provider.of<ThemeSettings>(
             context,
-          ).showSnackBar(SnackBar(content: Text('メモを削除しました')));
+            listen: false,
+          ).fontFamily;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'メモを削除しました',
+                style: TextStyle(fontFamily: fontFamily),
+              ),
+            ),
+          );
         }
       } catch (e) {
         developer.log('メモ削除エラー: $e', name: 'RoastSchedulerTab');
         if (mounted) {
-          ScaffoldMessenger.of(
+          final fontFamily = Provider.of<ThemeSettings>(
             context,
-          ).showSnackBar(SnackBar(content: Text('メモの削除に失敗しました')));
+            listen: false,
+          ).fontFamily;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'メモの削除に失敗しました',
+                style: TextStyle(fontFamily: fontFamily),
+              ),
+            ),
+          );
         }
       }
     }
@@ -285,6 +303,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
 
   Widget _buildMemoCard(RoastScheduleMemo memo) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final fontFamily = themeSettings.fontFamily;
 
     return Card(
       margin: EdgeInsets.only(bottom: 8),
@@ -312,6 +331,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                       color: themeSettings.iconColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
+                      fontFamily: fontFamily,
                     ),
                   ),
                 ),
@@ -341,6 +361,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
+                            fontFamily: fontFamily,
                           ),
                         ),
                       ),
@@ -361,6 +382,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                 color: Colors.orange,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
+                                fontFamily: fontFamily,
                               ),
                             ),
                           ],
@@ -381,6 +403,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                     color: Colors.brown,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
+                                    fontFamily: fontFamily,
                                   ),
                                   stickerSize: 14,
                                 ),
@@ -408,6 +431,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                       color: Colors.green[700],
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
+                                      fontFamily: fontFamily,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.center,
@@ -445,6 +469,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                       ),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
+                                      fontFamily: fontFamily,
                                     ),
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
@@ -558,6 +583,9 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                             style: TextStyle(
                                               color: themeSettings.fontColor1,
                                               fontSize: 16,
+                                              fontFamily:
+                                                  themeSettings.fontFamily,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           SizedBox(height: 8),
@@ -567,6 +595,8 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                               color: themeSettings.fontColor1
                                                   .withValues(alpha: 0.7),
                                               fontSize: 14,
+                                              fontFamily:
+                                                  themeSettings.fontFamily,
                                             ),
                                           ),
                                         ],
@@ -652,6 +682,8 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                         style: TextStyle(
                                           color: themeSettings.fontColor1,
                                           fontSize: 16,
+                                          fontFamily: themeSettings.fontFamily,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       SizedBox(height: 8),
@@ -661,6 +693,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                           color: themeSettings.fontColor1
                                               .withValues(alpha: 0.7),
                                           fontSize: 14,
+                                          fontFamily: themeSettings.fontFamily,
                                         ),
                                       ),
                                     ],

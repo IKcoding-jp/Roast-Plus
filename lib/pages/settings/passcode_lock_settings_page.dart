@@ -19,7 +19,6 @@ class PasscodeLockSettingsPage extends StatefulWidget {
 class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
   final TextEditingController _passcodeController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
-  String? _savedPasscode; // 表示用（実際の検証はストレージから実行）
   bool _isLoading = true;
   bool _isSaving = false;
   bool _isLockEnabled = false;
@@ -83,7 +82,6 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
       final hasQuestions = await PasscodeRecoveryService.hasSecurityQuestions();
 
       setState(() {
-        _savedPasscode = passcode;
         _isLockEnabled = isLockEnabled;
         _hasSecurityQuestions = hasQuestions;
         _isLoading = false;
@@ -158,7 +156,6 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
 
       if (allSaved) {
         setState(() {
-          _savedPasscode = passcode;
           _isLockEnabled = true;
           _isSaving = false;
         });
@@ -231,7 +228,6 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
 
       if (allDisabled) {
         setState(() {
-          _savedPasscode = null;
           _isLockEnabled = false;
           _isSaving = false;
         });
@@ -266,11 +262,31 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
             return StatefulBuilder(
               builder: (context, setState) {
                 return AlertDialog(
-                  title: Text('パスコード確認'),
+                  title: Text(
+                    'パスコード確認',
+                    style: TextStyle(
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
+                      fontSize:
+                          18 *
+                          Provider.of<ThemeSettings>(context).fontSizeScale,
+                    ),
+                  ),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('パスコードを入力してください'),
+                      Text(
+                        'パスコードを入力してください',
+                        style: TextStyle(
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
+                          fontSize:
+                              14 *
+                              Provider.of<ThemeSettings>(context).fontSizeScale,
+                        ),
+                      ),
                       SizedBox(height: 12),
                       TextField(
                         autofocus: true,
@@ -293,7 +309,17 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: Text('キャンセル'),
+                      child: Text(
+                        'キャンセル',
+                        style: TextStyle(
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
+                          fontSize:
+                              16 *
+                              Provider.of<ThemeSettings>(context).fontSizeScale,
+                        ),
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () async {
@@ -305,7 +331,17 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                           setState(() => error = 'パスコードが違います');
                         }
                       },
-                      child: Text('OK'),
+                      child: Text(
+                        'OK',
+                        style: TextStyle(
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
+                          fontSize:
+                              16 *
+                              Provider.of<ThemeSettings>(context).fontSizeScale,
+                        ),
+                      ),
                     ),
                   ],
                 );
@@ -381,15 +417,32 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeSettings = Provider.of<ThemeSettings>(context);
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text('パスコードロック設定')),
+        appBar: AppBar(
+          title: Text(
+            'パスコードロック設定',
+            style: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+            ),
+          ),
+        ),
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('パスコードロック設定')),
+      appBar: AppBar(
+        title: Text(
+          'パスコードロック設定',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
+      ),
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Center(
@@ -423,7 +476,14 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                 Text(
                                   'パスコードロックが有効です',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontFamily: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontFamily,
+                                    fontSize:
+                                        16 *
+                                        Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontSizeScale,
                                     fontWeight: FontWeight.bold,
                                     color: Provider.of<ThemeSettings>(
                                       context,
@@ -436,7 +496,14 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                             Text(
                               'アプリを開く際にパスコードの入力が必要です',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                                fontSize:
+                                    14 *
+                                    Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontSizeScale,
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1,
@@ -447,7 +514,19 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 icon: Icon(Icons.lock_open),
-                                label: Text('パスコードロックを無効にする'),
+                                label: Text(
+                                  'パスコードロックを無効にする',
+                                  style: TextStyle(
+                                    fontFamily: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontFamily,
+                                    fontSize:
+                                        16 *
+                                        Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontSizeScale,
+                                  ),
+                                ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
                                   foregroundColor: Colors.white,
@@ -471,6 +550,16 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                       _hasSecurityQuestions
                                           ? 'セキュリティ質問を管理'
                                           : 'セキュリティ質問を設定',
+                                      style: TextStyle(
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
+                                        fontSize:
+                                            16 *
+                                            Provider.of<ThemeSettings>(
+                                              context,
+                                            ).fontSizeScale,
+                                      ),
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blue,
@@ -497,7 +586,19 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     icon: Icon(Icons.lock_reset),
-                                    label: Text('パスコードをリセット'),
+                                    label: Text(
+                                      'パスコードをリセット',
+                                      style: TextStyle(
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
+                                        fontSize:
+                                            16 *
+                                            Provider.of<ThemeSettings>(
+                                              context,
+                                            ).fontSizeScale,
+                                      ),
+                                    ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange,
                                       foregroundColor: Colors.white,
@@ -541,7 +642,14 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                             Text(
                               'パスコードを設定',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                                fontSize:
+                                    18 *
+                                    Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontSizeScale,
                                 fontWeight: FontWeight.bold,
                                 color: Provider.of<ThemeSettings>(
                                   context,
@@ -583,8 +691,15 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                               Text(
                                 _error!,
                                 style: TextStyle(
+                                  fontFamily: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).fontFamily,
                                   color: Colors.red,
-                                  fontSize: 14,
+                                  fontSize:
+                                      14 *
+                                      Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontSizeScale,
                                 ),
                               ),
                             ],
@@ -593,7 +708,19 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                               width: double.infinity,
                               child: ElevatedButton.icon(
                                 icon: Icon(Icons.lock),
-                                label: Text('パスコードを設定'),
+                                label: Text(
+                                  'パスコードを設定',
+                                  style: TextStyle(
+                                    fontFamily: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontFamily,
+                                    fontSize:
+                                        16 *
+                                        Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontSizeScale,
+                                  ),
+                                ),
                                 style: ElevatedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),

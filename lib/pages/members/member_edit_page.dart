@@ -668,11 +668,17 @@ class _MemberEditPageState extends State<MemberEditPage> {
                     controller: _teamNameControllers[team.id],
                     style: TextStyle(
                       color: Provider.of<ThemeSettings>(context).fontColor1,
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
                     ),
                     decoration: InputDecoration(
                       labelText: '班名',
                       labelStyle: TextStyle(
                         color: Provider.of<ThemeSettings>(context).fontColor1,
+                        fontFamily: Provider.of<ThemeSettings>(
+                          context,
+                        ).fontFamily,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -727,12 +733,20 @@ class _MemberEditPageState extends State<MemberEditPage> {
                               team.members[memberIndex],
                             ),
                             isExpanded: true, // 幅を親要素に合わせる
+                            style: TextStyle(
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
+                            ),
                             decoration: InputDecoration(
                               labelText: 'メンバーを選択',
                               labelStyle: TextStyle(
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                               border: InputBorder.none,
                               prefixIcon: Icon(
@@ -747,7 +761,12 @@ class _MemberEditPageState extends State<MemberEditPage> {
                                 value: null,
                                 child: Text(
                                   'メンバーを選択してください',
-                                  style: TextStyle(color: Colors.grey),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontFamily: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontFamily,
+                                  ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -763,6 +782,9 @@ class _MemberEditPageState extends State<MemberEditPage> {
                                       color: Provider.of<ThemeSettings>(
                                         context,
                                       ).fontColor1,
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -800,6 +822,9 @@ class _MemberEditPageState extends State<MemberEditPage> {
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).fontColor1,
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
                           ),
                           decoration: InputDecoration(
                             labelText: '名前',
@@ -807,6 +832,9 @@ class _MemberEditPageState extends State<MemberEditPage> {
                               color: Provider.of<ThemeSettings>(
                                 context,
                               ).fontColor1,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -844,6 +872,7 @@ class _MemberEditPageState extends State<MemberEditPage> {
               style: TextStyle(
                 color: Provider.of<ThemeSettings>(context).fontColor2,
                 fontSize: 12,
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),
             ),
           ],
@@ -858,7 +887,12 @@ class _MemberEditPageState extends State<MemberEditPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text('メンバー編集'),
+            Text(
+              'メンバー編集',
+              style: TextStyle(
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+              ),
+            ),
             Consumer<GroupProvider>(
               builder: (context, groupProvider, _) {
                 if (groupProvider.groups.isNotEmpty) {
@@ -933,6 +967,9 @@ class _MemberEditPageState extends State<MemberEditPage> {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                           ),
                         ],

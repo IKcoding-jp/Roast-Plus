@@ -115,6 +115,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                       fontSize: _isMobileLayout(context) ? 18 : 22,
                       fontWeight: FontWeight.bold,
                       color: accentColor,
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
                     ),
                   ),
                 ),
@@ -164,6 +167,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                       fontSize: _isMobileLayout(context) ? 15 : 18,
                       fontWeight: FontWeight.w600,
                       color: accentColor,
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
                     ),
                   ),
                 ),
@@ -185,9 +191,27 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                     vertical: 12,
                   ),
                   hintText: '煎り度を選択',
+                  hintStyle: TextStyle(
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
+                ),
+                style: TextStyle(
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                 ),
                 items: ['浅煎り', '中煎り', '中深煎り', '深煎り']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .map(
+                      (e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(
+                          e,
+                          style: TextStyle(
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
+                        ),
+                      ),
+                    )
                     .toList(),
                 onChanged: onRoastLevelChanged,
               ),
@@ -219,6 +243,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                       fontSize: _isMobileLayout(context) ? 15 : 18,
                       fontWeight: FontWeight.w600,
                       color: accentColor,
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
                     ),
                   ),
                 ),
@@ -241,6 +268,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                     fontSize: _isMobileLayout(context) ? 22 : 28,
                     fontWeight: FontWeight.bold,
                     color: accentColor,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
                 ),
                 SizedBox(width: _isMobileLayout(context) ? 12.0 : 16.0),
@@ -294,6 +322,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                   fontSize: _isMobileLayout(context) ? 15 : 18,
                   fontWeight: FontWeight.w600,
                   color: accentColor,
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                 ),
               ),
             ),
@@ -316,7 +345,13 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 vertical: _isMobileLayout(context) ? 12.0 : 16.0,
               ),
               hintText: hint,
-              hintStyle: TextStyle(color: accentColor.withValues(alpha: 0.6)),
+              hintStyle: TextStyle(
+                color: accentColor.withValues(alpha: 0.6),
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+              ),
+            ),
+            style: TextStyle(
+              fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
             ),
             onChanged: (value) {
               // 数字入力フィールドの場合、全角数字を半角数字に変換
@@ -363,7 +398,13 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             vertical: _isMobileLayout(context) ? 12.0 : 16.0,
           ),
           hintText: label,
-          hintStyle: TextStyle(color: Colors.grey[400]),
+          hintStyle: TextStyle(
+            color: Colors.grey[400],
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+          ),
+        ),
+        style: TextStyle(
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
         ),
         onChanged: (value) {
           // 全角数字を半角数字に変換
@@ -411,6 +452,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                   fontSize: _isMobileLayout(context) ? 15 : 18,
                   fontWeight: FontWeight.w600,
                   color: accentColor,
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                 ),
               ),
             ),
@@ -432,13 +474,29 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 vertical: _isMobileLayout(context) ? 12.0 : 16.0,
               ),
               hintText: '重さを選択',
-              hintStyle: TextStyle(color: accentColor.withValues(alpha: 0.6)),
+              hintStyle: TextStyle(
+                color: accentColor.withValues(alpha: 0.6),
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+              ),
             ),
-            items: [
-              '200',
-              '300',
-              '500',
-            ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            style: TextStyle(
+              fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            ),
+            items: ['200', '300', '500']
+                .map(
+                  (e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      e,
+                      style: TextStyle(
+                        fontFamily: Provider.of<ThemeSettings>(
+                          context,
+                        ).fontFamily,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 controller.text = value;
@@ -627,7 +685,15 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 color: Provider.of<ThemeSettings>(context).iconColor,
               ),
               SizedBox(width: 8),
-              Text('焙煎記録入力'),
+              Text(
+                '焙煎記録入力',
+                style: TextStyle(
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  fontSize:
+                      (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
+                          .clamp(16.0, 28.0),
+                ),
+              ),
             ],
           ),
         ),
@@ -646,6 +712,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                 style: TextStyle(
                   color: Provider.of<ThemeSettings>(context).fontColor1,
                   fontSize: 16,
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                 ),
               ),
             ],
@@ -673,7 +740,15 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
               color: Provider.of<ThemeSettings>(context).iconColor,
             ),
             SizedBox(width: 8),
-            Text('焙煎記録入力'),
+            Text(
+              '焙煎記録入力',
+              style: TextStyle(
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                fontSize:
+                    (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
+                        .clamp(16.0, 28.0),
+              ),
+            ),
           ],
         ),
       ),
@@ -800,6 +875,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                             style: TextStyle(
                               fontSize: _isMobileLayout(context) ? 16 : 18,
                               fontWeight: FontWeight.bold,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(

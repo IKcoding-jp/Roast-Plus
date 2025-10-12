@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
 import '../../services/encrypted_local_storage_service.dart';
@@ -30,7 +31,30 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
           themeSettings.updateFontFamily('HannariMincho');
         }
       });
+
+      // Web版では追加でフォント設定を読み込み
+      if (kIsWeb) {
+        _loadWebFontSettings();
+      }
     });
+  }
+
+  // Web版でのフォント設定読み込み
+  void _loadWebFontSettings() async {
+    try {
+      final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+      await themeSettings.loadFontSettingsFromFirestore();
+      if (mounted) {
+        setState(() {
+          _fontSizeScale = themeSettings.fontSizeScale;
+          if (ThemeSettings.availableFonts.contains(themeSettings.fontFamily)) {
+            _selectedFontFamily = themeSettings.fontFamily;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Web版フォント設定読み込みエラー: $e');
+    }
   }
 
   void _onFontSizeScaleChanged(double value) {
@@ -64,10 +88,17 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
     // ローカル保存のみで、notifyListeners()を呼ばない
     _saveFontFamilyLocally(newValue);
     // ThemeSettingsを即座に更新
-    Provider.of<ThemeSettings>(
-      context,
-      listen: false,
-    ).updateFontFamily(newValue);
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+    themeSettings.updateFontFamily(newValue);
+
+    // Web版では追加で強制的にUIを更新
+    if (kIsWeb) {
+      Future.delayed(Duration(milliseconds: 50), () {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
   }
 
   void _saveFontFamilyLocally(String value) async {
@@ -113,6 +144,7 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                     font,
                     style: TextStyle(
                       fontFamily: font,
+                      fontSize: 16 * themeSettings.fontSizeScale,
                       fontWeight: FontWeight.w600,
                       color: themeSettings.fontColor1,
                     ),
@@ -132,7 +164,7 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
               '焙煎サンプル Aa123',
               style: TextStyle(
                 fontFamily: font,
-                fontSize: 16,
+                fontSize: 16 * themeSettings.fontSizeScale,
                 color: themeSettings.fontColor1,
               ),
               maxLines: 2,
@@ -149,7 +181,13 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
     final themeSettings = Provider.of<ThemeSettings>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('フォント設定'),
+        title: Text(
+          'フォント設定',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
       ),
@@ -178,7 +216,8 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                           Text(
                             'フォントファミリー',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontFamily: themeSettings.fontFamily,
+                              fontSize: 18 * themeSettings.fontSizeScale,
                               fontWeight: FontWeight.bold,
                               color: themeSettings.fontColor1,
                             ),
@@ -187,7 +226,8 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                           Text(
                             'アプリ内で使用するフォントを選択できます',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontFamily: themeSettings.fontFamily,
+                              fontSize: 14 * themeSettings.fontSizeScale,
                               color: themeSettings.fontColor1,
                             ),
                           ),
@@ -247,7 +287,7 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                               'サンプルテキスト\nこれは現在のフォントのサンプルです。',
                               style: TextStyle(
                                 fontFamily: _selectedFontFamily,
-                                fontSize: 16,
+                                fontSize: 16 * themeSettings.fontSizeScale,
                                 color: themeSettings.fontColor1,
                               ),
                             ),
@@ -271,7 +311,8 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                           Text(
                             'フォントサイズ',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontFamily: themeSettings.fontFamily,
+                              fontSize: 18 * themeSettings.fontSizeScale,
                               fontWeight: FontWeight.bold,
                               color: themeSettings.fontColor1,
                             ),
@@ -280,7 +321,8 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                           Text(
                             'アプリ内の文字サイズを調整できます',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontFamily: themeSettings.fontFamily,
+                              fontSize: 14 * themeSettings.fontSizeScale,
                               color: themeSettings.fontColor1,
                             ),
                           ),
@@ -290,7 +332,8 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                               Text(
                                 '小',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontFamily: themeSettings.fontFamily,
+                                  fontSize: 12 * themeSettings.fontSizeScale,
                                   color: themeSettings.fontColor1,
                                 ),
                               ),
@@ -315,7 +358,8 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                               Text(
                                 '大',
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontFamily: themeSettings.fontFamily,
+                                  fontSize: 20 * themeSettings.fontSizeScale,
                                   color: themeSettings.fontColor1,
                                 ),
                               ),
@@ -326,7 +370,8 @@ class _FontSizeSettingsPageState extends State<FontSizeSettingsPage> {
                             child: Text(
                               '${(_fontSizeScale * 100).round()}%',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontFamily: themeSettings.fontFamily,
+                                fontSize: 16 * themeSettings.fontSizeScale,
                                 fontWeight: FontWeight.bold,
                                 color: themeSettings.fontColor1,
                               ),

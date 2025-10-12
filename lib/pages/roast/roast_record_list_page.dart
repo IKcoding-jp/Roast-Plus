@@ -96,6 +96,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                           fontWeight: FontWeight.bold,
                           fontSize: _isMobileLayout(context) ? 14 : 16,
                           color: Provider.of<ThemeSettings>(context).fontColor1,
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
                         ),
                         stickerSize: _isMobileLayout(context) ? 14.0 : 16.0,
                       ),
@@ -126,6 +129,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                             ),
                           ),
@@ -148,6 +154,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                               '焙煎時間: ${record.time}',
                               style: TextStyle(
                                 fontSize: _isMobileLayout(context) ? 12 : 13,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -170,6 +179,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                               '煎り度: ${record.roast}',
                               style: TextStyle(
                                 fontSize: _isMobileLayout(context) ? 12 : 13,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -196,6 +208,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: _isMobileLayout(context) ? 12 : 13,
+                                  fontFamily: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).fontFamily,
                                 ),
                               ),
                             ),
@@ -221,6 +236,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1.withValues(alpha: 0.7),
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -863,11 +881,33 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                         color: Provider.of<ThemeSettings>(context).iconColor,
                       ),
                       SizedBox(width: 8),
-                      Text('焙煎記録一覧'),
+                      Text(
+                        '焙煎記録一覧',
+                        style: TextStyle(
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
+                          fontSize:
+                              (20 *
+                                      Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontSizeScale)
+                                  .clamp(16.0, 28.0),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                body: Center(child: Text('エラーが発生しました')),
+                body: Center(
+                  child: Text(
+                    'エラーが発生しました',
+                    style: TextStyle(
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
+                    ),
+                  ),
+                ),
               );
             }
 
@@ -883,7 +923,20 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                       color: Provider.of<ThemeSettings>(context).iconColor,
                     ),
                     SizedBox(width: 8),
-                    Text('焙煎記録一覧'),
+                    Text(
+                      '焙煎記録一覧',
+                      style: TextStyle(
+                        fontFamily: Provider.of<ThemeSettings>(
+                          context,
+                        ).fontFamily,
+                        fontSize:
+                            (20 *
+                                    Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontSizeScale)
+                                .clamp(16.0, 28.0),
+                      ),
+                    ),
                     // グループ状態バッジを追加
                     if (groupProvider.groups.isNotEmpty)
                       Container(
@@ -930,6 +983,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                 ? Colors.green.shade700
                                 : Colors.red.shade700,
                             fontWeight: FontWeight.bold,
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
                           ),
                         ),
                       ),
@@ -972,6 +1028,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                 context,
                               ).fontColor1,
                               fontSize: 16,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                           ),
                         ],
@@ -1044,6 +1103,11 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                             ThemeSettings
                                                           >(context)
                                                           .fontColor1,
+                                                  fontFamily:
+                                                      Provider.of<
+                                                            ThemeSettings
+                                                          >(context)
+                                                          .fontFamily,
                                                 ),
                                               ),
                                             ),
@@ -1072,8 +1136,20 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                             ),
                                           ),
                                           child: TextField(
+                                            style: TextStyle(
+                                              fontFamily:
+                                                  Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontFamily,
+                                            ),
                                             decoration: InputDecoration(
                                               hintText: 'キーワード検索',
+                                              hintStyle: TextStyle(
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
+                                              ),
                                               prefixIcon: Icon(
                                                 Icons.search,
                                                 color:
@@ -1161,6 +1237,10 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                       context,
                                                     ).fontColor1,
                                                 fontWeight: FontWeight.bold,
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
                                               ),
                                             ),
                                             SizedBox(width: 8),
@@ -1198,7 +1278,15 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                           alignment: Alignment.centerRight,
                                           child: ElevatedButton.icon(
                                             icon: Icon(Icons.refresh, size: 18),
-                                            label: Text('リセット'),
+                                            label: Text(
+                                              'リセット',
+                                              style: TextStyle(
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
+                                              ),
+                                            ),
                                             onPressed: () {
                                               setState(() {
                                                 _searchKeyword = '';
@@ -1274,6 +1362,11 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                               ThemeSettings
                                                             >(context)
                                                             .fontColor1,
+                                                    fontFamily:
+                                                        Provider.of<
+                                                              ThemeSettings
+                                                            >(context)
+                                                            .fontFamily,
                                                   ),
                                                 ),
                                                 SizedBox(height: 8),
@@ -1281,6 +1374,11 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                   '焙煎記録を入力してからご利用ください',
                                                   style: TextStyle(
                                                     color: Colors.grey[600],
+                                                    fontFamily:
+                                                        Provider.of<
+                                                              ThemeSettings
+                                                            >(context)
+                                                            .fontFamily,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
@@ -1326,6 +1424,11 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                               ThemeSettings
                                                             >(context)
                                                             .fontColor1,
+                                                    fontFamily:
+                                                        Provider.of<
+                                                              ThemeSettings
+                                                            >(context)
+                                                            .fontFamily,
                                                   ),
                                                 ),
                                                 SizedBox(height: 8),
@@ -1333,6 +1436,11 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                   '検索条件を変更してください',
                                                   style: TextStyle(
                                                     color: Colors.grey[600],
+                                                    fontFamily:
+                                                        Provider.of<
+                                                              ThemeSettings
+                                                            >(context)
+                                                            .fontFamily,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
@@ -1371,6 +1479,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
       ),
       child: DropdownButtonFormField<String>(
         initialValue: value,
+        style: TextStyle(
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+        ),
         items: items
             .map(
               (item) => DropdownMenuItem(
@@ -1378,6 +1489,9 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                 child: Text(
                   item.length > 20 ? '${item.substring(0, 20)}…' : item,
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
                 ),
               ),
             )
@@ -1387,7 +1501,10 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
           labelText: label,
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          labelStyle: TextStyle(color: Color(0xFF795548)),
+          labelStyle: TextStyle(
+            color: Color(0xFF795548),
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+          ),
         ),
       ),
     );
@@ -1416,6 +1533,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                 fontSize: 12,
                 color: Color(0xFF795548),
                 fontWeight: FontWeight.w500,
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),
             ),
             SizedBox(height: 4),
@@ -1424,6 +1542,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
               style: TextStyle(
                 fontSize: 14,
                 color: date != null ? Color(0xFF2C1D17) : Colors.grey[400],
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),
             ),
           ],

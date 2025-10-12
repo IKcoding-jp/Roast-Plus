@@ -25,7 +25,13 @@ class _DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
       ),
@@ -147,7 +153,13 @@ class _UsageGuidePageState extends State<UsageGuidePage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('使い方ガイド'),
+        title: Text(
+          '使い方ガイド',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
         bottom: WebUIUtils.isWeb

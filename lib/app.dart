@@ -1699,6 +1699,9 @@ class MainScaffoldState extends State<MainScaffold> {
                     (isSmallMobile ? 18 : (isMediumMobile ? 20 : 22)) *
                     WebUIUtils.getFontSizeScale(context),
                 fontWeight: FontWeight.bold,
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
               ),
             ),
           ],
@@ -1734,6 +1737,9 @@ class MainScaffoldState extends State<MainScaffold> {
               style: TextStyle(
                 color: themeSettings.appBarTextColor,
                 fontSize: MediaQuery.of(context).size.height < 600 ? 16 : 18,
+                fontFamily: _getFontFamilyWithFallback(
+                  themeSettings.fontFamily,
+                ),
               ),
             ),
           ],

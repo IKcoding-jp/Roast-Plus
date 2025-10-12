@@ -598,11 +598,13 @@ class _RoastTimerPageState extends State<RoastTimerPage>
               fontSize: (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
                   .clamp(16.0, 28.0),
               fontWeight: FontWeight.bold,
+              fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
             ),
             contentTextStyle: TextStyle(
               color: Provider.of<ThemeSettings>(context).dialogTextColor,
               fontSize: (16 * Provider.of<ThemeSettings>(context).fontSizeScale)
                   .clamp(12.0, 24.0),
+              fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
             ),
             title: Text('連続焙煎しますか？'),
             content: Text('焙煎機が温かいうちに次の焙煎が可能です。'),
@@ -663,11 +665,13 @@ class _RoastTimerPageState extends State<RoastTimerPage>
           fontSize: (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
               .clamp(16.0, 28.0),
           fontWeight: FontWeight.bold,
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
         ),
         contentTextStyle: TextStyle(
           color: Provider.of<ThemeSettings>(context).dialogTextColor,
           fontSize: (16 * Provider.of<ThemeSettings>(context).fontSizeScale)
               .clamp(12.0, 24.0),
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
         ),
         title: Text('お疲れ様でした！'),
         content: Text('機械をアフターパージに設定してください。\n焙煎時間の記録ができます。'),
@@ -766,11 +770,18 @@ class _RoastTimerPageState extends State<RoastTimerPage>
 
   @override
   Widget build(BuildContext context) {
+    final themeSettings = Provider.of<ThemeSettings>(context);
     // 手動入力画面
     if (_mode == RoastMode.inputManualTime) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('焙煎時間入力'),
+          title: Text(
+            '焙煎時間入力',
+            style: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+            ),
+          ),
           leading: widget.showBackButton
               ? IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -823,6 +834,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).fontColor1,
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
                           ),
                         ),
                         SizedBox(height: kIsWeb ? 32 : 20),
@@ -850,6 +864,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               color: Provider.of<ThemeSettings>(
                                 context,
                               ).inputTextColor,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                             decoration: InputDecoration(
                               prefixIcon: Icon(
@@ -863,11 +880,17 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).inputTextColor,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                               hintStyle: TextStyle(
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).inputTextColor.withValues(alpha: 0.6),
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.symmetric(
@@ -895,6 +918,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -935,6 +961,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -991,6 +1020,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               textStyle: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -1013,7 +1045,13 @@ class _RoastTimerPageState extends State<RoastTimerPage>
     if (_mode == RoastMode.inputRecommended) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('おすすめ焙煎入力'),
+          title: Text(
+            'おすすめ焙煎入力',
+            style: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+            ),
+          ),
           leading: widget.showBackButton
               ? IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -1062,6 +1100,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).fontColor1,
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
                           ),
                         ),
                         SizedBox(height: kIsWeb ? 32 : 24),
@@ -1090,13 +1131,30 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 horizontal: 16,
                                 vertical: 16,
                               ),
+                              labelStyle: TextStyle(
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                              ),
+                            ),
+                            style: TextStyle(
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                             initialValue: _selectedRecommendBean,
                             items: _recommendBeanList
                                 .map(
                                   (e) => DropdownMenuItem(
                                     value: e,
-                                    child: Text(e),
+                                    child: Text(
+                                      e,
+                                      style: TextStyle(
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -1136,13 +1194,30 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 horizontal: 16,
                                 vertical: 16,
                               ),
+                              labelStyle: TextStyle(
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                              ),
+                            ),
+                            style: TextStyle(
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                             initialValue: _selectedRecommendWeight,
                             items: _recommendWeightList
                                 .map(
                                   (e) => DropdownMenuItem(
                                     value: e,
-                                    child: Text('${e}g'),
+                                    child: Text(
+                                      '${e}g',
+                                      style: TextStyle(
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -1181,13 +1256,30 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 horizontal: 16,
                                 vertical: 16,
                               ),
+                              labelStyle: TextStyle(
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                              ),
+                            ),
+                            style: TextStyle(
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                             initialValue: _selectedRecommendRoast,
                             items: _recommendRoastList
                                 .map(
                                   (e) => DropdownMenuItem(
                                     value: e,
-                                    child: Text(e),
+                                    child: Text(
+                                      e,
+                                      style: TextStyle(
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
+                                      ),
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -1317,6 +1409,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -1339,6 +1434,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                             style: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                           ),
                         ],
@@ -1352,7 +1450,14 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               });
                             },
                             icon: Icon(Icons.arrow_back),
-                            label: Text('戻る'),
+                            label: Text(
+                              '戻る',
+                              style: TextStyle(
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -1397,7 +1502,13 @@ class _RoastTimerPageState extends State<RoastTimerPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('焙煎タイマー'),
+        title: Text(
+          '焙煎タイマー',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         leading: widget.showBackButton
             ? IconButton(
                 icon: Icon(Icons.arrow_back),
@@ -1457,6 +1568,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               color: Provider.of<ThemeSettings>(
                                 context,
                               ).fontColor1,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                           ),
                           SizedBox(height: kIsWeb ? 32 : 28),
@@ -1486,6 +1600,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                   color: Provider.of<ThemeSettings>(
                                     context,
                                   ).fontColor1,
+                                  fontFamily: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).fontFamily,
                                 ),
                               ),
                             ],
@@ -1518,6 +1635,10 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
+                                          fontFamily:
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontFamily,
                                         ),
                                       ),
                                       style: ElevatedButton.styleFrom(
@@ -1550,6 +1671,10 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
+                                          fontFamily:
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontFamily,
                                         ),
                                       ),
                                       style: ElevatedButton.styleFrom(
@@ -1595,6 +1720,10 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
+                                          fontFamily:
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontFamily,
                                         ),
                                       ),
                                       style: ElevatedButton.styleFrom(
@@ -1633,6 +1762,10 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
+                                              fontFamily:
+                                                  Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontFamily,
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
@@ -1679,6 +1812,10 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
+                                              fontFamily:
+                                                  Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontFamily,
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
@@ -1717,6 +1854,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                     style: ElevatedButton.styleFrom(
@@ -1757,6 +1897,9 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                   context,
                                 ).fontColor1,
                                 fontSize: 14,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                             ),
                           ),

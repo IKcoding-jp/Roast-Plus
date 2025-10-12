@@ -68,9 +68,7 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
   void _addLabel() async {
     // 入力値のバリデーション
     if (_hourController.text.isEmpty && _minuteController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('時間を入力してください'), backgroundColor: Colors.orange),
-      );
+      _showSnackBar('時間を入力してください', backgroundColor: Colors.orange);
       return;
     }
 
@@ -79,22 +77,12 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
 
     // 時間の範囲チェック
     if (hour < 0 || hour > 23) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('時間は0〜23の範囲で入力してください'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackBar('時間は0〜23の範囲で入力してください', backgroundColor: Colors.red);
       return;
     }
 
     if (minute < 0 || minute > 59) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('分は0〜59の範囲で入力してください'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackBar('分は0〜59の範囲で入力してください', backgroundColor: Colors.red);
       return;
     }
 
@@ -110,12 +98,7 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
 
     if (_labels.contains(label)) {
       debugPrint('ScheduleTimeLabelEditPage: ラベルが既に存在するため追加をスキップ');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('同じ時間のラベルが既に存在します'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      _showSnackBar('同じ時間のラベルが既に存在します', backgroundColor: Colors.orange);
       return;
     }
 
@@ -139,13 +122,16 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
     final parts = _labels[index].split(':');
     _hourController.text = parts[0];
     _minuteController.text = parts.length > 1 ? parts[1] : '';
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+    final fontFamily = themeSettings.fontFamily;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(
           '時間ラベルを編集',
           style: TextStyle(
-            color: Provider.of<ThemeSettings>(context).fontColor1,
+            color: themeSettings.fontColor1,
+            fontFamily: fontFamily,
           ),
         ),
         content: Row(
@@ -158,12 +144,14 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
                   signed: false,
                 ),
                 style: TextStyle(
-                  color: Provider.of<ThemeSettings>(context).fontColor1,
+                  color: themeSettings.fontColor1,
+                  fontFamily: fontFamily,
                 ),
                 decoration: InputDecoration(
                   labelText: '時',
                   labelStyle: TextStyle(
-                    color: Provider.of<ThemeSettings>(context).fontColor1,
+                    color: themeSettings.fontColor1,
+                    fontFamily: fontFamily,
                   ),
                   counterText: '',
                 ),
@@ -173,7 +161,8 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
             Text(
               ':',
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor1,
+                color: themeSettings.fontColor1,
+                fontFamily: fontFamily,
               ),
             ),
             SizedBox(width: 8),
@@ -185,12 +174,14 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
                   signed: false,
                 ),
                 style: TextStyle(
-                  color: Provider.of<ThemeSettings>(context).fontColor1,
+                  color: themeSettings.fontColor1,
+                  fontFamily: fontFamily,
                 ),
                 decoration: InputDecoration(
                   labelText: '分',
                   labelStyle: TextStyle(
-                    color: Provider.of<ThemeSettings>(context).fontColor1,
+                    color: themeSettings.fontColor1,
+                    fontFamily: fontFamily,
                   ),
                   counterText: '',
                 ),
@@ -204,7 +195,8 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
             child: Text(
               'キャンセル',
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor1,
+                color: themeSettings.fontColor1,
+                fontFamily: fontFamily,
               ),
             ),
           ),
@@ -213,12 +205,7 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
               // 入力値のバリデーション
               if (_hourController.text.isEmpty &&
                   _minuteController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('時間を入力してください'),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
+                _showSnackBar('時間を入力してください', backgroundColor: Colors.orange);
                 return;
               }
 
@@ -227,21 +214,17 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
 
               // 時間の範囲チェック
               if (hour < 0 || hour > 23) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('時間は0〜23の範囲で入力してください'),
-                    backgroundColor: Colors.red,
-                  ),
+                _showSnackBar(
+                  '時間は0〜23の範囲で入力してください',
+                  backgroundColor: Colors.red,
                 );
                 return;
               }
 
               if (minute < 0 || minute > 59) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('分は0〜59の範囲で入力してください'),
-                    backgroundColor: Colors.red,
-                  ),
+                _showSnackBar(
+                  '分は0〜59の範囲で入力してください',
+                  backgroundColor: Colors.red,
                 );
                 return;
               }
@@ -250,11 +233,9 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
                   '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 
               if (_labels.contains(newLabel) && _labels[index] != newLabel) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('同じ時間のラベルが既に存在します'),
-                    backgroundColor: Colors.orange,
-                  ),
+                _showSnackBar(
+                  '同じ時間のラベルが既に存在します',
+                  backgroundColor: Colors.orange,
                 );
                 return;
               }
@@ -274,7 +255,8 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
             child: Text(
               '保存',
               style: TextStyle(
-                color: Provider.of<ThemeSettings>(context).fontColor2,
+                color: themeSettings.fontColor2,
+                fontFamily: fontFamily,
               ),
             ),
           ),
@@ -304,678 +286,674 @@ class _ScheduleTimeLabelEditPageState extends State<ScheduleTimeLabelEditPage> {
     }
   }
 
+  void _showSnackBar(String message, {Color? backgroundColor}) {
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(fontFamily: themeSettings.fontFamily),
+        ),
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(
-              Icons.access_time,
-              color: Provider.of<ThemeSettings>(context).iconColor,
-            ),
-            SizedBox(width: 8),
-            Text(
-              '時間ラベル編集',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: true);
+    final fontFamily = themeSettings.fontFamily;
+    return DefaultTextStyle.merge(
+      style: TextStyle(fontFamily: fontFamily),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            children: [
+              Icon(Icons.access_time, color: themeSettings.iconColor),
+              SizedBox(width: 8),
+              Text(
+                '時間ラベル編集',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: fontFamily,
+                ),
               ),
-            ),
-            // グループ状態バッジを追加
-            Consumer<GroupProvider>(
-              builder: (context, groupProvider, _) {
-                if (groupProvider.groups.isNotEmpty) {
-                  return Container(
-                    margin: EdgeInsets.only(left: 12),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue.shade400),
-                    ),
-                    child: Icon(
-                      Icons.groups,
-                      size: 18,
-                      color: Colors.blue.shade700,
-                    ),
-                  );
-                } else {
-                  return SizedBox.shrink();
-                }
-              },
-            ),
-          ],
+              // グループ状態バッジを追加
+              Consumer<GroupProvider>(
+                builder: (context, groupProvider, _) {
+                  if (groupProvider.groups.isNotEmpty) {
+                    return Container(
+                      margin: EdgeInsets.only(left: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.blue.shade400),
+                      ),
+                      child: Icon(
+                        Icons.groups,
+                        size: 18,
+                        color: Colors.blue.shade700,
+                      ),
+                    );
+                  } else {
+                    return SizedBox.shrink();
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [],
+          backgroundColor: themeSettings.appBarColor,
+          elevation: 0,
+          iconTheme: IconThemeData(
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
-        actions: [],
-        backgroundColor: Provider.of<ThemeSettings>(context).appBarColor,
-        elevation: 0,
-        iconTheme: IconThemeData(
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-      ),
-      body: kIsWeb
-          ? Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 800),
-                child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        // 入力カード
-                        Card(
-                          elevation: 6,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          color: Provider.of<ThemeSettings>(
-                            context,
-                          ).cardBackgroundColor,
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '新しい時間ラベルを追加',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontColor1,
+        body: kIsWeb
+            ? Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 800),
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          // 入力カード
+                          Card(
+                            elevation: 6,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            color: themeSettings.cardBackgroundColor,
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '新しい時間ラベルを追加',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: themeSettings.fontColor1,
+                                      fontFamily: fontFamily,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _hourController,
-                                        keyboardType:
-                                            TextInputType.numberWithOptions(
-                                              decimal: false,
-                                              signed: false,
+                                  SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _hourController,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                decimal: false,
+                                                signed: false,
+                                              ),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: themeSettings.fontColor1,
+                                            fontFamily: fontFamily,
+                                          ),
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                              Icons.access_time,
+                                              color: themeSettings.iconColor,
                                             ),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Provider.of<ThemeSettings>(
-                                            context,
-                                          ).fontColor1,
+                                            labelText: '時',
+                                            labelStyle: TextStyle(
+                                              color: themeSettings.fontColor1,
+                                              fontFamily: fontFamily,
+                                            ),
+                                            filled: true,
+                                            fillColor: themeSettings
+                                                .inputBackgroundColor,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade300,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade300,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                color:
+                                                    themeSettings.buttonColor,
+                                                width: 2,
+                                              ),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                  horizontal: 14,
+                                                  vertical: 12,
+                                                ),
+                                            counterText: '',
+                                          ),
+                                          maxLength: 2,
                                         ),
-                                        decoration: InputDecoration(
-                                          prefixIcon: Icon(
-                                            Icons.access_time,
-                                            color: Provider.of<ThemeSettings>(
-                                              context,
-                                            ).iconColor,
-                                          ),
-                                          labelText: '時',
-                                          labelStyle: TextStyle(
-                                            color: Provider.of<ThemeSettings>(
-                                              context,
-                                            ).fontColor1,
-                                          ),
-                                          filled: true,
-                                          fillColor: Provider.of<ThemeSettings>(
-                                            context,
-                                          ).inputBackgroundColor,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade300,
-                                            ),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade300,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: Provider.of<ThemeSettings>(
-                                                context,
-                                              ).buttonColor,
-                                              width: 2,
-                                            ),
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 14,
-                                            vertical: 12,
-                                          ),
-                                          counterText: '',
-                                        ),
-                                        maxLength: 2,
                                       ),
-                                    ),
-                                    SizedBox(width: 12),
-                                    Text(
-                                      ':',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                        color: Provider.of<ThemeSettings>(
-                                          context,
-                                        ).fontColor1,
-                                      ),
-                                    ),
-                                    SizedBox(width: 12),
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _minuteController,
-                                        keyboardType:
-                                            TextInputType.numberWithOptions(
-                                              decimal: false,
-                                              signed: false,
-                                            ),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Provider.of<ThemeSettings>(
-                                            context,
-                                          ).fontColor1,
-                                        ),
-                                        decoration: InputDecoration(
-                                          labelText: '分',
-                                          labelStyle: TextStyle(
-                                            color: Provider.of<ThemeSettings>(
-                                              context,
-                                            ).fontColor1,
-                                          ),
-                                          filled: true,
-                                          fillColor: Provider.of<ThemeSettings>(
-                                            context,
-                                          ).inputBackgroundColor,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade300,
-                                            ),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade300,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: BorderSide(
-                                              color: Provider.of<ThemeSettings>(
-                                                context,
-                                              ).buttonColor,
-                                              width: 2,
-                                            ),
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 14,
-                                            vertical: 12,
-                                          ),
-                                          counterText: '',
-                                        ),
-                                        maxLength: 2,
-                                      ),
-                                    ),
-                                    SizedBox(width: 16),
-                                    ElevatedButton.icon(
-                                      onPressed: _addLabel,
-                                      icon: Icon(Icons.add, size: 20),
-                                      label: Text(
-                                        '追加',
+                                      SizedBox(width: 12),
+                                      Text(
+                                        ':',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                          fontSize: 20,
+                                          color: themeSettings.fontColor1,
+                                          fontFamily: fontFamily,
                                         ),
                                       ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            Theme.of(context)
-                                                .elevatedButtonTheme
-                                                .style
-                                                ?.backgroundColor
-                                                ?.resolve({}) ??
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                        foregroundColor:
-                                            Theme.of(context)
-                                                .elevatedButtonTheme
-                                                .style
-                                                ?.foregroundColor
-                                                ?.resolve({}) ??
-                                            Colors.white,
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 14,
-                                          horizontal: 24,
+                                      SizedBox(width: 12),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _minuteController,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                decimal: false,
+                                                signed: false,
+                                              ),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: themeSettings.fontColor1,
+                                            fontFamily: fontFamily,
+                                          ),
+                                          decoration: InputDecoration(
+                                            labelText: '分',
+                                            labelStyle: TextStyle(
+                                              color: themeSettings.fontColor1,
+                                              fontFamily: fontFamily,
+                                            ),
+                                            filled: true,
+                                            fillColor: themeSettings
+                                                .inputBackgroundColor,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade300,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey.shade300,
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                color:
+                                                    themeSettings.buttonColor,
+                                                width: 2,
+                                              ),
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                  horizontal: 14,
+                                                  vertical: 12,
+                                                ),
+                                            counterText: '',
+                                          ),
+                                          maxLength: 2,
                                         ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
+                                      ),
+                                      SizedBox(width: 16),
+                                      ElevatedButton.icon(
+                                        onPressed: _addLabel,
+                                        icon: Icon(Icons.add, size: 20),
+                                        label: Text(
+                                          '追加',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            fontFamily: fontFamily,
                                           ),
                                         ),
-                                        elevation: 4,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              Theme.of(context)
+                                                  .elevatedButtonTheme
+                                                  .style
+                                                  ?.backgroundColor
+                                                  ?.resolve({}) ??
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                          foregroundColor:
+                                              Theme.of(context)
+                                                  .elevatedButtonTheme
+                                                  .style
+                                                  ?.foregroundColor
+                                                  ?.resolve({}) ??
+                                              Colors.white,
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 14,
+                                            horizontal: 24,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          elevation: 4,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 24),
-                        // ラベルリスト
-                        Card(
-                          elevation: 6,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          color: Provider.of<ThemeSettings>(
-                            context,
-                          ).cardBackgroundColor,
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '時間ラベル一覧',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontColor1,
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                if (_labels.isEmpty)
-                                  Center(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(32),
-                                      child: Column(
-                                        children: [
-                                          Icon(
-                                            Icons.schedule,
-                                            size: 48,
-                                            color: Provider.of<ThemeSettings>(
-                                              context,
-                                            ).iconColor.withValues(alpha: 0.5),
-                                          ),
-                                          SizedBox(height: 16),
-                                          Text(
-                                            '時間ラベルがありません',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color:
-                                                  Provider.of<ThemeSettings>(
-                                                    context,
-                                                  ).fontColor1.withValues(
-                                                    alpha: 0.7,
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                          SizedBox(height: 24),
+                          // ラベルリスト
+                          Card(
+                            elevation: 6,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            color: themeSettings.cardBackgroundColor,
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '時間ラベル一覧',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: themeSettings.fontColor1,
+                                      fontFamily: fontFamily,
                                     ),
-                                  )
-                                else
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: _labels.length,
-                                    itemBuilder: (context, i) => Container(
-                                      margin: EdgeInsets.only(bottom: 12),
-                                      padding: EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: Provider.of<ThemeSettings>(
-                                          context,
-                                        ).inputBackgroundColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: Colors.grey.shade200,
+                                  ),
+                                  SizedBox(height: 16),
+                                  if (_labels.isEmpty)
+                                    Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(32),
+                                        child: Column(
+                                          children: [
+                                            Icon(
+                                              Icons.schedule,
+                                              size: 48,
+                                              color: themeSettings.iconColor
+                                                  .withValues(alpha: 0.5),
+                                            ),
+                                            SizedBox(height: 16),
+                                            Text(
+                                              '時間ラベルがありません',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: themeSettings.fontColor1
+                                                    .withValues(alpha: 0.7),
+                                                fontFamily: fontFamily,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Provider.of<ThemeSettings>(
-                                                    context,
-                                                  ).iconColor.withValues(
-                                                    alpha: 0.12,
-                                                  ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Icon(
-                                              Icons.access_time,
-                                              color: Provider.of<ThemeSettings>(
-                                                context,
-                                              ).iconColor,
-                                            ),
+                                    )
+                                  else
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: _labels.length,
+                                      itemBuilder: (context, i) => Container(
+                                        margin: EdgeInsets.only(bottom: 12),
+                                        padding: EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Provider.of<ThemeSettings>(
+                                            context,
+                                          ).inputBackgroundColor,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
                                           ),
-                                          SizedBox(width: 16),
-                                          Expanded(
-                                            child: Text(
-                                              _labels[i],
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
+                                          border: Border.all(
+                                            color: Colors.grey.shade200,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
                                                 color:
                                                     Provider.of<ThemeSettings>(
                                                       context,
-                                                    ).fontColor1,
+                                                    ).iconColor.withValues(
+                                                      alpha: 0.12,
+                                                    ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Icon(
+                                                Icons.access_time,
+                                                color:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).iconColor,
                                               ),
                                             ),
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                icon: Icon(
-                                                  Icons.edit,
+                                            SizedBox(width: 16),
+                                            Expanded(
+                                              child: Text(
+                                                _labels[i],
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
                                                   color:
-                                                      Provider.of<
-                                                            ThemeSettings
-                                                          >(context)
-                                                          .iconColor,
+                                                      themeSettings.fontColor1,
+                                                  fontFamily: fontFamily,
                                                 ),
-                                                onPressed: () => _editLabel(i),
-                                                tooltip: '編集',
                                               ),
-                                              IconButton(
-                                                icon: Icon(
-                                                  Icons.delete,
-                                                  color: Colors.red,
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                  icon: Icon(
+                                                    Icons.edit,
+                                                    color:
+                                                        Provider.of<
+                                                              ThemeSettings
+                                                            >(context)
+                                                            .iconColor,
+                                                  ),
+                                                  onPressed: () =>
+                                                      _editLabel(i),
+                                                  tooltip: '編集',
                                                 ),
-                                                onPressed: () =>
-                                                    _deleteLabel(i),
-                                                tooltip: '削除',
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                                IconButton(
+                                                  icon: Icon(
+                                                    Icons.delete,
+                                                    color: Colors.red,
+                                                  ),
+                                                  onPressed: () =>
+                                                      _deleteLabel(i),
+                                                  tooltip: '削除',
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          : Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // 入力カード
-                    Card(
-                      elevation: 6,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      color: Provider.of<ThemeSettings>(
-                        context,
-                      ).cardBackgroundColor,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _hourController,
-                                keyboardType: TextInputType.numberWithOptions(
-                                  decimal: false,
-                                  signed: false,
-                                ),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontColor1,
-                                ),
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.access_time,
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).iconColor,
-                                  ),
-                                  labelText: '時',
-                                  labelStyle: TextStyle(
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontColor1,
-                                  ),
-                                  filled: true,
-                                  fillColor: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).inputBackgroundColor,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).buttonColor,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 12,
-                                  ),
-                                  counterText: '',
-                                ),
-                                maxLength: 2,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              ':',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).fontColor1,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: TextField(
-                                controller: _minuteController,
-                                keyboardType: TextInputType.numberWithOptions(
-                                  decimal: false,
-                                  signed: false,
-                                ),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontColor1,
-                                ),
-                                decoration: InputDecoration(
-                                  labelText: '分',
-                                  labelStyle: TextStyle(
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontColor1,
-                                  ),
-                                  filled: true,
-                                  fillColor: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).inputBackgroundColor,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).buttonColor,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 12,
-                                  ),
-                                  counterText: '',
-                                ),
-                                maxLength: 2,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            ElevatedButton.icon(
-                              onPressed: _addLabel,
-                              icon: Icon(Icons.add, size: 20),
-                              label: Text(
-                                '追加',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context)
-                                        .elevatedButtonTheme
-                                        .style
-                                        ?.backgroundColor
-                                        ?.resolve({}) ??
-                                    Theme.of(context).colorScheme.primary,
-                                foregroundColor:
-                                    Theme.of(context)
-                                        .elevatedButtonTheme
-                                        .style
-                                        ?.foregroundColor
-                                        ?.resolve({}) ??
-                                    Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 14,
-                                  horizontal: 20,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                elevation: 4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    // ラベルリスト
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: _labels.length,
-                      itemBuilder: (context, i) => Card(
-                        elevation: 4,
+              )
+            : Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      // 入力カード
+                      Card(
+                        elevation: 6,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         color: Provider.of<ThemeSettings>(
                           context,
                         ).cardBackgroundColor,
-                        margin: EdgeInsets.only(bottom: 14),
-                        child: ListTile(
-                          leading: Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Provider.of<ThemeSettings>(
-                                context,
-                              ).iconColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.access_time,
-                              color: Provider.of<ThemeSettings>(
-                                context,
-                              ).iconColor,
-                            ),
-                          ),
-                          title: Text(
-                            _labels[i],
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Provider.of<ThemeSettings>(
-                                context,
-                              ).fontColor1,
-                            ),
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
                             children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.edit,
+                              Expanded(
+                                child: TextField(
+                                  controller: _hourController,
+                                  keyboardType: TextInputType.numberWithOptions(
+                                    decimal: false,
+                                    signed: false,
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontColor1,
+                                  ),
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.access_time,
+                                      color: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).iconColor,
+                                    ),
+                                    labelText: '時',
+                                    labelStyle: TextStyle(
+                                      color: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontColor1,
+                                    ),
+                                    filled: true,
+                                    fillColor: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).inputBackgroundColor,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).buttonColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
+                                    counterText: '',
+                                  ),
+                                  maxLength: 2,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                ':',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
                                   color: Provider.of<ThemeSettings>(
                                     context,
-                                  ).iconColor,
+                                  ).fontColor1,
                                 ),
-                                onPressed: () => _editLabel(i),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _deleteLabel(i),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: TextField(
+                                  controller: _minuteController,
+                                  keyboardType: TextInputType.numberWithOptions(
+                                    decimal: false,
+                                    signed: false,
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontColor1,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: '分',
+                                    labelStyle: TextStyle(
+                                      color: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontColor1,
+                                    ),
+                                    filled: true,
+                                    fillColor: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).inputBackgroundColor,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).buttonColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
+                                    counterText: '',
+                                  ),
+                                  maxLength: 2,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              ElevatedButton.icon(
+                                onPressed: _addLabel,
+                                icon: Icon(Icons.add, size: 20),
+                                label: Text(
+                                  '追加',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context)
+                                          .elevatedButtonTheme
+                                          .style
+                                          ?.backgroundColor
+                                          ?.resolve({}) ??
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context)
+                                          .elevatedButtonTheme
+                                          .style
+                                          ?.foregroundColor
+                                          ?.resolve({}) ??
+                                      Colors.white,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 20,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 4,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 20),
+                      // ラベルリスト
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: _labels.length,
+                        itemBuilder: (context, i) => Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          color: Provider.of<ThemeSettings>(
+                            context,
+                          ).cardBackgroundColor,
+                          margin: EdgeInsets.only(bottom: 14),
+                          child: ListTile(
+                            leading: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).iconColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.access_time,
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).iconColor,
+                              ),
+                            ),
+                            title: Text(
+                              _labels[i],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontColor1,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).iconColor,
+                                  ),
+                                  onPressed: () => _editLabel(i),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () => _deleteLabel(i),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }

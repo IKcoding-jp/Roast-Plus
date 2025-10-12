@@ -49,7 +49,13 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('テーマ設定'),
+          title: Text(
+            'テーマ設定',
+            style: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+            ),
+          ),
           backgroundColor: themeSettings.appBarColor,
         ),
         body: Container(
@@ -60,7 +66,13 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('テーマ設定'),
+        title: Text(
+          'テーマ設定',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         actions: [
           IconButton(

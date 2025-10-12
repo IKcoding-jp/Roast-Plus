@@ -263,6 +263,9 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
                         // 作業段階のドロップダウン
                         DropdownButtonFormField<WorkStage>(
                           initialValue: _selectedStage,
+                          style: TextStyle(
+                            fontFamily: themeSettings.fontFamily,
+                          ),
                           decoration: InputDecoration(
                             labelText: '作業段階を選択',
                             border: OutlineInputBorder(
@@ -270,16 +273,29 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
                             ),
                             filled: true,
                             fillColor: themeSettings.inputBackgroundColor,
+                            labelStyle: TextStyle(
+                              fontFamily: themeSettings.fontFamily,
+                            ),
                           ),
                           items: [
                             DropdownMenuItem<WorkStage>(
                               value: null,
-                              child: Text('作業段階を選択してください'),
+                              child: Text(
+                                '作業段階を選択してください',
+                                style: TextStyle(
+                                  fontFamily: themeSettings.fontFamily,
+                                ),
+                              ),
                             ),
                             ...WorkStage.values.map((stage) {
                               return DropdownMenuItem<WorkStage>(
                                 value: stage,
-                                child: Text(_getStageDisplayName(stage)),
+                                child: Text(
+                                  _getStageDisplayName(stage),
+                                  style: TextStyle(
+                                    fontFamily: themeSettings.fontFamily,
+                                  ),
+                                ),
                               );
                             }),
                           ],
@@ -310,6 +326,9 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
                           SizedBox(height: 8),
                           DropdownButtonFormField<WorkStatus>(
                             initialValue: _selectedStatus,
+                            style: TextStyle(
+                              fontFamily: themeSettings.fontFamily,
+                            ),
                             decoration: InputDecoration(
                               labelText: '作業状況を選択',
                               border: OutlineInputBorder(
@@ -317,19 +336,37 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
                               ),
                               filled: true,
                               fillColor: themeSettings.inputBackgroundColor,
+                              labelStyle: TextStyle(
+                                fontFamily: themeSettings.fontFamily,
+                              ),
                             ),
                             items: [
                               DropdownMenuItem(
                                 value: WorkStatus.before,
-                                child: Text('前'),
+                                child: Text(
+                                  '前',
+                                  style: TextStyle(
+                                    fontFamily: themeSettings.fontFamily,
+                                  ),
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: WorkStatus.inProgress,
-                                child: Text('途中'),
+                                child: Text(
+                                  '途中',
+                                  style: TextStyle(
+                                    fontFamily: themeSettings.fontFamily,
+                                  ),
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: WorkStatus.after,
-                                child: Text('済'),
+                                child: Text(
+                                  '済',
+                                  style: TextStyle(
+                                    fontFamily: themeSettings.fontFamily,
+                                  ),
+                                ),
                               ),
                             ],
                             onChanged: _canEdit

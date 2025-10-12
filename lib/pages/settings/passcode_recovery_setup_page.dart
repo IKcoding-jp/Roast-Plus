@@ -290,14 +290,25 @@ class _PasscodeRecoverySetupPageState extends State<PasscodeRecoverySetupPage> {
         SizedBox(height: 8),
         DropdownButtonFormField<String>(
           initialValue: _selectedQuestion,
+          style: TextStyle(
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+          ),
           decoration: InputDecoration(
             labelText: '質問を選択してください',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            labelStyle: TextStyle(
+              fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            ),
           ),
           items: _securityQuestions.map((String question) {
             return DropdownMenuItem<String>(
               value: question,
-              child: Text(question),
+              child: Text(
+                question,
+                style: TextStyle(
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                ),
+              ),
             );
           }).toList(),
           onChanged: (String? newValue) {

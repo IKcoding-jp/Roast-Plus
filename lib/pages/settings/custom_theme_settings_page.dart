@@ -24,7 +24,13 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
     final themeSettings = Provider.of<ThemeSettings>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('カスタム設定'),
+        title: Text(
+          'カスタム設定',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
       ),

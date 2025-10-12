@@ -110,6 +110,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final fontFamily = themeSettings.fontFamily;
 
     return Dialog(
       backgroundColor: themeSettings.dialogBackgroundColor,
@@ -119,324 +120,373 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
           maxWidth: kIsWeb ? 500 : MediaQuery.of(context).size.width * 0.9,
           maxHeight: kIsWeb ? 700 : MediaQuery.of(context).size.height * 0.8,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // ヘッダー
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: themeSettings.appBarColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+        child: DefaultTextStyle.merge(
+          style: TextStyle(fontFamily: fontFamily),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ヘッダー
+              Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: themeSettings.appBarColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit_note,
+                      color: themeSettings.appBarTextColor,
+                      size: 24,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        widget.memo == null ? 'メモを追加' : 'メモを編集',
+                        style: TextStyle(
+                          color: themeSettings.appBarTextColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: fontFamily,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: themeSettings.appBarTextColor,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.edit_note,
-                    color: themeSettings.appBarTextColor,
-                    size: 24,
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      widget.memo == null ? 'メモを追加' : 'メモを編集',
-                      style: TextStyle(
-                        color: themeSettings.appBarTextColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: themeSettings.appBarTextColor,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            ),
-            // フォーム
-            Flexible(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(kIsWeb ? 24 : 20),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 時間
-                      Text(
-                        '時間',
-                        style: TextStyle(
-                          color: themeSettings.fontColor1,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: _selectTime,
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            controller: _timeController,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              suffixIcon: Icon(Icons.access_time),
-                              labelText: '時間を選択',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return '時間を入力してください';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // 焙煎機オンチェックボックス
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _isRoasterOn,
-                            onChanged: (value) {
-                              setState(() {
-                                _isRoasterOn = value ?? false;
-                                if (_isRoasterOn) {
-                                  _isAfterPurge = false;
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            '焙煎機オン',
-                            style: TextStyle(
-                              color: themeSettings.fontColor1,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-
-                      // アフターパージチェックボックス
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _isAfterPurge,
-                            onChanged: (value) {
-                              setState(() {
-                                _isAfterPurge = value ?? false;
-                                if (_isAfterPurge) {
-                                  _isRoasterOn = false;
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            'アフターパージ',
-                            style: TextStyle(
-                              color: themeSettings.fontColor1,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-
-                      // 豆の名前（焙煎機オンでもアフターパージでもない場合のみ表示）
-                      if (!_isAfterPurge && !_isRoasterOn) ...[
+              // フォーム
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(kIsWeb ? 24 : 20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 時間
                         Text(
-                          '豆の名前（任意）',
+                          '時間',
                           style: TextStyle(
                             color: themeSettings.fontColor1,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            fontFamily: fontFamily,
                           ),
                         ),
                         SizedBox(height: 8),
-                        TextFormField(
-                          controller: _beanNameController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        GestureDetector(
+                          onTap: _selectTime,
+                          child: AbsorbPointer(
+                            child: TextFormField(
+                              controller: _timeController,
+                              style: TextStyle(
+                                color: themeSettings.fontColor1,
+                                fontFamily: fontFamily,
+                              ),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                suffixIcon: Icon(Icons.access_time),
+                                labelText: '時間を選択',
+                                labelStyle: TextStyle(fontFamily: fontFamily),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return '時間を入力してください';
+                                }
+                                return null;
+                              },
                             ),
-                            labelText: '豆の名前',
                           ),
                         ),
                         SizedBox(height: 16),
 
-                        // 重さと袋数
+                        // 焙煎機オンチェックボックス
                         Row(
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '重さ（g）',
-                                    style: TextStyle(
-                                      color: themeSettings.fontColor1,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  TextFormField(
-                                    controller: _weightController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      labelText: '重さ',
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                  ),
-                                ],
-                              ),
+                            Checkbox(
+                              value: _isRoasterOn,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isRoasterOn = value ?? false;
+                                  if (_isRoasterOn) {
+                                    _isAfterPurge = false;
+                                  }
+                                });
+                              },
                             ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '袋数',
-                                    style: TextStyle(
-                                      color: themeSettings.fontColor1,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  TextFormField(
-                                    controller: _quantityController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      labelText: '袋数',
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                  ),
-                                ],
+                            Text(
+                              '焙煎機オン',
+                              style: TextStyle(
+                                color: themeSettings.fontColor1,
+                                fontSize: 16,
+                                fontFamily: fontFamily,
                               ),
                             ),
                           ],
                         ),
                         SizedBox(height: 16),
 
-                        // 焙煎度合い
-                        Text(
-                          '焙煎度合い（任意）',
-                          style: TextStyle(
-                            color: themeSettings.fontColor1,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          initialValue: _selectedRoastLevel,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        // アフターパージチェックボックス
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _isAfterPurge,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isAfterPurge = value ?? false;
+                                  if (_isAfterPurge) {
+                                    _isRoasterOn = false;
+                                  }
+                                });
+                              },
                             ),
-                            labelText: '焙煎度合いを選択',
-                          ),
-                          items: _roastLevels.map((level) {
-                            return DropdownMenuItem(
-                              value: level,
-                              child: Text(level),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedRoastLevel = value;
-                            });
-                          },
-                        ),
-                      ] else ...[
-                        // 焙煎機オンまたはアフターパージの場合
-                        Container(
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: (_isAfterPurge ? Colors.blue : Colors.orange)
-                                .withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color:
-                                  (_isAfterPurge ? Colors.blue : Colors.orange)
-                                      .withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                _isAfterPurge
-                                    ? Icons.ac_unit
-                                    : Icons.local_fire_department,
-                                color: _isAfterPurge
-                                    ? Colors.blue
-                                    : Colors.orange,
+                            Text(
+                              'アフターパージ',
+                              style: TextStyle(
+                                color: themeSettings.fontColor1,
+                                fontSize: 16,
+                                fontFamily: fontFamily,
                               ),
-                              SizedBox(width: 12),
-                              Text(
-                                _isAfterPurge ? 'アフターパージ' : '焙煎機オン',
-                                style: TextStyle(
-                                  color: _isAfterPurge
-                                      ? Colors.blue
-                                      : Colors.orange,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+
+                        // 豆の名前（焙煎機オンでもアフターパージでもない場合のみ表示）
+                        if (!_isAfterPurge && !_isRoasterOn) ...[
+                          Text(
+                            '豆の名前（任意）',
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: fontFamily,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          TextFormField(
+                            controller: _beanNameController,
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontFamily: fontFamily,
+                            ),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              labelText: '豆の名前',
+                              labelStyle: TextStyle(fontFamily: fontFamily),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+
+                          // 重さと袋数
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '重さ（g）',
+                                      style: TextStyle(
+                                        color: themeSettings.fontColor1,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: fontFamily,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    TextFormField(
+                                      controller: _weightController,
+                                      style: TextStyle(
+                                        color: themeSettings.fontColor1,
+                                        fontFamily: fontFamily,
+                                      ),
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        labelText: '重さ',
+                                        labelStyle: TextStyle(
+                                          fontFamily: fontFamily,
+                                        ),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '袋数',
+                                      style: TextStyle(
+                                        color: themeSettings.fontColor1,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: fontFamily,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    TextFormField(
+                                      controller: _quantityController,
+                                      style: TextStyle(
+                                        color: themeSettings.fontColor1,
+                                        fontFamily: fontFamily,
+                                      ),
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        labelText: '袋数',
+                                        labelStyle: TextStyle(
+                                          fontFamily: fontFamily,
+                                        ),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                          SizedBox(height: 16),
+
+                          // 焙煎度合い
+                          Text(
+                            '焙煎度合い（任意）',
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: fontFamily,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          DropdownButtonFormField<String>(
+                            value: _selectedRoastLevel,
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontFamily: fontFamily,
+                            ),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              labelText: '焙煎度合いを選択',
+                              labelStyle: TextStyle(fontFamily: fontFamily),
+                            ),
+                            items: _roastLevels.map((level) {
+                              return DropdownMenuItem(
+                                value: level,
+                                child: Text(level),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedRoastLevel = value;
+                              });
+                            },
+                          ),
+                        ] else ...[
+                          // 焙煎機オンまたはアフターパージの場合
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color:
+                                  (_isAfterPurge ? Colors.blue : Colors.orange)
+                                      .withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color:
+                                    (_isAfterPurge
+                                            ? Colors.blue
+                                            : Colors.orange)
+                                        .withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _isAfterPurge
+                                      ? Icons.ac_unit
+                                      : Icons.local_fire_department,
+                                  color: _isAfterPurge
+                                      ? Colors.blue
+                                      : Colors.orange,
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  _isAfterPurge ? 'アフターパージ' : '焙煎機オン',
+                                  style: TextStyle(
+                                    color: _isAfterPurge
+                                        ? Colors.blue
+                                        : Colors.orange,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: fontFamily,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            // ボタン
-            Container(
-              padding: EdgeInsets.all(kIsWeb ? 24 : 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _saveMemo,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: themeSettings.appButtonColor,
-                        foregroundColor: themeSettings.fontColor2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+              // ボタン
+              Container(
+                padding: EdgeInsets.all(kIsWeb ? 24 : 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _saveMemo,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: themeSettings.appButtonColor,
+                          foregroundColor: themeSettings.fontColor2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 16),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: Text(
-                        '保存',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                        child: Text(
+                          '保存',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: fontFamily,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

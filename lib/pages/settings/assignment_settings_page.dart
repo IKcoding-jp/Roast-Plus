@@ -59,9 +59,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: true);
+    final fontFamily = themeSettings.fontFamily;
     if (!_prefsLoaded) {
       return Scaffold(
-        appBar: AppBar(title: Text('設定')),
+        appBar: AppBar(
+          title: Text('担当表設定', style: TextStyle(fontFamily: fontFamily)),
+          backgroundColor: themeSettings.appBarColor,
+          foregroundColor: themeSettings.appBarTextColor,
+        ),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -69,16 +75,13 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Icon(
-              Icons.settings,
-              color: Provider.of<ThemeSettings>(context).iconColor,
-            ),
+            Icon(Icons.settings, color: themeSettings.iconColor),
             SizedBox(width: 8),
-            Text('担当表設定'),
+            Text('担当表設定', style: TextStyle(fontFamily: fontFamily)),
           ],
         ),
-        backgroundColor: Provider.of<ThemeSettings>(context).appBarColor,
-        foregroundColor: Colors.white,
+        backgroundColor: themeSettings.appBarColor,
+        foregroundColor: themeSettings.appBarTextColor,
         elevation: 0,
       ),
       body: Container(
@@ -96,9 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  color: Provider.of<ThemeSettings>(
-                    context,
-                  ).cardBackgroundColor,
+                  color: themeSettings.cardBackgroundColor,
                   child: Padding(
                     padding: EdgeInsets.all(kIsWeb ? 28 : 24),
                     child: Column(
@@ -109,16 +110,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             Container(
                               padding: EdgeInsets.all(kIsWeb ? 10 : 8),
                               decoration: BoxDecoration(
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).iconColor.withValues(alpha: 0.12),
+                                color: themeSettings.iconColor.withValues(
+                                  alpha: 0.12,
+                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
                                 Icons.developer_mode,
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).iconColor,
+                                color: themeSettings.iconColor,
                                 size: kIsWeb ? 28 : 24,
                               ),
                             ),
@@ -132,9 +131,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                     style: TextStyle(
                                       fontSize: kIsWeb ? 20 : 18,
                                       fontWeight: FontWeight.bold,
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontColor1,
+                                      color: themeSettings.fontColor1,
+                                      fontFamily: fontFamily,
                                     ),
                                   ),
                                   SizedBox(height: 2),
@@ -142,9 +140,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                     '開発者向けの機能を有効にします',
                                     style: TextStyle(
                                       fontSize: kIsWeb ? 16 : 14,
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontColor1.withValues(alpha: 0.7),
+                                      color: themeSettings.fontColor1
+                                          .withValues(alpha: 0.7),
+                                      fontFamily: fontFamily,
                                     ),
                                   ),
                                 ],
@@ -153,9 +151,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             Switch(
                               value: developerMode,
                               onChanged: _toggleDevMode,
-                              activeThumbColor: Provider.of<ThemeSettings>(
-                                context,
-                              ).buttonColor,
+                              activeThumbColor: themeSettings.buttonColor,
                             ),
                           ],
                         ),
@@ -169,9 +165,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  color: Provider.of<ThemeSettings>(
-                    context,
-                  ).cardBackgroundColor,
+                  color: themeSettings.cardBackgroundColor,
                   child: Padding(
                     padding: EdgeInsets.all(kIsWeb ? 28 : 24),
                     child: Column(
@@ -182,16 +176,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             Container(
                               padding: EdgeInsets.all(kIsWeb ? 10 : 8),
                               decoration: BoxDecoration(
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).iconColor.withValues(alpha: 0.12),
+                                color: themeSettings.iconColor.withValues(
+                                  alpha: 0.12,
+                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
                                 Icons.refresh,
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).iconColor,
+                                color: themeSettings.iconColor,
                                 size: kIsWeb ? 28 : 24,
                               ),
                             ),
@@ -205,9 +197,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                     style: TextStyle(
                                       fontSize: kIsWeb ? 20 : 18,
                                       fontWeight: FontWeight.bold,
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontColor1,
+                                      color: themeSettings.fontColor1,
+                                      fontFamily: fontFamily,
                                     ),
                                   ),
                                   SizedBox(height: 2),
@@ -215,9 +206,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                     'すでに決定した今日の担当をリセットします',
                                     style: TextStyle(
                                       fontSize: kIsWeb ? 16 : 14,
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontColor1.withValues(alpha: 0.7),
+                                      color: themeSettings.fontColor1
+                                          .withValues(alpha: 0.7),
+                                      fontFamily: fontFamily,
                                     ),
                                   ),
                                 ],
@@ -230,12 +221,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             icon: Icon(Icons.refresh),
-                            label: Text('今日の担当リセット'),
+                            label: Text(
+                              '今日の担当リセット',
+                              style: TextStyle(fontFamily: fontFamily),
+                            ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Provider.of<ThemeSettings>(
-                                context,
-                              ).buttonColor,
-                              foregroundColor: Colors.white,
+                              backgroundColor: themeSettings.buttonColor,
+                              foregroundColor: themeSettings.fontColor2,
                               elevation: 2,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -243,11 +235,17 @@ class _SettingsPageState extends State<SettingsPage> {
                               padding: EdgeInsets.symmetric(
                                 vertical: kIsWeb ? 16 : 14,
                               ),
+                              textStyle: TextStyle(fontFamily: fontFamily),
                             ),
                             onPressed: () {
                               widget.onReset();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('リセットしました')),
+                                SnackBar(
+                                  content: Text(
+                                    'リセットしました',
+                                    style: TextStyle(fontFamily: fontFamily),
+                                  ),
+                                ),
                               );
                               Navigator.pop(context);
                             },

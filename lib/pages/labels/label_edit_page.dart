@@ -512,7 +512,12 @@ class LabelEditPageState extends State<LabelEditPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text('担当ラベル編集'),
+            Text(
+              '担当ラベル編集',
+              style: TextStyle(
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+              ),
+            ),
             Consumer<GroupProvider>(
               builder: (context, groupProvider, _) {
                 if (groupProvider.groups.isNotEmpty) {
@@ -580,6 +585,9 @@ class LabelEditPageState extends State<LabelEditPage> {
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1,
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
                               ),
                             ),
                           ],
@@ -599,6 +607,9 @@ class LabelEditPageState extends State<LabelEditPage> {
                                       color: Provider.of<ThemeSettings>(
                                         context,
                                       ).fontColor1,
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
                                     ),
                                     decoration: InputDecoration(
                                       labelText: '左ラベル',
@@ -606,6 +617,9 @@ class LabelEditPageState extends State<LabelEditPage> {
                                         color: Provider.of<ThemeSettings>(
                                           context,
                                         ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -631,6 +645,9 @@ class LabelEditPageState extends State<LabelEditPage> {
                                       color: Provider.of<ThemeSettings>(
                                         context,
                                       ).fontColor1,
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
                                     ),
                                     decoration: InputDecoration(
                                       labelText: '右ラベル',
@@ -638,6 +655,9 @@ class LabelEditPageState extends State<LabelEditPage> {
                                         color: Provider.of<ThemeSettings>(
                                           context,
                                         ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -670,7 +690,14 @@ class LabelEditPageState extends State<LabelEditPage> {
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             icon: Icon(Icons.add),
-                            label: Text('ラベルを追加'),
+                            label: Text(
+                              'ラベルを追加',
+                              style: TextStyle(
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                              ),
+                            ),
                             onPressed: _addLabel,
                             style: ElevatedButton.styleFrom(
                               backgroundColor:

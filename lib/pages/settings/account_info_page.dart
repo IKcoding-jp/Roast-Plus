@@ -84,14 +84,25 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('表示名を編集'),
+        title: Text(
+          '表示名を編集',
+          style: TextStyle(
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            fontSize: 18 * Provider.of<ThemeSettings>(context).fontSizeScale,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Googleアカウント名から変更を推奨します。',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: TextStyle(
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                fontSize:
+                    14 * Provider.of<ThemeSettings>(context).fontSizeScale,
+                color: Colors.grey[600],
+              ),
             ),
             SizedBox(height: 16),
             TextField(
@@ -107,11 +118,25 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('キャンセル'),
+            child: Text(
+              'キャンセル',
+              style: TextStyle(
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                fontSize:
+                    16 * Provider.of<ThemeSettings>(context).fontSizeScale,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: Text('保存'),
+            child: Text(
+              '保存',
+              style: TextStyle(
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                fontSize:
+                    16 * Provider.of<ThemeSettings>(context).fontSizeScale,
+              ),
+            ),
           ),
         ],
       ),
@@ -230,7 +255,16 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('アカウント情報')),
+      appBar: AppBar(
+        title: Text(
+          'アカウント情報',
+          style: TextStyle(
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            fontSize: (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
+                .clamp(16.0, 28.0),
+          ),
+        ),
+      ),
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Center(
@@ -293,9 +327,19 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                   child: Text(
                                                     _userName!,
                                                     style: TextStyle(
+                                                      fontFamily:
+                                                          Provider.of<
+                                                                ThemeSettings
+                                                              >(context)
+                                                              .fontFamily,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontSize: 18,
+                                                      fontSize:
+                                                          18 *
+                                                          Provider.of<
+                                                                ThemeSettings
+                                                              >(context)
+                                                              .fontSizeScale,
                                                       color:
                                                           Provider.of<
                                                                 ThemeSettings
@@ -330,6 +374,15 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                             Text(
                                               'ログイン済み',
                                               style: TextStyle(
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
+                                                fontSize:
+                                                    14 *
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontSizeScale,
                                                 fontWeight: FontWeight.bold,
                                                 color:
                                                     Provider.of<ThemeSettings>(
@@ -360,10 +413,20 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                     child: Text(
                                                       '開発者',
                                                       style: TextStyle(
+                                                        fontFamily:
+                                                            Provider.of<
+                                                                  ThemeSettings
+                                                                >(context)
+                                                                .fontFamily,
                                                         color: Colors.white,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 12,
+                                                        fontSize:
+                                                            12 *
+                                                            Provider.of<
+                                                                  ThemeSettings
+                                                                >(context)
+                                                                .fontSizeScale,
                                                       ),
                                                     ),
                                                   ),
@@ -388,7 +451,20 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                 ?.resolve({}) ??
                                             Colors.white,
                                       ),
-                                      label: Text('ログアウト'),
+                                      label: Text(
+                                        'ログアウト',
+                                        style: TextStyle(
+                                          fontFamily:
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontFamily,
+                                          fontSize:
+                                              16 *
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontSizeScale,
+                                        ),
+                                      ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             Theme.of(context)
@@ -503,7 +579,20 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                         Icons.delete_forever,
                                         color: Colors.red,
                                       ),
-                                      label: Text('アカウントデータ全削除'),
+                                      label: Text(
+                                        'アカウントデータ全削除',
+                                        style: TextStyle(
+                                          fontFamily:
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontFamily,
+                                          fontSize:
+                                              16 *
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontSizeScale,
+                                        ),
+                                      ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white,
                                         foregroundColor: Colors.red,
@@ -544,9 +633,37 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                               final confirm = await showDialog<bool>(
                                                 context: context,
                                                 builder: (context) => AlertDialog(
-                                                  title: Text('本当に削除しますか？'),
+                                                  title: Text(
+                                                    '本当に削除しますか？',
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          Provider.of<
+                                                                ThemeSettings
+                                                              >(context)
+                                                              .fontFamily,
+                                                      fontSize:
+                                                          18 *
+                                                          Provider.of<
+                                                                ThemeSettings
+                                                              >(context)
+                                                              .fontSizeScale,
+                                                    ),
+                                                  ),
                                                   content: Text(
                                                     'アカウントに保存された全てのデータ（グループデータを除く）を完全に削除します。\nこの操作は元に戻せません。',
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          Provider.of<
+                                                                ThemeSettings
+                                                              >(context)
+                                                              .fontFamily,
+                                                      fontSize:
+                                                          14 *
+                                                          Provider.of<
+                                                                ThemeSettings
+                                                              >(context)
+                                                              .fontSizeScale,
+                                                    ),
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -555,7 +672,22 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                             context,
                                                             false,
                                                           ),
-                                                      child: Text('キャンセル'),
+                                                      child: Text(
+                                                        'キャンセル',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontFamily,
+                                                          fontSize:
+                                                              16 *
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontSizeScale,
+                                                        ),
+                                                      ),
                                                     ),
                                                     ElevatedButton(
                                                       style:
@@ -570,7 +702,22 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                             context,
                                                             true,
                                                           ),
-                                                      child: Text('削除する'),
+                                                      child: Text(
+                                                        '削除する',
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontFamily,
+                                                          fontSize:
+                                                              16 *
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontSizeScale,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -657,11 +804,19 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                         child: Text(
                                           '未ログイン',
                                           style: TextStyle(
+                                            fontFamily:
+                                                Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontFamily,
                                             fontWeight: FontWeight.bold,
                                             color: Provider.of<ThemeSettings>(
                                               context,
                                             ).fontColor1,
-                                            fontSize: 16,
+                                            fontSize:
+                                                16 *
+                                                Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontSizeScale,
                                           ),
                                         ),
                                       ),
@@ -674,7 +829,20 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                         'assets/google_logo.png',
                                         height: 24,
                                       ),
-                                      label: const Text('Googleでログイン'),
+                                      label: Text(
+                                        'Googleでログイン',
+                                        style: TextStyle(
+                                          fontFamily:
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontFamily,
+                                          fontSize:
+                                              16 *
+                                              Provider.of<ThemeSettings>(
+                                                context,
+                                              ).fontSizeScale,
+                                        ),
+                                      ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white,
                                         foregroundColor:

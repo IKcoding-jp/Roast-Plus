@@ -1731,12 +1731,27 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Text('エラー'),
-          content: Text('シャッフルするには2つ以上の班が必要です。'),
+          title: Text(
+            'エラー',
+            style: TextStyle(
+              fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            ),
+          ),
+          content: Text(
+            'シャッフルするには2つ以上の班が必要です。',
+            style: TextStyle(
+              fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                ),
+              ),
             ),
           ],
         ),
@@ -2064,6 +2079,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Provider.of<ThemeSettings>(context).fontColor1,
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
                     ),
                   ),
                 ],
@@ -2145,7 +2163,19 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           children: [
             Icon(Icons.group, color: themeSettings.iconColor),
             SizedBox(width: 8),
-            Flexible(child: Text('担当表', overflow: TextOverflow.ellipsis)),
+            Flexible(
+              child: Text(
+                '担当表',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: (20 * themeSettings.fontSizeScale).clamp(
+                    16.0,
+                    28.0,
+                  ),
+                ),
+              ),
+            ),
             // グループ状態バッジを追加
             if (groupProvider.groups.isNotEmpty)
               Container(
@@ -2267,7 +2297,19 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           children: [
             Icon(Icons.group, color: themeSettings.iconColor),
             SizedBox(width: 8),
-            Flexible(child: Text('担当表', overflow: TextOverflow.ellipsis)),
+            Flexible(
+              child: Text(
+                '担当表',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: (20 * themeSettings.fontSizeScale).clamp(
+                    16.0,
+                    28.0,
+                  ),
+                ),
+              ),
+            ),
             // グループ状態バッジを追加
             if (groupProvider.groups.isNotEmpty)
               Container(
@@ -2388,7 +2430,19 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           children: [
             Icon(Icons.group, color: themeSettings.iconColor),
             SizedBox(width: 8),
-            Flexible(child: Text('担当表', overflow: TextOverflow.ellipsis)),
+            Flexible(
+              child: Text(
+                '担当表',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: (20 * themeSettings.fontSizeScale).clamp(
+                    16.0,
+                    28.0,
+                  ),
+                ),
+              ),
+            ),
             // グループ状態バッジを追加
             if (groupProvider.groups.isNotEmpty)
               Container(
@@ -2530,6 +2584,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                           fontWeight: FontWeight.bold,
                           fontSize: 24 * themeSettings.fontSizeScale,
                           color: themeSettings.fontColor1,
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
                         ),
                       ),
                     ),
@@ -2624,6 +2681,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                                       ? 1.1
                                       : 1.0),
                               color: themeSettings.fontColor1,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -2694,6 +2754,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                             fontWeight: FontWeight.bold,
                             fontSize: 20 * WebUIUtils.getFontSizeScale(context),
                             color: themeSettings.fontColor1,
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
                           ),
                         ),
                       ),
@@ -2761,6 +2824,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                             fontWeight: FontWeight.bold,
                             fontSize: 20 * WebUIUtils.getFontSizeScale(context),
                             color: themeSettings.fontColor1,
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
                           ),
                         ),
                       ),
@@ -2853,6 +2919,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 fontWeight: FontWeight.bold,
                 fontSize: (isSmallMobile ? 14 : 16) * (isTablet ? 1.1 : 1.0),
                 color: themeSettings.fontColor1,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ),
@@ -2890,6 +2957,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 fontWeight: FontWeight.bold,
                 fontSize: (isSmallMobile ? 14 : 16) * (isTablet ? 1.1 : 1.0),
                 color: themeSettings.fontColor1,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
           ),
@@ -2923,6 +2991,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   20 * // タブレット版レイアウトを統一使用
                   (isTabletLocal ? 1.1 : 1.0),
               color: themeSettings.fontColor1,
+              fontFamily: themeSettings.fontFamily,
             ),
           ),
         ),
@@ -2966,6 +3035,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   20 * // タブレット版レイアウトを統一使用
                   (isTabletLocal ? 1.1 : 1.0),
               color: themeSettings.fontColor1,
+              fontFamily: themeSettings.fontFamily,
             ),
           ),
         ),
@@ -3003,6 +3073,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                         fontWeight: FontWeight.bold,
                         fontSize: 16 * themeSettings.fontSizeScale,
                         color: themeSettings.fontColor1,
+                        fontFamily: Provider.of<ThemeSettings>(
+                          context,
+                        ).fontFamily,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -3063,6 +3136,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     fontWeight: FontWeight.bold,
                     fontSize: 18 * themeSettings.fontSizeScale,
                     color: themeSettings.fontColor1,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
                 ),
               ),
@@ -3103,6 +3177,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     fontWeight: FontWeight.bold,
                     fontSize: 18 * themeSettings.fontSizeScale,
                     color: themeSettings.fontColor1,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
                 ),
               ),
@@ -3140,6 +3215,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     fontWeight: FontWeight.bold,
                     fontSize: 13 * themeSettings.fontSizeScale,
                     color: themeSettings.fontColor1,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
                   overflow: TextOverflow.visible,
                   maxLines: 2,
@@ -3183,6 +3259,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     fontWeight: FontWeight.bold,
                     fontSize: 13 * themeSettings.fontSizeScale,
                     color: themeSettings.fontColor1,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
                   overflow: TextOverflow.visible,
                   maxLines: 2,
@@ -3207,7 +3284,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 padding: EdgeInsets.only(bottom: 8),
                 child: Text(
                   'デバッグ: 編集権限=$_canEditAssignment',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
                 ),
               ),
             SizedBox(
@@ -3227,7 +3308,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     if (isShuffling) return 'シャッフル中...';
                     return '今日の担当を決める';
                   }(),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
                 ),
               ),
             ),
@@ -3254,7 +3339,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 padding: EdgeInsets.only(bottom: 8),
                 child: Text(
                   'デバッグ: 編集権限=$_canEditAssignment',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
                 ),
               ),
             SizedBox(
@@ -3278,6 +3367,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   style: TextStyle(
                     fontSize: 16, // タブレット版レイアウトを統一使用
                     fontWeight: FontWeight.bold,
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
                 ),
               ),
@@ -3673,6 +3763,7 @@ class _MemberCardState extends State<MemberCard> {
                 fontSize: fontSize,
                 fontWeight: FontWeight.bold,
                 color: textColor,
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,

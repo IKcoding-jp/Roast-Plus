@@ -180,6 +180,9 @@ ${_messageController.text.trim()}
                           SizedBox(height: 8),
                           DropdownButtonFormField<String>(
                             initialValue: _selectedCategory,
+                            style: TextStyle(
+                              fontFamily: themeSettings.fontFamily,
+                            ),
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -194,6 +197,7 @@ ${_messageController.text.trim()}
                                   category,
                                   style: TextStyle(
                                     color: themeSettings.fontColor1,
+                                    fontFamily: themeSettings.fontFamily,
                                   ),
                                 ),
                               );

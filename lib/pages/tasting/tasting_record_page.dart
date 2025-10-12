@@ -117,7 +117,13 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('試飲記録'),
+        title: Text(
+          '試飲記録',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
       ),

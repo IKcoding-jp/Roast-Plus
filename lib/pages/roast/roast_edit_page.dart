@@ -160,7 +160,14 @@ class _RoastEditPageState extends State<RoastEditPage> {
                     color: Provider.of<ThemeSettings>(context).iconColor,
                   ),
                   SizedBox(width: 8),
-                  Text('記録の編集'),
+                  Text(
+                    '記録の編集',
+                    style: TextStyle(
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -179,6 +186,9 @@ class _RoastEditPageState extends State<RoastEditPage> {
                     style: TextStyle(
                       color: Provider.of<ThemeSettings>(context).fontColor1,
                       fontSize: 16,
+                      fontFamily: Provider.of<ThemeSettings>(
+                        context,
+                      ).fontFamily,
                     ),
                   ),
                 ],
@@ -196,7 +206,12 @@ class _RoastEditPageState extends State<RoastEditPage> {
                   color: Provider.of<ThemeSettings>(context).iconColor,
                 ),
                 SizedBox(width: 8),
-                Text('記録の編集'),
+                Text(
+                  '記録の編集',
+                  style: TextStyle(
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
+                ),
               ],
             ),
             actions: [if (!canEdit) Icon(Icons.lock, color: Colors.orange)],
@@ -239,6 +254,9 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                       color: Colors.orange[800],
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
                                     ),
                                   ),
                                 ),
@@ -290,6 +308,9 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                       color: Provider.of<ThemeSettings>(
                                         context,
                                       ).fontColor1,
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
                                     ),
                                   ),
                                 ],
@@ -311,6 +332,11 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                   child: TextField(
                                     controller: _beanController,
                                     enabled: canEdit,
+                                    style: TextStyle(
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.symmetric(
@@ -323,6 +349,9 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                           context,
                                         ).fontColor1.withValues(alpha: 0.6),
                                         fontSize: 13,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                   ),
@@ -345,6 +374,11 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                   ),
                                   child: DropdownButtonFormField<String>(
                                     initialValue: _selectedWeight,
+                                    style: TextStyle(
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.symmetric(
@@ -357,13 +391,24 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                           context,
                                         ).fontColor1.withValues(alpha: 0.6),
                                         fontSize: 13,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                     items: ['200', '300', '500']
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e,
-                                            child: Text('${e}g'),
+                                            child: Text(
+                                              '${e}g',
+                                              style: TextStyle(
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
+                                              ),
+                                            ),
                                           ),
                                         )
                                         .toList(),
@@ -404,6 +449,12 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                                 signed: false,
                                               ),
                                           textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontFamily:
+                                                Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontFamily,
+                                          ),
                                           decoration: InputDecoration(
                                             border: InputBorder.none,
                                             contentPadding:
@@ -420,6 +471,10 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                                     alpha: 0.6,
                                                   ),
                                               fontSize: 13,
+                                              fontFamily:
+                                                  Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontFamily,
                                             ),
                                           ),
                                         ),
@@ -457,6 +512,12 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                                 signed: false,
                                               ),
                                           textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontFamily:
+                                                Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontFamily,
+                                          ),
                                           decoration: InputDecoration(
                                             border: InputBorder.none,
                                             contentPadding:
@@ -473,6 +534,10 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                                     alpha: 0.6,
                                                   ),
                                               fontSize: 13,
+                                              fontFamily:
+                                                  Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontFamily,
                                             ),
                                           ),
                                         ),
@@ -498,6 +563,11 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                   ),
                                   child: DropdownButtonFormField<String>(
                                     initialValue: _selectedRoast,
+                                    style: TextStyle(
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.symmetric(
@@ -510,13 +580,24 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                           context,
                                         ).fontColor1.withValues(alpha: 0.6),
                                         fontSize: 13,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                     items: ['浅煎り', '中煎り', '中深煎り', '深煎り']
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e,
-                                            child: Text(e),
+                                            child: Text(
+                                              e,
+                                              style: TextStyle(
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
+                                              ),
+                                            ),
                                           ),
                                         )
                                         .toList(),
@@ -547,6 +628,11 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                     controller: _memoController,
                                     enabled: canEdit,
                                     maxLines: 2,
+                                    style: TextStyle(
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.symmetric(
@@ -559,6 +645,9 @@ class _RoastEditPageState extends State<RoastEditPage> {
                                           context,
                                         ).fontColor1.withValues(alpha: 0.6),
                                         fontSize: 13,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                   ),
@@ -582,6 +671,9 @@ class _RoastEditPageState extends State<RoastEditPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
@@ -640,6 +732,7 @@ class _RoastEditPageState extends State<RoastEditPage> {
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: Provider.of<ThemeSettings>(context).fontColor1,
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),
             ),
           ],

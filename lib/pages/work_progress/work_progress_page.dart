@@ -1068,7 +1068,13 @@ class _WorkProgressPageState extends State<WorkProgressPage>
       appBar: AppBar(
         title: Row(
           children: [
-            Text('作業状況記録'),
+            Text(
+              '作業状況記録',
+              style: TextStyle(
+                fontFamily: themeSettings.fontFamily,
+                fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+              ),
+            ),
             Consumer<GroupProvider>(
               builder: (context, groupProvider, _) {
                 if (groupProvider.groups.isNotEmpty) {

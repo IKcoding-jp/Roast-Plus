@@ -560,6 +560,11 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                           ),
                         ),
                         child: DropdownButtonFormField<String>(
+                          style: TextStyle(
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.coffee,
@@ -571,12 +576,26 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                               horizontal: 16,
                               vertical: 16,
                             ),
+                            labelStyle: TextStyle(
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
+                            ),
                           ),
                           initialValue: _selectedRecommendBean,
                           items: _recommendBeanList
                               .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(
+                                    e,
+                                    style: TextStyle(
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
+                                  ),
+                                ),
                               )
                               .toList(),
                           onChanged: (v) {
@@ -604,6 +623,11 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                           ),
                         ),
                         child: DropdownButtonFormField<String>(
+                          style: TextStyle(
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.scale,
@@ -615,12 +639,26 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                               horizontal: 16,
                               vertical: 16,
                             ),
+                            labelStyle: TextStyle(
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
+                            ),
                           ),
                           initialValue: _selectedRecommendWeight,
                           items: _recommendWeightList
                               .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(
+                                    e,
+                                    style: TextStyle(
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
+                                  ),
+                                ),
                               )
                               .toList(),
                           onChanged: (v) {
@@ -647,6 +685,11 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                           ),
                         ),
                         child: DropdownButtonFormField<String>(
+                          style: TextStyle(
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.local_fire_department,
@@ -658,12 +701,26 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                               horizontal: 16,
                               vertical: 16,
                             ),
+                            labelStyle: TextStyle(
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
+                            ),
                           ),
                           initialValue: _selectedRecommendRoast,
                           items: _recommendRoastList
                               .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(
+                                    e,
+                                    style: TextStyle(
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
+                                  ),
+                                ),
                               )
                               .toList(),
                           onChanged: (v) {

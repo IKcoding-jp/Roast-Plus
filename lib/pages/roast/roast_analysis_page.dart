@@ -41,7 +41,15 @@ class RoastAnalysisPage extends StatelessWidget {
               color: Provider.of<ThemeSettings>(context).iconColor,
             ),
             SizedBox(width: 8),
-            Text('焙煎分析'),
+            Text(
+              '焙煎分析',
+              style: TextStyle(
+                fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                fontSize:
+                    (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
+                        .clamp(16.0, 28.0),
+              ),
+            ),
           ],
         ),
         backgroundColor: Provider.of<ThemeSettings>(context).appBarColor,
@@ -189,6 +197,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                     color: Provider.of<ThemeSettings>(
                                       context,
                                     ).fontColor1,
+                                    fontFamily: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).fontFamily,
                                   ),
                                 ),
                               ),
@@ -246,6 +257,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                         color: Provider.of<ThemeSettings>(
                                           context,
                                         ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                   ),
@@ -260,6 +274,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                         color: Provider.of<ThemeSettings>(
                                           context,
                                         ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                   ),
@@ -277,6 +294,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                         color: Provider.of<ThemeSettings>(
                                           context,
                                         ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                   ),
@@ -291,6 +311,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                         color: Provider.of<ThemeSettings>(
                                           context,
                                         ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                     ),
                                   ),
@@ -319,6 +342,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                         color: Provider.of<ThemeSettings>(
                                           context,
                                         ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
                                       ),
                                       stickerSize: 20.0,
                                     ),
@@ -347,7 +373,7 @@ class RoastAnalysisPage extends StatelessWidget {
                                               alpha: 0.08,
                                             ),
                                           ),
-                                          children: const [
+                                          children: [
                                             Padding(
                                               padding: EdgeInsets.symmetric(
                                                 vertical: 10,
@@ -359,6 +385,11 @@ class RoastAnalysisPage extends StatelessWidget {
                                                   fontWeight: FontWeight.bold,
                                                   color: brown,
                                                   fontSize: 15,
+                                                  fontFamily:
+                                                      Provider.of<
+                                                            ThemeSettings
+                                                          >(context)
+                                                          .fontFamily,
                                                 ),
                                               ),
                                             ),
@@ -373,6 +404,11 @@ class RoastAnalysisPage extends StatelessWidget {
                                                   fontWeight: FontWeight.bold,
                                                   color: brown,
                                                   fontSize: 15,
+                                                  fontFamily:
+                                                      Provider.of<
+                                                            ThemeSettings
+                                                          >(context)
+                                                          .fontFamily,
                                                 ),
                                               ),
                                             ),
@@ -387,6 +423,11 @@ class RoastAnalysisPage extends StatelessWidget {
                                                   fontWeight: FontWeight.bold,
                                                   color: brown,
                                                   fontSize: 15,
+                                                  fontFamily:
+                                                      Provider.of<
+                                                            ThemeSettings
+                                                          >(context)
+                                                          .fontFamily,
                                                 ),
                                               ),
                                             ),
@@ -401,6 +442,11 @@ class RoastAnalysisPage extends StatelessWidget {
                                                   fontWeight: FontWeight.bold,
                                                   color: brown,
                                                   fontSize: 15,
+                                                  fontFamily:
+                                                      Provider.of<
+                                                            ThemeSettings
+                                                          >(context)
+                                                          .fontFamily,
                                                 ),
                                               ),
                                             ),
@@ -456,6 +502,10 @@ class RoastAnalysisPage extends StatelessWidget {
                                             color: Provider.of<ThemeSettings>(
                                               context,
                                             ).fontColor1,
+                                            fontFamily:
+                                                Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontFamily,
                                           ),
                                         ),
                                         SizedBox(height: 4),
@@ -466,6 +516,10 @@ class RoastAnalysisPage extends StatelessWidget {
                                             color: Provider.of<ThemeSettings>(
                                               context,
                                             ).fontColor1.withValues(alpha: 0.8),
+                                            fontFamily:
+                                                Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontFamily,
                                           ),
                                         ),
                                       ],

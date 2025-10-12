@@ -622,6 +622,9 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
       ),
       child: DropdownButtonFormField<String>(
         initialValue: value,
+        style: TextStyle(
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+        ),
         items: items
             .map(
               (item) => DropdownMenuItem(
@@ -629,6 +632,9 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
                 child: Text(
                   item.length > 20 ? '${item.substring(0, 20)}…' : item,
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  ),
                 ),
               ),
             )
@@ -638,7 +644,10 @@ class _DripPackRecordListPageState extends State<DripPackRecordListPage> {
           labelText: label,
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          labelStyle: TextStyle(color: Color(0xFF795548)),
+          labelStyle: TextStyle(
+            color: Color(0xFF795548),
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+          ),
         ),
       ),
     );

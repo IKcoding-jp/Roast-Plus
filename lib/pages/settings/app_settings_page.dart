@@ -25,7 +25,16 @@ class AppSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('アプリ設定')),
+      appBar: AppBar(
+        title: Text(
+          'アプリ設定',
+          style: TextStyle(
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            fontSize: (20 * Provider.of<ThemeSettings>(context).fontSizeScale)
+                .clamp(16.0, 28.0),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: WebUIUtils.isWeb
             ? _buildWebLayout(context)
@@ -209,6 +218,7 @@ class AppSettingsPage extends StatelessWidget {
       child: Text(
         title,
         style: TextStyle(
+          fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
           fontSize: 16 * Provider.of<ThemeSettings>(context).fontSizeScale,
           fontWeight: FontWeight.bold,
           color: Provider.of<ThemeSettings>(context).fontColor1,
@@ -236,6 +246,8 @@ class AppSettingsPage extends StatelessWidget {
         title: Text(
           title,
           style: TextStyle(
+            fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            fontSize: 16 * Provider.of<ThemeSettings>(context).fontSizeScale,
             fontWeight: FontWeight.bold,
             color: Provider.of<ThemeSettings>(context).fontColor1,
           ),
@@ -244,6 +256,9 @@ class AppSettingsPage extends StatelessWidget {
             ? Text(
                 subtitle,
                 style: TextStyle(
+                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                  fontSize:
+                      14 * Provider.of<ThemeSettings>(context).fontSizeScale,
                   color: Provider.of<ThemeSettings>(context).fontColor1,
                 ),
               )

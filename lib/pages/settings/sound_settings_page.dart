@@ -318,7 +318,13 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
     final themeSettings = Provider.of<ThemeSettings>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('サウンド設定'),
+        title: Text(
+          'サウンド設定',
+          style: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+          ),
+        ),
         backgroundColor: themeSettings.appBarColor,
         foregroundColor: themeSettings.appBarTextColor,
       ),

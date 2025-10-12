@@ -1167,6 +1167,11 @@ class ThemeSettings extends ChangeNotifier {
             );
           }
 
+          // フォント設定が読み込まれた場合は通知を送信
+          if (fontSettings.isNotEmpty) {
+            _instance!.notifyListeners();
+          }
+
           // Web版ローカル永続化からテーマ設定を読み込み
           final themeSettings =
               await WebSettingsPersistenceService.getThemeSettings();
@@ -1700,6 +1705,10 @@ class ThemeSettings extends ChangeNotifier {
     // WEB版でのフォント適用を確実にするため、少し遅延を入れる
     if (kIsWeb) {
       Future.delayed(Duration(milliseconds: 100), () {
+        notifyListeners();
+      });
+      // 追加の遅延で確実に適用
+      Future.delayed(Duration(milliseconds: 300), () {
         notifyListeners();
       });
     }

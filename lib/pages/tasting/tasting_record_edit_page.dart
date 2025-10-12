@@ -449,14 +449,31 @@ class _TastingRecordEditPageState extends State<TastingRecordEditPage> {
                       SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         initialValue: _selectedRoastLevel,
+                        style: TextStyle(
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
+                        ),
                         decoration: InputDecoration(
                           labelText: '焙煎度合い *',
                           border: OutlineInputBorder(),
+                          labelStyle: TextStyle(
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
                         ),
                         items: _roastLevels.map((String level) {
                           return DropdownMenuItem<String>(
                             value: level,
-                            child: Text(level),
+                            child: Text(
+                              level,
+                              style: TextStyle(
+                                fontFamily: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontFamily,
+                              ),
+                            ),
                           );
                         }).toList(),
                         // 常に選択可能に修正

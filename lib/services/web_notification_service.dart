@@ -16,7 +16,7 @@ class WebNotificationService {
     try {
       _isSupported = html.Notification.supported;
       _logInfo('Web Notifications APIサポート: $_isSupported');
-      
+
       if (_isSupported) {
         _isPermissionGranted = html.Notification.permission == 'granted';
         _logInfo('通知権限状態: ${html.Notification.permission}');
@@ -87,11 +87,7 @@ class WebNotificationService {
     required String title,
     required String body,
   }) async {
-    await showNotification(
-      title: title,
-      body: body,
-      tag: 'roast_timer',
-    );
+    await showNotification(title: title, body: body, tag: 'roast_timer');
   }
 
   /// TODO通知を表示
@@ -99,11 +95,7 @@ class WebNotificationService {
     required String title,
     required String body,
   }) async {
-    await showNotification(
-      title: title,
-      body: body,
-      tag: 'todo',
-    );
+    await showNotification(title: title, body: body, tag: 'todo');
   }
 
   /// 権限状態を取得

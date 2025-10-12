@@ -316,6 +316,11 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final baseTextStyle = TextStyle(
+      fontFamily: themeSettings.fontFamily,
+      fontSize: 14 * themeSettings.fontSizeScale,
+      color: themeSettings.fontColor1,
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -338,15 +343,18 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                     constraints: BoxConstraints(
                       maxWidth: 600, // Web版での最大幅を制限
                     ),
-                    child: ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        _buildTimerSoundSection(themeSettings),
-                        const SizedBox(height: 24),
-                        _buildNotificationSoundSection(themeSettings),
-                        const SizedBox(height: 24),
-                        _buildVolumeSection(themeSettings),
-                      ],
+                    child: DefaultTextStyle.merge(
+                      style: baseTextStyle,
+                      child: ListView(
+                        padding: const EdgeInsets.all(16),
+                        children: [
+                          _buildTimerSoundSection(themeSettings),
+                          const SizedBox(height: 24),
+                          _buildNotificationSoundSection(themeSettings),
+                          const SizedBox(height: 24),
+                          _buildVolumeSection(themeSettings),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -375,6 +383,7 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                     fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -393,11 +402,17 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: 16 * themeSettings.fontSizeScale,
                 ),
               ),
               subtitle: Text(
                 _timerSoundEnabled ? 'タイマー終了時に音が鳴ります' : 'タイマー音が無効です',
-                style: TextStyle(color: themeSettings.fontColor1),
+                style: TextStyle(
+                  color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: 14 * themeSettings.fontSizeScale,
+                ),
               ),
               trailing: Switch(
                 value: _timerSoundEnabled,
@@ -414,6 +429,7 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                   fontSize: 16 * themeSettings.fontSizeScale,
                   fontWeight: FontWeight.bold,
                   color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
                 ),
               ),
               const SizedBox(height: 8),
@@ -441,6 +457,8 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: themeSettings.fontColor1,
+                            fontFamily: themeSettings.fontFamily,
+                            fontSize: 14 * themeSettings.fontSizeScale,
                           ),
                         ),
                         trailing: IconButton(
@@ -482,6 +500,7 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                     fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -500,11 +519,17 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: 16 * themeSettings.fontSizeScale,
                 ),
               ),
               subtitle: Text(
                 _notificationSoundEnabled ? '通知時に音が鳴ります' : '通知音が無効です',
-                style: TextStyle(color: themeSettings.fontColor1),
+                style: TextStyle(
+                  color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: 14 * themeSettings.fontSizeScale,
+                ),
               ),
               trailing: Switch(
                 value: _notificationSoundEnabled,
@@ -521,6 +546,7 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                   fontSize: 16 * themeSettings.fontSizeScale,
                   fontWeight: FontWeight.bold,
                   color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
                 ),
               ),
               const SizedBox(height: 8),
@@ -548,6 +574,8 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: themeSettings.fontColor1,
+                            fontFamily: themeSettings.fontFamily,
+                            fontSize: 14 * themeSettings.fontSizeScale,
                           ),
                         ),
                         trailing: IconButton(
@@ -586,9 +614,10 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                 Text(
                   '音量設定',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -599,9 +628,10 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
               Text(
                 'タイマー音量',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 16 * themeSettings.fontSizeScale,
                   fontWeight: FontWeight.bold,
                   color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
                 ),
               ),
               const SizedBox(height: 8),
@@ -628,6 +658,8 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: themeSettings.fontColor1,
+                      fontFamily: themeSettings.fontFamily,
+                      fontSize: 14 * themeSettings.fontSizeScale,
                     ),
                   ),
                 ],
@@ -639,9 +671,10 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
               Text(
                 '通知音量',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 16 * themeSettings.fontSizeScale,
                   fontWeight: FontWeight.bold,
                   color: themeSettings.fontColor1,
+                  fontFamily: themeSettings.fontFamily,
                 ),
               ),
               const SizedBox(height: 8),
@@ -668,6 +701,8 @@ class _SoundSettingsPageState extends State<SoundSettingsPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: themeSettings.fontColor1,
+                      fontFamily: themeSettings.fontFamily,
+                      fontSize: 14 * themeSettings.fontSizeScale,
                     ),
                   ),
                 ],

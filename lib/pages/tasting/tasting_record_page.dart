@@ -114,102 +114,285 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final baseTheme = Theme.of(context);
+    final fontFamily = themeSettings.fontFamily;
+    final themedText = baseTheme.textTheme.apply(fontFamily: fontFamily);
+    final themedPrimaryText = baseTheme.primaryTextTheme.apply(
+      fontFamily: fontFamily,
+    );
+    final snackBarContentStyle =
+        (baseTheme.snackBarTheme.contentTextStyle ??
+                baseTheme.textTheme.bodyMedium ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
+    final dialogTitleStyle =
+        (baseTheme.dialogTheme.titleTextStyle ??
+                baseTheme.textTheme.titleLarge ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
+    final dialogContentStyle =
+        (baseTheme.dialogTheme.contentTextStyle ??
+                baseTheme.textTheme.bodyMedium ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '試飲記録',
-          style: TextStyle(
-            fontFamily: themeSettings.fontFamily,
-            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
-          ),
+    return Theme(
+      data: baseTheme.copyWith(
+        textTheme: themedText,
+        primaryTextTheme: themedPrimaryText,
+        dialogTheme: baseTheme.dialogTheme.copyWith(
+          titleTextStyle: dialogTitleStyle,
+          contentTextStyle: dialogContentStyle,
         ),
-        backgroundColor: themeSettings.appBarColor,
-        foregroundColor: themeSettings.appBarTextColor,
+        snackBarTheme: baseTheme.snackBarTheme.copyWith(
+          contentTextStyle: snackBarContentStyle,
+        ),
       ),
-      body: Consumer<TastingProvider>(
-        builder: (context, tastingProvider, child) {
-          if (tastingProvider.isLoading) {
-            return const LoadingAnimationWidget();
-          }
-          final groupProvider = context.read<GroupProvider>();
-          final hasGroup = groupProvider.hasGroup;
-          if (hasGroup && tastingProvider.sessions.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.coffee,
-                    size: 64,
-                    color: themeSettings.tastingColor.withValues(alpha: 0.5),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'セッションがありません',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: themeSettings.fontColor1,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '右下のボタンからセッションを開始してください',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: themeSettings.fontColor1.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
+      child: DefaultTextStyle.merge(
+        style: TextStyle(fontFamily: fontFamily),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              '試飲記録',
+              style: TextStyle(
+                fontFamily: themeSettings.fontFamily,
+                fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
               ),
-            );
-          }
-          if (!hasGroup && tastingProvider.tastingRecords.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.coffee,
-                    size: 64,
-                    color: themeSettings.tastingColor.withValues(alpha: 0.5),
+            ),
+            backgroundColor: themeSettings.appBarColor,
+            foregroundColor: themeSettings.appBarTextColor,
+          ),
+          body: Consumer<TastingProvider>(
+            builder: (context, tastingProvider, child) {
+              if (tastingProvider.isLoading) {
+                return const LoadingAnimationWidget();
+              }
+              final groupProvider = context.read<GroupProvider>();
+              final hasGroup = groupProvider.hasGroup;
+              if (hasGroup && tastingProvider.sessions.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.coffee,
+                        size: 64,
+                        color: themeSettings.tastingColor.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'セッションがありません',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: themeSettings.fontColor1,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        '右下のボタンからセッションを開始してください',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: themeSettings.fontColor1.withValues(
+                            alpha: 0.7,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    '試飲記録がありません',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: themeSettings.fontColor1,
-                    ),
+                );
+              }
+              if (!hasGroup && tastingProvider.tastingRecords.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.coffee,
+                        size: 64,
+                        color: themeSettings.tastingColor.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        '試飲記録がありません',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: themeSettings.fontColor1,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        '右下のボタンから記録を追加してください',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: themeSettings.fontColor1.withValues(
+                            alpha: 0.7,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    '右下のボタンから記録を追加してください',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: themeSettings.fontColor1.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+                );
+              }
 
-          if (hasGroup) {
-            final sessions = tastingProvider.sessions;
-            final memberCount = groupProvider.currentGroup?.members.length ?? 0;
-            return Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width > 600
-                      ? 600
-                      : double.infinity,
-                ),
-                child: ListView.builder(
+              if (hasGroup) {
+                final sessions = tastingProvider.sessions;
+                final memberCount =
+                    groupProvider.currentGroup?.members.length ?? 0;
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width > 600
+                          ? 600
+                          : double.infinity,
+                    ),
+                    child: ListView.builder(
+                      padding: EdgeInsets.all(16),
+                      itemCount: sessions.length,
+                      itemBuilder: (context, index) {
+                        final s = sessions[index];
+                        return Card(
+                          margin: EdgeInsets.only(bottom: 12),
+                          elevation: 4,
+                          color: themeSettings.cardBackgroundColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => TastingSessionDetailPage(
+                                    sessionId: s.id,
+                                    beanName: s.beanName,
+                                    roastLevel: s.roastLevel,
+                                  ),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: BeanNameWithSticker(
+                                          beanName: s.beanName,
+                                          textStyle: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: themeSettings.fontColor1,
+                                          ),
+                                          stickerSize: 18,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _getRoastLevelColor(
+                                            s.roastLevel,
+                                          ),
+                                          border: Border.all(
+                                            color: _getRoastLevelColor(
+                                              s.roastLevel,
+                                            ),
+                                            width: 1.5,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          s.roastLevel,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _getRoastLevelTextColor(
+                                              s.roastLevel,
+                                            ),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      IconButton(
+                                        onPressed: () =>
+                                            _deleteSession(s.id, s.beanName),
+                                        icon: Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.red.withValues(
+                                            alpha: 0.7,
+                                          ),
+                                          size: 20,
+                                        ),
+                                        tooltip: 'セッションを削除',
+                                        constraints: BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
+                                        padding: EdgeInsets.all(4),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.people,
+                                        size: 16,
+                                        color: themeSettings.fontColor1
+                                            .withValues(alpha: 0.7),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        '${s.entriesCount}/$memberCount人が参加',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: themeSettings.fontColor1
+                                              .withValues(alpha: 0.7),
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Text(
+                                        _formatDate(s.createdAt),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: themeSettings.fontColor1
+                                              .withValues(alpha: 0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (s.entriesCount > 0) ...[
+                                    SizedBox(height: 8),
+                                    _buildAverageScores(s, themeSettings),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              } else {
+                // 個人の試飲記録表示
+                final records = tastingProvider.tastingRecords;
+                return ListView.builder(
                   padding: EdgeInsets.all(16),
-                  itemCount: sessions.length,
+                  itemCount: records.length,
                   itemBuilder: (context, index) {
-                    final s = sessions[index];
+                    final record = records[index];
                     return Card(
                       margin: EdgeInsets.only(bottom: 12),
                       elevation: 4,
@@ -222,11 +405,7 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => TastingSessionDetailPage(
-                                sessionId: s.id,
-                                beanName: s.beanName,
-                                roastLevel: s.roastLevel,
-                              ),
+                              builder: (_) => TastingRecordEditPage(),
                             ),
                           );
                         },
@@ -240,13 +419,13 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                                 children: [
                                   Expanded(
                                     child: BeanNameWithSticker(
-                                      beanName: s.beanName,
+                                      beanName: record.beanName,
                                       textStyle: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: themeSettings.fontColor1,
                                       ),
-                                      stickerSize: 18,
+                                      stickerSize: 18.0,
                                     ),
                                   ),
                                   Container(
@@ -255,41 +434,27 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _getRoastLevelColor(s.roastLevel),
+                                      color: _getRoastLevelColor(
+                                        record.roastLevel,
+                                      ),
                                       border: Border.all(
                                         color: _getRoastLevelColor(
-                                          s.roastLevel,
+                                          record.roastLevel,
                                         ),
                                         width: 1.5,
                                       ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      s.roastLevel,
+                                      record.roastLevel,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: _getRoastLevelTextColor(
-                                          s.roastLevel,
+                                          record.roastLevel,
                                         ),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  IconButton(
-                                    onPressed: () =>
-                                        _deleteSession(s.id, s.beanName),
-                                    icon: Icon(
-                                      Icons.delete_outline,
-                                      color: Colors.red.withValues(alpha: 0.7),
-                                      size: 20,
-                                    ),
-                                    tooltip: 'セッションを削除',
-                                    constraints: BoxConstraints(
-                                      minWidth: 32,
-                                      minHeight: 32,
-                                    ),
-                                    padding: EdgeInsets.all(4),
                                   ),
                                 ],
                               ),
@@ -297,7 +462,7 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                               Row(
                                 children: [
                                   Icon(
-                                    Icons.people,
+                                    Icons.calendar_today,
                                     size: 16,
                                     color: themeSettings.fontColor1.withValues(
                                       alpha: 0.7,
@@ -305,7 +470,7 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                                   ),
                                   SizedBox(width: 4),
                                   Text(
-                                    '${s.entriesCount}/$memberCount人が参加',
+                                    _formatDate(record.tastingDate),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: themeSettings.fontColor1
@@ -314,159 +479,48 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                                   ),
                                   Spacer(),
                                   Text(
-                                    _formatDate(s.createdAt),
+                                    '総合: ${record.overallRating.toStringAsFixed(1)}',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: themeSettings.fontColor1
-                                          .withValues(alpha: 0.7),
+                                      fontWeight: FontWeight.bold,
+                                      color: themeSettings.tastingColor,
                                     ),
                                   ),
                                 ],
                               ),
-                              if (s.entriesCount > 0) ...[
-                                SizedBox(height: 8),
-                                _buildAverageScores(s, themeSettings),
-                              ],
                             ],
                           ),
                         ),
                       ),
                     );
                   },
-                ),
-              ),
-            );
-          } else {
-            // 個人の試飲記録表示
-            final records = tastingProvider.tastingRecords;
-            return ListView.builder(
-              padding: EdgeInsets.all(16),
-              itemCount: records.length,
-              itemBuilder: (context, index) {
-                final record = records[index];
-                return Card(
-                  margin: EdgeInsets.only(bottom: 12),
-                  elevation: 4,
-                  color: themeSettings.cardBackgroundColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TastingRecordEditPage(),
-                        ),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: BeanNameWithSticker(
-                                  beanName: record.beanName,
-                                  textStyle: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: themeSettings.fontColor1,
-                                  ),
-                                  stickerSize: 18.0,
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _getRoastLevelColor(record.roastLevel),
-                                  border: Border.all(
-                                    color: _getRoastLevelColor(
-                                      record.roastLevel,
-                                    ),
-                                    width: 1.5,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  record.roastLevel,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: _getRoastLevelTextColor(
-                                      record.roastLevel,
-                                    ),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 16,
-                                color: themeSettings.fontColor1.withValues(
-                                  alpha: 0.7,
-                                ),
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                _formatDate(record.tastingDate),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: themeSettings.fontColor1.withValues(
-                                    alpha: 0.7,
-                                  ),
-                                ),
-                              ),
-                              Spacer(),
-                              Text(
-                                '総合: ${record.overallRating.toStringAsFixed(1)}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: themeSettings.tastingColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                );
+              }
+            },
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              final groupProvider = context.read<GroupProvider>();
+              if (groupProvider.hasGroup) {
+                // グループ: 詳細/新規で作るのは詳細画面の上部で行う
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => TastingSessionDetailPage()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TastingRecordEditPage(),
                   ),
                 );
-              },
-            );
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final groupProvider = context.read<GroupProvider>();
-          if (groupProvider.hasGroup) {
-            // グループ: 詳細/新規で作るのは詳細画面の上部で行う
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => TastingSessionDetailPage()),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TastingRecordEditPage()),
-            );
-          }
-        },
-        backgroundColor: themeSettings.appButtonColor,
-        foregroundColor: themeSettings.fontColor2,
-        child: Icon(Icons.add),
+              }
+            },
+            backgroundColor: themeSettings.appButtonColor,
+            foregroundColor: themeSettings.fontColor2,
+            child: Icon(Icons.add),
+          ),
+        ),
       ),
     );
   }

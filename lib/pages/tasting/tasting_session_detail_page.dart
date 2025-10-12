@@ -197,6 +197,40 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeSettings>(context);
+    final baseTheme = Theme.of(context);
+    final fontFamily = theme.fontFamily;
+    final textTheme = baseTheme.textTheme.apply(fontFamily: fontFamily);
+    final primaryTextTheme = baseTheme.primaryTextTheme.apply(
+      fontFamily: fontFamily,
+    );
+    final appBarTitleStyle =
+        (baseTheme.appBarTheme.titleTextStyle ??
+                primaryTextTheme.titleLarge ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
+    final inputLabelStyle =
+        (baseTheme.inputDecorationTheme.labelStyle ??
+                textTheme.bodyMedium ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
+    final inputHintStyle =
+        (baseTheme.inputDecorationTheme.hintStyle ??
+                textTheme.bodyMedium ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
+    final inputHelperStyle =
+        (baseTheme.inputDecorationTheme.helperStyle ??
+                textTheme.bodySmall ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
+    final snackBarContentStyle =
+        (baseTheme.snackBarTheme.contentTextStyle ??
+                textTheme.bodyMedium ??
+                const TextStyle())
+            .copyWith(fontFamily: fontFamily);
+    final dropdownTextStyle =
+        (baseTheme.dropdownMenuTheme.textStyle ?? textTheme.bodyMedium)
+            ?.copyWith(fontFamily: fontFamily);
     final groupProvider = Provider.of<GroupProvider>(context);
     final tastingProvider = Provider.of<TastingProvider>(context);
     final hasGroup = groupProvider.hasGroup;
@@ -255,42 +289,65 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
     final media = MediaQuery.of(context);
     final bottomPad = 16.0 + media.padding.bottom + media.viewInsets.bottom;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('試飲セッション'),
-        backgroundColor: theme.appBarColor,
-        foregroundColor: theme.appBarTextColor,
+    return Theme(
+      data: baseTheme.copyWith(
+        textTheme: textTheme,
+        primaryTextTheme: primaryTextTheme,
+        appBarTheme: baseTheme.appBarTheme.copyWith(
+          titleTextStyle: appBarTitleStyle,
+        ),
+        inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
+          labelStyle: inputLabelStyle,
+          hintStyle: inputHintStyle,
+          helperStyle: inputHelperStyle,
+        ),
+        dropdownMenuTheme: baseTheme.dropdownMenuTheme.copyWith(
+          textStyle: dropdownTextStyle,
+        ),
+        snackBarTheme: baseTheme.snackBarTheme.copyWith(
+          contentTextStyle: snackBarContentStyle,
+        ),
       ),
-      body: !hasGroup
-          ? Center(child: Text('グループが選択されていません'))
-          : Center(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(16, 16, 16, bottomPad),
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width > 600
-                        ? 600
-                        : double.infinity,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_sessionId == null)
-                        _buildCreateSessionCard(theme)
-                      else
-                        _buildSessionStatsCard(theme, session!),
-                      SizedBox(height: 16),
-                      if (_sessionId != null) _buildMembersList(theme),
-                      SizedBox(height: 16),
-                      if (_sessionId != null) _buildMyEntryForm(theme),
-                      SizedBox(height: 16),
-                    ],
+      child: DefaultTextStyle.merge(
+        style: TextStyle(fontFamily: fontFamily),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('試飲セッション'),
+            backgroundColor: theme.appBarColor,
+            foregroundColor: theme.appBarTextColor,
+          ),
+          body: !hasGroup
+              ? Center(child: Text('グループが選択されていません'))
+              : Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, bottomPad),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width > 600
+                            ? 600
+                            : double.infinity,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_sessionId == null)
+                            _buildCreateSessionCard(theme)
+                          else
+                            _buildSessionStatsCard(theme, session!),
+                          SizedBox(height: 16),
+                          if (_sessionId != null) _buildMembersList(theme),
+                          SizedBox(height: 16),
+                          if (_sessionId != null) _buildMyEntryForm(theme),
+                          SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+        ),
+      ),
     );
   }
 
@@ -327,32 +384,14 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: _roastLevel,
-                style: TextStyle(
-                  fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
-                ),
                 items: roasts
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(
-                          e,
-                          style: TextStyle(
-                            fontFamily: Provider.of<ThemeSettings>(
-                              context,
-                            ).fontFamily,
-                          ),
-                        ),
-                      ),
-                    )
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: (v) =>
                     setState(() => _roastLevel = v ?? _roastLevel),
                 decoration: InputDecoration(
                   labelText: '焙煎度合い *',
                   border: OutlineInputBorder(),
-                  labelStyle: TextStyle(
-                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
-                  ),
                 ),
               ),
               SizedBox(height: 12),

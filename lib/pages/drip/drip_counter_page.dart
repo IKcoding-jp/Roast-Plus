@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
 import '../../models/dashboard_stats_provider.dart';
+import 'drip_pack_record_list_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
@@ -189,6 +190,12 @@ class DripCounterPageState extends State<DripCounterPage>
         });
   }
 
+  void _openDripPackRecordList() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const DripPackRecordListPage()),
+    );
+  }
+
   void _startPermissionListener() {
     // didChangeDependenciesで呼ばれるため、contextが利用可能
     final groupProvider = Provider.of<GroupProvider>(context, listen: false);
@@ -253,6 +260,13 @@ class DripCounterPageState extends State<DripCounterPage>
         ),
         backgroundColor: themeSettings.appBarColor,
         iconTheme: IconThemeData(color: themeSettings.appBarTextColor),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.list_alt, color: themeSettings.appBarTextColor),
+            tooltip: '記録一覧',
+            onPressed: _openDripPackRecordList,
+          ),
+        ],
       ),
       body: DefaultTextStyle.merge(
         style: TextStyle(

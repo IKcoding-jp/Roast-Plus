@@ -384,7 +384,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           ),
                           SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedRoastLevel,
+                            initialValue: _selectedRoastLevel,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontFamily: fontFamily,

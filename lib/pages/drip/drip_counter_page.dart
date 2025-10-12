@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:roastplus/pages/drip/drip_pack_record_list_page.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
@@ -12,7 +11,6 @@ import '../../services/user_settings_firestore_service.dart';
 import '../../services/group_data_sync_service.dart';
 import '../../utils/permission_utils.dart';
 import '../../utils/web_compatibility.dart';
-import '../../widgets/permission_denied_page.dart';
 import 'dart:developer' as developer;
 
 class DripCounterPage extends StatefulWidget {

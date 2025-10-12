@@ -418,6 +418,24 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final baseInputFontSize = 16 * themeSettings.fontSizeScale;
+    final inputTextStyle = TextStyle(
+      fontFamily: themeSettings.fontFamily,
+      fontSize: baseInputFontSize,
+      color: themeSettings.inputTextColor,
+    );
+    final labelStyle = inputTextStyle.copyWith(
+      color: themeSettings.inputTextColor.withOpacity(0.8),
+    );
+    final floatingLabelStyle = labelStyle.copyWith(
+      fontWeight: FontWeight.bold,
+      color: themeSettings.inputTextColor,
+    );
+    final counterStyle = TextStyle(
+      fontFamily: themeSettings.fontFamily,
+      fontSize: 12 * themeSettings.fontSizeScale,
+      color: themeSettings.inputTextColor.withOpacity(0.7),
+    );
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
@@ -461,9 +479,7 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      color: Provider.of<ThemeSettings>(
-                        context,
-                      ).cardBackgroundColor,
+                      color: themeSettings.cardBackgroundColor,
                       child: Padding(
                         padding: EdgeInsets.all(16),
                         child: Column(
@@ -476,14 +492,8 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                 Text(
                                   'パスコードロックが有効です',
                                   style: TextStyle(
-                                    fontFamily: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontFamily,
-                                    fontSize:
-                                        16 *
-                                        Provider.of<ThemeSettings>(
-                                          context,
-                                        ).fontSizeScale,
+                                    fontFamily: themeSettings.fontFamily,
+                                    fontSize: 16 * themeSettings.fontSizeScale,
                                     fontWeight: FontWeight.bold,
                                     color: Provider.of<ThemeSettings>(
                                       context,
@@ -517,14 +527,8 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                 label: Text(
                                   'パスコードロックを無効にする',
                                   style: TextStyle(
-                                    fontFamily: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontFamily,
-                                    fontSize:
-                                        16 *
-                                        Provider.of<ThemeSettings>(
-                                          context,
-                                        ).fontSizeScale,
+                                    fontFamily: themeSettings.fontFamily,
+                                    fontSize: 16 * themeSettings.fontSizeScale,
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
@@ -631,9 +635,7 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      color: Provider.of<ThemeSettings>(
-                        context,
-                      ).cardBackgroundColor,
+                      color: themeSettings.cardBackgroundColor,
                       child: Padding(
                         padding: EdgeInsets.all(16),
                         child: Column(
@@ -642,18 +644,10 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                             Text(
                               'パスコードを設定',
                               style: TextStyle(
-                                fontFamily: Provider.of<ThemeSettings>(
-                                  context,
-                                ).fontFamily,
-                                fontSize:
-                                    18 *
-                                    Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontSizeScale,
+                                fontFamily: themeSettings.fontFamily,
+                                fontSize: 18 * themeSettings.fontSizeScale,
                                 fontWeight: FontWeight.bold,
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).fontColor1,
+                                color: themeSettings.fontColor1,
                               ),
                             ),
                             SizedBox(height: 16),
@@ -663,8 +657,13 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                 decimal: false,
                                 signed: false,
                               ),
+                              cursorColor: themeSettings.inputTextColor,
+                              style: inputTextStyle,
                               decoration: InputDecoration(
                                 labelText: 'パスコード（4桁）',
+                                labelStyle: labelStyle,
+                                floatingLabelStyle: floatingLabelStyle,
+                                counterStyle: counterStyle,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -678,8 +677,13 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                 decimal: false,
                                 signed: false,
                               ),
+                              cursorColor: themeSettings.inputTextColor,
+                              style: inputTextStyle,
                               decoration: InputDecoration(
                                 labelText: 'パスコード確認',
+                                labelStyle: labelStyle,
+                                floatingLabelStyle: floatingLabelStyle,
+                                counterStyle: counterStyle,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -691,15 +695,9 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                               Text(
                                 _error!,
                                 style: TextStyle(
-                                  fontFamily: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontFamily,
+                                  fontFamily: themeSettings.fontFamily,
                                   color: Colors.red,
-                                  fontSize:
-                                      14 *
-                                      Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontSizeScale,
+                                  fontSize: 14 * themeSettings.fontSizeScale,
                                 ),
                               ),
                             ],
@@ -711,14 +709,8 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                                 label: Text(
                                   'パスコードを設定',
                                   style: TextStyle(
-                                    fontFamily: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontFamily,
-                                    fontSize:
-                                        16 *
-                                        Provider.of<ThemeSettings>(
-                                          context,
-                                        ).fontSizeScale,
+                                    fontFamily: themeSettings.fontFamily,
+                                    fontSize: 16 * themeSettings.fontSizeScale,
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(

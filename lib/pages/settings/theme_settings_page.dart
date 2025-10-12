@@ -277,6 +277,7 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
                     fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -288,7 +289,8 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
                   'カスタムテーマがありません',
                   style: TextStyle(
                     color: themeSettings.fontColor1,
-                    fontSize: 16,
+                    fontSize: 16 * themeSettings.fontSizeScale,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               )
@@ -329,6 +331,7 @@ class _PresetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeSettings = Provider.of<ThemeSettings>(context);
     final preset = ThemeSettings.presets[presetName];
     final isLight = presetName == 'ライト';
 
@@ -359,6 +362,11 @@ class _PresetButton extends StatelessWidget {
           ElevatedButton(
             onPressed: isDisabled ? null : onPressed,
             style: ElevatedButton.styleFrom(
+              textStyle: TextStyle(
+                fontFamily: themeSettings.fontFamily,
+                fontSize: 14 * themeSettings.fontSizeScale,
+                fontWeight: FontWeight.w600,
+              ),
               backgroundColor: isLight
                   ? Colors.white
                   : (preset?['buttonColor'] ??
@@ -406,9 +414,10 @@ class _PresetButton extends StatelessWidget {
                   child: Text(
                     presetName,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 14 * themeSettings.fontSizeScale,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
+                      fontFamily: themeSettings.fontFamily,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -516,11 +525,17 @@ class _CustomThemeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeSettings = Provider.of<ThemeSettings>(context);
     return GestureDetector(
       onLongPress: onDelete,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
+          textStyle: TextStyle(
+            fontFamily: themeSettings.fontFamily,
+            fontSize: 14 * themeSettings.fontSizeScale,
+            fontWeight: FontWeight.w500,
+          ),
           backgroundColor: Colors.grey.shade300,
           foregroundColor: Colors.black87,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -535,7 +550,11 @@ class _CustomThemeButton extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               themeName,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 14 * themeSettings.fontSizeScale,
+                fontWeight: FontWeight.w500,
+                fontFamily: themeSettings.fontFamily,
+              ),
             ),
           ],
         ),

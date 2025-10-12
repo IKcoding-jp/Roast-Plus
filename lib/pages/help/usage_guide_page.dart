@@ -23,109 +23,111 @@ class _DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontFamily: themeSettings.fontFamily,
-            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+    return DefaultTextStyle.merge(
+      style: TextStyle(fontFamily: themeSettings.fontFamily),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            title,
+            style: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+            ),
           ),
+          backgroundColor: themeSettings.appBarColor,
+          foregroundColor: themeSettings.appBarTextColor,
         ),
-        backgroundColor: themeSettings.appBarColor,
-        foregroundColor: themeSettings.appBarTextColor,
-      ),
-      body: Container(
-        color: themeSettings.backgroundColor,
-        child: WebUIUtils.isWeb
-            ? Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 800),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(24),
-                    child: Card(
-                      elevation: 4,
-                      color: themeSettings.cardBackgroundColor,
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: content.map((item) {
-                            if (item.isEmpty) {
-                              return SizedBox(height: 16);
-                            } else if (item.startsWith('【') &&
-                                item.endsWith('】')) {
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: 12),
-                                child: Text(
-                                  item,
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
+        body: Container(
+          color: themeSettings.backgroundColor,
+          child: WebUIUtils.isWeb
+              ? Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: 800),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(24),
+                      child: Card(
+                        elevation: 4,
+                        color: themeSettings.cardBackgroundColor,
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: content.map((item) {
+                              final headingStyle = TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                fontFamily: themeSettings.fontFamily,
                               );
-                            } else {
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: 6),
-                                child: Text(
-                                  item,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black87,
-                                  ),
-                                ),
+                              final bodyStyle = TextStyle(
+                                fontSize: 18,
+                                color: Colors.black87,
+                                fontFamily: themeSettings.fontFamily,
                               );
-                            }
-                          }).toList(),
+
+                              if (item.isEmpty) {
+                                return SizedBox(height: 16);
+                              } else if (item.startsWith('【') &&
+                                  item.endsWith('】')) {
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 12),
+                                  child: Text(item, style: headingStyle),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 6),
+                                  child: Text(item, style: bodyStyle),
+                                );
+                              }
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              )
-            : SingleChildScrollView(
-                padding: EdgeInsets.all(16),
-                child: Card(
-                  elevation: 4,
-                  color: themeSettings.cardBackgroundColor,
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: content.map((item) {
-                        if (item.isEmpty) {
-                          return SizedBox(height: 16);
-                        } else if (item.startsWith('【') && item.endsWith('】')) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 12),
-                            child: Text(
-                              item,
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
+                )
+              : SingleChildScrollView(
+                  padding: EdgeInsets.all(16),
+                  child: Card(
+                    elevation: 4,
+                    color: themeSettings.cardBackgroundColor,
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: content.map((item) {
+                          final headingStyle = TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontFamily: themeSettings.fontFamily,
                           );
-                        } else {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 6),
-                            child: Text(
-                              item,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.black87,
-                              ),
-                            ),
+                          final bodyStyle = TextStyle(
+                            fontSize: 18,
+                            color: Colors.black87,
+                            fontFamily: themeSettings.fontFamily,
                           );
-                        }
-                      }).toList(),
+
+                          if (item.isEmpty) {
+                            return SizedBox(height: 16);
+                          } else if (item.startsWith('【') &&
+                              item.endsWith('】')) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 12),
+                              child: Text(item, style: headingStyle),
+                            );
+                          } else {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 6),
+                              child: Text(item, style: bodyStyle),
+                            );
+                          }
+                        }).toList(),
+                      ),
                     ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -151,49 +153,61 @@ class _UsageGuidePageState extends State<UsageGuidePage>
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '使い方ガイド',
-          style: TextStyle(
-            fontFamily: themeSettings.fontFamily,
-            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+    final tabLabelStyle = TextStyle(
+      fontFamily: themeSettings.fontFamily,
+      fontSize: (14 * themeSettings.fontSizeScale).clamp(12.0, 18.0),
+      fontWeight: FontWeight.w600,
+    );
+
+    return DefaultTextStyle.merge(
+      style: TextStyle(fontFamily: themeSettings.fontFamily),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            '使い方ガイド',
+            style: TextStyle(
+              fontFamily: themeSettings.fontFamily,
+              fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+            ),
           ),
-        ),
-        backgroundColor: themeSettings.appBarColor,
-        foregroundColor: themeSettings.appBarTextColor,
-        bottom: WebUIUtils.isWeb
-            ? null
-            : TabBar(
-                controller: _tabController,
-                indicatorColor: themeSettings.buttonColor,
-                labelColor: themeSettings.appBarTextColor,
-                unselectedLabelColor: themeSettings.appBarTextColor.withValues(
-                  alpha: 0.7,
+          backgroundColor: themeSettings.appBarColor,
+          foregroundColor: themeSettings.appBarTextColor,
+          bottom: WebUIUtils.isWeb
+              ? null
+              : TabBar(
+                  controller: _tabController,
+                  indicatorColor: themeSettings.buttonColor,
+                  labelColor: themeSettings.appBarTextColor,
+                  unselectedLabelColor: themeSettings.appBarTextColor
+                      .withValues(alpha: 0.7),
+                  labelStyle: tabLabelStyle,
+                  unselectedLabelStyle: tabLabelStyle.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  tabs: [
+                    Tab(text: '基本'),
+                    Tab(text: '焙煎'),
+                    Tab(text: '管理'),
+                    Tab(text: 'グループ'),
+                    Tab(text: 'ゲーム'),
+                    Tab(text: '設定'),
+                  ],
                 ),
-                tabs: [
-                  Tab(text: '基本'),
-                  Tab(text: '焙煎'),
-                  Tab(text: '管理'),
-                  Tab(text: 'グループ'),
-                  Tab(text: 'ゲーム'),
-                  Tab(text: '設定'),
+        ),
+        body: WebUIUtils.isWeb
+            ? _buildWebLayout(themeSettings)
+            : TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildBasicTab(themeSettings),
+                  _buildRoastingTab(themeSettings),
+                  _buildManagementTab(themeSettings),
+                  _buildGroupTab(themeSettings),
+                  _buildGamificationTab(themeSettings),
+                  _buildSettingsTab(themeSettings),
                 ],
               ),
       ),
-      body: WebUIUtils.isWeb
-          ? _buildWebLayout(themeSettings)
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildBasicTab(themeSettings),
-                _buildRoastingTab(themeSettings),
-                _buildManagementTab(themeSettings),
-                _buildGroupTab(themeSettings),
-                _buildGamificationTab(themeSettings),
-                _buildSettingsTab(themeSettings),
-              ],
-            ),
     );
   }
 

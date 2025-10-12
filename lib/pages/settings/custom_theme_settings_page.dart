@@ -22,6 +22,11 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final baseTextStyle = TextStyle(
+      fontFamily: themeSettings.fontFamily,
+      fontSize: 14 * themeSettings.fontSizeScale,
+      color: themeSettings.fontColor1,
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -43,16 +48,19 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: ListView(
-                children: [
-                  _buildBasicColorsSection(context, themeSettings),
-                  const SizedBox(height: 24),
-                  _buildTextColorsSection(context, themeSettings),
-                  const SizedBox(height: 24),
-                  _buildUIColorsSection(context, themeSettings),
-                  const SizedBox(height: 24),
-                  _buildSaveButton(context, themeSettings),
-                ],
+              child: DefaultTextStyle.merge(
+                style: baseTextStyle,
+                child: ListView(
+                  children: [
+                    _buildBasicColorsSection(context, themeSettings),
+                    const SizedBox(height: 24),
+                    _buildTextColorsSection(context, themeSettings),
+                    const SizedBox(height: 24),
+                    _buildUIColorsSection(context, themeSettings),
+                    const SizedBox(height: 24),
+                    _buildSaveButton(context, themeSettings),
+                  ],
+                ),
               ),
             ),
           ),
@@ -84,6 +92,7 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
                     fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -141,6 +150,7 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
                     fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -236,6 +246,7 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
                     fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -312,6 +323,7 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
                     fontSize: 18 * themeSettings.fontSizeScale,
                     fontWeight: FontWeight.bold,
                     color: themeSettings.fontColor1,
+                    fontFamily: themeSettings.fontFamily,
                   ),
                 ),
               ],
@@ -325,7 +337,11 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: themeSettings.appButtonColor,
                   foregroundColor: themeSettings.fontColor2,
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: TextStyle(
+                    fontFamily: themeSettings.fontFamily,
+                    fontSize: 16 * themeSettings.fontSizeScale,
+                    fontWeight: FontWeight.w600,
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -356,8 +372,9 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
           'カスタムテーマを保存',
           style: TextStyle(
             color: themeSettings.dialogTextColor,
-            fontSize: 20,
+            fontSize: 20 * themeSettings.fontSizeScale,
             fontWeight: FontWeight.bold,
+            fontFamily: themeSettings.fontFamily,
           ),
         ),
         content: Column(
@@ -367,7 +384,8 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
               'テーマ名を入力してください',
               style: TextStyle(
                 color: themeSettings.dialogTextColor,
-                fontSize: 16,
+                fontSize: 16 * themeSettings.fontSizeScale,
+                fontFamily: themeSettings.fontFamily,
               ),
             ),
             const SizedBox(height: 16),
@@ -375,11 +393,16 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
               controller: nameController,
               style: TextStyle(
                 color: themeSettings.inputTextColor,
-                fontSize: 16,
+                fontSize: 16 * themeSettings.fontSizeScale,
+                fontFamily: themeSettings.fontFamily,
               ),
               decoration: InputDecoration(
                 labelText: 'テーマ名',
-                labelStyle: TextStyle(color: themeSettings.inputTextColor),
+                labelStyle: TextStyle(
+                  color: themeSettings.inputTextColor,
+                  fontFamily: themeSettings.fontFamily,
+                  fontSize: 14 * themeSettings.fontSizeScale,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -395,7 +418,11 @@ class _CustomThemeSettingsPageState extends State<CustomThemeSettingsPage> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'キャンセル',
-              style: TextStyle(color: themeSettings.dialogTextColor),
+              style: TextStyle(
+                color: themeSettings.dialogTextColor,
+                fontFamily: themeSettings.fontFamily,
+                fontSize: 14 * themeSettings.fontSizeScale,
+              ),
             ),
           ),
           ElevatedButton(
@@ -528,6 +555,8 @@ class _ColorPickerTile extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: themeSettings.fontColor1,
+            fontFamily: themeSettings.fontFamily,
+            fontSize: 16 * themeSettings.fontSizeScale,
           ),
         ),
         trailing: Icon(Icons.color_lens, color: color),
@@ -589,7 +618,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                   '${widget.label}の色を選択',
                   style: TextStyle(
                     color: themeSettings.fontColor1,
-                    fontSize: 18,
+                    fontSize: 18 * themeSettings.fontSizeScale,
+                    fontFamily: themeSettings.fontFamily,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -604,7 +634,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                             '現在の色',
                             style: TextStyle(
                               color: themeSettings.fontColor1,
-                              fontSize: 12,
+                              fontSize: 12 * themeSettings.fontSizeScale,
+                              fontFamily: themeSettings.fontFamily,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -640,8 +671,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                                 hex,
                                 style: TextStyle(
                                   color: themeSettings.fontColor1,
-                                  fontSize: 10,
-                                  fontFamily: 'monospace',
+                                  fontSize: 10 * themeSettings.fontSizeScale,
+                                  fontFamily: themeSettings.fontFamily,
                                 ),
                               );
                             },
@@ -657,7 +688,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                             '選択中の色',
                             style: TextStyle(
                               color: themeSettings.fontColor1,
-                              fontSize: 12,
+                              fontSize: 12 * themeSettings.fontSizeScale,
+                              fontFamily: themeSettings.fontFamily,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -687,8 +719,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                                 hex,
                                 style: TextStyle(
                                   color: themeSettings.fontColor1,
-                                  fontSize: 10,
-                                  fontFamily: 'monospace',
+                                  fontSize: 10 * themeSettings.fontSizeScale,
+                                  fontFamily: themeSettings.fontFamily,
                                 ),
                               );
                             },

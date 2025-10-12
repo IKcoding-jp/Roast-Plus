@@ -378,134 +378,143 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void _showCalendarDialog(BuildContext context, ThemeSettings themeSettings) {
+    final fontFamily = themeSettings.fontFamily;
+    final dialogBaseTextStyle = TextStyle(fontFamily: fontFamily);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: themeSettings.cardBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '日付を選択',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: themeSettings.fontColor1,
+        return DefaultTextStyle.merge(
+          style: dialogBaseTextStyle,
+          child: Dialog(
+            backgroundColor: themeSettings.cardBackgroundColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '日付を選択',
+                        style: dialogBaseTextStyle.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: themeSettings.fontColor1,
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.close, color: themeSettings.iconColor),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
+                      IconButton(
+                        icon: Icon(Icons.close, color: themeSettings.iconColor),
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),
-                  child: TableCalendar(
-                    firstDay: DateTime(2020),
-                    lastDay: DateTime(2030),
-                    focusedDay: _focusedDate,
-                    selectedDayPredicate: (day) =>
-                        isSameDay(_selectedDate, day),
-                    enabledDayPredicate: (day) => !_isWeekend(day),
-                    onDaySelected: (selectedDay, focusedDay) {
-                      _onDateSelected(selectedDay, focusedDay);
-                      Navigator.of(context).pop();
-                    },
-                    onPageChanged: (focusedDay) {
-                      setState(() {
-                        _focusedDate = focusedDay;
-                      });
-                    },
-                    calendarFormat: CalendarFormat.month,
-                    startingDayOfWeek: StartingDayOfWeek.monday,
-                    headerStyle: HeaderStyle(
-                      formatButtonVisible: false,
-                      titleCentered: true,
-                      titleTextStyle: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: themeSettings.fontColor1,
-                      ),
-                      leftChevronIcon: Icon(
-                        Icons.chevron_left,
-                        color: themeSettings.iconColor,
-                      ),
-                      rightChevronIcon: Icon(
-                        Icons.chevron_right,
-                        color: themeSettings.iconColor,
-                      ),
+                  SizedBox(height: 16),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    daysOfWeekStyle: DaysOfWeekStyle(
-                      weekdayStyle: TextStyle(
-                        color: themeSettings.fontColor1,
-                        fontWeight: FontWeight.bold,
+                    child: TableCalendar(
+                      firstDay: DateTime(2020),
+                      lastDay: DateTime(2030),
+                      focusedDay: _focusedDate,
+                      selectedDayPredicate: (day) =>
+                          isSameDay(_selectedDate, day),
+                      enabledDayPredicate: (day) => !_isWeekend(day),
+                      onDaySelected: (selectedDay, focusedDay) {
+                        _onDateSelected(selectedDay, focusedDay);
+                        Navigator.of(context).pop();
+                      },
+                      onPageChanged: (focusedDay) {
+                        setState(() {
+                          _focusedDate = focusedDay;
+                        });
+                      },
+                      calendarFormat: CalendarFormat.month,
+                      startingDayOfWeek: StartingDayOfWeek.monday,
+                      headerStyle: HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                        titleTextStyle: dialogBaseTextStyle.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: themeSettings.fontColor1,
+                        ),
+                        leftChevronIcon: Icon(
+                          Icons.chevron_left,
+                          color: themeSettings.iconColor,
+                        ),
+                        rightChevronIcon: Icon(
+                          Icons.chevron_right,
+                          color: themeSettings.iconColor,
+                        ),
                       ),
-                      weekendStyle: TextStyle(
-                        color: themeSettings.fontColor1,
-                        fontWeight: FontWeight.bold,
+                      daysOfWeekStyle: DaysOfWeekStyle(
+                        weekdayStyle: dialogBaseTextStyle.copyWith(
+                          color: themeSettings.fontColor1,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        weekendStyle: dialogBaseTextStyle.copyWith(
+                          color: themeSettings.fontColor1,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    calendarStyle: CalendarStyle(
-                      outsideDaysVisible: false,
-                      weekendTextStyle: TextStyle(
-                        color: themeSettings.fontColor1.withValues(alpha: 0.3),
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                      holidayTextStyle: TextStyle(
-                        color: themeSettings.fontColor1,
-                      ),
-                      defaultTextStyle: TextStyle(
-                        color: themeSettings.fontColor1,
-                      ),
-                      disabledTextStyle: TextStyle(
-                        color: themeSettings.fontColor1.withValues(alpha: 0.3),
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                      selectedDecoration: BoxDecoration(
-                        color: themeSettings.buttonColor,
-                        shape: BoxShape.circle,
-                      ),
-                      selectedTextStyle: TextStyle(
-                        color: themeSettings.fontColor2,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      todayDecoration: BoxDecoration(
-                        color: themeSettings.buttonColor.withValues(alpha: 0.3),
-                        shape: BoxShape.circle,
-                      ),
-                      todayTextStyle: TextStyle(
-                        color: themeSettings.fontColor1,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      defaultDecoration: BoxDecoration(shape: BoxShape.circle),
-                      weekendDecoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: themeSettings.fontColor1.withValues(alpha: 0.1),
+                      calendarStyle: CalendarStyle(
+                        outsideDaysVisible: false,
+                        weekendTextStyle: dialogBaseTextStyle.copyWith(
+                          color:
+                              themeSettings.fontColor1.withValues(alpha: 0.3),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                        holidayTextStyle: dialogBaseTextStyle.copyWith(
+                          color: themeSettings.fontColor1,
+                        ),
+                        defaultTextStyle: dialogBaseTextStyle.copyWith(
+                          color: themeSettings.fontColor1,
+                        ),
+                        disabledTextStyle: dialogBaseTextStyle.copyWith(
+                          color:
+                              themeSettings.fontColor1.withValues(alpha: 0.3),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                        selectedDecoration: BoxDecoration(
+                          color: themeSettings.buttonColor,
+                          shape: BoxShape.circle,
+                        ),
+                        selectedTextStyle: dialogBaseTextStyle.copyWith(
+                          color: themeSettings.fontColor2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        todayDecoration: BoxDecoration(
+                          color:
+                              themeSettings.buttonColor.withValues(alpha: 0.3),
+                          shape: BoxShape.circle,
+                        ),
+                        todayTextStyle: dialogBaseTextStyle.copyWith(
+                          color: themeSettings.fontColor1,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        defaultDecoration: BoxDecoration(shape: BoxShape.circle),
+                        weekendDecoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: themeSettings.fontColor1.withValues(alpha: 0.1),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -516,30 +525,41 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     final themeSettings = Provider.of<ThemeSettings>(context);
+    final fontFamily = themeSettings.fontFamily;
+    final baseTextStyle = TextStyle(fontFamily: fontFamily);
+    final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'カレンダー',
-          style: TextStyle(
-            fontFamily: themeSettings.fontFamily,
-            fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
-          ),
-        ),
-        backgroundColor: themeSettings.appBarColor,
-        foregroundColor: themeSettings.appBarTextColor,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.calendar_month),
-            onPressed: () {
-              _showCalendarDialog(context, themeSettings);
-            },
-          ),
-        ],
+    return Theme(
+      data: theme.copyWith(
+        textTheme: theme.textTheme.apply(fontFamily: fontFamily),
       ),
-      body: kIsWeb
-          ? _buildWebLayout(themeSettings)
-          : SafeArea(child: _buildMobileLayout(themeSettings)),
+      child: DefaultTextStyle.merge(
+        style: baseTextStyle,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'カレンダー',
+              style: baseTextStyle.copyWith(
+                fontSize: (20 * themeSettings.fontSizeScale)
+                    .clamp(16.0, 28.0),
+              ),
+            ),
+            backgroundColor: themeSettings.appBarColor,
+            foregroundColor: themeSettings.appBarTextColor,
+            actions: [
+              IconButton(
+                icon: Icon(Icons.calendar_month),
+                onPressed: () {
+                  _showCalendarDialog(context, themeSettings);
+                },
+              ),
+            ],
+          ),
+          body: kIsWeb
+              ? _buildWebLayout(themeSettings)
+              : SafeArea(child: _buildMobileLayout(themeSettings)),
+        ),
+      ),
     );
   }
 
@@ -654,14 +674,21 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             SizedBox(height: isMobile ? 16 : 24), // スマホでは間隔を狭く
             // 日付選択ボタン（直近の平日7営業日を表示）
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 左右の幅を最大活用
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: isMobile ? 12 : 28,
+              runSpacing: isMobile ? 12 : 16,
               children: _getRecentWeekdays(7).map((date) {
-                return _buildWeekdayDateButton(
-                  context,
-                  date,
-                  themeSettings,
-                  isMobile: isMobile,
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 0 : 4,
+                  ),
+                  child: _buildWeekdayDateButton(
+                    context,
+                    date,
+                    themeSettings,
+                    isMobile: isMobile,
+                  ),
                 );
               }).toList(),
             ),

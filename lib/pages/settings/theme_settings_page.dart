@@ -210,6 +210,16 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               'ゴールド',
               'シルバー',
             ], Icons.auto_awesome),
+
+            const SizedBox(height: 16),
+
+            // マルチカラー系テーマ
+            _buildThemeCategory(context, themeSettings, 'マルチカラー 🌈', [
+              'ロマンチック',
+              'おしゃれ',
+              '清潔感',
+              '高級',
+            ], Icons.gradient),
           ],
         ),
       ),
@@ -505,6 +515,14 @@ class _PresetButton extends StatelessWidget {
         return Icons.auto_awesome_outlined;
       case 'ピーチ':
         return Icons.local_florist_outlined;
+      case 'ロマンチック':
+        return Icons.favorite;
+      case 'おしゃれ':
+        return Icons.style;
+      case '清潔感':
+        return Icons.clean_hands;
+      case '高級':
+        return Icons.diamond;
 
       default:
         return Icons.palette;

@@ -61,7 +61,28 @@ class UserSettingsFirestoreService {
 
   /// 設定を取得
   static Future<dynamic> getSetting(String key, {dynamic defaultValue}) async {
-    if (_uid == null) throw Exception('未ログイン');
+    final uid = _uid;
+
+    // 未ログイン時のフォールバック処理
+    if (uid == null) {
+      if (kIsWeb) {
+        try {
+          final localValue = await WebSettingsPersistenceService.getSetting(
+            key,
+            defaultValue: defaultValue,
+          );
+          if (localValue != null) {
+            _logInfo('未ログイン(Web)のためローカル設定から取得: $key = $localValue');
+            return localValue;
+          }
+        } catch (e, st) {
+          _logError('未ログイン時ローカル設定取得エラー', e, st);
+        }
+      }
+
+      _logInfo('未ログインのためデフォルト値を返却: $key');
+      return defaultValue;
+    }
 
     try {
       // Web版ではまずローカル永続化から取得を試行
@@ -80,7 +101,12 @@ class UserSettingsFirestoreService {
         }
       }
 
-      final doc = await _userSettingsCollection.doc(key).get();
+      final doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('settings')
+          .doc(key)
+          .get();
       if (!doc.exists) return defaultValue;
 
       final data = doc.data()!;

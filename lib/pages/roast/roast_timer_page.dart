@@ -66,6 +66,7 @@ class _RoastTimerPageState extends State<RoastTimerPage>
   bool? _useRoast;
   bool? _useCooling;
   int? _coolingMinutes;
+  int _recommendedOffsetSeconds = 60;
 
   void _loadInterstitialAdAndShow(VoidCallback onAdClosed) async {
     // 広告機能を削除したため、直接コールバックを実行
@@ -193,6 +194,12 @@ class _RoastTimerPageState extends State<RoastTimerPage>
           await UserSettingsFirestoreService.getSetting('useCooling') ?? false;
       _coolingMinutes =
           await UserSettingsFirestoreService.getSetting('coolingMinutes') ?? 10;
+
+      final offsetRaw = await UserSettingsFirestoreService.getSetting(
+        'recommendedRoastOffsetSeconds',
+        defaultValue: 60,
+      );
+      _recommendedOffsetSeconds = _parseIntSetting(offsetRaw, fallback: 60);
     } catch (e) {
       debugPrint('設定読み込みエラー: $e');
       // エラー時はデフォルト値を使用
@@ -201,7 +208,21 @@ class _RoastTimerPageState extends State<RoastTimerPage>
       _useRoast = true;
       _useCooling = false;
       _coolingMinutes = 10;
+      _recommendedOffsetSeconds = 60;
     }
+  }
+
+  int _parseIntSetting(dynamic value, {required int fallback}) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is double) return value.round();
+    if (value is String) {
+      final parsed = int.tryParse(value);
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+    return fallback;
   }
 
   // 通知権限を初期化
@@ -1337,10 +1358,10 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               }
                               if (count == 0) return;
                               int avgSeconds = (totalSeconds ~/ count);
-                              int offset =
-                                  await UserSettingsFirestoreService.getSetting(
-                                    'recommendedRoastOffsetSeconds',
-                                  );
+                              int offset = _recommendedOffsetSeconds;
+                              if (offset <= 0) {
+                                offset = 60;
+                              }
                               int setSeconds = avgSeconds - offset;
                               if (setSeconds < 60) setSeconds = 60;
                               String format(int sec) =>

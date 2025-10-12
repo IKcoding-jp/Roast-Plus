@@ -311,15 +311,27 @@ class DripCounterPageState extends State<DripCounterPage>
                           ),
                         ),
                         SizedBox(height: 24),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: _createButtons(themeSettings),
-                            ),
-                          ),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final screenWidth = MediaQuery.sizeOf(
+                              context,
+                            ).width;
+                            final isCompact = screenWidth <= 540;
+                            if (isCompact) {
+                              return _buildCompactButtonGrid(
+                                themeSettings,
+                                constraints.maxWidth,
+                              );
+                            }
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: _createButtons(themeSettings),
+                              ),
+                            );
+                          },
                         ),
                         SizedBox(height: 24),
                         _buildInputs(themeSettings),
@@ -363,14 +375,17 @@ class DripCounterPageState extends State<DripCounterPage>
     return _counter > 0 && bean.isNotEmpty && _selectedRoast != null;
   }
 
-  List<Widget> _createButtons(ThemeSettings themeSettings) {
+  List<Widget> _createButtons(
+    ThemeSettings themeSettings, {
+    double buttonWidth = 72,
+  }) {
     const increments = [-10, -5, -1, 1, 5, 10];
     return increments
         .map(
           (value) => Padding(
             padding: EdgeInsets.symmetric(horizontal: 6),
             child: SizedBox(
-              width: 72,
+              width: buttonWidth,
               child: ElevatedButton(
                 onPressed: () => _addToCounter(value),
                 style: ElevatedButton.styleFrom(
@@ -394,6 +409,62 @@ class DripCounterPageState extends State<DripCounterPage>
           ),
         )
         .toList();
+  }
+
+  Widget _buildCompactButtonGrid(ThemeSettings themeSettings, double maxWidth) {
+    const negativeValues = [-1, -5, -10];
+    const positiveValues = [1, 5, 10];
+    final availableWidth = maxWidth <= 0 ? double.infinity : maxWidth;
+    final buttonWidth = (availableWidth - 64) / 2;
+    final resolvedWidth = buttonWidth.clamp(120.0, 168.0);
+
+    Widget buildColumn(List<int> values) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: values
+            .map(
+              (value) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: SizedBox(
+                  width: resolvedWidth,
+                  height: 60,
+                  child: ElevatedButton(
+                    onPressed: () => _addToCounter(value),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: themeSettings.buttonColor,
+                      foregroundColor: themeSettings.fontColor2,
+                      padding: EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      textStyle: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: themeSettings.fontFamily,
+                      ),
+                    ),
+                    child: Text('${value > 0 ? '+' : ''}$value'),
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      );
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildColumn(negativeValues),
+          SizedBox(width: 20),
+          buildColumn(positiveValues),
+        ],
+      ),
+    );
   }
 
   Widget _buildInputs(ThemeSettings themeSettings) {

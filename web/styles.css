@@ -1,35 +1,35 @@
 /* カスタムフォントの定義 */
 @font-face {
   font-family: 'ZenMaruGothic';
-  src: url('fonts/ZenMaruGothic-Regular.ttf') format('truetype');
+  src: local('ZenMaruGothic'), url('assets/fonts/ZenMaruGothic-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'utsukushiFONT';
-  src: url('fonts/UtsukushiFONT.otf') format('opentype');
+  src: local('utsukushiFONT'), url('assets/fonts/UtsukushiFONT.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'KiwiMaru';
-  src: url('fonts/KiwiMaru-Regular.ttf') format('truetype');
+  src: local('KiwiMaru'), url('assets/fonts/KiwiMaru-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'HannariMincho';
-  src: url('fonts/HannariMincho-Regular.otf') format('opentype');
+  src: local('HannariMincho'), url('assets/fonts/HannariMincho-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Harenosora';
-  src: url('fonts/Harenosora.otf') format('opentype');
+  src: local('Harenosora'), url('assets/fonts/Harenosora.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }

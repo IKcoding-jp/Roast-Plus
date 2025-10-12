@@ -41,42 +41,94 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
   String? _selectedRecommendWeight;
   String? _selectedRecommendRoast;
   List<Map<String, dynamic>> _recommendRecords = [];
+  int _recommendedOffsetSeconds = 60;
 
   // 記録からおすすめ条件の組み合わせを抽出
   Future<void> _loadRecommendOptions() async {
     final saved = await UserSettingsFirestoreService.getSetting('roastRecords');
-    if (saved != null) {
-      final records = saved.map((e) => Map<String, dynamic>.from(e)).toList();
-      // 組み合わせごとに件数カウント
-      final Map<String, int> countMap = {};
-      for (var r in records) {
-        final bean = (r['bean'] ?? '').toString();
-        final weight = (r['weight'] ?? '').toString();
-        final roast = (r['roast'] ?? '').toString();
-        if (bean.isEmpty || weight.isEmpty || roast.isEmpty) continue;
-        final key = '$bean|$weight|$roast';
-        countMap[key] = (countMap[key] ?? 0) + 1;
-      }
-      // 2件以上ある組み合わせのみ
-      final validKeys = countMap.entries
-          .where((e) => e.value >= 2)
-          .map((e) => e.key)
-          .toList();
-      _recommendRecords = records.where((r) {
-        final key = '${r['bean']}|${r['weight']}|${r['roast']}';
-        return validKeys.contains(key);
-      }).toList();
-      // 豆リスト
-      _recommendBeanList = _recommendRecords
-          .map((r) => r['bean'] as String)
-          .toSet()
-          .toList();
-      // 初期選択
-      if (_recommendBeanList.isNotEmpty) {
-        _selectedRecommendBean ??= _recommendBeanList.first;
-        _updateRecommendWeightList();
-      }
+    if (saved == null) {
+      _resetRecommendSelections();
+      if (mounted) setState(() {});
+      return;
     }
+
+    if (saved is! Iterable) {
+      debugPrint('おすすめ焙煎データが不正な形式です: ${saved.runtimeType}');
+      _resetRecommendSelections();
+      if (mounted) setState(() {});
+      return;
+    }
+
+    final records = saved
+        .map((dynamic e) {
+          if (e is Map<String, dynamic>) {
+            return Map<String, dynamic>.from(e);
+          }
+          if (e is Map) {
+            return Map<String, dynamic>.from(e);
+          }
+          return <String, dynamic>{};
+        })
+        .where((r) => r.isNotEmpty)
+        .toList();
+
+    if (records.isEmpty) {
+      _resetRecommendSelections();
+      if (mounted) setState(() {});
+      return;
+    }
+    // 組み合わせごとに件数カウント
+    final Map<String, int> countMap = {};
+    for (var r in records) {
+      final bean = (r['bean'] ?? '').toString();
+      final weight = (r['weight'] ?? '').toString();
+      final roast = (r['roast'] ?? '').toString();
+      if (bean.isEmpty || weight.isEmpty || roast.isEmpty) continue;
+      final key = '$bean|$weight|$roast';
+      countMap[key] = (countMap[key] ?? 0) + 1;
+    }
+
+    // 2件以上ある組み合わせのみ
+    final validKeys = countMap.entries
+        .where((e) => e.value >= 2)
+        .map((e) => e.key)
+        .toList();
+    _recommendRecords = records.where((r) {
+      final key = '${r['bean']}|${r['weight']}|${r['roast']}';
+      return validKeys.contains(key);
+    }).toList();
+
+    // 豆リスト
+    _recommendBeanList = _recommendRecords
+        .map((r) => r['bean'] as String)
+        .toSet()
+        .toList();
+
+    // 初期選択
+    if (_recommendBeanList.isNotEmpty) {
+      _selectedRecommendBean ??= _recommendBeanList.first;
+      _updateRecommendWeightList();
+    }
+
+    final offsetRaw = await UserSettingsFirestoreService.getSetting(
+      'recommendedRoastOffsetSeconds',
+      defaultValue: 60,
+    );
+    _recommendedOffsetSeconds = _parseIntSetting(offsetRaw, fallback: 60);
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _resetRecommendSelections() {
+    _recommendRecords = [];
+    _recommendBeanList = [];
+    _recommendWeightList = [];
+    _recommendRoastList = [];
+    _selectedRecommendBean = null;
+    _selectedRecommendWeight = null;
+    _selectedRecommendRoast = null;
   }
 
   void _updateRecommendWeightList() {
@@ -776,7 +828,11 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                             }
                             if (count == 0) return;
                             int avgSeconds = (totalSeconds ~/ count);
-                            int setSeconds = avgSeconds - 60;
+                            int offset = _recommendedOffsetSeconds;
+                            if (offset <= 0) {
+                              offset = 60;
+                            }
+                            int setSeconds = avgSeconds - offset;
                             if (setSeconds < 60) setSeconds = 60;
                             String format(int sec) =>
                                 '${(sec ~/ 60).toString().padLeft(2, '0')}:${(sec % 60).toString().padLeft(2, '0')}';
@@ -796,7 +852,7 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                                 ),
                                 content: Text(
                                   '平均焙煎時間: ${format(avgSeconds)}\n'
-                                  'おすすめタイマー: ${format(setSeconds)}（平均−60秒）\n\n'
+                                  'おすすめタイマー: ${format(setSeconds)}（平均−${offset}秒）\n\n'
                                   'この時間でタイマーを開始しますか？',
                                   style: TextStyle(
                                     color: Provider.of<ThemeSettings>(
@@ -1052,5 +1108,18 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
         ),
       ),
     );
+  }
+
+  int _parseIntSetting(dynamic value, {required int fallback}) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is double) return value.round();
+    if (value is String) {
+      final parsed = int.tryParse(value);
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+    return fallback;
   }
 }

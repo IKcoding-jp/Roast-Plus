@@ -324,6 +324,7 @@ class _WorkProgressPageState extends State<WorkProgressPage>
   }
 
   Widget _buildWebLayout(
+    BuildContext context,
     ThemeSettings themeSettings,
     WorkProgressProvider workProgressProvider,
     GroupProvider groupProvider,
@@ -375,18 +376,62 @@ class _WorkProgressPageState extends State<WorkProgressPage>
       );
     }
 
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    if (screenWidth <= 600) {
+      return _buildMobileLayout(
+        themeSettings,
+        workProgressProvider,
+        groupProvider,
+        canEdit,
+      );
+    }
+
+    final maxWidth = 1000.0;
+    final padding = 16.0;
+    final spacing = 16.0;
+
+    final availableWidth = (screenWidth - padding * 2).clamp(320.0, maxWidth);
+    int columns = 3;
+    double cardWidth = (availableWidth - (columns - 1) * spacing) / columns;
+
+    while (columns > 1 && cardWidth < 240) {
+      columns--;
+      cardWidth = (availableWidth - (columns - 1) * spacing) / columns;
+    }
+
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       child: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 1000),
-          child: _buildMasonryLayout(
-            workProgressProvider.workProgressList,
-            themeSettings,
-            groupProvider,
-            canEdit,
-            workProgressProvider,
-          ),
+        child: SizedBox(
+          width: screenWidth > maxWidth ? maxWidth : availableWidth,
+          child: columns == 1
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: workProgressProvider.workProgressList
+                      .map(
+                        (workProgress) => Padding(
+                          padding: EdgeInsets.only(bottom: spacing),
+                          child: _buildWorkProgressCard(
+                            workProgress,
+                            themeSettings,
+                            groupProvider,
+                            canEdit,
+                            workProgressProvider,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                )
+              : _buildMasonryLayout(
+                  workProgressProvider.workProgressList,
+                  themeSettings,
+                  groupProvider,
+                  canEdit,
+                  workProgressProvider,
+                  columns: columns,
+                  cardWidth: cardWidth,
+                  spacing: spacing,
+                ),
         ),
       ),
     );
@@ -397,59 +442,54 @@ class _WorkProgressPageState extends State<WorkProgressPage>
     ThemeSettings themeSettings,
     GroupProvider groupProvider,
     bool canEdit,
-    WorkProgressProvider workProgressProvider,
-  ) {
-    const int columns = 3;
-    const double cardWidth = 300.0;
-    const double spacing = 8.0;
+    WorkProgressProvider workProgressProvider, {
+    int columns = 3,
+    double cardWidth = 300.0,
+    double spacing = 16.0,
+  }) {
+    final columnHeights = List<double>.filled(columns, 0);
+    final columnChildren = List.generate(columns, (_) => <Widget>[]);
 
-    // 各カラムの高さを追跡
-    List<double> columnHeights = List.filled(columns, 0.0);
-    List<List<Widget>> columnWidgets = List.generate(columns, (_) => []);
-
-    for (int i = 0; i < workProgressList.length; i++) {
-      final workProgress = workProgressList[i];
-
-      // 最も短いカラムを見つける
+    for (final workProgress in workProgressList) {
       int shortestColumnIndex = 0;
       double minHeight = columnHeights[0];
-      for (int j = 1; j < columns; j++) {
-        if (columnHeights[j] < minHeight) {
-          minHeight = columnHeights[j];
-          shortestColumnIndex = j;
+      for (int i = 1; i < columns; i++) {
+        if (columnHeights[i] < minHeight) {
+          minHeight = columnHeights[i];
+          shortestColumnIndex = i;
         }
       }
 
-      // カードウィジェットを作成
-      final cardWidget = _buildWorkProgressCard(
-        workProgress,
-        themeSettings,
-        groupProvider,
-        canEdit,
-        workProgressProvider,
-      );
-
-      // カードの高さを推定（実際の高さは後で計算）
-      final estimatedHeight = _estimateCardHeight(workProgress);
-
-      // カラムに追加
-      columnWidgets[shortestColumnIndex].add(
-        Container(
-          width: cardWidth,
-          margin: EdgeInsets.only(bottom: spacing),
-          child: cardWidget,
+      final card = SizedBox(
+        width: cardWidth,
+        child: _buildWorkProgressCard(
+          workProgress,
+          themeSettings,
+          groupProvider,
+          canEdit,
+          workProgressProvider,
         ),
       );
 
-      // カラムの高さを更新
-      columnHeights[shortestColumnIndex] += estimatedHeight + spacing;
+      columnChildren[shortestColumnIndex].add(
+        Padding(
+          padding: EdgeInsets.only(bottom: spacing),
+          child: card,
+        ),
+      );
+      columnHeights[shortestColumnIndex] +=
+          _estimateCardHeight(workProgress) + spacing;
     }
 
-    // カラムを横に並べて表示
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(columns, (index) {
-        return Expanded(child: Column(children: columnWidgets[index]));
+        return Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: columnChildren[index],
+          ),
+        );
       }),
     );
   }
@@ -635,9 +675,10 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                     final stage = workProgress.stageStatus.keys.first;
                     final status = workProgress.stageStatus.values.first;
                     return Container(
+                      width: double.infinity,
                       padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
+                        horizontal: 12,
+                        vertical: 10,
                       ),
                       decoration: BoxDecoration(
                         color: _getStatusBgColor(context, status, stage),
@@ -647,30 +688,30 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                               : _getStatusColor(context, status, stage),
                           width: 1,
                         ),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             _getStatusIcon(status, stage),
                             color: stage == WorkStage.dripPack
                                 ? _getStageTextColor(context, stage)
                                 : _getStatusColor(context, status, stage),
-                            size: 15,
+                            size: 18,
                           ),
-                          SizedBox(width: 6),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               '${_getStageDisplayName(stage)} ${_getStatusDisplayName(status)}',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 14,
                                 color: stage == WorkStage.dripPack
                                     ? _getStageTextColor(context, stage)
                                     : _getStatusColor(context, status, stage),
                                 fontWeight: FontWeight.bold,
                               ),
                               overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         ],
@@ -1077,8 +1118,10 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                 '作業状況記録',
                 style: TextStyle(
                   fontFamily: themeSettings.fontFamily,
-                  fontSize:
-                      (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
+                  fontSize: (20 * themeSettings.fontSizeScale).clamp(
+                    16.0,
+                    28.0,
+                  ),
                 ),
               ),
               Consumer<GroupProvider>(
@@ -1110,6 +1153,7 @@ class _WorkProgressPageState extends State<WorkProgressPage>
         ),
         body: kIsWeb
             ? _buildWebLayout(
+                context,
                 themeSettings,
                 workProgressProvider,
                 groupProvider,

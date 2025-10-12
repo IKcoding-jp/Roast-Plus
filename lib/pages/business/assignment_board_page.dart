@@ -3200,71 +3200,55 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                     team.members.length > max ? team.members.length : max,
               ),
         (i) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          padding: EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 左ラベル
-              SizedBox(
-                width: 60,
-                child: Text(
-                  leftLabels.isNotEmpty && i < leftLabels.length
-                      ? leftLabels[i]
-                      : '',
+              if (leftLabels.isNotEmpty && i < leftLabels.length)
+                Text(
+                  leftLabels[i],
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 13 * themeSettings.fontSizeScale,
+                    fontSize: 16,
                     color: themeSettings.fontColor1,
-                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
-                  overflow: TextOverflow.visible,
-                  maxLines: 2,
                 ),
-              ),
-              SizedBox(width: 2), // ラベルとカードの間の小さなスペース（間隔を狭く）
-              // メンバーカード
-              ...teams.map<Widget>(
-                (team) => Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: 1,
-                  ), // カード間の小さなスペース（間隔を狭く）
-                  child: MemberCard(
-                    name: i < team.members.length && team.members[i].isNotEmpty
-                        ? team.members[i]
-                        : '未設定',
-                    attendanceStatus: _getMemberAttendanceStatus(
+              SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: teams.map((team) {
+                  final memberName =
                       i < team.members.length && team.members[i].isNotEmpty
-                          ? team.members[i]
-                          : '未設定',
+                      ? team.members[i]
+                      : '未設定';
+                  return SizedBox(
+                    width: 120,
+                    child: MemberCard(
+                      name: memberName,
+                      attendanceStatus: _getMemberAttendanceStatus(memberName),
+                      onTap: () {
+                        if (memberName != '未設定') {
+                          _showAttendanceDialog(memberName);
+                        }
+                      },
                     ),
-                    onTap: () {
-                      if (i < team.members.length &&
-                          team.members[i].isNotEmpty) {
-                        _showAttendanceDialog(team.members[i]);
-                      }
-                    },
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 8),
+              if (rightLabels.isNotEmpty && i < rightLabels.length)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    rightLabels[i],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: themeSettings.fontColor1,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 2), // カードとラベルの間の小さなスペース（間隔を狭く）
-              // 右ラベル
-              SizedBox(
-                width: 60,
-                child: Text(
-                  rightLabels.isNotEmpty && i < rightLabels.length
-                      ? rightLabels[i]
-                      : '',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13 * themeSettings.fontSizeScale,
-                    color: themeSettings.fontColor1,
-                    fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
-                  ),
-                  overflow: TextOverflow.visible,
-                  maxLines: 2,
-                ),
-              ),
             ],
           ),
         ),
@@ -3529,7 +3513,6 @@ class MemberCard extends StatefulWidget {
   final String name;
   final AttendanceStatus attendanceStatus;
   final VoidCallback? onTap;
-
   const MemberCard({
     super.key,
     required this.name,

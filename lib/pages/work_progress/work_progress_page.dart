@@ -209,6 +209,8 @@ class _WorkProgressPageState extends State<WorkProgressPage>
         return 'ミル';
       case WorkStage.dripPack:
         return 'ドリップパック';
+      case WorkStage.sticker:
+        return 'シール貼り';
       case WorkStage.threeWayBag:
         return '三方袋';
       case WorkStage.packaging:
@@ -282,6 +284,8 @@ class _WorkProgressPageState extends State<WorkProgressPage>
         return Icons.coffee;
       case WorkStage.dripPack:
         return Icons.local_cafe;
+      case WorkStage.sticker:
+        return Icons.emoji_emotions;
       case WorkStage.threeWayBag:
         return Icons.shopping_bag;
       case WorkStage.packaging:
@@ -306,6 +310,8 @@ class _WorkProgressPageState extends State<WorkProgressPage>
         return brightness == Brightness.dark
             ? const Color(0xFFEEEEEE)
             : Colors.white;
+      case WorkStage.sticker:
+        return const Color(0xFFE5DDBE);
       case WorkStage.threeWayBag:
         return const Color(0xFFC0C0C0);
       case WorkStage.packaging:
@@ -508,7 +514,49 @@ class _WorkProgressPageState extends State<WorkProgressPage>
       height += 30.0;
     }
 
+    if (_hasQuantity(workProgress)) {
+      height += 24.0;
+    }
+
     return height;
+  }
+
+  bool _hasQuantity(WorkProgress workProgress) {
+    final unit = workProgress.quantityUnit?.trim() ?? '';
+    return workProgress.quantity != null && unit.isNotEmpty;
+  }
+
+  String _formatQuantityValue(double quantity) {
+    if (quantity % 1 == 0) {
+      return quantity.toStringAsFixed(0);
+    }
+    return quantity.toString();
+  }
+
+  Widget _buildQuantityChip(
+    String display,
+    ThemeSettings themeSettings, {
+    double fontSize = 13,
+    EdgeInsets padding = const EdgeInsets.symmetric(
+      horizontal: 10,
+      vertical: 4,
+    ),
+  }) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: themeSettings.fontColor1.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        display,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w600,
+          color: themeSettings.fontColor1,
+        ),
+      ),
+    );
   }
 
   Widget _buildWorkProgressCard(
@@ -520,6 +568,15 @@ class _WorkProgressPageState extends State<WorkProgressPage>
   ) {
     final hasNotes =
         workProgress.notes != null && workProgress.notes!.isNotEmpty;
+    final hasQuantity = _hasQuantity(workProgress);
+    final quantityValue = hasQuantity
+        ? _formatQuantityValue(workProgress.quantity!)
+        : null;
+    final quantityUnit = hasQuantity ? workProgress.quantityUnit! : null;
+    final quantityDisplay =
+        (hasQuantity && quantityValue != null && quantityUnit != null)
+        ? '$quantityValue $quantityUnit'
+        : null;
 
     return Card(
       elevation: 3,
@@ -555,14 +612,26 @@ class _WorkProgressPageState extends State<WorkProgressPage>
               Row(
                 children: [
                   Expanded(
-                    child: BeanNameWithSticker(
-                      beanName: workProgress.beanName,
-                      textStyle: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: themeSettings.fontColor1,
-                      ),
-                      stickerSize: 16.0,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: BeanNameWithSticker(
+                            beanName: workProgress.beanName,
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: themeSettings.fontColor1,
+                            ),
+                            stickerSize: 16.0,
+                          ),
+                        ),
+                        if (quantityDisplay != null) ...[
+                          SizedBox(width: 6),
+                          _buildQuantityChip(quantityDisplay, themeSettings),
+                        ],
+                      ],
                     ),
                   ),
                   if (canEdit)
@@ -653,9 +722,18 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                           value: 'delete',
                           child: Row(
                             children: [
-                              Icon(Icons.delete, size: 16, color: Colors.red),
+                              Icon(
+                                Icons.delete,
+                                size: 16,
+                                color: themeSettings.iconColor,
+                              ),
                               SizedBox(width: 8),
-                              Text('削除', style: TextStyle(color: Colors.red)),
+                              Text(
+                                '削除',
+                                style: TextStyle(
+                                  color: themeSettings.iconColor,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -826,6 +904,15 @@ class _WorkProgressPageState extends State<WorkProgressPage>
       itemCount: workProgressProvider.workProgressList.length,
       itemBuilder: (context, index) {
         final workProgress = workProgressProvider.workProgressList[index];
+        final hasQuantity = _hasQuantity(workProgress);
+        final quantityValue = hasQuantity
+            ? _formatQuantityValue(workProgress.quantity!)
+            : null;
+        final quantityUnit = hasQuantity ? workProgress.quantityUnit! : null;
+        final quantityDisplay =
+            (hasQuantity && quantityValue != null && quantityUnit != null)
+            ? '$quantityValue $quantityUnit'
+            : null;
         return Card(
           margin: EdgeInsets.only(bottom: 12),
           elevation: 4,
@@ -860,9 +947,10 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
+                      Flexible(
                         child: BeanNameWithSticker(
                           beanName: workProgress.beanName,
                           textStyle: TextStyle(
@@ -873,6 +961,18 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                           stickerSize: 18.0,
                         ),
                       ),
+                      if (quantityDisplay != null) ...[
+                        SizedBox(width: 6),
+                        _buildQuantityChip(
+                          quantityDisplay,
+                          themeSettings,
+                          fontSize: 12,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                        ),
+                      ],
                       if (workProgress.stageStatus.isNotEmpty) ...[
                         Builder(
                           builder: (context) {
@@ -1054,6 +1154,34 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                       color: themeSettings.fontColor1.withValues(alpha: 0.7),
                     ),
                   ),
+                  if (hasQuantity &&
+                      quantityValue != null &&
+                      quantityUnit != null)
+                    Padding(
+                      padding: EdgeInsets.only(top: 6),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.scale,
+                            size: 16,
+                            color: themeSettings.fontColor1.withValues(
+                              alpha: 0.6,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            '$quantityValue $quantityUnit',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: themeSettings.fontColor1.withValues(
+                                alpha: 0.85,
+                              ),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   if (workProgress.notes != null &&
                       workProgress.notes!.isNotEmpty) ...[
                     SizedBox(height: 8),

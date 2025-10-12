@@ -178,9 +178,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
             SizedBox(height: _isMobileLayout(context) ? 6.0 : 8.0),
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: themeSettings.inputBackgroundColor,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: themeSettings.borderColor),
               ),
               child: DropdownButtonFormField<String>(
                 initialValue: roastLevel,
@@ -192,6 +192,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                   ),
                   hintText: '煎り度を選択',
                   hintStyle: TextStyle(
+                    color: themeSettings.fontColor1.withValues(alpha: 0.6),
                     fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
                   ),
                 ),
@@ -296,7 +297,8 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
     required Color iconColor,
     TextInputType? keyboardType,
   }) {
-    final accentColor = Provider.of<ThemeSettings>(context).fontColor1;
+    final themeSettings = Provider.of<ThemeSettings>(context);
+    final accentColor = themeSettings.fontColor1;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -331,9 +333,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
         SizedBox(height: _isMobileLayout(context) ? 6.0 : 8.0),
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: themeSettings.inputBackgroundColor,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: themeSettings.borderColor),
           ),
           child: TextField(
             controller: controller,
@@ -346,7 +348,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
               ),
               hintText: hint,
               hintStyle: TextStyle(
-                color: accentColor.withValues(alpha: 0.6),
+                color: themeSettings.fontColor1.withValues(alpha: 0.6),
                 fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),
             ),
@@ -378,11 +380,12 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
     required String label,
     required Color iconColor,
   }) {
+    final themeSettings = Provider.of<ThemeSettings>(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: themeSettings.inputBackgroundColor,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: themeSettings.borderColor),
       ),
       child: TextField(
         controller: controller,
@@ -399,7 +402,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
           ),
           hintText: label,
           hintStyle: TextStyle(
-            color: Colors.grey[400],
+            color: themeSettings.fontColor1.withValues(alpha: 0.5),
             fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
           ),
         ),
@@ -426,7 +429,8 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
     required TextEditingController controller,
     required Color iconColor,
   }) {
-    final accentColor = Provider.of<ThemeSettings>(context).fontColor1;
+    final themeSettings = Provider.of<ThemeSettings>(context);
+    final accentColor = themeSettings.fontColor1;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -461,9 +465,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
         SizedBox(height: _isMobileLayout(context) ? 6.0 : 8.0),
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: themeSettings.inputBackgroundColor,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: themeSettings.borderColor),
           ),
           child: DropdownButtonFormField<String>(
             initialValue: controller.text.isEmpty ? null : controller.text,
@@ -475,7 +479,7 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
               ),
               hintText: '重さを選択',
               hintStyle: TextStyle(
-                color: accentColor.withValues(alpha: 0.6),
+                color: themeSettings.fontColor1.withValues(alpha: 0.6),
                 fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),
             ),
@@ -856,7 +860,9 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                         color: Theme.of(context).scaffoldBackgroundColor,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1.withValues(alpha: 0.1),
                             blurRadius: 4,
                             offset: Offset(0, -2),
                           ),
@@ -887,14 +893,16 @@ class _RoastRecordPageState extends State<RoastRecordPage> {
                                     .style
                                     ?.backgroundColor
                                     ?.resolve({}) ??
-                                Theme.of(context).colorScheme.primary,
+                                Provider.of<ThemeSettings>(
+                                  context,
+                                ).appButtonColor,
                             foregroundColor:
                                 Theme.of(context)
                                     .elevatedButtonTheme
                                     .style
                                     ?.foregroundColor
                                     ?.resolve({}) ??
-                                Colors.white,
+                                Provider.of<ThemeSettings>(context).fontColor2,
                             padding: EdgeInsets.symmetric(
                               vertical: _isMobileLayout(context) ? 15.0 : 18.0,
                             ),

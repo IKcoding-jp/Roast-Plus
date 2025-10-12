@@ -109,14 +109,20 @@ class _SchedulePageState extends State<SchedulePage>
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.blue.shade100,
+                            color: themeSettings.iconColor.withValues(
+                              alpha: 0.15,
+                            ),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.blue.shade400),
+                            border: Border.all(
+                              color: themeSettings.iconColor.withValues(
+                                alpha: 0.4,
+                              ),
+                            ),
                           ),
                           child: Icon(
                             Icons.groups,
                             size: 18,
-                            color: Colors.blue.shade700,
+                            color: themeSettings.iconColor,
                           ),
                         );
                       }
@@ -155,7 +161,7 @@ class _SchedulePageState extends State<SchedulePage>
                                 color: themeSettings.cardBackgroundColor,
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Colors.grey.shade300,
+                                    color: themeSettings.borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -197,7 +203,7 @@ class _SchedulePageState extends State<SchedulePage>
                           color: themeSettings.cardBackgroundColor,
                           border: Border(
                             bottom: BorderSide(
-                              color: Colors.grey.shade300,
+                              color: themeSettings.borderColor,
                               width: 1,
                             ),
                           ),
@@ -295,7 +301,8 @@ class _SchedulePageState extends State<SchedulePage>
                                             16,
                                           ),
                                         ),
-                                        color: Colors.white,
+                                        color:
+                                            themeSettings.cardBackgroundColor,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -379,7 +386,8 @@ class _SchedulePageState extends State<SchedulePage>
                                             16,
                                           ),
                                         ),
-                                        color: Colors.white,
+                                        color:
+                                            themeSettings.cardBackgroundColor,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -439,7 +447,7 @@ class _SchedulePageState extends State<SchedulePage>
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      color: Colors.white,
+                                      color: themeSettings.cardBackgroundColor,
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -526,7 +534,8 @@ class _SchedulePageState extends State<SchedulePage>
                                             16,
                                           ),
                                         ),
-                                        color: Colors.white,
+                                        color:
+                                            themeSettings.cardBackgroundColor,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,

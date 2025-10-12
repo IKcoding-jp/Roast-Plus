@@ -247,9 +247,9 @@ class _CalendarPageState extends State<CalendarPage> {
   // タスクの色を取得するヘルパーメソッド
   Color _getTaskColor(RoastScheduleMemo memo, ThemeSettings themeSettings) {
     if (memo.isRoasterOn) {
-      return Colors.orange;
+      return themeSettings.iconColor;
     } else if (memo.isAfterPurge) {
-      return Colors.blue;
+      return themeSettings.settingsColor;
     } else {
       return themeSettings.iconColor;
     }
@@ -419,7 +419,9 @@ class _CalendarPageState extends State<CalendarPage> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: themeSettings.fontColor1.withValues(
+                            alpha: 0.12,
+                          ),
                           blurRadius: 8,
                           offset: Offset(0, 2),
                         ),
@@ -473,8 +475,9 @@ class _CalendarPageState extends State<CalendarPage> {
                       calendarStyle: CalendarStyle(
                         outsideDaysVisible: false,
                         weekendTextStyle: dialogBaseTextStyle.copyWith(
-                          color:
-                              themeSettings.fontColor1.withValues(alpha: 0.3),
+                          color: themeSettings.fontColor1.withValues(
+                            alpha: 0.3,
+                          ),
                           decoration: TextDecoration.lineThrough,
                         ),
                         holidayTextStyle: dialogBaseTextStyle.copyWith(
@@ -484,8 +487,9 @@ class _CalendarPageState extends State<CalendarPage> {
                           color: themeSettings.fontColor1,
                         ),
                         disabledTextStyle: dialogBaseTextStyle.copyWith(
-                          color:
-                              themeSettings.fontColor1.withValues(alpha: 0.3),
+                          color: themeSettings.fontColor1.withValues(
+                            alpha: 0.3,
+                          ),
                           decoration: TextDecoration.lineThrough,
                         ),
                         selectedDecoration: BoxDecoration(
@@ -497,18 +501,23 @@ class _CalendarPageState extends State<CalendarPage> {
                           fontWeight: FontWeight.bold,
                         ),
                         todayDecoration: BoxDecoration(
-                          color:
-                              themeSettings.buttonColor.withValues(alpha: 0.3),
+                          color: themeSettings.buttonColor.withValues(
+                            alpha: 0.3,
+                          ),
                           shape: BoxShape.circle,
                         ),
                         todayTextStyle: dialogBaseTextStyle.copyWith(
                           color: themeSettings.fontColor1,
                           fontWeight: FontWeight.bold,
                         ),
-                        defaultDecoration: BoxDecoration(shape: BoxShape.circle),
+                        defaultDecoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
                         weekendDecoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: themeSettings.fontColor1.withValues(alpha: 0.1),
+                          color: themeSettings.fontColor1.withValues(
+                            alpha: 0.1,
+                          ),
                         ),
                       ),
                     ),
@@ -532,6 +541,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Theme(
       data: theme.copyWith(
         textTheme: theme.textTheme.apply(fontFamily: fontFamily),
+        cardColor: themeSettings.cardBackgroundColor,
       ),
       child: DefaultTextStyle.merge(
         style: baseTextStyle,
@@ -540,8 +550,7 @@ class _CalendarPageState extends State<CalendarPage> {
             title: Text(
               'カレンダー',
               style: baseTextStyle.copyWith(
-                fontSize: (20 * themeSettings.fontSizeScale)
-                    .clamp(16.0, 28.0),
+                fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
               ),
             ),
             backgroundColor: themeSettings.appBarColor,
@@ -642,7 +651,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.white,
+      color: themeSettings.cardBackgroundColor,
       child: Padding(
         padding: EdgeInsets.all(isMobile ? 16 : 24), // スマホではパディングを小さく
         child: Column(
@@ -680,9 +689,7 @@ class _CalendarPageState extends State<CalendarPage> {
               runSpacing: isMobile ? 12 : 16,
               children: _getRecentWeekdays(7).map((date) {
                 return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 0 : 4,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 0 : 4),
                   child: _buildWeekdayDateButton(
                     context,
                     date,
@@ -1390,7 +1397,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                     : Icons.radio_button_unchecked,
                                 size: 14,
                                 color: isCompleted
-                                    ? Colors.green
+                                    ? themeSettings.iconColor
                                     : themeSettings.iconColor.withValues(
                                         alpha: 0.5,
                                       ),
@@ -1455,6 +1462,8 @@ class _CalendarPageState extends State<CalendarPage> {
         return 'ミル';
       case WorkStage.dripPack:
         return 'ドリップパック';
+      case WorkStage.sticker:
+        return 'シール貼り';
       case WorkStage.threeWayBag:
         return '三方袋';
       case WorkStage.packaging:
@@ -1523,7 +1532,7 @@ class _CalendarPageState extends State<CalendarPage> {
               ? themeSettings.buttonColor
               : (isToday
                     ? themeSettings.buttonColor.withValues(alpha: 0.3)
-                    : Colors.transparent),
+                    : themeSettings.cardBackgroundColor.withValues(alpha: 0.2)),
           borderRadius: BorderRadius.circular(isMobile ? 6 : 8), // スマホでは角丸を小さく
           border: Border.all(
             color: isSelected
@@ -1579,7 +1588,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.white,
+      color: themeSettings.cardBackgroundColor,
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(

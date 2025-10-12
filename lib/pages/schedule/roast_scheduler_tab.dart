@@ -257,7 +257,12 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(
+              foregroundColor: Provider.of<ThemeSettings>(
+                context,
+                listen: false,
+              ).iconColor,
+            ),
             child: Text('削除'),
           ),
         ],
@@ -309,7 +314,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
       margin: EdgeInsets.only(bottom: 8),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      color: Colors.white,
+      color: themeSettings.cardBackgroundColor,
       child: InkWell(
         onTap: _canEditRoastSchedule ? () => _editMemo(memo) : null,
         borderRadius: BorderRadius.circular(8),
@@ -322,7 +327,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: themeSettings.iconColor.withValues(alpha: 0.1),
+                    color: themeSettings.iconColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -340,10 +345,14 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.1),
+                    color: themeSettings.settingsColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Icon(Icons.ac_unit, color: Colors.blue, size: 18),
+                  child: Icon(
+                    Icons.ac_unit,
+                    color: themeSettings.settingsColor,
+                    size: 18,
+                  ),
                 ),
               ],
               SizedBox(width: 12),
@@ -358,7 +367,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                         child: Text(
                           'アフターパージ',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: themeSettings.settingsColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             fontFamily: fontFamily,
@@ -372,14 +381,14 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                           children: [
                             Icon(
                               Icons.local_fire_department,
-                              color: Colors.orange,
+                              color: themeSettings.iconColor,
                               size: 18,
                             ),
                             SizedBox(width: 6),
                             Text(
                               '焙煎機オン',
                               style: TextStyle(
-                                color: Colors.orange,
+                                color: themeSettings.iconColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
                                 fontFamily: fontFamily,
@@ -400,7 +409,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                 child: BeanNameWithSticker(
                                   beanName: memo.beanName!,
                                   textStyle: TextStyle(
-                                    color: Colors.brown,
+                                    color: themeSettings.fontColor1,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     fontFamily: fontFamily,
@@ -428,7 +437,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                         '${memo.quantity}袋',
                                     ].join(' '),
                                     style: TextStyle(
-                                      color: Colors.green[700],
+                                      color: themeSettings.iconColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                       fontFamily: fontFamily,
@@ -492,7 +501,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                     : null,
                 icon: Icon(
                   Icons.delete_outline,
-                  color: Colors.red[400],
+                  color: themeSettings.iconColor,
                   size: 20,
                 ),
                 padding: EdgeInsets.zero,
@@ -518,7 +527,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
       case '深煎り':
         return Color(0xFF2F1B14); // ほぼ黒（非常に濃い茶色）
       default:
-        return Colors.grey[700]!;
+        return Provider.of<ThemeSettings>(context, listen: false).fontColor1;
     }
   }
 
@@ -548,7 +557,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
         ? Stack(
             children: [
               Scaffold(
-                backgroundColor: Colors.white,
+                backgroundColor: themeSettings.backgroundColor,
                 body: Column(
                   children: [
                     // ヘッダー
@@ -641,7 +650,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
             ],
           )
         : Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: themeSettings.backgroundColor,
             floatingActionButton: FloatingActionButton(
               onPressed: _canEditRoastSchedule ? _addMemo : null,
               backgroundColor: themeSettings.appButtonColor,

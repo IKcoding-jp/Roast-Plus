@@ -609,18 +609,25 @@ class _HomeBodyState extends State<HomeBody> {
           width: 16,
           height: 16,
           decoration: BoxDecoration(
-            color: Colors.green,
+            color: widget.themeSettings.iconColor,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(
+              color: widget.themeSettings.cardBackgroundColor,
+              width: 2,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.green.withValues(alpha: 0.3),
+                color: widget.themeSettings.iconColor.withValues(alpha: 0.3),
                 blurRadius: 4,
                 offset: Offset(0, 2),
               ),
             ],
           ),
-          child: Icon(Icons.check, color: Colors.white, size: 10),
+          child: Icon(
+            Icons.check,
+            color: widget.themeSettings.cardBackgroundColor,
+            size: 10,
+          ),
         );
       },
     );

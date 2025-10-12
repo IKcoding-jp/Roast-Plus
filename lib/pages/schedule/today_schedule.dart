@@ -1300,7 +1300,7 @@ class _TodayScheduleState extends State<TodaySchedule>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            color: Colors.white,
+            color: Provider.of<ThemeSettings>(context).cardBackgroundColor,
             child: SizedBox(
               height:
                   MediaQuery.of(context).size.height * 0.72, // 画面の72%の高さに微調整
@@ -1437,9 +1437,7 @@ class _TodayScheduleState extends State<TodaySchedule>
         Container(
           decoration: BoxDecoration(
             color: (isRangeStart || isRangeEnd || isBetweenRange)
-                ? Provider.of<ThemeSettings>(
-                    context,
-                  ).buttonColor.withValues(alpha: 0.07)
+                ? themeSettings.buttonColor.withValues(alpha: 0.07)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -1461,11 +1459,7 @@ class _TodayScheduleState extends State<TodaySchedule>
                   ), // パディングを少し拡大
                   decoration: BoxDecoration(
                     color: (_tempStartIndex == i || isRangeStart || isRangeEnd)
-                        ? Provider.of<ThemeSettings>(
-                            context,
-                          ).buttonColor.withValues(alpha: 0.18)
-                        : inAnyRange
-                        ? Colors.transparent
+                        ? themeSettings.buttonColor.withValues(alpha: 0.18)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -1476,9 +1470,7 @@ class _TodayScheduleState extends State<TodaySchedule>
                       style: TextStyle(
                         fontSize: kIsWeb ? 16 : 12,
                         fontWeight: FontWeight.bold,
-                        color: inAnyRange
-                            ? Colors.grey.shade700
-                            : themeSettings.fontColor1,
+                        color: themeSettings.fontColor1,
                         fontFamily: themeSettings.fontFamily,
                       ),
                     ),
@@ -1589,18 +1581,22 @@ class _TodayScheduleState extends State<TodaySchedule>
                               color: themeSettings.fontColor1,
                             ),
                             decoration: InputDecoration(
-                              filled: false,
-                              border: UnderlineInputBorder(
+                              filled: true,
+                              fillColor: themeSettings.inputBackgroundColor,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color: Colors.grey.shade300,
+                                  color: themeSettings.borderColor,
                                 ),
                               ),
-                              enabledBorder: UnderlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color: Colors.grey.shade300,
+                                  color: themeSettings.borderColor,
                                 ),
                               ),
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
                                   color: themeSettings.buttonColor,
                                   width: 2,
@@ -1617,12 +1613,14 @@ class _TodayScheduleState extends State<TodaySchedule>
                       : Container(
                           height: 52,
                           padding: EdgeInsets.symmetric(
-                            horizontal: 0,
+                            horizontal: 12,
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey.shade300),
+                            color: themeSettings.inputBackgroundColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: themeSettings.borderColor,
                             ),
                           ),
                           child: Align(

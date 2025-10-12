@@ -225,18 +225,24 @@ class LoadingAnimationWidget extends StatelessWidget {
               width: width ?? 200,
               height: height ?? 200,
               decoration: BoxDecoration(
-                color: Colors.brown.shade50,
+                color: Theme.of(context).cardColor.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.coffee, size: 60, color: Colors.brown.shade400),
+                  Icon(
+                    Icons.coffee,
+                    size: 60,
+                    color: Theme.of(context).iconTheme.color ?? Colors.brown,
+                  ),
                   SizedBox(height: 10),
                   Text(
                     'Loading...',
                     style: TextStyle(
-                      color: Colors.brown.shade600,
+                      color:
+                          Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.brown.shade600,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),

@@ -49,7 +49,11 @@ class GamificationProvider extends ChangeNotifier {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.celebration, color: Colors.amber, size: 32),
+            Icon(
+              Icons.celebration,
+              color: Theme.of(context).iconTheme.color,
+              size: 32,
+            ),
             SizedBox(width: 8),
             Text('グループレベルアップ！'),
           ],

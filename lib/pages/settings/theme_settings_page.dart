@@ -76,7 +76,7 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
         backgroundColor: themeSettings.appBarColor,
         actions: [
           IconButton(
-            icon: Icon(Icons.tune, color: themeSettings.appBarTextColor),
+            icon: Icon(Icons.tune, color: themeSettings.iconColor),
             onPressed: () async {
               final result = await Navigator.push(
                 context,

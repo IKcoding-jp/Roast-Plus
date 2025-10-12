@@ -259,10 +259,10 @@ class DripCounterPageState extends State<DripCounterPage>
           ),
         ),
         backgroundColor: themeSettings.appBarColor,
-        iconTheme: IconThemeData(color: themeSettings.appBarTextColor),
+        iconTheme: IconThemeData(color: themeSettings.iconColor),
         actions: [
           IconButton(
-            icon: Icon(Icons.list_alt, color: themeSettings.appBarTextColor),
+            icon: Icon(Icons.list_alt, color: themeSettings.iconColor),
             tooltip: '記録一覧',
             onPressed: _openDripPackRecordList,
           ),

@@ -56,12 +56,14 @@ class _DetailPage extends StatelessWidget {
                               final headingStyle = TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: themeSettings.fontColor1,
                                 fontFamily: themeSettings.fontFamily,
                               );
                               final bodyStyle = TextStyle(
                                 fontSize: 18,
-                                color: Colors.black87,
+                                color: themeSettings.fontColor1.withValues(
+                                  alpha: 0.85,
+                                ),
                                 fontFamily: themeSettings.fontFamily,
                               );
 
@@ -99,12 +101,14 @@ class _DetailPage extends StatelessWidget {
                           final headingStyle = TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: themeSettings.fontColor1,
                             fontFamily: themeSettings.fontFamily,
                           );
                           final bodyStyle = TextStyle(
                             fontSize: 18,
-                            color: Colors.black87,
+                            color: themeSettings.fontColor1.withValues(
+                              alpha: 0.85,
+                            ),
                             fontFamily: themeSettings.fontFamily,
                           );
 
@@ -297,7 +301,10 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                 decoration: BoxDecoration(
                   color: themeSettings.cardBackgroundColor,
                   border: Border(
-                    right: BorderSide(color: Colors.grey.shade300, width: 1),
+                    right: BorderSide(
+                      color: themeSettings.borderColor,
+                      width: 1,
+                    ),
                   ),
                 ),
                 child: Column(
@@ -406,7 +413,10 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                 decoration: BoxDecoration(
                   color: themeSettings.cardBackgroundColor,
                   border: Border(
-                    right: BorderSide(color: Colors.grey.shade300, width: 1),
+                    right: BorderSide(
+                      color: themeSettings.borderColor,
+                      width: 1,
+                    ),
                   ),
                 ),
                 child: Column(
@@ -530,7 +540,9 @@ class _UsageGuidePageState extends State<UsageGuidePage>
               Icon(
                 icon,
                 size: 16,
-                color: isSelected ? Colors.white : themeSettings.iconColor,
+                color: isSelected
+                    ? themeSettings.fontColor2
+                    : themeSettings.iconColor,
               ),
               SizedBox(width: 6),
               Text(
@@ -538,7 +550,9 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                 style: TextStyle(
                   fontSize: 12 * themeSettings.fontSizeScale,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Colors.white : themeSettings.fontColor1,
+                  color: isSelected
+                      ? themeSettings.fontColor2
+                      : themeSettings.fontColor1,
                   fontFamily: themeSettings.fontFamily,
                 ),
               ),
@@ -568,7 +582,9 @@ class _UsageGuidePageState extends State<UsageGuidePage>
         child: ListTile(
           leading: Icon(
             icon,
-            color: isSelected ? Colors.white : themeSettings.iconColor,
+            color: isSelected
+                ? themeSettings.fontColor2
+                : themeSettings.iconColor,
             size: isTablet ? 20 : 24,
           ),
           title: Text(
@@ -576,7 +592,9 @@ class _UsageGuidePageState extends State<UsageGuidePage>
             style: TextStyle(
               fontSize: (isTablet ? 14 : 16) * themeSettings.fontSizeScale,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.white : themeSettings.fontColor1,
+              color: isSelected
+                  ? themeSettings.fontColor2
+                  : themeSettings.fontColor1,
               fontFamily: themeSettings.fontFamily,
             ),
           ),
@@ -1160,7 +1178,7 @@ class _UsageGuidePageState extends State<UsageGuidePage>
       child: ListTile(
         leading: Icon(
           icon,
-          color: Colors.blue,
+          color: themeSettings.iconColor,
           size: isMobile
               ? 24
               : isTablet
@@ -1178,7 +1196,7 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                     : 18) *
                 themeSettings.fontSizeScale,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: themeSettings.fontColor1,
             fontFamily: themeSettings.fontFamily,
           ),
         ),
@@ -1192,13 +1210,13 @@ class _UsageGuidePageState extends State<UsageGuidePage>
                     ? 13
                     : 14) *
                 themeSettings.fontSizeScale,
-            color: Colors.black54,
+            color: themeSettings.fontColor1.withValues(alpha: 0.6),
             fontFamily: themeSettings.fontFamily,
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
-          color: Colors.grey,
+          color: themeSettings.fontColor1.withValues(alpha: 0.4),
           size: isMobile
               ? 16
               : isTablet

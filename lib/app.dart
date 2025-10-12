@@ -1681,12 +1681,12 @@ class MainScaffoldState extends State<MainScaffold> {
             Container(
               padding: EdgeInsets.all(isSmallMobile ? 6 : 8),
               decoration: BoxDecoration(
-                color: themeSettings.appBarColor.withValues(alpha: 0.1),
+                color: themeSettings.iconColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(isSmallMobile ? 6 : 8),
               ),
               child: Icon(
                 Icons.local_cafe,
-                color: themeSettings.appBarTextColor,
+                color: themeSettings.iconColor,
                 size: isSmallMobile ? 20 : 24,
               ),
             ),

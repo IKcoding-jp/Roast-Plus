@@ -9,6 +9,7 @@ enum WorkStage {
   afterPick, // アフターピック
   mill, // ミル
   dripPack, // ドリップパック
+  sticker, // シール貼り
   threeWayBag, // 三方袋
   packaging, // 梱包
   shipping, // 発送
@@ -21,6 +22,8 @@ enum WorkStatus {
 }
 
 class WorkProgress {
+  static const Object _unsetValue = Object();
+
   final String id;
   final String beanName;
   final String beanId;
@@ -29,6 +32,8 @@ class WorkProgress {
   final DateTime updatedAt;
   final String? notes;
   final String userId;
+  final double? quantity;
+  final String? quantityUnit;
 
   WorkProgress({
     required this.id,
@@ -39,6 +44,8 @@ class WorkProgress {
     required this.updatedAt,
     this.notes,
     required this.userId,
+    this.quantity,
+    this.quantityUnit,
   });
 
   Map<String, dynamic> toMap() {
@@ -53,10 +60,33 @@ class WorkProgress {
       'updatedAt': updatedAt.toIso8601String(),
       'notes': notes,
       'userId': userId,
+      'quantity': quantity,
+      'quantityUnit': quantityUnit,
     };
   }
 
   factory WorkProgress.fromMap(Map<String, dynamic> map) {
+    double? parseQuantity(dynamic value) {
+      if (value == null) return null;
+      if (value is num) {
+        return value.toDouble();
+      }
+      if (value is String) {
+        final trimmed = value.trim();
+        if (trimmed.isEmpty) return null;
+        final normalized = trimmed.replaceAll(',', '');
+        return double.tryParse(normalized);
+      }
+      return null;
+    }
+
+    final rawUnit = map['quantityUnit'] ?? map['amountUnit'];
+    final quantityUnit = rawUnit == null
+        ? null
+        : rawUnit is String
+        ? rawUnit
+        : rawUnit.toString();
+
     return WorkProgress(
       id: map['id'] ?? '',
       beanName: map['beanName'] ?? '',
@@ -64,7 +94,10 @@ class WorkProgress {
       stageStatus:
           (map['stageStatus'] as Map<String, dynamic>?)?.map(
             (key, value) => MapEntry(
-              WorkStage.values.firstWhere((e) => e.name == key),
+              WorkStage.values.firstWhere(
+                (e) => e.name == key,
+                orElse: () => WorkStage.handpick,
+              ),
               WorkStatus.values.firstWhere((e) => e.name == value),
             ),
           ) ??
@@ -73,6 +106,8 @@ class WorkProgress {
       updatedAt: DateTime.parse(map['updatedAt']),
       notes: map['notes'],
       userId: map['userId'] ?? '',
+      quantity: parseQuantity(map['quantity'] ?? map['amount']),
+      quantityUnit: quantityUnit?.trim().isEmpty == true ? null : quantityUnit,
     );
   }
 
@@ -85,6 +120,8 @@ class WorkProgress {
     DateTime? updatedAt,
     String? notes,
     String? userId,
+    Object? quantity = _unsetValue,
+    Object? quantityUnit = _unsetValue,
   }) {
     return WorkProgress(
       id: id ?? this.id,
@@ -95,6 +132,12 @@ class WorkProgress {
       updatedAt: updatedAt ?? this.updatedAt,
       notes: notes ?? this.notes,
       userId: userId ?? this.userId,
+      quantity: identical(quantity, _unsetValue)
+          ? this.quantity
+          : quantity as double?,
+      quantityUnit: identical(quantityUnit, _unsetValue)
+          ? this.quantityUnit
+          : quantityUnit as String?,
     );
   }
 }

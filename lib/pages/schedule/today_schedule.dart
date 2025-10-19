@@ -1610,19 +1610,8 @@ class _TodayScheduleState extends State<TodaySchedule>
                             ),
                           ),
                         )
-                      : Container(
-                          height: 52,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: themeSettings.inputBackgroundColor,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: themeSettings.borderColor,
-                            ),
-                          ),
+                      : Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
@@ -1634,6 +1623,9 @@ class _TodayScheduleState extends State<TodaySchedule>
                                 fontWeight: FontWeight.bold,
                                 color: themeSettings.fontColor1,
                                 fontFamily: themeSettings.fontFamily,
+                                decoration: TextDecoration.underline,
+                                decorationColor: themeSettings.fontColor1,
+                                decorationThickness: 1.5,
                               ),
                             ),
                           ),

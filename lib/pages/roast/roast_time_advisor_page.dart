@@ -852,7 +852,7 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                                 ),
                                 content: Text(
                                   '平均焙煎時間: ${format(avgSeconds)}\n'
-                                  'おすすめタイマー: ${format(setSeconds)}（平均−${offset}秒）\n\n'
+                                  'おすすめタイマー: ${format(setSeconds)}（平均−$offset秒）\n\n'
                                   'この時間でタイマーを開始しますか？',
                                   style: TextStyle(
                                     color: Provider.of<ThemeSettings>(

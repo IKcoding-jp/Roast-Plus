@@ -267,10 +267,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 newTeams.every((t) => t.members.isEmpty) ||
                 newLeftLabels.isEmpty;
             _isDataInitialized = true;
-            // 担当決定状態も同時に更新
-            if (hasTodayAssignment) {
-              isAssignedToday = true;
-            }
+            // 担当決定状態を常に hasTodayAssignment の値で更新
+            isAssignedToday = hasTodayAssignment;
           });
           debugPrint('AssignmentBoard: グループデータの更新完了');
         }
@@ -674,10 +672,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   loadedTeams.every((t) => t.members.isEmpty) ||
                   loadedLeftLabels.isEmpty);
           _isDataInitialized = true;
-          // 担当決定状態も同時に更新
-          if (hasTodayAssignment) {
-            isAssignedToday = true;
-          }
+          // 担当決定状態を常に hasTodayAssignment の値で更新
+          isAssignedToday = hasTodayAssignment;
         });
         // ローカルデータ読み込み完了後、バックグラウンドでFirebaseと同期
         _isRemoteSyncCompleted = false;
@@ -1829,7 +1825,13 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               debugPrint('AssignmentBoard: より良い配置を発見 (スコア: $bestScore)');
             }
 
-            if (bestScore == 0) {
+            if (candidateScore == 0) {
+              bestPairs = candidatePairs;
+              bestScore = candidateScore;
+              bestShuffledMembers = List.generate(
+                teams.length,
+                (i) => List.from(shuffledMembers[i]),
+              );
               debugPrint('AssignmentBoard: 完璧な配置を発見しました');
               break;
             }

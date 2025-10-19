@@ -1582,31 +1582,30 @@ class _TodayScheduleState extends State<TodaySchedule>
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: themeSettings.inputBackgroundColor,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              fillColor: Colors.white,
+                              border: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: themeSettings.borderColor,
+                                  color: Colors.black,
+                                  width: 1,
                                 ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: themeSettings.borderColor,
+                                  color: Colors.black,
+                                  width: 1,
                                 ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: themeSettings.buttonColor,
+                                  color: Colors.black,
                                   width: 2,
                                 ),
                               ),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 0,
-                                vertical: 8, // 10から8に調整
+                                vertical: 8,
                               ),
-                              isDense: true, // 高さを固定
+                              isDense: true,
                             ),
                           ),
                         )

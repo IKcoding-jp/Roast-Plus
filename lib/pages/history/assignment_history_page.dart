@@ -26,6 +26,7 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
   bool isReady = false;
   bool? _canEditAssignmentHistory; // null: 未判定, true/false: 判定済み
   StreamSubscription<GroupSettings?>? _permissionSubscription;
+  int _rebuildTrigger = 0; // FutureBuilderのリビルドトリガー
 
   final formatter = DateFormat('yyyy-MM-dd');
   final weekdayFormatter = DateFormat('E', 'ja_JP');
@@ -86,13 +87,13 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
       _groupAssignmentHistorySubscription =
           GroupDataSyncService.watchGroupAssignmentHistory(group.id).listen((
             groupAssignmentHistoryData,
-          ) {
+          ) async {
             developer.log(
               'グループ担当履歴変更検知: $groupAssignmentHistoryData',
               name: 'AssignmentHistoryPage',
             );
             if (groupAssignmentHistoryData != null) {
-              _updateLocalAssignmentHistory(groupAssignmentHistoryData);
+              await _updateLocalAssignmentHistory(groupAssignmentHistoryData);
               _isGroupDataLoaded = true;
             }
           });
@@ -100,11 +101,16 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
   }
 
   /// ローカルの担当履歴を更新
-  void _updateLocalAssignmentHistory(
+  Future<void> _updateLocalAssignmentHistory(
     Map<String, dynamic> groupAssignmentHistoryData,
-  ) {
+  ) async {
     developer.log('ローカル担当履歴更新開始', name: 'AssignmentHistoryPage');
-    groupAssignmentHistoryData.forEach((dateKey, historyData) async {
+
+    // for-inループで非同期処理を順次実行
+    for (final entry in groupAssignmentHistoryData.entries) {
+      final dateKey = entry.key;
+      final historyData = entry.value;
+
       if (historyData is Map<String, dynamic>) {
         if (historyData['deleted'] == true) {
           // 削除の場合
@@ -141,8 +147,12 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
           }
         }
       }
-    });
-    setState(() {});
+    }
+
+    // すべての非同期処理が完了してからsetStateを呼ぶ
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadPrefs() async {
@@ -207,6 +217,12 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
   void _startPermissionListener() {
     final groupProvider = context.read<GroupProvider>();
     if (groupProvider.hasGroup) {
+      // グループ参加時は即座に初期判定を実行
+      final groupSettings = groupProvider.getCurrentGroupSettings();
+      if (groupSettings != null) {
+        _checkEditPermissionFromSettings(groupSettings, groupProvider);
+      }
+
       _permissionSubscription?.cancel();
       // グループ設定の変更を直接監視
       _permissionSubscription =
@@ -480,7 +496,14 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
         if (isInGroup) {
           await _syncAssignmentHistoryDeletionToGroup(dateKey);
         }
-        setState(() {});
+
+        // すべての削除処理が完了してからUI更新
+        if (mounted) {
+          setState(() {
+            _rebuildTrigger++; // リビルドトリガーを更新
+          });
+          developer.log('担当履歴削除完了 - UI更新実行', name: 'AssignmentHistoryPage');
+        }
       } catch (e) {
         developer.log('担当履歴削除エラー: $e', name: 'AssignmentHistoryPage', error: e);
       }
@@ -619,6 +642,7 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
           // 担当履歴を非同期で取得するため、FutureBuilderを使用
           items.add(
             FutureBuilder<Map<String, dynamic>?>(
+              key: ValueKey('$dayKey-$_rebuildTrigger'), // リビルドトリガーを追加
               future: (() async {
                 // まずUserSettingsFirestoreServiceから取得を試行
                 final userSettingsResult =
@@ -716,7 +740,7 @@ class _AssignmentHistoryPageState extends State<AssignmentHistoryPage> {
                                 ),
                               ),
                               // 編集権限がある場合のみ編集・削除ボタンを表示
-                              if (_canEditAssignmentHistory == true) ...[
+                              if (_canEditAssignmentHistory != false) ...[
                                 IconButton(
                                   icon: Icon(
                                     Icons.edit,

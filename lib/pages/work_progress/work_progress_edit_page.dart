@@ -323,7 +323,7 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
             SizedBox(width: 12),
             Flexible(
               child: DropdownButtonFormField<String>(
-                value: _selectedQuantityUnit,
+                initialValue: _selectedQuantityUnit,
                 items: _quantityUnitOptions
                     .map(
                       (unit) => DropdownMenuItem<String>(
@@ -731,7 +731,7 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
             Expanded(
               flex: isWide ? 3 : 4,
               child: DropdownButtonFormField<String>(
-                value: _selectedQuantityUnit,
+                initialValue: _selectedQuantityUnit,
                 items: _quantityUnitOptions
                     .map(
                       (unit) => DropdownMenuItem<String>(
@@ -782,7 +782,7 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
 
   Widget _buildStageField(ThemeSettings themeSettings) {
     return DropdownButtonFormField<WorkStage>(
-      value: _selectedStage,
+      initialValue: _selectedStage,
       style: TextStyle(fontFamily: themeSettings.fontFamily),
       decoration: InputDecoration(
         labelText: '作業段階を選択',
@@ -814,7 +814,7 @@ class _WorkProgressEditPageState extends State<WorkProgressEditPage> {
 
   Widget _buildStatusField(ThemeSettings themeSettings) {
     return DropdownButtonFormField<WorkStatus>(
-      value: _selectedStatus,
+      initialValue: _selectedStatus,
       style: TextStyle(fontFamily: themeSettings.fontFamily),
       decoration: InputDecoration(
         labelText: '作業状況を選択',

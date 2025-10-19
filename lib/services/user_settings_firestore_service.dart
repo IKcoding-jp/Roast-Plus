@@ -185,6 +185,17 @@ class UserSettingsFirestoreService {
     try {
       await _userSettingsCollection.doc(key).delete();
       _logInfo('設定を削除しました: $key');
+
+      // Web版ではローカル永続化からも削除
+      if (kIsWeb) {
+        try {
+          await WebSettingsPersistenceService.deleteSetting(key);
+          _logInfo('Web版ローカル永続化からも削除完了: $key');
+        } catch (e) {
+          _logError('Web版ローカル永続化削除エラー', e);
+          // ローカル永続化の削除失敗はFirestore削除を阻害しない
+        }
+      }
     } catch (e, st) {
       _logError('設定削除エラー', e, st);
       rethrow;

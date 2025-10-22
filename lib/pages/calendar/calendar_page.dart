@@ -1460,14 +1460,12 @@ class _CalendarPageState extends State<CalendarPage> {
         return 'アフターピック';
       case WorkStage.mill:
         return 'ミル';
-      case WorkStage.dripPack:
-        return 'ドリップパック';
+      case WorkStage.assort:
+        return 'アソート';
       case WorkStage.sticker:
         return 'シール貼り';
-      case WorkStage.threeWayBag:
-        return '三方袋';
       case WorkStage.packaging:
-        return '梱包';
+        return 'パッケージ';
       case WorkStage.shipping:
         return '発送';
     }

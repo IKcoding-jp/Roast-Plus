@@ -207,14 +207,12 @@ class _WorkProgressPageState extends State<WorkProgressPage>
         return 'アフターピック';
       case WorkStage.mill:
         return 'ミル';
-      case WorkStage.dripPack:
-        return 'ドリップパック';
+      case WorkStage.assort:
+        return 'アソート';
       case WorkStage.sticker:
         return 'シール貼り';
-      case WorkStage.threeWayBag:
-        return '三方袋';
       case WorkStage.packaging:
-        return '梱包';
+        return 'パッケージ';
       case WorkStage.shipping:
         return '発送';
     }
@@ -282,14 +280,12 @@ class _WorkProgressPageState extends State<WorkProgressPage>
         return Icons.check_circle_outline;
       case WorkStage.mill:
         return Icons.coffee;
-      case WorkStage.dripPack:
-        return Icons.local_cafe;
+      case WorkStage.assort:
+        return Icons.dashboard_customize; // アソート用のアイコン
       case WorkStage.sticker:
         return Icons.emoji_emotions;
-      case WorkStage.threeWayBag:
-        return Icons.shopping_bag;
       case WorkStage.packaging:
-        return Icons.all_inbox;
+        return Icons.inventory_2; // パッケージ用のアイコン
       case WorkStage.shipping:
         return Icons.local_shipping;
     }
@@ -298,35 +294,22 @@ class _WorkProgressPageState extends State<WorkProgressPage>
   Color _getStageColor(BuildContext context, WorkStage stage) {
     switch (stage) {
       case WorkStage.handpick:
-        return const Color(0xFFB7C29A);
+        return const Color(0xFF7A8F5B); // B7C29A → より濃い緑（約30%濃く）
       case WorkStage.roast:
         return Colors.deepOrange;
       case WorkStage.afterPick:
         return const Color(0xFF6F4E37);
       case WorkStage.mill:
         return const Color(0xFF4B2E19);
-      case WorkStage.dripPack:
-        final brightness = Theme.of(context).brightness;
-        return brightness == Brightness.dark
-            ? const Color(0xFFEEEEEE)
-            : Colors.white;
+      case WorkStage.assort:
+        return const Color(0xFF6B5B95); // 紫色
       case WorkStage.sticker:
-        return const Color(0xFFE5DDBE);
-      case WorkStage.threeWayBag:
-        return const Color(0xFFC0C0C0);
+        return const Color(0xFF2C2C2C); // 白黒（濃いグレー）
       case WorkStage.packaging:
-        return const Color(0xFFD2B48C);
+        return const Color(0xFF2C2C2C); // 白黒（濃いグレー）
       case WorkStage.shipping:
         return Colors.blue;
     }
-  }
-
-  Color _getStageTextColor(BuildContext context, WorkStage stage) {
-    if (stage == WorkStage.dripPack) {
-      final brightness = Theme.of(context).brightness;
-      return brightness == Brightness.dark ? Colors.black : Colors.black87;
-    }
-    return _getStageColor(context, stage);
   }
 
   Widget _buildWebLayout(
@@ -545,15 +528,20 @@ class _WorkProgressPageState extends State<WorkProgressPage>
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: themeSettings.fontColor1.withValues(alpha: 0.08),
+        color: themeSettings.fontColor1.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: themeSettings.fontColor1.withValues(alpha: 0.25),
+          width: 0.8,
+        ),
       ),
       child: Text(
         display,
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.w600,
-          color: themeSettings.fontColor1,
+          color: themeSettings.fontColor1.withValues(alpha: 0.9),
+          height: 1.2,
         ),
       ),
     );
@@ -579,9 +567,15 @@ class _WorkProgressPageState extends State<WorkProgressPage>
         : null;
 
     return Card(
-      elevation: 3,
+      elevation: 4,
       color: themeSettings.cardBackgroundColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(
+          color: themeSettings.fontColor1.withValues(alpha: 0.08),
+          width: 1,
+        ),
+      ),
       child: InkWell(
         onTap: canEdit && groupProvider.currentGroup != null
             ? () {
@@ -602,9 +596,9 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                 });
               }
             : null,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -623,12 +617,13 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: themeSettings.fontColor1,
+                              height: 1.3,
                             ),
                             stickerSize: 16.0,
                           ),
                         ),
                         if (quantityDisplay != null) ...[
-                          SizedBox(width: 6),
+                          SizedBox(width: 8),
                           _buildQuantityChip(quantityDisplay, themeSettings),
                         ],
                       ],
@@ -712,7 +707,7 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                           value: 'edit',
                           child: Row(
                             children: [
-                              Icon(Icons.edit, size: 16),
+                              Icon(Icons.edit, size: 18),
                               SizedBox(width: 8),
                               Text('編集'),
                             ],
@@ -724,7 +719,7 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                             children: [
                               Icon(
                                 Icons.delete,
-                                size: 16,
+                                size: 18,
                                 color: themeSettings.iconColor,
                               ),
                               SizedBox(width: 8),
@@ -741,12 +736,12 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                       child: Icon(
                         Icons.more_vert,
                         color: themeSettings.iconColor,
-                        size: 18,
+                        size: 20,
                       ),
                     ),
                 ],
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 12),
               if (workProgress.stageStatus.isNotEmpty) ...[
                 Builder(
                   builder: (context) {
@@ -755,16 +750,14 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                     return Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
+                        horizontal: 13,
+                        vertical: 11,
                       ),
                       decoration: BoxDecoration(
                         color: _getStatusBgColor(context, status, stage),
                         border: Border.all(
-                          color: stage == WorkStage.dripPack
-                              ? _getStageTextColor(context, stage)
-                              : _getStatusColor(context, status, stage),
-                          width: 1,
+                          color: _getStatusColor(context, status, stage),
+                          width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -772,21 +765,18 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                         children: [
                           Icon(
                             _getStatusIcon(status, stage),
-                            color: stage == WorkStage.dripPack
-                                ? _getStageTextColor(context, stage)
-                                : _getStatusColor(context, status, stage),
-                            size: 18,
+                            color: _getStatusColor(context, status, stage),
+                            size: 19,
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: 9),
                           Expanded(
                             child: Text(
                               '${_getStageDisplayName(stage)} ${_getStatusDisplayName(status)}',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: stage == WorkStage.dripPack
-                                    ? _getStageTextColor(context, stage)
-                                    : _getStatusColor(context, status, stage),
+                                color: _getStatusColor(context, status, stage),
                                 fontWeight: FontWeight.bold,
+                                height: 1.3,
                               ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
@@ -797,40 +787,47 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                     );
                   },
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 10),
               ],
               Text(
                 '作成日: ${workProgress.createdAt.toString().substring(0, 16)}',
                 style: TextStyle(
-                  fontSize: 12,
-                  color: themeSettings.fontColor1.withValues(alpha: 0.7),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: themeSettings.fontColor1.withValues(alpha: 0.85),
+                  height: 1.3,
                 ),
               ),
               if (hasNotes) ...[
-                SizedBox(height: 8),
+                SizedBox(height: 10),
                 Container(
-                  padding: EdgeInsets.all(6),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: themeSettings.fontColor1.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(8),
+                    color: themeSettings.fontColor1.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(9),
+                    border: Border.all(
+                      color: themeSettings.fontColor1.withValues(alpha: 0.12),
+                      width: 0.8,
+                    ),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
                         Icons.note,
-                        size: 14,
-                        color: themeSettings.fontColor1.withValues(alpha: 0.6),
+                        size: 16,
+                        color: themeSettings.fontColor1.withValues(alpha: 0.7),
                       ),
-                      SizedBox(width: 6),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           workProgress.notes!,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             color: themeSettings.fontColor1.withValues(
-                              alpha: 0.8,
+                              alpha: 0.85,
                             ),
+                            height: 1.4,
                           ),
                         ),
                       ),
@@ -899,308 +896,52 @@ class _WorkProgressPageState extends State<WorkProgressPage>
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: workProgressProvider.workProgressList.length,
-      itemBuilder: (context, index) {
-        final workProgress = workProgressProvider.workProgressList[index];
-        final hasQuantity = _hasQuantity(workProgress);
-        final quantityValue = hasQuantity
-            ? _formatQuantityValue(workProgress.quantity!)
-            : null;
-        final quantityUnit = hasQuantity ? workProgress.quantityUnit! : null;
-        final quantityDisplay =
-            (hasQuantity && quantityValue != null && quantityUnit != null)
-            ? '$quantityValue $quantityUnit'
-            : null;
-        return Card(
-          margin: EdgeInsets.only(bottom: 12),
-          elevation: 4,
-          color: themeSettings.cardBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: InkWell(
-            onTap: canEdit && groupProvider.currentGroup != null
-                ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => WorkProgressEditPage(
-                          workProgress: workProgress,
-                          groupId: groupProvider.currentGroup!.id,
-                        ),
-                      ),
-                    ).then((result) {
-                      if (result == true) {
-                        workProgressProvider.loadWorkProgress(
-                          groupId: groupProvider.currentGroup!.id,
-                        );
-                      }
-                    });
-                  }
-                : null,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            BeanNameWithSticker(
-                              beanName: workProgress.beanName,
-                              textStyle: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: themeSettings.fontColor1,
-                              ),
-                              stickerSize: 18.0,
-                            ),
-                            if (quantityDisplay != null) ...[
-                              SizedBox(height: 6),
-                              _buildQuantityChip(
-                                quantityDisplay,
-                                themeSettings,
-                                fontSize: 12,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      if (workProgress.stageStatus.isNotEmpty) ...[
-                        SizedBox(width: 8),
-                        Builder(
-                          builder: (context) {
-                            final stage = workProgress.stageStatus.keys.first;
-                            final status =
-                                workProgress.stageStatus.values.first;
-                            return Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _getStatusBgColor(
-                                  context,
-                                  status,
-                                  stage,
-                                ),
-                                border: Border.all(
-                                  color: stage == WorkStage.dripPack
-                                      ? _getStageTextColor(context, stage)
-                                      : _getStatusColor(context, status, stage),
-                                  width: 1.5,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    _getStatusIcon(status, stage),
-                                    color: stage == WorkStage.dripPack
-                                        ? _getStageTextColor(context, stage)
-                                        : _getStatusColor(
-                                            context,
-                                            status,
-                                            stage,
-                                          ),
-                                    size: 18,
-                                  ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    '${_getStageDisplayName(stage)} ${_getStatusDisplayName(status)}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: stage == WorkStage.dripPack
-                                          ? _getStageTextColor(context, stage)
-                                          : _getStatusColor(
-                                              context,
-                                              status,
-                                              stage,
-                                            ),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                      Spacer(),
-                      if (canEdit)
-                        PopupMenuButton<String>(
-                          onSelected: (value) async {
-                            if (value == 'edit') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => WorkProgressEditPage(
-                                    workProgress: workProgress,
-                                    groupId: groupProvider.hasGroup
-                                        ? groupProvider.currentGroup!.id
-                                        : null,
-                                  ),
-                                ),
-                              ).then((result) {
-                                if (result == true) {
-                                  if (groupProvider.hasGroup) {
-                                    workProgressProvider.loadWorkProgress(
-                                      groupId: groupProvider.currentGroup!.id,
-                                    );
-                                  } else if (groupProvider.groups.isNotEmpty) {
-                                    workProgressProvider.loadWorkProgress(
-                                      groupId: groupProvider.groups.first.id,
-                                    );
-                                  } else {
-                                    workProgressProvider.loadWorkProgress();
-                                  }
-                                }
-                              });
-                            } else if (value == 'delete') {
-                              final confirmed = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: Text('削除確認'),
-                                  content: Text('この作業状況記録を削除しますか？'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: Text('キャンセル'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      child: Text('削除'),
-                                    ),
-                                  ],
-                                ),
-                              );
+    // スマホ版でもPC版と同じグリッドレイアウトを使用
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final padding = 16.0;
+    final spacing = 12.0;
 
-                              if (!mounted) return;
+    // スマホでは2列表示、画面幅に応じて調整
+    int columns = 2;
+    if (screenWidth < 400) {
+      columns = 1;
+    } else if (screenWidth > 600) {
+      columns = 3;
+    }
 
-                              if (confirmed == true) {
-                                final messenger = ScaffoldMessenger.of(
-                                  this.context,
-                                );
-                                try {
-                                  await workProgressProvider.deleteWorkProgress(
-                                    workProgress.id,
-                                    groupId: groupProvider.hasGroup
-                                        ? groupProvider.currentGroup!.id
-                                        : null,
-                                  );
-                                  if (!mounted) return;
-                                  messenger.showSnackBar(
-                                    SnackBar(content: Text('削除しました')),
-                                  );
-                                } catch (e) {
-                                  if (!mounted) return;
-                                  messenger.showSnackBar(
-                                    SnackBar(content: Text('削除に失敗しました')),
-                                  );
-                                }
-                              }
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('編集'),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.delete,
-                                    size: 20,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    '削除',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                          child: Icon(
-                            Icons.more_vert,
-                            color: themeSettings.iconColor,
-                          ),
-                        ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '作成日: ${workProgress.createdAt.toString().substring(0, 16)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: themeSettings.fontColor1.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  if (workProgress.notes != null &&
-                      workProgress.notes!.isNotEmpty) ...[
-                    SizedBox(height: 8),
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: themeSettings.fontColor1.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.note,
-                            size: 16,
-                            color: themeSettings.fontColor1.withValues(
-                              alpha: 0.6,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              workProgress.notes!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: themeSettings.fontColor1.withValues(
-                                  alpha: 0.8,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+    final availableWidth = screenWidth - padding * 2;
+    double cardWidth = (availableWidth - (columns - 1) * spacing) / columns;
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(padding),
+      child: columns == 1
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: workProgressProvider.workProgressList
+                  .map(
+                    (workProgress) => Padding(
+                      padding: EdgeInsets.only(bottom: spacing),
+                      child: _buildWorkProgressCard(
+                        workProgress,
+                        themeSettings,
+                        groupProvider,
+                        canEdit,
+                        workProgressProvider,
                       ),
                     ),
-                  ],
-                ],
-              ),
+                  )
+                  .toList(),
+            )
+          : _buildMasonryLayout(
+              workProgressProvider.workProgressList,
+              themeSettings,
+              groupProvider,
+              canEdit,
+              workProgressProvider,
+              columns: columns,
+              cardWidth: cardWidth,
+              spacing: spacing,
             ),
-          ),
-        );
-      },
     );
   }
 

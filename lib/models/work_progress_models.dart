@@ -8,10 +8,9 @@ enum WorkStage {
   roast, // ロースト
   afterPick, // アフターピック
   mill, // ミル
-  dripPack, // ドリップパック
   sticker, // シール貼り
-  threeWayBag, // 三方袋
-  packaging, // 梱包
+  packaging, // パッケージ（梱包・ドリップパック・三方袋を統合）
+  assort, // アソート
   shipping, // 発送
 }
 

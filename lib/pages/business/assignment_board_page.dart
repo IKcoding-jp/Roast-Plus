@@ -1722,7 +1722,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     return score;
   }
 
-  void _shuffleAssignments() {
+  Future<void> _shuffleAssignments() async {
     if (teams.length < 2) {
       showDialog(
         context: context,
@@ -1756,11 +1756,78 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     }
 
     setState(() => isShuffling = true);
+
+    // シャッフル前に基本構成データを読み込む
+    List<Team> basicTeams = [];
+    try {
+      debugPrint('AssignmentBoard: シャッフル用の基本構成データを読み込み開始');
+      final groupProvider = context.read<GroupProvider>();
+
+      if (groupProvider.hasGroup) {
+        // グループモード：グループから基本構成を取得
+        final group = groupProvider.currentGroup!;
+        final groupData = await GroupDataSyncService.getGroupAssignmentBoard(
+          group.id,
+        );
+
+        if (groupData != null) {
+          if (groupData['teams'] != null) {
+            final teamsList = groupData['teams'] as List;
+            basicTeams = teamsList
+                .map((teamMap) => Team.fromMap(teamMap))
+                .toList();
+          } else {
+            // 古い形式の場合
+            final aMembers = _safeStringListFromDynamic(groupData['aMembers']);
+            final bMembers = _safeStringListFromDynamic(groupData['bMembers']);
+            basicTeams = [
+              Team(id: 'team_a', name: 'A班', members: aMembers),
+              Team(id: 'team_b', name: 'B班', members: bMembers),
+            ];
+          }
+          debugPrint('AssignmentBoard: グループから基本構成を取得しました');
+        }
+      } else {
+        // 個人モード：UserSettingsから基本構成を取得
+        final settings = await UserSettingsFirestoreService.getMultipleSettings(
+          ['teams', 'assignment_team_a', 'assignment_team_b'],
+        );
+
+        final teamsJson = settings['teams'];
+        if (teamsJson != null) {
+          final teamsList = jsonDecode(teamsJson) as List;
+          basicTeams = teamsList
+              .map((teamMap) => Team.fromMap(teamMap))
+              .toList();
+        } else {
+          // 古い形式から変換
+          final loadedA = settings['assignment_team_a'] ?? [];
+          final loadedB = settings['assignment_team_b'] ?? [];
+          basicTeams = [
+            Team(id: 'team_a', name: 'A班', members: loadedA),
+            Team(id: 'team_b', name: 'B班', members: loadedB),
+          ];
+        }
+        debugPrint('AssignmentBoard: ローカルから基本構成を取得しました');
+      }
+
+      // 基本構成データが取得できない場合は現在のteamsを使用
+      if (basicTeams.isEmpty || basicTeams.length < 2) {
+        debugPrint('AssignmentBoard: 基本構成データが不正のため、現在のteamsを使用');
+        basicTeams = teams;
+      } else {
+        debugPrint('AssignmentBoard: 基本構成データを使用してシャッフルを開始');
+      }
+    } catch (e) {
+      debugPrint('AssignmentBoard: 基本構成データの読み込みエラー: $e - 現在のteamsを使用');
+      basicTeams = teams;
+    }
+
     int cnt = 0;
     const dur = Duration(milliseconds: 100);
     List<List<String>> shuffledMembers = List.generate(
-      teams.length,
-      (i) => List.from(teams[i].members),
+      basicTeams.length,
+      (i) => List.from(basicTeams[i].members),
     );
     shuffleTimer = Timer.periodic(dur, (_) async {
       try {
@@ -1771,8 +1838,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         if (cnt % 5 == 0) {
           if (!mounted) return;
           setState(() {
-            for (int i = 0; i < teams.length; i++) {
-              teams[i] = teams[i].copyWith(
+            for (int i = 0; i < basicTeams.length; i++) {
+              teams[i] = basicTeams[i].copyWith(
                 members: List.from(shuffledMembers[i]),
               );
             }
@@ -1789,9 +1856,17 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           debugPrint('AssignmentBoard: 担当履歴を参照してシャッフル開始');
 
           List<List<String>> bestShuffledMembers = List.generate(
-            teams.length,
+            basicTeams.length,
             (i) => List.from(shuffledMembers[i]),
           );
+
+          // 基本構成データを使用してteamsを更新してからペアを作成
+          for (int i = 0; i < basicTeams.length; i++) {
+            teams[i] = basicTeams[i].copyWith(
+              members: List.from(shuffledMembers[i]),
+            );
+          }
+
           List<String> bestPairs = _makePairs();
           int bestScore = _calculateAssignmentScore(bestPairs, recentHistory);
 
@@ -1803,8 +1878,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               shuffledMembers[i].shuffle(Random());
             }
 
-            for (int i = 0; i < teams.length; i++) {
-              teams[i] = teams[i].copyWith(
+            for (int i = 0; i < basicTeams.length; i++) {
+              teams[i] = basicTeams[i].copyWith(
                 members: List.from(shuffledMembers[i]),
               );
             }
@@ -1819,7 +1894,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               bestPairs = candidatePairs;
               bestScore = candidateScore;
               bestShuffledMembers = List.generate(
-                teams.length,
+                basicTeams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
               debugPrint('AssignmentBoard: より良い配置を発見 (スコア: $bestScore)');
@@ -1829,7 +1904,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               bestPairs = candidatePairs;
               bestScore = candidateScore;
               bestShuffledMembers = List.generate(
-                teams.length,
+                basicTeams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
               debugPrint('AssignmentBoard: 完璧な配置を発見しました');
@@ -1840,8 +1915,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             await Future.delayed(Duration(milliseconds: 5));
           }
 
-          for (int i = 0; i < teams.length; i++) {
-            teams[i] = teams[i].copyWith(
+          for (int i = 0; i < basicTeams.length; i++) {
+            teams[i] = basicTeams[i].copyWith(
               members: List.from(bestShuffledMembers[i]),
             );
           }

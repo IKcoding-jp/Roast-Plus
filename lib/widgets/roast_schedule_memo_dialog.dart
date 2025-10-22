@@ -19,26 +19,62 @@ class RoastScheduleMemoDialog extends StatefulWidget {
 class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
   final _formKey = GlobalKey<FormState>();
   final _timeController = TextEditingController();
-  final _beanNameController = TextEditingController();
-  final _weightController = TextEditingController();
-  final _quantityController = TextEditingController();
   String? _selectedRoastLevel;
+  String? _selectedRoastMachineMode;
+  String? _selectedBeanName;
+  int? _selectedWeight;
   bool _isAfterPurge = false;
   bool _isRoasterOn = false;
+  bool _isRoast = false;
+  final _roastCountController = TextEditingController();
+  int? _bagCount;
 
   final List<String> _roastLevels = ['浅煎り', '中煎り', '中深煎り', '深煎り'];
+  final List<int> _weightOptions = [200, 300, 500];
+  final List<int> _bagOptions = [1, 2];
+
+  final Map<String, String> _beanToMachineMode = {
+    // G1
+    'ブラジル': 'G1',
+    'ジャマイカ': 'G1',
+    'ドミニカ': 'G1',
+    'ベトナム': 'G1',
+    'ハイチ': 'G1',
+    // G2
+    'ペルー': 'G2',
+    'エルサルバドル': 'G2',
+    'グアテマラ': 'G2',
+    // G3
+    'エチオピア': 'G3',
+    'コロンビア': 'G3',
+    'インドネシア': 'G3',
+    'タンザニア': 'G3',
+    'ルワンダ': 'G3',
+    'マラウイ': 'G3',
+    'インド': 'G3',
+  };
+
+  List<String> get _beanNames => _beanToMachineMode.keys.toList();
 
   @override
   void initState() {
     super.initState();
     if (widget.memo != null) {
       _timeController.text = widget.memo!.time;
-      _beanNameController.text = widget.memo!.beanName ?? '';
-      _weightController.text = widget.memo!.weight?.toString() ?? '';
-      _quantityController.text = widget.memo!.quantity?.toString() ?? '';
+      _selectedWeight = widget.memo!.weight;
       _selectedRoastLevel = widget.memo!.roastLevel;
+      _selectedRoastMachineMode = widget.memo!.roastMachineMode;
       _isAfterPurge = widget.memo!.isAfterPurge;
       _isRoasterOn = widget.memo!.isRoasterOn;
+      _isRoast = widget.memo!.isRoast;
+      _bagCount = widget.memo!.bagCount;
+      if (widget.memo!.roastCount != null) {
+        _roastCountController.text = widget.memo!.roastCount.toString();
+      }
+      // 焙煎機オン時の豆の名前を復元
+      if (_isRoasterOn && widget.memo!.beanName != null) {
+        _selectedBeanName = widget.memo!.beanName;
+      }
     } else {
       _timeController.text = '10:30';
     }
@@ -47,9 +83,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
   @override
   void dispose() {
     _timeController.dispose();
-    _beanNameController.dispose();
-    _weightController.dispose();
-    _quantityController.dispose();
+    _roastCountController.dispose();
     super.dispose();
   }
 
@@ -86,17 +120,26 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
     if (_formKey.currentState!.validate()) {
       final now = DateTime.now();
       final today = DateTime.now();
+
+      // ロースト選択時の回数をパース
+      int? roastCount;
+      if (_isRoast && _roastCountController.text.isNotEmpty) {
+        roastCount = int.tryParse(_roastCountController.text);
+      }
+
       final memo = RoastScheduleMemo(
         id: widget.memo?.id ?? const Uuid().v4(),
         time: _timeController.text,
-        beanName: _beanNameController.text.isNotEmpty
-            ? _beanNameController.text
-            : null,
-        weight: int.tryParse(_weightController.text),
-        quantity: int.tryParse(_quantityController.text),
+        beanName: _isRoasterOn ? _selectedBeanName : null,
+        weight: _selectedWeight,
+        quantity: null,
         roastLevel: _selectedRoastLevel,
+        roastMachineMode: _selectedRoastMachineMode,
         isAfterPurge: _isAfterPurge,
         isRoasterOn: _isRoasterOn,
+        isRoast: _isRoast,
+        roastCount: roastCount,
+        bagCount: _isRoast ? _bagCount : null,
         date: widget.memo?.date ?? today,
         createdAt: widget.memo?.createdAt ?? now,
         updatedAt: now,
@@ -213,61 +256,67 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                         SizedBox(height: 16),
 
                         // 焙煎機オンチェックボックス
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _isRoasterOn,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isRoasterOn = value ?? false;
-                                  if (_isRoasterOn) {
-                                    _isAfterPurge = false;
-                                  }
-                                });
-                              },
-                            ),
-                            Text(
-                              '焙煎機オン',
-                              style: TextStyle(
-                                color: themeSettings.fontColor1,
-                                fontSize: 16,
-                                fontFamily: fontFamily,
+                        if (!_isRoast) ...[
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _isRoasterOn,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isRoasterOn = value ?? false;
+                                    if (_isRoasterOn) {
+                                      _isAfterPurge = false;
+                                      _isRoast = false;
+                                    }
+                                  });
+                                },
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16),
-
-                        // アフターパージチェックボックス
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _isAfterPurge,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isAfterPurge = value ?? false;
-                                  if (_isAfterPurge) {
-                                    _isRoasterOn = false;
-                                  }
-                                });
-                              },
-                            ),
-                            Text(
-                              'アフターパージ',
-                              style: TextStyle(
-                                color: themeSettings.fontColor1,
-                                fontSize: 16,
-                                fontFamily: fontFamily,
+                              Text(
+                                '焙煎機オン',
+                                style: TextStyle(
+                                  color: themeSettings.fontColor1,
+                                  fontSize: 16,
+                                  fontFamily: fontFamily,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                        ],
 
-                        // 豆の名前（焙煎機オンでもアフターパージでもない場合のみ表示）
-                        if (!_isAfterPurge && !_isRoasterOn) ...[
+                        // ロースト チェックボックス（焙煎機オン未選択時のみ表示）
+                        if (!_isRoasterOn) ...[
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _isRoast,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isRoast = value ?? false;
+                                    if (_isRoast) {
+                                      _isRoasterOn = false;
+                                      _isAfterPurge = false;
+                                    }
+                                  });
+                                },
+                              ),
+                              Text(
+                                'ロースト',
+                                style: TextStyle(
+                                  color: themeSettings.fontColor1,
+                                  fontSize: 16,
+                                  fontFamily: fontFamily,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                        ],
+
+                        // ロースト選択時の入力欄
+                        if (_isRoast) ...[
                           Text(
-                            '豆の名前（任意）',
+                            '何回目',
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontSize: 16,
@@ -277,7 +326,47 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           ),
                           SizedBox(height: 8),
                           TextFormField(
-                            controller: _beanNameController,
+                            controller: _roastCountController,
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontFamily: fontFamily,
+                            ),
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              labelText: '回数を入力',
+                              labelStyle: TextStyle(fontFamily: fontFamily),
+                              hintText: '例: 1, 2, 3',
+                              hintStyle: TextStyle(fontFamily: fontFamily),
+                            ),
+                            validator: (value) {
+                              if (_isRoast &&
+                                  (value == null || value.isEmpty)) {
+                                return '回数を入力してください';
+                              }
+                              if (_isRoast &&
+                                  int.tryParse(value ?? '') == null) {
+                                return '数値を入力してください';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+
+                          Text(
+                            '袋数',
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: fontFamily,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          DropdownButtonFormField<int>(
+                            value: _bagCount,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontFamily: fontFamily,
@@ -286,95 +375,63 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              labelText: '豆の名前',
+                              labelText: '袋数を選択',
                               labelStyle: TextStyle(fontFamily: fontFamily),
                             ),
+                            items: _bagOptions.map((bagCount) {
+                              return DropdownMenuItem(
+                                value: bagCount,
+                                child: Text(bagCount.toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _bagCount = value;
+                              });
+                            },
+                            validator: (value) {
+                              if (_isRoast && value == null) {
+                                return '袋数を選択してください';
+                              }
+                              return null;
+                            },
                           ),
                           SizedBox(height: 16),
+                        ],
 
-                          // 重さと袋数
+                        // アフターパージチェックボックス（焙煎機オンでない場合のみ表示）
+                        if (!_isRoasterOn && !_isRoast) ...[
                           Row(
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '重さ（g）',
-                                      style: TextStyle(
-                                        color: themeSettings.fontColor1,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: fontFamily,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    TextFormField(
-                                      controller: _weightController,
-                                      style: TextStyle(
-                                        color: themeSettings.fontColor1,
-                                        fontFamily: fontFamily,
-                                      ),
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        labelText: '重さ',
-                                        labelStyle: TextStyle(
-                                          fontFamily: fontFamily,
-                                        ),
-                                      ),
-                                      keyboardType: TextInputType.number,
-                                    ),
-                                  ],
-                                ),
+                              Checkbox(
+                                value: _isAfterPurge,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isAfterPurge = value ?? false;
+                                    if (_isAfterPurge) {
+                                      _isRoasterOn = false;
+                                      _isRoast = false;
+                                    }
+                                  });
+                                },
                               ),
-                              SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '袋数',
-                                      style: TextStyle(
-                                        color: themeSettings.fontColor1,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: fontFamily,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    TextFormField(
-                                      controller: _quantityController,
-                                      style: TextStyle(
-                                        color: themeSettings.fontColor1,
-                                        fontFamily: fontFamily,
-                                      ),
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        labelText: '袋数',
-                                        labelStyle: TextStyle(
-                                          fontFamily: fontFamily,
-                                        ),
-                                      ),
-                                      keyboardType: TextInputType.number,
-                                    ),
-                                  ],
+                              Text(
+                                'アフターパージ',
+                                style: TextStyle(
+                                  color: themeSettings.fontColor1,
+                                  fontSize: 16,
+                                  fontFamily: fontFamily,
                                 ),
                               ),
                             ],
                           ),
                           SizedBox(height: 16),
+                        ],
 
-                          // 焙煎度合い
+                        // 豆の名前（焙煎機オンの場合のみ表示）
+                        if (_isRoasterOn) ...[
                           Text(
-                            '焙煎度合い（任意）',
+                            '豆の名前',
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontSize: 16,
@@ -384,7 +441,102 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           ),
                           SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            initialValue: _selectedRoastLevel,
+                            value: _selectedBeanName,
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontFamily: fontFamily,
+                            ),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              labelText: '豆の種類を選択',
+                              labelStyle: TextStyle(fontFamily: fontFamily),
+                            ),
+                            items: _beanNames.map((bean) {
+                              return DropdownMenuItem(
+                                value: bean,
+                                child: Text(bean),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedBeanName = value;
+                                // 豆を選択したらG番号を自動設定
+                                if (value != null) {
+                                  _selectedRoastMachineMode =
+                                      _beanToMachineMode[value];
+                                }
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '豆の名前を選択してください';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+                        ],
+
+                        // 重さと焙煎度合い（焙煎機オンの場合のみ表示）
+                        if (_isRoasterOn) ...[
+                          Text(
+                            '重さ（g）',
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: fontFamily,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          DropdownButtonFormField<int>(
+                            value: _selectedWeight,
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontFamily: fontFamily,
+                            ),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              labelText: '重さを選択',
+                              labelStyle: TextStyle(fontFamily: fontFamily),
+                            ),
+                            items: _weightOptions.map((weight) {
+                              return DropdownMenuItem(
+                                value: weight,
+                                child: Text(weight.toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedWeight = value;
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return '重さを選択してください';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+
+                          // 焙煎度合い
+                          Text(
+                            '焙煎度合い',
+                            style: TextStyle(
+                              color: themeSettings.fontColor1,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: fontFamily,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          DropdownButtonFormField<String>(
+                            value: _selectedRoastLevel,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontFamily: fontFamily,
@@ -407,20 +559,36 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                                 _selectedRoastLevel = value;
                               });
                             },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '焙煎度合いを選択してください';
+                              }
+                              return null;
+                            },
                           ),
-                        ] else ...[
-                          // 焙煎機オンまたはアフターパージの場合
+                          SizedBox(height: 16),
+                        ],
+
+                        // 焙煎機オンまたはアフターパージまたはロースト の情報表示
+                        if (_isAfterPurge || _isRoasterOn || _isRoast) ...[
+                          // 焙煎機オンまたはアフターパージまたはロースト の場合
                           Container(
                             padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color:
-                                  (_isAfterPurge ? Colors.blue : Colors.orange)
+                                  (_isAfterPurge
+                                          ? Colors.blue
+                                          : _isRoast
+                                          ? Colors.brown
+                                          : Colors.orange)
                                       .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color:
                                     (_isAfterPurge
                                             ? Colors.blue
+                                            : _isRoast
+                                            ? Colors.brown
                                             : Colors.orange)
                                         .withValues(alpha: 0.3),
                               ),
@@ -430,17 +598,27 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                                 Icon(
                                   _isAfterPurge
                                       ? Icons.ac_unit
+                                      : _isRoast
+                                      ? Icons.coffee_maker
                                       : Icons.local_fire_department,
                                   color: _isAfterPurge
                                       ? Colors.blue
+                                      : _isRoast
+                                      ? Colors.brown
                                       : Colors.orange,
                                 ),
                                 SizedBox(width: 12),
                                 Text(
-                                  _isAfterPurge ? 'アフターパージ' : '焙煎機オン',
+                                  _isAfterPurge
+                                      ? 'アフターパージ'
+                                      : _isRoast
+                                      ? 'ロースト ${_roastCountController.text.isEmpty ? '?' : _roastCountController.text}回目、${_bagCount == null ? '?' : _bagCount}袋'
+                                      : '焙煎機オン',
                                   style: TextStyle(
                                     color: _isAfterPurge
                                         ? Colors.blue
+                                        : _isRoast
+                                        ? Colors.brown
                                         : Colors.orange,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

@@ -10,7 +10,6 @@ import 'package:roastplus/services/roast_schedule_memo_service.dart';
 import 'package:roastplus/widgets/roast_schedule_memo_dialog.dart';
 import 'package:roastplus/utils/permission_utils.dart';
 import 'dart:developer' as developer;
-import 'package:roastplus/widgets/bean_name_with_sticker.dart';
 import 'package:roastplus/utils/web_ui_utils.dart';
 import 'package:flutter/foundation.dart';
 
@@ -345,12 +344,12 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: themeSettings.settingsColor.withValues(alpha: 0.15),
+                    color: Color(0xFF64B5F6).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
                     Icons.ac_unit,
-                    color: themeSettings.settingsColor,
+                    color: Color(0xFF1976D2),
                     size: 18,
                   ),
                 ),
@@ -367,7 +366,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                         child: Text(
                           'アフターパージ',
                           style: TextStyle(
-                            color: themeSettings.settingsColor,
+                            color: Color(0xFF1976D2),
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             fontFamily: fontFamily,
@@ -377,115 +376,127 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                     ] else if (memo.isRoasterOn) ...[
                       // 焙煎機オンの場合
                       Expanded(
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.local_fire_department,
-                              color: themeSettings.iconColor,
-                              size: 18,
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              '焙煎機オン',
-                              style: TextStyle(
-                                color: themeSettings.iconColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                fontFamily: fontFamily,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ] else ...[
-                      // 通常の焙煎メモの場合
-                      Expanded(
-                        child: Row(
-                          children: [
-                            // 豆の名前
-                            if (memo.beanName != null) ...[
-                              Expanded(
-                                flex: 3,
-                                child: BeanNameWithSticker(
-                                  beanName: memo.beanName!,
-                                  textStyle: TextStyle(
-                                    color: themeSettings.fontColor1,
+                            // 1行目：焙煎機オンアイコンとテキスト
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.local_fire_department,
+                                  color: themeSettings.iconColor,
+                                  size: 18,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  '焙煎機オン',
+                                  style: TextStyle(
+                                    color: themeSettings.iconColor,
+                                    fontWeight: FontWeight.bold,
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w600,
                                     fontFamily: fontFamily,
                                   ),
-                                  stickerSize: 14,
                                 ),
-                              ),
-                              SizedBox(width: 12),
-                            ],
-
-                            // 重さと個数
-                            if (memo.weight != null ||
-                                memo.quantity != null) ...[
-                              Expanded(
-                                flex: 2,
-                                child: Center(
+                              ],
+                            ),
+                            SizedBox(height: 4),
+                            // 2行目：豆の名前、重さ、焙煎度合い
+                            Row(
+                              children: [
+                                // 豆の名前とG番号
+                                Flexible(
                                   child: Text(
-                                    [
-                                      if (memo.weight != null)
-                                        '${memo.weight}g',
-                                      if (memo.weight != null &&
-                                          memo.quantity != null)
-                                        '×',
-                                      if (memo.quantity != null)
-                                        '${memo.quantity}袋',
-                                    ].join(' '),
+                                    memo.beanName != null &&
+                                            memo.roastMachineMode != null
+                                        ? '${memo.beanName} (${memo.roastMachineMode})'
+                                        : memo.roastMachineMode != null
+                                        ? '${memo.roastMachineMode}'
+                                        : '',
+                                    style: TextStyle(
+                                      color: themeSettings.iconColor,
+                                      fontSize: 14,
+                                      fontFamily: fontFamily,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+
+                                // 重さ
+                                if (memo.weight != null) ...[
+                                  SizedBox(width: 12),
+                                  Text(
+                                    '${memo.weight}g',
                                     style: TextStyle(
                                       color: themeSettings.iconColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                       fontFamily: fontFamily,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                            ],
+                                ],
 
-                            // 焙煎度合い
-                            if (memo.roastLevel != null) ...[
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _getRoastLevelColor(
-                                      memo.roastLevel!,
-                                    ).withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(
-                                      color: _getRoastLevelColor(
-                                        memo.roastLevel!,
-                                      ).withValues(alpha: 0.3),
+                                // 焙煎度合い
+                                if (memo.roastLevel != null) ...[
+                                  SizedBox(width: 12),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                      vertical: 2,
                                     ),
-                                  ),
-                                  child: Text(
-                                    _getShortRoastLevel(memo.roastLevel!),
-                                    style: TextStyle(
+                                    decoration: BoxDecoration(
                                       color: _getRoastLevelColor(
                                         memo.roastLevel!,
+                                      ).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: _getRoastLevelColor(
+                                          memo.roastLevel!,
+                                        ).withValues(alpha: 0.3),
                                       ),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: fontFamily,
                                     ),
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
+                                    child: Text(
+                                      _getShortRoastLevel(memo.roastLevel!),
+                                      style: TextStyle(
+                                        color: _getRoastLevelColor(
+                                          memo.roastLevel!,
+                                        ),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: fontFamily,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
+                                ],
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (memo.isRoast) ...[
+                      // ロースト表示
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.coffee_maker,
+                              color: themeSettings.iconColor,
+                              size: 18,
+                            ),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'ロースト ${memo.roastCount}回目、${memo.bagCount}袋',
+                                style: TextStyle(
+                                  color: themeSettings.iconColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  fontFamily: fontFamily,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
+                            ),
                           ],
                         ),
                       ),

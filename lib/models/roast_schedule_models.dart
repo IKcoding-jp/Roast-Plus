@@ -8,8 +8,12 @@ class RoastScheduleMemo {
   final int? weight;
   final int? quantity;
   final String? roastLevel;
+  final String? roastMachineMode; // 焙煎機設定モード (G1, G2, G3)
   final bool isAfterPurge;
   final bool isRoasterOn;
+  final bool isRoast; // ロースト機能のフラグ
+  final int? roastCount; // 何回目か
+  final int? bagCount; // 袋数（1 or 2）
   final DateTime date; // 日付フィールドを追加
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -21,8 +25,12 @@ class RoastScheduleMemo {
     this.weight,
     this.quantity,
     this.roastLevel,
+    this.roastMachineMode,
     this.isAfterPurge = false,
     this.isRoasterOn = false,
+    this.isRoast = false,
+    this.roastCount,
+    this.bagCount,
     required this.date,
     required this.createdAt,
     required this.updatedAt,
@@ -35,8 +43,12 @@ class RoastScheduleMemo {
     'weight': weight,
     'quantity': quantity,
     'roastLevel': roastLevel,
+    'roastMachineMode': roastMachineMode,
     'isAfterPurge': isAfterPurge,
     'isRoasterOn': isRoasterOn,
+    'isRoast': isRoast,
+    'roastCount': roastCount,
+    'bagCount': bagCount,
     'date': date.toIso8601String(),
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
@@ -50,8 +62,12 @@ class RoastScheduleMemo {
       weight: json['weight'],
       quantity: json['quantity'],
       roastLevel: json['roastLevel'],
+      roastMachineMode: json['roastMachineMode'],
       isAfterPurge: json['isAfterPurge'] ?? false,
       isRoasterOn: json['isRoasterOn'] ?? false,
+      isRoast: json['isRoast'] ?? false,
+      roastCount: json['roastCount'],
+      bagCount: json['bagCount'],
       date: DateTime.parse(
         json['date'] ?? json['createdAt'],
       ), // 後方互換性のためcreatedAtをフォールバック
@@ -67,8 +83,12 @@ class RoastScheduleMemo {
     int? weight,
     int? quantity,
     String? roastLevel,
+    String? roastMachineMode,
     bool? isAfterPurge,
     bool? isRoasterOn,
+    bool? isRoast,
+    int? roastCount,
+    int? bagCount,
     DateTime? date,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -80,8 +100,12 @@ class RoastScheduleMemo {
       weight: weight ?? this.weight,
       quantity: quantity ?? this.quantity,
       roastLevel: roastLevel ?? this.roastLevel,
+      roastMachineMode: roastMachineMode ?? this.roastMachineMode,
       isAfterPurge: isAfterPurge ?? this.isAfterPurge,
       isRoasterOn: isRoasterOn ?? this.isRoasterOn,
+      isRoast: isRoast ?? this.isRoast,
+      roastCount: roastCount ?? this.roastCount,
+      bagCount: bagCount ?? this.bagCount,
       date: date ?? this.date,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

@@ -947,33 +947,39 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        child: BeanNameWithSticker(
-                          beanName: workProgress.beanName,
-                          textStyle: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: themeSettings.fontColor1,
-                          ),
-                          stickerSize: 18.0,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            BeanNameWithSticker(
+                              beanName: workProgress.beanName,
+                              textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: themeSettings.fontColor1,
+                              ),
+                              stickerSize: 18.0,
+                            ),
+                            if (quantityDisplay != null) ...[
+                              SizedBox(height: 6),
+                              _buildQuantityChip(
+                                quantityDisplay,
+                                themeSettings,
+                                fontSize: 12,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                      if (quantityDisplay != null) ...[
-                        SizedBox(width: 6),
-                        _buildQuantityChip(
-                          quantityDisplay,
-                          themeSettings,
-                          fontSize: 12,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                        ),
-                      ],
                       if (workProgress.stageStatus.isNotEmpty) ...[
+                        SizedBox(width: 8),
                         Builder(
                           builder: (context) {
                             final stage = workProgress.stageStatus.keys.first;
@@ -1032,8 +1038,8 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                             );
                           },
                         ),
-                        SizedBox(width: 8),
                       ],
+                      Spacer(),
                       if (canEdit)
                         PopupMenuButton<String>(
                           onSelected: (value) async {
@@ -1154,34 +1160,6 @@ class _WorkProgressPageState extends State<WorkProgressPage>
                       color: themeSettings.fontColor1.withValues(alpha: 0.7),
                     ),
                   ),
-                  if (hasQuantity &&
-                      quantityValue != null &&
-                      quantityUnit != null)
-                    Padding(
-                      padding: EdgeInsets.only(top: 6),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.scale,
-                            size: 16,
-                            color: themeSettings.fontColor1.withValues(
-                              alpha: 0.6,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            '$quantityValue $quantityUnit',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: themeSettings.fontColor1.withValues(
-                                alpha: 0.85,
-                              ),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   if (workProgress.notes != null &&
                       workProgress.notes!.isNotEmpty) ...[
                     SizedBox(height: 8),

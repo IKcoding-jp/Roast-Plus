@@ -926,6 +926,102 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     return record.status;
   }
 
+  /// メンバーを班内で並び替え
+  Future<void> _reorderMemberInTeam(
+    String teamId,
+    int fromIndex,
+    int toIndex,
+  ) async {
+    if (!mounted) return;
+
+    // チームを検索
+    final teamIndex = teams.indexWhere((t) => t.id == teamId);
+    if (teamIndex == -1) return;
+
+    final team = teams[teamIndex];
+    final members = List<String>.from(team.members);
+
+    // インデックスが範囲外の場合は何もしない
+    if (fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= members.length ||
+        toIndex >= members.length) {
+      return;
+    }
+
+    // 同じ位置なら何もしない
+    if (fromIndex == toIndex) return;
+
+    // メンバーを移動
+    final member = members.removeAt(fromIndex);
+    members.insert(toIndex, member);
+
+    // チームを更新
+    final updatedTeam = team.copyWith(members: members);
+    final updatedTeams = List<Team>.from(teams);
+    updatedTeams[teamIndex] = updatedTeam;
+
+    setState(() {
+      teams = updatedTeams;
+    });
+
+    // 担当表履歴に保存
+    await _saveAssignmentHistory();
+  }
+
+  /// 担当表履歴を保存
+  Future<void> _saveAssignmentHistory() async {
+    if (!mounted) return;
+
+    try {
+      final today = _todayKey();
+
+      // 各行のメンバーを"-"で結合した形式で保存
+      final maxMembers = teams.fold<int>(
+        0,
+        (max, team) => team.members.length > max ? team.members.length : max,
+      );
+
+      final assignments = <String>[];
+      for (int i = 0; i < maxMembers; i++) {
+        final rowMembers = teams
+            .map((team) {
+              return i < team.members.length && team.members[i].isNotEmpty
+                  ? team.members[i]
+                  : '未設定';
+            })
+            .join('-');
+        assignments.add(rowMembers);
+      }
+
+      // Firestoreに保存
+      await AssignmentFirestoreService.saveAssignmentHistory(
+        dateKey: today,
+        assignments: assignments,
+        leftLabels: leftLabels,
+        rightLabels: rightLabels,
+      );
+
+      // グループ参加中の場合は同期
+      final groupProvider = context.read<GroupProvider>();
+      if (groupProvider.hasGroup) {
+        final group = groupProvider.currentGroup;
+        if (group != null) {
+          // グループの今日の担当履歴を更新
+          await GroupDataSyncService.syncTodayAssignment(group.id, {
+            'assignments': assignments,
+            'dateKey': today,
+            'updatedAt': DateTime.now().toIso8601String(),
+          });
+        }
+      }
+
+      debugPrint('AssignmentBoard: 担当表履歴保存完了 - $today');
+    } catch (e) {
+      debugPrint('AssignmentBoard: 担当表履歴保存エラー: $e');
+    }
+  }
+
   /// メンバーの出勤退勤状態を更新
   Future<void> _updateMemberAttendance(
     String memberName,
@@ -3176,27 +3272,87 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             ),
           ),
           // メンバーカード
-          ...teams.map<Widget>(
-            (team) => Container(
+          ...teams.asMap().entries.map<Widget>((entry) {
+            final team = entry.value;
+            final memberName =
+                i < team.members.length && team.members[i].isNotEmpty
+                ? team.members[i]
+                : '未設定';
+
+            return Container(
               width: isSmallMobile ? 70 : 85,
               margin: EdgeInsets.symmetric(horizontal: 2),
-              child: MemberCard(
-                name: i < team.members.length && team.members[i].isNotEmpty
-                    ? team.members[i]
-                    : '未設定',
-                attendanceStatus: _getMemberAttendanceStatus(
-                  i < team.members.length && team.members[i].isNotEmpty
-                      ? team.members[i]
-                      : '未設定',
-                ),
-                onTap: () {
-                  if (i < team.members.length && team.members[i].isNotEmpty) {
-                    _showAttendanceDialog(team.members[i]);
-                  }
+              child: DragTarget<Map<String, dynamic>>(
+                onWillAcceptWithDetails: (details) {
+                  // 同じチーム内のみ受け入れる
+                  return details.data['teamId'] == team.id &&
+                      details.data['fromIndex'] != i;
+                },
+                onAcceptWithDetails: (details) {
+                  final fromIndex = details.data['fromIndex'] as int;
+                  _reorderMemberInTeam(team.id, fromIndex, i);
+                },
+                builder: (context, candidateData, rejectedData) {
+                  final isHovering = candidateData.isNotEmpty;
+                  return LongPressDraggable<Map<String, dynamic>>(
+                    data: {
+                      'teamId': team.id,
+                      'fromIndex': i,
+                      'memberName': memberName,
+                    },
+                    feedback: Material(
+                      color: Colors.transparent,
+                      child: Opacity(
+                        opacity: 0.7,
+                        child: Container(
+                          width: isSmallMobile ? 70 : 85,
+                          child: MemberCard(
+                            name: memberName,
+                            attendanceStatus: _getMemberAttendanceStatus(
+                              memberName,
+                            ),
+                            onTap: () {},
+                          ),
+                        ),
+                      ),
+                    ),
+                    childWhenDragging: Opacity(
+                      opacity: 0.3,
+                      child: MemberCard(
+                        name: memberName,
+                        attendanceStatus: _getMemberAttendanceStatus(
+                          memberName,
+                        ),
+                        onTap: () {},
+                      ),
+                    ),
+                    child: Container(
+                      decoration: isHovering
+                          ? BoxDecoration(
+                              border: Border.all(
+                                color: themeSettings.iconColor,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            )
+                          : null,
+                      child: MemberCard(
+                        name: memberName,
+                        attendanceStatus: _getMemberAttendanceStatus(
+                          memberName,
+                        ),
+                        onTap: () {
+                          if (memberName != '未設定') {
+                            _showAttendanceDialog(memberName);
+                          }
+                        },
+                      ),
+                    ),
+                  );
                 },
               ),
-            ),
-          ),
+            );
+          }),
           // 右ラベル
           SizedBox(
             width: isSmallMobile ? 60 : 80,
@@ -3249,29 +3405,89 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         ),
         SizedBox(width: 2), // 左ラベルとメンバーカードの間隔
         // メンバーカード
-        ...teams.map<Widget>(
-          (team) => Container(
+        ...teams.asMap().entries.map<Widget>((entry) {
+          final team = entry.value;
+          final memberName =
+              i < team.members.length && team.members[i].isNotEmpty
+              ? team.members[i]
+              : '未設定';
+
+          return Container(
             width: 180, // タブレット版レイアウトを統一使用
             margin: EdgeInsets.symmetric(horizontal: 0), // カード間の間隔を0に調整
             child: Center(
-              child: MemberCard(
-                name: i < team.members.length && team.members[i].isNotEmpty
-                    ? team.members[i]
-                    : '未設定',
-                attendanceStatus: _getMemberAttendanceStatus(
-                  i < team.members.length && team.members[i].isNotEmpty
-                      ? team.members[i]
-                      : '未設定',
-                ),
-                onTap: () {
-                  if (i < team.members.length && team.members[i].isNotEmpty) {
-                    _showAttendanceDialog(team.members[i]);
-                  }
+              child: DragTarget<Map<String, dynamic>>(
+                onWillAcceptWithDetails: (details) {
+                  // 同じチーム内のみ受け入れる
+                  return details.data['teamId'] == team.id &&
+                      details.data['fromIndex'] != i;
+                },
+                onAcceptWithDetails: (details) {
+                  final fromIndex = details.data['fromIndex'] as int;
+                  _reorderMemberInTeam(team.id, fromIndex, i);
+                },
+                builder: (context, candidateData, rejectedData) {
+                  final isHovering = candidateData.isNotEmpty;
+                  return LongPressDraggable<Map<String, dynamic>>(
+                    data: {
+                      'teamId': team.id,
+                      'fromIndex': i,
+                      'memberName': memberName,
+                    },
+                    feedback: Material(
+                      color: Colors.transparent,
+                      child: Opacity(
+                        opacity: 0.7,
+                        child: Container(
+                          width: 180,
+                          child: MemberCard(
+                            name: memberName,
+                            attendanceStatus: _getMemberAttendanceStatus(
+                              memberName,
+                            ),
+                            onTap: () {},
+                          ),
+                        ),
+                      ),
+                    ),
+                    childWhenDragging: Opacity(
+                      opacity: 0.3,
+                      child: MemberCard(
+                        name: memberName,
+                        attendanceStatus: _getMemberAttendanceStatus(
+                          memberName,
+                        ),
+                        onTap: () {},
+                      ),
+                    ),
+                    child: Container(
+                      decoration: isHovering
+                          ? BoxDecoration(
+                              border: Border.all(
+                                color: themeSettings.iconColor,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            )
+                          : null,
+                      child: MemberCard(
+                        name: memberName,
+                        attendanceStatus: _getMemberAttendanceStatus(
+                          memberName,
+                        ),
+                        onTap: () {
+                          if (memberName != '未設定') {
+                            _showAttendanceDialog(memberName);
+                          }
+                        },
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
-          ),
-        ),
+          );
+        }),
         SizedBox(width: 2), // メンバーカードと右ラベルの間隔
         // 右ラベル
         SizedBox(
@@ -3393,30 +3609,88 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 ),
               ),
               // メンバーカード
-              ...teams.map<Widget>(
-                (team) => SizedBox(
+              ...teams.asMap().entries.map<Widget>((entry) {
+                final team = entry.value;
+                final memberName =
+                    i < team.members.length && team.members[i].isNotEmpty
+                    ? team.members[i]
+                    : '未設定';
+
+                return SizedBox(
                   width: 200,
                   child: Center(
-                    child: MemberCard(
-                      name:
-                          i < team.members.length && team.members[i].isNotEmpty
-                          ? team.members[i]
-                          : '未設定',
-                      attendanceStatus: _getMemberAttendanceStatus(
-                        i < team.members.length && team.members[i].isNotEmpty
-                            ? team.members[i]
-                            : '未設定',
-                      ),
-                      onTap: () {
-                        if (i < team.members.length &&
-                            team.members[i].isNotEmpty) {
-                          _showAttendanceDialog(team.members[i]);
-                        }
+                    child: DragTarget<Map<String, dynamic>>(
+                      onWillAcceptWithDetails: (details) {
+                        // 同じチーム内のみ受け入れる
+                        return details.data['teamId'] == team.id &&
+                            details.data['fromIndex'] != i;
+                      },
+                      onAcceptWithDetails: (details) {
+                        final fromIndex = details.data['fromIndex'] as int;
+                        _reorderMemberInTeam(team.id, fromIndex, i);
+                      },
+                      builder: (context, candidateData, rejectedData) {
+                        final isHovering = candidateData.isNotEmpty;
+                        return LongPressDraggable<Map<String, dynamic>>(
+                          data: {
+                            'teamId': team.id,
+                            'fromIndex': i,
+                            'memberName': memberName,
+                          },
+                          feedback: Material(
+                            color: Colors.transparent,
+                            child: Opacity(
+                              opacity: 0.7,
+                              child: Container(
+                                width: 200,
+                                child: MemberCard(
+                                  name: memberName,
+                                  attendanceStatus: _getMemberAttendanceStatus(
+                                    memberName,
+                                  ),
+                                  onTap: () {},
+                                ),
+                              ),
+                            ),
+                          ),
+                          childWhenDragging: Opacity(
+                            opacity: 0.3,
+                            child: MemberCard(
+                              name: memberName,
+                              attendanceStatus: _getMemberAttendanceStatus(
+                                memberName,
+                              ),
+                              onTap: () {},
+                            ),
+                          ),
+                          child: Container(
+                            decoration: isHovering
+                                ? BoxDecoration(
+                                    border: Border.all(
+                                      color: themeSettings.iconColor,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  )
+                                : null,
+                            child: MemberCard(
+                              name: memberName,
+                              attendanceStatus: _getMemberAttendanceStatus(
+                                memberName,
+                              ),
+                              onTap: () {
+                                if (memberName != '未設定') {
+                                  _showAttendanceDialog(memberName);
+                                }
+                              },
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
-                ),
-              ),
+                );
+              }),
               // 右ラベル
               SizedBox(
                 width: 150,
@@ -3469,20 +3743,82 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: teams.map((team) {
+                children: teams.asMap().entries.map((entry) {
+                  final team = entry.value;
                   final memberName =
                       i < team.members.length && team.members[i].isNotEmpty
                       ? team.members[i]
                       : '未設定';
+
                   return SizedBox(
                     width: 120,
-                    child: MemberCard(
-                      name: memberName,
-                      attendanceStatus: _getMemberAttendanceStatus(memberName),
-                      onTap: () {
-                        if (memberName != '未設定') {
-                          _showAttendanceDialog(memberName);
-                        }
+                    child: DragTarget<Map<String, dynamic>>(
+                      onWillAcceptWithDetails: (details) {
+                        // 同じチーム内のみ受け入れる
+                        return details.data['teamId'] == team.id &&
+                            details.data['fromIndex'] != i;
+                      },
+                      onAcceptWithDetails: (details) {
+                        final fromIndex = details.data['fromIndex'] as int;
+                        _reorderMemberInTeam(team.id, fromIndex, i);
+                      },
+                      builder: (context, candidateData, rejectedData) {
+                        final isHovering = candidateData.isNotEmpty;
+                        return LongPressDraggable<Map<String, dynamic>>(
+                          data: {
+                            'teamId': team.id,
+                            'fromIndex': i,
+                            'memberName': memberName,
+                          },
+                          feedback: Material(
+                            color: Colors.transparent,
+                            child: Opacity(
+                              opacity: 0.7,
+                              child: Container(
+                                width: 120,
+                                child: MemberCard(
+                                  name: memberName,
+                                  attendanceStatus: _getMemberAttendanceStatus(
+                                    memberName,
+                                  ),
+                                  onTap: () {},
+                                ),
+                              ),
+                            ),
+                          ),
+                          childWhenDragging: Opacity(
+                            opacity: 0.3,
+                            child: MemberCard(
+                              name: memberName,
+                              attendanceStatus: _getMemberAttendanceStatus(
+                                memberName,
+                              ),
+                              onTap: () {},
+                            ),
+                          ),
+                          child: Container(
+                            decoration: isHovering
+                                ? BoxDecoration(
+                                    border: Border.all(
+                                      color: themeSettings.iconColor,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  )
+                                : null,
+                            child: MemberCard(
+                              name: memberName,
+                              attendanceStatus: _getMemberAttendanceStatus(
+                                memberName,
+                              ),
+                              onTap: () {
+                                if (memberName != '未設定') {
+                                  _showAttendanceDialog(memberName);
+                                }
+                              },
+                            ),
+                          ),
+                        );
                       },
                     ),
                   );

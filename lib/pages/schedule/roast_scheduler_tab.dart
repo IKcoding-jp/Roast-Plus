@@ -568,7 +568,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
         ? Stack(
             children: [
               Scaffold(
-                backgroundColor: themeSettings.backgroundColor,
+                backgroundColor: themeSettings.cardBackgroundColor,
                 body: Column(
                   children: [
                     // ヘッダー
@@ -661,7 +661,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
             ],
           )
         : Scaffold(
-            backgroundColor: themeSettings.backgroundColor,
+            backgroundColor: themeSettings.cardBackgroundColor,
             floatingActionButton: FloatingActionButton(
               onPressed: _canEditRoastSchedule ? _addMemo : null,
               backgroundColor: themeSettings.appButtonColor,

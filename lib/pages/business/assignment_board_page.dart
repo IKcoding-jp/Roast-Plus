@@ -1755,6 +1755,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       return;
     }
 
+    // 既存のシャッフルタイマーをキャンセル
+    shuffleTimer?.cancel();
+
     setState(() => isShuffling = true);
 
     // シャッフル前に基本構成データを読み込む
@@ -2170,7 +2173,6 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         final todayIsWeekend = _isWeekend();
         final isButtonDisabled =
             todayIsWeekend && !isDeveloperMode ||
-            isAssignedToday ||
             isShuffling;
 
         final themeSettings = Provider.of<ThemeSettings>(context);
@@ -3365,8 +3367,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 child: Text(
                   () {
                     if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
-                    if (isAssignedToday) return '今日はすでに決定済み';
                     if (isShuffling) return 'シャッフル中...';
+                    if (isAssignedToday) return '再度シャッフル';
                     return '今日の担当を決める';
                   }(),
                   style: TextStyle(
@@ -3421,8 +3423,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 child: Text(
                   () {
                     if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
-                    if (isAssignedToday) return '今日はすでに決定済み';
                     if (isShuffling) return 'シャッフル中...';
+                    if (isAssignedToday) return '再度シャッフル';
                     return '今日の担当を決める';
                   }(),
                   style: TextStyle(
@@ -3456,8 +3458,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             onPressed: isButtonDisabled ? null : _shuffleAssignments,
             child: Text(() {
               if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
-              if (isAssignedToday) return '今日はすでに決定済み';
               if (isShuffling) return 'シャッフル中...';
+              if (isAssignedToday) return '再度シャッフル';
               return '今日の担当を決める';
             }()),
           ),

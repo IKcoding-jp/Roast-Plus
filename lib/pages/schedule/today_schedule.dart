@@ -1301,90 +1301,113 @@ class _TodayScheduleState extends State<TodaySchedule>
               borderRadius: BorderRadius.circular(16),
             ),
             color: Provider.of<ThemeSettings>(context).cardBackgroundColor,
-            child: SizedBox(
-              height:
-                  MediaQuery.of(context).size.height * 0.72, // 画面の72%の高さに微調整
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 初期化中の場合はローディング表示
-                    if (_isInitializing)
-                      Expanded(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Lottie.asset(
-                                'assets/animations/Loading coffee bean.json',
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.contain,
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.72,
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 初期化中の場合はローディング表示
+                        if (_isInitializing)
+                          Expanded(
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Lottie.asset(
+                                    'assets/animations/Loading coffee bean.json',
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Loading...',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontColor1.withValues(alpha: 0.7),
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 16),
-                              Text(
-                                'Loading...',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontColor1.withValues(alpha: 0.7),
-                                  fontFamily: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontFamily,
-                                ),
+                            ),
+                          )
+                        // ラベルが空の場合は空の状態表示
+                        else if (_scheduleLabels.isEmpty ||
+                            (_scheduleLabels.length == 1 &&
+                                _scheduleLabels.first.isEmpty))
+                          Expanded(
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.schedule,
+                                    size: 48,
+                                    color: Provider.of<ThemeSettings>(
+                                      context,
+                                    ).iconColor.withValues(alpha: 0.5),
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    '時間ラベルを追加してください',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontColor1.withValues(alpha: 0.7),
+                                      fontFamily: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).fontFamily,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          )
+                        // ラベルがある場合はスケジュール表示（スクロール可能）
+                        else
+                          Expanded(
+                            child: SingleChildScrollView(
+                              padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).padding.bottom + 16,
+                              ),
+                              child: Column(
+                                children: _buildScheduleLabelWidgets(),
+                              ),
+                            ),
                           ),
-                        ),
-                      )
-                    // ラベルが空の場合は空の状態表示
-                    else if (_scheduleLabels.isEmpty ||
-                        (_scheduleLabels.length == 1 &&
-                            _scheduleLabels.first.isEmpty))
-                      Expanded(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.schedule,
-                                size: 48,
-                                color: Provider.of<ThemeSettings>(
-                                  context,
-                                ).iconColor.withValues(alpha: 0.5),
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                '時間ラベルを追加してください',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontColor1.withValues(alpha: 0.7),
-                                  fontFamily: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).fontFamily,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    // ラベルがある場合はスケジュール表示（スクロール可能）
-                    else
-                      Expanded(
-                        child: SingleChildScrollView(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).padding.bottom + 16,
-                          ),
-                          child: Column(children: _buildScheduleLabelWidgets()),
-                        ),
-                      ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                // 時間ラベル編集用FAB（右下に配置）
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: FloatingActionButton(
+                    onPressed: _openLabelEdit,
+                    heroTag: null,
+                    tooltip: '時間ラベル編集',
+                    backgroundColor: Provider.of<ThemeSettings>(
+                      context,
+                    ).buttonColor,
+                    child: Icon(
+                      Icons.label,
+                      color: Provider.of<ThemeSettings>(context).fontColor2,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );

@@ -339,23 +339,6 @@ class _SchedulePageState extends State<SchedulePage>
                                                           .fontFamily,
                                                     ),
                                                   ),
-                                                  Spacer(),
-                                                  // Web版での時間ラベル編集ボタン
-                                                  if (kIsWeb)
-                                                    IconButton(
-                                                      icon: Icon(
-                                                        Icons.label,
-                                                        color: themeSettings
-                                                            .iconColor,
-                                                        size: 20,
-                                                      ),
-                                                      onPressed:
-                                                          _openTimeLabelEdit,
-                                                      tooltip: '時間ラベルを編集',
-                                                      padding: EdgeInsets.zero,
-                                                      constraints:
-                                                          BoxConstraints(),
-                                                    ),
                                                 ],
                                               ),
                                             ),
@@ -487,23 +470,6 @@ class _SchedulePageState extends State<SchedulePage>
                                                         .fontFamily,
                                                   ),
                                                 ),
-                                                Spacer(),
-                                                // Web版での時間ラベル編集ボタン
-                                                if (kIsWeb)
-                                                  IconButton(
-                                                    icon: Icon(
-                                                      Icons.label,
-                                                      color: themeSettings
-                                                          .iconColor,
-                                                      size: 20,
-                                                    ),
-                                                    onPressed:
-                                                        _openTimeLabelEdit,
-                                                    tooltip: '時間ラベルを編集',
-                                                    padding: EdgeInsets.zero,
-                                                    constraints:
-                                                        BoxConstraints(),
-                                                  ),
                                               ],
                                             ),
                                           ),

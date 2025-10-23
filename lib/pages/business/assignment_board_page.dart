@@ -48,6 +48,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   bool isAssignedToday = false;
   bool isDeveloperMode = false;
   Timer? shuffleTimer;
+  String? _lastShuffledDate; // 最後にシャッフルした日付（YYYY-MM-DD形式）
+  Timer? _dateCheckTimer; // 日付変更を監視するタイマー
 
   // 出勤退勤機能用
   List<AttendanceRecord> _todayAttendance = [];
@@ -547,6 +549,10 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     _startDisplayNameMonitoring();
 
     _setupGroupProviderListener();
+
+    // 日付変更監視と最終シャッフル日付を読み込み
+    _startDateChangeMonitor();
+    _loadLastShuffleDate();
 
     // タイムアウト処理を追加 - 10秒後には必ずローディングを終了
     Future.delayed(Duration(seconds: 10), () {
@@ -1539,6 +1545,72 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
   String _todayKey() => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
+  /// 本日シャッフル可能かを判定
+  bool _canShuffleToday() {
+    // 初回シャッフル（まだ割り当てられていない）なら常に許可
+    if (!isAssignedToday) return true;
+
+    // 開発者モードなら常に許可
+    if (isDeveloperMode) return true;
+
+    // 最後のシャッフル日付が今日と異なれば許可
+    final today = _todayKey();
+    if (_lastShuffledDate == null || _lastShuffledDate != today) return true;
+
+    // それ以外は不許可
+    return false;
+  }
+
+  /// 日付変更を監視
+  void _startDateChangeMonitor() {
+    _dateCheckTimer?.cancel();
+    _dateCheckTimer = Timer.periodic(Duration(minutes: 1), (_) {
+      final today = _todayKey();
+      // 日付が変わった場合、最後のシャッフル日付をクリアしてUIを更新
+      if (_lastShuffledDate != null && _lastShuffledDate != today) {
+        debugPrint('AssignmentBoard: 日付が変更されたため、シャッフル制限をリセット');
+        if (mounted) {
+          setState(() {
+            _lastShuffledDate = null;
+          });
+        }
+      }
+    });
+  }
+
+  /// 最終シャッフル日付を読み込み
+  Future<void> _loadLastShuffleDate() async {
+    try {
+      final lastShuffleDate = await UserSettingsFirestoreService.getSetting(
+        'lastShuffleDate',
+      );
+      if (mounted) {
+        setState(() {
+          _lastShuffledDate = lastShuffleDate;
+        });
+      }
+      debugPrint('AssignmentBoard: 最終シャッフル日付を読み込み: $_lastShuffledDate');
+    } catch (e) {
+      debugPrint('AssignmentBoard: 最終シャッフル日付読み込みエラー: $e');
+    }
+  }
+
+  /// 最終シャッフル日付を保存
+  Future<void> _saveLastShuffleDate() async {
+    try {
+      final today = _todayKey();
+      await UserSettingsFirestoreService.saveSetting('lastShuffleDate', today);
+      if (mounted) {
+        setState(() {
+          _lastShuffledDate = today;
+        });
+      }
+      debugPrint('AssignmentBoard: 最終シャッフル日付を保存: $today');
+    } catch (e) {
+      debugPrint('AssignmentBoard: 最終シャッフル日付保存エラー: $e');
+    }
+  }
+
   String _dayKeyAgo(int d) => DateFormat(
     'yyyy-MM-dd',
   ).format(DateTime.now().subtract(Duration(days: d)));
@@ -2031,6 +2103,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             isAssignedToday = true;
           });
 
+          // シャッフル日付を保存
+          await _saveLastShuffleDate();
+
           try {
             await AssignmentFirestoreService.saveAssignmentHistory(
               dateKey: today,
@@ -2201,6 +2276,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   @override
   void dispose() {
     shuffleTimer?.cancel();
+    _dateCheckTimer?.cancel();
     _groupAssignmentSubscription?.cancel();
     _groupSettingsSubscription?.cancel();
     _groupTodayAssignmentSubscription?.cancel();
@@ -2266,8 +2342,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         }
 
         final todayIsWeekend = _isWeekend();
+        final canShuffleToday = isDeveloperMode || _canShuffleToday();
         final isButtonDisabled =
-            todayIsWeekend && !isDeveloperMode || isShuffling;
+            (todayIsWeekend && !isDeveloperMode) ||
+            isShuffling ||
+            !canShuffleToday;
 
         final themeSettings = Provider.of<ThemeSettings>(context);
 
@@ -3462,6 +3541,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   () {
                     if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
                     if (isShuffling) return 'シャッフル中...';
+                    if (isAssignedToday && !_canShuffleToday())
+                      return '本日はシャッフル済み';
                     if (isAssignedToday) return '再度シャッフル';
                     return '今日の担当を決める';
                   }(),
@@ -3518,6 +3599,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   () {
                     if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
                     if (isShuffling) return 'シャッフル中...';
+                    if (isAssignedToday && !_canShuffleToday())
+                      return '本日はシャッフル済み';
                     if (isAssignedToday) return '再度シャッフル';
                     return '今日の担当を決める';
                   }(),
@@ -3553,6 +3636,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             child: Text(() {
               if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
               if (isShuffling) return 'シャッフル中...';
+              if (isAssignedToday && !_canShuffleToday()) return '本日はシャッフル済み';
               if (isAssignedToday) return '再度シャッフル';
               return '今日の担当を決める';
             }()),

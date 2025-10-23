@@ -44,6 +44,9 @@ class GroupProvider extends ChangeNotifier {
   bool get showGroupDeletedPage => _showGroupDeletedPage;
 
   bool? _hasActiveGroupFlag;
+  
+  // Disposed状態をトラッキング
+  bool _disposed = false;
 
   GroupProvider() {
     // 初期化状態をリセット
@@ -979,6 +982,7 @@ class GroupProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     // 既存の監視を停止
     for (final sub in _groupWatchers.values) {
       sub.cancel();
@@ -1023,16 +1027,29 @@ class GroupProvider extends ChangeNotifier {
   /// 安全にnotifyListenersを呼び出す
   void _safeNotifyListeners() {
     try {
+      // disposedチェックを最初に実施
+      if (_disposed) {
+        return;
+      }
+      
       // ビルド中でないことを確認してからnotifyListenersを呼び出す
       WidgetsBinding.instance.addPostFrameCallback((_) {
         try {
-          notifyListeners();
+          // disposed状態を再度チェック（コールバック実行時）
+          if (!_disposed) {
+            notifyListeners();
+          }
         } catch (e) {
-          debugPrint('GroupProvider: notifyListenersエラー: $e');
+          // disposeされたProvider への呼び出しはスキップ
+          if (!_disposed) {
+            debugPrint('GroupProvider: notifyListenersエラー: $e');
+          }
         }
       });
     } catch (e) {
-      debugPrint('GroupProvider: _safeNotifyListenersエラー: $e');
+      if (!_disposed) {
+        debugPrint('GroupProvider: _safeNotifyListenersエラー: $e');
+      }
     }
   }
 

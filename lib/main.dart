@@ -407,13 +407,37 @@ void _initializeBackgroundServices() async {
   WidgetsBinding.instance.addObserver(
     LifecycleEventHandler(
       detachedCallBack: () async {
+        developer.log('アプリ終了時のクリーンアップ開始', name: 'Main');
+        
         // Web版ではネイティブ機能のクリーンアップをスキップ
         if (!kIsWeb) {
-          TodoNotificationService().stopNotificationService();
-          SecurityMonitorService.stopMonitoring();
-          SessionManagementService.stopMonitoring();
+          try {
+            TodoNotificationService().stopNotificationService();
+          } catch (e) {
+            developer.log('通知サービス停止エラー: $e', name: 'Main');
+          }
+          
+          try {
+            SecurityMonitorService.stopMonitoring();
+          } catch (e) {
+            developer.log('セキュリティ監視停止エラー: $e', name: 'Main');
+          }
+          
+          try {
+            SessionManagementService.stopMonitoring();
+          } catch (e) {
+            developer.log('セッション管理停止エラー: $e', name: 'Main');
+          }
         }
-        AutoSyncService.dispose();
+        
+        // AutoSyncServiceを終了（Web版でも実行）
+        try {
+          AutoSyncService.dispose();
+        } catch (e) {
+          developer.log('AutoSyncService停止エラー: $e', name: 'Main');
+        }
+        
+        developer.log('アプリ終了時のクリーンアップ完了', name: 'Main');
       },
     ),
   );
@@ -423,7 +447,11 @@ void _initializeBackgroundServices() async {
     PerformanceMonitor.measureAsync('AutoSync初期化', _initializeAutoSync),
   ];
 
-  await Future.wait(backgroundTasks);
+  try {
+    await Future.wait(backgroundTasks);
+  } catch (e) {
+    developer.log('バックグラウンドサービス初期化エラー: $e', name: 'Main');
+  }
 }
 
 // Web版では通知サービスはWeb Notifications APIで実装

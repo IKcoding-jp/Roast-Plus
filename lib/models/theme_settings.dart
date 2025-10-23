@@ -2216,4 +2216,12 @@ class ThemeSettings extends ChangeNotifier {
         return 'Noto Sans JP';
     }
   }
+
+  @override
+  void dispose() {
+    // すべてのStreamSubscriptionをキャンセル
+    _fontSettingsSubscription?.cancel();
+    _themeSettingsSubscription?.cancel();
+    super.dispose();
+  }
 }

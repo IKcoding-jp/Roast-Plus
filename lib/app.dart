@@ -350,6 +350,7 @@ class _AuthGateState extends State<AuthGate> {
   bool _forceRefresh = false;
   User? _currentUser;
   bool _isInitializing = true;
+  StreamSubscription<User?>? _authStateSubscription;
 
   @override
   void initState() {
@@ -357,12 +358,25 @@ class _AuthGateState extends State<AuthGate> {
 
     // Firebase設定の検証
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final isValid =
-          await EncryptedFirebaseConfigService.validateConfiguration();
-      if (!isValid) {
-        developer.log('❌ AuthGate: Firebase設定が無効です', name: 'AuthGate');
-      } else {
-        developer.log('✅ AuthGate: Firebase設定が有効です', name: 'AuthGate');
+      // ウィジェットがマウントされているか確認
+      if (!mounted) return;
+      
+      try {
+        final isValid =
+            await EncryptedFirebaseConfigService.validateConfiguration();
+        
+        // コールバック実行時に再度mounted確認
+        if (mounted) {
+          if (!isValid) {
+            developer.log('❌ AuthGate: Firebase設定が無効です', name: 'AuthGate');
+          } else {
+            developer.log('✅ AuthGate: Firebase設定が有効です', name: 'AuthGate');
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          developer.log('Firebase設定検証エラー: $e', name: 'AuthGate');
+        }
       }
     });
 
@@ -370,29 +384,46 @@ class _AuthGateState extends State<AuthGate> {
 
     // 認証状態のリスナーを追加（エラーハンドリング付き）
     try {
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        if (mounted) {
-          setState(() {
-            _currentUser = user;
-            _isInitializing = false;
-          });
-          developer.log(
-            'AuthGate: 認証状態リスナー - user: ${user?.email}',
-            name: 'AuthGate',
-          );
-
-          // ログアウト後の状態変化を確実に検知
-          if (user == null) {
+      _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen(
+        (User? user) {
+          if (mounted) {
+            setState(() {
+              _currentUser = user;
+              _isInitializing = false;
+            });
             developer.log(
-              'AuthGate: ユーザーがログアウトされました - ログイン画面を表示',
+              'AuthGate: 認証状態リスナー - user: ${user?.email}',
               name: 'AuthGate',
             );
+
+            // ログアウト後の状態変化を確実に検知
+            if (user == null) {
+              developer.log(
+                'AuthGate: ユーザーがログアウトされました - ログイン画面を表示',
+                name: 'AuthGate',
+              );
+            }
           }
-        }
-      });
+        },
+        onError: (e) {
+          developer.log('AuthGate: 認証状態リスナーエラー: $e', name: 'AuthGate');
+          if (mounted) {
+            setState(() {
+              _isInitializing = false;
+            });
+          }
+        },
+      );
     } catch (e) {
       developer.log('AuthGate: 認証状態リスナーの設定でエラー: $e', name: 'AuthGate');
     }
+  }
+
+  @override
+  void dispose() {
+    // 認証状態リスナーをキャンセル
+    _authStateSubscription?.cancel();
+    super.dispose();
   }
 
   // 認証状態の初期化
@@ -576,6 +607,9 @@ class _GroupRequiredWrapperState extends State<GroupRequiredWrapper> {
     super.initState();
     // GroupProviderの初期化を開始（一度だけ）
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // ウィジェットがまだマウントされているか確認
+      if (!mounted) return;
+      
       final groupProvider = Provider.of<GroupProvider>(context, listen: false);
 
       debugPrint('GroupRequiredWrapper: initState開始');
@@ -588,6 +622,9 @@ class _GroupRequiredWrapperState extends State<GroupRequiredWrapper> {
         // Web版では少し待機してから初期化を開始
         await Future.delayed(Duration(milliseconds: 100));
       }
+
+      // ウィジェットがまだマウントされているか確認
+      if (!mounted) return;
 
       // データがなく、読み込み中でもない場合のみ初期化
       if (groupProvider.groups.isEmpty &&
@@ -699,7 +736,11 @@ class _PasscodeGateState extends State<PasscodeGate>
     WidgetsBinding.instance.removeObserver(this);
     // Web版では通知サービスを停止しない
     if (!kIsWeb) {
-      TodoNotificationService().stopNotificationService();
+      try {
+        TodoNotificationService().stopNotificationService();
+      } catch (e) {
+        developer.log('通知サービス停止エラー: $e', name: 'PasscodeGate');
+      }
     }
     super.dispose();
   }
@@ -1196,9 +1237,13 @@ class MainScaffoldState extends State<MainScaffold> {
 
     // GroupProviderを初期化（グループデータの監視は後で開始）
     if (mounted) {
-      final groupProvider = context.read<GroupProvider>();
-      await groupProvider.loadUserGroups();
-      // グループデータの監視は後で開始（クラッシュ防止のため）
+      try {
+        final groupProvider = context.read<GroupProvider>();
+        await groupProvider.loadUserGroups();
+        // グループデータの監視は後で開始（クラッシュ防止のため）
+      } catch (e) {
+        developer.log('GroupProvider初期化エラー: $e', name: 'MainScaffold');
+      }
     }
 
     // GamificationProviderの初期化は後で実行（クラッシュ防止のため）

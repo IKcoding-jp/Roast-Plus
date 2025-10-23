@@ -117,3 +117,39 @@ lib/
 ---
 
 **RoastPlus** - コーヒー焙煎業務を、もっと楽しく、もっと効率的に ☕✨
+
+## 🔧 トラブルシューティング
+
+### Web版での描画エラー修正
+
+**エラー**: `"Trying to render a disposed EngineFlutterView"`
+
+このエラーは Web 版で複数の非同期操作がビューの破棄後も続行されるときに発生します。
+
+#### 実施した修正:
+
+1. **状態管理の改善**
+   - GroupProvider に `_disposed` フラグを追加し、破棄後の操作を防止
+   - `_safeNotifyListeners()` に mounted チェックを2段階実装
+
+2. **リスナー管理の強化**
+   - AuthGate の authStateChanges リスナーを StreamSubscription として管理
+   - リスナーの購読を dispose() で確実にキャンセル
+
+3. **非同期操作のガード強化**
+   - addPostFrameCallback 内で mounted チェックを実施
+   - コールバック実行時に再度 mounted 確認
+
+4. **リソースクリーンアップの改善**
+   - バックグラウンドサービスの停止にエラーハンドリングを追加
+   - AutoSyncService 等のタイマーを確実にキャンセル
+
+5. **Provider の dispose メソッド追加**
+   - ThemeSettings に dispose() メソッドを追加
+   - StreamSubscription の適切なキャンセル処理を実装
+
+#### 推奨事項:
+
+- 定期的に linter と analysis_options.yaml を確認
+- StatefulWidget と Provider の mounted / disposed 状態を常に意識
+- Web 版では特に非同期操作のライフサイクル管理に注意

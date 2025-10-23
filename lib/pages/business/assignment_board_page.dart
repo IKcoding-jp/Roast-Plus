@@ -1661,25 +1661,45 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   /// 新しい配置の重複スコアを計算（低いほど良い）
   int _calculateAssignmentScore(
     List<String> newPairs,
-    Map<String, List<String>> recentHistory,
-  ) {
+    Map<String, List<String>> recentHistory, {
+    bool enableDebugLog = false,
+  }) {
     int score = 0;
+    int positionDuplicates = 0; // 担当位置の重複数
+    int pairDuplicates = 0; // ペア相手の重複数
 
-    // 各メンバーの担当位置とペア相手を抽出
-    final memberAssignments = <String, List<MapEntry<int, String>>>{};
+    // 新しい配置のペア関係を抽出（どのメンバーがどのメンバーとペアになっているか）
+    final newPairRelations = <String, Set<String>>{};
+    for (var i = 0; i < newPairs.length; i++) {
+      final members = newPairs[i]
+          .split('-')
+          .where((m) => m.isNotEmpty && m != '未設定')
+          .toList();
+      // 各メンバーとそのペア相手を記録
+      for (var j = 0; j < members.length; j++) {
+        final member = members[j];
+        if (!newPairRelations.containsKey(member)) {
+          newPairRelations[member] = {};
+        }
+        // このメンバーのペア相手全員を追加
+        for (var k = 0; k < members.length; k++) {
+          if (k != j) {
+            newPairRelations[member]!.add(members[k]);
+          }
+        }
+      }
+    }
 
+    // 新しい配置の担当位置を抽出
+    final newPositions = <String, Set<int>>{};
     for (var i = 0; i < newPairs.length; i++) {
       final members = newPairs[i].split('-');
-      for (var teamIndex = 0; teamIndex < members.length; teamIndex++) {
-        final memberName = members[teamIndex];
-        if (memberName.isNotEmpty && memberName != '未設定') {
-          final partnerNames = List<String>.from(members)..removeAt(teamIndex);
-          if (!memberAssignments.containsKey(memberName)) {
-            memberAssignments[memberName] = [];
+      for (var member in members) {
+        if (member.isNotEmpty && member != '未設定') {
+          if (!newPositions.containsKey(member)) {
+            newPositions[member] = {};
           }
-          memberAssignments[memberName]!.add(
-            MapEntry(i, partnerNames.join('-')),
-          );
+          newPositions[member]!.add(i);
         }
       }
     }
@@ -1688,35 +1708,97 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     int dayIndex = 1;
     for (var entry in recentHistory.entries) {
       final historyPairs = entry.value;
-      final weight = dayIndex == 1 ? 2 : 1; // 直近1日は重み2倍
+      // 段階的な重み付け：直近ほど重く、過去ほど軽く
+      final weight = switch (dayIndex) {
+        1 => 10, // 1日前（最も避けたい）
+        2 => 5, // 2日前
+        3 => 3, // 3日前
+        4 => 2, // 4日前
+        _ => 1, // 5日前以降
+      };
 
-      for (var memberName in memberAssignments.keys) {
-        final newAssignments = memberAssignments[memberName]!;
-
-        // 過去の履歴から同じメンバーの担当位置とペア相手を抽出
-        for (var i = 0; i < historyPairs.length; i++) {
-          final members = historyPairs[i].split('-');
-          for (var teamIndex = 0; teamIndex < members.length; teamIndex++) {
-            if (members[teamIndex] == memberName) {
-              // 担当位置の重複チェック
-              for (var newAssignment in newAssignments) {
-                if (newAssignment.key == i) {
-                  score += 10 * weight; // 同じ担当位置
-                }
-
-                // ペア相手の重複チェック
-                final oldPartners = List<String>.from(members)
-                  ..removeAt(teamIndex);
-                final oldPartnerStr = oldPartners.join('-');
-                if (newAssignment.value == oldPartnerStr) {
-                  score += 10 * weight; // 同じペア相手
-                }
-              }
+      // 過去の配置のペア関係を抽出
+      final historyPairRelations = <String, Set<String>>{};
+      for (var i = 0; i < historyPairs.length; i++) {
+        final members = historyPairs[i]
+            .split('-')
+            .where((m) => m.isNotEmpty && m != '未設定')
+            .toList();
+        for (var j = 0; j < members.length; j++) {
+          final member = members[j];
+          if (!historyPairRelations.containsKey(member)) {
+            historyPairRelations[member] = {};
+          }
+          for (var k = 0; k < members.length; k++) {
+            if (k != j) {
+              historyPairRelations[member]!.add(members[k]);
             }
           }
         }
       }
+
+      // 過去の担当位置を抽出
+      final historyPositions = <String, Set<int>>{};
+      for (var i = 0; i < historyPairs.length; i++) {
+        final members = historyPairs[i].split('-');
+        for (var member in members) {
+          if (member.isNotEmpty && member != '未設定') {
+            if (!historyPositions.containsKey(member)) {
+              historyPositions[member] = {};
+            }
+            historyPositions[member]!.add(i);
+          }
+        }
+      }
+
+      // ペアの重複をチェック（担当位置に関係なく）
+      for (var member in newPairRelations.keys) {
+        if (historyPairRelations.containsKey(member)) {
+          final newPartners = newPairRelations[member]!;
+          final oldPartners = historyPairRelations[member]!;
+
+          // 共通のペア相手を見つける
+          final commonPartners = newPartners.intersection(oldPartners);
+          for (var partner in commonPartners) {
+            // ペアの重複にはより強いペナルティを適用
+            score += 15 * weight;
+            pairDuplicates++;
+            if (enableDebugLog) {
+              debugPrint(
+                '  ペア重複: $member と $partner が${dayIndex}日前もペア (重み: ${weight}x, ペナルティ: ${15 * weight})',
+              );
+            }
+          }
+        }
+      }
+
+      // 担当位置の重複をチェック
+      for (var member in newPositions.keys) {
+        if (historyPositions.containsKey(member)) {
+          final newPos = newPositions[member]!;
+          final oldPos = historyPositions[member]!;
+
+          // 共通の担当位置を見つける
+          final commonPositions = newPos.intersection(oldPos);
+          for (var pos in commonPositions) {
+            score += 10 * weight;
+            positionDuplicates++;
+            if (enableDebugLog) {
+              debugPrint(
+                '  担当位置重複: $member が${dayIndex}日前と同じ担当位置 $pos (重み: ${weight}x)',
+              );
+            }
+          }
+        }
+      }
+
       dayIndex++;
+    }
+
+    if (enableDebugLog && score > 0) {
+      debugPrint(
+        'AssignmentBoard: スコア詳細 - 合計: $score, 担当位置重複: $positionDuplicates件, ペア重複: $pairDuplicates件',
+      );
     }
 
     return score;
@@ -1855,9 +1937,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
           final today = _todayKey();
 
-          final recentHistory = await _getRecentAssignmentHistory(2);
+          final recentHistory = await _getRecentAssignmentHistory(7);
 
-          debugPrint('AssignmentBoard: 担当履歴を参照してシャッフル開始');
+          debugPrint('AssignmentBoard: 担当履歴を参照してシャッフル開始（過去7日分）');
 
           List<List<String>> bestShuffledMembers = List.generate(
             teams.length,
@@ -1875,7 +1957,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           int bestScore = _calculateAssignmentScore(bestPairs, recentHistory);
 
           int retry = 0;
-          const maxRetries = 100;
+          const maxRetries = 1000; // より多くの試行でベストな配置を探す
 
           while (retry < maxRetries) {
             for (int i = 0; i < shuffledMembers.length; i++) {
@@ -1901,7 +1983,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 teams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
-              debugPrint('AssignmentBoard: より良い配置を発見 (スコア: $bestScore)');
+              debugPrint(
+                'AssignmentBoard: より良い配置を発見 (スコア: $bestScore, 試行: $retry)',
+              );
             }
 
             if (candidateScore == 0) {
@@ -1911,7 +1995,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 teams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
-              debugPrint('AssignmentBoard: 完璧な配置を発見しました');
+              debugPrint('AssignmentBoard: 完璧な配置を発見！重複なし (試行: $retry)');
               break;
             }
 
@@ -1926,6 +2010,16 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           }
 
           debugPrint('AssignmentBoard: 最終配置決定 (スコア: $bestScore, 試行回数: $retry)');
+
+          // 最終配置の詳細ログを出力
+          if (bestScore > 0) {
+            debugPrint('AssignmentBoard: 最終配置の詳細分析:');
+            _calculateAssignmentScore(
+              bestPairs,
+              recentHistory,
+              enableDebugLog: true,
+            );
+          }
 
           await UserSettingsFirestoreService.saveMultipleSettings({
             'assignment_$today': bestPairs,

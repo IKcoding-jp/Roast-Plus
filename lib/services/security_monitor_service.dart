@@ -59,10 +59,10 @@ class SecurityMonitorService {
       final user = _auth.currentUser;
       if (user == null) return;
 
-      // 1. トークンの有効性チェック
-      final isTokenValid = await SecureAuthService.validateStoredTokens();
-      if (!isTokenValid) {
-        await _handleSecurityViolation('invalid_tokens', 'トークンが無効です');
+      // 1. 認証状態チェック
+      final isAuthenticated = await SecureAuthService.isUserAuthenticated();
+      if (!isAuthenticated) {
+        await _handleSecurityViolation('not_authenticated', '認証されていません');
       }
 
       // 2. セキュアストレージの可用性チェック
@@ -76,8 +76,8 @@ class SecurityMonitorService {
       }
 
       // 3. 認証状態の整合性チェック
-      final isAuthenticated = await SecureAuthService.isUserAuthenticated();
-      if (!isAuthenticated) {
+      final authStateValid = await SecureAuthService.isUserAuthenticated();
+      if (!authStateValid) {
         await _handleSecurityViolation(
           'authentication_mismatch',
           '認証状態に不整合があります',
@@ -238,10 +238,9 @@ class SecurityMonitorService {
         'generatedAt': DateTime.now().toIso8601String(),
         'securityStatus': {
           'isMonitoring': _isMonitoring,
-          'isTokenValid': await SecureAuthService.validateStoredTokens(),
+          'isAuthenticated': await SecureAuthService.isUserAuthenticated(),
           'isSecureStorageAvailable':
               await SecureStorageService.isSecureStorageAvailable(),
-          'isAuthenticated': await SecureAuthService.isUserAuthenticated(),
         },
         'recentViolations': await _getRecentViolations(user.uid),
         'lastActivity': await _getLastActivityTime(user.uid),

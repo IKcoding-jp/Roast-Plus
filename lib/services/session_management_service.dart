@@ -149,7 +149,7 @@ class SessionManagementService {
       await _updateSessionStats(reason);
 
       // セキュアサインアウト
-      await SecureAuthService.signOutSecurely();
+      await SecureAuthService.signOut();
 
       developer.log('セッション期限切れ処理完了: $reason', name: _logName);
     } catch (e) {
@@ -375,7 +375,7 @@ class SessionManagementService {
       await _updateSessionStats('manual_termination');
 
       // セキュアサインアウト
-      await SecureAuthService.signOutSecurely();
+      await SecureAuthService.signOut();
 
       developer.log('セッションを手動で終了', name: _logName);
     } catch (e) {

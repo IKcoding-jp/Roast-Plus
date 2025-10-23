@@ -17,7 +17,6 @@ dependencies:
   google_fonts: ^6.1.0
   audioplayers: ^6.5.0
   fl_chart: ^1.0.0
-  google_sign_in: ^6.2.0
   firebase_core: ^4.0.0
   firebase_auth: ^6.0.1
   cloud_firestore: ^6.0.0
@@ -52,7 +51,6 @@ flutter:
     - assets/fonts/
     - assets/animations/
     - assets/launcher_icon/icon.jpeg
-    - assets/google_logo.png
   fonts:
     - family: ZenMaruGothic
       fonts:

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../services/sync_firestore_all.dart';
 import '../../services/data_sync_service.dart';
 import '../../services/secure_auth_service.dart';
 import '../../services/encrypted_local_storage_service.dart';
@@ -207,50 +206,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
-    if (mounted) setState(() => _loading = true);
-    try {
-      final userCredential =
-          await SecureAuthService.signInWithGoogleForceAccountSelection();
-      if (userCredential == null) {
-        // キャンセル時
-        if (!mounted) return;
-        setState(() => _loading = false);
-        return;
-      }
-
-      final user = userCredential.user;
-      if (user != null) {
-        // ユーザー情報を更新
-        if (!mounted) return;
-        setState(() {
-          _userName = user.displayName ?? user.email;
-          _userEmail = user.email;
-          _loginProvider = 'Google';
-          _userPhotoUrl = user.photoURL;
-          _loading = false;
-        });
-
-        // サインイン直後にFirestore同期
-        await syncAllFirestoreData(context);
-        if (!mounted) return;
-        setState(() {});
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          setState(() {});
-        });
-
-        // セキュリティイベントを記録
-        await SecureAuthService.logSecurityEvent('account_info_login_success');
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('セキュアなGoogleログイン失敗: $e')));
-      if (mounted) setState(() => _loading = false);
-    }
-  }
+  // Email認証ではGoogle再ログイン機能は不要
 
   @override
   Widget build(BuildContext context) {
@@ -525,8 +481,8 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                 dashboardStatsProvider
                                                     .clearOnLogout();
 
-                                                // セキュアなサインアウトを実行（Google Sign-Inとセキュアストレージもクリア）
-                                                await SecureAuthService.signOutSecurely();
+                                                // サインアウトを実行
+                                                await SecureAuthService.signOut();
                                                 if (!mounted) return;
                                                 setState(() {
                                                   _userName = null;
@@ -739,8 +695,8 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                 // 注: UserSettingsFirestoreServiceにはclearAllSettingsメソッドがないため、
                                                 // 個別に削除するか、暗号化されたローカルストレージを使用
                                                 await EncryptedLocalStorageService.clear();
-                                                // セキュアなサインアウトを実行（Google Sign-Inとセキュアストレージもクリア）
-                                                await SecureAuthService.signOutSecurely();
+                                                // サインアウトを実行
+                                                await SecureAuthService.signOut();
                                                 if (!mounted) return;
                                                 setState(() {
                                                   _userName = null;
@@ -822,54 +778,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton.icon(
-                                      icon: Image.asset(
-                                        'assets/google_logo.png',
-                                        height: 24,
-                                      ),
-                                      label: Text(
-                                        'Googleでログイン',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              Provider.of<ThemeSettings>(
-                                                context,
-                                              ).fontFamily,
-                                          fontSize:
-                                              16 *
-                                              Provider.of<ThemeSettings>(
-                                                context,
-                                              ).fontSizeScale,
-                                        ),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        foregroundColor:
-                                            Provider.of<ThemeSettings>(
-                                              context,
-                                            ).fontColor1,
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          side: BorderSide(
-                                            color: Provider.of<ThemeSettings>(
-                                              context,
-                                            ).fontColor1,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 14,
-                                        ),
-                                      ),
-                                      onPressed: _loading
-                                          ? null
-                                          : _signInWithGoogle,
-                                    ),
-                                  ),
+                                  // Email認証ではGoogle再ログインボタンは不要
                                 ],
                               ],
                             ),

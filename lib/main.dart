@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'models/roast_schedule_form_provider.dart';
 import 'services/encrypted_firebase_config_service.dart';
-import 'services/secure_auth_service.dart';
 import 'models/theme_settings.dart';
 import 'models/group_provider.dart';
 import 'models/work_progress_models.dart';
@@ -268,7 +267,7 @@ Future<void> _initializeFirebase() async {
         }
       }
 
-      await SecureAuthService.tryRestoreSessionSilently();
+      // Email認証ではセッション復元は不要（Firebase Authが自動管理）
     } catch (e) {
       developer.log('暗号化Firebase設定エラー: $e', name: 'Main');
       // フォールバック: デフォルト設定で初期化
@@ -386,14 +385,10 @@ Future<void> _checkWebRedirectResult() async {
     final currentUser = fb_auth.FirebaseAuth.instance.currentUser;
     developer.log('Web版: リダイレクト前の現在ユーザー: ${currentUser?.email}', name: 'Main');
 
-    // SecureAuthServiceをインポートして使用
-    final redirectResult = await SecureAuthService.getRedirectResult();
-
-    if (redirectResult?.user != null) {
-      developer.log(
-        'Web版: リダイレクト認証が成功しました: ${redirectResult!.user!.email}',
-        name: 'Main',
-      );
+    // Email認証ではリダイレクト処理は不要
+    // 直接現在のユーザー状態を確認
+    if (currentUser != null) {
+      developer.log('Web版: 認証済みユーザーを検出: ${currentUser.email}', name: 'Main');
 
       // リダイレクト後のユーザー状態を再確認
       final newUser = fb_auth.FirebaseAuth.instance.currentUser;

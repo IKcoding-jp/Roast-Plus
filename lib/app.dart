@@ -19,9 +19,7 @@ import 'package:provider/provider.dart';
 import 'models/theme_settings.dart';
 import 'models/group_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'services/data_sync_service.dart';
 import 'pages/settings/passcode_recovery_page.dart';
-import 'services/assignment_firestore_service.dart';
 import 'services/user_settings_firestore_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'pages/group/group_required_page.dart';
@@ -41,7 +39,7 @@ import 'utils/web_ui_utils.dart';
 import 'utils/web_compatibility.dart';
 import 'widgets/lottie_animation_widget.dart';
 import 'utils/font_optimizer.dart';
-import 'pages/auth/display_name_setup_page.dart';
+import 'pages/auth/email_auth_page.dart';
 // navigatorKeyが定義されているファイルをimport
 
 class WorkAssignmentApp extends StatefulWidget {
@@ -314,7 +312,6 @@ class _WorkAssignmentAppState extends State<WorkAssignmentApp> {
           routes: {
             // 必須のルート（即座に読み込み）
             '/group_required': (context) => const GroupRequiredPage(),
-            '/display_name_setup': (context) => const DisplayNameSetupPage(),
             '/analytics': (context) => HomePage(),
 
             '/roast': (context) => RoastTimerPage(showBackButton: true),
@@ -350,7 +347,6 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
-  bool _isCheckingRedirect = false;
   bool _forceRefresh = false;
   User? _currentUser;
   bool _isInitializing = true;
@@ -405,18 +401,7 @@ class _AuthGateState extends State<AuthGate> {
       // Firebase Authの初期化を待機
       await Future.delayed(const Duration(milliseconds: 100));
 
-      _checkRedirectResult();
       _checkCurrentUser();
-
-      // ネイティブ版ではセッション復元を試行
-      if (!kIsWeb) {
-        try {
-          await SecureAuthService.tryRestoreSessionSilently();
-          developer.log('AuthGate: セッション復元を試行しました', name: 'AuthGate');
-        } catch (e) {
-          developer.log('AuthGate: セッション復元エラー: $e', name: 'AuthGate');
-        }
-      }
 
       // 初期化完了をマーク
       if (mounted) {
@@ -457,28 +442,6 @@ class _AuthGateState extends State<AuthGate> {
     _checkCurrentUser();
   }
 
-  Future<void> _checkRedirectResult() async {
-    if (kIsWeb) {
-      setState(() {
-        _isCheckingRedirect = true;
-      });
-
-      try {
-        // リダイレクト結果をチェック
-        await SecureAuthService.getRedirectResult();
-        developer.log('AuthGate: リダイレクト結果チェック完了', name: 'AuthGate');
-      } catch (e) {
-        developer.log('AuthGate: リダイレクト結果チェックエラー: $e', name: 'AuthGate');
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isCheckingRedirect = false;
-          });
-        }
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // 初期化中はローディング表示
@@ -509,24 +472,19 @@ class _AuthGateState extends State<AuthGate> {
             );
           }
 
-          // Web版でリダイレクト結果チェック中はローディング表示
-          if (_isCheckingRedirect) {
-            return const LoadingScreen(title: '認証を確認中...');
-          }
-
           // 認証状態をより厳密にチェック
           final user = snapshot.data ?? _currentUser;
 
           // ユーザーが存在しない場合はログイン画面を表示
           if (user == null) {
             developer.log('AuthGate: ユーザーがnull - ログイン画面を表示', name: 'AuthGate');
-            return GoogleSignInScreen();
+            return const EmailAuthPage();
           }
 
           // ユーザーが存在するが、メールアドレスが確認されていない場合はログイン画面を表示
           if (user.email == null || user.email!.isEmpty) {
             developer.log('AuthGate: メールアドレスが空 - ログイン画面を表示', name: 'AuthGate');
-            return GoogleSignInScreen();
+            return const EmailAuthPage();
           }
 
           // ネイティブ版では追加の認証状態チェック（非同期処理のため、FutureBuilderで処理）
@@ -543,7 +501,7 @@ class _AuthGateState extends State<AuthGate> {
                     'AuthGate: ネイティブ版認証状態チェックエラー: ${snapshot.error}',
                     name: 'AuthGate',
                   );
-                  return GoogleSignInScreen();
+                  return const EmailAuthPage();
                 }
 
                 final isAuthenticated = snapshot.data ?? false;
@@ -552,7 +510,7 @@ class _AuthGateState extends State<AuthGate> {
                     'AuthGate: ネイティブ版認証状態チェック失敗 - ログイン画面を表示',
                     name: 'AuthGate',
                   );
-                  return GoogleSignInScreen();
+                  return const EmailAuthPage();
                 }
 
                 developer.log(
@@ -581,68 +539,22 @@ class _AuthGateState extends State<AuthGate> {
         );
       }
 
-      return GoogleSignInScreen();
+      return const EmailAuthPage();
     }
   }
 }
 
-/// 初回ログインチェックのラッパー
-class FirstLoginWrapper extends StatefulWidget {
+/// 初回ログインチェックのラッパー（簡略化版）
+/// Email認証では新規登録時に表示名を設定するため、DisplayNameSetupPageは不要
+class FirstLoginWrapper extends StatelessWidget {
   final Widget child;
 
   const FirstLoginWrapper({super.key, required this.child});
 
   @override
-  State<FirstLoginWrapper> createState() => _FirstLoginWrapperState();
-}
-
-class _FirstLoginWrapperState extends State<FirstLoginWrapper> {
-  bool _isChecking = true;
-  bool _isFirstLogin = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkFirstLogin();
-  }
-
-  Future<void> _checkFirstLogin() async {
-    try {
-      debugPrint('FirstLoginWrapper: 初回ログインチェック開始');
-
-      // 一時的に初回ログインチェックをスキップして、メイン画面を表示
-      debugPrint('FirstLoginWrapper: 初回ログインチェックをスキップしてメイン画面を表示');
-
-      if (mounted) {
-        setState(() {
-          _isFirstLogin = false; // 初回ログインではないとみなす
-          _isChecking = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('FirstLoginWrapper: 初回ログインチェックでエラーが発生: $e');
-
-      if (mounted) {
-        setState(() {
-          _isFirstLogin = false; // エラーの場合は初回ログインではないと判定
-          _isChecking = false;
-        });
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isChecking) {
-      return const LoadingScreen(title: 'Loading...');
-    }
-
-    if (_isFirstLogin) {
-      return const DisplayNameSetupPage();
-    }
-
-    // 初回ログインでない場合はグループ参加チェックを行う
-    return GroupRequiredWrapper(child: widget.child);
+    // 直接グループ参加チェックに進む
+    return GroupRequiredWrapper(child: child);
   }
 }
 
@@ -666,6 +578,11 @@ class _GroupRequiredWrapperState extends State<GroupRequiredWrapper> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final groupProvider = Provider.of<GroupProvider>(context, listen: false);
 
+      debugPrint('GroupRequiredWrapper: initState開始');
+      debugPrint(
+        'GroupRequiredWrapper: 初期状態 - groups: ${groupProvider.groups.length}, loading: ${groupProvider.loading}, initialized: ${groupProvider.initialized}, hasGroup: ${groupProvider.hasGroup}',
+      );
+
       // Web版では初期化処理をより慎重に行う
       if (kIsWeb) {
         // Web版では少し待機してから初期化を開始
@@ -678,9 +595,13 @@ class _GroupRequiredWrapperState extends State<GroupRequiredWrapper> {
           !groupProvider.initialized) {
         debugPrint('GroupRequiredWrapper: グループデータの初期化を開始');
         await groupProvider.loadUserGroups();
-        debugPrint('GroupRequiredWrapper: グループデータの初期化完了');
+        debugPrint(
+          'GroupRequiredWrapper: グループデータの初期化完了 - groups: ${groupProvider.groups.length}, hasGroup: ${groupProvider.hasGroup}',
+        );
       } else if (groupProvider.initialized) {
-        debugPrint('GroupRequiredWrapper: グループデータは既に初期化済み');
+        debugPrint(
+          'GroupRequiredWrapper: グループデータは既に初期化済み - groups: ${groupProvider.groups.length}, hasGroup: ${groupProvider.hasGroup}',
+        );
       }
 
       // 初期化完了フラグを設定
@@ -706,7 +627,7 @@ class _GroupRequiredWrapperState extends State<GroupRequiredWrapper> {
             groupProvider.loading ||
             !groupProvider.initialized) {
           debugPrint(
-            'GroupRequiredWrapper: ローディング画面を表示中 - initialized: ${groupProvider.initialized}, loading: ${groupProvider.loading}, hasGroup: ${groupProvider.hasGroup}',
+            'GroupRequiredWrapper: ローディング画面を表示中 - _isInitialized: $_isInitialized, provider.initialized: ${groupProvider.initialized}, loading: ${groupProvider.loading}, groups: ${groupProvider.groups.length}, hasGroup: ${groupProvider.hasGroup}',
           );
           return const LoadingScreen(title: 'Loading...');
         }
@@ -726,376 +647,28 @@ class _GroupRequiredWrapperState extends State<GroupRequiredWrapper> {
 
         // グループ参加状態の判定をより慎重に行う
         final hasGroup = groupProvider.hasGroup;
+        final currentGroup = groupProvider.currentGroup;
+        final groupsCount = groupProvider.groups.length;
+
         debugPrint(
-          'GroupRequiredWrapper: 状態判定 - initialized: ${groupProvider.initialized}, loading: ${groupProvider.loading}, hasGroup: $hasGroup, currentGroup: ${groupProvider.currentGroup?.name}',
+          'GroupRequiredWrapper: 状態判定 - initialized: ${groupProvider.initialized}, loading: ${groupProvider.loading}, hasGroup: $hasGroup, groupsCount: $groupsCount, currentGroup: ${currentGroup?.name} (ID: ${currentGroup?.id})',
         );
 
         // グループに参加していない場合はグループ参加ページを表示
         if (!hasGroup) {
-          debugPrint('GroupRequiredWrapper: グループ未参加 - GroupRequiredPageを表示');
+          debugPrint(
+            'GroupRequiredWrapper: グループ未参加 - GroupRequiredPageを表示 (groups: $groupsCount, currentGroup: ${currentGroup != null ? "存在" : "null"})',
+          );
           return const GroupRequiredPage();
         }
 
         // グループに参加している場合はメイン画面を表示
-        debugPrint('GroupRequiredWrapper: グループ参加済み - メイン画面を表示');
+        debugPrint(
+          'GroupRequiredWrapper: グループ参加済み - メイン画面を表示 (グループ名: ${currentGroup?.name})',
+        );
         // データ同期は後で自動的に実行されるため、ここでは実行しない
         return widget.child;
       },
-    );
-  }
-}
-
-/// Googleログイン画面
-class GoogleSignInScreen extends StatefulWidget {
-  const GoogleSignInScreen({super.key});
-  @override
-  State<GoogleSignInScreen> createState() => _GoogleSignInScreenState();
-}
-
-class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
-  bool _loading = false;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    developer.log(
-      '🔵 GoogleSignInScreen: initState - _loading: $_loading',
-      name: 'GoogleSignInScreen',
-    );
-  }
-
-  Future<void> _signInWithGoogle() async {
-    developer.log(
-      '🔵 GoogleSignInScreen: ログインボタンがクリックされました',
-      name: 'GoogleSignInScreen',
-    );
-    if (!mounted) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    developer.log(
-      '🔵 GoogleSignInScreen: ローディング状態を設定しました',
-      name: 'GoogleSignInScreen',
-    );
-    try {
-      UserCredential? userCredential;
-
-      // Web版ではリダイレクト方式を使用
-      if (kIsWeb) {
-        developer.log(
-          '🔵 GoogleSignInScreen: Web版の処理を開始',
-          name: 'GoogleSignInScreen',
-        );
-        if (!mounted) return;
-        setState(() {
-          _loading = true;
-          _error = 'Googleログインを開始しています...';
-        });
-        developer.log(
-          '🔵 GoogleSignInScreen: Web版の状態を更新しました',
-          name: 'GoogleSignInScreen',
-        );
-
-        // リダイレクト方式でログイン
-        developer.log(
-          '🔵 GoogleSignInScreen: SecureAuthService.signInWithGoogle()を呼び出します',
-          name: 'GoogleSignInScreen',
-        );
-        userCredential = await SecureAuthService.signInWithGoogle();
-        developer.log(
-          '🔵 GoogleSignInScreen: SecureAuthService.signInWithGoogle()が完了しました',
-          name: 'GoogleSignInScreen',
-        );
-        developer.log('Web版: リダイレクト方式でログイン開始', name: 'GoogleSignInScreen');
-      } else {
-        try {
-          userCredential =
-              await SecureAuthService.signInWithGoogleForceAccountSelection();
-          developer.log('Google Sign-In 成功', name: 'GoogleSignInScreen');
-        } catch (e) {
-          developer.log(
-            'Google Sign-In エラー: $e',
-            name: 'GoogleSignInScreen',
-            error: e,
-          );
-          if (!mounted) return;
-          setState(() {
-            _loading = false;
-            _error = 'Googleログインエラー: $e';
-          });
-          return;
-        }
-      }
-
-      if (userCredential == null) {
-        if (!mounted) return;
-        setState(() {
-          _loading = false;
-          _error = 'Googleアカウントの選択がキャンセルされました';
-        });
-        return;
-      }
-
-      // ログイン成功のデバッグログ
-      developer.log(
-        'GoogleSignInScreen: ログイン成功 - user: ${userCredential.user?.email}, uid: ${userCredential.user?.uid}',
-        name: 'GoogleSignInScreen',
-      );
-
-      // 認証状態を強制的に更新
-      await SecureAuthService.forceAuthStateRefresh();
-
-      // セキュリティイベントを記録
-      await SecureAuthService.logSecurityEvent(
-        kIsWeb ? 'secure_login_success_web_redirect' : 'secure_login_success',
-      );
-
-      // ログイン成功後に認証状態の変化を強制的にトリガー
-      developer.log(
-        'GoogleSignInScreen: 認証状態の変化をトリガー',
-        name: 'GoogleSignInScreen',
-      );
-
-      // 少し待機してから認証状態の変化を確認
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // 現在のユーザーを再確認
-      final currentUser = FirebaseAuth.instance.currentUser;
-      developer.log(
-        'GoogleSignInScreen: 現在のユーザー: ${currentUser?.email}',
-        name: 'GoogleSignInScreen',
-      );
-
-      // AuthGateの認証状態を強制的に更新
-      if (mounted) {
-        // 親のAuthGateの状態を更新
-        final authGateState = context.findAncestorStateOfType<_AuthGateState>();
-        if (authGateState != null) {
-          authGateState.forceAuthStateRefresh();
-          developer.log(
-            'GoogleSignInScreen: AuthGateの認証状態を強制更新',
-            name: 'GoogleSignInScreen',
-          );
-        }
-      }
-      // 追加: ログイン成功後にクラウド設定をダウンロード
-      try {
-        await DataSyncService.downloadAllData();
-        // ダウンロードした設定でThemeSettingsを更新
-        if (!mounted) return;
-        final themeSettings = Provider.of<ThemeSettings>(
-          context,
-          listen: false,
-        );
-
-        // フォント設定を更新
-        final fontSize = await UserSettingsFirestoreService.getSetting(
-          'fontSize',
-        );
-        final fontFamily = await UserSettingsFirestoreService.getSetting(
-          'fontFamily',
-        );
-        if (fontSize != null) {
-          themeSettings.updateFontSizeScale(fontSize);
-        }
-        if (fontFamily != null) {
-          themeSettings.updateFontFamily(fontFamily);
-        }
-
-        // 担当表データを更新
-        try {
-          final assignmentMembers =
-              await AssignmentFirestoreService.loadAssignmentMembers();
-          if (assignmentMembers != null &&
-              assignmentBoardKey.currentState != null) {
-            // mergeGroupDataWithLocalメソッドを使用してデータを更新
-            assignmentBoardKey.currentState!.mergeGroupDataWithLocal(
-              assignmentMembers,
-            );
-          }
-        } catch (e) {
-          // 担当表データの更新に失敗
-        }
-
-        // サウンド設定は既にSharedPreferencesに保存されているので、
-        // 各画面で読み込まれる際に反映される
-      } catch (e) {
-        // クラウド設定のダウンロードに失敗
-      }
-    } catch (e) {
-      if (!mounted) return;
-
-      String errorMessage = 'Googleログインに失敗しました';
-
-      // 特定のエラーの場合は分かりやすいメッセージを表示
-      if (e.toString().contains('invalid-cert-hash')) {
-        errorMessage =
-            '署名証明書の検証に失敗しました。\nこれはGoogle Playからインストールしたアプリで発生する問題です。\n開発者に連絡してください。';
-      } else if (e.toString().contains('network')) {
-        errorMessage = 'ネットワーク接続に問題があります。\nインターネット接続を確認してください。';
-      } else if (e.toString().contains('cancelled')) {
-        errorMessage = 'ログインがキャンセルされました。';
-      }
-
-      setState(() {
-        _error = errorMessage;
-      });
-      // Google Sign-In エラー
-    } finally {
-      // do nothing
-    }
-    if (!mounted) return;
-    setState(() {
-      _loading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Card(
-          elevation: 8,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset('assets/google_logo.png', width: 64, height: 64),
-                SizedBox(height: 24),
-                Text(
-                  'アプリを利用するには、Googleアカウントのログインが必要です',
-                  style: TextStyle(fontSize: 18),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 24),
-                if (_error != null)
-                  Container(
-                    width: kIsWeb ? 400 : double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: _error!.contains('開始')
-                          ? Colors.blue.withValues(alpha: 0.1)
-                          : Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: _error!.contains('開始')
-                            ? Colors.blue
-                            : Colors.red,
-                        width: 1,
-                      ),
-                    ),
-                    child: kIsWeb && _error!.contains('開始')
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.blue,
-                                size: 20,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                _error!,
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 14,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              Icon(
-                                _error!.contains('開始')
-                                    ? Icons.info_outline
-                                    : Icons.error_outline,
-                                color: _error!.contains('開始')
-                                    ? Colors.blue
-                                    : Colors.red,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _error!,
-                                  style: TextStyle(
-                                    color: _error!.contains('開始')
-                                        ? Colors.blue
-                                        : Colors.red,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                  ),
-                _loading
-                    ? Column(
-                        children: [
-                          CircularProgressIndicator(),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Googleログインを処理中...',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          ElevatedButton.icon(
-                            icon: Image.asset(
-                              'assets/google_logo.png',
-                              width: 24,
-                              height: 24,
-                            ),
-                            label: Text('Googleでログイン'),
-                            onPressed: () {
-                              developer.log(
-                                '🔴 ボタンのonPressedが呼び出されました - _loading: $_loading',
-                                name: 'GoogleSignInScreen',
-                              );
-                              if (_loading) {
-                                developer.log(
-                                  '🔴 ローディング中のため処理をスキップ',
-                                  name: 'GoogleSignInScreen',
-                                );
-                                return;
-                              }
-                              developer.log(
-                                '🔴 ログインボタンがクリックされました！',
-                                name: 'GoogleSignInScreen',
-                              );
-                              _signInWithGoogle();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                      ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

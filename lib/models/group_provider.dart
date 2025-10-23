@@ -75,12 +75,15 @@ class GroupProvider extends ChangeNotifier {
 
   /// ユーザーが参加しているグループを取得（単一グループ対応）
   Future<void> loadUserGroups() async {
-    // 既に読み込み中またはデータがある場合はスキップ
+    // 既に読み込み中の場合はスキップ
     if (_loading) {
+      developer.log('既に読み込み中のためスキップ', name: 'GroupProvider');
       return;
     }
 
+    // 既にデータがあり初期化済みの場合はスキップ
     if (_groups.isNotEmpty && _initialized) {
+      developer.log('既にグループデータが存在し初期化済みのためスキップ', name: 'GroupProvider');
       return;
     }
 
@@ -88,22 +91,9 @@ class GroupProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      // グループ読み込み開始
+      developer.log('グループ読み込み開始', name: 'GroupProvider');
 
-      // まず参加状態フラグを確認
-      final hasActiveGroup = await GroupFirestoreService.userHasActiveGroup();
-
-      if (!hasActiveGroup) {
-        // 参加状態フラグが false の場合はグループなしとして処理
-        _groups = [];
-        _currentGroup = null;
-        _hasActiveGroupFlag = false;
-        _initialized = true;
-        _safeNotifyListeners();
-        return;
-      }
-
-      // 参加状態フラグが true の場合はグループデータを取得
+      // 常に実際のグループデータを取得（hasActiveGroupフラグは信頼性が低いため）
       _groups = await GroupFirestoreService.getUserGroups().timeout(
         Duration(seconds: 20),
         onTimeout: () {
@@ -111,28 +101,75 @@ class GroupProvider extends ChangeNotifier {
         },
       );
 
+      developer.log('取得したグループ数: ${_groups.length}', name: 'GroupProvider');
+
       // 単一グループ制限: 最初のグループのみをcurrentGroupに設定
       if (_groups.isNotEmpty) {
         _currentGroup = _groups.first;
         _hasActiveGroupFlag = true;
 
+        developer.log(
+          'グループが存在します - ID: ${_currentGroup!.id}, 名前: ${_currentGroup!.name}',
+          name: 'GroupProvider',
+        );
+
+        // Firestoreのフラグも更新（整合性を保つ）
+        try {
+          final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+          if (currentUserId != null) {
+            final userRole = _currentGroup!.getMemberRole(currentUserId);
+            await GroupFirestoreService.updateUserParticipationFlag(
+              hasActiveGroup: true,
+              groupId: _currentGroup!.id,
+              groupName: _currentGroup!.name,
+              role: userRole,
+            );
+            developer.log(
+              'hasActiveGroupフラグをtrueに更新しました',
+              name: 'GroupProvider',
+            );
+          }
+        } catch (flagUpdateError) {
+          developer.log(
+            'hasActiveGroupフラグの更新に失敗しましたが続行します: $flagUpdateError',
+            name: 'GroupProvider',
+          );
+        }
+
         // グループの監視を開始
         watchGroup(_currentGroup!.id);
       } else {
-        // グループデータが取得できなかった場合は参加状態をリセット
+        // グループデータが存在しない場合
         _currentGroup = null;
         _hasActiveGroupFlag = false;
-        GroupFirestoreService.updateUserParticipationFlag(
-          hasActiveGroup: false,
-        );
+
+        developer.log('グループが存在しません', name: 'GroupProvider');
+
+        // Firestoreのフラグも更新
+        try {
+          await GroupFirestoreService.updateUserParticipationFlag(
+            hasActiveGroup: false,
+          );
+          developer.log(
+            'hasActiveGroupフラグをfalseに更新しました',
+            name: 'GroupProvider',
+          );
+        } catch (flagUpdateError) {
+          developer.log(
+            'hasActiveGroupフラグの更新に失敗しましたが続行します: $flagUpdateError',
+            name: 'GroupProvider',
+          );
+        }
       }
 
       // 初期化完了フラグを設定
       _initialized = true;
       _safeNotifyListeners();
 
-      // グループ読み込み完了
+      developer.log('グループ読み込み完了', name: 'GroupProvider');
     } catch (e) {
+      developer.log('グループ読み込みエラー: $e', name: 'GroupProvider');
+
       // グループ読み込みエラー
       if (e.toString().contains('未ログイン')) {
         _setError('ログインすることで、グループ機能を使うことができます');
@@ -141,6 +178,7 @@ class GroupProvider extends ChangeNotifier {
       } else {
         _setError('グループの取得に失敗しました: $e');
       }
+
       // エラーが発生しても初期化完了フラグを設定
       _initialized = true;
       _safeNotifyListeners();

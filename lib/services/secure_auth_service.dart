@@ -1,565 +1,114 @@
-import 'dart:async';
 import 'dart:developer' as developer;
-import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
-import 'encrypted_firebase_config_service.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import '../utils/common_utils.dart';
-import '../utils/app_logger.dart';
-import 'secure_storage_service.dart';
-import 'package:flutter/services.dart';
 
 /// セキュアな認証サービス
-/// Google認証のトークンを安全に管理し、セキュリティを強化するサービス
+/// Firebase Email/Password認証を管理するセキュアな認証サービス
 class SecureAuthService {
   static const String _logName = 'SecureAuthService';
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // Google Sign-In初期化ステート管理
-  static bool _googleSignInInitialized = false;
-  static Completer<void>? _googleSignInInitCompleter;
 
-  static Future<void> _ensureGoogleSignInInitialized() async {
-    if (_googleSignInInitialized) {
-      return;
-    }
-    if (_googleSignInInitCompleter != null) {
-      await _googleSignInInitCompleter!.future;
-      return;
-    }
-    final completer = Completer<void>();
-    _googleSignInInitCompleter = completer;
+  /// メールアドレスとパスワードで新規登録
+  static Future<UserCredential> signUpWithEmail(
+    String email,
+    String password,
+    String displayName,
+  ) async {
     try {
-      // Google Sign-In初期化は不要（自動初期化される）
-      _googleSignInInitialized = true;
-      completer.complete();
-    } catch (error, stackTrace) {
-      if (!completer.isCompleted) {
-        completer.completeError(error, stackTrace);
-      }
-      rethrow;
-    } finally {
-      _googleSignInInitCompleter = null;
-    }
-  }
+      developer.log('メールアドレスでの新規登録を開始: $email', name: _logName);
 
-  /// セキュアなGoogleサインイン
-  static Future<UserCredential?> signInWithGoogle() async {
-    try {
-      developer.log('セキュアなGoogleサインインを開始', name: _logName);
-
-      // 本番環境でのデバッグ情報
-      developer.log('環境情報:', name: _logName);
-      developer.log(
-        '  - プラットフォーム: ${kIsWeb ? 'Web' : 'Mobile'}',
-        name: _logName,
+      // Firebase Authで新規ユーザーを作成
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
-      developer.log('  - デバッグモード: $kDebugMode', name: _logName);
-      developer.log('  - 現在のURL: ${Uri.base}', name: _logName);
-
-      // Web版でのFirebase初期化状態を確認
-      if (kIsWeb) {
-        developer.log('Web版: Firebase初期化状態を確認中', name: _logName);
-        final apps = Firebase.apps;
-        developer.log('Web版: Firebaseアプリ数: ${apps.length}', name: _logName);
-
-        if (apps.isEmpty) {
-          developer.log('Web版: Firebaseアプリが初期化されていません', name: _logName);
-          // Web版ではFirebase初期化を試行
-          try {
-            developer.log('Web版: Firebase初期化を試行中', name: _logName);
-            await Firebase.initializeApp(
-              options: DefaultFirebaseOptions.currentPlatform,
-            );
-            developer.log('Web版: Firebase初期化完了', name: _logName);
-          } catch (initError) {
-            developer.log('Web版: Firebase初期化に失敗: $initError', name: _logName);
-            throw Exception('Firebaseが初期化されていません。ページを再読み込みしてください。');
-          }
-        }
-      }
-
-      final provider = GoogleAuthProvider();
-      // 可能ならアカウント選択を促す
-      provider.setCustomParameters({
-        'prompt': 'select_account',
-        'hd': '', // ドメイン制限を無効化
-        'include_granted_scopes': 'true',
-        'access_type': 'offline', // Chrome用の追加パラメータ
-      });
-
-      late final UserCredential userCredential;
-      if (kIsWeb) {
-        // Web版ではリダイレクト方式を使用（CSP問題を回避）
-        developer.log('Web版: リダイレクト方式でGoogleサインインを試行', name: _logName);
-        developer.log('Web版: 現在のURL: ${Uri.base}', name: _logName);
-        developer.log('Web版: プロバイダーID: ${provider.providerId}', name: _logName);
-
-        // デバッグ: Firebase設定の詳細ログ
-        developer.log('Web版: Firebase設定確認:', name: _logName);
-        developer.log(
-          '  - Project ID: ${DefaultFirebaseOptions.currentPlatform.projectId}',
-          name: _logName,
-        );
-        developer.log(
-          '  - Auth Domain: ${DefaultFirebaseOptions.currentPlatform.authDomain}',
-          name: _logName,
-        );
-        developer.log(
-          '  - API Key: ${DefaultFirebaseOptions.currentPlatform.apiKey.substring(0, 20)}...',
-          name: _logName,
-        );
-        developer.log('  - 現在のドメイン: ${Uri.base.origin}', name: _logName);
-        developer.log(
-          '  - 本番環境か: ${Uri.base.origin.contains('roastplus-site')}',
-          name: _logName,
-        );
-
-        // デバッグ: Firebase Authの状態を詳しくログ出力
-        try {
-          final currentUser = FirebaseAuth.instance.currentUser;
-          developer.log(
-            'Web版: 現在のFirebase Authユーザー: ${currentUser?.email}',
-            name: _logName,
-          );
-          developer.log(
-            'Web版: Firebase Authインスタンス: ${FirebaseAuth.instance.hashCode}',
-            name: _logName,
-          );
-        } catch (e) {
-          developer.log('Web版: Firebase Auth状態確認エラー: $e', name: _logName);
-        }
-
-        try {
-          // ポップアップ方式を使用（デバッグ用）
-          userCredential = await _auth.signInWithPopup(provider);
-          developer.log('Web版: ポップアップ方式でサインイン成功', name: _logName);
-        } catch (popupError) {
-          developer.log('Web版: ポップアップ方式でエラー: $popupError', name: _logName);
-          developer.log(
-            'Web版: エラータイプ: ${popupError.runtimeType}',
-            name: _logName,
-          );
-
-          // エラーの詳細情報をさらに詳しくログ出力
-          if (popupError.toString().contains('popup_blocked')) {
-            developer.log(
-              '❌ Web版: ポップアップがブロックされました - ブラウザのポップアップブロッカーを確認してください',
-              name: _logName,
-            );
-          } else if (popupError.toString().contains(
-            'auth/unauthorized-domain',
-          )) {
-            developer.log(
-              '❌ Web版: 未承認ドメインエラー - Firebase Consoleでドメインを承認してください',
-              name: _logName,
-            );
-            developer.log('Web版: 現在のドメイン: ${Uri.base.origin}', name: _logName);
-          } else if (popupError.toString().contains(
-            'auth/operation-not-allowed',
-          )) {
-            developer.log(
-              '❌ Web版: Google認証が有効になっていません - Firebase ConsoleでGoogle認証を有効にしてください',
-              name: _logName,
-            );
-          } else if (popupError.toString().contains('invalid_client')) {
-            developer.log(
-              '❌ Web版: OAuthクライアント設定エラー - Google Cloud Consoleでクライアント設定を確認してください',
-              name: _logName,
-            );
-          }
-
-          rethrow;
-        }
-      } else {
-        // ネイティブ版ではGoogle Sign-Inライブラリを使用
-        developer.log('ネイティブ版: Google Sign-Inライブラリを使用', name: _logName);
-
-        try {
-          // Google Sign-Inを実行
-
-          // Firebase認証情報を作成
-          await _ensureGoogleSignInInitialized();
-
-          GoogleSignInAccount? googleUser;
-          try {
-            await _ensureGoogleSignInInitialized();
-            // Android: Firebase連携のため、Web client IDをserverClientIdとして指定
-            String serverClientId =
-                '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
-            if (defaultTargetPlatform == TargetPlatform.android) {
-              serverClientId = await _getAndroidServerClientId();
-              developer.log(
-                'Android: 使用するserverClientId = $serverClientId',
-                name: _logName,
-              );
-            }
-
-            final googleSignIn = GoogleSignIn(
-              serverClientId: serverClientId,
-              scopes: ['email', 'profile'],
-            );
-
-            developer.log(
-              'Google Sign-In 初期化完了 - serverClientId: ${serverClientId.substring(0, 20)}...',
-              name: _logName,
-            );
-
-            googleUser = await googleSignIn.signIn();
-            if (googleUser == null) {
-              developer.log(
-                'Mobile: Google Sign-In canceled by user',
-                name: _logName,
-              );
-              return null;
-            }
-          } catch (signInError) {
-            if (signInError.toString().contains('canceled') ||
-                signInError.toString().contains('interrupted') ||
-                signInError.toString().contains('uiUnavailable')) {
-              developer.log(
-                'Mobile: Google Sign-In canceled: $signInError',
-                name: _logName,
-              );
-              return null;
-            }
-            rethrow;
-          }
-
-          developer.log(
-            'Mobile: Google Sign-In account: ${googleUser.email}',
-            name: _logName,
-          );
-
-          // Google Sign-Inの認証情報取得
-          final GoogleSignInAuthentication googleAuth =
-              await googleUser.authentication;
-          final credential = GoogleAuthProvider.credential(
-            idToken: googleAuth.idToken,
-          );
-
-          // Firebaseにサインイン
-          userCredential = await _auth.signInWithCredential(credential);
-          developer.log('ネイティブ版: Firebase認証完了', name: _logName);
-        } catch (e) {
-          developer.log('ネイティブ版: Google Sign-Inでエラー: $e', name: _logName);
-          developer.log('ネイティブ版: エラータイプ: ${e.runtimeType}', name: _logName);
-
-          // PlatformExceptionの詳細情報を表示
-          if (e is PlatformException) {
-            developer.log('❌ PlatformException詳細:', name: _logName);
-            developer.log('  - コード: ${e.code}', name: _logName);
-            developer.log('  - メッセージ: ${e.message}', name: _logName);
-            developer.log('  - 詳細: ${e.details}', name: _logName);
-
-            // エラーコード12500の詳細な対処法
-            if (e.message?.contains('12500') ?? false) {
-              developer.log('', name: _logName);
-              developer.log('【エラーコード12500の解決方法】', name: _logName);
-              developer.log('このエラーは以下の原因で発生します：', name: _logName);
-              developer.log('1. FirebaseコンソールにSHA証明書が登録されていない', name: _logName);
-              developer.log('2. google-services.jsonが最新でない', name: _logName);
-              developer.log(
-                '3. エミュレーターにGoogle Playストアがインストールされていない',
-                name: _logName,
-              );
-              developer.log('', name: _logName);
-              developer.log('【対処法】', name: _logName);
-              developer.log('A. 実機で試す場合:', name: _logName);
-              developer.log(
-                '   1. Firebaseコンソールで以下のSHA証明書を確認:',
-                name: _logName,
-              );
-              developer.log(
-                '      - デバッグ: 33:B4:46:E0:EC:C4:AE:2B:D4:7A:E5:A3:B8:D5:87:10:D2:19:41:83',
-                name: _logName,
-              );
-              developer.log(
-                '      - リリース: 2B:D3:F0:9C:C4:91:14:27:02:84:12:8B:EB:FE:A9:6F:7D:8E:84:8F',
-                name: _logName,
-              );
-              developer.log(
-                '      - Play署名: 33:8C:63:9F:67:3B:FD:43:DE:07:61:2F:2D:FD:0E:33:8B:D3:4B:AF',
-                name: _logName,
-              );
-              developer.log(
-                '   2. Firebaseコンソールでgoogle-services.jsonを再ダウンロード',
-                name: _logName,
-              );
-              developer.log('   3. アプリを完全にアンインストールして再インストール', name: _logName);
-              developer.log('', name: _logName);
-              developer.log('B. エミュレーターで試す場合:', name: _logName);
-              developer.log(
-                '   1. Google Play Store付きのエミュレーターを使用',
-                name: _logName,
-              );
-              developer.log('   2. エミュレーターでGoogleアカウントにログイン', name: _logName);
-              developer.log('   3. エミュレーターをコールドブートで再起動', name: _logName);
-              developer.log('', name: _logName);
-            }
-          }
-
-          // Play Store版での詳細エラー情報を記録
-          if (e.toString().contains('sign_in_failed') ||
-              e.toString().contains('network_error') ||
-              e.toString().contains('invalid_client') ||
-              e.toString().contains('12500')) {
-            developer.log(
-              'Play Store版: Google Sign-In認証エラーを検出',
-              name: _logName,
-            );
-            developer.log(
-              'Play Store版: エラー詳細: ${e.toString()}',
-              name: _logName,
-            );
-
-            // エラーログをFirestoreに記録
-            await _logDetailedError('google_sign_in_error', e.toString());
-          }
-
-          rethrow;
-        }
-      }
 
       final user = userCredential.user;
       if (user == null) {
-        developer.log('ユーザー情報が取得できませんでした', name: _logName);
-        return userCredential;
+        throw Exception('ユーザーの作成に失敗しました');
       }
 
-      developer.log('ユーザー情報取得成功: ${user.email}', name: _logName);
+      developer.log('Firebase Auth登録完了: ${user.uid}', name: _logName);
 
-      // FirebaseのIDトークンを取得して保存
-      final idToken = await user.getIdToken();
-      await _saveIdTokenSecurely(idToken);
+      // 表示名をFirebase Authのプロフィールに設定
+      await user.updateDisplayName(displayName);
+      await user.reload();
+
+      developer.log('表示名を設定: $displayName', name: _logName);
 
       // Firestoreにユーザー情報を保存
-      await _saveUserToFirestore(user);
+      await _firestore.collection('users').doc(user.uid).set({
+        'displayName': displayName,
+        'email': email,
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastLogin': FieldValue.serverTimestamp(),
+        'loginProvider': 'Email',
+      });
 
-      developer.log('セキュアなGoogleサインインが完了しました', name: _logName);
+      developer.log('Firestoreにユーザー情報を保存完了', name: _logName);
+
+      // セキュリティイベントを記録
+      await logSecurityEvent('email_signup_success');
+
+      developer.log('新規登録が完了しました', name: _logName);
       return userCredential;
     } catch (e) {
-      developer.log('セキュアなGoogleサインインでエラーが発生: $e', name: _logName);
-
-      // Web版特有のエラーハンドリング
-      if (kIsWeb) {
-        if (e.toString().contains('popup_blocked')) {
-          developer.log('Web版: ポップアップがブロックされました', name: _logName);
-          throw Exception('ポップアップがブロックされています。ブラウザの設定でポップアップを許可してください。');
-        }
-
-        if (e.toString().contains('auth/popup-closed-by-user')) {
-          developer.log('Web版: ユーザーがポップアップを閉じました', name: _logName);
-          throw Exception('ログインがキャンセルされました。');
-        }
-
-        if (e.toString().contains('auth/unauthorized-domain')) {
-          developer.log('Web版: 未承認ドメインエラー', name: _logName);
-          throw Exception(
-            'このドメインは認証に使用できません。Firebase Console > Authentication > Settings > Authorized domains でlocalhostドメインを追加してください。',
-          );
-        }
-
-        if (e.toString().contains('auth/operation-not-allowed')) {
-          developer.log('Web版: Google認証が有効になっていません', name: _logName);
-          throw Exception(
-            'Google認証が有効になっていません。Firebase Console > Authentication > Sign-in method > Google で有効にしてください。',
-          );
-        }
-
-        if (e.toString().contains('auth/invalid-api-key')) {
-          developer.log('Web版: APIキーが無効です', name: _logName);
-          throw Exception(
-            'Firebase APIキーが無効です。Firebase Console > Project Settings > General でAPIキーを確認してください。',
-          );
-        }
-
-        if (e.toString().contains('frame-ancestors') ||
-            e.toString().contains('CSP')) {
-          developer.log('Web版: CSPエラーが検出されました', name: _logName);
-          throw Exception('セキュリティポリシーの問題が発生しました。ページを再読み込みしてから再度お試しください。');
-        }
-
-        if (e.toString().contains('auth/network-request-failed')) {
-          developer.log('Web版: ネットワークエラー', name: _logName);
-          throw Exception('ネットワークエラーが発生しました。インターネット接続を確認してください。');
-        }
-      }
-
-      // invalid-cert-hashエラーの詳細なログ記録
-      if (e.toString().contains('invalid-cert-hash')) {
-        developer.log(
-          '署名証明書ハッシュエラーが発生しました。これはGoogle Playからインストールしたアプリでよく発生する問題です。',
-          name: _logName,
-        );
-        developer.log(
-          '解決方法: Firebase Console > Project Settings > General > Your apps > Android app でリリース用の署名証明書ハッシュを追加してください。',
-          name: _logName,
-        );
-        developer.log('現在のアプリID: com.ikcoding.roastplus', name: _logName);
-        developer.log(
-          'デバッグ署名SHA1ハッシュ: 33:B4:46:E0:EC:C4:AE:2B:D4:7A:E5:A3:B8:D5:87:10:D2:19:41:83',
-          name: _logName,
-        );
-        developer.log(
-          'リリース署名SHA1ハッシュ: 2B:D3:F0:9C:C4:91:14:27:02:84:12:8B:EB:FE:A9:6F:7D:8E:84:8F',
-          name: _logName,
-        );
-        developer.log(
-          'Play署名SHA1ハッシュ: 33:B4:46:E0:EC:C4:AE:2B:D4:7A:E5:A3:B8:D5:87:10:D2:19:41:83',
-          name: _logName,
-        );
-        await _logDetailedError('invalid_cert_hash_error', e.toString());
-      }
-
-      if (e.toString().contains('SSL') ||
-          e.toString().contains('TLS') ||
-          e.toString().contains('certificate') ||
-          e.toString().contains('network')) {
-        developer.log('SSL/TLS接続エラーを検出: $e', name: _logName);
-        await _logDetailedError('ssl_tls_connection_error', e.toString());
-      }
-
-      // エラーの詳細をログに記録
-      developer.log('エラーの詳細: ${e.runtimeType} - $e', name: _logName);
-      await _logDetailedError('google_signin_error', e.toString());
-
-      throw Exception('Googleサインインエラー: $e');
+      developer.log('新規登録でエラーが発生: $e', name: _logName);
+      rethrow;
     }
   }
 
-  /// トークンをセキュアストレージに保存
-  static Future<void> _saveIdTokenSecurely(String? idToken) async {
+  /// メールアドレスとパスワードでログイン
+  static Future<UserCredential> signInWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
-      if (idToken != null && idToken.isNotEmpty) {
-        await SecureStorageService.saveIdToken(idToken);
-        developer.log('IDトークンをセキュアストレージに保存', name: _logName);
-      }
-    } catch (e) {
-      developer.log('トークンの保存に失敗: $e', name: _logName);
-    }
-  }
+      developer.log('メールアドレスでのログインを開始: $email', name: _logName);
 
-  /// ユーザー情報をFirestoreに保存
-  static Future<void> _saveUserToFirestore(User user) async {
-    try {
-      // 既存のカスタム表示名を保持するため、まず現在のデータを取得
-      final existingDoc = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      String? displayNameToSave = user.displayName;
+      // Firebase Authでログイン
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      if (existingDoc.exists) {
-        final existingData = existingDoc.data();
-        // カスタム表示名が設定されている場合はそれを保持
-        if (existingData != null &&
-            existingData['displayName'] != null &&
-            existingData['displayName'] != user.displayName) {
-          displayNameToSave = existingData['displayName'];
-        }
+      final user = userCredential.user;
+      if (user == null) {
+        throw Exception('ログインに失敗しました');
       }
 
-      await _firestore.collection('users').doc(user.uid).set({
-        'displayName': displayNameToSave,
-        'email': user.email,
-        'photoUrl': user.photoURL,
+      developer.log('Firebase Authログイン完了: ${user.uid}', name: _logName);
+
+      // Firestoreのユーザー情報を更新（最終ログイン時刻）
+      await _firestore.collection('users').doc(user.uid).update({
         'lastLogin': FieldValue.serverTimestamp(),
-        'loginProvider': 'Google',
-        'lastSecureLogin': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-      developer.log('ユーザー情報をFirestoreに保存', name: _logName);
+      });
+
+      developer.log('最終ログイン時刻を更新', name: _logName);
+
+      // セキュリティイベントを記録
+      await logSecurityEvent('email_login_success');
+
+      developer.log('ログインが完了しました', name: _logName);
+      return userCredential;
     } catch (e) {
-      developer.log('Firestoreへの保存に失敗: $e', name: _logName);
-    }
-  }
-
-  /// 保存されたトークンを使用して認証を復元
-  static Future<UserCredential?> restoreAuthFromSecureStorage() async {
-    try {
-      AppLogger.debug('セキュアストレージから認証を復元中', name: _logName);
-
-      final idToken = await SecureStorageService.getIdToken();
-
-      if (idToken == null) {
-        AppLogger.debug('保存されたトークンが見つかりません', name: _logName);
-        return null;
-      }
-
-      // トークンの期限を簡易チェック
-      final payload = CommonUtils.decodeJwtPayload(idToken);
-      final exp = payload['exp'];
-      if (exp == null) {
-        AppLogger.warn('保存トークンに exp が含まれていません - トークンを破棄します', name: _logName);
-        await _clearInvalidTokens();
-        return null;
-      }
-
-      final expiry = DateTime.fromMillisecondsSinceEpoch((exp as int) * 1000);
-      if (DateTime.now().isAfter(expiry)) {
-        AppLogger.warn('保存トークンが期限切れのため復元を中止します', name: _logName);
-        await _clearInvalidTokens();
-        return null;
-      }
-
-      // 有効期限内であれば再認証を試みる
-      try {
-        final credential = GoogleAuthProvider.credential(idToken: idToken);
-        final userCredential = await _auth.signInWithCredential(credential);
-        AppLogger.info('認証の復元が完了しました', name: _logName);
-        return userCredential;
-      } catch (e, st) {
-        AppLogger.error(
-          '保存トークンでの再認証に失敗しました',
-          name: _logName,
-          error: e,
-          stackTrace: st,
-        );
-        await _clearInvalidTokens();
-        return null;
-      }
-    } catch (e) {
-      AppLogger.error('認証の復元に失敗しました', name: _logName, error: e);
-      // トークンが無効な場合は削除
-      await _clearInvalidTokens();
-      return null;
-    }
-  }
-
-  /// 無効なトークンを削除
-  static Future<void> _clearInvalidTokens() async {
-    try {
-      await SecureStorageService.deleteSecureData('id_token');
-      developer.log('無効なトークンを削除しました', name: _logName);
-    } catch (e) {
-      developer.log('トークンの削除に失敗: $e', name: _logName);
+      developer.log('ログインでエラーが発生: $e', name: _logName);
+      rethrow;
     }
   }
 
   /// セキュアなサインアウト
-  static Future<void> signOutSecurely() async {
+  static Future<void> signOut() async {
     try {
-      developer.log('セキュアなサインアウトを開始', name: _logName);
+      developer.log('サインアウトを開始', name: _logName);
 
       // Firebaseからサインアウト
       await _auth.signOut();
-      // Google Sign-Inからもサインアウト
-      try {
-        await _ensureGoogleSignInInitialized();
-        await GoogleSignIn().signOut();
-      } catch (signOutError) {
-        developer.log('Google Sign-In signOut failed: ', name: _logName);
-      }
 
-      // セキュアストレージからトークンを削除
-      await SecureStorageService.clearAllSecureData();
-
-      developer.log('セキュアなサインアウトが完了しました', name: _logName);
+      developer.log('サインアウトが完了しました', name: _logName);
     } catch (e) {
-      developer.log('セキュアなサインアウトでエラーが発生: $e', name: _logName);
+      developer.log('サインアウトでエラーが発生: $e', name: _logName);
       rethrow;
     }
   }
@@ -574,25 +123,14 @@ class SecureAuthService {
       }
 
       developer.log('認証状態確認: ユーザーが存在 - ${user.email}', name: _logName);
-
-      // Web版ではセキュアストレージのチェックをスキップ
-      if (kIsWeb) {
-        developer.log('Web版: 認証状態確認完了', name: _logName);
-        return true;
-      }
-
-      // ネイティブ版ではセキュアストレージにトークンが存在するか確認
-      final idToken = await SecureStorageService.getIdToken();
-      final hasToken = idToken != null;
-      developer.log('ネイティブ版: トークン存在確認 - $hasToken', name: _logName);
-      return hasToken;
+      return true;
     } catch (e) {
       developer.log('認証状態の確認に失敗: $e', name: _logName);
       return false;
     }
   }
 
-  /// 認証状態を強制的に更新（デバッグ用）
+  /// 認証状態を強制的に更新
   static Future<void> forceAuthStateRefresh() async {
     try {
       developer.log('認証状態の強制更新を開始', name: _logName);
@@ -604,24 +142,6 @@ class SecureAuthService {
       developer.log('認証状態強制更新完了 - user: ${user?.email}', name: _logName);
     } catch (e) {
       developer.log('認証状態の強制更新でエラー: $e', name: _logName);
-    }
-  }
-
-  /// トークンの有効性を確認
-  static Future<bool> validateStoredTokens() async {
-    try {
-      final accessToken = await SecureStorageService.getAccessToken();
-      final idToken = await SecureStorageService.getIdToken();
-
-      if (accessToken == null || idToken == null) {
-        return false;
-      }
-
-      // トークンの形式を簡単にチェック（実際の実装ではJWT検証を行う）
-      return accessToken.isNotEmpty && idToken.isNotEmpty;
-    } catch (e) {
-      developer.log('トークンの検証に失敗: $e', name: _logName);
-      return false;
     }
   }
 
@@ -642,7 +162,6 @@ class SecureAuthService {
             'event': event,
             'details': details ?? {},
             'timestamp': FieldValue.serverTimestamp(),
-            'ipAddress': 'client_side', // 実際の実装ではIPアドレスを取得
             'userAgent': 'flutter_app',
           });
 
@@ -658,13 +177,8 @@ class SecureAuthService {
       final user = _auth.currentUser;
       if (user == null) return;
 
-      // 新しいトークンを取得
-      final idToken = await user.getIdToken(true);
-
-      // セキュアストレージを更新
-      if (idToken != null) {
-        await SecureStorageService.saveIdToken(idToken);
-      }
+      // ユーザー情報をリロード
+      await user.reload();
 
       // セキュリティログを記録
       await logSecurityEvent('session_refreshed');
@@ -675,535 +189,17 @@ class SecureAuthService {
     }
   }
 
-  /// 詳細なエラー情報をログに記録
-  static Future<void> _logDetailedError(
-    String errorType,
-    String errorMessage,
-  ) async {
+  /// パスワードリセットメールを送信
+  static Future<void> sendPasswordResetEmail(String email) async {
     try {
-      // Web版ではFirebaseExceptionの型エラーを回避するため、エラーログ記録をスキップ
-      if (kIsWeb) {
-        developer.log('Web版: エラーログ記録をスキップ（型エラー回避）', name: _logName);
-        developer.log('エラー詳細: $errorType - $errorMessage', name: _logName);
-        return;
-      }
+      developer.log('パスワードリセットメール送信: $email', name: _logName);
 
-      final user = _auth.currentUser;
-      if (user != null) {
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .collection('error_logs')
-            .add({
-              'error_type': errorType,
-              'error_message': errorMessage,
-              'timestamp': FieldValue.serverTimestamp(),
-              'platform': kIsWeb ? 'web' : 'android',
-              'app_version': '1.0.0', // 実際のバージョンに置き換える
-            });
-      }
+      await _auth.sendPasswordResetEmail(email: email);
+
+      developer.log('パスワードリセットメールを送信しました', name: _logName);
     } catch (e) {
-      developer.log('エラーログの記録に失敗: $e', name: _logName);
-      // Web版ではFirebaseExceptionの型エラーを特別に処理
-      if (kIsWeb && e.toString().contains('JavaScriptObject')) {
-        developer.log(
-          'Web版: FirebaseException型エラーを検出、エラーログ記録をスキップ',
-          name: _logName,
-        );
-      }
-    }
-  }
-
-  /// Googleサインインの状態を確認
-  static Future<bool> isGoogleSignInAvailable() async {
-    try {
-      // Firebase認証が使用可能かどうかの簡易判定
-      return true;
-    } catch (e) {
-      developer.log('Googleサインインの状態確認に失敗: $e', name: _logName);
-      return false;
-    }
-  }
-
-  /// 安全なGoogleサインイン（disconnectエラーを回避）
-  static Future<UserCredential?> signInWithGoogleSafely() async {
-    developer.log('安全なGoogleサインインを開始', name: _logName);
-    return signInWithGoogle();
-  }
-
-  /// アカウント選択を強制してGoogleサインイン
-  /// Web: GoogleAuthProviderのカスタムパラメータで`prompt=select_account`を指定
-  /// Mobile: 既存セッションを明示的にクリアしてから`signIn()`を実行
-  static Future<UserCredential?> signInWithGoogleForceAccountSelection() async {
-    try {
-      developer.log('アカウント選択を強制したGoogleサインインを開始', name: _logName);
-
-      // Firebase初期化状態を確認
-      final isFirebaseInitialized =
-          await EncryptedFirebaseConfigService.validateConfiguration();
-      if (!isFirebaseInitialized) {
-        developer.log('Firebase設定が無効です', name: _logName);
-        throw Exception('Firebase設定が無効です');
-      }
-
-      // 毎回アカウント選択を強制するため、既存セッションをクリア
-      developer.log('既存セッションをクリアしてアカウント選択を強制', name: _logName);
-      await _auth.signOut();
-      await SecureStorageService.clearAllSecureData();
-
-      final provider = GoogleAuthProvider();
-
-      // カスタムパラメータを設定
-      final customParams = {
-        'prompt': 'select_account',
-        'hd': '', // ドメイン制限を無効化
-        'include_granted_scopes': 'true',
-      };
-      provider.setCustomParameters(customParams);
-
-      // デバッグ: プロバイダ設定前に現在のFirebase Auth状態を確認
-      developer.log('FirebaseAuthインスタンス状態:', name: _logName);
-      developer.log(
-        '  - Current User: ${_auth.currentUser?.email}',
-        name: _logName,
-      );
-      developer.log(
-        '  - Is Initialized: ${Firebase.apps.isNotEmpty}',
-        name: _logName,
-      );
-
-      // デバッグ: プロバイダ設定の詳細ログ
-      developer.log('GoogleAuthProvider設定:', name: _logName);
-      developer.log('  - Custom Parameters: $customParams', name: _logName);
-
-      late final UserCredential userCredential;
-      if (kIsWeb) {
-        // Web版ではリダイレクト方式を優先使用（CSP問題を回避）
-        try {
-          await _auth.signInWithRedirect(provider);
-          return null; // リダイレクトが開始されたので処理を終了
-        } catch (redirectError) {
-          developer.log('Web版: リダイレクト方式でエラー: $redirectError', name: _logName);
-          rethrow; // リダイレクトが失敗した場合はエラーを投げる
-        }
-      } else {
-        // ネイティブ版ではGoogle Sign-Inライブラリを使用（アカウント選択を強制）
-        developer.log(
-          'ネイティブ版: Google Sign-Inライブラリを使用（アカウント選択強制）',
-          name: _logName,
-        );
-
-        try {
-          // 既存のセッションをクリアしてアカウント選択を強制
-          // Google Sign-Inのセッションをクリアして強制的にアカウント選択を促す
-          await _ensureGoogleSignInInitialized();
-          // Android: Firebase連携のため、Web client IDをserverClientIdとして指定
-          String serverClientId =
-              '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
-          if (defaultTargetPlatform == TargetPlatform.android) {
-            serverClientId = await _getAndroidServerClientId();
-            developer.log(
-              'Android: 使用するserverClientId = $serverClientId',
-              name: _logName,
-            );
-          }
-
-          final googleSignIn = GoogleSignIn(
-            serverClientId: serverClientId,
-            scopes: ['email', 'profile'],
-          );
-          try {
-            await googleSignIn.signOut();
-          } catch (signOutError) {
-            developer.log(
-              'Mobile: Google Sign-In pre sign-out failed: $signOutError',
-              name: _logName,
-            );
-          }
-
-          GoogleSignInAccount? googleUser;
-          try {
-            googleUser = await googleSignIn.signIn();
-            if (googleUser == null) {
-              developer.log(
-                'Mobile: Google Sign-In canceled by user (force select)',
-                name: _logName,
-              );
-              return null;
-            }
-          } catch (signInError) {
-            if (signInError.toString().contains('canceled') ||
-                signInError.toString().contains('interrupted') ||
-                signInError.toString().contains('uiUnavailable')) {
-              developer.log(
-                'Mobile: Google Sign-In canceled: $signInError',
-                name: _logName,
-              );
-              return null;
-            }
-            rethrow;
-          }
-
-          developer.log(
-            'Mobile: Google Sign-In account (force select): ${googleUser.email}',
-            name: _logName,
-          );
-
-          // Google Sign-Inから取得した認証情報
-          final GoogleSignInAuthentication googleAuth =
-              await googleUser.authentication;
-
-          // Firebase認証情報を作成
-          final credential = GoogleAuthProvider.credential(
-            idToken: googleAuth.idToken,
-          );
-
-          // Firebaseにサインイン
-          userCredential = await _auth.signInWithCredential(credential);
-          developer.log('ネイティブ版: Firebase認証完了', name: _logName);
-        } catch (e) {
-          developer.log(
-            'ネイティブ版: Google Sign-In認証エラー: $e',
-            name: _logName,
-            error: e,
-          );
-
-          // 詳細なエラー情報
-          if (e.toString().contains('invalid_client')) {
-            developer.log(
-              '❌ OAuthクライアント設定エラー - Firebase ConsoleでGoogle認証を確認してください',
-              name: _logName,
-            );
-            developer.log(
-              '解決方法: Firebase Console > Authentication > Sign-in method > Google > Web SDK設定を確認',
-              name: _logName,
-            );
-            developer.log(
-              '本番環境の場合: Google Cloud Console > OAuth 2.0 クライアント ID > Web クライアントの設定を確認',
-              name: _logName,
-            );
-          } else if (e.toString().contains('access_denied')) {
-            developer.log(
-              '❌ OAuth同意画面設定エラー - Google Cloud Consoleで本番環境設定を確認してください',
-              name: _logName,
-            );
-            developer.log(
-              '解決方法: Google Cloud Console > OAuth同意画面 > 本番環境の設定を確認',
-              name: _logName,
-            );
-            developer.log(
-              '本番環境の場合: OAuth同意画面を「本番環境」に設定し、テストユーザーを追加してください',
-              name: _logName,
-            );
-          } else if (e.toString().contains('invalid_grant')) {
-            developer.log('❌ トークンエラー - アプリを再インストールしてください', name: _logName);
-            developer.log('解決方法: アプリを完全にアンインストールしてから再インストール', name: _logName);
-          } else if (e.toString().contains('network_error')) {
-            developer.log('❌ ネットワークエラー - インターネット接続を確認してください', name: _logName);
-          } else if (e.toString().contains('sign_in_failed')) {
-            developer.log(
-              '❌ サインイン失敗 - Google Play Servicesが最新か確認してください',
-              name: _logName,
-            );
-          } else if (e.toString().contains('invalid-cert-hash')) {
-            developer.log(
-              '❌ 証明書ハッシュエラー - 本番環境の署名証明書が正しく設定されていません',
-              name: _logName,
-            );
-            developer.log(
-              '解決方法: Firebase Console > Project Settings > General > Your apps > Android app で本番用の署名証明書ハッシュを追加',
-              name: _logName,
-            );
-            developer.log(
-              '本番環境の署名証明書ハッシュ: 2B:D3:F0:9C:C4:91:14:27:02:84:12:8B:EB:FE:A9:6F:7D:8E:84:8F',
-              name: _logName,
-            );
-          }
-
-          rethrow;
-        }
-      }
-
-      final user = userCredential.user;
-      if (user != null) {
-        final idToken = await user.getIdToken();
-        await _saveIdTokenSecurely(idToken);
-        await _saveUserToFirestore(user);
-      }
-
-      developer.log('アカウント選択を強制したGoogleサインインが完了', name: _logName);
-      return userCredential;
-    } catch (e) {
-      developer.log('アカウント選択を強制したGoogleサインインでエラー: $e', name: _logName);
-      throw Exception('Googleサインインエラー: $e');
-    }
-  }
-
-  /// Web版でのGoogleサインイン（リダイレクト方式）
-  /// ポップアップがブロックされた場合の代替手段
-  static Future<void> signInWithGoogleRedirect() async {
-    try {
-      developer.log('Web版: Googleサインイン（リダイレクト方式）を開始', name: _logName);
-
-      if (!kIsWeb) {
-        throw Exception('リダイレクト方式はWeb版でのみ使用できます');
-      }
-
-      final provider = GoogleAuthProvider();
-      provider.setCustomParameters({
-        'prompt': 'select_account',
-        'hd': '', // ドメイン制限を無効化
-        'include_granted_scopes': 'true',
-      });
-
-      await _auth.signInWithRedirect(provider);
-      developer.log('Web版: リダイレクトが開始されました', name: _logName);
-    } catch (e) {
-      developer.log('Web版: リダイレクト方式でエラー: $e', name: _logName);
-      throw Exception('Googleサインイン（リダイレクト）エラー: $e');
-    }
-  }
-
-  /// リダイレクト後の認証結果を取得
-  static Future<UserCredential?> getRedirectResult() async {
-    try {
-      developer.log('Web版: リダイレクト結果を取得中', name: _logName);
-
-      if (!kIsWeb) {
-        return null;
-      }
-
-      // Web版でのFirebase初期化状態を確認
-      final apps = Firebase.apps;
-      if (apps.isEmpty) {
-        developer.log('Web版: Firebaseアプリが初期化されていません', name: _logName);
-        // Web版ではFirebase初期化を試行
-        try {
-          developer.log('Web版: Firebase初期化を試行中', name: _logName);
-          await Firebase.initializeApp(
-            options: DefaultFirebaseOptions.currentPlatform,
-          );
-          developer.log('Web版: Firebase初期化完了', name: _logName);
-        } catch (initError) {
-          developer.log('Web版: Firebase初期化に失敗: $initError', name: _logName);
-          return null;
-        }
-      }
-
-      final userCredential = await _auth.getRedirectResult();
-
-      if (userCredential.user != null) {
-        final user = userCredential.user!;
-        developer.log('Web版: リダイレクト認証成功: ${user.email}', name: _logName);
-
-        final idToken = await user.getIdToken();
-        await _saveIdTokenSecurely(idToken);
-        await _saveUserToFirestore(user);
-
-        // セキュリティイベントを記録
-        await logSecurityEvent('web_redirect_login_success');
-
-        developer.log('Web版: リダイレクト認証処理完了', name: _logName);
-      } else {
-        developer.log('Web版: リダイレクト認証結果なし', name: _logName);
-      }
-
-      return userCredential;
-    } catch (e) {
-      developer.log('Web版: リダイレクト結果取得エラー: $e', name: _logName);
-      await _logDetailedError('web_redirect_result_error', e.toString());
-      return null;
-    }
-  }
-
-  static Future<void> tryRestoreSessionSilently() async {
-    if (kIsWeb) {
-      developer.log('Silent restore skipped on web', name: _logName);
-      return;
-    }
-
-    try {
-      // Firebase Authに既存のユーザーがいる場合は、それを優先
-      final currentUser = _auth.currentUser;
-      if (currentUser != null) {
-        developer.log(
-          'Silent restore: Firebase Authに既存ユーザーが存在 - ${currentUser.email}',
-          name: _logName,
-        );
-
-        // トークンの有効性をチェック
-        try {
-          await currentUser.getIdToken(true); // 強制リフレッシュ
-          developer.log(
-            'Silent restore: Firebase Authユーザーのトークンが有効',
-            name: _logName,
-          );
-
-          // セキュアストレージにトークンを保存
-          final idToken = await currentUser.getIdToken();
-          await _saveIdTokenSecurely(idToken);
-          await _saveUserToFirestore(currentUser);
-
-          developer.log(
-            'Silent restore: Firebase Authユーザーでセッション復元完了',
-            name: _logName,
-          );
-          return;
-        } catch (tokenError) {
-          developer.log(
-            'Silent restore: Firebase Authユーザーのトークンが無効: $tokenError',
-            name: _logName,
-          );
-          // トークンが無効な場合はGoogle Sign-Inで復元を試行
-        }
-      }
-
-      await _ensureGoogleSignInInitialized();
-
-      String serverClientId =
-          '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        serverClientId = await _getAndroidServerClientId();
-        developer.log(
-          'Silent restore: using Android serverClientId',
-          name: _logName,
-        );
-      }
-
-      final googleSignIn = GoogleSignIn(
-        serverClientId: serverClientId,
-        scopes: ['email', 'profile'],
-      );
-
-      final googleUser = await googleSignIn.signInSilently();
-      if (googleUser == null) {
-        developer.log('Silent restore: no cached Google user', name: _logName);
-        return;
-      }
-
-      final googleAuth = await googleUser.authentication;
-      final hasIdToken =
-          googleAuth.idToken != null && googleAuth.idToken!.isNotEmpty;
-      final hasAccessToken =
-          googleAuth.accessToken != null && googleAuth.accessToken!.isNotEmpty;
-
-      if (!hasIdToken && !hasAccessToken) {
-        developer.log('Silent restore: missing Google tokens', name: _logName);
-        return;
-      }
-
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-        accessToken: googleAuth.accessToken,
-      );
-
-      final userCredential = await _auth.signInWithCredential(credential);
-      final firebaseUser = userCredential.user;
-
-      if (firebaseUser != null) {
-        final firebaseIdToken = await firebaseUser.getIdToken();
-        await _saveIdTokenSecurely(firebaseIdToken);
-        await _saveUserToFirestore(firebaseUser);
-      }
-
-      developer.log('Silent Google sign-in restored session', name: _logName);
-    } catch (e) {
-      developer.log(
-        'Silent Google sign-in failed: $e',
-        name: _logName,
-      );
-    }
-  }
-
-  /// Googleサインインの状態をリセット
-  static Future<void> resetGoogleSignInState() async {
-    try {
-      developer.log('Googleサインイン状態のリセットを開始', name: _logName);
-      await _auth.signOut();
-      try {
-        await _ensureGoogleSignInInitialized();
-        await GoogleSignIn().signOut();
-      } catch (signOutError) {
-        developer.log('Google Sign-In signOut failed: ', name: _logName);
-      }
-      await SecureStorageService.clearAllSecureData();
-      developer.log('Googleサインイン状態のリセットが完了', name: _logName);
-    } catch (e) {
-      developer.log('Googleサインイン状態のリセットでエラーが発生: $e', name: _logName);
-    }
-  }
-
-  /// 本番環境での設定確認
-  static Future<void> checkProductionEnvironmentSettings() async {
-    try {
-      developer.log('本番環境設定の確認を開始', name: _logName);
-
-      // Firebase設定の確認
-      final apps = Firebase.apps;
-      developer.log('Firebase設定確認:', name: _logName);
-      developer.log('  - Firebaseアプリ数: ${apps.length}', name: _logName);
-      if (apps.isNotEmpty) {
-        final app = apps.first;
-        developer.log('  - プロジェクトID: ${app.options.projectId}', name: _logName);
-        developer.log(
-          '  - APIキー: ${app.options.apiKey.substring(0, 10)}...',
-          name: _logName,
-        );
-      }
-
-      // 環境情報の確認
-      developer.log('環境情報確認:', name: _logName);
-      developer.log(
-        '  - プラットフォーム: ${kIsWeb ? 'Web' : 'Mobile'}',
-        name: _logName,
-      );
-      developer.log('  - デバッグモード: $kDebugMode', name: _logName);
-      developer.log('  - 現在のURL: ${Uri.base}', name: _logName);
-
-      // Google Sign-In設定の確認
-      try {
-        await _ensureGoogleSignInInitialized();
-        developer.log('Google Sign-In設定確認: 初期化完了', name: _logName);
-      } catch (e) {
-        developer.log('Google Sign-In設定確認: 初期化エラー - $e', name: _logName);
-      }
-
-      developer.log('本番環境設定の確認が完了', name: _logName);
-    } catch (e) {
-      developer.log('本番環境設定の確認でエラー: $e', name: _logName);
-    }
-  }
-
-  /// アンドロイドのserverClientIdを取得
-  static Future<String> _getAndroidServerClientId() async {
-    const methodChannel = MethodChannel('com.ikcoding.roastplus/build_config');
-    final fallback =
-        '330871937318-ua3q3aikt2vkd6p30288mm1d62df53pl.apps.googleusercontent.com';
-    try {
-      final clientId = await methodChannel.invokeMethod<String>(
-        'getGoogleSignInClientId',
-      );
-      if (clientId == null || clientId.isEmpty) {
-        developer.log(
-          'Android: BuildConfigからGoogle Sign-In client IDを取得できませんでした。フォールバック値を使用します',
-          name: _logName,
-        );
-        return fallback;
-      }
-      developer.log(
-        'Android: BuildConfigからGoogle Sign-In client IDを取得しました',
-        name: _logName,
-      );
-      return clientId;
-    } on PlatformException catch (e) {
-      developer.log(
-        'Android: BuildConfig取得でPlatformException: ${e.message}',
-        name: _logName,
-      );
-      return fallback;
-    } catch (e) {
-      developer.log('Android: BuildConfig取得で予期しないエラー: $e', name: _logName);
-      return fallback;
+      developer.log('パスワードリセットメール送信でエラー: $e', name: _logName);
+      rethrow;
     }
   }
 }

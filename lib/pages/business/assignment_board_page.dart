@@ -1918,11 +1918,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     int dayIndex = 1;
     for (var entry in recentHistory.entries) {
       final historyPairs = entry.value;
-      // 段階的な重み付け：直近ほど重く、過去ほど軽く
+      // 段階的な重み付け：直近ほど重く、過去ほど軽く（より急激に減衰）
       final weight = switch (dayIndex) {
-        1 => 10, // 1日前（最も避けたい）
-        2 => 5, // 2日前
-        3 => 3, // 3日前
+        1 => 20, // 1日前（最も避けたい）- 強化
+        2 => 8, // 2日前 - より急激に減衰
+        3 => 4, // 3日前
         4 => 2, // 4日前
         _ => 1, // 5日前以降
       };
@@ -1970,12 +1970,12 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           // 共通のペア相手を見つける
           final commonPartners = newPartners.intersection(oldPartners);
           for (var partner in commonPartners) {
-            // ペアの重複にはより強いペナルティを適用
-            score += 15 * weight;
+            // ペアの重複にはより強いペナルティを適用（強化：15 → 20）
+            score += 20 * weight;
             pairDuplicates++;
             if (enableDebugLog) {
               debugPrint(
-                '  ペア重複: $member と $partner が${dayIndex}日前もペア (重み: ${weight}x, ペナルティ: ${15 * weight})',
+                '  ペア重複: $member と $partner が${dayIndex}日前もペア (重み: ${weight}x, ペナルティ: ${20 * weight})',
               );
             }
           }
@@ -1991,7 +1991,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           // 共通の担当位置を見つける
           final commonPositions = newPos.intersection(oldPos);
           for (var pos in commonPositions) {
-            score += 10 * weight;
+            // 担当位置重複の重みも調整（強化：10 → 12）
+            score += 12 * weight;
             positionDuplicates++;
             if (enableDebugLog) {
               debugPrint(
@@ -2167,11 +2168,38 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           int bestScore = _calculateAssignmentScore(bestPairs, recentHistory);
 
           int retry = 0;
-          const maxRetries = 1000; // より多くの試行でベストな配置を探す
+          const maxRetries = 2000; // 試行回数を増加：1000 → 2000
+          int noImproveCount = 0; // スコア改善がない試行回数
+          const maxNoImproveThreshold = 300; // 300回改善がなければ大きなシャッフルを実行
 
           while (retry < maxRetries) {
-            for (int i = 0; i < shuffledMembers.length; i++) {
-              shuffledMembers[i].shuffle(Random());
+            final random = Random();
+            final isExploratory = random.nextDouble() < 0.7; // 70%の確率で全列シャッフル
+
+            if (isExploratory) {
+              // 探索的シャッフル：全列を完全にシャッフル（元の方法）
+              for (int i = 0; i < shuffledMembers.length; i++) {
+                shuffledMembers[i].shuffle(Random());
+              }
+            } else {
+              // 局所改善：現在の最良配置から1-2列のみをシャッフル
+              final numColumnsToShuffle = random.nextInt(2) + 1; // 1-2列をシャッフル
+              final columnsToShuffle = <int>{};
+              while (columnsToShuffle.length < numColumnsToShuffle) {
+                columnsToShuffle.add(random.nextInt(shuffledMembers.length));
+              }
+              for (int colIdx in columnsToShuffle) {
+                shuffledMembers[colIdx].shuffle(Random());
+              }
+            }
+
+            // 300回改善がなければ、より大きな変更を試みる
+            if (noImproveCount > maxNoImproveThreshold) {
+              // より積極的な再シャッフルを実行
+              for (int i = 0; i < shuffledMembers.length; i++) {
+                shuffledMembers[i].shuffle(Random());
+              }
+              noImproveCount = 0;
             }
 
             for (int i = 0; i < teams.length; i++) {
@@ -2193,9 +2221,26 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 teams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
+              noImproveCount = 0;
               debugPrint(
                 'AssignmentBoard: より良い配置を発見 (スコア: $bestScore, 試行: $retry)',
               );
+            } else {
+              noImproveCount++;
+            }
+
+            // スコアが5以下なら受け入れる（完璧なスコア0以外でも早期終了可能）
+            if (candidateScore <= 5) {
+              bestPairs = candidatePairs;
+              bestScore = candidateScore;
+              bestShuffledMembers = List.generate(
+                teams.length,
+                (i) => List.from(shuffledMembers[i]),
+              );
+              debugPrint(
+                'AssignmentBoard: 十分に良い配置を発見！(スコア: $bestScore, 試行: $retry)',
+              );
+              break;
             }
 
             if (candidateScore == 0) {
@@ -2221,14 +2266,23 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
           debugPrint('AssignmentBoard: 最終配置決定 (スコア: $bestScore, 試行回数: $retry)');
 
-          // 最終配置の詳細ログを出力
+          // 最終配置の詳細ログを出力（スコアが0以外の場合）
           if (bestScore > 0) {
-            debugPrint('AssignmentBoard: 最終配置の詳細分析:');
+            debugPrint('AssignmentBoard: ============ 最終配置の詳細分析 ============');
+            debugPrint('AssignmentBoard: スコア: $bestScore（低いほど良い）');
+            debugPrint('AssignmentBoard: 使用した最適化戦略:');
+            debugPrint('  - 試行回数: $retry回 / 最大$maxRetries回');
+            debugPrint('  - 試行戦略: 探索的シャッフル70% + 局所改善30%');
+            debugPrint('  - 早期終了条件: スコア≤5で終了可能');
+            debugPrint('AssignmentBoard: 詳細な重複情報:');
             _calculateAssignmentScore(
               bestPairs,
               recentHistory,
               enableDebugLog: true,
             );
+            debugPrint('AssignmentBoard: ================================');
+          } else {
+            debugPrint('AssignmentBoard: 完璧な配置達成！スコア: 0 (重複なし)');
           }
 
           await UserSettingsFirestoreService.saveMultipleSettings({

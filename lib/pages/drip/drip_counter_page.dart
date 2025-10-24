@@ -236,7 +236,7 @@ class DripCounterPageState extends State<DripCounterPage>
   // カウンター更新時
   void _addToCounter(int value) {
     setState(() {
-      _counter = (_counter + value).clamp(0, 500);
+      _counter = (_counter + value).clamp(0, 1500);
     });
     _animationController.forward().then((_) {
       _animationController.reverse();
@@ -306,13 +306,16 @@ class DripCounterPageState extends State<DripCounterPage>
                           ),
                         ),
                         SizedBox(height: 8),
-                        Text(
-                          _counter.toString(),
-                          style: TextStyle(
-                            fontSize: kIsWeb ? 64 : 48,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: fontFamily,
-                            color: themeSettings.fontColor1,
+                        GestureDetector(
+                          onTap: () => _showCounterInputDialog(),
+                          child: Text(
+                            _counter.toString(),
+                            style: TextStyle(
+                              fontSize: kIsWeb ? 64 : 48,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: fontFamily,
+                              color: themeSettings.fontColor1,
+                            ),
                           ),
                         ),
                         SizedBox(height: 8),
@@ -778,7 +781,7 @@ class DripCounterPageState extends State<DripCounterPage>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '0〜500の数字を入力してください',
+                '0〜1500の数字を入力してください',
                 style: TextStyle(
                   color: themeSettings.fontColor1.withValues(alpha: 0.8),
                   fontSize: 14,
@@ -855,15 +858,15 @@ class DripCounterPageState extends State<DripCounterPage>
   /// 入力された値でカウンターを更新
   void _updateCounterFromInput(String value) {
     final int? newValue = int.tryParse(value);
-    if (newValue != null && newValue >= 0 && newValue <= 500) {
+    if (newValue != null && newValue >= 0 && newValue <= 1500) {
       setState(() {
         _counter = newValue;
       });
-    } else if (newValue != null && newValue > 500) {
-      // 500を超える値の場合はエラーメッセージを表示
+    } else if (newValue != null && newValue > 1500) {
+      // 1500を超える値の場合はエラーメッセージを表示
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('500以下の数字を入力してください'),
+          content: Text('1500以下の数字を入力してください'),
           backgroundColor: Colors.red,
         ),
       );

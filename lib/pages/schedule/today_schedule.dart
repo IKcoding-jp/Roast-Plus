@@ -474,14 +474,8 @@ class _TodayScheduleState extends State<TodaySchedule>
                 'TodaySchedule: onLabelsChangedで保存中フラグを設定: $_isSaving',
               );
 
-              // AutoSyncServiceを一時的に無効化
-              AutoSyncService.disableSync();
-
-              // 時間ラベルを保存（グループ同期も含む）
+              // 時間ラベルを保存（AutoSyncService管理は_saveTimeLabels内で実施）
               await _saveTimeLabels(newLabels);
-
-              // グループ同期の完了を待つため、より長く待機
-              await Future.delayed(Duration(seconds: 3));
 
               debugPrint('TodaySchedule: 保存処理完了');
             } catch (e) {
@@ -490,9 +484,6 @@ class _TodayScheduleState extends State<TodaySchedule>
               // 保存完了後にフラグをリセット
               _isSaving = false;
               debugPrint('TodaySchedule: 保存中フラグをリセット: $_isSaving');
-
-              // AutoSyncServiceを再度有効化
-              AutoSyncService.enableSync();
             }
 
             debugPrint('TodaySchedule: onLabelsChangedコールバック終了');
@@ -637,6 +628,9 @@ class _TodayScheduleState extends State<TodaySchedule>
       return;
     }
 
+    // AutoSyncServiceを一時的に無効化（保存中は自動同期を防止）
+    AutoSyncService.disableSync();
+
     try {
       debugPrint('TodaySchedule: 時間ラベル保存開始: $labels');
       debugPrint('TodaySchedule: 保存するラベル数: ${labels.length}');
@@ -694,6 +688,10 @@ class _TodayScheduleState extends State<TodaySchedule>
       // 処理完了後にフラグをリセット
       _isProcessing = false;
       debugPrint('TodaySchedule: 時間ラベル保存で処理中フラグをリセット: $_isProcessing');
+
+      // AutoSyncServiceを再度有効化（即座に実行、例外発生時でも確実に実行）
+      AutoSyncService.enableSync();
+      debugPrint('TodaySchedule: AutoSyncServiceを再度有効化');
     }
   }
 

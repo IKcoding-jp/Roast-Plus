@@ -2229,20 +2229,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               noImproveCount++;
             }
 
-            // スコアが5以下なら受け入れる（完璧なスコア0以外でも早期終了可能）
-            if (candidateScore <= 5) {
-              bestPairs = candidatePairs;
-              bestScore = candidateScore;
-              bestShuffledMembers = List.generate(
-                teams.length,
-                (i) => List.from(shuffledMembers[i]),
-              );
-              debugPrint(
-                'AssignmentBoard: 十分に良い配置を発見！(スコア: $bestScore, 試行: $retry)',
-              );
-              break;
-            }
-
+            // 新しいペナルティ重みでは、スコア0（完全に重複なし）のみを受け入れる
+            // ペナルティ重み: ペア重複20、担当位置重複12（1日前の場合）
+            // スコア1以上は最近の履歴との重複を示唆している
             if (candidateScore == 0) {
               bestPairs = candidatePairs;
               bestScore = candidateScore;
@@ -2273,7 +2262,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             debugPrint('AssignmentBoard: 使用した最適化戦略:');
             debugPrint('  - 試行回数: $retry回 / 最大$maxRetries回');
             debugPrint('  - 試行戦略: 探索的シャッフル70% + 局所改善30%');
-            debugPrint('  - 早期終了条件: スコア≤5で終了可能');
+            debugPrint('  - 早期終了条件: スコア==0で終了（完全に重複なし）');
             debugPrint('AssignmentBoard: 詳細な重複情報:');
             _calculateAssignmentScore(
               bestPairs,

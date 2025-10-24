@@ -651,10 +651,9 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                   backgroundColor: themeSettings.appButtonColor,
                   foregroundColor: themeSettings.fontColor2,
                   elevation: 6,
-                  mini: WebUIUtils.isMobile(context),
                   child: Icon(
                     Icons.add,
-                    size: WebUIUtils.isMobile(context) ? 20 : 24,
+                    size: WebUIUtils.isMobile(context) ? 26 : 32,
                   ),
                 ),
               ),
@@ -667,7 +666,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
               backgroundColor: themeSettings.appButtonColor,
               foregroundColor: themeSettings.fontColor2,
               elevation: 6,
-              child: Icon(Icons.add),
+              child: Icon(Icons.add, size: 28),
             ),
             body: Column(
               children: [

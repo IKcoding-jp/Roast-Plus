@@ -47,6 +47,66 @@ class ScheduleFirestoreService {
     return doc.data();
   }
 
+  /// 指定した日付のスケジュール（ラベル・内容）を保存
+  static Future<void> saveTodoScheduleForDate({
+    required DateTime date,
+    required List<String> labels,
+    required Map<String, String> contents,
+  }) async {
+    if (_uid == null) throw Exception('未ログイン');
+    final docId =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    await _firestore
+        .collection('users')
+        .doc(_uid)
+        .collection('todaySchedule')
+        .doc(docId)
+        .set({
+          'labels': labels,
+          'contents': contents,
+          'savedAt': FieldValue.serverTimestamp(),
+        });
+    // 自動同期を実行
+    await AutoSyncService.triggerAutoSyncForDataType('today_schedule');
+  }
+
+  /// 指定した日付のスケジュール（ラベル・内容）を取得
+  static Future<Map<String, dynamic>?> loadTodoScheduleForDate(
+    DateTime date,
+  ) async {
+    if (_uid == null) throw Exception('未ログイン');
+    final docId =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    final doc = await _firestore
+        .collection('users')
+        .doc(_uid)
+        .collection('todaySchedule')
+        .doc(docId)
+        .get();
+    if (!doc.exists) return null;
+    return doc.data();
+  }
+
+  /// 指定した日付のスケジュール（ラベル・内容）を削除
+  static Future<void> deleteAllTodoScheduleForDate({
+    required DateTime date,
+    String? groupId,
+  }) async {
+    if (_uid == null) throw Exception('未ログイン');
+    final docId =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+    await _firestore
+        .collection('users')
+        .doc(_uid)
+        .collection('todaySchedule')
+        .doc(docId)
+        .delete();
+
+    // 自動同期を実行
+    await AutoSyncService.triggerAutoSyncForDataType('today_schedule');
+  }
+
   /// 本日のローストスケジュールを取得
   static Future<Map<String, dynamic>?> loadTodaySchedule() async {
     if (_uid == null) throw Exception('未ログイン');

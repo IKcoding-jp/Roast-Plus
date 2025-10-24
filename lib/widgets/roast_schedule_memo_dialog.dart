@@ -8,8 +8,14 @@ import 'package:uuid/uuid.dart';
 class RoastScheduleMemoDialog extends StatefulWidget {
   final RoastScheduleMemo? memo;
   final Function(RoastScheduleMemo) onSave;
+  final Function()? onDelete;
 
-  const RoastScheduleMemoDialog({super.key, this.memo, required this.onSave});
+  const RoastScheduleMemoDialog({
+    super.key,
+    this.memo,
+    required this.onSave,
+    this.onDelete,
+  });
 
   @override
   State<RoastScheduleMemoDialog> createState() =>
@@ -639,6 +645,33 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                 padding: EdgeInsets.all(kIsWeb ? 24 : 20),
                 child: Row(
                   children: [
+                    if (widget.memo != null && widget.onDelete != null)
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            widget.onDelete!();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: themeSettings.iconColor,
+                            foregroundColor: themeSettings.fontColor2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: Text(
+                            '削除',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: fontFamily,
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (widget.memo != null && widget.onDelete != null)
+                      SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _saveMemo,

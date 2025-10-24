@@ -242,6 +242,19 @@ class AssignmentFirestoreService {
         .delete();
   }
 
+  /// 指定した日付の担当履歴をすべて削除
+  static Future<void> deleteAllAssignmentHistory({
+    required String dateKey,
+  }) async {
+    if (_uid == null) throw Exception('未ログイン');
+    await _firestore
+        .collection('users')
+        .doc(_uid)
+        .collection('assignmentHistory')
+        .doc(dateKey)
+        .delete();
+  }
+
   /// 担当履歴を全件取得
   static Future<Map<String, List<String>>> loadAllAssignmentHistory() async {
     if (_uid == null) throw Exception('未ログイン');

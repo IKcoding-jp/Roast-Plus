@@ -17,6 +17,8 @@ import '../../models/group_provider.dart';
 import '../../services/group_data_sync_service.dart';
 import '../../widgets/bean_name_with_sticker.dart';
 import '../../widgets/lottie_animation_widget.dart';
+import '../../widgets/roast_schedule_memo_dialog.dart';
+import '../../services/schedule_firestore_service.dart' as schedule_service;
 
 class CalendarPage extends StatefulWidget {
   final DateTime? initialDate;
@@ -224,12 +226,348 @@ class _CalendarPageState extends State<CalendarPage> {
   String _getTaskDescription(RoastScheduleMemo memo) {
     if (memo.isRoasterOn) {
       return '焙煎機オン';
+    } else if (memo.isRoast) {
+      return 'ロースト';
     } else if (memo.isAfterPurge) {
       return 'アフターパージ';
     } else if (memo.beanName != null && memo.beanName!.isNotEmpty) {
       return memo.beanName!;
     } else {
       return '未設定';
+    }
+  }
+
+  // ローストスケジュールメモを編集
+  Future<void> _editRoastMemo(RoastScheduleMemo memo) async {
+    if (!mounted) return;
+
+    final groupProvider = context.read<GroupProvider>();
+    final groupId = groupProvider.groups.isNotEmpty
+        ? groupProvider.groups.first.id
+        : null;
+
+    await showDialog<RoastScheduleMemo>(
+      context: context,
+      builder: (dialogContext) => RoastScheduleMemoDialog(
+        memo: memo,
+        onSave: (updatedMemo) async {
+          try {
+            await RoastScheduleMemoService.updateMemo(
+              updatedMemo,
+              groupId: groupId,
+            );
+            if (mounted) {
+              // メモ更新後、データを再読み込み
+              await _loadRoastScheduleMemos(_selectedDate);
+            }
+          } catch (e) {
+            debugPrint('CalendarPage: メモ更新エラー: $e');
+            if (mounted && dialogContext.mounted) {
+              ScaffoldMessenger.of(
+                dialogContext,
+              ).showSnackBar(SnackBar(content: Text('メモの更新に失敗しました')));
+            }
+          }
+        },
+        onDelete: () async {
+          await _deleteRoastMemo(memo);
+        },
+      ),
+    );
+  }
+
+  // ローストスケジュールメモを削除
+  Future<void> _deleteRoastMemo(RoastScheduleMemo memo) async {
+    if (!mounted) return;
+
+    try {
+      final groupProvider = context.read<GroupProvider>();
+      final groupId = groupProvider.groups.isNotEmpty
+          ? groupProvider.groups.first.id
+          : null;
+
+      await RoastScheduleMemoService.deleteMemo(
+        memo.id,
+        groupId: groupId,
+        date: _selectedDate,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('ローストスケジュールを削除しました')));
+        // メモ削除後、データを再読み込み
+        await _loadRoastScheduleMemos(_selectedDate);
+      }
+    } catch (e) {
+      debugPrint('CalendarPage: メモ削除エラー: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('ローストスケジュールの削除に失敗しました')));
+      }
+    }
+  }
+
+  // 本日のスケジュール項目を編集
+  Future<void> _editScheduleItem(String label) async {
+    if (!mounted) return;
+
+    final TextEditingController contentController = TextEditingController(
+      text: _todaySchedule!['contents']?[label] ?? '',
+    );
+
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('$labelを編集'),
+        content: TextField(
+          controller: contentController,
+          decoration: InputDecoration(
+            hintText: '内容を入力してください',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(null),
+            child: Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop('DELETE'),
+            style: TextButton.styleFrom(
+              foregroundColor: themeSettings.iconColor,
+            ),
+            child: Text('削除'),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(contentController.text),
+            style: TextButton.styleFrom(
+              foregroundColor: themeSettings.buttonColor,
+            ),
+            child: Text('保存'),
+          ),
+        ],
+      ),
+    );
+
+    contentController.dispose();
+
+    if (result == 'DELETE' && mounted) {
+      await _deleteScheduleItem(label);
+    } else if (result != null && mounted) {
+      final updatedContents = Map<String, String>.from(
+        _todaySchedule!['contents'] ?? {},
+      );
+      updatedContents[label] = result;
+
+      try {
+        await schedule_service.ScheduleFirestoreService.saveTodoScheduleForDate(
+          date: _selectedDate,
+          labels: _todaySchedule!['labels'] as List<String>,
+          contents: updatedContents,
+        );
+
+        if (mounted) {
+          setState(() {
+            _todaySchedule!['contents'] = updatedContents;
+          });
+        }
+      } catch (e) {
+        debugPrint('CalendarPage: スケジュール更新エラー: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('スケジュールの更新に失敗しました')));
+        }
+      }
+    }
+  }
+
+  // 本日のスケジュール項目を削除
+  Future<void> _deleteScheduleItem(String label) async {
+    if (!mounted) return;
+
+    try {
+      final updatedLabels = List<String>.from(_todaySchedule!['labels']);
+      updatedLabels.remove(label);
+
+      final updatedContents = Map<String, String>.from(
+        _todaySchedule!['contents'] ?? {},
+      );
+      updatedContents.remove(label);
+
+      await schedule_service.ScheduleFirestoreService.saveTodoScheduleForDate(
+        date: _selectedDate,
+        labels: updatedLabels,
+        contents: updatedContents,
+      );
+
+      if (mounted) {
+        setState(() {
+          _todaySchedule!['labels'] = updatedLabels;
+          _todaySchedule!['contents'] = updatedContents;
+        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('スケジュールを削除しました')));
+      }
+    } catch (e) {
+      debugPrint('CalendarPage: スケジュール削除エラー: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('スケジュールの削除に失敗しました')));
+      }
+    }
+  }
+
+  // 担当表アイテムを編集
+  Future<void> _editAssignmentItem(int index, String assignment) async {
+    if (!mounted) return;
+
+    final parts = assignment.split('-');
+    if (parts.length != 2) return;
+
+    final TextEditingController leftController = TextEditingController(
+      text: parts[0],
+    );
+    final TextEditingController rightController = TextEditingController(
+      text: parts[1],
+    );
+
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('担当を編集'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: leftController,
+              decoration: InputDecoration(
+                labelText: '左側のメンバー',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 12),
+            TextField(
+              controller: rightController,
+              decoration: InputDecoration(
+                labelText: '右側のメンバー',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(null),
+            child: Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.of(dialogContext).pop({'action': 'DELETE'}),
+            style: TextButton.styleFrom(
+              foregroundColor: themeSettings.iconColor,
+            ),
+            child: Text('削除'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop({
+              'left': leftController.text,
+              'right': rightController.text,
+              'action': 'SAVE',
+            }),
+            style: TextButton.styleFrom(
+              foregroundColor: themeSettings.buttonColor,
+            ),
+            child: Text('保存'),
+          ),
+        ],
+      ),
+    );
+
+    leftController.dispose();
+    rightController.dispose();
+
+    if (result == null || !mounted) return;
+
+    if (result['action'] == 'DELETE') {
+      await _deleteAssignmentItem(index);
+    } else if (result['action'] == 'SAVE') {
+      final assignments = List<String>.from(
+        _assignmentHistoryWithLabels!['assignments'] as List,
+      );
+      assignments[index] = '${result['left']} - ${result['right']}';
+
+      try {
+        final today = DateFormat('yyyy-MM-dd').format(_selectedDate);
+        await AssignmentFirestoreService.saveAssignmentHistory(
+          dateKey: today,
+          assignments: assignments,
+          leftLabels:
+              _assignmentHistoryWithLabels!['leftLabels'] as List<String>,
+          rightLabels:
+              _assignmentHistoryWithLabels!['rightLabels'] as List<String>,
+        );
+
+        if (mounted) {
+          setState(() {
+            _assignmentHistoryWithLabels!['assignments'] = assignments;
+          });
+        }
+      } catch (e) {
+        debugPrint('CalendarPage: 担当更新エラー: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('担当の更新に失敗しました')));
+        }
+      }
+    }
+  }
+
+  // 担当表アイテムを削除
+  Future<void> _deleteAssignmentItem(int index) async {
+    if (!mounted) return;
+
+    try {
+      final assignments = List<String>.from(
+        _assignmentHistoryWithLabels!['assignments'] as List,
+      );
+      assignments.removeAt(index);
+
+      final today = DateFormat('yyyy-MM-dd').format(_selectedDate);
+      await AssignmentFirestoreService.saveAssignmentHistory(
+        dateKey: today,
+        assignments: assignments,
+        leftLabels: _assignmentHistoryWithLabels!['leftLabels'] as List<String>,
+        rightLabels:
+            _assignmentHistoryWithLabels!['rightLabels'] as List<String>,
+      );
+
+      if (mounted) {
+        setState(() {
+          _assignmentHistoryWithLabels!['assignments'] = assignments;
+        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('担当を削除しました')));
+      }
+    } catch (e) {
+      debugPrint('CalendarPage: 担当削除エラー: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('担当の削除に失敗しました')));
+      }
     }
   }
 
@@ -896,43 +1234,48 @@ class _CalendarPageState extends State<CalendarPage> {
                   final label = _todaySchedule!['labels'][index];
                   final content = _todaySchedule!['contents']?[label] ?? '';
                   if (content.isNotEmpty) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: themeSettings.buttonColor.withValues(
-                                alpha: 0.1,
+                    return InkWell(
+                      onTap: () => _editScheduleItem(label),
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
                               ),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              label,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: themeSettings.buttonColor,
+                              decoration: BoxDecoration(
+                                color: themeSettings.buttonColor.withValues(
+                                  alpha: 0.1,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
                               ),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              content,
-                              style: TextStyle(
-                                color: themeSettings.fontColor1,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: themeSettings.buttonColor,
+                                  fontFamily: themeSettings.fontFamily,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                content,
+                                style: TextStyle(
+                                  color: themeSettings.fontColor1,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: themeSettings.fontFamily,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
@@ -946,6 +1289,12 @@ class _CalendarPageState extends State<CalendarPage> {
               ],
             )
           : _buildEmptyScheduleMessage(themeSettings),
+      onDelete:
+          _todaySchedule != null &&
+              _todaySchedule!['labels'] != null &&
+              (_todaySchedule!['labels'] as List).isNotEmpty
+          ? () => _deleteAllScheduleItems()
+          : null,
     );
   }
 
@@ -992,102 +1341,134 @@ class _CalendarPageState extends State<CalendarPage> {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: _roastScheduleMemos.map((memo) {
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        _getTaskIcon(memo),
-                        size: 16,
-                        color: _getTaskColor(memo, themeSettings),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            memo.isAfterPurge
-                                ? Text(
-                                    _getTaskDescription(memo),
-                                    style: TextStyle(
-                                      color: themeSettings.fontColor1,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                : Row(
-                                    children: [
-                                      Text(
-                                        '${memo.time} - ',
-                                        style: TextStyle(
-                                          color: themeSettings.fontColor1,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(width: 6),
-                                      Expanded(
-                                        child:
-                                            memo.beanName != null &&
-                                                memo.beanName!.isNotEmpty
-                                            ? BeanNameWithSticker(
-                                                beanName: memo.beanName!,
-                                                textStyle: TextStyle(
-                                                  color:
-                                                      themeSettings.fontColor1,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                stickerSize: 14,
-                                              )
-                                            : Text(
-                                                _getTaskDescription(memo),
-                                                style: TextStyle(
-                                                  color:
-                                                      themeSettings.fontColor1,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                      ),
-                                    ],
-                                  ),
-                            if (!memo.isRoasterOn &&
-                                !memo.isAfterPurge &&
-                                memo.weight != null &&
-                                memo.quantity != null)
-                              Text(
-                                '${memo.weight}g × ${memo.quantity}袋',
-                                style: TextStyle(
-                                  color: themeSettings.fontColor1.withValues(
-                                    alpha: 0.7,
-                                  ),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            if (!memo.isRoasterOn &&
-                                !memo.isAfterPurge &&
-                                memo.roastLevel != null &&
-                                memo.roastLevel!.isNotEmpty)
-                              Text(
-                                '煎り度: ${memo.roastLevel}',
-                                style: TextStyle(
-                                  color: themeSettings.fontColor1.withValues(
-                                    alpha: 0.7,
-                                  ),
-                                  fontSize: 12,
-                                ),
-                              ),
-                          ],
+                return InkWell(
+                  onTap: () => _editRoastMemo(memo),
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          _getTaskIcon(memo),
+                          size: 16,
+                          color: _getTaskColor(memo, themeSettings),
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (memo.isRoasterOn ||
+                                  memo.isRoast ||
+                                  memo.isAfterPurge)
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${memo.time} - ',
+                                      style: TextStyle(
+                                        color: themeSettings.fontColor1,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: memo.isRoast
+                                          ? Text(
+                                              '${_getTaskDescription(memo)}${memo.roastCount != null ? ' ${memo.roastCount}回目' : ''}${memo.bagCount != null ? ' ${memo.bagCount}袋' : ''}',
+                                              style: TextStyle(
+                                                color: themeSettings.fontColor1,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            )
+                                          : Text(
+                                              _getTaskDescription(memo),
+                                              style: TextStyle(
+                                                color: themeSettings.fontColor1,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${memo.time} - ',
+                                      style: TextStyle(
+                                        color: themeSettings.fontColor1,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Expanded(
+                                      child:
+                                          memo.beanName != null &&
+                                              memo.beanName!.isNotEmpty
+                                          ? BeanNameWithSticker(
+                                              beanName: memo.beanName!,
+                                              textStyle: TextStyle(
+                                                color: themeSettings.fontColor1,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              stickerSize: 14,
+                                            )
+                                          : Text(
+                                              _getTaskDescription(memo),
+                                              style: TextStyle(
+                                                color: themeSettings.fontColor1,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                    ),
+                                  ],
+                                ),
+                              if (!memo.isRoasterOn &&
+                                  !memo.isRoast &&
+                                  !memo.isAfterPurge &&
+                                  memo.weight != null &&
+                                  memo.quantity != null)
+                                Text(
+                                  '${memo.weight}g × ${memo.quantity}袋',
+                                  style: TextStyle(
+                                    color: themeSettings.fontColor1.withValues(
+                                      alpha: 0.7,
+                                    ),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              if (!memo.isRoasterOn &&
+                                  !memo.isRoast &&
+                                  !memo.isAfterPurge &&
+                                  memo.roastLevel != null &&
+                                  memo.roastLevel!.isNotEmpty)
+                                Text(
+                                  '煎り度: ${memo.roastLevel}',
+                                  style: TextStyle(
+                                    color: themeSettings.fontColor1.withValues(
+                                      alpha: 0.7,
+                                    ),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),
             )
           : _buildEmptyRoastScheduleMessage(themeSettings),
+      onDelete: _roastScheduleMemos.isNotEmpty
+          ? () => _deleteAllRoastMemos()
+          : null,
     );
   }
 
@@ -1136,42 +1517,40 @@ class _CalendarPageState extends State<CalendarPage> {
               (_assignmentHistoryWithLabels!['assignments'] as List).isNotEmpty
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: (_assignmentHistoryWithLabels!['assignments'] as List)
-                  .map((assignment) => assignment.toString())
-                  .toList()
-                  .asMap()
-                  .entries
-                  .map((entry) {
-                    final index = entry.key;
-                    final assignment = entry.value;
-                    final parts = assignment.split('-');
+              children: List.generate(
+                (_assignmentHistoryWithLabels!['assignments'] as List).length,
+                (index) {
+                  final assignments =
+                      _assignmentHistoryWithLabels!['assignments'] as List;
+                  final assignment = assignments[index].toString();
+                  final parts = assignment.split('-');
 
-                    if (parts.length == 2) {
-                      final leftLabelsRaw =
-                          _assignmentHistoryWithLabels!['leftLabels']
-                              as List? ??
-                          [];
-                      final rightLabelsRaw =
-                          _assignmentHistoryWithLabels!['rightLabels']
-                              as List? ??
-                          [];
+                  if (parts.length == 2) {
+                    final leftLabelsRaw =
+                        _assignmentHistoryWithLabels!['leftLabels'] as List? ??
+                        [];
+                    final rightLabelsRaw =
+                        _assignmentHistoryWithLabels!['rightLabels'] as List? ??
+                        [];
 
-                      final leftLabels = leftLabelsRaw
-                          .map((label) => label.toString())
-                          .toList();
-                      final rightLabels = rightLabelsRaw
-                          .map((label) => label.toString())
-                          .toList();
+                    final leftLabels = leftLabelsRaw
+                        .map((label) => label.toString())
+                        .toList();
+                    final rightLabels = rightLabelsRaw
+                        .map((label) => label.toString())
+                        .toList();
 
-                      final leftLabel = index < leftLabels.length
-                          ? leftLabels[index]
-                          : '';
-                      final rightLabel = index < rightLabels.length
-                          ? rightLabels[index]
-                          : '';
+                    final leftLabel = index < leftLabels.length
+                        ? leftLabels[index]
+                        : '';
+                    final rightLabel = index < rightLabels.length
+                        ? rightLabels[index]
+                        : '';
 
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: 8),
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: InkWell(
+                        onTap: () => _editAssignmentItem(index, assignment),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1209,13 +1588,20 @@ class _CalendarPageState extends State<CalendarPage> {
                               ),
                           ],
                         ),
-                      );
-                    }
-                    return SizedBox.shrink();
-                  })
-                  .toList(),
+                      ),
+                    );
+                  }
+                  return SizedBox.shrink();
+                },
+              ),
             )
           : _buildEmptyAssignmentMessage(themeSettings),
+      onDelete:
+          _assignmentHistoryWithLabels != null &&
+              _assignmentHistoryWithLabels!['assignments'] != null &&
+              (_assignmentHistoryWithLabels!['assignments'] as List).isNotEmpty
+          ? () => _deleteAllAssignments()
+          : null,
     );
   }
 
@@ -1582,6 +1968,7 @@ class _CalendarPageState extends State<CalendarPage> {
     required IconData icon,
     required ThemeSettings themeSettings,
     required Widget child,
+    Function()? onDelete,
   }) {
     return Card(
       elevation: 4,
@@ -1613,6 +2000,17 @@ class _CalendarPageState extends State<CalendarPage> {
                     ),
                   ),
                 ),
+                if (onDelete != null)
+                  IconButton(
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: themeSettings.iconColor,
+                      size: 20,
+                    ),
+                    onPressed: onDelete,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(),
+                  ),
               ],
             ),
             SizedBox(height: 16),
@@ -1621,5 +2019,171 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _deleteAllScheduleItems() async {
+    if (!mounted) return;
+
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('本日のスケジュールを全て削除'),
+        content: Text('本日のスケジュールを全て削除します。この操作は取り消せません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: themeSettings.iconColor,
+            ),
+            child: Text('削除'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final groupProvider = context.read<GroupProvider>();
+        final groupId = groupProvider.groups.isNotEmpty
+            ? groupProvider.groups.first.id
+            : null;
+
+        await schedule_service
+            .ScheduleFirestoreService.deleteAllTodoScheduleForDate(
+          date: _selectedDate,
+          groupId: groupId,
+        );
+
+        if (mounted) {
+          setState(() {
+            _todaySchedule = null;
+          });
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('本日のスケジュールを全て削除しました')));
+        }
+      } catch (e) {
+        debugPrint('CalendarPage: スケジュール全削除エラー: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('本日のスケジュールの削除に失敗しました')));
+        }
+      }
+    }
+  }
+
+  Future<void> _deleteAllRoastMemos() async {
+    if (!mounted) return;
+
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('ローストスケジュールを全て削除'),
+        content: Text('ローストスケジュールを全て削除します。この操作は取り消せません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: themeSettings.iconColor,
+            ),
+            child: Text('削除'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final groupProvider = context.read<GroupProvider>();
+        final groupId = groupProvider.groups.isNotEmpty
+            ? groupProvider.groups.first.id
+            : null;
+
+        await RoastScheduleMemoService.deleteAllMemosForDate(
+          groupId: groupId,
+          date: _selectedDate,
+        );
+
+        if (mounted) {
+          setState(() {
+            _roastScheduleMemos = [];
+          });
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('ローストスケジュールを全て削除しました')));
+        }
+      } catch (e) {
+        debugPrint('CalendarPage: ローストスケジュール全削除エラー: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('ローストスケジュールの削除に失敗しました')));
+        }
+      }
+    }
+  }
+
+  Future<void> _deleteAllAssignments() async {
+    if (!mounted) return;
+
+    final themeSettings = Provider.of<ThemeSettings>(context, listen: false);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('担当を全て削除'),
+        content: Text('担当を全て削除します。この操作は取り消せません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: themeSettings.iconColor,
+            ),
+            child: Text('削除'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await AssignmentFirestoreService.deleteAllAssignmentHistory(
+          dateKey: DateFormat('yyyy-MM-dd').format(_selectedDate),
+        );
+
+        if (mounted) {
+          setState(() {
+            _assignmentHistoryWithLabels = null;
+          });
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('担当を全て削除しました')));
+        }
+      } catch (e) {
+        debugPrint('CalendarPage: 担当全削除エラー: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('担当の削除に失敗しました')));
+        }
+      }
+    }
   }
 }

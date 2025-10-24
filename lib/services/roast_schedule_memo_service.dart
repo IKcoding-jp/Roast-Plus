@@ -376,4 +376,21 @@ class RoastScheduleMemoService {
       rethrow;
     }
   }
+
+  // 指定した日付のメモをすべて削除
+  static Future<void> deleteAllMemosForDate({
+    String? groupId,
+    required DateTime date,
+  }) async {
+    try {
+      if (groupId != null) {
+        await saveGroupMemosForDate(groupId, date, []);
+      } else {
+        await saveUserMemosForDate(date, []);
+      }
+    } catch (e, st) {
+      _logError('メモ全削除エラー', e, st);
+      rethrow;
+    }
+  }
 }

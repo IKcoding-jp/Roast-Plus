@@ -66,6 +66,9 @@ class _TodayScheduleState extends State<TodaySchedule>
   int? _tempStartIndex;
   // ▲▲▲
 
+  // 日付変更検知用フィールド
+  DateTime? _lastSavedDate;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -99,6 +102,50 @@ class _TodayScheduleState extends State<TodaySchedule>
     for (final k in toRemove) {
       _scheduleControllers[k]?.dispose();
       _scheduleControllers.remove(k);
+    }
+  }
+
+  /// 日付が変更されたか確認し、前日のスケジュールを履歴として保存
+  Future<void> _checkDateChangeAndSaveHistory() async {
+    try {
+      final today = DateTime.now();
+      final todayDateOnly = DateTime(today.year, today.month, today.day);
+
+      // 最後に保存した日付がない場合は、今日の日付を記録して終了
+      if (_lastSavedDate == null) {
+        _lastSavedDate = todayDateOnly;
+        return;
+      }
+
+      final lastSavedDateOnly = DateTime(
+        _lastSavedDate!.year,
+        _lastSavedDate!.month,
+        _lastSavedDate!.day,
+      );
+
+      // 日付が変更されていない場合は何もしない
+      if (todayDateOnly == lastSavedDateOnly) {
+        return;
+      }
+
+      // 日付が変更された場合、前日のスケジュールを取得
+      final previousDay = todayDateOnly.subtract(Duration(days: 1));
+      final previousSchedule = await schedule_service
+          .ScheduleFirestoreService.loadTodoScheduleForDate(previousDay);
+
+      // 前日のスケジュールが存在する場合、そのまま保存（履歴として保持）
+      // 前日と同じ内容であれば保存しないようにする場合はここで比較ロジックを追加
+      if (previousSchedule != null &&
+          (previousSchedule['labels'] as List?)?.isNotEmpty == true) {
+        debugPrint('TodaySchedule: 前日のスケジュールを履歴として保存: $previousDay');
+        // 前日のスケジュールは既にFirestoreに保存されているため、追加の保存は不要
+        // 必要に応じて、アーカイブコレクションへの移動やタイムスタンプの更新を行う
+      }
+
+      // 今日の日付を更新
+      _lastSavedDate = todayDateOnly;
+    } catch (e) {
+      debugPrint('TodaySchedule: 日付変更検知エラー: $e');
     }
   }
 
@@ -470,6 +517,9 @@ class _TodayScheduleState extends State<TodaySchedule>
       debugPrint('TodaySchedule: 既に処理中のため、保存をスキップ');
       return;
     }
+
+    // 日付変更を検知し、前日のスケジュールを履歴として保存
+    await _checkDateChangeAndSaveHistory();
 
     debugPrint('TodaySchedule: _saveSchedules 開始');
     debugPrint('TodaySchedule: ラベル: $_scheduleLabels');

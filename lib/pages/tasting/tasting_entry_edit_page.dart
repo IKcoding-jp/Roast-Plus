@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../models/tasting_models.dart';
 import '../../models/theme_settings.dart';
-// import '../../models/group_provider.dart';
+import '../../widgets/tasting_radar_chart.dart';
 import '../../services/tasting_firestore_service.dart';
 
 /// 任意: 単体のエントリ編集用（詳細ページ内フォームを使う想定のため最小）
@@ -84,31 +84,154 @@ class _TastingEntryEditPageState extends State<TastingEntryEditPage> {
     final theme = Provider.of<ThemeSettings>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('エントリ編集'),
+        title: Text('エントリを記録'),
         backgroundColor: theme.appBarColor,
         foregroundColor: theme.appBarTextColor,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _slider('苦味', _bitterness, (v) => setState(() => _bitterness = v)),
-            _slider('酸味', _acidity, (v) => setState(() => _acidity = v)),
-            _slider('ボディ', _body, (v) => setState(() => _body = v)),
-            _slider('甘み', _sweetness, (v) => setState(() => _sweetness = v)),
-            _slider('香り', _aroma, (v) => setState(() => _aroma = v)),
-            _slider('総合', _overall, (v) => setState(() => _overall = v)),
-            TextField(
-              controller: _commentCtrl,
-              maxLines: 4,
-              decoration: InputDecoration(
-                labelText: 'コメント',
-                border: OutlineInputBorder(),
+            // リアルタイムプレビュー
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'プレビュー',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: theme.fontColor1,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Center(
+                      child: SizedBox(
+                        width: 160,
+                        height: 160,
+                        child: TastingRadarChart(
+                          acidity: _acidity,
+                          bitterness: _bitterness,
+                          body: _body,
+                          sweetness: _sweetness,
+                          aroma: _aroma,
+                          size: 160,
+                          showLabels: false,
+                          theme: theme,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 16),
+            // 評価セクション
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '評価 (1-5段階)',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: theme.fontColor1,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    _buildSlider(
+                      '苦味',
+                      _bitterness,
+                      (v) => setState(() => _bitterness = v),
+                    ),
+                    SizedBox(height: 12),
+                    _buildSlider(
+                      '酸味',
+                      _acidity,
+                      (v) => setState(() => _acidity = v),
+                    ),
+                    SizedBox(height: 12),
+                    _buildSlider(
+                      'ボディ',
+                      _body,
+                      (v) => setState(() => _body = v),
+                    ),
+                    SizedBox(height: 12),
+                    _buildSlider(
+                      '甘み',
+                      _sweetness,
+                      (v) => setState(() => _sweetness = v),
+                    ),
+                    SizedBox(height: 12),
+                    _buildSlider(
+                      '香り',
+                      _aroma,
+                      (v) => setState(() => _aroma = v),
+                    ),
+                    SizedBox(height: 12),
+                    _buildSlider(
+                      '総合',
+                      _overall,
+                      (v) => setState(() => _overall = v),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            // コメントセクション
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'コメント',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: theme.fontColor1,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    TextField(
+                      controller: _commentCtrl,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'このコーヒーの感想を記入してください',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
+              height: 48,
               child: ElevatedButton(onPressed: _save, child: Text('保存')),
             ),
           ],
@@ -117,8 +240,14 @@ class _TastingEntryEditPageState extends State<TastingEntryEditPage> {
     );
   }
 
-  Widget _slider(String label, double value, ValueChanged<double> onChanged) {
+  Widget _buildSlider(
+    String label,
+    double value,
+    ValueChanged<double> onChanged,
+  ) {
     final theme = Provider.of<ThemeSettings>(context, listen: false);
+    final color = TastingRadarChart.getColorForValue(value);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -128,29 +257,67 @@ class _TastingEntryEditPageState extends State<TastingEntryEditPage> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
                 color: theme.fontColor1,
               ),
             ),
-            Text(
-              value.toStringAsFixed(1),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: theme.fontColor1,
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: color.withValues(alpha: 0.4),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                value.toStringAsFixed(1),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
               ),
             ),
           ],
         ),
-        Slider(
-          value: value,
-          min: 1.0,
-          max: 5.0,
-          divisions: 8,
-          activeColor: theme.buttonColor,
-          inactiveColor: theme.fontColor1.withValues(alpha: 0.3),
-          onChanged: onChanged,
+        SizedBox(height: 8),
+        SliderTheme(
+          data: SliderThemeData(
+            trackHeight: 8.0,
+            thumbShape: RoundSliderThumbShape(
+              elevation: 6.0,
+              enabledThumbRadius: 12.0,
+              pressedElevation: 10.0,
+            ),
+            overlayShape: RoundSliderOverlayShape(overlayRadius: 16.0),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF2196F3), // 青
+                  const Color(0xFF4CAF50), // 緑
+                  const Color(0xFFFFEB3B), // 黄
+                  const Color(0xFFFF9800), // オレンジ
+                  const Color(0xFFF44336), // 赤
+                ],
+                stops: const [0, 0.25, 0.5, 0.75, 1.0],
+              ),
+            ),
+            child: Slider(
+              value: value,
+              min: 1.0,
+              max: 5.0,
+              divisions: 8,
+              activeColor: color.withValues(alpha: 0.0),
+              inactiveColor: Colors.transparent,
+              onChanged: onChanged,
+            ),
+          ),
         ),
       ],
     );

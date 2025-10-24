@@ -335,9 +335,7 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
                           if (_sessionId == null)
                             _buildCreateSessionCard(theme)
                           else
-                            _buildSessionStatsCard(theme, session!),
-                          SizedBox(height: 16),
-                          if (_sessionId != null) _buildMembersList(theme),
+                            _buildSessionHeaderCard(theme, session!),
                           SizedBox(height: 16),
                           if (_sessionId != null) _buildMyEntryForm(theme),
                           SizedBox(height: 16),
@@ -409,144 +407,39 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
     );
   }
 
-  Widget _buildSessionStatsCard(ThemeSettings theme, TastingSession session) {
+  Widget _buildSessionHeaderCard(ThemeSettings theme, TastingSession session) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    session.beanName,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: theme.fontColor1,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.brown.shade200,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    session.roastLevel,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
+            Text(
+              session.beanName,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: theme.fontColor1,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 8),
-            Builder(
-              builder: (context) {
-                final members =
-                    context
-                        .read<GroupProvider>()
-                        .currentGroup
-                        ?.members
-                        .length ??
-                    0;
-                Widget stars(double rating) {
-                  const color = Color(0xFFFFD700);
-                  final clamped = rating.clamp(0.0, 5.0);
-                  final full = clamped.floor();
-                  final hasHalf = (clamped - full) >= 0.5;
-                  final empty = 5 - full - (hasHalf ? 1 : 0);
-                  return Row(
-                    children: [
-                      for (int i = 0; i < full; i++)
-                        Icon(Icons.star, size: 16, color: color),
-                      if (hasHalf)
-                        Icon(Icons.star_half, size: 16, color: color),
-                      for (int i = 0; i < empty; i++)
-                        Icon(Icons.star_border, size: 16, color: color),
-                    ],
-                  );
-                }
-
-                return Row(
-                  children: [
-                    Text('件数: ${session.entriesCount}/$members'),
-                    SizedBox(width: 12),
-                    Text('平均総合: '),
-                    stars(session.avgOverall),
-                  ],
-                );
-              },
+            SizedBox(width: 12),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.brown.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                session.roastLevel,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-            SizedBox(height: 8),
-            _metricBar('苦味', session.avgBitterness, theme),
-            _metricBar('酸味', session.avgAcidity, theme),
-            _metricBar('ボディ', session.avgBody, theme),
-            _metricBar('甘み', session.avgSweetness, theme),
-            _metricBar('香り', session.avgAroma, theme),
-            _metricBar('総合', session.avgOverall, theme),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _metricBar(String label, double v, ThemeSettings theme) {
-    Color color(double r) {
-      if (r >= 4) return Colors.green;
-      if (r >= 3) return Colors.blue;
-      if (r >= 2) return Colors.orange;
-      return Colors.grey;
-    }
-
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: theme.fontColor1.withValues(alpha: 0.7),
-            ),
-          ),
-          Row(
-            children: [
-              Text(
-                v.toStringAsFixed(1),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: color(v),
-                ),
-              ),
-              SizedBox(width: 6),
-              Container(
-                width: 80,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: theme.fontColor1.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: (v.clamp(0, 5)) / 5.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: color(v),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -678,60 +571,6 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
           onChanged: onChanged,
         ),
       ],
-    );
-  }
-
-  Widget _buildMembersList(ThemeSettings theme) {
-    final entries = (_sessionId == null)
-        ? const <TastingEntry>[]
-        : context.watch<TastingProvider>().getEntriesOf(_sessionId!);
-
-    // コメントのみを集約（重複除去・最新優先）
-    final seen = <String>{};
-    final comments = <String>[];
-    final sorted = List<TastingEntry>.from(entries)
-      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-    for (final e in sorted) {
-      final c = e.comment.trim();
-      if (c.isEmpty) continue;
-      final key = c.toLowerCase();
-      if (!seen.contains(key)) {
-        seen.add(key);
-        comments.add(c);
-      }
-    }
-
-    final aggregated = comments.isEmpty
-        ? 'まだ感想がありません'
-        : comments.map((c) => '・$c').join('\n');
-
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'みんなの感想',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: theme.fontColor1,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                aggregated,
-                style: TextStyle(fontSize: 14, color: theme.fontColor1),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

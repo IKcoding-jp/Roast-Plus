@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/tasting_models.dart';
 import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
+import '../../widgets/tasting_radar_chart.dart';
 
 class TastingRecordEditPage extends StatefulWidget {
   final TastingRecord? tastingRecord;
@@ -201,40 +202,84 @@ class _TastingRecordEditPageState extends State<TastingRecordEditPage> {
     ValueChanged<double> onChanged,
   ) {
     final themeSettings = Provider.of<ThemeSettings>(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: themeSettings.fontColor1,
+    final color = TastingRadarChart.getColorForValue(value);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: themeSettings.fontColor1,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: color.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  value.toStringAsFixed(1),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          // グラデーションスライダー背景
+          SliderTheme(
+            data: SliderThemeData(
+              trackHeight: 8.0,
+              thumbShape: RoundSliderThumbShape(
+                elevation: 6.0,
+                enabledThumbRadius: 12.0,
+                pressedElevation: 10.0,
+              ),
+              overlayShape: RoundSliderOverlayShape(overlayRadius: 16.0),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF2196F3), // 青
+                    const Color(0xFF4CAF50), // 緑
+                    const Color(0xFFFFEB3B), // 黄
+                    const Color(0xFFFF9800), // オレンジ
+                    const Color(0xFFF44336), // 赤
+                  ],
+                  stops: const [0, 0.25, 0.5, 0.75, 1.0],
+                ),
+              ),
+              child: Slider(
+                value: value,
+                min: 1.0,
+                max: 5.0,
+                divisions: 8,
+                activeColor: color.withValues(alpha: 0.0),
+                inactiveColor: Colors.transparent,
+                onChanged: onChanged,
               ),
             ),
-            Text(
-              value.toStringAsFixed(1),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: themeSettings.fontColor1,
-              ),
-            ),
-          ],
-        ),
-        Slider(
-          value: value,
-          min: 1.0,
-          max: 5.0,
-          divisions: 8,
-          activeColor: themeSettings.buttonColor,
-          inactiveColor: themeSettings.fontColor1.withValues(alpha: 0.3),
-          onChanged: onChanged,
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -564,6 +609,24 @@ class _TastingRecordEditPageState extends State<TastingRecordEditPage> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: themeSettings.fontColor1,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      // リアルタイムプレビューレーダーチャート
+                      Center(
+                        child: SizedBox(
+                          width: 180,
+                          height: 180,
+                          child: TastingRadarChart(
+                            acidity: _acidity,
+                            bitterness: _bitterness,
+                            body: 3.0, // コーヒーテイスティングではボディは用意されていないため3.0にセット
+                            sweetness: 3.0, // 甘みも同様
+                            aroma: _aroma,
+                            size: 180,
+                            showLabels: false,
+                            theme: themeSettings,
+                          ),
                         ),
                       ),
                       SizedBox(height: 16),

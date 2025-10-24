@@ -6,6 +6,7 @@ import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
 import '../../widgets/lottie_animation_widget.dart';
 import '../../widgets/bean_name_with_sticker.dart';
+import '../../widgets/tasting_radar_chart.dart';
 import 'tasting_session_detail_page.dart';
 import 'tasting_record_edit_page.dart';
 
@@ -55,6 +56,14 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
       final groupId = groupProvider.currentGroup!.id;
       debugPrint('試飲記録ページ: セッション購読開始 - groupId: $groupId');
       tastingProvider.subscribeGroupTastingSessions(groupId);
+
+      // セッション取得後、各セッションのエントリも購読
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        for (final session in tastingProvider.sessions) {
+          debugPrint('試飲記録ページ: エントリ購読開始 - sessionId: ${session.id}');
+          tastingProvider.loadEntries(groupId, session.id);
+        }
+      });
     } else {
       debugPrint('試飲記録ページ: グループが選択されていないため、個人記録を読み込み');
       tastingProvider.subscribeTastingRecords();
@@ -563,60 +572,129 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
     TastingSession session,
     ThemeSettings themeSettings,
   ) {
-    return Row(
+    // エントリを取得
+    final entries = context.watch<TastingProvider>().getEntriesOf(session.id);
+
+    // 空でないコメントのみ抽出
+    final comments = entries
+        .map((e) => e.comment.trim())
+        .where((c) => c.isNotEmpty)
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildScoreItem('苦味', session.avgBitterness, themeSettings),
-        SizedBox(width: 8),
-        _buildScoreItem('酸味', session.avgAcidity, themeSettings),
-        SizedBox(width: 8),
-        _buildScoreItem('ボディ', session.avgBody, themeSettings),
-        SizedBox(width: 8),
-        _buildScoreItem('甘味', session.avgSweetness, themeSettings),
-        SizedBox(width: 8),
-        _buildScoreItem('香り', session.avgAroma, themeSettings),
-        Spacer(),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: themeSettings.tastingColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            '総合: ${session.avgOverall.toStringAsFixed(1)}',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: themeSettings.tastingColor,
+        Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // レーダーチャート（値付き）
+                Center(
+                  child: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: TastingRadarChart(
+                      acidity: session.avgAcidity,
+                      bitterness: session.avgBitterness,
+                      body: session.avgBody,
+                      sweetness: session.avgSweetness,
+                      aroma: session.avgAroma,
+                      size: 200,
+                      showLabels: true,
+                      showValues: true,
+                      theme: themeSettings,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40),
+              ],
             ),
-          ),
+            // 星と総合点を右下に配置
+            Positioned(
+              bottom: 8,
+              right: 8,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildStars(session.avgOverall, 24),
+                  SizedBox(width: 6),
+                  Text(
+                    '${session.avgOverall.toStringAsFixed(1)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: themeSettings.tastingColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+        if (comments.isNotEmpty) ...[
+          SizedBox(height: 16),
+          _buildCommentsSection(comments, themeSettings),
+        ],
       ],
     );
   }
 
-  Widget _buildScoreItem(
-    String label,
-    double score,
+  Widget _buildCommentsSection(
+    List<String> comments,
     ThemeSettings themeSettings,
   ) {
-    return Column(
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: themeSettings.fontColor1.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'みんなの感想',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: themeSettings.fontColor1,
+            ),
+          ),
+          SizedBox(height: 8),
+          ...comments.map(
+            (comment) => Padding(
+              padding: EdgeInsets.only(bottom: 4),
+              child: Text(
+                '・$comment',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: themeSettings.fontColor1.withValues(alpha: 0.8),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStars(double rating, double iconSize) {
+    const goldColor = Color(0xFFFFD700);
+    final clamped = rating.clamp(0.0, 5.0);
+    final full = clamped.floor();
+    final hasHalf = (clamped - full) >= 0.5;
+    final empty = 5 - full - (hasHalf ? 1 : 0);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: themeSettings.fontColor1.withValues(alpha: 0.7),
-          ),
-        ),
-        SizedBox(height: 2),
-        Text(
-          score.toStringAsFixed(1),
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: themeSettings.fontColor1,
-          ),
-        ),
+        for (int i = 0; i < full; i++)
+          Icon(Icons.star, size: iconSize, color: goldColor),
+        if (hasHalf) Icon(Icons.star_half, size: iconSize, color: goldColor),
+        for (int i = 0; i < empty; i++)
+          Icon(Icons.star_border, size: iconSize, color: goldColor),
       ],
     );
   }

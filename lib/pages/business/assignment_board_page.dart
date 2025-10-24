@@ -1660,18 +1660,60 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   /// 日付変更を監視
   void _startDateChangeMonitor() {
     _dateCheckTimer?.cancel();
-    _dateCheckTimer = Timer.periodic(Duration(minutes: 1), (_) {
+    _dateCheckTimer = Timer.periodic(Duration(minutes: 1), (_) async {
       final today = _todayKey();
       // 日付が変わった場合、最後のシャッフル日付をクリアしてUIを更新
       if (_lastShuffledDate != null && _lastShuffledDate != today) {
-        debugPrint('AssignmentBoard: 日付が変更されたため、シャッフル制限をリセット');
+        debugPrint('AssignmentBoard: 日付が変更されました - 担当表をリセット');
+
+        // 基本構成データを読み込んで担当表を元に戻す
+        await _resetToBasicConfiguration();
+
         if (mounted) {
           setState(() {
             _lastShuffledDate = null;
+            isAssignedToday = false;
           });
         }
+        debugPrint(
+          'AssignmentBoard: 日付変更後の状態 - isAssignedToday: false, _lastShuffledDate: null',
+        );
       }
     });
+  }
+
+  /// 基本構成に戻す（日付変更時に呼び出し）
+  Future<void> _resetToBasicConfiguration() async {
+    try {
+      final settings = await UserSettingsFirestoreService.getMultipleSettings([
+        'teams',
+        'assignment_team_a',
+        'assignment_team_b',
+      ]);
+
+      List<Team> basicTeams = [];
+      final teamsJson = settings['teams'];
+      if (teamsJson != null) {
+        final teamsList = jsonDecode(teamsJson) as List;
+        basicTeams = teamsList.map((teamMap) => Team.fromMap(teamMap)).toList();
+      } else {
+        final loadedA = settings['assignment_team_a'] ?? [];
+        final loadedB = settings['assignment_team_b'] ?? [];
+        basicTeams = [
+          Team(id: 'team_a', name: 'A班', members: loadedA),
+          Team(id: 'team_b', name: 'B班', members: loadedB),
+        ];
+      }
+
+      if (basicTeams.isNotEmpty && mounted) {
+        setState(() {
+          teams = basicTeams;
+        });
+        debugPrint('AssignmentBoard: 基本構成に戻しました');
+      }
+    } catch (e) {
+      debugPrint('AssignmentBoard: 基本構成リセットエラー: $e');
+    }
   }
 
   /// 最終シャッフル日付を読み込み

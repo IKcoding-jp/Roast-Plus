@@ -27,7 +27,6 @@ class _BadgeListPageState extends State<BadgeListPage>
     'roasting': '焙煎',
     'dripPack': 'ドリップパック',
     'level': 'レベル',
-    'special': '特別',
   };
 
   @override
@@ -734,9 +733,6 @@ class _BadgeListPageState extends State<BadgeListPage>
       case 'group_level_9999':
         return _calculateLevelBadgeProgress(condition, profile.stats);
 
-      // 特殊バッジの進捗率
-      case 'group_tasting_100':
-        return (profile.stats.totalTastingRecords / 100).clamp(0.0, 1.0);
 
       default:
         return 0.0;
@@ -919,8 +915,6 @@ class _BadgeListPageState extends State<BadgeListPage>
           return badge.category == BadgeCategory.dripPack;
         case 'level':
           return badge.category == BadgeCategory.level;
-        case 'special':
-          return badge.category == BadgeCategory.special;
         default:
           return false;
       }

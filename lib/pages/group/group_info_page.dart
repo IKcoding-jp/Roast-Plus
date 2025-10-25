@@ -1156,7 +1156,7 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                                           earnedAt: DateTime.now(),
                                           earnedByUserId: '',
                                           earnedByUserName: '',
-                                          category: BadgeCategory.special,
+                                          category: condition.category,
                                         ),
                                       );
 

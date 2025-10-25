@@ -70,7 +70,6 @@ enum BadgeCategory {
   roasting, // 焙煎系
   dripPack, // ドリップパック系
   level, // レベル系
-  special, // 特殊・イベント系
 }
 
 /// グループバッジの獲得条件を表すクラス
@@ -686,62 +685,6 @@ class GroupBadgeConditions {
     // ④ 🏆 レベルバッジ（グループレベル）- 新しい仕様に基づく段階的バッジ
     ...levelBadgeConditions,
 
-    // ⑤ 🏅 特殊・記録バッジ
-    GroupBadgeCondition(
-      badgeId: 'group_all_member_attendance',
-      name: '全員出勤！',
-      description: '同じ日に全メンバーが出勤',
-      iconCodePoint: Icons.groups.codePoint,
-      color: Colors.green.shade500,
-      category: BadgeCategory.special,
-      checkCondition: (stats) => stats.allMemberAttendanceCount >= 1,
-    ),
-    GroupBadgeCondition(
-      badgeId: 'group_roast_triple',
-      name: '焙煎3連チャン',
-      description: '累計3回の焙煎記録がある',
-      iconCodePoint: Icons.local_fire_department.codePoint,
-      color: Colors.orange.shade700,
-      category: BadgeCategory.special,
-      checkCondition: (stats) => stats.totalRoastDays >= 3,
-    ),
-    GroupBadgeCondition(
-      badgeId: 'group_first_tasting',
-      name: '初テイスティング',
-      description: '最初の試飲感想を記録',
-      iconCodePoint: Icons.restaurant.codePoint,
-      color: Colors.pink.shade400,
-      category: BadgeCategory.special,
-      checkCondition: (stats) => stats.totalTastingRecords >= 1,
-    ),
-
-    GroupBadgeCondition(
-      badgeId: 'group_continuous_week',
-      name: '皆勤チーム',
-      description: '7日以上の出勤記録を達成',
-      iconCodePoint: Icons.calendar_today.codePoint,
-      color: Colors.green.shade600,
-      category: BadgeCategory.special,
-      checkCondition: (stats) => stats.totalAttendanceDays >= 7,
-    ),
-    GroupBadgeCondition(
-      badgeId: 'group_tasting_100',
-      name: '味覚の達人',
-      description: 'グループで累計100回のテイスティング記録',
-      iconCodePoint: Icons.restaurant_menu.codePoint,
-      color: Colors.pink.shade600,
-      category: BadgeCategory.special,
-      checkCondition: (stats) => stats.totalTastingRecords >= 100,
-    ),
-    GroupBadgeCondition(
-      badgeId: 'group_recommended_timer',
-      name: 'おすすめタイマー使い',
-      description: '5回以上の焙煎を記録',
-      iconCodePoint: Icons.timer.codePoint,
-      color: Colors.orange.shade500,
-      category: BadgeCategory.special,
-      checkCondition: (stats) => stats.totalRoastDays >= 5,
-    ),
   ];
 
   /// グループレベルチェック（統計ベース - フォールバック用）

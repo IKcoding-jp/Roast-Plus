@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/tasting_models.dart';
 import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
-import '../../models/group_gamification_provider.dart';
+import '../../services/group_gamification_service.dart';
 import '../../services/tasting_firestore_service.dart';
 import '../../widgets/lottie_animation_widget.dart';
 
@@ -141,12 +141,12 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
     debugPrint(
       '_saveMyEntry: 保存開始 - groupId: $groupId, sessionId: $_sessionId, uid: $uid',
     );
-    
+
     // 既存エントリがあるかチェック（新規エントリかどうかの判定）
     final tastingProvider = context.read<TastingProvider>();
     final hadMyEntry = tastingProvider.hasMyEntry(_sessionId!, uid);
     debugPrint('_saveMyEntry: 既存エントリの有無: $hadMyEntry');
-    
+
     final entry = TastingEntry(
       id: uid,
       userId: uid,
@@ -165,23 +165,47 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
       // 1. エントリを保存
       await TastingFirestoreService.upsertEntry(groupId, _sessionId!, entry);
       debugPrint('_saveMyEntry: 保存完了');
-      
+
       // 2. 新規エントリの場合のみ経験値を付与
       if (!hadMyEntry) {
         debugPrint('_saveMyEntry: 新規エントリのため経験値を付与');
         try {
-          final gamificationProvider = context.read<GroupGamificationProvider>();
-          final result = await gamificationProvider.recordTasting();
-          
+          final result = await GroupGamificationService.recordTasting(groupId);
+
+          debugPrint(
+            '_saveMyEntry: 経験値付与結果 - success: ${result.success}, xp: ${result.experienceGained}, message: ${result.message}',
+          );
+
           if (result.success && mounted) {
             debugPrint('_saveMyEntry: 経験値付与成功 - ${result.experienceGained}XP');
+
+            // UIの更新を待ってからアニメーションを表示
+            await Future.delayed(Duration(milliseconds: 100));
+
             // 経験値獲得アニメーションを表示
-            AnimationHelper.showExperienceGainAnimation(
-              context,
-              xpGained: result.experienceGained,
-              description: result.message,
-              onComplete: () {},
-            );
+            try {
+              AnimationHelper.showExperienceGainAnimation(
+                context,
+                xpGained: result.experienceGained,
+                description: result.message,
+                onComplete: () {
+                  debugPrint('_saveMyEntry: アニメーション完了');
+                },
+              );
+              debugPrint('_saveMyEntry: アニメーション表示開始');
+            } catch (animationError) {
+              debugPrint('_saveMyEntry: アニメーション表示エラー: $animationError');
+              // アニメーション表示に失敗した場合はスナックバーで通知
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('+${result.experienceGained}XP 獲得！'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+            }
           } else {
             debugPrint('_saveMyEntry: 経験値付与失敗 - ${result.message}');
           }
@@ -192,7 +216,7 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
       } else {
         debugPrint('_saveMyEntry: 既存エントリの更新のため経験値は付与しない');
       }
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,

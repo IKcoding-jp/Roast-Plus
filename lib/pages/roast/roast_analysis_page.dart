@@ -27,7 +27,6 @@ class RoastAnalysisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const brown = Color(0xFF795548);
     final width = MediaQuery.of(context).size.width;
     // スマホならカラム幅を均等、タブレットなら少し余裕を持たせる
     final isWide = width > 600;
@@ -350,6 +349,12 @@ class RoastAnalysisPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 16),
                                     Table(
+                                      border: TableBorder.all(
+                                        color: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontColor1.withValues(alpha: 0.2),
+                                        width: 1,
+                                      ),
                                       columnWidths: {
                                         0: FlexColumnWidth(
                                           colFlex[0].toDouble(),
@@ -368,11 +373,6 @@ class RoastAnalysisPage extends StatelessWidget {
                                           TableCellVerticalAlignment.middle,
                                       children: [
                                         TableRow(
-                                          decoration: BoxDecoration(
-                                            color: brown.withValues(
-                                              alpha: 0.08,
-                                            ),
-                                          ),
                                           children: [
                                             Padding(
                                               padding: EdgeInsets.symmetric(
@@ -383,7 +383,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                                 '重さ',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: brown,
+                                                  color: Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontColor1,
                                                   fontSize: 15,
                                                   fontFamily:
                                                       Provider.of<
@@ -402,7 +404,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                                 '煎り度',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: brown,
+                                                  color: Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontColor1,
                                                   fontSize: 15,
                                                   fontFamily:
                                                       Provider.of<
@@ -421,7 +425,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                                 '平均時間',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: brown,
+                                                  color: Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontColor1,
                                                   fontSize: 15,
                                                   fontFamily:
                                                       Provider.of<
@@ -440,7 +446,9 @@ class RoastAnalysisPage extends StatelessWidget {
                                                 '件数',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: brown,
+                                                  color: Provider.of<ThemeSettings>(
+                                                    context,
+                                                  ).fontColor1,
                                                   fontSize: 15,
                                                   fontFamily:
                                                       Provider.of<

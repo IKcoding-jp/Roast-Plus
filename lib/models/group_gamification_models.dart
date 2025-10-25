@@ -275,17 +275,17 @@ class GroupGamificationProfile {
     return badges.where((badge) => badge.category == category).toList();
   }
 
-  /// レベルに必要な経験値を計算（新しい経験値システム対応）
+  /// 指定レベルまでの累積必要経験値を計算（新しい経験値システム対応）
   static int _calculateRequiredXP(int level) {
     if (level <= 1) return 0; // レベル1は0XPから開始
 
     // 新しいシステムでの3年間獲得可能経験値: 約2,434,000XP
     // 出勤: 780日 × 1000XP = 780,000XP
-    // 焙煎: 468回 × 1000XP = 468,000XP
-    // ドリップパック: 46,800個 × 2XP = 93,600XP
+    // 焙煎: 468回 × 2000XP = 936,000XP
+    // ドリップパック: 46,800個 × 10XP = 468,000XP
     // テイスティング: 約200回 × 500XP = 100,000XP
     // 作業進捗: 約1,000回 × 150XP = 150,000XP
-    // 合計: 約1,591,600XP
+    // 合計: 約2,434,000XP
 
     if (level <= 1) return 0;
 

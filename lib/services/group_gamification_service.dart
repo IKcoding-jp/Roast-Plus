@@ -866,7 +866,7 @@ class GroupGamificationService {
     return level;
   }
 
-  /// レベルに必要な経験値を計算（新しい経験値システム対応）
+  /// 指定レベルまでの累積必要経験値を計算（新しい経験値システム対応）
   static int _calculateRequiredXP(int level) {
     if (level <= 1) return 0; // レベル1は0XPから開始
 

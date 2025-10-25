@@ -312,10 +312,16 @@ class GroupDataSyncService {
       throw Exception('本日のスケジュールの同期権限がありません');
     }
 
-    await GroupFirestoreService.syncGroupData(
+    // 今日の日付キーを生成
+    final today = DateTime.now();
+    final todayKey =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
+    // 日付別データとして保存
+    await GroupFirestoreService.syncGroupScheduleForDate(
       groupId: groupId,
-      dataType: 'today_schedule',
-      data: todayScheduleData,
+      dateKey: todayKey,
+      scheduleData: todayScheduleData,
     );
   }
 
@@ -323,17 +329,74 @@ class GroupDataSyncService {
   static Future<Map<String, dynamic>?> getGroupTodaySchedule(
     String groupId,
   ) async {
-    return await GroupFirestoreService.getGroupData(
+    // 今日の日付キーを生成
+    final today = DateTime.now();
+    final todayKey =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
+    // 日付別データとして取得
+    return await GroupFirestoreService.getGroupScheduleForDate(
       groupId: groupId,
-      dataType: 'today_schedule',
+      dateKey: todayKey,
     );
   }
 
   /// グループの本日のスケジュールの変更を監視
   static Stream<Map<String, dynamic>?> watchGroupTodaySchedule(String groupId) {
-    return GroupFirestoreService.watchGroupData(
+    // 今日の日付キーを生成
+    final today = DateTime.now();
+    final todayKey =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
+    // 日付別データとして監視
+    return GroupFirestoreService.watchGroupScheduleForDate(
+      groupId: groupId,
+      dateKey: todayKey,
+    );
+  }
+
+  /// グループの指定日付のスケジュールの変更を監視
+  static Stream<Map<String, dynamic>?> watchGroupScheduleForDate(
+    String groupId,
+    String dateKey,
+  ) {
+    return GroupFirestoreService.watchGroupScheduleForDate(
+      groupId: groupId,
+      dateKey: dateKey,
+    );
+  }
+
+  /// グループの指定日付のスケジュールを取得
+  static Future<Map<String, dynamic>?> getGroupScheduleForDate(
+    String groupId,
+    String dateKey,
+  ) async {
+    return await GroupFirestoreService.getGroupScheduleForDate(
+      groupId: groupId,
+      dateKey: dateKey,
+    );
+  }
+
+  /// グループの指定日付のスケジュールを同期
+  static Future<void> syncScheduleForDate(
+    String groupId,
+    String dateKey,
+    Map<String, dynamic> scheduleData,
+  ) async {
+    // 同期権限チェック（編集権限とは別）
+    final canSync = await GroupFirestoreService.canSyncDataType(
       groupId: groupId,
       dataType: 'today_schedule',
+    );
+
+    if (!canSync) {
+      throw Exception('スケジュールの同期権限がありません');
+    }
+
+    await GroupFirestoreService.syncGroupScheduleForDate(
+      groupId: groupId,
+      dateKey: dateKey,
+      scheduleData: scheduleData,
     );
   }
 

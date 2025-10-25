@@ -102,32 +102,32 @@ class _CalendarPageState extends State<CalendarPage> {
   // グループスケジュールの変更を監視
   void _setupGroupScheduleListener() {
     try {
+      // 既存のリスナーをキャンセル
+      _groupScheduleSubscription?.cancel();
+      _groupScheduleSubscription = null;
+
       final groupProvider = context.read<GroupProvider>();
       if (groupProvider.groups.isNotEmpty) {
         final group = groupProvider.groups.first;
         debugPrint('CalendarPage: グループスケジュールリスナーを設定: ${group.id}');
 
+        // 選択された日付のスケジュールを監視
+        final selectedKey = DateFormat('yyyy-MM-dd').format(_selectedDate);
+        debugPrint('CalendarPage: 監視する日付キー: $selectedKey');
+
         _groupScheduleSubscription =
-            GroupDataSyncService.watchGroupTodaySchedule(group.id).listen((
-              scheduleData,
-            ) {
+            GroupDataSyncService.watchGroupScheduleForDate(
+              group.id,
+              selectedKey,
+            ).listen((scheduleData) {
               if (!mounted) return;
 
               debugPrint('CalendarPage: グループスケジュール変更を検知: $scheduleData');
 
-              // 今日の日付の場合のみ更新
-              final today = DateTime.now();
-              final todayKey = DateFormat('yyyy-MM-dd').format(today);
-              final selectedKey = DateFormat(
-                'yyyy-MM-dd',
-              ).format(_selectedDate);
-
-              if (selectedKey == todayKey) {
-                setState(() {
-                  _todaySchedule = scheduleData;
-                });
-                debugPrint('CalendarPage: 本日のスケジュールを更新しました');
-              }
+              setState(() {
+                _todaySchedule = scheduleData;
+              });
+              debugPrint('CalendarPage: 選択日付のスケジュールを更新しました');
             });
       }
     } catch (e) {
@@ -673,9 +673,12 @@ class _CalendarPageState extends State<CalendarPage> {
         debugPrint('CalendarPage: グループ参加中 - グループデータを優先読み込み: $dateKey');
 
         try {
-          // グループデータから本日のスケジュールを取得
+          // グループデータから指定日付のスケジュールを取得
           final groupScheduleData =
-              await GroupDataSyncService.getGroupTodaySchedule(group.id);
+              await GroupDataSyncService.getGroupScheduleForDate(
+                group.id,
+                dateKey,
+              );
           if (groupScheduleData != null) {
             debugPrint('CalendarPage: グループからスケジュールデータを取得: $groupScheduleData');
             return groupScheduleData;
@@ -713,18 +716,8 @@ class _CalendarPageState extends State<CalendarPage> {
     Future.delayed(Duration(milliseconds: 100), () {
       if (mounted) {
         _loadSelectedDateData();
-        // 日付変更時にリスナーを再設定（今日の日付の場合のみ）
-        final today = DateTime.now();
-        final todayKey = DateFormat('yyyy-MM-dd').format(today);
-        final selectedKey = DateFormat('yyyy-MM-dd').format(selectedDate);
-
-        if (selectedKey == todayKey) {
-          _setupGroupScheduleListener();
-        } else {
-          // 今日以外の日付の場合はリスナーを停止
-          _groupScheduleSubscription?.cancel();
-          _groupScheduleSubscription = null;
-        }
+        // 日付変更時にリスナーを再設定（選択された日付を監視）
+        _setupGroupScheduleListener();
       }
     });
   }
@@ -1917,6 +1910,8 @@ class _CalendarPageState extends State<CalendarPage> {
         Future.delayed(Duration(milliseconds: 100), () {
           if (mounted) {
             _loadSelectedDateData();
+            // 日付変更時にリスナーを再設定
+            _setupGroupScheduleListener();
           }
         });
       },

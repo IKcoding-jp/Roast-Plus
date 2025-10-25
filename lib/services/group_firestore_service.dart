@@ -1210,6 +1210,139 @@ class GroupFirestoreService {
         .map((doc) => doc.data()?['data'] as Map<String, dynamic>?);
   }
 
+  /// グループの日付別スケジュールデータの変更を監視
+  static Stream<Map<String, dynamic>?> watchGroupScheduleForDate({
+    required String groupId,
+    required String dateKey,
+  }) {
+    if (_uid == null || _uid!.isEmpty) throw Exception('未ログイン');
+
+    return _firestore
+        .collection('groups')
+        .doc(groupId)
+        .collection('sharedData')
+        .doc('today_schedule')
+        .snapshots()
+        .map((doc) {
+          if (!doc.exists) return null;
+
+          final data = doc.data()?['data'] as Map<String, dynamic>?;
+          if (data == null) return null;
+
+          // 指定された日付のスケジュールデータを取得
+          return data[dateKey] as Map<String, dynamic>?;
+        });
+  }
+
+  /// グループの日付別スケジュールデータを取得
+  static Future<Map<String, dynamic>?> getGroupScheduleForDate({
+    required String groupId,
+    required String dateKey,
+  }) async {
+    developer.log('getGroupScheduleForDate開始', name: 'GroupFirestoreService');
+    developer.log('グループID: $groupId', name: 'GroupFirestoreService');
+    developer.log('日付キー: $dateKey', name: 'GroupFirestoreService');
+
+    if (_uid == null || _uid!.isEmpty) throw Exception('未ログイン');
+
+    final group = await getGroup(groupId);
+    if (group == null) throw Exception('グループが見つかりません');
+
+    // メンバーのみ取得可能
+    if (!group.isMember(_uid!)) {
+      throw Exception('グループメンバーのみデータを取得できます');
+    }
+
+    final doc = await _firestore
+        .collection('groups')
+        .doc(groupId)
+        .collection('sharedData')
+        .doc('today_schedule')
+        .get();
+
+    if (!doc.exists) {
+      developer.log('ドキュメントが存在しません', name: 'GroupFirestoreService');
+      return null;
+    }
+
+    final data = doc.data()?['data'] as Map<String, dynamic>?;
+    if (data == null) {
+      developer.log('データがnullです', name: 'GroupFirestoreService');
+      return null;
+    }
+
+    developer.log('取得した全データ: $data', name: 'GroupFirestoreService');
+
+    // 日付別のスケジュールデータを取得
+    final result = data[dateKey] as Map<String, dynamic>?;
+    developer.log('指定日付のデータ: $result', name: 'GroupFirestoreService');
+
+    return result;
+  }
+
+  /// グループの日付別スケジュールデータを同期
+  static Future<void> syncGroupScheduleForDate({
+    required String groupId,
+    required String dateKey,
+    required Map<String, dynamic> scheduleData,
+  }) async {
+    developer.log('syncGroupScheduleForDate開始', name: 'GroupFirestoreService');
+    developer.log('グループID: $groupId', name: 'GroupFirestoreService');
+    developer.log('日付キー: $dateKey', name: 'GroupFirestoreService');
+    developer.log('スケジュールデータ: $scheduleData', name: 'GroupFirestoreService');
+
+    if (_uid == null || _uid!.isEmpty) {
+      developer.log('未ログインエラー', name: 'GroupFirestoreService');
+      throw Exception('未ログイン');
+    }
+
+    final group = await getGroup(groupId);
+    if (group == null) throw Exception('グループが見つかりません');
+
+    // メンバーのみ同期可能
+    if (!group.isMember(_uid!)) {
+      throw Exception('グループメンバーのみデータを同期できます');
+    }
+
+    // 既存のデータを取得
+    final existingDoc = await _firestore
+        .collection('groups')
+        .doc(groupId)
+        .collection('sharedData')
+        .doc('today_schedule')
+        .get();
+
+    Map<String, dynamic> allScheduleData = {};
+    if (existingDoc.exists) {
+      final existingData = existingDoc.data()?['data'] as Map<String, dynamic>?;
+      if (existingData != null) {
+        allScheduleData = Map<String, dynamic>.from(existingData);
+        developer.log(
+          '既存データを取得: $allScheduleData',
+          name: 'GroupFirestoreService',
+        );
+      }
+    }
+
+    // 指定された日付のデータを更新
+    allScheduleData[dateKey] = scheduleData;
+    developer.log('更新後の全データ: $allScheduleData', name: 'GroupFirestoreService');
+
+    // 更新されたデータを保存
+    await _firestore
+        .collection('groups')
+        .doc(groupId)
+        .collection('sharedData')
+        .doc('today_schedule')
+        .set({
+          'data': allScheduleData,
+          'updatedBy': _uid,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+
+    developer.log('日付別スケジュール同期完了', name: 'GroupFirestoreService');
+  }
+
   /// グループ設定を取得
   static Future<GroupSettings?> getGroupSettings(String groupId) async {
     if (_uid == null || _uid!.isEmpty) throw Exception('未ログイン');
@@ -1447,10 +1580,7 @@ class GroupFirestoreService {
       }
     }
 
-    developer.log(
-      '全メンバーの担当履歴削除完了',
-      name: 'GroupFirestoreService',
-    );
+    developer.log('全メンバーの担当履歴削除完了', name: 'GroupFirestoreService');
   }
 
   /// 特定メンバーの担当履歴を削除
@@ -1465,10 +1595,7 @@ class GroupFirestoreService {
       final querySnapshot = await assignmentHistoryRef.get();
 
       if (querySnapshot.docs.isEmpty) {
-        developer.log(
-          '担当履歴なし - uid: $uid',
-          name: 'GroupFirestoreService',
-        );
+        developer.log('担当履歴なし - uid: $uid', name: 'GroupFirestoreService');
         return;
       }
 

@@ -30,7 +30,7 @@ class RoastAnalysisPage extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     // スマホならカラム幅を均等、タブレットなら少し余裕を持たせる
     final isWide = width > 600;
-    final colFlex = isWide ? [2, 2, 2, 1] : [3, 3, 3, 2];
+    final colFlex = isWide ? [1.5, 2, 1.5, 1] : [2, 2.5, 2, 1.5];
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -166,45 +166,50 @@ class RoastAnalysisPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Provider.of<ThemeSettings>(context)
-                                      .iconColor
-                                      .withValues(
-                                        alpha: 0.12,
-                                      ), // テーマのアイコン色を薄く反映
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(
-                                  Icons.analytics,
-                                  color: Provider.of<ThemeSettings>(
-                                    context,
-                                  ).iconColor,
-                                  size: 24,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  '豆の種類ごとに平均焙煎時間を表示',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontColor1,
-                                    fontFamily: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).fontFamily,
+                          Center(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 700),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Provider.of<ThemeSettings>(context)
+                                          .iconColor
+                                          .withValues(
+                                            alpha: 0.12,
+                                          ), // テーマのアイコン色を薄く反映
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.analytics,
+                                      color: Provider.of<ThemeSettings>(
+                                        context,
+                                      ).iconColor,
+                                      size: 24,
+                                    ),
                                   ),
-                                ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      '豆の種類ごとに平均焙煎時間を表示',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontColor1,
+                                        fontFamily: Provider.of<ThemeSettings>(
+                                          context,
+                                        ).fontFamily,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 24),
                           ...beanNames.map((bean) {
                             final beanRecords = beanGroups[bean]!;
                             // (重さ,煎り度)ごとにグループ化
@@ -248,10 +253,11 @@ class RoastAnalysisPage extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 8,
-                                      horizontal: 4,
+                                      horizontal: 8,
                                     ),
                                     child: Text(
                                       '$weight g',
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Provider.of<ThemeSettings>(
                                           context,
@@ -265,10 +271,11 @@ class RoastAnalysisPage extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 8,
-                                      horizontal: 4,
+                                      horizontal: 8,
                                     ),
                                     child: Text(
                                       roast,
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Provider.of<ThemeSettings>(
                                           context,
@@ -282,12 +289,13 @@ class RoastAnalysisPage extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 8,
-                                      horizontal: 4,
+                                      horizontal: 8,
                                     ),
                                     child: Text(
                                       times.isNotEmpty
                                           ? _formatSeconds(avgSec)
                                           : '-',
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Provider.of<ThemeSettings>(
@@ -302,10 +310,11 @@ class RoastAnalysisPage extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 8,
-                                      horizontal: 4,
+                                      horizontal: 8,
                                     ),
                                     child: Text(
                                       '${entry.value.length}件',
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Provider.of<ThemeSettings>(
                                           context,
@@ -320,220 +329,324 @@ class RoastAnalysisPage extends StatelessWidget {
                               );
                             }).toList();
 
-                            return Card(
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              color: Provider.of<ThemeSettings>(
-                                context,
-                              ).cardBackgroundColor,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    BeanNameWithSticker(
-                                      beanName: bean,
-                                      textStyle: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Provider.of<ThemeSettings>(
-                                          context,
-                                        ).fontColor1,
-                                        fontFamily: Provider.of<ThemeSettings>(
-                                          context,
-                                        ).fontFamily,
-                                      ),
-                                      stickerSize: 20.0,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Table(
-                                      border: TableBorder.all(
-                                        color: Provider.of<ThemeSettings>(
-                                          context,
-                                        ).fontColor1.withValues(alpha: 0.2),
-                                        width: 1,
-                                      ),
-                                      columnWidths: {
-                                        0: FlexColumnWidth(
-                                          colFlex[0].toDouble(),
-                                        ),
-                                        1: FlexColumnWidth(
-                                          colFlex[1].toDouble(),
-                                        ),
-                                        2: FlexColumnWidth(
-                                          colFlex[2].toDouble(),
-                                        ),
-                                        3: FlexColumnWidth(
-                                          colFlex[3].toDouble(),
-                                        ),
-                                      },
-                                      defaultVerticalAlignment:
-                                          TableCellVerticalAlignment.middle,
+                            return Center(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(maxWidth: 700),
+                                child: Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  color: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).cardBackgroundColor,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        TableRow(
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 10,
-                                                horizontal: 4,
-                                              ),
-                                              child: Text(
-                                                '重さ',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Provider.of<ThemeSettings>(
-                                                    context,
-                                                  ).fontColor1,
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      Provider.of<
-                                                            ThemeSettings
-                                                          >(context)
-                                                          .fontFamily,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 10,
-                                                horizontal: 4,
-                                              ),
-                                              child: Text(
-                                                '煎り度',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Provider.of<ThemeSettings>(
-                                                    context,
-                                                  ).fontColor1,
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      Provider.of<
-                                                            ThemeSettings
-                                                          >(context)
-                                                          .fontFamily,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 10,
-                                                horizontal: 4,
-                                              ),
-                                              child: Text(
-                                                '平均時間',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Provider.of<ThemeSettings>(
-                                                    context,
-                                                  ).fontColor1,
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      Provider.of<
-                                                            ThemeSettings
-                                                          >(context)
-                                                          .fontFamily,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 10,
-                                                horizontal: 4,
-                                              ),
-                                              child: Text(
-                                                '件数',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Provider.of<ThemeSettings>(
-                                                    context,
-                                                  ).fontColor1,
-                                                  fontSize: 15,
-                                                  fontFamily:
-                                                      Provider.of<
-                                                            ThemeSettings
-                                                          >(context)
-                                                          .fontFamily,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                        BeanNameWithSticker(
+                                          beanName: bean,
+                                          textStyle: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Provider.of<ThemeSettings>(
+                                              context,
+                                            ).fontColor1,
+                                            fontFamily: Provider.of<ThemeSettings>(
+                                              context,
+                                            ).fontFamily,
+                                          ),
+                                          stickerSize: 20.0,
                                         ),
-                                        ...rows,
+                                        const SizedBox(height: 16),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Table(
+                                            border: TableBorder(
+                                              top: BorderSide(
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1.withValues(alpha: 0.2),
+                                                width: 1,
+                                              ),
+                                              bottom: BorderSide(
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1.withValues(alpha: 0.2),
+                                                width: 1,
+                                              ),
+                                              left: BorderSide(
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1.withValues(alpha: 0.2),
+                                                width: 1,
+                                              ),
+                                              right: BorderSide(
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1.withValues(alpha: 0.2),
+                                                width: 1,
+                                              ),
+                                              horizontalInside: BorderSide(
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1.withValues(alpha: 0.1),
+                                                width: 0.5,
+                                              ),
+                                              verticalInside: BorderSide(
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1.withValues(alpha: 0.1),
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                          columnWidths: {
+                                            0: FlexColumnWidth(
+                                              colFlex[0].toDouble(),
+                                            ),
+                                            1: FlexColumnWidth(
+                                              colFlex[1].toDouble(),
+                                            ),
+                                            2: FlexColumnWidth(
+                                              colFlex[2].toDouble(),
+                                            ),
+                                            3: FlexColumnWidth(
+                                              colFlex[3].toDouble(),
+                                            ),
+                                          },
+                                          defaultVerticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          children: [
+                                            TableRow(
+                                              decoration: BoxDecoration(
+                                                color: Provider.of<ThemeSettings>(context).appBarColor.withValues(alpha: 0.15),
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(8),
+                                                  topRight: Radius.circular(8),
+                                                ),
+                                              ),
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 4,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.scale,
+                                                        size: 16,
+                                                        color: Provider.of<ThemeSettings>(
+                                                          context,
+                                                        ).fontColor1,
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        '重さ',
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Provider.of<ThemeSettings>(
+                                                            context,
+                                                          ).fontColor1,
+                                                          fontSize: 15,
+                                                          fontFamily:
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontFamily,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 4,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.local_fire_department,
+                                                        size: 16,
+                                                        color: Provider.of<ThemeSettings>(
+                                                          context,
+                                                        ).fontColor1,
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        '煎り度',
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Provider.of<ThemeSettings>(
+                                                            context,
+                                                          ).fontColor1,
+                                                          fontSize: 15,
+                                                          fontFamily:
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontFamily,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 4,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.timer,
+                                                        size: 16,
+                                                        color: Provider.of<ThemeSettings>(
+                                                          context,
+                                                        ).fontColor1,
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        '平均時間',
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Provider.of<ThemeSettings>(
+                                                            context,
+                                                          ).fontColor1,
+                                                          fontSize: 15,
+                                                          fontFamily:
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontFamily,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 4,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.format_list_numbered,
+                                                        size: 16,
+                                                        color: Provider.of<ThemeSettings>(
+                                                          context,
+                                                        ).fontColor1,
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        '件数',
+                                                        style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Provider.of<ThemeSettings>(
+                                                            context,
+                                                          ).fontColor1,
+                                                          fontSize: 15,
+                                                          fontFamily:
+                                                              Provider.of<
+                                                                    ThemeSettings
+                                                                  >(context)
+                                                                  .fontFamily,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            ...rows,
+                                          ],
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             );
                           }),
                           const SizedBox(height: 24),
                           // おすすめ焙煎タイマーについての説明
-                          Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            color: Provider.of<ThemeSettings>(
-                              context,
-                            ).cardBackgroundColor,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Color(
-                                        0xFFFF8225,
-                                      ).withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      Icons.recommend,
-                                      color: Color(0xFFFF8225),
-                                      size: 20,
-                                    ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'おすすめ焙煎タイマー',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Provider.of<ThemeSettings>(
-                                              context,
-                                            ).fontColor1,
-                                            fontFamily:
-                                                Provider.of<ThemeSettings>(
-                                                  context,
-                                                ).fontFamily,
-                                          ),
+                          Center(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 700),
+                              child: Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).cardBackgroundColor,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Color(
+                                            0xFFFF8225,
+                                          ).withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          '同じ焙煎記録が2件以上あると、おすすめの焙煎時間を提案できるようになります。たくさん記録を集めましょう！',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Provider.of<ThemeSettings>(
-                                              context,
-                                            ).fontColor1.withValues(alpha: 0.8),
-                                            fontFamily:
-                                                Provider.of<ThemeSettings>(
-                                                  context,
-                                                ).fontFamily,
-                                          ),
+                                        child: Icon(
+                                          Icons.recommend,
+                                          color: Color(0xFFFF8225),
+                                          size: 20,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'おすすめ焙煎タイマー',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1,
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
+                                              ),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Text(
+                                              '同じ焙煎記録が2件以上あると、おすすめの焙煎時間を提案できるようになります。たくさん記録を集めましょう！',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Provider.of<ThemeSettings>(
+                                                  context,
+                                                ).fontColor1.withValues(alpha: 0.8),
+                                                fontFamily:
+                                                    Provider.of<ThemeSettings>(
+                                                      context,
+                                                    ).fontFamily,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),

@@ -50,6 +50,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   Timer? shuffleTimer;
   String? _lastShuffledDate; // 最後にシャッフルした日付（YYYY-MM-DD形式）
   Timer? _dateCheckTimer; // 日付変更を監視するタイマー
+  bool _hasPendingAssignmentChanges = false;
+  Timer? _assignmentPersistDebouncer;
 
   // 出勤退勤機能用
   List<AttendanceRecord> _todayAttendance = [];
@@ -965,8 +967,24 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       teams = updatedTeams;
     });
 
-    // 担当表履歴に保存
+    _hasPendingAssignmentChanges = true;
+
+    _scheduleAssignmentPersistence();
+  }
+
+  Future<void> _persistAssignmentsIfDirty() async {
+    if (!mounted || !_hasPendingAssignmentChanges) return;
+
+    _hasPendingAssignmentChanges = false;
     await _saveAssignmentHistory();
+  }
+
+  void _scheduleAssignmentPersistence() {
+    _assignmentPersistDebouncer?.cancel();
+    _assignmentPersistDebouncer = Timer(const Duration(seconds: 2), () async {
+      if (!mounted) return;
+      await _persistAssignmentsIfDirty();
+    });
   }
 
   /// 担当表履歴を保存
@@ -2458,6 +2476,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
   void dispose() {
     shuffleTimer?.cancel();
     _dateCheckTimer?.cancel();
+    _assignmentPersistDebouncer?.cancel();
+    _assignmentPersistDebouncer = null;
     _groupAssignmentSubscription?.cancel();
     _groupSettingsSubscription?.cancel();
     _groupTodayAssignmentSubscription?.cancel();

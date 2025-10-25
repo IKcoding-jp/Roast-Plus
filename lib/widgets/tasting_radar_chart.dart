@@ -31,38 +31,38 @@ class TastingRadarChart extends StatefulWidget {
 
   /// 評価値（1-5）に応じてグラデーションカラーを返す
   static Color getColorForValue(double value) {
-    // 1.0-2.0: 青系
+    // 1.0-2.0: ライトブラウン → ミディアムブラウン
     if (value <= 2.0) {
       final t = (value - 1.0) / 1.0;
       return Color.lerp(
-        const Color(0xFF2196F3), // 青
-        const Color(0xFF4CAF50), // 緑
+        const Color(0xFFD4A574), // ライトブラウン
+        const Color(0xFFA67C52), // ミディアムブラウン
         t,
       )!;
     }
-    // 2.0-3.0: 緑→黄
+    // 2.0-3.0: ミディアムブラウン → ブラウン
     if (value <= 3.0) {
       final t = (value - 2.0) / 1.0;
       return Color.lerp(
-        const Color(0xFF4CAF50), // 緑
-        const Color(0xFFFFEB3B), // 黄
+        const Color(0xFFA67C52), // ミディアムブラウン
+        const Color(0xFF8B5A3C), // ブラウン
         t,
       )!;
     }
-    // 3.0-4.0: 黄→オレンジ
+    // 3.0-4.0: ブラウン → コーヒーブラウン
     if (value <= 4.0) {
       final t = (value - 3.0) / 1.0;
       return Color.lerp(
-        const Color(0xFFFFEB3B), // 黄
-        const Color(0xFFFF9800), // オレンジ
+        const Color(0xFF8B5A3C), // ブラウン
+        const Color(0xFF6F4E37), // コーヒーブラウン
         t,
       )!;
     }
-    // 4.0-5.0: オレンジ→赤
+    // 4.0-5.0: コーヒーブラウン → エスプレッソ
     final t = (value - 4.0) / 1.0;
     return Color.lerp(
-      const Color(0xFFFF9800), // オレンジ
-      const Color(0xFFF44336), // 赤
+      const Color(0xFF6F4E37), // コーヒーブラウン
+      const Color(0xFF3E2723), // エスプレッソ
       t,
     )!;
   }

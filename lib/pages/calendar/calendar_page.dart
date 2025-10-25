@@ -2178,9 +2178,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
     if (confirmed == true) {
       try {
-        await AssignmentFirestoreService.deleteAllAssignmentHistory(
-          dateKey: DateFormat('yyyy-MM-dd').format(_selectedDate),
-        );
+        await AssignmentFirestoreService.deleteAllAssignmentHistory();
 
         if (mounted) {
           setState(() {

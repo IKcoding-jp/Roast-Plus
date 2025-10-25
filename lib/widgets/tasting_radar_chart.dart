@@ -121,6 +121,35 @@ class _TastingRadarChartState extends State<TastingRadarChart>
               child: RadarChart(
                 RadarChartData(
                   dataSets: [
+                    // 基準となる0-5のスケールを固定するためのデータセット（非表示）
+                    RadarDataSet(
+                      fillColor: Colors.transparent,
+                      borderColor: Colors.transparent,
+                      entryRadius: 0,
+                      dataEntries: [
+                        RadarEntry(value: 0.0), // 中心を0に固定
+                        RadarEntry(value: 0.0),
+                        RadarEntry(value: 0.0),
+                        RadarEntry(value: 0.0),
+                        RadarEntry(value: 0.0),
+                      ],
+                      borderWidth: 0,
+                    ),
+                    // 基準となる5のスケールを固定するためのデータセット（非表示）
+                    RadarDataSet(
+                      fillColor: Colors.transparent,
+                      borderColor: Colors.transparent,
+                      entryRadius: 0,
+                      dataEntries: [
+                        RadarEntry(value: 5.0), // 外周を5に固定
+                        RadarEntry(value: 5.0),
+                        RadarEntry(value: 5.0),
+                        RadarEntry(value: 5.0),
+                        RadarEntry(value: 5.0),
+                      ],
+                      borderWidth: 0,
+                    ),
+                    // 実際のデータセット
                     RadarDataSet(
                       fillColor: TastingRadarChart.getColorForValue(
                         (widget.acidity +

@@ -976,6 +976,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     if (!mounted || !_hasPendingAssignmentChanges) return;
 
     _hasPendingAssignmentChanges = false;
+
+    // ローカルSettings と Firestoreの両方を更新
+    await _updateLocalData();
     await _saveAssignmentHistory();
   }
 
@@ -1669,7 +1672,16 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
     // 最後のシャッフル日付が今日と異なれば許可
     final today = _todayKey();
-    if (_lastShuffledDate == null || _lastShuffledDate != today) return true;
+
+    // _lastShuffledDate が null の場合、Firestore から最新情報を確認
+    // これはアプリ再起動後に状態が失われるのを防ぐ
+    if (_lastShuffledDate == null) {
+      // Firestoreから読み込む必要があるため、一時的に許可しない
+      // ただし、isAssignedToday が true の場合は、すでに今日シャッフルされている可能性が高い
+      return false;
+    }
+
+    if (_lastShuffledDate != today) return true;
 
     // それ以外は不許可
     return false;

@@ -20,6 +20,7 @@ class TastingRecordPage extends StatefulWidget {
 class _TastingRecordPageState extends State<TastingRecordPage> {
   String? _lastGroupId;
   bool _hasInitialized = false;
+  final Set<String> _subscribedSessionIds = {};
 
   @override
   void initState() {
@@ -54,14 +55,27 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
 
     if (groupProvider.hasGroup) {
       final groupId = groupProvider.currentGroup!.id;
+      // グループIDが変更された場合は購読済みセッションをリセット
+      if (_lastGroupId != groupId) {
+        _subscribedSessionIds.clear();
+      }
+
       debugPrint('試飲記録ページ: セッション購読開始 - groupId: $groupId');
       tastingProvider.subscribeGroupTastingSessions(groupId);
 
       // セッション取得後、各セッションのエントリも購読
+      // 購読フラグで、既にロード済みのセッションの重複購読を防ぐ
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        for (final session in tastingProvider.sessions) {
-          debugPrint('試飲記録ページ: エントリ購読開始 - sessionId: ${session.id}');
-          tastingProvider.loadEntries(groupId, session.id);
+        final currentSessions = List<String>.from(
+          tastingProvider.sessions.map((s) => s.id),
+        );
+
+        for (final sessionId in currentSessions) {
+          if (!_subscribedSessionIds.contains(sessionId)) {
+            debugPrint('試飲記録ページ: エントリ購読開始 - sessionId: $sessionId');
+            tastingProvider.loadEntries(groupId, sessionId);
+            _subscribedSessionIds.add(sessionId);
+          }
         }
       });
     } else {

@@ -270,7 +270,21 @@ class _CalendarPageState extends State<CalendarPage> {
           }
         },
         onDelete: () async {
-          await _deleteRoastMemo(memo);
+          try {
+            await _deleteRoastMemo(memo);
+            if (mounted) {
+              Navigator.of(dialogContext).pop();
+              // 削除後、データを再読み込み
+              await _loadRoastScheduleMemos(_selectedDate);
+            }
+          } catch (e) {
+            debugPrint('CalendarPage: メモ削除エラー: $e');
+            if (mounted && dialogContext.mounted) {
+              ScaffoldMessenger.of(
+                dialogContext,
+              ).showSnackBar(SnackBar(content: Text('メモの削除に失敗しました')));
+            }
+          }
         },
       ),
     );

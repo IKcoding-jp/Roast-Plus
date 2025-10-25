@@ -616,15 +616,15 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                 // レーダーチャート（値付き）
                 Center(
                   child: SizedBox(
-                    width: 200,
-                    height: 200,
+                    width: 280,
+                    height: 280,
                     child: TastingRadarChart(
                       acidity: session.avgAcidity,
                       bitterness: session.avgBitterness,
                       body: session.avgBody,
                       sweetness: session.avgSweetness,
                       aroma: session.avgAroma,
-                      size: 200,
+                      size: 280,
                       showLabels: true,
                       showValues: true,
                       theme: themeSettings,

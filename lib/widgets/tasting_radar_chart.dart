@@ -194,7 +194,7 @@ class _TastingRadarChartState extends State<TastingRadarChart>
                       positionPercentageOffset: widget.showValues ? 0.22 : 0.15,
                     );
                   },
-                  tickCount: 4,
+                  tickCount: 5,
                 ),
                 swapAnimationDuration: const Duration(milliseconds: 1500),
               ),

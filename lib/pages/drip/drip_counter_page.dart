@@ -32,7 +32,6 @@ class DripCounterPageState extends State<DripCounterPage>
   late Animation<double> _scaleAnimation;
 
   // 権限チェック用の状態変数
-  bool _canUseDripCounter = true;
   bool _isCheckingPermission = true;
   StreamSubscription<bool>? _permissionSubscription;
 
@@ -96,20 +95,18 @@ class DripCounterPageState extends State<DripCounterPage>
     try {
       final groupProvider = Provider.of<GroupProvider>(context, listen: false);
       if (groupProvider.hasGroup) {
-        final canUse = await PermissionUtils.canCreateDataType(
+        await PermissionUtils.canCreateDataType(
           groupId: groupProvider.currentGroup!.id,
           dataType: 'dripCounter',
         );
         if (mounted) {
           setState(() {
-            _canUseDripCounter = canUse;
             _isCheckingPermission = false;
           });
         }
       } else {
         if (mounted) {
           setState(() {
-            _canUseDripCounter = true;
             _isCheckingPermission = false;
           });
         }
@@ -123,7 +120,6 @@ class DripCounterPageState extends State<DripCounterPage>
       );
       if (mounted) {
         setState(() {
-          _canUseDripCounter = false;
           _isCheckingPermission = false;
         });
       }
@@ -133,7 +129,6 @@ class DripCounterPageState extends State<DripCounterPage>
     Future.delayed(Duration(seconds: 5), () {
       if (mounted && _isCheckingPermission) {
         setState(() {
-          _canUseDripCounter = true; // デフォルトで許可
           _isCheckingPermission = false;
         });
       }
@@ -204,10 +199,9 @@ class DripCounterPageState extends State<DripCounterPage>
       _permissionSubscription = PermissionUtils.listenForPermissionChange(
         groupId: groupProvider.currentGroup!.id,
         dataType: 'dripCounter',
-        onPermissionChange: (canUse) {
+        onPermissionChange: (_) {
           if (mounted) {
             setState(() {
-              _canUseDripCounter = canUse;
               _isCheckingPermission = false;
             });
           }
@@ -217,7 +211,6 @@ class DripCounterPageState extends State<DripCounterPage>
       _permissionSubscription?.cancel();
       if (mounted) {
         setState(() {
-          _canUseDripCounter = true;
           _isCheckingPermission = false;
         });
       }
@@ -248,6 +241,25 @@ class DripCounterPageState extends State<DripCounterPage>
     final themeSettings = Provider.of<ThemeSettings>(context);
     final fontFamily = themeSettings.fontFamily;
 
+    // グラデーション定義
+    final primaryGradient = LinearGradient(
+      colors: [
+        themeSettings.buttonColor,
+        themeSettings.buttonColor.withValues(alpha: 0.8),
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    final cardGradient = LinearGradient(
+      colors: [
+        themeSettings.cardBackgroundColor,
+        themeSettings.cardBackgroundColor.withValues(alpha: 0.95),
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
     return Scaffold(
       backgroundColor: themeSettings.backgroundColor,
       appBar: AppBar(
@@ -273,236 +285,10 @@ class DripCounterPageState extends State<DripCounterPage>
           color: themeSettings.fontColor1,
           fontFamily: fontFamily,
         ),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: kIsWeb ? 680 : double.infinity,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // カウンターカード
-                Card(
-                  margin: EdgeInsets.symmetric(horizontal: kIsWeb ? 24 : 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  color: themeSettings.cardBackgroundColor,
-                  elevation: 6,
-                  child: Padding(
-                    padding: EdgeInsets.all(kIsWeb ? 32 : 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.refresh,
-                              color: themeSettings.iconColor,
-                            ),
-                            tooltip: 'リセット',
-                            onPressed: () => _addToCounter(-_counter),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: () => _showCounterInputDialog(),
-                          child: Text(
-                            _counter.toString(),
-                            style: TextStyle(
-                              fontSize: kIsWeb ? 64 : 48,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: fontFamily,
-                              color: themeSettings.fontColor1,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '袋',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: fontFamily,
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final screenWidth = MediaQuery.sizeOf(
-                              context,
-                            ).width;
-                            final isCompact = screenWidth <= 540;
-                            if (isCompact) {
-                              return _buildCompactButtonGrid(
-                                themeSettings,
-                                constraints.maxWidth,
-                              );
-                            }
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: _createButtons(themeSettings),
-                              ),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 24),
-                        _buildInputs(themeSettings),
-                        SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(Icons.save),
-                            label: Text(
-                              '記録を保存',
-                              style: TextStyle(
-                                fontFamily: fontFamily,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: themeSettings.appButtonColor,
-                              foregroundColor: themeSettings.fontColor2,
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            onPressed: _hasInput ? _addRecord : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        child: kIsWeb
+            ? _buildWebLayout(themeSettings, primaryGradient, cardGradient)
+            : _buildMobileLayout(themeSettings, primaryGradient, cardGradient),
       ),
-    );
-  }
-
-  bool get _hasInput {
-    final bean = _beanController.text.trim();
-    return _counter > 0 && bean.isNotEmpty && _selectedRoast != null;
-  }
-
-  List<Widget> _createButtons(
-    ThemeSettings themeSettings, {
-    double buttonWidth = 72,
-  }) {
-    const increments = [-10, -5, -1, 1, 5, 10];
-    return increments
-        .map(
-          (value) => Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6),
-            child: SizedBox(
-              width: buttonWidth,
-              child: ElevatedButton(
-                onPressed: () => _addToCounter(value),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: themeSettings.buttonColor,
-                  foregroundColor: themeSettings.fontColor2,
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Text(
-                  '${value > 0 ? '+' : ''}$value',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: themeSettings.fontFamily,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        )
-        .toList();
-  }
-
-  Widget _buildCompactButtonGrid(ThemeSettings themeSettings, double maxWidth) {
-    const negativeValues = [-1, -5, -10];
-    const positiveValues = [1, 5, 10];
-    final availableWidth = maxWidth <= 0 ? double.infinity : maxWidth;
-    final buttonWidth = (availableWidth - 64) / 2;
-    final resolvedWidth = buttonWidth.clamp(120.0, 168.0);
-
-    Widget buildColumn(List<int> values) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: values
-            .map(
-              (value) => Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: SizedBox(
-                  width: resolvedWidth,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: () => _addToCounter(value),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: themeSettings.buttonColor,
-                      foregroundColor: themeSettings.fontColor2,
-                      padding: EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      textStyle: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: themeSettings.fontFamily,
-                      ),
-                    ),
-                    child: Text('${value > 0 ? '+' : ''}$value'),
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      );
-    }
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          buildColumn(negativeValues),
-          SizedBox(width: 20),
-          buildColumn(positiveValues),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInputs(ThemeSettings themeSettings) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildLabeledField(
-                themeSettings,
-                label: '豆の種類',
-                icon: Icons.coffee,
-                hintText: '例: ブラジル、コロンビア',
-                controller: _beanController,
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(child: _buildRoastLevelField(themeSettings)),
-          ],
-        ),
-      ],
     );
   }
 
@@ -1196,7 +982,6 @@ class DripCounterPageState extends State<DripCounterPage>
             minSectionHeight,
             double.infinity,
           );
-          final double buttonFont = 28;
 
           return SingleChildScrollView(
             child: Padding(

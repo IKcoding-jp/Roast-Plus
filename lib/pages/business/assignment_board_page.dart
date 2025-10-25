@@ -1024,6 +1024,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
       );
 
       // グループ参加中の場合は同期
+      if (!mounted) return;
       final groupProvider = context.read<GroupProvider>();
       if (groupProvider.hasGroup) {
         final group = groupProvider.currentGroup;

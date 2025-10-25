@@ -402,6 +402,7 @@ class GroupRequiredPage extends StatelessWidget {
 
                         if (success) {
                           // ダイアログを閉じる
+                          if (!context.mounted) return;
                           Navigator.of(context).pop();
 
                           // GroupProviderの状態を明示的に更新
@@ -409,6 +410,7 @@ class GroupRequiredPage extends StatelessWidget {
                           await groupProvider.loadUserGroups();
 
                           // スナックバーを表示
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('グループに参加しました！'),
@@ -420,6 +422,7 @@ class GroupRequiredPage extends StatelessWidget {
                           await Future.delayed(Duration(milliseconds: 500));
 
                           // MainScaffoldに直接遷移（GroupRequiredWrapperを経由しない）
+                          if (!context.mounted) return;
                           Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                               builder: (context) =>
@@ -428,6 +431,7 @@ class GroupRequiredPage extends StatelessWidget {
                             (route) => false,
                           );
                         } else if (!success) {
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('招待コードが無効です'),
@@ -436,6 +440,7 @@ class GroupRequiredPage extends StatelessWidget {
                           );
                         }
                       } catch (e) {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('エラーが発生しました: ${e.toString()}'),

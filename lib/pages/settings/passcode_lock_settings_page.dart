@@ -326,6 +326,7 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
                         // パスコード検証を実行
                         final isValid = await _verifyPasscode(input);
                         if (isValid) {
+                          if (!context.mounted) return;
                           Navigator.pop(context, true);
                         } else {
                           setState(() => error = 'パスコードが違います');
@@ -425,7 +426,7 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
       color: themeSettings.inputTextColor,
     );
     final labelStyle = inputTextStyle.copyWith(
-      color: themeSettings.inputTextColor.withOpacity(0.8),
+      color: themeSettings.inputTextColor.withValues(alpha: 0.8),
     );
     final floatingLabelStyle = labelStyle.copyWith(
       fontWeight: FontWeight.bold,
@@ -434,7 +435,7 @@ class _PasscodeLockSettingsPageState extends State<PasscodeLockSettingsPage> {
     final counterStyle = TextStyle(
       fontFamily: themeSettings.fontFamily,
       fontSize: 12 * themeSettings.fontSizeScale,
-      color: themeSettings.inputTextColor.withOpacity(0.7),
+      color: themeSettings.inputTextColor.withValues(alpha: 0.7),
     );
     if (_isLoading) {
       return Scaffold(

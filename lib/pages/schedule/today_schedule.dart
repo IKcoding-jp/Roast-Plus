@@ -1479,7 +1479,6 @@ class _TodayScheduleState extends State<TodaySchedule>
     List<Widget> widgets = [];
     for (int i = 0; i < _scheduleLabels.length; i++) {
       debugPrint('TodaySchedule: ラベル $i を処理中: ${_scheduleLabels[i]}');
-      final inAnyRange = _arrowRanges.any((r) => r.inRange(i));
       final isRangeStart = _arrowRanges.any((r) => r.isStart(i));
       final isRangeEnd = _arrowRanges.any((r) => r.isEnd(i));
       final isBetweenRange = _arrowRanges.any((r) => r.contains(i));

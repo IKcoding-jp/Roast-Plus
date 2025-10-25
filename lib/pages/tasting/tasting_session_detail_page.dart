@@ -183,6 +183,7 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
             await Future.delayed(Duration(milliseconds: 100));
 
             // 経験値獲得アニメーションを表示
+            if (!mounted) return;
             try {
               AnimationHelper.showExperienceGainAnimation(
                 context,

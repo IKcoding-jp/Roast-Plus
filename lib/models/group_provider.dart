@@ -1431,6 +1431,7 @@ class GroupProvider extends ChangeNotifier {
         if (context != null && context.mounted) {
           // 演出処理を非同期で実行し、タイムアウトを設定
           Future.delayed(Duration(milliseconds: 100), () async {
+            if (!context.mounted) return;
             try {
               await GroupCelebrationHelper.showCompleteCelebration(
                 context,

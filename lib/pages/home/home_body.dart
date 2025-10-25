@@ -650,11 +650,11 @@ class _HomeBodyState extends State<HomeBody> {
   Color _getThemeBasedColor(String sectionType) {
     // デフォルト、ダーク、ライトテーマの場合は従来の固定色を使用
     final isDefaultTheme =
-        widget.themeSettings.appBarColor.value == 0xFF2C1810; // デフォルトテーマの色
+        widget.themeSettings.appBarColor.toARGB32() == 0xFF2C1810; // デフォルトテーマの色
     final isDarkTheme =
-        widget.themeSettings.appBarColor.value == 0xFF121212; // ダークテーマの色
+        widget.themeSettings.appBarColor.toARGB32() == 0xFF121212; // ダークテーマの色
     final isLightTheme =
-        widget.themeSettings.appBarColor.value == 0xFFFAFAFA; // ライトテーマの色
+        widget.themeSettings.appBarColor.toARGB32() == 0xFFFAFAFA; // ライトテーマの色
 
     // デフォルト、ダーク、ライトテーマの場合は従来の固定色を使用
     if (isDefaultTheme || isDarkTheme || isLightTheme) {

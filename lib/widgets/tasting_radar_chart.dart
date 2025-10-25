@@ -196,7 +196,7 @@ class _TastingRadarChartState extends State<TastingRadarChart>
                   },
                   tickCount: 5,
                 ),
-                swapAnimationDuration: const Duration(milliseconds: 1500),
+                duration: const Duration(milliseconds: 1500),
               ),
             ),
           ),

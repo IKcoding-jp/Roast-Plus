@@ -473,19 +473,61 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                                   );
                             }
                           },
-                          style: TextStyle(color: Colors.black),
+                          style: TextStyle(
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1,
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.timer,
-                              color: Color(0xFF795548),
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).iconColor,
                             ),
                             hintText: '分数を入力',
                             filled: true,
                             fillColor: Provider.of<ThemeSettings>(
                               context,
                             ).inputBackgroundColor,
-                            hintStyle: TextStyle(color: Colors.black),
-                            border: InputBorder.none,
+                            hintStyle: TextStyle(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontColor1.withValues(alpha: 0.6),
+                              fontFamily: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontFamily,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).borderColor,
+                                width: 1,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).borderColor,
+                                width: 1,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).appButtonColor,
+                                width: 2,
+                              ),
+                            ),
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 16,
@@ -582,8 +624,12 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: Provider.of<ThemeSettings>(context).borderColor,
+                    width: 1,
+                  ),
                 ),
-                color: Color(0xFFFFF8E1),
+                color: Provider.of<ThemeSettings>(context).cardBackgroundColor,
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
@@ -594,7 +640,10 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C1D17),
+                          color: Provider.of<ThemeSettings>(context).fontColor1,
+                          fontFamily: Provider.of<ThemeSettings>(
+                            context,
+                          ).fontFamily,
                         ),
                       ),
                       SizedBox(height: 24),
@@ -613,6 +662,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                         ),
                         child: DropdownButtonFormField<String>(
                           style: TextStyle(
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1,
                             fontFamily: Provider.of<ThemeSettings>(
                               context,
                             ).fontFamily,
@@ -620,7 +672,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.coffee,
-                              color: Color(0xFF795548),
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).iconColor,
                             ),
                             labelText: '豆の種類',
                             border: InputBorder.none,
@@ -629,6 +683,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                               vertical: 16,
                             ),
                             labelStyle: TextStyle(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontColor1,
                               fontFamily: Provider.of<ThemeSettings>(
                                 context,
                               ).fontFamily,
@@ -676,6 +733,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                         ),
                         child: DropdownButtonFormField<String>(
                           style: TextStyle(
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1,
                             fontFamily: Provider.of<ThemeSettings>(
                               context,
                             ).fontFamily,
@@ -683,7 +743,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.scale,
-                              color: Color(0xFF795548),
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).iconColor,
                             ),
                             labelText: '豆の重さ(g)',
                             border: InputBorder.none,
@@ -692,6 +754,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                               vertical: 16,
                             ),
                             labelStyle: TextStyle(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontColor1,
                               fontFamily: Provider.of<ThemeSettings>(
                                 context,
                               ).fontFamily,
@@ -738,6 +803,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                         ),
                         child: DropdownButtonFormField<String>(
                           style: TextStyle(
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1,
                             fontFamily: Provider.of<ThemeSettings>(
                               context,
                             ).fontFamily,
@@ -745,7 +813,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.local_fire_department,
-                              color: Color(0xFF795548),
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).iconColor,
                             ),
                             labelText: '煎り度',
                             border: InputBorder.none,
@@ -754,6 +824,9 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                               vertical: 16,
                             ),
                             labelStyle: TextStyle(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontColor1,
                               fontFamily: Provider.of<ThemeSettings>(
                                 context,
                               ).fontFamily,
@@ -929,8 +1002,16 @@ class _RoastTimerPageState extends State<RoastTimerPage> {
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF8D6E63),
-                            foregroundColor: Colors.white,
+                            backgroundColor: Provider.of<ThemeSettings>(
+                              context,
+                            ).appButtonColor,
+                            foregroundColor:
+                                Provider.of<ThemeSettings>(
+                                      context,
+                                    ).backgroundColor.computeLuminance() <
+                                    0.5
+                                ? Colors.white
+                                : Colors.black,
                             padding: EdgeInsets.symmetric(vertical: 15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),

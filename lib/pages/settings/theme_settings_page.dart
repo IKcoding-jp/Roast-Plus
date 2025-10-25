@@ -210,16 +210,6 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               'ゴールド',
               'シルバー',
             ], Icons.auto_awesome),
-
-            const SizedBox(height: 16),
-
-            // マルチカラー系テーマ
-            _buildThemeCategory(context, themeSettings, 'マルチカラー 🌈', [
-              'ロマンチック',
-              'おしゃれ',
-              '清潔感',
-              '高級',
-            ], Icons.gradient),
           ],
         ),
       ),

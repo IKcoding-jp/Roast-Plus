@@ -863,8 +863,16 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                         SizedBox(height: kIsWeb ? 32 : 20),
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFFF3EDE7),
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).inputBackgroundColor,
                             borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).borderColor,
+                              width: 1,
+                            ),
                           ),
                           child: TextField(
                             controller: _manualMinuteController,
@@ -884,7 +892,7 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                         ).fontSizeScale,
                               color: Provider.of<ThemeSettings>(
                                 context,
-                              ).inputTextColor,
+                              ).fontColor1,
                               fontFamily: Provider.of<ThemeSettings>(
                                 context,
                               ).fontFamily,
@@ -900,7 +908,7 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                               labelStyle: TextStyle(
                                 color: Provider.of<ThemeSettings>(
                                   context,
-                                ).inputTextColor,
+                                ).fontColor1,
                                 fontFamily: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontFamily,
@@ -913,7 +921,33 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                   context,
                                 ).fontFamily,
                               ),
-                              border: InputBorder.none,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).borderColor,
+                                  width: 1,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).borderColor,
+                                  width: 1,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Provider.of<ThemeSettings>(
+                                    context,
+                                  ).appButtonColor,
+                                  width: 2,
+                                ),
+                              ),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 14,
                                 vertical: kIsWeb ? 16 : 12,
@@ -1014,28 +1048,16 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                             label: Text('最初の画面に戻る'),
                             style: OutlinedButton.styleFrom(
                               foregroundColor:
-                                  Theme.of(context).brightness ==
-                                          Brightness.dark ||
-                                      Provider.of<ThemeSettings>(
-                                            context,
-                                          ).backgroundColor.computeLuminance() <
-                                          0.2
-                                  ? Colors.white
-                                  : Provider.of<ThemeSettings>(
-                                      context,
-                                    ).appButtonColor,
-                              side: BorderSide(
-                                color:
-                                    Theme.of(context).brightness ==
-                                            Brightness.dark ||
-                                        Provider.of<ThemeSettings>(context)
-                                                .backgroundColor
-                                                .computeLuminance() <
-                                            0.2
-                                    ? Colors.white
-                                    : Provider.of<ThemeSettings>(
+                                  Provider.of<ThemeSettings>(
                                         context,
-                                      ).appButtonColor,
+                                      ).backgroundColor.computeLuminance() <
+                                      0.5
+                                  ? Colors.white
+                                  : Colors.black,
+                              side: BorderSide(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).appButtonColor,
                               ),
                               padding: EdgeInsets.symmetric(vertical: 15),
                               textStyle: TextStyle(
@@ -1104,6 +1126,10 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                   elevation: 8,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: Provider.of<ThemeSettings>(context).borderColor,
+                      width: 1,
+                    ),
                   ),
                   color: Provider.of<ThemeSettings>(
                     context,
@@ -1153,12 +1179,18 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 vertical: 16,
                               ),
                               labelStyle: TextStyle(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontColor1,
                                 fontFamily: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontFamily,
                               ),
                             ),
                             style: TextStyle(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontColor1,
                               fontFamily: Provider.of<ThemeSettings>(
                                 context,
                               ).fontFamily,
@@ -1216,12 +1248,18 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 vertical: 16,
                               ),
                               labelStyle: TextStyle(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontColor1,
                                 fontFamily: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontFamily,
                               ),
                             ),
                             style: TextStyle(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontColor1,
                               fontFamily: Provider.of<ThemeSettings>(
                                 context,
                               ).fontFamily,
@@ -1278,12 +1316,18 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 vertical: 16,
                               ),
                               labelStyle: TextStyle(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).fontColor1,
                                 fontFamily: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontFamily,
                               ),
                             ),
                             style: TextStyle(
+                              color: Provider.of<ThemeSettings>(
+                                context,
+                              ).fontColor1,
                               fontFamily: Provider.of<ThemeSettings>(
                                 context,
                               ).fontFamily,
@@ -1477,6 +1521,20 @@ class _RoastTimerPageState extends State<RoastTimerPage>
                                 fontFamily: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontFamily,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor:
+                                  Provider.of<ThemeSettings>(
+                                        context,
+                                      ).backgroundColor.computeLuminance() <
+                                      0.5
+                                  ? Colors.white
+                                  : Colors.black,
+                              side: BorderSide(
+                                color: Provider.of<ThemeSettings>(
+                                  context,
+                                ).appButtonColor,
                               ),
                             ),
                           ),

@@ -83,8 +83,11 @@ class PermissionDeniedPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: onBackPressed ?? () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: themeSettings.buttonColor,
-                  foregroundColor: themeSettings.fontColor2,
+                  backgroundColor: themeSettings.appButtonColor,
+                  foregroundColor:
+                      themeSettings.backgroundColor.computeLuminance() < 0.5
+                      ? Colors.white
+                      : Colors.black,
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 ),
                 child: Text(

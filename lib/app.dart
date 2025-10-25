@@ -8,6 +8,7 @@ import 'package:roastplus/pages/drip/drip_counter_page.dart';
 import 'package:roastplus/pages/schedule/schedule_page.dart';
 import 'pages/home/home_page.dart';
 import 'pages/gamification/badge_list_page.dart';
+import 'pages/gamification/handpick_game_page.dart';
 import 'services/sync_firestore_all.dart';
 import 'services/todo_notification_service.dart';
 import 'services/secure_auth_service.dart';
@@ -325,6 +326,7 @@ class _WorkAssignmentAppState extends State<WorkAssignmentApp> {
             '/group': (context) => GroupListPage(),
             '/group_info': (context) => GroupInfoPage(),
             '/badges': (context) => BadgeListPage(),
+            '/handpick_game': (context) => HandpickGamePage(),
             '/help': (context) => UsageGuidePage(),
             '/settings': (context) => AppSettingsPage(),
             '/assignment_board': (context) => AssignmentBoard(),

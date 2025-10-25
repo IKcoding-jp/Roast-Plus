@@ -570,6 +570,13 @@ class _HomeBodyState extends State<HomeBody> {
         onTap: () => Navigator.pushNamed(context, '/badges'),
         customColor: growthColor,
       ),
+      HomeFeatureCard(
+        themeSettings: widget.themeSettings,
+        title: 'ハンドピックゲーム',
+        icon: Icons.casino,
+        onTap: () => Navigator.pushNamed(context, '/handpick_game'),
+        customColor: growthColor,
+      ),
     ];
   }
 

@@ -344,6 +344,50 @@ class GroupGamificationService {
     }
   }
 
+  /// ハンドピックゲーム記録の経験値を追加
+  static Future<GroupActivityResult> recordHandpickGame(
+    String groupId,
+    int accuracy,
+    int timeTaken,
+  ) async {
+    if (_uid == null) throw Exception('未ログイン');
+    if (accuracy < 0 || accuracy > 100) {
+      return GroupActivityResult(
+        success: false,
+        message: '正確度が不正です',
+        levelUp: false,
+        newBadges: [],
+        experienceGained: 0,
+        newLevel: 0,
+      );
+    }
+    if (timeTaken < 0) {
+      return GroupActivityResult(
+        success: false,
+        message: '時間が不正です',
+        levelUp: false,
+        newBadges: [],
+        experienceGained: 0,
+        newLevel: 0,
+      );
+    }
+
+    try {
+      final reward = GroupActivityReward.handpickGame(accuracy, timeTaken);
+      return await _addExperienceAndUpdateProfile(groupId, reward);
+    } catch (e) {
+      _logger.e('ハンドピックゲーム記録エラー: $e');
+      return GroupActivityResult(
+        success: false,
+        message: 'ハンドピックゲーム記録に失敗しました',
+        levelUp: false,
+        newBadges: [],
+        experienceGained: 0,
+        newLevel: 0,
+      );
+    }
+  }
+
   /// 経験値を追加してプロフィールを更新する共通メソッド
   static Future<GroupActivityResult> _addExperienceAndUpdateProfile(
     String groupId,

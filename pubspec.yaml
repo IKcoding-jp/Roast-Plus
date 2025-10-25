@@ -34,6 +34,7 @@ dependencies:
   flutter_layout_grid: ^2.0.0
   crypto: ^3.0.3
   web: ^1.1.0
+  flame: ^1.20.0
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +53,7 @@ flutter:
     - assets/fonts/
     - assets/animations/
     - assets/launcher_icon/icon.jpeg
+    - assets/images/beans/
   fonts:
     - family: ZenMaruGothic
       fonts:

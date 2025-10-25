@@ -1673,15 +1673,8 @@ class AssignmentBoardState extends State<AssignmentBoard> {
     // 最後のシャッフル日付が今日と異なれば許可
     final today = _todayKey();
 
-    // _lastShuffledDate が null の場合、Firestore から最新情報を確認
-    // これはアプリ再起動後に状態が失われるのを防ぐ
-    if (_lastShuffledDate == null) {
-      // Firestoreから読み込む必要があるため、一時的に許可しない
-      // ただし、isAssignedToday が true の場合は、すでに今日シャッフルされている可能性が高い
-      return false;
-    }
-
-    if (_lastShuffledDate != today) return true;
+    // _lastShuffledDate が null または今日と異なる場合は許可
+    if (_lastShuffledDate == null || _lastShuffledDate != today) return true;
 
     // それ以外は不許可
     return false;
@@ -2212,7 +2205,11 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                 shuffledMembers[i].shuffle(Random());
               }
             } else {
-              // 局所改善：現在の最良配置から1-2列のみをシャッフル
+              // 局所改善：最良配置から1-2列のみをシャッフル
+              // 最良配置をコピーして開始
+              for (int i = 0; i < shuffledMembers.length; i++) {
+                shuffledMembers[i] = List.from(bestShuffledMembers[i]);
+              }
               final numColumnsToShuffle = random.nextInt(2) + 1; // 1-2列をシャッフル
               final columnsToShuffle = <int>{};
               while (columnsToShuffle.length < numColumnsToShuffle) {

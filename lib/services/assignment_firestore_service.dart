@@ -242,17 +242,23 @@ class AssignmentFirestoreService {
         .delete();
   }
 
-  /// 指定した日付の担当履歴をすべて削除
-  static Future<void> deleteAllAssignmentHistory({
-    required String dateKey,
-  }) async {
+  /// 担当履歴のすべてを削除
+  static Future<void> deleteAllAssignmentHistory() async {
     if (_uid == null) throw Exception('未ログイン');
-    await _firestore
+
+    // すべての履歴ドキュメントを取得
+    final snapshot = await _firestore
         .collection('users')
         .doc(_uid)
         .collection('assignmentHistory')
-        .doc(dateKey)
-        .delete();
+        .get();
+
+    // 一括削除を実行
+    final batch = _firestore.batch();
+    for (final doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
   }
 
   /// 担当履歴を全件取得

@@ -633,6 +633,27 @@ class TastingProvider extends ChangeNotifier {
     }
   }
 
+  /// グループセッションの購読をすべてクリア
+  /// グループ変更時にメモリリークを防ぐため、古い購読を停止
+  void unsubscribeGroupSessions() {
+    debugPrint('TastingProvider: グループセッション購読を完全にクリア');
+
+    // セッション購読の停止
+    _sessionsSub?.cancel();
+    _sessionsSub = null;
+
+    // すべてのエントリ購読を停止
+    for (final sub in _entriesSubs.values) {
+      sub.cancel();
+    }
+    _entriesSubs.clear();
+    _entriesBySession.clear();
+
+    // セッション一覧もクリア
+    _sessions = [];
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _sessionsSub?.cancel();

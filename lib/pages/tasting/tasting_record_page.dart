@@ -55,8 +55,11 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
 
     if (groupProvider.hasGroup) {
       final groupId = groupProvider.currentGroup!.id;
-      // グループIDが変更された場合は購読済みセッションをリセット
-      if (_lastGroupId != groupId) {
+
+      // グループIDが変更された場合は古い購読をクリア
+      if (_lastGroupId != groupId && _lastGroupId != null) {
+        debugPrint('試飲記録ページ: グループ変更を検出 - 古い購読をクリア');
+        tastingProvider.unsubscribeGroupSessions();
         _subscribedSessionIds.clear();
       }
 
@@ -80,6 +83,13 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
       });
     } else {
       debugPrint('試飲記録ページ: グループが選択されていないため、個人記録を読み込み');
+
+      // グループから個人記録へ切り替わった場合は、グループ購読をクリア
+      if (_lastGroupId != null) {
+        tastingProvider.unsubscribeGroupSessions();
+        _subscribedSessionIds.clear();
+      }
+
       tastingProvider.subscribeTastingRecords();
     }
     _hasInitialized = true;

@@ -133,13 +133,18 @@ class _TodayScheduleState extends State<TodaySchedule>
       final previousSchedule = await schedule_service
           .ScheduleFirestoreService.loadTodoScheduleForDate(previousDay);
 
-      // 前日のスケジュールが存在する場合、そのまま保存（履歴として保持）
-      // 前日と同じ内容であれば保存しないようにする場合はここで比較ロジックを追加
+      // 前日のスケジュールが存在する場合、履歴として保存
       if (previousSchedule != null &&
           (previousSchedule['labels'] as List?)?.isNotEmpty == true) {
         debugPrint('TodaySchedule: 前日のスケジュールを履歴として保存: $previousDay');
-        // 前日のスケジュールは既にFirestoreに保存されているため、追加の保存は不要
-        // 必要に応じて、アーカイブコレクションへの移動やタイムスタンプの更新を行う
+
+        // 前日のスケジュールを scheduleHistory コレクションに保存
+        await schedule_service.ScheduleFirestoreService.saveScheduleToHistory(
+          date: previousDay,
+          scheduleData: previousSchedule,
+        );
+
+        debugPrint('TodaySchedule: 前日のスケジュールを履歴コレクションに保存完了');
       }
 
       // 今日の日付を更新

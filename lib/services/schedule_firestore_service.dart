@@ -107,6 +107,26 @@ class ScheduleFirestoreService {
     await AutoSyncService.triggerAutoSyncForDataType('today_schedule');
   }
 
+  /// 指定した日付のスケジュール（ラベル・内容）をアーカイブとして保存
+  /// 前日のスケジュールをhistoryコレクションに記録
+  static Future<void> saveScheduleToHistory({
+    required DateTime date,
+    required Map<String, dynamic> scheduleData,
+  }) async {
+    if (_uid == null) throw Exception('未ログイン');
+    final docId =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+    await _firestore
+        .collection('users')
+        .doc(_uid)
+        .collection('scheduleHistory')
+        .doc(docId)
+        .set({...scheduleData, 'archivedAt': FieldValue.serverTimestamp()});
+    // 自動同期を実行
+    await AutoSyncService.triggerAutoSyncForDataType('schedule_history');
+  }
+
   /// 本日のローストスケジュールを取得
   static Future<Map<String, dynamic>?> loadTodaySchedule() async {
     if (_uid == null) throw Exception('未ログイン');

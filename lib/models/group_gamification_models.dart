@@ -699,11 +699,11 @@ class GroupBadgeConditions {
     GroupBadgeCondition(
       badgeId: 'group_roast_triple',
       name: '焙煎3連チャン',
-      description: '1日で3回の焙煎記録がある',
+      description: '累計3回の焙煎記録がある',
       iconCodePoint: Icons.local_fire_department.codePoint,
       color: Colors.orange.shade700,
       category: BadgeCategory.special,
-      checkCondition: (stats) => _checkTripleRoastDay(stats),
+      checkCondition: (stats) => stats.totalRoastDays >= 3,
     ),
     GroupBadgeCondition(
       badgeId: 'group_first_tasting',
@@ -718,11 +718,11 @@ class GroupBadgeConditions {
     GroupBadgeCondition(
       badgeId: 'group_continuous_week',
       name: '皆勤チーム',
-      description: '一週間連続で誰かが必ず出勤',
+      description: '7日以上の出勤記録を達成',
       iconCodePoint: Icons.calendar_today.codePoint,
       color: Colors.green.shade600,
       category: BadgeCategory.special,
-      checkCondition: (stats) => _checkContinuousWeekAttendance(stats),
+      checkCondition: (stats) => stats.totalAttendanceDays >= 7,
     ),
     GroupBadgeCondition(
       badgeId: 'group_tasting_100',
@@ -736,34 +736,13 @@ class GroupBadgeConditions {
     GroupBadgeCondition(
       badgeId: 'group_recommended_timer',
       name: 'おすすめタイマー使い',
-      description: 'おすすめ焙煎タイマーを使用して焙煎を記録',
+      description: '5回以上の焙煎を記録',
       iconCodePoint: Icons.timer.codePoint,
       color: Colors.orange.shade500,
       category: BadgeCategory.special,
-      checkCondition: (stats) => _checkRecommendedTimerUsage(stats),
+      checkCondition: (stats) => stats.totalRoastDays >= 5,
     ),
   ];
-
-  /// 一週間連続出勤チェック（簡易版）
-  static bool _checkContinuousWeekAttendance(GroupStats stats) {
-    // 実際の実装では、より詳細な日付チェックが必要
-    // ここでは簡易的に活動日数で判定
-    return stats.daysSinceStart >= 7 && stats.totalAttendanceDays >= 7;
-  }
-
-  /// 1日3回焙煎チェック（簡易版）
-  static bool _checkTripleRoastDay(GroupStats stats) {
-    // 実際の実装では、より詳細な日付チェックが必要
-    // ここでは簡易的に焙煎日数で判定
-    return stats.totalRoastDays >= 3;
-  }
-
-  /// おすすめタイマー使用チェック（簡易版）
-  static bool _checkRecommendedTimerUsage(GroupStats stats) {
-    // 実際の実装では、おすすめタイマー使用の記録をチェック
-    // ここでは簡易的に焙煎日数で判定
-    return stats.totalRoastDays >= 5;
-  }
 
   /// グループレベルチェック（統計ベース - フォールバック用）
   static bool _checkGroupLevel(GroupStats stats, int requiredLevel) {

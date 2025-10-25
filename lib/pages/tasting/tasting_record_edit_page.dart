@@ -337,8 +337,13 @@ class _TastingRecordEditPageState extends State<TastingRecordEditPage> {
         messenger.showSnackBar(SnackBar(content: Text('試飲感想記録を更新しました')));
       } else {
         await tastingProvider.addTastingRecord(tastingRecord, groupId: groupId);
-        // グループレベルシステムで試飲記録を処理
-        await _processTastingForGroup();
+        // グループレベルシステムで試飲記録を処理（タイムアウト保護付き）
+        await _processTastingForGroup().timeout(
+          Duration(seconds: 20),
+          onTimeout: () {
+            debugPrint('試飲記録処理がタイムアウトしました');
+          },
+        );
         if (!mounted) return;
         messenger.showSnackBar(
           SnackBar(
@@ -366,8 +371,15 @@ class _TastingRecordEditPageState extends State<TastingRecordEditPage> {
       if (groupProvider.hasGroup) {
         final groupId = groupProvider.currentGroup!.id;
 
-        // グループのゲーミフィケーションシステムに通知
-        await groupProvider.processGroupTasting(groupId, context: context);
+        // グループのゲーミフィケーションシステムに通知（タイムアウト保護付き）
+        await groupProvider
+            .processGroupTasting(groupId, context: context)
+            .timeout(
+              Duration(seconds: 15),
+              onTimeout: () {
+                debugPrint('グループテイスティング処理がタイムアウトしました');
+              },
+            );
       }
     } catch (e) {
       debugPrint('グループレベルシステム処理エラー: $e');

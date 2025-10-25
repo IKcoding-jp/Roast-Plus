@@ -1427,14 +1427,26 @@ class GroupProvider extends ChangeNotifier {
         _groupGamificationProfiles[groupId] = profile;
         _safeNotifyListeners();
 
-        // 演出を表示（contextが提供されている場合）
+        // 演出を非同期で表示（メイン処理をブロックしない）
         if (context != null && context.mounted) {
-          await GroupCelebrationHelper.showCompleteCelebration(
-            context,
-            xpGained: result.experienceGained,
-            newLevel: result.levelUp ? result.newLevel : null,
-            newBadges: result.newBadges,
-          );
+          // 演出処理を非同期で実行し、タイムアウトを設定
+          Future.delayed(Duration(milliseconds: 100), () async {
+            try {
+              await GroupCelebrationHelper.showCompleteCelebration(
+                context,
+                xpGained: result.experienceGained,
+                newLevel: result.levelUp ? result.newLevel : null,
+                newBadges: result.newBadges,
+              ).timeout(
+                Duration(seconds: 10),
+                onTimeout: () {
+                  debugPrint('演出表示がタイムアウトしました');
+                },
+              );
+            } catch (e) {
+              debugPrint('演出表示エラー: $e');
+            }
+          });
         }
 
         if (result.newBadges.isNotEmpty) {

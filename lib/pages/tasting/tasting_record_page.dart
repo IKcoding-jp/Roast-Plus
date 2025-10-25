@@ -644,7 +644,7 @@ class _TastingRecordPageState extends State<TastingRecordPage> {
                   _buildStars(session.avgOverall, 24),
                   SizedBox(width: 6),
                   Text(
-                    '${session.avgOverall.toStringAsFixed(1)}',
+                    session.avgOverall.toStringAsFixed(1),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

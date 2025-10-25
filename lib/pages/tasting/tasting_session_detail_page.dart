@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/tasting_models.dart';
 import '../../models/theme_settings.dart';
 import '../../models/group_provider.dart';
+import '../../models/group_gamification_provider.dart';
 import '../../services/tasting_firestore_service.dart';
+import '../../widgets/lottie_animation_widget.dart';
 
 class TastingSessionDetailPage extends StatefulWidget {
   final String? sessionId;
@@ -139,6 +141,12 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
     debugPrint(
       '_saveMyEntry: 保存開始 - groupId: $groupId, sessionId: $_sessionId, uid: $uid',
     );
+    
+    // 既存エントリがあるかチェック（新規エントリかどうかの判定）
+    final tastingProvider = context.read<TastingProvider>();
+    final hadMyEntry = tastingProvider.hasMyEntry(_sessionId!, uid);
+    debugPrint('_saveMyEntry: 既存エントリの有無: $hadMyEntry');
+    
     final entry = TastingEntry(
       id: uid,
       userId: uid,
@@ -154,8 +162,37 @@ class _TastingSessionDetailPageState extends State<TastingSessionDetailPage> {
     );
 
     try {
+      // 1. エントリを保存
       await TastingFirestoreService.upsertEntry(groupId, _sessionId!, entry);
       debugPrint('_saveMyEntry: 保存完了');
+      
+      // 2. 新規エントリの場合のみ経験値を付与
+      if (!hadMyEntry) {
+        debugPrint('_saveMyEntry: 新規エントリのため経験値を付与');
+        try {
+          final gamificationProvider = context.read<GroupGamificationProvider>();
+          final result = await gamificationProvider.recordTasting();
+          
+          if (result.success && mounted) {
+            debugPrint('_saveMyEntry: 経験値付与成功 - ${result.experienceGained}XP');
+            // 経験値獲得アニメーションを表示
+            AnimationHelper.showExperienceGainAnimation(
+              context,
+              xpGained: result.experienceGained,
+              description: result.message,
+              onComplete: () {},
+            );
+          } else {
+            debugPrint('_saveMyEntry: 経験値付与失敗 - ${result.message}');
+          }
+        } catch (xpError) {
+          debugPrint('_saveMyEntry: 経験値付与エラー: $xpError');
+          // 経験値付与に失敗してもエントリ保存は成功として扱う
+        }
+      } else {
+        debugPrint('_saveMyEntry: 既存エントリの更新のため経験値は付与しない');
+      }
+      
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,

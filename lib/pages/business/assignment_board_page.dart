@@ -1998,7 +1998,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             pairDuplicates++;
             if (enableDebugLog) {
               debugPrint(
-                '  ペア重複: $member と $partner が${dayIndex}日前もペア (重み: ${weight}x, ペナルティ: ${20 * weight})',
+                '  ペア重複: $member と $partner が$dayIndex日前もペア (重み: ${weight}x, ペナルティ: ${20 * weight})',
               );
             }
           }
@@ -2019,7 +2019,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             positionDuplicates++;
             if (enableDebugLog) {
               debugPrint(
-                '  担当位置重複: $member が${dayIndex}日前と同じ担当位置 $pos (重み: ${weight}x)',
+                '  担当位置重複: $member が$dayIndex日前と同じ担当位置 $pos (重み: ${weight}x)',
               );
             }
           }
@@ -3418,7 +3418,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                       color: Colors.transparent,
                       child: Opacity(
                         opacity: 0.7,
-                        child: Container(
+                        child: SizedBox(
                           width: isSmallMobile ? 70 : 85,
                           child: MemberCard(
                             name: memberName,
@@ -3552,7 +3552,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                       color: Colors.transparent,
                       child: Opacity(
                         opacity: 0.7,
-                        child: Container(
+                        child: SizedBox(
                           width: 180,
                           child: MemberCard(
                             name: memberName,
@@ -3755,7 +3755,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                             color: Colors.transparent,
                             child: Opacity(
                               opacity: 0.7,
-                              child: Container(
+                              child: SizedBox(
                                 width: 200,
                                 child: MemberCard(
                                   name: memberName,
@@ -3888,7 +3888,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                             color: Colors.transparent,
                             child: Opacity(
                               opacity: 0.7,
-                              child: Container(
+                              child: SizedBox(
                                 width: 120,
                                 child: MemberCard(
                                   name: memberName,
@@ -3991,8 +3991,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   () {
                     if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
                     if (isShuffling) return 'シャッフル中...';
-                    if (isAssignedToday && !_canShuffleToday())
+                    if (isAssignedToday && !_canShuffleToday()) {
                       return '本日はシャッフル済み';
+                    }
                     if (isAssignedToday) return '再度シャッフル';
                     return '今日の担当を決める';
                   }(),
@@ -4049,8 +4050,9 @@ class AssignmentBoardState extends State<AssignmentBoard> {
                   () {
                     if (todayIsWeekend && !isDeveloperMode) return '土日は休み';
                     if (isShuffling) return 'シャッフル中...';
-                    if (isAssignedToday && !_canShuffleToday())
+                    if (isAssignedToday && !_canShuffleToday()) {
                       return '本日はシャッフル済み';
+                    }
                     if (isAssignedToday) return '再度シャッフル';
                     return '今日の担当を決める';
                   }(),

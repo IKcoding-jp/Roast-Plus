@@ -372,7 +372,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           ),
                           SizedBox(height: 8),
                           DropdownButtonFormField<int>(
-                            value: _bagCount,
+                            initialValue: _bagCount,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontFamily: fontFamily,
@@ -447,7 +447,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           ),
                           SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedBeanName,
+                            initialValue: _selectedBeanName,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontFamily: fontFamily,
@@ -498,7 +498,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           ),
                           SizedBox(height: 8),
                           DropdownButtonFormField<int>(
-                            value: _selectedWeight,
+                            initialValue: _selectedWeight,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontFamily: fontFamily,
@@ -542,7 +542,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           ),
                           SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedRoastLevel,
+                            initialValue: _selectedRoastLevel,
                             style: TextStyle(
                               color: themeSettings.fontColor1,
                               fontFamily: fontFamily,
@@ -618,7 +618,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                                   _isAfterPurge
                                       ? 'アフターパージ'
                                       : _isRoast
-                                      ? 'ロースト ${_roastCountController.text.isEmpty ? '?' : _roastCountController.text}回目、${_bagCount == null ? '?' : _bagCount}袋'
+                                      ? 'ロースト ${_roastCountController.text.isEmpty ? '?' : _roastCountController.text}回目、${_bagCount ?? '?'}袋'
                                       : '焙煎機オン',
                                   style: TextStyle(
                                     color: _isAfterPurge

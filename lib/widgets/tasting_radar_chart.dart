@@ -172,7 +172,7 @@ class _TastingRadarChartState extends State<TastingRadarChart>
                       return RadarChartTitle(text: '');
                     }
                     const titles = ['酸味', '苦味', 'コク', '甘み', '香り'];
-                    final values_list = [
+                    final valuesList = [
                       widget.acidity,
                       widget.bitterness,
                       widget.body,
@@ -183,7 +183,7 @@ class _TastingRadarChartState extends State<TastingRadarChart>
                     String titleText = '';
                     if (widget.showValues) {
                       titleText =
-                          '${titles[index]}\n${values_list[index].toStringAsFixed(1)}';
+                          '${titles[index]}\n${valuesList[index].toStringAsFixed(1)}';
                     } else if (widget.showLabels) {
                       titleText = titles[index];
                     }

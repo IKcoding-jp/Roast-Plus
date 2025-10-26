@@ -537,19 +537,6 @@ class GroupActivityReward {
     );
   }
 
-  factory GroupActivityReward.handpickGame(int accuracy, int timeTaken) {
-    // 正確度が高いほど多くのXP
-    // 基本: 50XP + (accuracy * 5)
-    // 時間ボーナス: (60 - timeTaken) * 2
-    final accuracyBonus = (accuracy * 5).round();
-    final timeBonus = (60 - timeTaken).clamp(0, 60) * 2;
-    final totalXp = 50 + accuracyBonus + timeBonus;
-    
-    return GroupActivityReward(
-      experiencePoints: totalXp.clamp(0, 1000), // 最大1000XP
-      description: 'ハンドピックゲームで+${totalXp.clamp(0, 1000)}XP獲得！',
-    );
-  }
 }
 
 /// グループバッジの獲得条件定義（段階的達成システム）

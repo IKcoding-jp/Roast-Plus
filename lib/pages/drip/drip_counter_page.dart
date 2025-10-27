@@ -285,10 +285,82 @@ class DripCounterPageState extends State<DripCounterPage>
           color: themeSettings.fontColor1,
           fontFamily: fontFamily,
         ),
-        child: kIsWeb
-            ? _buildWebLayout(themeSettings, primaryGradient, cardGradient)
-            : _buildMobileLayout(themeSettings, primaryGradient, cardGradient),
+        child: _buildResponsiveLayout(
+          themeSettings,
+          primaryGradient,
+          cardGradient,
+        ),
       ),
+    );
+  }
+
+  /// レスポンシブレイアウトの判定
+  Widget _buildResponsiveLayout(
+    ThemeSettings themeSettings,
+    LinearGradient primaryGradient,
+    LinearGradient cardGradient,
+  ) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final screenHeight = constraints.maxHeight;
+
+        // Webアプリでの画面サイズ判定
+        // スマホ判定：幅が480px以下、または高さが800px以下
+        // タブレット（768px以上）はPCレイアウトを使用
+        final isMobile =
+            screenWidth <= 480 || (screenWidth < 768 && screenHeight <= 800);
+
+        // デバッグ用ログ
+        String deviceType = 'Unknown';
+        if (screenWidth >= 768) {
+          deviceType = 'PC/Tablet';
+        } else if (screenWidth > 480) {
+          deviceType = 'Small Tablet';
+        } else {
+          deviceType = 'Mobile';
+        }
+
+        developer.log(
+          '画面サイズ: ${screenWidth.toInt()}x${screenHeight.toInt()}, '
+          'デバイスタイプ: $deviceType, isMobile: $isMobile, kIsWeb: $kIsWeb',
+          name: 'DripCounterPage',
+        );
+
+        if (kIsWeb) {
+          if (isMobile) {
+            developer.log('Web版スマホレイアウトを使用', name: 'DripCounterPage');
+            return _buildMobileOptimizedLayout(
+              themeSettings,
+              primaryGradient,
+              cardGradient,
+            );
+          } else {
+            developer.log('Web版PCレイアウトを使用', name: 'DripCounterPage');
+            return _buildWebLayout(
+              themeSettings,
+              primaryGradient,
+              cardGradient,
+            );
+          }
+        } else {
+          if (isMobile) {
+            developer.log('モバイル最適化レイアウトを使用', name: 'DripCounterPage');
+            return _buildMobileOptimizedLayout(
+              themeSettings,
+              primaryGradient,
+              cardGradient,
+            );
+          } else {
+            developer.log('通常モバイルレイアウトを使用', name: 'DripCounterPage');
+            return _buildMobileLayout(
+              themeSettings,
+              primaryGradient,
+              cardGradient,
+            );
+          }
+        }
+      },
     );
   }
 
@@ -1046,11 +1118,9 @@ class DripCounterPageState extends State<DripCounterPage>
                                         borderRadius: BorderRadius.circular(15),
                                         color: Colors.transparent,
                                       ),
-                                      child: Row(
+                                      child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
                                         children: [
                                           Text(
                                             '$_counter',
@@ -1138,6 +1208,16 @@ class DripCounterPageState extends State<DripCounterPage>
                                                       ),
                                                     ],
                                                   ),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            '袋',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
+                                              color: themeSettings.fontColor1
+                                                  .withValues(alpha: 0.7),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -1233,7 +1313,7 @@ class DripCounterPageState extends State<DripCounterPage>
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 4),
                                   child: SizedBox(
-                                    height: sectionHeight * 0.7,
+                                    height: sectionHeight * 0.8,
                                     child: ElevatedButton(
                                       onPressed: () => _addToCounter(v),
                                       style: ElevatedButton.styleFrom(
@@ -1246,13 +1326,22 @@ class DripCounterPageState extends State<DripCounterPage>
                                             12,
                                           ),
                                         ),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 8,
+                                        ),
                                       ),
-                                      child: Text(
-                                        '${v > 0 ? '+' : ''}$v',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: themeSettings.fontFamily,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          '${v > 0 ? '+' : ''}$v',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily:
+                                                themeSettings.fontFamily,
+                                          ),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ),
                                     ),
@@ -1368,6 +1457,266 @@ class DripCounterPageState extends State<DripCounterPage>
             ),
           );
         },
+      ),
+    );
+  }
+
+  /// スマホ専用最適化レイアウト
+  Widget _buildMobileOptimizedLayout(
+    ThemeSettings themeSettings,
+    LinearGradient primaryGradient,
+    LinearGradient cardGradient,
+  ) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // カウンター表示エリア
+              Container(
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                  gradient: cardGradient,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    // カウンター数字
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => _showCounterInputDialog(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '$_counter',
+                              style: TextStyle(
+                                fontSize: 80,
+                                fontWeight: FontWeight.w900,
+                                color: themeSettings.fontColor1,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '袋',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: themeSettings.fontColor1.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // リセットボタン
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.refresh,
+                          color: themeSettings.iconColor,
+                          size: 24,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _counter = 0;
+                          });
+                        },
+                        tooltip: 'リセット',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // カウンター操作ボタン（2行に分けて配置）
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: cardGradient,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      // 1行目：マイナスボタン
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildCounterButton(
+                              themeSettings,
+                              -10,
+                              '−10',
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: _buildCounterButton(themeSettings, -5, '−5'),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: _buildCounterButton(themeSettings, -1, '−1'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      // 2行目：プラスボタン
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildCounterButton(themeSettings, 1, '+1'),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: _buildCounterButton(themeSettings, 5, '+5'),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: _buildCounterButton(
+                              themeSettings,
+                              10,
+                              '+10',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // 入力フォーム
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: cardGradient,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      // 豆の種類
+                      _buildLabeledField(
+                        themeSettings,
+                        label: '豆の種類',
+                        icon: Icons.coffee,
+                        hintText: '例: ブラジル、コロンビア',
+                        controller: _beanController,
+                      ),
+                      SizedBox(height: 16),
+                      // 煎り度
+                      _buildRoastLevelField(themeSettings),
+                      SizedBox(height: 20),
+                      // 保存ボタン
+                      SizedBox(
+                        width: double.infinity,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: primaryGradient,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: themeSettings.buttonColor.withValues(
+                                  alpha: 0.3,
+                                ),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.save, size: 22),
+                            label: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              child: Text(
+                                '記録を保存',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.1,
+                                ),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: themeSettings.appButtonColor,
+                              foregroundColor: themeSettings.fontColor2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: _addRecord,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// カウンター操作ボタンのウィジェット
+  Widget _buildCounterButton(
+    ThemeSettings themeSettings,
+    int value,
+    String label,
+  ) {
+    return SizedBox(
+      height: 60,
+      child: ElevatedButton(
+        onPressed: () => _addToCounter(value),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: themeSettings.buttonColor,
+          foregroundColor: themeSettings.fontColor2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: themeSettings.fontFamily,
+          ),
+        ),
       ),
     );
   }

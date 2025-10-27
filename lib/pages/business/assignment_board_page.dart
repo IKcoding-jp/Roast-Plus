@@ -2145,10 +2145,10 @@ class AssignmentBoardState extends State<AssignmentBoard> {
 
     int cnt = 0;
     const dur = Duration(milliseconds: 100);
-    // 現在画面に表示されている teams を基準にシャッフル
+    // 基本構成データ（basicTeams）を基準にシャッフル
     List<List<String>> shuffledMembers = List.generate(
-      teams.length,
-      (i) => List.from(teams[i].members),
+      basicTeams.length,
+      (i) => List.from(basicTeams[i].members),
     );
     shuffleTimer = Timer.periodic(dur, (_) async {
       try {
@@ -2159,7 +2159,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
         if (cnt % 5 == 0) {
           if (!mounted) return;
           setState(() {
-            for (int i = 0; i < teams.length; i++) {
+            for (int i = 0; i < basicTeams.length; i++) {
               teams[i] = teams[i].copyWith(
                 members: List.from(shuffledMembers[i]),
               );
@@ -2177,12 +2177,12 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           debugPrint('AssignmentBoard: 担当履歴を参照してシャッフル開始（過去7日分）');
 
           List<List<String>> bestShuffledMembers = List.generate(
-            teams.length,
+            basicTeams.length,
             (i) => List.from(shuffledMembers[i]),
           );
 
           // 現在の配置を使用してteamsを更新してからペアを作成
-          for (int i = 0; i < teams.length; i++) {
+          for (int i = 0; i < basicTeams.length; i++) {
             teams[i] = teams[i].copyWith(
               members: List.from(shuffledMembers[i]),
             );
@@ -2230,7 +2230,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               noImproveCount = 0;
             }
 
-            for (int i = 0; i < teams.length; i++) {
+            for (int i = 0; i < basicTeams.length; i++) {
               teams[i] = teams[i].copyWith(
                 members: List.from(shuffledMembers[i]),
               );
@@ -2246,7 +2246,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               bestPairs = candidatePairs;
               bestScore = candidateScore;
               bestShuffledMembers = List.generate(
-                teams.length,
+                basicTeams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
               noImproveCount = 0;
@@ -2264,7 +2264,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               bestPairs = candidatePairs;
               bestScore = candidateScore;
               bestShuffledMembers = List.generate(
-                teams.length,
+                basicTeams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
               debugPrint('AssignmentBoard: 完璧な配置を発見！重複なし (試行: $retry)');
@@ -2275,7 +2275,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             await Future.delayed(Duration(milliseconds: 5));
           }
 
-          for (int i = 0; i < teams.length; i++) {
+          for (int i = 0; i < basicTeams.length; i++) {
             teams[i] = teams[i].copyWith(
               members: List.from(bestShuffledMembers[i]),
             );

@@ -64,7 +64,10 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
         child: GestureDetector(
           onTap: null, // タップ機能を無効化
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: _isMobileLayout(context) ? 16 : 20,
+              vertical: _isMobileLayout(context) ? 14 : 16,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -80,7 +83,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                   child: Icon(
                     Icons.coffee,
                     color: Provider.of<ThemeSettings>(context).iconColor,
-                    size: _isMobileLayout(context) ? 20 : 24,
+                    size: (_isMobileLayout(context) ? 20 : _isTabletLayout(context) ? 22 : 24) *
+                        Provider.of<ThemeSettings>(context).fontSizeScale,
                   ),
                 ),
                 SizedBox(width: _isMobileLayout(context) ? 12 : 16),
@@ -94,13 +98,15 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                         beanName: record.bean,
                         textStyle: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: _isMobileLayout(context) ? 14 : 16,
+                          fontSize: (_isMobileLayout(context) ? 16 : _isTabletLayout(context) ? 18 : 18) *
+                              Provider.of<ThemeSettings>(context).fontSizeScale,
                           color: Provider.of<ThemeSettings>(context).fontColor1,
                           fontFamily: Provider.of<ThemeSettings>(
                             context,
                           ).fontFamily,
                         ),
-                        stickerSize: _isMobileLayout(context) ? 14.0 : 16.0,
+                        stickerSize: (_isMobileLayout(context) ? 16.0 : _isTabletLayout(context) ? 18.0 : 20.0) *
+                            Provider.of<ThemeSettings>(context).fontSizeScale,
                       ),
                       SizedBox(height: _isMobileLayout(context) ? 6 : 8),
                       // 詳細情報
@@ -114,7 +120,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             margin: EdgeInsets.only(top: 1),
                             child: Icon(
                               Icons.scale,
-                              size: _isMobileLayout(context) ? 14 : 16,
+                              size: (_isMobileLayout(context) ? 16 : _isTabletLayout(context) ? 18 : 20) *
+                                  Provider.of<ThemeSettings>(context).fontSizeScale,
                               color: Provider.of<ThemeSettings>(
                                 context,
                               ).iconColor,
@@ -125,7 +132,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             child: Text(
                               '重さ：${record.weight}g',
                               style: TextStyle(
-                                fontSize: _isMobileLayout(context) ? 12 : 13,
+                                fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 15 : 15) *
+                                    Provider.of<ThemeSettings>(context).fontSizeScale,
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1,
@@ -143,7 +151,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                         children: [
                           Icon(
                             Icons.timer,
-                            size: _isMobileLayout(context) ? 14 : 16,
+                            size: (_isMobileLayout(context) ? 16 : _isTabletLayout(context) ? 18 : 20) *
+                                Provider.of<ThemeSettings>(context).fontSizeScale,
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).iconColor,
@@ -153,7 +162,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             child: Text(
                               '焙煎時間: ${record.time}',
                               style: TextStyle(
-                                fontSize: _isMobileLayout(context) ? 12 : 13,
+                                fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 15 : 15) *
+                                    Provider.of<ThemeSettings>(context).fontSizeScale,
                                 fontFamily: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontFamily,
@@ -168,7 +178,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                         children: [
                           Icon(
                             Icons.local_fire_department,
-                            size: _isMobileLayout(context) ? 14 : 16,
+                            size: (_isMobileLayout(context) ? 16 : _isTabletLayout(context) ? 18 : 20) *
+                                Provider.of<ThemeSettings>(context).fontSizeScale,
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).iconColor,
@@ -178,7 +189,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             child: Text(
                               '煎り度: ${record.roast}',
                               style: TextStyle(
-                                fontSize: _isMobileLayout(context) ? 12 : 13,
+                                fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 15 : 15) *
+                                    Provider.of<ThemeSettings>(context).fontSizeScale,
                                 fontFamily: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontFamily,
@@ -195,7 +207,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                           children: [
                             Icon(
                               Icons.note,
-                              size: _isMobileLayout(context) ? 14 : 16,
+                              size: (_isMobileLayout(context) ? 16 : _isTabletLayout(context) ? 18 : 20) *
+                                  Provider.of<ThemeSettings>(context).fontSizeScale,
                               color: Provider.of<ThemeSettings>(
                                 context,
                               ).iconColor,
@@ -207,7 +220,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: _isMobileLayout(context) ? 12 : 13,
+                                  fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 15 : 15) *
+                                      Provider.of<ThemeSettings>(context).fontSizeScale,
                                   fontFamily: Provider.of<ThemeSettings>(
                                     context,
                                   ).fontFamily,
@@ -222,7 +236,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                         children: [
                           Icon(
                             Icons.calendar_today,
-                            size: _isMobileLayout(context) ? 14 : 16,
+                            size: (_isMobileLayout(context) ? 16 : _isTabletLayout(context) ? 18 : 20) *
+                                Provider.of<ThemeSettings>(context).fontSizeScale,
                             color: Provider.of<ThemeSettings>(
                               context,
                             ).iconColor,
@@ -232,7 +247,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             child: Text(
                               _formatTimestamp(record.timestamp),
                               style: TextStyle(
-                                fontSize: _isMobileLayout(context) ? 12 : 13,
+                                fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 15 : 15) *
+                                    Provider.of<ThemeSettings>(context).fontSizeScale,
                                 color: Provider.of<ThemeSettings>(
                                   context,
                                 ).fontColor1.withValues(alpha: 0.7),
@@ -263,7 +279,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             ).iconColor,
                           ),
                           onPressed: () => _editRecord(record),
-                          iconSize: _isMobileLayout(context) ? 20 : 24,
+                          iconSize: (_isMobileLayout(context) ? 22 : _isTabletLayout(context) ? 26 : 28) *
+                              Provider.of<ThemeSettings>(context).fontSizeScale,
                           padding: EdgeInsets.all(
                             _isMobileLayout(context) ? 6 : 8,
                           ),
@@ -280,7 +297,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                             ).iconColor,
                           ),
                           onPressed: () => _deleteRecords([index]),
-                          iconSize: _isMobileLayout(context) ? 20 : 24,
+                          iconSize: (_isMobileLayout(context) ? 22 : _isTabletLayout(context) ? 26 : 28) *
+                              Provider.of<ThemeSettings>(context).fontSizeScale,
                           padding: EdgeInsets.all(
                             _isMobileLayout(context) ? 6 : 8,
                           ),
@@ -814,7 +832,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
           crossAxisCount: 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          mainAxisExtent: 180,
+          mainAxisExtent: _isMobileLayout(context) ? 200 : 220,
         ),
         itemCount: filteredRecords.length,
         itemBuilder: (context, index) {
@@ -835,7 +853,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
           crossAxisCount: 3,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          mainAxisExtent: 160,
+          mainAxisExtent: _isMobileLayout(context) ? 180 : 200,
         ),
         itemCount: filteredRecords.length,
         itemBuilder: (context, index) {
@@ -1061,7 +1079,7 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                 ).cardBackgroundColor,
                                 child: Padding(
                                   padding: EdgeInsets.all(
-                                    _isMobileLayout(context) ? 16 : 20,
+                                    _isMobileLayout(context) ? 20 : 24,
                                   ),
                                   child: Column(
                                     crossAxisAlignment:
@@ -1080,9 +1098,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                               color: Provider.of<ThemeSettings>(
                                                 context,
                                               ).iconColor,
-                                              size: _isMobileLayout(context)
-                                                  ? 20
-                                                  : 24,
+                                              size: (_isMobileLayout(context) ? 22 : _isTabletLayout(context) ? 26 : 28) *
+                                                  Provider.of<ThemeSettings>(context).fontSizeScale,
                                             ),
                                             SizedBox(
                                               width: _isMobileLayout(context)
@@ -1093,10 +1110,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                               child: Text(
                                                 '検索・フィルター',
                                                 style: TextStyle(
-                                                  fontSize:
-                                                      _isMobileLayout(context)
-                                                      ? 16
-                                                      : 18,
+                                                  fontSize: (_isMobileLayout(context) ? 18 : _isTabletLayout(context) ? 20 : 22) *
+                                                      Provider.of<ThemeSettings>(context).fontSizeScale,
                                                   fontWeight: FontWeight.bold,
                                                   color:
                                                       Provider.of<
@@ -1118,6 +1133,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                               color: Provider.of<ThemeSettings>(
                                                 context,
                                               ).iconColor,
+                                              size: (_isMobileLayout(context) ? 22 : _isTabletLayout(context) ? 26 : 28) *
+                                                  Provider.of<ThemeSettings>(context).fontSizeScale,
                                             ),
                                           ],
                                         ),
@@ -1141,6 +1158,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                   Provider.of<ThemeSettings>(
                                                     context,
                                                   ).fontFamily,
+                                              fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 16 : 18) *
+                                                  Provider.of<ThemeSettings>(context).fontSizeScale,
                                             ),
                                             decoration: InputDecoration(
                                               hintText: 'キーワード検索',
@@ -1149,6 +1168,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                     Provider.of<ThemeSettings>(
                                                       context,
                                                     ).fontFamily,
+                                                fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 16 : 18) *
+                                                    Provider.of<ThemeSettings>(context).fontSizeScale,
                                               ),
                                               prefixIcon: Icon(
                                                 Icons.search,
@@ -1156,6 +1177,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                     Provider.of<ThemeSettings>(
                                                       context,
                                                     ).iconColor,
+                                                size: (_isMobileLayout(context) ? 20 : _isTabletLayout(context) ? 24 : 28) *
+                                                    Provider.of<ThemeSettings>(context).fontSizeScale,
                                               ),
                                               border: InputBorder.none,
                                               contentPadding:
@@ -1355,7 +1378,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                 Text(
                                                   '記録がありません',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: (_isMobileLayout(context) ? 20 : _isTabletLayout(context) ? 22 : 24) *
+                                                        Provider.of<ThemeSettings>(context).fontSizeScale,
                                                     fontWeight: FontWeight.bold,
                                                     color:
                                                         Provider.of<
@@ -1379,6 +1403,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                               ThemeSettings
                                                             >(context)
                                                             .fontFamily,
+                                                    fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 16 : 18) *
+                                                        Provider.of<ThemeSettings>(context).fontSizeScale,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
@@ -1417,7 +1443,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                 Text(
                                                   '条件に合う記録がありません',
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: (_isMobileLayout(context) ? 20 : _isTabletLayout(context) ? 22 : 24) *
+                                                        Provider.of<ThemeSettings>(context).fontSizeScale,
                                                     fontWeight: FontWeight.bold,
                                                     color:
                                                         Provider.of<
@@ -1441,6 +1468,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                                                               ThemeSettings
                                                             >(context)
                                                             .fontFamily,
+                                                    fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 16 : 18) *
+                                                        Provider.of<ThemeSettings>(context).fontSizeScale,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
@@ -1481,6 +1510,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
         initialValue: value,
         style: TextStyle(
           fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+          fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 16 : 18) *
+              Provider.of<ThemeSettings>(context).fontSizeScale,
         ),
         items: items
             .map(
@@ -1491,6 +1522,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+                    fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 16 : 18) *
+                        Provider.of<ThemeSettings>(context).fontSizeScale,
                   ),
                 ),
               ),
@@ -1504,6 +1537,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
           labelStyle: TextStyle(
             color: Color(0xFF795548),
             fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
+            fontSize: (_isMobileLayout(context) ? 12 : _isTabletLayout(context) ? 14 : 16) *
+                Provider.of<ThemeSettings>(context).fontSizeScale,
           ),
         ),
       ),
@@ -1530,7 +1565,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: (_isMobileLayout(context) ? 14 : _isTabletLayout(context) ? 16 : 18) *
+                    Provider.of<ThemeSettings>(context).fontSizeScale,
                 color: Color(0xFF795548),
                 fontWeight: FontWeight.w500,
                 fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
@@ -1540,7 +1576,8 @@ class _RoastRecordListPageState extends State<RoastRecordListPage> {
             Text(
               date != null ? DateFormat('yyyy/MM/dd').format(date) : '',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: (_isMobileLayout(context) ? 16 : _isTabletLayout(context) ? 18 : 20) *
+                    Provider.of<ThemeSettings>(context).fontSizeScale,
                 color: date != null ? Color(0xFF2C1D17) : Colors.grey[400],
                 fontFamily: Provider.of<ThemeSettings>(context).fontFamily,
               ),

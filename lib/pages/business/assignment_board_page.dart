@@ -2156,7 +2156,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           shuffledMembers[i].shuffle(Random());
         }
 
-        if (cnt % 5 == 0) {
+        if (cnt % 2 == 0) {
           if (!mounted) return;
           setState(() {
             for (int i = 0; i < basicTeams.length; i++) {
@@ -2167,7 +2167,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           });
         }
 
-        if (++cnt >= 50) {
+        if (++cnt >= 20) {
           shuffleTimer?.cancel();
 
           final today = _todayKey();
@@ -2192,9 +2192,10 @@ class AssignmentBoardState extends State<AssignmentBoard> {
           int bestScore = _calculateAssignmentScore(bestPairs, recentHistory);
 
           int retry = 0;
-          const maxRetries = 2000; // 試行回数を増加：1000 → 2000
+          const maxRetries = 500; // 試行回数を削減：2000 → 500（高速化）
           int noImproveCount = 0; // スコア改善がない試行回数
-          const maxNoImproveThreshold = 300; // 300回改善がなければ大きなシャッフルを実行
+          const maxNoImproveThreshold = 100; // 100回改善がなければ大きなシャッフルを実行
+          const acceptableScore = 2; // 許容スコア（スコア2以下で終了）
 
           while (retry < maxRetries) {
             final random = Random();
@@ -2221,7 +2222,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               }
             }
 
-            // 300回改善がなければ、より大きな変更を試みる
+            // 100回改善がなければ、より大きな変更を試みる
             if (noImproveCount > maxNoImproveThreshold) {
               // より積極的な再シャッフルを実行
               for (int i = 0; i < shuffledMembers.length; i++) {
@@ -2257,17 +2258,17 @@ class AssignmentBoardState extends State<AssignmentBoard> {
               noImproveCount++;
             }
 
-            // 新しいペナルティ重みでは、スコア0（完全に重複なし）のみを受け入れる
+            // 許容スコア以下なら十分良い配置として終了（高速化のため）
             // ペナルティ重み: ペア重複20、担当位置重複12（1日前の場合）
-            // スコア1以上は最近の履歴との重複を示唆している
-            if (candidateScore == 0) {
+            // スコア2以下は軽微な重複のみで実用上問題なし
+            if (candidateScore <= acceptableScore) {
               bestPairs = candidatePairs;
               bestScore = candidateScore;
               bestShuffledMembers = List.generate(
                 basicTeams.length,
                 (i) => List.from(shuffledMembers[i]),
               );
-              debugPrint('AssignmentBoard: 完璧な配置を発見！重複なし (試行: $retry)');
+              debugPrint('AssignmentBoard: 十分良い配置を発見！スコア: $bestScore (試行: $retry)');
               break;
             }
 
@@ -2290,7 +2291,7 @@ class AssignmentBoardState extends State<AssignmentBoard> {
             debugPrint('AssignmentBoard: 使用した最適化戦略:');
             debugPrint('  - 試行回数: $retry回 / 最大$maxRetries回');
             debugPrint('  - 試行戦略: 探索的シャッフル70% + 局所改善30%');
-            debugPrint('  - 早期終了条件: スコア==0で終了（完全に重複なし）');
+            debugPrint('  - 早期終了条件: スコア<=2で終了（軽微な重複許容）');
             debugPrint('AssignmentBoard: 詳細な重複情報:');
             _calculateAssignmentScore(
               bestPairs,

@@ -648,40 +648,16 @@ class _HomeBodyState extends State<HomeBody> {
 
   /// テーマに基づいた色を取得
   Color _getThemeBasedColor(String sectionType) {
-    // デフォルト、ダーク、ライトテーマの場合は従来の固定色を使用
-    final isDefaultTheme =
-        widget.themeSettings.appBarColor.toARGB32() == 0xFF2C1810; // デフォルトテーマの色
-    final isDarkTheme =
-        widget.themeSettings.appBarColor.toARGB32() == 0xFF121212; // ダークテーマの色
-    final isLightTheme =
-        widget.themeSettings.appBarColor.toARGB32() == 0xFFFAFAFA; // ライトテーマの色
-
-    // デフォルト、ダーク、ライトテーマの場合は従来の固定色を使用
-    if (isDefaultTheme || isDarkTheme || isLightTheme) {
-      switch (sectionType) {
-        case 'business':
-          return Color(0xFFE65100); // 焙煎をイメージした暖色のオレンジ（火・熱を表現）
-        case 'record':
-          return Colors.blue.shade700;
-        case 'growth':
-          return Color(0xFFD4AF37); // ゴールド
-        case 'support':
-          return Color(0xFF757575); // グレー
-        default:
-          return widget.themeSettings.iconColor;
-      }
-    }
-
-    // その他のテーマ（パステル、暖色系、寒色系、コーヒー、エレガント）ではテーマの色を使用
+    // すべてのテーマでデフォルトテーマと同じ色を使用
     switch (sectionType) {
       case 'business':
-        return widget.themeSettings.buttonColor;
+        return Color(0xFFE65100); // 焙煎をイメージした暖色のオレンジ（火・熱を表現）
       case 'record':
-        return widget.themeSettings.iconColor;
+        return Colors.blue.shade700;
       case 'growth':
-        return widget.themeSettings.timerCircleColor;
+        return Color(0xFFD4AF37); // ゴールド
       case 'support':
-        return widget.themeSettings.settingsColor;
+        return Color(0xFF757575); // グレー
       default:
         return widget.themeSettings.iconColor;
     }

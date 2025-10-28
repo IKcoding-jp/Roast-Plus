@@ -162,7 +162,6 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               'ピンク',
               'ブルー',
               'グリーン',
-              'イエロー',
               'パープル',
               'ピーチ',
             ], Icons.brush),
@@ -499,8 +498,6 @@ class _PresetButton extends StatelessWidget {
         return Icons.water_drop;
       case 'グリーン':
         return Icons.eco;
-      case 'イエロー':
-        return Icons.wb_sunny_outlined;
       case 'パープル':
         return Icons.auto_awesome_outlined;
       case 'ピーチ':

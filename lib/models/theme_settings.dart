@@ -967,31 +967,6 @@ class ThemeSettings extends ChangeNotifier {
       'todoColor': Color(0xFF81C784), // タスク機能のアクセント色
       'tastingColor': Color(0xFFD84315), // テイスティング機能のアクセント色
     },
-    'イエロー': {
-      'appBarColor': Color(0xFFFFF9C4), // 優しいイエロー
-      'backgroundColor': Color(0xFFFFFDE7), // 非常に薄いイエロー
-      'buttonColor': Color(0xFFFFF59D), // パステルイエロー
-      'cardBackgroundColor': Color(0xFFFFFFFF), // ←追加
-      'fontColor1': Color(0xFF2C1810), // 深いコーヒー色の文字
-      'fontColor2': Color(0xFF2C1810), // 明るいボタンなので黒文字
-      'timerCircleColor': Color(0xFFFFF59D),
-      'bottomNavigationColor': Color(0xFFFFF9C4),
-      'inputBackgroundColor': Color(0xFFFFFEF0),
-      'iconColor': Color(0xFFFFF176), // パステルイエロー
-      'memberBackgroundColor': Color(0xFFFFF8E1),
-      'appBarTextColor': Color(0xFF2C1810), // 明るい背景なので黒文字
-      'bottomNavigationTextColor': Color(0xFF2C1810), // 明るい背景なので黒文字
-      'dialogBackgroundColor': Color(0xFFFFFFFF),
-      'dialogTextColor': Color(0xFF2C1810), // 深いコーヒー色の文字
-      'inputTextColor': Color(0xFF2C1810), // 深いコーヒー色の文字
-      'borderColor': Color(0xFFFFF8E1), // 薄いイエローの境界線
-      'bottomNavigationSelectedColor': Color(0xFFFFF176),
-      'bottomNavigationUnselectedColor': Color(0xFF757575), // グレー（明るい背景に対して）
-      'settingsColor': Color(0xFFF57F17), // ダークイエロー
-      'calculatorColor': Color(0xFFFFF176), // 計算機機能のアクセント色
-      'todoColor': Color(0xFFFFF176), // タスク機能のアクセント色
-      'tastingColor': Color(0xFFD84315), // テイスティング機能のアクセント色
-    },
     'パープル': {
       'appBarColor': Color(0xFFE1BEE7), // 優しいパープル
       'backgroundColor': Color(0xFFFAF4FF), // 非常に薄いパープル

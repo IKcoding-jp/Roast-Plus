@@ -83,7 +83,7 @@ class _SchedulePageState extends State<SchedulePage>
           child: Scaffold(
             backgroundColor: themeSettings.backgroundColor,
             appBar: AppBar(
-              toolbarHeight: kIsWeb ? 80 : 70,
+              toolbarHeight: kIsWeb && WebUIUtils.shouldUseMobileUI(context) ? 70 : null,
               title: Row(
                 children: [
                   Icon(Icons.pending_actions, color: themeSettings.iconColor),

@@ -225,7 +225,7 @@ class _CalendarPageState extends State<CalendarPage> {
   // タスクの説明を取得するヘルパーメソッド
   String _getTaskDescription(RoastScheduleMemo memo) {
     if (memo.isRoasterOn) {
-      return '焙煎機オン';
+      return '焙煎機予熱';
     } else if (memo.isRoast) {
       return 'ロースト';
     } else if (memo.isAfterPurge) {

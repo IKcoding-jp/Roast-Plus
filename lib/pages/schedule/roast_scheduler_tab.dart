@@ -374,12 +374,12 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                         ),
                       ),
                     ] else if (memo.isRoasterOn) ...[
-                      // 焙煎機オンの場合
+                      // 焙煎機予熱の場合
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // 1行目：焙煎機オンアイコンとテキスト
+                            // 1行目：焙煎機予熱アイコンとテキスト
                             Row(
                               children: [
                                 Icon(
@@ -389,7 +389,7 @@ class RoastSchedulerTabState extends State<RoastSchedulerTab>
                                 ),
                                 SizedBox(width: 6),
                                 Text(
-                                  '焙煎機オン',
+                                  '焙煎機予熱',
                                   style: TextStyle(
                                     color: themeSettings.iconColor,
                                     fontWeight: FontWeight.bold,

@@ -77,7 +77,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
       if (widget.memo!.roastCount != null) {
         _roastCountController.text = widget.memo!.roastCount.toString();
       }
-      // 焙煎機オン時の豆の名前を復元
+      // 焙煎機予熱時の豆の名前を復元
       if (_isRoasterOn && widget.memo!.beanName != null) {
         _selectedBeanName = widget.memo!.beanName;
       }
@@ -261,7 +261,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                         ),
                         SizedBox(height: 16),
 
-                        // 焙煎機オンチェックボックス
+                        // 焙煎機予熱チェックボックス
                         if (!_isRoast) ...[
                           Row(
                             children: [
@@ -278,7 +278,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                                 },
                               ),
                               Text(
-                                '焙煎機オン',
+                                '焙煎機予熱',
                                 style: TextStyle(
                                   color: themeSettings.fontColor1,
                                   fontSize: 16,
@@ -290,7 +290,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           SizedBox(height: 16),
                         ],
 
-                        // ロースト チェックボックス（焙煎機オン未選択時のみ表示）
+                        // ロースト チェックボックス（焙煎機予熱未選択時のみ表示）
                         if (!_isRoasterOn) ...[
                           Row(
                             children: [
@@ -405,7 +405,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           SizedBox(height: 16),
                         ],
 
-                        // アフターパージチェックボックス（焙煎機オンでない場合のみ表示）
+                        // アフターパージチェックボックス（焙煎機予熱でない場合のみ表示）
                         if (!_isRoasterOn && !_isRoast) ...[
                           Row(
                             children: [
@@ -434,7 +434,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           SizedBox(height: 16),
                         ],
 
-                        // 豆の名前（焙煎機オンの場合のみ表示）
+                        // 豆の名前（焙煎機予熱の場合のみ表示）
                         if (_isRoasterOn) ...[
                           Text(
                             '豆の名前',
@@ -485,7 +485,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           SizedBox(height: 16),
                         ],
 
-                        // 重さと焙煎度合い（焙煎機オンの場合のみ表示）
+                        // 重さと焙煎度合い（焙煎機予熱の場合のみ表示）
                         if (_isRoasterOn) ...[
                           Text(
                             '重さ（g）',
@@ -575,9 +575,9 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                           SizedBox(height: 16),
                         ],
 
-                        // 焙煎機オンまたはアフターパージまたはロースト の情報表示
+                        // 焙煎機予熱またはアフターパージまたはロースト の情報表示
                         if (_isAfterPurge || _isRoasterOn || _isRoast) ...[
-                          // 焙煎機オンまたはアフターパージまたはロースト の場合
+                          // 焙煎機予熱またはアフターパージまたはロースト の場合
                           Container(
                             padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -619,7 +619,7 @@ class _RoastScheduleMemoDialogState extends State<RoastScheduleMemoDialog> {
                                       ? 'アフターパージ'
                                       : _isRoast
                                       ? 'ロースト ${_roastCountController.text.isEmpty ? '?' : _roastCountController.text}回目、${_bagCount ?? '?'}袋'
-                                      : '焙煎機オン',
+                                      : '焙煎機予熱',
                                   style: TextStyle(
                                     color: _isAfterPurge
                                         ? Colors.blue

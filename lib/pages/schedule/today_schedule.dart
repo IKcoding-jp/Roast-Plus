@@ -794,38 +794,7 @@ class _TodayScheduleState extends State<TodaySchedule>
               debugPrint('TodaySchedule: グループ設定変更検知: $groupSettings');
 
               if (groupSettings != null) {
-                final currentUser = FirebaseAuth.instance.currentUser;
-                if (currentUser != null) {
-                  final userRole = group.getMemberRole(currentUser.uid);
-                  if (userRole != null) {
-                    debugPrint(
-                      'TodaySchedule: 設定変更時の権限チェック - ユーザーロール: $userRole',
-                    );
-                    debugPrint(
-                      'TodaySchedule: 設定変更時のグループ設定: ${groupSettings.dataPermissions}',
-                    );
-
-                    final canEditTodaySchedule = groupSettings.canEditDataType(
-                      'todaySchedule',
-                      userRole,
-                    );
-
-                    debugPrint(
-                      'TodaySchedule: 設定変更による権限チェック - todaySchedule: $canEditTodaySchedule',
-                    );
-
-                    if (mounted) {
-                      setState(() {
-                        _canEditTodaySchedule = canEditTodaySchedule;
-                      });
-                      debugPrint('TodaySchedule: 設定変更によるsetState実行完了');
-                    }
-                  } else {
-                    debugPrint('TodaySchedule: 設定変更時 - ユーザーロールがnull');
-                  }
-                } else {
-                  debugPrint('TodaySchedule: 設定変更時 - 現在のユーザーがnull');
-                }
+                _updateEditPermissions(groupSettings, group);
               } else {
                 debugPrint('TodaySchedule: 設定変更時 - グループ設定がnull');
               }
@@ -1276,6 +1245,78 @@ class _TodayScheduleState extends State<TodaySchedule>
     }
   }
 
+  // 編集権限を更新するメソッド
+  void _updateEditPermissions(dynamic groupSettings, dynamic group) {
+    try {
+      // 認証状態を非同期で確認
+      FirebaseAuth.instance
+          .authStateChanges()
+          .first
+          .then((user) {
+            if (!mounted) return;
+
+            if (user != null) {
+              final userRole = group.getMemberRole(user.uid);
+              if (userRole != null) {
+                debugPrint('TodaySchedule: 設定変更時の権限チェック - ユーザーロール: $userRole');
+                debugPrint(
+                  'TodaySchedule: 設定変更時のグループ設定: ${groupSettings.dataPermissions}',
+                );
+
+                final canEditTodaySchedule = groupSettings.canEditDataType(
+                  'todaySchedule',
+                  userRole,
+                );
+
+                debugPrint(
+                  'TodaySchedule: 設定変更による権限チェック - todaySchedule: $canEditTodaySchedule',
+                );
+
+                if (mounted) {
+                  setState(() {
+                    _canEditTodaySchedule = canEditTodaySchedule;
+                  });
+                  debugPrint('TodaySchedule: 設定変更によるsetState実行完了');
+                }
+              } else {
+                debugPrint('TodaySchedule: 設定変更時 - ユーザーロールがnull');
+                // ユーザーロールがnullの場合は編集不可に設定
+                if (mounted) {
+                  setState(() {
+                    _canEditTodaySchedule = false;
+                  });
+                }
+              }
+            } else {
+              debugPrint('TodaySchedule: 設定変更時 - 現在のユーザーがnull');
+              // ユーザーがnullの場合は編集不可に設定
+              if (mounted) {
+                setState(() {
+                  _canEditTodaySchedule = false;
+                });
+              }
+            }
+          })
+          .catchError((e) {
+            debugPrint('TodaySchedule: 認証状態確認エラー: $e');
+            // エラーが発生した場合は編集不可に設定
+            if (mounted) {
+              setState(() {
+                _canEditTodaySchedule = false;
+              });
+            }
+          });
+    } catch (e) {
+      debugPrint('TodaySchedule: 設定変更時のエラー: $e');
+      // エラーが発生した場合は編集不可に設定
+      if (mounted) {
+        setState(() {
+          _canEditTodaySchedule = false;
+        });
+      }
+    }
+  }
+
   // ローカルデータを更新するメソッド
   Future<void> _updateLocalData(
     List<String> labels,
@@ -1422,9 +1463,7 @@ class _TodayScheduleState extends State<TodaySchedule>
                     padding: EdgeInsets.only(
                       bottom: MediaQuery.of(context).padding.bottom + 16,
                     ),
-                    child: Column(
-                      children: _buildScheduleLabelWidgets(),
-                    ),
+                    child: Column(children: _buildScheduleLabelWidgets()),
                   ),
                 ),
             ],
@@ -1522,209 +1561,211 @@ class _TodayScheduleState extends State<TodaySchedule>
             Container(
               decoration: BoxDecoration(
                 // Web版では範囲選択時のみ背景色を使用、それ以外は透明
-                color: (kIsWeb && !isRangeStart && !isRangeEnd && !isBetweenRange)
+                color:
+                    (kIsWeb && !isRangeStart && !isRangeEnd && !isBetweenRange)
                     ? Colors.transparent
                     : (isRangeStart || isRangeEnd || isBetweenRange)
-                        ? themeSettings.buttonColor.withValues(alpha: 0.07)
-                        : Colors.transparent,
+                    ? themeSettings.buttonColor.withValues(alpha: 0.07)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
               ),
-              margin: EdgeInsets.symmetric(
-                vertical: isBetweenRange ? 0.5 : 0,
-              ),
+              margin: EdgeInsets.symmetric(vertical: isBetweenRange ? 0.5 : 0),
               padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
               child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start, // centerからstartに変更
-            children: [
-              SizedBox(width: 4),
-              // 時間ラベル（左）
-              GestureDetector(
-                onTap: _canEditTodaySchedule ? () => _onTapLabel(i) : null,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8, // 行間を狭くするため調整
-                  ),
-                  decoration: BoxDecoration(
-                    color: (_tempStartIndex == i || isRangeStart || isRangeEnd)
-                        ? themeSettings.buttonColor.withValues(alpha: 0.18)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      _scheduleLabels[i],
-                      style: TextStyle(
-                        fontSize: kIsWeb ? 16 : 12,
-                        fontWeight: FontWeight.bold,
-                        color: themeSettings.fontColor1,
-                        fontFamily: themeSettings.fontFamily,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // centerからstartに変更
+                children: [
+                  SizedBox(width: 4),
+                  // 時間ラベル（左）
+                  GestureDetector(
+                    onTap: _canEditTodaySchedule ? () => _onTapLabel(i) : null,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8, // 行間を狭くするため調整
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            (_tempStartIndex == i || isRangeStart || isRangeEnd)
+                            ? themeSettings.buttonColor.withValues(alpha: 0.18)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          _scheduleLabels[i],
+                          style: TextStyle(
+                            fontSize: kIsWeb ? 16 : 12,
+                            fontWeight: FontWeight.bold,
+                            color: themeSettings.fontColor1,
+                            fontFamily: themeSettings.fontFamily,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(width: 8), // 6から8に拡大して間隔を調整
-              // コンテンツフィールド（右）
-              if (!isBetweenRange)
-                Expanded(
-                  child: _canEditTodaySchedule
-                      ? SizedBox(
-                          height: 44, // 行間を狭くするため調整
-                          child: TextField(
-                            controller:
-                                _scheduleControllers[_scheduleLabels[i]],
-                            keyboardType: TextInputType.text,
-                            enableSuggestions: true,
-                            autocorrect: true,
-                            enabled: true,
-                            textInputAction:
-                                TextInputAction.done, // Enterキーの動作を明示
-                            onChanged: (v) {
-                              final label = _scheduleLabels[i];
-                              // IME未確定テキスト中は保存しない
-                              if (_scheduleControllers[label]!
-                                  .value
-                                  .composing
-                                  .isValid) {
-                                debugPrint(
-                                  'TodaySchedule: 変換中のため保存スキップ - ラベル: $label, 値: $v',
-                                );
-                              }
-
-                              setState(() {
-                                _scheduleContents[label] = v;
-                              });
-
-                              // デバウンス保存（最後の入力から一定時間後に保存）
-                              _saveDebounceTimers[label]?.cancel();
-                              _saveDebounceTimers[label] = Timer(
-                                Duration(milliseconds: 600),
-                                () {
-                                  // 変換が終わっているか再確認
-                                  if (!mounted) return;
-                                  final composing = _scheduleControllers[label]!
+                  SizedBox(width: 8), // 6から8に拡大して間隔を調整
+                  // コンテンツフィールド（右）
+                  if (!isBetweenRange)
+                    Expanded(
+                      child: _canEditTodaySchedule
+                          ? SizedBox(
+                              height: 44, // 行間を狭くするため調整
+                              child: TextField(
+                                controller:
+                                    _scheduleControllers[_scheduleLabels[i]],
+                                keyboardType: TextInputType.text,
+                                enableSuggestions: true,
+                                autocorrect: true,
+                                enabled: true,
+                                textInputAction:
+                                    TextInputAction.done, // Enterキーの動作を明示
+                                onChanged: (v) {
+                                  final label = _scheduleLabels[i];
+                                  // IME未確定テキスト中は保存しない
+                                  if (_scheduleControllers[label]!
                                       .value
-                                      .composing;
-                                  if (composing.isValid) {
+                                      .composing
+                                      .isValid) {
                                     debugPrint(
-                                      'TodaySchedule: まだ変換中のため保存延期 - ラベル: $label',
+                                      'TodaySchedule: 変換中のため保存スキップ - ラベル: $label, 値: $v',
                                     );
-                                    return;
                                   }
 
-                                  debugPrint(
-                                    'TodaySchedule: デバウンス保存実行 - ラベル: $label, 値: ${_scheduleContents[label]}',
-                                  );
-                                  _saveSchedules();
-                                },
-                              );
-                            },
-                            onTap: () {
-                              debugPrint(
-                                'TodaySchedule: テキストフィールドタップ - ラベル: ${_scheduleLabels[i]}',
-                              );
-                              _isEditing = true;
-                            },
-                            onEditingComplete: () {
-                              debugPrint(
-                                'TodaySchedule: テキストフィールド編集完了 - ラベル: ${_scheduleLabels[i]}',
-                              );
-                              // 編集完了時（フォーカスが外れた時）のみ入力中フラグをリセット
-                              _isEditing = false;
-                              // すぐに最終値を保存
-                              final label = _scheduleLabels[i];
-                              _saveDebounceTimers[label]?.cancel();
-                              _saveDebounceTimers[label] = Timer(
-                                Duration(milliseconds: 50),
-                                () {
-                                  _saveSchedules();
-                                },
-                              );
-                            },
-                            onSubmitted: (v) {
-                              debugPrint(
-                                'TodaySchedule: テキストフィールド送信 - ラベル: ${_scheduleLabels[i]}, 内容: $v',
-                              );
-                              // Enterキーで確定した場合はフォーカスを外す
-                              FocusScope.of(context).unfocus();
-                              _isEditing = false;
-                              final label = _scheduleLabels[i];
-                              _saveDebounceTimers[label]?.cancel();
-                              _saveDebounceTimers[label] = Timer(
-                                Duration(milliseconds: 50),
-                                () {
-                                  _saveSchedules();
-                                },
-                              );
-                            },
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize:
-                                  (kIsWeb ? 18 : 14) *
-                                  themeSettings.fontSizeScale,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: themeSettings.fontFamily,
-                              color: themeSettings.fontColor1,
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.black,
-                                  width: 1,
-                                ),
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.black,
-                                  width: 1,
-                                ),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.black,
-                                  width: 2,
-                                ),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 0,
-                                vertical: 4,
-                              ),
-                              isDense: true,
-                            ),
-                          ),
-                        )
-                      : Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              _scheduleContents[_scheduleLabels[i]] ?? '',
-                              style: TextStyle(
-                                fontSize:
-                                    (kIsWeb ? 17 : 13) *
-                                    themeSettings.fontSizeScale,
-                                fontWeight: FontWeight.bold,
-                                color: themeSettings.fontColor1,
-                                fontFamily: themeSettings.fontFamily,
-                                decoration: TextDecoration.underline,
-                                decorationColor: themeSettings.fontColor1,
-                                decorationThickness: 1.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                ),
-              if (isBetweenRange) Expanded(child: SizedBox.shrink()),
+                                  setState(() {
+                                    _scheduleContents[label] = v;
+                                  });
 
-              // タイムライン（右端）
-              SizedBox(width: 4),
-              SizedBox(width: 18, child: Center(child: timelineIcon)),
-            ],
-          ),
+                                  // デバウンス保存（最後の入力から一定時間後に保存）
+                                  _saveDebounceTimers[label]?.cancel();
+                                  _saveDebounceTimers[label] = Timer(
+                                    Duration(milliseconds: 600),
+                                    () {
+                                      // 変換が終わっているか再確認
+                                      if (!mounted) return;
+                                      final composing =
+                                          _scheduleControllers[label]!
+                                              .value
+                                              .composing;
+                                      if (composing.isValid) {
+                                        debugPrint(
+                                          'TodaySchedule: まだ変換中のため保存延期 - ラベル: $label',
+                                        );
+                                        return;
+                                      }
+
+                                      debugPrint(
+                                        'TodaySchedule: デバウンス保存実行 - ラベル: $label, 値: ${_scheduleContents[label]}',
+                                      );
+                                      _saveSchedules();
+                                    },
+                                  );
+                                },
+                                onTap: () {
+                                  debugPrint(
+                                    'TodaySchedule: テキストフィールドタップ - ラベル: ${_scheduleLabels[i]}',
+                                  );
+                                  _isEditing = true;
+                                },
+                                onEditingComplete: () {
+                                  debugPrint(
+                                    'TodaySchedule: テキストフィールド編集完了 - ラベル: ${_scheduleLabels[i]}',
+                                  );
+                                  // 編集完了時（フォーカスが外れた時）のみ入力中フラグをリセット
+                                  _isEditing = false;
+                                  // すぐに最終値を保存
+                                  final label = _scheduleLabels[i];
+                                  _saveDebounceTimers[label]?.cancel();
+                                  _saveDebounceTimers[label] = Timer(
+                                    Duration(milliseconds: 50),
+                                    () {
+                                      _saveSchedules();
+                                    },
+                                  );
+                                },
+                                onSubmitted: (v) {
+                                  debugPrint(
+                                    'TodaySchedule: テキストフィールド送信 - ラベル: ${_scheduleLabels[i]}, 内容: $v',
+                                  );
+                                  // Enterキーで確定した場合はフォーカスを外す
+                                  FocusScope.of(context).unfocus();
+                                  _isEditing = false;
+                                  final label = _scheduleLabels[i];
+                                  _saveDebounceTimers[label]?.cancel();
+                                  _saveDebounceTimers[label] = Timer(
+                                    Duration(milliseconds: 50),
+                                    () {
+                                      _saveSchedules();
+                                    },
+                                  );
+                                },
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontSize:
+                                      (kIsWeb ? 18 : 14) *
+                                      themeSettings.fontSizeScale,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: themeSettings.fontFamily,
+                                  color: themeSettings.fontColor1,
+                                ),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.black,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.black,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.black,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 0,
+                                    vertical: 4,
+                                  ),
+                                  isDense: true,
+                                ),
+                              ),
+                            )
+                          : Padding(
+                              padding: EdgeInsets.symmetric(vertical: 4),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  _scheduleContents[_scheduleLabels[i]] ?? '',
+                                  style: TextStyle(
+                                    fontSize:
+                                        (kIsWeb ? 17 : 13) *
+                                        themeSettings.fontSizeScale,
+                                    fontWeight: FontWeight.bold,
+                                    color: themeSettings.fontColor1,
+                                    fontFamily: themeSettings.fontFamily,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: themeSettings.fontColor1,
+                                    decorationThickness: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+                  if (isBetweenRange) Expanded(child: SizedBox.shrink()),
+
+                  // タイムライン（右端）
+                  SizedBox(width: 4),
+                  SizedBox(width: 18, child: Center(child: timelineIcon)),
+                ],
+              ),
             ),
             // 各項目の下に区切り線を追加（最後の項目以外）
             if (i < _scheduleLabels.length - 1 && !isBetweenRange)

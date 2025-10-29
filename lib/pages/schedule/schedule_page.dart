@@ -190,6 +190,9 @@ class _SchedulePageState extends State<SchedulePage>
                                     text: 'ローストスケジュール',
                                   ),
                                 ],
+                                labelColor: themeSettings.buttonColor,
+                                unselectedLabelColor: themeSettings.fontColor1.withValues(alpha: 0.7),
+                                indicatorColor: themeSettings.buttonColor,
                                 indicatorWeight: 3,
                               ),
                             ),
@@ -260,7 +263,7 @@ class _SchedulePageState extends State<SchedulePage>
                               ),
                             ),
                           ],
-                          labelColor: themeSettings.fontColor1,
+                          labelColor: themeSettings.buttonColor,
                           unselectedLabelColor: themeSettings.fontColor1
                               .withValues(alpha: 0.7),
                           indicatorColor: themeSettings.buttonColor,

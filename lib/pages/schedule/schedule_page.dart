@@ -83,6 +83,7 @@ class _SchedulePageState extends State<SchedulePage>
           child: Scaffold(
             backgroundColor: themeSettings.backgroundColor,
             appBar: AppBar(
+              toolbarHeight: kIsWeb ? 80 : 70,
               title: Row(
                 children: [
                   Icon(Icons.pending_actions, color: themeSettings.iconColor),
@@ -91,9 +92,7 @@ class _SchedulePageState extends State<SchedulePage>
                     'スケジュール管理',
                     style: TextStyle(
                       color: themeSettings.appBarTextColor,
-                      fontSize: kIsWeb
-                          ? 22 * WebUIUtils.getFontSizeScale(context)
-                          : 20 * themeSettings.fontSizeScale,
+                      fontSize: (20 * themeSettings.fontSizeScale).clamp(16.0, 28.0),
                       fontWeight: FontWeight.bold,
                       fontFamily: themeSettings.fontFamily,
                     ),
@@ -276,13 +275,33 @@ class _SchedulePageState extends State<SchedulePage>
                           controller: _tabController,
                           children: [
                             // --- 本日のスケジュールタブ ---
-                            TodaySchedule(
-                              onEditTimeLabels: (callback) {
-                                _openTimeLabelEditCallback = callback;
-                              },
+                            Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                color: themeSettings.cardBackgroundColor,
+                                child: TodaySchedule(
+                                  onEditTimeLabels: (callback) {
+                                    _openTimeLabelEditCallback = callback;
+                                  },
+                                ),
+                              ),
                             ),
                             // --- ローストスケジュールタブ ---
-                            RoastSchedulerTab(breakTimes: _roastBreakTimes),
+                            Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                color: themeSettings.cardBackgroundColor,
+                                child: RoastSchedulerTab(breakTimes: _roastBreakTimes),
+                              ),
+                            ),
                           ],
                         )
                       : WebUIUtils.responsiveContainer(

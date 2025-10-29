@@ -1346,6 +1346,97 @@ class _TodayScheduleState extends State<TodaySchedule>
 
     return Consumer<GroupProvider>(
       builder: (context, groupProvider, child) {
+        // 共通のコンテンツ部分
+        final content = Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 初期化中の場合はローディング表示
+              if (_isInitializing)
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Lottie.asset(
+                          'assets/animations/Loading coffee bean.json',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.contain,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Loading...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1.withValues(alpha: 0.7),
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              // ラベルが空の場合は空の状態表示
+              else if (_scheduleLabels.isEmpty ||
+                  (_scheduleLabels.length == 1 &&
+                      _scheduleLabels.first.isEmpty))
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.schedule,
+                          size: 48,
+                          color: Provider.of<ThemeSettings>(
+                            context,
+                          ).iconColor.withValues(alpha: 0.5),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          '時間ラベルを追加してください',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontColor1.withValues(alpha: 0.7),
+                            fontFamily: Provider.of<ThemeSettings>(
+                              context,
+                            ).fontFamily,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              // ラベルがある場合はスケジュール表示（スクロール可能）
+              else
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom + 16,
+                    ),
+                    child: Column(
+                      children: _buildScheduleLabelWidgets(),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+
+        // Web版では親のCardが既に存在するため、Cardを追加しない
+        if (kIsWeb) {
+          return content;
+        }
+
+        // モバイル版ではCardで包む
         return Padding(
           padding: EdgeInsets.all(16),
           child: Card(
@@ -1358,90 +1449,7 @@ class _TodayScheduleState extends State<TodaySchedule>
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.72,
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 初期化中の場合はローディング表示
-                        if (_isInitializing)
-                          Expanded(
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Lottie.asset(
-                                    'assets/animations/Loading coffee bean.json',
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'Loading...',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontColor1.withValues(alpha: 0.7),
-                                      fontFamily: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontFamily,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        // ラベルが空の場合は空の状態表示
-                        else if (_scheduleLabels.isEmpty ||
-                            (_scheduleLabels.length == 1 &&
-                                _scheduleLabels.first.isEmpty))
-                          Expanded(
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.schedule,
-                                    size: 48,
-                                    color: Provider.of<ThemeSettings>(
-                                      context,
-                                    ).iconColor.withValues(alpha: 0.5),
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    '時間ラベルを追加してください',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontColor1.withValues(alpha: 0.7),
-                                      fontFamily: Provider.of<ThemeSettings>(
-                                        context,
-                                      ).fontFamily,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        // ラベルがある場合はスケジュール表示（スクロール可能）
-                        else
-                          Expanded(
-                            child: SingleChildScrollView(
-                              padding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).padding.bottom + 16,
-                              ),
-                              child: Column(
-                                children: _buildScheduleLabelWidgets(),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
+                  child: content,
                 ),
                 // 時間ラベル編集用FAB（右下に配置）
                 Positioned(
@@ -1509,18 +1517,23 @@ class _TodayScheduleState extends State<TodaySchedule>
       }
 
       widgets.add(
-        Container(
-          decoration: BoxDecoration(
-            color: (isRangeStart || isRangeEnd || isBetweenRange)
-                ? themeSettings.buttonColor.withValues(alpha: 0.07)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          margin: EdgeInsets.symmetric(
-            vertical: isBetweenRange ? 1 : 1,
-          ), // さらに1に縮小
-          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-          child: Row(
+        Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                // Web版では範囲選択時のみ背景色を使用、それ以外は透明
+                color: (kIsWeb && !isRangeStart && !isRangeEnd && !isBetweenRange)
+                    ? Colors.transparent
+                    : (isRangeStart || isRangeEnd || isBetweenRange)
+                        ? themeSettings.buttonColor.withValues(alpha: 0.07)
+                        : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              margin: EdgeInsets.symmetric(
+                vertical: isBetweenRange ? 0.5 : 0,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+              child: Row(
             crossAxisAlignment: CrossAxisAlignment.start, // centerからstartに変更
             children: [
               SizedBox(width: 4),
@@ -1530,8 +1543,8 @@ class _TodayScheduleState extends State<TodaySchedule>
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 12, // 8から12に拡大してテキストフィールドと高さを合わせる
-                  ), // パディングを少し拡大
+                    vertical: 8, // 行間を狭くするため調整
+                  ),
                   decoration: BoxDecoration(
                     color: (_tempStartIndex == i || isRangeStart || isRangeEnd)
                         ? themeSettings.buttonColor.withValues(alpha: 0.18)
@@ -1558,7 +1571,7 @@ class _TodayScheduleState extends State<TodaySchedule>
                 Expanded(
                   child: _canEditTodaySchedule
                       ? SizedBox(
-                          height: 52, // 55から52に微調整してラベルと高さを合わせる
+                          height: 44, // 行間を狭くするため調整
                           child: TextField(
                             controller:
                                 _scheduleControllers[_scheduleLabels[i]],
@@ -1678,14 +1691,14 @@ class _TodayScheduleState extends State<TodaySchedule>
                               ),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 0,
-                                vertical: 8,
+                                vertical: 4,
                               ),
                               isDense: true,
                             ),
                           ),
                         )
                       : Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.symmetric(vertical: 4),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
@@ -1712,6 +1725,15 @@ class _TodayScheduleState extends State<TodaySchedule>
               SizedBox(width: 18, child: Center(child: timelineIcon)),
             ],
           ),
+            ),
+            // 各項目の下に区切り線を追加（最後の項目以外）
+            if (i < _scheduleLabels.length - 1 && !isBetweenRange)
+              Divider(
+                height: 0.5,
+                thickness: 0.5,
+                color: themeSettings.borderColor.withValues(alpha: 0.3),
+              ),
+          ],
         ),
       );
     }

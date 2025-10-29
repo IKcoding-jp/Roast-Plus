@@ -16,18 +16,6 @@ import 'package:flutter/foundation.dart';
 import '../../utils/web_ui_utils.dart' show WebUIUtils;
 import 'package:lottie/lottie.dart';
 
-// ▼▼▼ 範囲管理用クラスを追加 ▼▼▼
-class _ArrowRange {
-  final int start;
-  final int end;
-  _ArrowRange(this.start, this.end);
-  bool contains(int idx) =>
-      (start < end) ? (idx > start && idx < end) : (idx < start && idx > end);
-  bool isStart(int idx) => idx == start;
-  bool isEnd(int idx) => idx == end;
-  bool inRange(int idx) => isStart(idx) || isEnd(idx);
-}
-// ▲▲▲
 
 class TodaySchedule extends StatefulWidget {
   final void Function(void Function())? onEditTimeLabels;
@@ -42,7 +30,6 @@ class _TodayScheduleState extends State<TodaySchedule>
   List<String> _scheduleLabels = [];
   Map<String, String> _scheduleContents = {};
   final Map<String, TextEditingController> _scheduleControllers = {};
-  final List<_ArrowRange> _arrowRanges = [];
   bool _canEditTodaySchedule = true;
   bool _isSaving = false; // 保存中フラグを追加
   bool _isEditing = false; // 入力中フラグを追加
@@ -63,9 +50,6 @@ class _TodayScheduleState extends State<TodaySchedule>
   VoidCallback? _groupProviderListener;
   GroupProvider? _groupProvider; // GroupProviderの参照を保存
 
-  // ▼▼▼ 複数範囲用 ▼▼▼
-  int? _tempStartIndex;
-  // ▲▲▲
 
   // 日付変更検知用フィールド
   DateTime? _lastSavedDate;
@@ -155,42 +139,10 @@ class _TodayScheduleState extends State<TodaySchedule>
     }
   }
 
-  // ▼▼▼ 範囲選択の保存 ▼▼▼
-  Future<void> _saveArrowRanges() async {
-    try {
-      final ranges = _arrowRanges.map((r) => [r.start, r.end]).toList();
-      await UserSettingsFirestoreService.saveSetting(
-        'todaySchedule_arrowRanges',
-        ranges,
-      );
-    } catch (e) {
-      // 範囲選択保存エラー
-    }
-  }
-
-  Future<void> _loadArrowRanges() async {
-    try {
-      final ranges =
-          await UserSettingsFirestoreService.getSetting(
-            'todaySchedule_arrowRanges',
-          ) ??
-          [];
-      _arrowRanges.clear();
-      for (final item in ranges) {
-        if (item is List && item.length == 2) {
-          _arrowRanges.add(_ArrowRange(item[0], item[1]));
-        }
-      }
-    } catch (e) {
-      // 範囲選択読み込みエラー
-    }
-  }
-  // ▲▲▲
 
   @override
   void initState() {
     super.initState();
-    _loadArrowRanges();
     _setupGroupDataListener();
     _setupFirestoreListener();
     _cleanupOldTimeLabelsData(); // 古いtime_labelsデータを削除
@@ -349,7 +301,6 @@ class _TodayScheduleState extends State<TodaySchedule>
                   }
                 });
                 _initScheduleControllers();
-                await _loadArrowRanges();
                 debugPrint('TodaySchedule: グループデータ読み込み完了');
                 return; // グループデータが読み込めた場合は終了
               }
@@ -410,7 +361,6 @@ class _TodayScheduleState extends State<TodaySchedule>
         );
         debugPrint('TodaySchedule: 最終ラベル: $_scheduleLabels');
         _initScheduleControllers();
-        await _loadArrowRanges();
         if (mounted) {
           setState(() {
             // UIの強制更新
@@ -426,7 +376,6 @@ class _TodayScheduleState extends State<TodaySchedule>
           _scheduleContents = {};
         });
         _initScheduleControllers();
-        _arrowRanges.clear();
         if (mounted) {
           setState(() {
             // エラー時のUI強制更新
@@ -1215,36 +1164,6 @@ class _TodayScheduleState extends State<TodaySchedule>
     }
   }
 
-  // 範囲選択の追加・削除時に保存
-  void _onTapLabel(int i) {
-    // 権限がない場合は範囲選択を許可しない
-    if (!_canEditTodaySchedule) {
-      debugPrint('TodaySchedule: 時間ラベル編集権限がないため、範囲選択を許可しません');
-      return;
-    }
-
-    if (mounted) {
-      setState(() {
-        final removeIndex = _arrowRanges.indexWhere(
-          (r) => r.isStart(i) || r.isEnd(i),
-        );
-        if (removeIndex != -1) {
-          _arrowRanges.removeAt(removeIndex);
-          _saveArrowRanges();
-          return;
-        }
-        if (_tempStartIndex == null) {
-          _tempStartIndex = i;
-        } else if (_tempStartIndex != i) {
-          _arrowRanges.add(_ArrowRange(_tempStartIndex!, i));
-          _tempStartIndex = null;
-          _saveArrowRanges();
-        } else {
-          _tempStartIndex = null;
-        }
-      });
-    }
-  }
 
   // 編集権限を更新するメソッド
   void _updateEditPermissions(dynamic groupSettings, dynamic group) {
@@ -1543,50 +1462,12 @@ class _TodayScheduleState extends State<TodaySchedule>
     List<Widget> widgets = [];
     for (int i = 0; i < _scheduleLabels.length; i++) {
       debugPrint('TodaySchedule: ラベル $i を処理中: ${_scheduleLabels[i]}');
-      final isRangeStart = _arrowRanges.any((r) => r.isStart(i));
-      final isRangeEnd = _arrowRanges.any((r) => r.isEnd(i));
-      final isBetweenRange = _arrowRanges.any((r) => r.contains(i));
 
-      // タイムライン用アイコン
-      final themeButtonColor = themeSettings.buttonColor;
-      Widget timelineIcon;
-      if (isRangeStart) {
-        timelineIcon = Icon(
-          Icons.fiber_manual_record,
-          color: themeButtonColor,
-          size: 18,
-        ); // ●
-      } else if (isRangeEnd) {
-        timelineIcon = Icon(
-          Icons.arrow_drop_down,
-          color: themeButtonColor,
-          size: 24,
-        ); // ▼
-      } else if (isBetweenRange) {
-        timelineIcon = Container(
-          width: 2,
-          height: 24,
-          color: themeButtonColor.withValues(alpha: 0.7),
-        ); // │
-      } else {
-        timelineIcon = SizedBox(width: 18, height: 24); // 空白
-      }
 
       widgets.add(
         Column(
           children: [
             Container(
-              decoration: BoxDecoration(
-                // Web版では範囲選択時のみ背景色を使用、それ以外は透明
-                color:
-                    (kIsWeb && !isRangeStart && !isRangeEnd && !isBetweenRange)
-                    ? Colors.transparent
-                    : (isRangeStart || isRangeEnd || isBetweenRange)
-                    ? themeSettings.buttonColor.withValues(alpha: 0.07)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: EdgeInsets.symmetric(vertical: isBetweenRange ? 0.5 : 0),
               padding: EdgeInsets.symmetric(
                 horizontal: 0,
                 vertical: isMobileWeb
@@ -1603,42 +1484,32 @@ class _TodayScheduleState extends State<TodaySchedule>
                 children: [
                   SizedBox(width: isMobileWeb ? 0 : (isTablet ? 2 : 4)),
                   // 時間ラベル（左）
-                  GestureDetector(
-                    onTap: _canEditTodaySchedule ? () => _onTapLabel(i) : null,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobileWeb ? 10 : 12,
-                        vertical: isMobileWeb
-                            ? 10
-                            : isTablet
-                            ? 9.5
-                            : isWebDesktop
-                            ? 9
-                            : 8, // 行間を狭くするため調整
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            (_tempStartIndex == i || isRangeStart || isRangeEnd)
-                            ? themeSettings.buttonColor.withValues(alpha: 0.18)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          _scheduleLabels[i],
-                          style: TextStyle(
-                            fontSize: isMobileWeb
-                                ? 19
-                                : isTablet
-                                ? 18.5
-                                : isWebDesktop
-                                ? 18
-                                : (kIsWeb ? 16 : 12),
-                            fontWeight: FontWeight.bold,
-                            color: themeSettings.fontColor1,
-                            fontFamily: themeSettings.fontFamily,
-                          ),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobileWeb ? 10 : 12,
+                      vertical: isMobileWeb
+                          ? 10
+                          : isTablet
+                          ? 9.5
+                          : isWebDesktop
+                          ? 9
+                          : 8, // 行間を狭くするため調整
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        _scheduleLabels[i],
+                        style: TextStyle(
+                          fontSize: isMobileWeb
+                              ? 19
+                              : isTablet
+                              ? 18.5
+                              : isWebDesktop
+                              ? 18
+                              : (kIsWeb ? 16 : 12),
+                          fontWeight: FontWeight.bold,
+                          color: themeSettings.fontColor1,
+                          fontFamily: themeSettings.fontFamily,
                         ),
                       ),
                     ),
@@ -1647,9 +1518,8 @@ class _TodayScheduleState extends State<TodaySchedule>
                     width: isMobileWeb ? 6 : (isTablet ? 7 : 8),
                   ), // モバイルWebは少し詰める
                   // コンテンツフィールド（右）
-                  if (!isBetweenRange)
-                    Expanded(
-                      child: _canEditTodaySchedule
+                  Expanded(
+                    child: _canEditTodaySchedule
                           ? TextField(
                               controller:
                                   _scheduleControllers[_scheduleLabels[i]],
@@ -1828,19 +1698,15 @@ class _TodayScheduleState extends State<TodaySchedule>
                                       ? TextOverflow.visible
                                       : TextOverflow.ellipsis,
                                 ),
-                              ),
                             ),
+                          ),
                     ),
-                  if (isBetweenRange) Expanded(child: SizedBox.shrink()),
 
-                  // タイムライン（右端）
-                  SizedBox(width: 4),
-                  SizedBox(width: 18, child: Center(child: timelineIcon)),
                 ],
               ),
             ),
             // 各項目の下に区切り線を追加（最後の項目以外）
-            if (i < _scheduleLabels.length - 1 && !isBetweenRange)
+            if (i < _scheduleLabels.length - 1)
               Divider(
                 height: isMobileWeb
                     ? 1

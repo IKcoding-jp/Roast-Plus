@@ -2356,30 +2356,20 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                                     shape: BoxShape.circle,
                                   ),
                                   child: Center(
-                                    child: Text(
-                                      member.displayName.isNotEmpty
-                                          ? member.displayName[0].toUpperCase()
-                                          : '?',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: roleColor,
-                                      ),
+                                    child: _buildNameAvatar(
+                                      member.displayName,
+                                      radius: 20,
+                                      textColor: roleColor,
                                     ),
                                   ),
                                 );
                               },
                             ),
                           )
-                        : Text(
-                            member.displayName.isNotEmpty
-                                ? member.displayName[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: roleColor,
-                            ),
+                        : _buildNameAvatar(
+                            member.displayName,
+                            radius: 20,
+                            textColor: roleColor,
                           ),
                   ),
                   SizedBox(height: 4),
@@ -2411,6 +2401,43 @@ class _GroupInfoPageState extends State<GroupInfoPage>
             ),
           ),
       ],
+    );
+  }
+
+  // フルネームを丸アバター内に収めて表示する共通ウィジェット
+  Widget _buildNameAvatar(
+    String displayName, {
+    required double radius,
+    required Color textColor,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double diameter = radius * 2;
+        final double baseFontSize = (diameter * 0.28).clamp(10.0, 28.0);
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.center,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: diameter - 8),
+              child: Text(
+                displayName,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: TextStyle(
+                  fontSize: baseFontSize.toDouble(),
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                  height: 1.1,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -2526,19 +2553,10 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: Center(
-                                                  child: Text(
-                                                    member
-                                                            .displayName
-                                                            .isNotEmpty
-                                                        ? member.displayName[0]
-                                                              .toUpperCase()
-                                                        : '?',
-                                                    style: TextStyle(
-                                                      fontSize: 28,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: roleColor,
-                                                    ),
+                                                  child: _buildNameAvatar(
+                                                    member.displayName,
+                                                    radius: 32,
+                                                    textColor: roleColor,
                                                   ),
                                                 ),
                                               );
@@ -2555,31 +2573,20 @@ class _GroupInfoPageState extends State<GroupInfoPage>
                                       shape: BoxShape.circle,
                                     ),
                                     child: Center(
-                                      child: Text(
-                                        member.displayName.isNotEmpty
-                                            ? member.displayName[0]
-                                                  .toUpperCase()
-                                            : '?',
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.bold,
-                                          color: roleColor,
-                                        ),
+                                      child: _buildNameAvatar(
+                                        member.displayName,
+                                        radius: 32,
+                                        textColor: roleColor,
                                       ),
                                     ),
                                   );
                                 },
                               ),
                             )
-                          : Text(
-                              member.displayName.isNotEmpty
-                                  ? member.displayName[0].toUpperCase()
-                                  : '?',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: roleColor,
-                              ),
+                          : _buildNameAvatar(
+                              member.displayName,
+                              radius: 32,
+                              textColor: roleColor,
                             ),
                     ),
                     SizedBox(height: 12),

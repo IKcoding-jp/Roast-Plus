@@ -1628,22 +1628,22 @@ class _TodayScheduleState extends State<TodaySchedule>
                               ),
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: themeSettings.cardBackgroundColor,
                                 border: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: Colors.black,
+                                    color: themeSettings.fontColor1,
                                     width: 1,
                                   ),
                                 ),
                                 enabledBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: Colors.black,
+                                    color: themeSettings.fontColor1,
                                     width: 1,
                                   ),
                                 ),
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: Colors.black,
+                                    color: themeSettings.fontColor1,
                                     width: 2,
                                   ),
                                 ),

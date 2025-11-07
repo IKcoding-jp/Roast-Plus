@@ -56,6 +56,9 @@ export default function LoginPage() {
         case 'auth/wrong-password':
           errorMessage = 'パスワードが正しくありません';
           break;
+        case 'auth/invalid-credential':
+          errorMessage = 'メールアドレスもしくはパスワードが違います';
+          break;
         case 'auth/email-already-in-use':
           errorMessage = 'このメールアドレスは既に使用されています';
           break;

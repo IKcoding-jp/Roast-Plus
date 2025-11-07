@@ -13,6 +13,8 @@ export function useAppData() {
     taskLabels: [],
     assignments: [],
     assignmentHistory: [],
+    todaySchedules: [],
+    roastSchedules: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const isUpdatingRef = useRef(false);

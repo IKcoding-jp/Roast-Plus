@@ -16,6 +16,8 @@ const defaultData: AppData = {
   taskLabels: [],
   assignments: [],
   assignmentHistory: [],
+  todaySchedules: [],
+  roastSchedules: [],
 };
 
 function getUserDocRef(userId: string) {

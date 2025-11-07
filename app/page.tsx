@@ -91,15 +91,17 @@ export default function HomePage() {
           </button>
 
           {/* スケジュールカード */}
-          <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
+          <button
+            onClick={() => router.push('/schedule')}
+            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+          >
             <div className="mb-4 flex justify-center">
               <RiCalendarScheduleLine className="h-16 w-16 text-orange-500" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               スケジュール
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-500">開発中</p>
-          </div>
+          </button>
 
           {/* 試飲感想記録カード */}
           <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
@@ -109,7 +111,6 @@ export default function HomePage() {
             <h2 className="text-center text-lg font-semibold text-gray-800">
               試飲感想記録
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-500">開発中</p>
           </div>
 
           {/* 設定カード */}

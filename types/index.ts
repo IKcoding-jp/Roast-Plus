@@ -31,6 +31,38 @@ export interface Assignment {
   assignedDate: string; // YYYY-MM-DD形式
 }
 
+// 時間ラベル（本日のスケジュール用）
+export interface TimeLabel {
+  id: string;
+  time: string; // HH:mm形式
+  content: string; // 内容
+  memo?: string; // メモ（任意）
+  order?: number; // 表示順序
+}
+
+// 本日のスケジュール（日次スケジュール）
+export interface TodaySchedule {
+  id: string;
+  date: string; // YYYY-MM-DD形式
+  timeLabels: TimeLabel[];
+}
+
+// ローストスケジュール
+export interface RoastSchedule {
+  id: string;
+  time: string; // HH:mm形式
+  bean: string; // 豆の種類
+  settings?: string; // 設定
+  roastLevel?: string; // 焙煎度
+  bagCount?: number; // 袋数
+  flags: {
+    preheat?: boolean; // 予熱
+    afterPurge?: boolean; // アフターパージ
+    roast?: boolean; // ロースト
+  };
+  order?: number; // 時間順ソート用
+}
+
 // アプリ全体のデータ構造
 export interface AppData {
   teams: Team[];
@@ -38,6 +70,8 @@ export interface AppData {
   taskLabels: TaskLabel[];
   assignments: Assignment[]; // 現在の担当表（配列形式）
   assignmentHistory: Assignment[]; // 過去の履歴
+  todaySchedules: TodaySchedule[]; // 本日のスケジュール
+  roastSchedules: RoastSchedule[]; // ローストスケジュール
 }
 
 // 通知

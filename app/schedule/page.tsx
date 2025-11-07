@@ -41,10 +41,10 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-amber-50 py-2 sm:py-4 lg:py-6 px-2 sm:px-4 lg:px-6 flex flex-col">
-      <div className="w-full flex-1 flex flex-col">
+    <div className="h-screen bg-amber-50 pt-2 pb-4 px-4 sm:py-4 sm:px-4 lg:py-6 lg:px-6 flex flex-col overflow-hidden">
+      <div className="w-full flex-1 flex flex-col min-h-0">
         {/* ヘッダー */}
-        <header className="mb-4">
+        <header className="mb-4 flex-shrink-0">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors min-w-[44px] min-h-[44px]"
@@ -55,7 +55,7 @@ export default function SchedulePage() {
         </header>
 
         {/* タブナビゲーション（モバイル版） */}
-        <div className="mb-4 block lg:hidden">
+        <div className="mb-4 block lg:hidden flex-shrink-0">
           <nav className="flex gap-2 bg-white rounded-lg shadow p-1 sm:p-2">
             <button
               onClick={() => setActiveTab('today')}

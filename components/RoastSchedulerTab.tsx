@@ -280,8 +280,8 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
             <div className="mb-4 flex justify-center">
               <HiCalendar className="h-16 w-16 text-gray-300" />
             </div>
-            <p className="text-base font-medium">スケジュールがありません</p>
-            <p className="mt-2 text-sm">ボタンから新しいスケジュールを作成してください</p>
+            <p className="text-lg font-medium">スケジュールがありません</p>
+            <p className="mt-2 text-base">ボタンから新しいスケジュールを作成してください</p>
           </div>
         </div>
       ) : (
@@ -303,21 +303,34 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
                 onDragEnd={handleDragEnd}
               />
             ))}
+            {/* モバイル版：追加ボタンを一番下に表示 */}
+            <div className="mt-4 flex lg:hidden items-center justify-center pb-2">
+              <button
+                onClick={handleAdd}
+                className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
+                aria-label="スケジュールを追加"
+              >
+                <HiPlus className="h-4 w-4" />
+                <span className="hidden sm:inline">追加</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* モバイル版：追加ボタンを一番下に表示 */}
-      <div className="mt-4 flex lg:hidden items-center justify-center">
-        <button
-          onClick={handleAdd}
-          className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 min-w-[36px] min-h-[36px]"
-          aria-label="スケジュールを追加"
-        >
-          <HiPlus className="h-4 w-4" />
-          <span className="hidden sm:inline">追加</span>
-        </button>
-      </div>
+      {/* モバイル版：追加ボタンを一番下に表示（空の場合） */}
+      {sortedSchedules.length === 0 && (
+        <div className="mt-4 flex lg:hidden items-center justify-center">
+          <button
+            onClick={handleAdd}
+            className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
+            aria-label="スケジュールを追加"
+          >
+            <HiPlus className="h-4 w-4" />
+            <span className="hidden sm:inline">追加</span>
+          </button>
+        </div>
+      )}
 
       {/* モーダルダイアログ */}
       {(isAdding || editingSchedule) && (
@@ -392,9 +405,9 @@ function ScheduleCard({
 
   // アイコンの取得
   const getIcon = () => {
-    if (isRoasterOn) return <HiFire className="text-lg text-orange-500" />;
-    if (isRoast) return <FaCoffee className="text-lg text-amber-700" />;
-    if (isAfterPurge) return <FaSnowflake className="text-lg text-blue-500" />;
+    if (isRoasterOn) return <HiFire className="text-xl text-orange-500" />;
+    if (isRoast) return <FaCoffee className="text-xl text-amber-700" />;
+    if (isAfterPurge) return <FaSnowflake className="text-xl text-blue-500" />;
     return null;
   };
 
@@ -465,7 +478,7 @@ function ScheduleCard({
         onDragEnd();
       }}
       onClick={handleCardClick}
-      className={`rounded-lg border border-gray-200 bg-white p-2 sm:p-3 cursor-move hover:shadow-sm hover:border-amber-300 transition-all ${
+      className={`rounded-lg border border-gray-200 bg-white p-3 sm:p-4 cursor-move hover:shadow-sm hover:border-amber-300 transition-all ${
         isDragging ? 'opacity-50' : ''
       } ${isDragOver ? 'border-amber-500 border-2 bg-amber-50' : ''}`}
     >
@@ -473,14 +486,14 @@ function ScheduleCard({
         {/* 左側：時間バッジまたはアイコン */}
         {isAfterPurge ? (
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <div className="text-sm sm:text-base font-medium text-gray-800 select-none min-w-[50px]">
+            <div className="text-base sm:text-base font-medium text-gray-800 select-none min-w-[50px]">
               {/* スペーサーとして空のdivを使用 */}
             </div>
             {getIcon()}
           </div>
         ) : (
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <div className="text-sm sm:text-base font-medium text-gray-800 select-none min-w-[50px]">
+            <div className="text-base sm:text-base font-medium text-gray-800 select-none min-w-[50px]">
               {schedule.time || ''}
             </div>
             {getIcon()}
@@ -489,15 +502,15 @@ function ScheduleCard({
 
         {/* 中央：メモ内容 */}
         <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          <div className="text-sm font-medium text-gray-800">
+          <div className="text-base font-medium text-gray-800">
             {memoContent.firstLine}
           </div>
           {memoContent.secondLine && (
-            <div className="text-xs text-gray-500">{memoContent.secondLine}</div>
+            <div className="text-sm text-gray-500">{memoContent.secondLine}</div>
           )}
           {schedule.roastLevel && (
             <span
-              className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${getRoastLevelColor(
+              className={`inline-block rounded px-2 py-1 text-sm font-medium ${getRoastLevelColor(
                 schedule.roastLevel
               )}`}
             >
@@ -512,10 +525,10 @@ function ScheduleCard({
             e.stopPropagation();
             onDelete();
           }}
-          className="rounded-md bg-red-50 p-1.5 sm:p-2 text-red-600 transition-colors hover:bg-red-100 min-w-[32px] min-h-[32px] sm:min-w-[36px] sm:min-h-[36px] flex items-center justify-center flex-shrink-0"
-          aria-label="削除"
-        >
-          <HiTrash className="h-3 w-3 sm:h-4 sm:w-4" />
+          className="rounded-md bg-red-50 p-1.5 sm:p-2 text-red-600 transition-colors hover:bg-red-100 min-w-[36px] min-h-[36px] sm:min-w-[36px] sm:min-h-[36px] flex items-center justify-center flex-shrink-0"
+                  aria-label="削除"
+                >
+                  <HiTrash className="h-4 w-4 sm:h-4 sm:w-4" />
         </button>
       </div>
     </div>

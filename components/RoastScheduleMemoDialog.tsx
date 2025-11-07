@@ -32,7 +32,7 @@ export function RoastScheduleMemoDialog({
   const [isRoasterOn, setIsRoasterOn] = useState(schedule?.isRoasterOn || false);
   const [isRoast, setIsRoast] = useState(schedule?.isRoast || false);
   const [isAfterPurge, setIsAfterPurge] = useState(schedule?.isAfterPurge || false);
-  const [beanName, setBeanName] = useState<BeanName | ''>(schedule?.beanName || '');
+  const [beanName, setBeanName] = useState<BeanName | ''>((schedule?.beanName as BeanName | undefined) || '');
   const [weight, setWeight] = useState<200 | 300 | 500 | ''>(schedule?.weight || '');
   const [roastLevel, setRoastLevel] = useState<
     '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
@@ -48,7 +48,7 @@ export function RoastScheduleMemoDialog({
     setIsRoasterOn(schedule?.isRoasterOn || false);
     setIsRoast(schedule?.isRoast || false);
     setIsAfterPurge(schedule?.isAfterPurge || false);
-    setBeanName(schedule?.beanName || '');
+    setBeanName((schedule?.beanName as BeanName | undefined) || '');
     setWeight(schedule?.weight || '');
     setRoastLevel(schedule?.roastLevel || '');
     setRoastCount(schedule?.roastCount?.toString() || '');

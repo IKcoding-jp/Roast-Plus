@@ -1,0 +1,31 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
+import { auth } from './firebase';
+
+export function useAuth() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return { user, loading };
+}
+
+export async function signOut() {
+  try {
+    await firebaseSignOut(auth);
+  } catch (error) {
+    console.error('ログアウトエラー:', error);
+    throw error;
+  }
+}
+

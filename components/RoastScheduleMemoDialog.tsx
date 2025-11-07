@@ -75,7 +75,7 @@ export function RoastScheduleMemoDialog({
 
     // バリデーション
     if (!isRoasterOn && !isRoast && !isAfterPurge) {
-      alert('メモタイプを選択してください');
+      alert('スケジュールタイプを選択してください');
       return;
     }
 
@@ -123,7 +123,7 @@ export function RoastScheduleMemoDialog({
 
   const handleDelete = () => {
     if (schedule && onDelete) {
-      if (confirm('このメモを削除してもよろしいですか？')) {
+      if (confirm('このスケジュールを削除してもよろしいですか？')) {
         onDelete(schedule.id);
       }
     }
@@ -173,7 +173,7 @@ export function RoastScheduleMemoDialog({
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h3 className="text-xl font-semibold text-gray-800">
-            {schedule ? 'メモを編集' : 'メモを追加'}
+            {schedule ? 'スケジュールを編集' : 'スケジュールを追加'}
           </h3>
           <button
             onClick={onCancel}
@@ -229,10 +229,10 @@ export function RoastScheduleMemoDialog({
               </div>
             )}
 
-            {/* メモタイプ選択（排他的） */}
+            {/* スケジュールタイプ選択（排他的） */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700 text-center">
-                メモタイプ <span className="text-red-500">*</span>
+                スケジュールタイプ <span className="text-red-500">*</span>
               </label>
               <div className="flex flex-wrap justify-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">

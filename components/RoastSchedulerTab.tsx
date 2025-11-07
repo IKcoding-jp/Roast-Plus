@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { AppData, RoastSchedule } from '@/types';
-import { HiPlus, HiTrash, HiFire } from 'react-icons/hi';
+import { HiPlus, HiTrash, HiFire, HiCalendar } from 'react-icons/hi';
 import { FaCoffee, FaSnowflake } from 'react-icons/fa';
 import { RoastScheduleMemoDialog } from './RoastScheduleMemoDialog';
 
@@ -267,7 +267,7 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
         <button
           onClick={handleAdd}
           className="flex items-center gap-1 sm:gap-2 rounded-md bg-amber-600 px-3 py-2 text-sm sm:text-base font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0"
-          aria-label="メモを追加"
+          aria-label="スケジュールを追加"
         >
           <HiPlus className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="hidden sm:inline">追加</span>
@@ -275,13 +275,13 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       </div>
 
       {sortedSchedules.length === 0 ? (
-        <div className="flex-1 flex items-start justify-center pt-12 text-center text-gray-500">
+        <div className="flex-1 flex items-center justify-center text-center text-gray-500">
           <div>
             <div className="mb-4 flex justify-center">
-              <div className="text-6xl text-gray-300">📄</div>
+              <HiCalendar className="h-16 w-16 text-gray-300" />
             </div>
-            <p className="text-base font-medium">メモがありません</p>
-            <p className="mt-2 text-sm">ボタンから新しいメモを作成してください</p>
+            <p className="text-base font-medium">スケジュールがありません</p>
+            <p className="mt-2 text-sm">ボタンから新しいスケジュールを作成してください</p>
           </div>
         </div>
       ) : (
@@ -312,7 +312,7 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
         <button
           onClick={handleAdd}
           className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 min-w-[36px] min-h-[36px]"
-          aria-label="メモを追加"
+          aria-label="スケジュールを追加"
         >
           <HiPlus className="h-4 w-4" />
           <span className="hidden sm:inline">追加</span>
@@ -333,9 +333,9 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       {deleteConfirmId && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4" onClick={handleDeleteCancel}>
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">メモを削除</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">スケジュールを削除</h3>
             <p className="text-gray-600 mb-6">
-              このメモを削除してもよろしいですか？この操作は取り消せません。
+              このスケジュールを削除してもよろしいですか？この操作は取り消せません。
             </p>
             <div className="flex gap-3 justify-end">
               <button

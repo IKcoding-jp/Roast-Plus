@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { AppData, TodaySchedule, TimeLabel } from '@/types';
-import { HiPlus, HiTrash, HiX } from 'react-icons/hi';
+import { HiPlus, HiTrash, HiX, HiClock } from 'react-icons/hi';
 
 interface TodayScheduleProps {
   data: AppData | null;
@@ -454,9 +454,12 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       </div>
 
       {localTimeLabels.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center py-8 text-center text-gray-500">
+        <div className="flex-1 flex items-center justify-center text-center text-gray-500">
           <div>
-            <p>時間ラベルがありません</p>
+            <div className="mb-4 flex justify-center">
+              <HiClock className="h-16 w-16 text-gray-300" />
+            </div>
+            <p className="text-base font-medium">時間ラベルがありません</p>
             <p className="mt-2 text-sm">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
           </div>
         </div>

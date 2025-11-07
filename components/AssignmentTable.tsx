@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import type { AppData, Assignment } from '@/types';
+import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
 interface AssignmentTableProps {
   data: AppData | null;
@@ -112,6 +113,7 @@ function shuffleAssignments(
 }
 
 export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
+  const { isEnabled: isDeveloperModeEnabled } = useDeveloperMode();
   const [isShuffling, setIsShuffling] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [shuffleDisplay, setShuffleDisplay] = useState<{ [key: string]: string | null }>({});
@@ -470,25 +472,27 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
             ? '既にシャッフル済みです'
             : 'シャッフルして担当を決める'}
         </button>
-        <button
-          onClick={() => {
-            setIsShuffling(true);
-            setIsAnimating(true);
-            setIsCompleted(false);
-            setSelectedCell(null);
-            setHighlightedCell(null);
-            const shuffled = shuffleAssignments(data);
-            setShuffledAssignments(shuffled);
-            setTimeout(() => {
+        {isDeveloperModeEnabled && (
+          <button
+            onClick={() => {
+              setIsShuffling(true);
               setIsAnimating(true);
-            }, 0);
-          }}
-          disabled={isShuffling || isAnimating}
-          className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-600 text-white text-sm sm:text-base rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          title="開発用: 制限なしでシャッフル"
-        >
-          {isShuffling || isAnimating ? 'シャッフル中...' : '開発用: 強制シャッフル'}
-        </button>
+              setIsCompleted(false);
+              setSelectedCell(null);
+              setHighlightedCell(null);
+              const shuffled = shuffleAssignments(data);
+              setShuffledAssignments(shuffled);
+              setTimeout(() => {
+                setIsAnimating(true);
+              }, 0);
+            }}
+            disabled={isShuffling || isAnimating}
+            className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-600 text-white text-sm sm:text-base rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            title="開発用: 制限なしでシャッフル"
+          >
+            {isShuffling || isAnimating ? 'シャッフル中...' : '開発用: 強制シャッフル'}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { AppData, TodaySchedule, TimeLabel } from '@/types';
-import { HiPlus, HiTrash, HiPencil } from 'react-icons/hi';
+import { HiPlus, HiTrash, HiX } from 'react-icons/hi';
 
 interface TodayScheduleProps {
   data: AppData | null;
@@ -12,8 +12,11 @@ interface TodayScheduleProps {
 export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   const [isComposing, setIsComposing] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
+  const [addError, setAddError] = useState<string>('');
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUpdatingRef = useRef(false);
   const dataRef = useRef<AppData | null>(data);
   const todayScheduleIdRef = useRef<string>('');
@@ -278,15 +281,41 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
+      
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
     };
   }, []);
 
   const addTimeLabel = () => {
-    const hour = newHour.padStart(2, '0');
-    const minute = newMinute.padStart(2, '0');
-    const time = `${hour}:${minute}`;
+    if (!newHour) {
+      setAddError('数字を入力してください');
+      
+      // 既存のタイマーをクリア
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      
+      // 3秒後にエラーを自動的にクリア
+      errorTimeoutRef.current = setTimeout(() => {
+        setAddError('');
+        errorTimeoutRef.current = null;
+      }, 3000);
+      
+      return;
+    }
     
-    if (!newHour || !newMinute) return;
+    // エラーをクリア（タイマーもクリア）
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+      errorTimeoutRef.current = null;
+    }
+    setAddError('');
+    
+    const hour = newHour.padStart(2, '0');
+    const minute = newMinute ? newMinute.padStart(2, '0') : '00'; // 分が未入力の場合は00
+    const time = `${hour}:${minute}`;
     
     const newLabel: TimeLabel = {
       id: `time-${Date.now()}`,
@@ -313,6 +342,25 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
 
   const handleDeleteCancel = () => {
     setDeleteConfirmId(null);
+  };
+
+  const handleEditLabel = (id: string) => {
+    setEditingLabelId(id);
+  };
+
+  const handleEditCancel = () => {
+    setEditingLabelId(null);
+  };
+
+  const handleEditSave = (id: string, hour: string, minute: string) => {
+    if (!hour) return; // 時が入力されていない場合は保存しない
+    
+    const formattedHour = hour.padStart(2, '0');
+    const formattedMinute = minute ? minute.padStart(2, '0') : '00';
+    const newTime = `${formattedHour}:${formattedMinute}`;
+    
+    updateTimeLabel(id, { time: newTime });
+    setEditingLabelId(null);
   };
 
   const updateTimeLabel = (id: string, updates: Partial<TimeLabel>) => {
@@ -359,11 +407,23 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
                 const value = e.target.value;
                 if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
                   setNewHour(value);
+                  // エラーをクリア（タイマーもクリア）
+                  if (addError) {
+                    if (errorTimeoutRef.current) {
+                      clearTimeout(errorTimeoutRef.current);
+                      errorTimeoutRef.current = null;
+                    }
+                    setAddError('');
+                  }
                 }
               }}
               min="0"
               max="23"
-              className="w-16 rounded-md border border-gray-300 px-2 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className={`w-16 rounded-md border px-2 py-2 text-sm sm:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                addError 
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                  : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
+              }`}
               placeholder="時"
             />
             <span className="text-gray-600">:</span>
@@ -384,8 +444,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
           </div>
           <button
             onClick={addTimeLabel}
-            disabled={!newHour || !newMinute}
-            className="flex items-center gap-1 sm:gap-2 rounded-md bg-amber-600 px-3 py-2 text-sm sm:text-base font-medium text-white transition-colors hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0"
+            className="flex items-center gap-1 sm:gap-2 rounded-md bg-amber-600 px-3 py-2 text-sm sm:text-base font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0"
             aria-label="時間ラベルを追加"
           >
             <HiPlus className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -411,7 +470,10 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
               >
                 {/* 時間表示 */}
                 <div className="w-14 sm:w-16 flex-shrink-0">
-                  <div className="text-sm sm:text-base font-medium text-gray-800 select-none">
+                  <div 
+                    onClick={() => handleEditLabel(label.id)}
+                    className="text-sm sm:text-base font-medium text-gray-800 select-none cursor-pointer hover:text-amber-600 transition-colors"
+                  >
                     {label.time || '--:--'}
                   </div>
                 </div>
@@ -458,11 +520,23 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
               const value = e.target.value;
               if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
                 setNewHour(value);
+                // エラーをクリア（タイマーもクリア）
+                if (addError) {
+                  if (errorTimeoutRef.current) {
+                    clearTimeout(errorTimeoutRef.current);
+                    errorTimeoutRef.current = null;
+                  }
+                  setAddError('');
+                }
               }
             }}
             min="0"
             max="23"
-            className="w-12 rounded-md border border-gray-300 px-1 py-1.5 text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className={`w-12 rounded-md border px-1 py-1.5 text-sm text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+              addError 
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
+            }`}
             placeholder="時"
           />
           <span className="text-gray-600 text-xs">:</span>
@@ -483,8 +557,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         </div>
         <button
           onClick={addTimeLabel}
-          disabled={!newHour || !newMinute}
-          className="flex items-center gap-1 rounded-md bg-amber-600 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed min-w-[36px] min-h-[36px]"
+          className="flex items-center gap-1 rounded-md bg-amber-600 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 min-w-[36px] min-h-[36px]"
           aria-label="時間ラベルを追加"
         >
           <HiPlus className="h-3 w-3" />
@@ -517,6 +590,138 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
           </div>
         </div>
       )}
+
+      {/* 時間編集ダイアログ */}
+      {editingLabelId && (() => {
+        const editingLabel = localTimeLabels.find((label) => label.id === editingLabelId);
+        if (!editingLabel) return null;
+        
+        const parseTime = (timeStr: string) => {
+          if (!timeStr) return { hour: '', minute: '' };
+          const [hour, minute] = timeStr.split(':');
+          return { hour: hour || '', minute: minute || '' };
+        };
+        
+        const initialTime = parseTime(editingLabel.time);
+        
+        return (
+          <TimeEditDialog
+            initialHour={initialTime.hour}
+            initialMinute={initialTime.minute}
+            onSave={(hour, minute) => handleEditSave(editingLabelId, hour, minute)}
+            onCancel={handleEditCancel}
+          />
+        );
+      })()}
+    </div>
+  );
+}
+
+interface TimeEditDialogProps {
+  initialHour: string;
+  initialMinute: string;
+  onSave: (hour: string, minute: string) => void;
+  onCancel: () => void;
+}
+
+function TimeEditDialog({
+  initialHour,
+  initialMinute,
+  onSave,
+  onCancel,
+}: TimeEditDialogProps) {
+  const [hour, setHour] = useState(initialHour);
+  const [minute, setMinute] = useState(initialMinute);
+
+  // initialHour/initialMinuteが変更されたときにstateを更新
+  useEffect(() => {
+    setHour(initialHour);
+    setMinute(initialMinute);
+  }, [initialHour, initialMinute]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hour) return;
+    onSave(hour, minute);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4" onClick={onCancel}>
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full border-2 border-gray-300" onClick={(e) => e.stopPropagation()}>
+        {/* ヘッダー */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-gray-800">時間を編集</h3>
+          <button
+            onClick={onCancel}
+            className="rounded-md bg-gray-200 p-2 text-gray-700 transition-colors hover:bg-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="閉じる"
+          >
+            <HiX className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* フォーム */}
+        <form onSubmit={handleSubmit} className="p-6">
+          <div className="space-y-4 max-w-md mx-auto">
+            {/* 時間選択 */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 text-center">
+                時間 <span className="text-red-500">*</span>
+              </label>
+              <div className="flex items-center justify-center gap-2">
+                <input
+                  type="number"
+                  value={hour}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
+                      setHour(value);
+                    }
+                  }}
+                  min="0"
+                  max="23"
+                  required
+                  className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  placeholder="時"
+                />
+                <span className="text-gray-600 text-lg">:</span>
+                <input
+                  type="number"
+                  value={minute}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 59)) {
+                      setMinute(value);
+                    }
+                  }}
+                  min="0"
+                  max="59"
+                  className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  placeholder="分"
+                />
+              </div>
+            </div>
+
+            {/* フッター */}
+            <div className="flex gap-3 pt-4 border-t border-gray-200 justify-center">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors min-h-[44px]"
+              >
+                キャンセル
+              </button>
+              <button
+                type="submit"
+                disabled={!hour}
+                className="px-6 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                保存
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

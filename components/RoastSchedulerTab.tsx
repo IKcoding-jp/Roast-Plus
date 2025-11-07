@@ -58,19 +58,19 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
     
     if (roastLevel === '浅煎り') {
       // ライト・ロースト / シナモン・ロースト: 黄味がかった小麦色 / シナモン色
-      return 'bg-yellow-200 text-yellow-900';
+      return 'text-yellow-900';
     }
     if (roastLevel === '中煎り') {
       // ミディアム・ロースト: 栗色
-      return 'bg-orange-400 text-white';
+      return 'text-white';
     }
     if (roastLevel === '中深煎り') {
       // ハイ・ロースト: 濃い茶色
-      return 'bg-amber-700 text-white';
+      return 'text-white';
     }
     if (roastLevel === '深煎り') {
       // シティ・ロースト以降: 非常に濃い茶色から黒色
-      return 'bg-gray-800 text-white';
+      return 'text-white';
     }
     return 'bg-gray-100 text-gray-800';
   };
@@ -96,13 +96,16 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
     if (!weight) return 'bg-gray-100 text-gray-800';
     
     if (weight === '200g') {
-      return 'bg-emerald-100 text-emerald-800';
+      // 明るい緑または明るい黄色（軽さ・新鮮さ）
+      return 'bg-green-200 text-green-900';
     }
     if (weight === '300g') {
-      return 'bg-teal-100 text-teal-800';
+      // 水色または落ち着いた緑（バランス・標準・穏やかさ）
+      return 'bg-sky-100 text-sky-800';
     }
     if (weight === '500g') {
-      return 'bg-cyan-100 text-cyan-800';
+      // 暖色系（オレンジ、茶色）または赤
+      return 'bg-orange-200 text-orange-900';
     }
     return 'bg-gray-100 text-gray-800';
   };
@@ -536,7 +539,20 @@ function ScheduleCard({
                 </span>
               )}
               {memoContent.roastLevel && (
-                <span className={`inline-block rounded px-2 py-0.5 text-sm font-medium ${getRoastLevelColor(memoContent.roastLevel)}`}>
+                <span 
+                  className={`inline-block rounded px-2 py-0.5 text-sm font-medium ${getRoastLevelColor(memoContent.roastLevel)}`}
+                  style={
+                    memoContent.roastLevel === '深煎り' 
+                      ? { backgroundColor: '#120C0A' }
+                      : memoContent.roastLevel === '中深煎り'
+                      ? { backgroundColor: '#4E3526' }
+                      : memoContent.roastLevel === '中煎り'
+                      ? { backgroundColor: '#745138' }
+                      : memoContent.roastLevel === '浅煎り'
+                      ? { backgroundColor: '#C78F5D' }
+                      : undefined
+                  }
+                >
                   {memoContent.roastLevel}
                 </span>
               )}

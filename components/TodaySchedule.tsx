@@ -14,6 +14,16 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUpdatingRef = useRef(false);
+  const dataRef = useRef<AppData | null>(data);
+  const todayScheduleIdRef = useRef<string>('');
+  const originalTimeLabelsRef = useRef<TimeLabel[]>([]);
+  const onUpdateRef = useRef(onUpdate);
+
+  // 最新の参照を保持
+  useEffect(() => {
+    dataRef.current = data;
+    onUpdateRef.current = onUpdate;
+  }, [data, onUpdate]);
 
   if (!data) {
     return (
@@ -30,26 +40,43 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     timeLabels: [],
   };
 
-  const [localTimeLabels, setLocalTimeLabels] = useState<TimeLabel[]>(todaySchedule.timeLabels || []);
+  const [localTimeLabels, setLocalTimeLabels] = useState<TimeLabel[]>([]);
   const [newHour, setNewHour] = useState<string>('');
   const [newMinute, setNewMinute] = useState<string>('');
+  const lastDataRef = useRef<string>('');
+  const localTimeLabelsRef = useRef<TimeLabel[]>([]);
 
-  // データが更新されたらローカル状態を同期（外部からの更新のみ）
+  // データが読み込まれたときにローカル状態を初期化・同期
   useEffect(() => {
-    if (isUpdatingRef.current) {
-      return; // ローカル更新中は同期しない
-    }
+    if (!data) return;
 
     const currentSchedule = data.todaySchedules?.find((s) => s.date === today);
     const newTimeLabels = currentSchedule?.timeLabels || [];
+    const newTimeLabelsStr = JSON.stringify(newTimeLabels);
     
-    // 内容が異なる場合のみ更新
-    const currentStr = JSON.stringify(localTimeLabels);
-    const newStr = JSON.stringify(newTimeLabels);
-    if (currentStr !== newStr) {
-      setLocalTimeLabels(newTimeLabels);
+    // 前回のデータと同じ場合は何もしない（無限ループ防止）
+    if (lastDataRef.current === newTimeLabelsStr) {
+      return;
     }
-  }, [data.todaySchedules, today]);
+    
+    // 外部からの更新の場合のみ同期（ローカル更新中は同期しない）
+    if (!isUpdatingRef.current) {
+      // originalTimeLabelsRefと比較して、異なる場合のみ更新
+      const originalStr = JSON.stringify(originalTimeLabelsRef.current);
+      if (originalStr !== newTimeLabelsStr) {
+        setLocalTimeLabels(newTimeLabels);
+        localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+        originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+        todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+        lastDataRef.current = newTimeLabelsStr;
+      }
+    } else {
+      // ローカル更新後、Firestoreからの更新が来た場合は、originalTimeLabelsRefを更新
+      originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+      todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+      lastDataRef.current = newTimeLabelsStr;
+    }
+  }, [data?.todaySchedules, today]);
 
   // デバウンス保存関数
   const debouncedSave = useCallback(
@@ -61,16 +88,27 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       // 既存のタイマーをクリア
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
       }
 
       // 新しいタイマーを設定（500ms後に保存）
       debounceTimerRef.current = setTimeout(() => {
+        const currentData = dataRef.current;
+        if (!currentData) return;
+
+        // 保存する値がoriginalTimeLabelsRefと同じ場合は保存しない（無限ループ防止）
+        const newTimeLabelsStr = JSON.stringify(newTimeLabels);
+        const originalStr = JSON.stringify(originalTimeLabelsRef.current);
+        if (originalStr === newTimeLabelsStr) {
+          return;
+        }
+
         isUpdatingRef.current = true;
-        const updatedSchedules = [...(data.todaySchedules || [])];
+        const updatedSchedules = [...(currentData.todaySchedules || [])];
         const existingIndex = updatedSchedules.findIndex((s) => s.date === today);
 
         const updatedSchedule: TodaySchedule = {
-          id: todaySchedule.id,
+          id: todayScheduleIdRef.current || `schedule-${today}`,
           date: today,
           timeLabels: newTimeLabels,
         };
@@ -82,19 +120,25 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         }
 
         const updatedData: AppData = {
-          ...data,
+          ...currentData,
           todaySchedules: updatedSchedules,
         };
 
-        onUpdate(updatedData);
+        // originalTimeLabelsRefを更新
+        originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+        localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+        todayScheduleIdRef.current = updatedSchedule.id;
+        lastDataRef.current = newTimeLabelsStr;
+
+        onUpdateRef.current(updatedData);
         
-        // 更新フラグをリセット（少し遅延）
+        // 更新フラグをリセット（FirestoreのonSnapshotが発火する前に）
         setTimeout(() => {
           isUpdatingRef.current = false;
-        }, 100);
+        }, 500);
       }, 500);
     },
-    [data, today, todaySchedule.id, onUpdate, isComposing]
+    [today, isComposing]
   );
 
   // ローカル状態が変更されたらデバウンス保存
@@ -103,7 +147,10 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       return; // 更新中は保存しない
     }
 
-    const originalTimeLabels = todaySchedule.timeLabels || [];
+    // localTimeLabelsRefを更新
+    localTimeLabelsRef.current = JSON.parse(JSON.stringify(localTimeLabels));
+
+    const originalTimeLabels = originalTimeLabelsRef.current;
     
     // 長さが異なる場合
     if (localTimeLabels.length !== originalTimeLabels.length) {
@@ -126,15 +173,62 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     if (hasChanges) {
       debouncedSave(localTimeLabels);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localTimeLabels]);
+  }, [localTimeLabels, debouncedSave]);
 
-  // クリーンアップ
+  // クリーンアップ（アンマウント時に未保存の変更を保存）
   useEffect(() => {
     return () => {
+      // 未保存の変更がある場合は保存
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
       }
+      
+      // 未保存の変更を即座に保存（変更がある場合のみ）
+      if (!isUpdatingRef.current) {
+        const currentTimeLabels = localTimeLabelsRef.current;
+        const originalTimeLabels = originalTimeLabelsRef.current;
+        const hasChanges = currentTimeLabels.length !== originalTimeLabels.length ||
+          currentTimeLabels.some((label, index) => {
+            const original = originalTimeLabels[index];
+            return (
+              !original ||
+              label.id !== original.id ||
+              label.time !== original.time ||
+              label.content !== original.content ||
+              label.memo !== original.memo
+            );
+          });
+
+        if (hasChanges) {
+          const currentData = dataRef.current;
+          if (currentData) {
+            const currentToday = new Date().toISOString().split('T')[0];
+            const updatedSchedules = [...(currentData.todaySchedules || [])];
+            const existingIndex = updatedSchedules.findIndex((s) => s.date === currentToday);
+
+            const updatedSchedule: TodaySchedule = {
+              id: todayScheduleIdRef.current || `schedule-${currentToday}`,
+              date: currentToday,
+              timeLabels: currentTimeLabels,
+            };
+
+            if (existingIndex >= 0) {
+              updatedSchedules[existingIndex] = updatedSchedule;
+            } else {
+              updatedSchedules.push(updatedSchedule);
+            }
+
+            const updatedData: AppData = {
+              ...currentData,
+              todaySchedules: updatedSchedules,
+            };
+
+            onUpdateRef.current(updatedData);
+          }
+        }
+      }
+
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }

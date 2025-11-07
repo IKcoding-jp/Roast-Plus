@@ -8,10 +8,13 @@ import { RiCalendarScheduleLine } from "react-icons/ri";
 import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
 import { IoSettings } from "react-icons/io5";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { useNotifications } from '@/hooks/useNotifications';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -48,12 +51,27 @@ export default function HomePage() {
           <PiCoffeeBeanFill className="h-6 w-6 text-[#8B4513]" />
           <h1 className="text-xl font-bold text-gray-800">ローストプラス</h1>
         </div>
-        <button
-          onClick={handleLogout}
-          className="text-sm font-medium text-gray-700 hover:text-gray-900"
-        >
-          ログアウト
-        </button>
+        <div className="flex items-center gap-4">
+          {/* 通知マーク */}
+          <button
+            onClick={() => router.push('/notifications')}
+            className="relative p-2.5 text-gray-700 hover:text-gray-900 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="通知"
+          >
+            <IoNotificationsOutline className="h-6 w-6" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={handleLogout}
+            className="text-sm font-medium text-gray-700 hover:text-gray-900"
+          >
+            ログアウト
+          </button>
+        </div>
       </header>
 
       {/* メインコンテンツ */}

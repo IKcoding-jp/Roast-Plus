@@ -40,3 +40,14 @@ export interface AppData {
   assignmentHistory: Assignment[]; // 過去の履歴
 }
 
+// 通知
+export type NotificationType = 'update' | 'announcement';
+
+export interface Notification {
+  id: string;
+  title: string;
+  content: string;
+  date: string; // YYYY-MM-DD形式
+  type: NotificationType;
+}
+

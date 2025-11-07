@@ -7,6 +7,7 @@ import { PiCoffeeBeanFill } from "react-icons/pi";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
+import { IoSettings } from "react-icons/io5";
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -57,7 +58,7 @@ export default function HomePage() {
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* 担当表カード */}
           <button
             onClick={() => router.push('/assignment')}
@@ -92,6 +93,19 @@ export default function HomePage() {
             </h2>
             <p className="mt-2 text-center text-sm text-gray-500">開発中</p>
           </div>
+
+          {/* 設定カード */}
+          <button
+            onClick={() => router.push('/settings')}
+            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+          >
+            <div className="mb-4 flex justify-center">
+              <IoSettings className="h-16 w-16 text-orange-500" />
+            </div>
+            <h2 className="text-center text-lg font-semibold text-gray-800">
+              設定
+            </h2>
+          </button>
         </div>
       </main>
     </div>

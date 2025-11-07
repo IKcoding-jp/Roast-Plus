@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import type { AppData, RoastSchedule } from '@/types';
-import { HiPlus, HiTrash, HiFire, HiCalendar } from 'react-icons/hi';
+import { HiPlus, HiFire, HiCalendar } from 'react-icons/hi';
 import { FaCoffee, FaSnowflake } from 'react-icons/fa';
 import { RoastScheduleMemoDialog } from './RoastScheduleMemoDialog';
+import { CountryFlagEmoji } from './CountryFlagEmoji';
 
 interface RoastSchedulerTabProps {
   data: AppData | null;
@@ -14,7 +15,6 @@ interface RoastSchedulerTabProps {
 export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
   const [editingSchedule, setEditingSchedule] = useState<RoastSchedule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
@@ -52,21 +52,57 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
     });
   }, [roastSchedules]);
 
-  // 焙煎度ごとの色分け
+  // 焙煎度ごとの色分け（コーヒー豆の色に合わせる）
   const getRoastLevelColor = (roastLevel?: string) => {
     if (!roastLevel) return 'bg-gray-100 text-gray-800';
     
     if (roastLevel === '浅煎り') {
-      return 'bg-yellow-100 text-yellow-800';
+      // ライト・ロースト / シナモン・ロースト: 黄味がかった小麦色 / シナモン色
+      return 'bg-yellow-200 text-yellow-900';
     }
     if (roastLevel === '中煎り') {
-      return 'bg-orange-100 text-orange-800';
+      // ミディアム・ロースト: 栗色
+      return 'bg-orange-400 text-white';
     }
     if (roastLevel === '中深煎り') {
-      return 'bg-amber-600 text-white';
+      // ハイ・ロースト: 濃い茶色
+      return 'bg-amber-700 text-white';
     }
     if (roastLevel === '深煎り') {
-      return 'bg-amber-900 text-white';
+      // シティ・ロースト以降: 非常に濃い茶色から黒色
+      return 'bg-gray-800 text-white';
+    }
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  // Gモードごとの色分け
+  const getModeColor = (mode?: string) => {
+    if (!mode) return 'bg-gray-100 text-gray-800';
+    
+    if (mode === 'G1') {
+      return 'bg-blue-100 text-blue-800';
+    }
+    if (mode === 'G2') {
+      return 'bg-green-100 text-green-800';
+    }
+    if (mode === 'G3') {
+      return 'bg-purple-100 text-purple-800';
+    }
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  // 重さごとの色分け
+  const getWeightColor = (weight?: string) => {
+    if (!weight) return 'bg-gray-100 text-gray-800';
+    
+    if (weight === '200g') {
+      return 'bg-emerald-100 text-emerald-800';
+    }
+    if (weight === '300g') {
+      return 'bg-teal-100 text-teal-800';
+    }
+    if (weight === '500g') {
+      return 'bg-cyan-100 text-cyan-800';
     }
     return 'bg-gray-100 text-gray-800';
   };
@@ -137,26 +173,15 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
   };
 
   const handleDelete = (id: string) => {
-    setDeleteConfirmId(id);
-  };
-
-  const handleDeleteConfirm = () => {
-    if (deleteConfirmId) {
-      const updatedSchedules = roastSchedules.filter((s) => s.id !== deleteConfirmId);
-      const updatedData: AppData = {
-        ...data,
-        roastSchedules: updatedSchedules,
-      };
-      onUpdate(updatedData);
-      setDeleteConfirmId(null);
-      if (editingSchedule?.id === deleteConfirmId) {
-        setEditingSchedule(null);
-      }
+    const updatedSchedules = roastSchedules.filter((s) => s.id !== id);
+    const updatedData: AppData = {
+      ...data,
+      roastSchedules: updatedSchedules,
+    };
+    onUpdate(updatedData);
+    if (editingSchedule?.id === id) {
+      setEditingSchedule(null);
     }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteConfirmId(null);
   };
 
   const handleDialogCancel = () => {
@@ -292,8 +317,9 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
                 key={schedule.id}
                 schedule={schedule}
                 onEdit={() => handleEdit(schedule)}
-                onDelete={() => handleDelete(schedule.id)}
                 getRoastLevelColor={getRoastLevelColor}
+                getModeColor={getModeColor}
+                getWeightColor={getWeightColor}
                 isDragging={draggedId === schedule.id}
                 isDragOver={dragOverId === schedule.id}
                 onDragStart={() => handleDragStart(schedule.id)}
@@ -337,35 +363,9 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
         <RoastScheduleMemoDialog
           schedule={editingSchedule}
           onSave={handleSave}
-          onDelete={editingSchedule ? handleDelete : undefined}
+          onDelete={editingSchedule ? () => handleDelete(editingSchedule.id) : undefined}
           onCancel={handleDialogCancel}
         />
-      )}
-
-      {/* 削除確認ダイアログ */}
-      {deleteConfirmId && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4" onClick={handleDeleteCancel}>
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">スケジュールを削除</h3>
-            <p className="text-gray-600 mb-6">
-              このスケジュールを削除してもよろしいですか？この操作は取り消せません。
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleDeleteCancel}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors min-h-[44px]"
-              >
-                削除
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
@@ -374,8 +374,9 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
 interface ScheduleCardProps {
   schedule: RoastSchedule;
   onEdit: () => void;
-  onDelete: () => void;
   getRoastLevelColor: (roastLevel?: string) => string;
+  getModeColor: (mode?: string) => string;
+  getWeightColor: (weight?: string) => string;
   isDragging?: boolean;
   isDragOver?: boolean;
   onDragStart: () => void;
@@ -388,8 +389,9 @@ interface ScheduleCardProps {
 function ScheduleCard({
   schedule,
   onEdit,
-  onDelete,
   getRoastLevelColor,
+  getModeColor,
+  getWeightColor,
   isDragging = false,
   isDragOver = false,
   onDragStart,
@@ -417,13 +419,13 @@ function ScheduleCard({
       const beanText = schedule.beanName || '';
       const modeText = schedule.roastMachineMode || '';
       const weightText = schedule.weight ? `${schedule.weight}g` : '';
-      // 焙煎度合いは別途バッジで表示するため、secondLineから除外
-      const secondLine = [beanText, modeText ? `(${modeText})` : '', weightText]
-        .filter(Boolean)
-        .join(' ');
+      const roastLevelText = schedule.roastLevel || '';
       return {
         firstLine: '焙煎機予熱',
-        secondLine,
+        beanName: beanText,
+        mode: modeText,
+        weight: weightText,
+        roastLevel: roastLevelText,
       };
     }
     if (isRoast) {
@@ -432,22 +434,31 @@ function ScheduleCard({
       if (bagText) {
         return {
           firstLine: `ロースト${countText}・${bagText}`,
-          secondLine: '',
+          beanName: '',
+          mode: '',
+          weight: '',
+          roastLevel: '',
         };
       } else {
         return {
           firstLine: `ロースト${countText}`,
-          secondLine: '',
+          beanName: '',
+          mode: '',
+          weight: '',
+          roastLevel: '',
         };
       }
     }
     if (isAfterPurge) {
       return {
         firstLine: 'アフターパージ',
-        secondLine: '',
+        beanName: '',
+        mode: '',
+        weight: '',
+        roastLevel: '',
       };
     }
-    return { firstLine: '', secondLine: '' };
+    return { firstLine: '', beanName: '', mode: '', weight: '', roastLevel: '' };
   };
 
   const memoContent = getMemoContent();
@@ -501,35 +512,37 @@ function ScheduleCard({
         )}
 
         {/* 中央：メモ内容 */}
-        <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          <div className="text-base font-medium text-gray-800">
-            {memoContent.firstLine}
+        <div className="flex-1 min-w-0 flex flex-col gap-1">
+          <div className="text-base font-medium text-gray-800 flex items-center gap-2 flex-wrap">
+            <span>{memoContent.firstLine}</span>
+            {memoContent.beanName && (
+              <span className="inline-block rounded px-2 py-0.5 text-sm font-medium bg-gray-100 text-gray-800">
+                {memoContent.beanName}
+                {' '}
+                <CountryFlagEmoji countryName={memoContent.beanName} />
+              </span>
+            )}
           </div>
-          {memoContent.secondLine && (
-            <div className="text-sm text-gray-500">{memoContent.secondLine}</div>
-          )}
-          {schedule.roastLevel && (
-            <span
-              className={`inline-block rounded px-2 py-1 text-sm font-medium ${getRoastLevelColor(
-                schedule.roastLevel
-              )}`}
-            >
-              {schedule.roastLevel}
-            </span>
+          {(memoContent.mode || memoContent.weight || memoContent.roastLevel) && (
+            <div className="text-sm flex items-center gap-1.5 flex-wrap">
+              {memoContent.mode && (
+                <span className={`inline-block rounded px-2 py-0.5 text-sm font-medium ${getModeColor(memoContent.mode)}`}>
+                  {memoContent.mode}
+                </span>
+              )}
+              {memoContent.weight && (
+                <span className={`inline-block rounded px-2 py-0.5 text-sm font-medium ${getWeightColor(memoContent.weight)}`}>
+                  {memoContent.weight}
+                </span>
+              )}
+              {memoContent.roastLevel && (
+                <span className={`inline-block rounded px-2 py-0.5 text-sm font-medium ${getRoastLevelColor(memoContent.roastLevel)}`}>
+                  {memoContent.roastLevel}
+                </span>
+              )}
+            </div>
           )}
         </div>
-
-        {/* 右側：削除ボタン */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="rounded-md bg-red-50 p-1.5 sm:p-2 text-red-600 transition-colors hover:bg-red-100 min-w-[36px] min-h-[36px] sm:min-w-[36px] sm:min-h-[36px] flex items-center justify-center flex-shrink-0"
-                  aria-label="削除"
-                >
-                  <HiTrash className="h-4 w-4 sm:h-4 sm:w-4" />
-        </button>
       </div>
     </div>
   );

@@ -123,9 +123,8 @@ export function RoastScheduleMemoDialog({
 
   const handleDelete = () => {
     if (schedule && onDelete) {
-      if (confirm('このスケジュールを削除してもよろしいですか？')) {
-        onDelete(schedule.id);
-      }
+      onDelete(schedule.id);
+      onCancel();
     }
   };
 

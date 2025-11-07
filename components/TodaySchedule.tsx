@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { AppData, TodaySchedule, TimeLabel } from '@/types';
-import { HiPlus, HiTrash, HiX, HiClock } from 'react-icons/hi';
+import { HiPlus, HiX, HiClock } from 'react-icons/hi';
 
 interface TodayScheduleProps {
   data: AppData | null;
@@ -11,7 +11,6 @@ interface TodayScheduleProps {
 
 export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   const [isComposing, setIsComposing] = useState(false);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [addError, setAddError] = useState<string>('');
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -330,18 +329,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   };
 
   const deleteTimeLabel = (id: string) => {
-    setDeleteConfirmId(id);
-  };
-
-  const handleDeleteConfirm = () => {
-    if (deleteConfirmId) {
-      setLocalTimeLabels(localTimeLabels.filter((label) => label.id !== deleteConfirmId));
-      setDeleteConfirmId(null);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteConfirmId(null);
+    setLocalTimeLabels(localTimeLabels.filter((label) => label.id !== id));
   };
 
   const handleEditLabel = (id: string) => {
@@ -493,15 +481,6 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
                     placeholder="内容を入力"
                   />
                 </div>
-
-                {/* 削除ボタン */}
-                <button
-                  onClick={() => deleteTimeLabel(label.id)}
-                  className="flex-shrink-0 rounded-md bg-red-100 p-1.5 sm:p-2 text-red-700 transition-colors hover:bg-red-200 min-w-[36px] min-h-[36px] sm:min-w-[36px] sm:min-h-[36px] flex items-center justify-center"
-                  aria-label="削除"
-                >
-                  <HiTrash className="h-4 w-4 sm:h-4 sm:w-4" />
-                </button>
               </div>
             ))}
             {sortedTimeLabels.length > 10 && (
@@ -624,32 +603,6 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         </div>
       )}
 
-      {/* 削除確認ダイアログ */}
-      {deleteConfirmId && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4" onClick={handleDeleteCancel}>
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">時間ラベルを削除</h3>
-            <p className="text-gray-600 mb-6">
-              この時間ラベルを削除してもよろしいですか？この操作は取り消せません。
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleDeleteCancel}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors min-h-[44px]"
-              >
-                削除
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 時間編集ダイアログ */}
       {editingLabelId && (() => {
         const editingLabel = localTimeLabels.find((label) => label.id === editingLabelId);
@@ -668,6 +621,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
             initialHour={initialTime.hour}
             initialMinute={initialTime.minute}
             onSave={(hour, minute) => handleEditSave(editingLabelId, hour, minute)}
+            onDelete={() => deleteTimeLabel(editingLabelId)}
             onCancel={handleEditCancel}
           />
         );
@@ -680,6 +634,7 @@ interface TimeEditDialogProps {
   initialHour: string;
   initialMinute: string;
   onSave: (hour: string, minute: string) => void;
+  onDelete: () => void;
   onCancel: () => void;
 }
 
@@ -687,6 +642,7 @@ function TimeEditDialog({
   initialHour,
   initialMinute,
   onSave,
+  onDelete,
   onCancel,
 }: TimeEditDialogProps) {
   const [hour, setHour] = useState(initialHour);
@@ -769,6 +725,16 @@ function TimeEditDialog({
                 className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors min-h-[44px]"
               >
                 キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onDelete();
+                  onCancel();
+                }}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors min-h-[44px]"
+              >
+                削除
               </button>
               <button
                 type="submit"

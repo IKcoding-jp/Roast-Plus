@@ -92,7 +92,7 @@ self.addEventListener('fetch', (event) => {
       const htmlRequest = new Request(htmlUrl.toString(), {
         method: event.request.method,
         headers: event.request.headers,
-        mode: event.request.mode,
+        mode: 'same-origin',
         credentials: event.request.credentials,
         redirect: event.request.redirect,
       });

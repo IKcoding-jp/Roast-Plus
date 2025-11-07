@@ -311,10 +311,10 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       <div className="mt-4 flex lg:hidden items-center justify-center">
         <button
           onClick={handleAdd}
-          className="flex items-center gap-1 sm:gap-2 rounded-md bg-amber-600 px-3 py-2 text-sm sm:text-base font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0"
+          className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 min-w-[36px] min-h-[36px]"
           aria-label="メモを追加"
         >
-          <HiPlus className="h-4 w-4 sm:h-5 sm:w-5" />
+          <HiPlus className="h-4 w-4" />
           <span className="hidden sm:inline">追加</span>
         </button>
       </div>
@@ -416,10 +416,17 @@ function ScheduleCard({
     if (isRoast) {
       const countText = schedule.roastCount ? `${schedule.roastCount}回目` : '';
       const bagText = schedule.bagCount ? `${schedule.bagCount}袋` : '';
-      return {
-        firstLine: `ロースト${countText}、${bagText}`,
-        secondLine: '',
-      };
+      if (bagText) {
+        return {
+          firstLine: `ロースト${countText}・${bagText}`,
+          secondLine: '',
+        };
+      } else {
+        return {
+          firstLine: `ロースト${countText}`,
+          secondLine: '',
+        };
+      }
     }
     if (isAfterPurge) {
       return {

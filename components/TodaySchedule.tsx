@@ -557,10 +557,10 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         </div>
         <button
           onClick={addTimeLabel}
-          className="flex items-center gap-1 rounded-md bg-amber-600 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 min-w-[36px] min-h-[36px]"
+          className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 min-w-[36px] min-h-[36px]"
           aria-label="時間ラベルを追加"
         >
-          <HiPlus className="h-3 w-3" />
+          <HiPlus className="h-4 w-4" />
           <span className="hidden sm:inline">追加</span>
         </button>
       </div>

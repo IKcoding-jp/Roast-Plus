@@ -87,8 +87,8 @@ export function RoastScheduleMemoDialog({
     }
 
     if (isRoast) {
-      if (!roastCount || !bagCount) {
-        alert('何回目と袋数を入力してください');
+      if (!roastCount) {
+        alert('何回目を入力してください');
         return;
       }
     }
@@ -114,7 +114,7 @@ export function RoastScheduleMemoDialog({
       weight: isRoasterOn ? (weight as 200 | 300 | 500) : undefined,
       roastLevel: isRoasterOn ? (roastLevel as '浅煎り' | '中煎り' | '中深煎り' | '深煎り') : undefined,
       roastCount: isRoast ? parseInt(roastCount, 10) : undefined,
-      bagCount: isRoast ? (bagCount as 1 | 2) : undefined,
+      bagCount: isRoast && bagCount ? (bagCount as 1 | 2) : undefined,
       order: schedule?.order,
     };
 
@@ -140,8 +140,12 @@ export function RoastScheduleMemoDialog({
     }
     if (isRoast) {
       const countText = roastCount ? `${roastCount}回目` : '?回目';
-      const bagText = bagCount ? `${bagCount}袋` : '?袋';
-      return `ロースト${countText}、${bagText}`;
+      const bagText = bagCount ? `${bagCount}袋` : '';
+      if (bagText) {
+        return `ロースト${countText}・${bagText}`;
+      } else {
+        return `ロースト${countText}`;
+      }
     }
     if (isAfterPurge) {
       return 'アフターパージ';
@@ -344,12 +348,11 @@ export function RoastScheduleMemoDialog({
 
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    袋数 <span className="text-red-500">*</span>
+                    袋数
                   </label>
                   <select
                     value={bagCount}
                     onChange={(e) => setBagCount(e.target.value ? (parseInt(e.target.value, 10) as 1 | 2) : '')}
-                    required={isRoast}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>

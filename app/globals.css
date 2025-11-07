@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #FDF8F0;
   --foreground: #171717;
 }
 
@@ -23,4 +23,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* select要素とoption要素のスタイル */
+select option {
+  color: #1f2937; /* text-gray-800 */
+  background-color: white;
 }

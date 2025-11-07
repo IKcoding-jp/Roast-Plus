@@ -59,14 +59,17 @@ export default function HomePage() {
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {/* 担当表カード */}
-          <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
+          <button
+            onClick={() => router.push('/assignment')}
+            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+          >
             <div className="mb-4 flex justify-center">
               <HiUsers className="h-16 w-16 text-orange-500" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               担当表
             </h2>
-          </div>
+          </button>
 
           {/* スケジュールカード */}
           <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">

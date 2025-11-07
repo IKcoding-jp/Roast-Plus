@@ -45,6 +45,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   const [newMinute, setNewMinute] = useState<string>('');
   const lastDataRef = useRef<string>('');
   const localTimeLabelsRef = useRef<TimeLabel[]>([]);
+  const lastTodaySchedulesStrRef = useRef<string>('');
 
   // データが読み込まれたときにローカル状態を初期化・同期
   useEffect(() => {
@@ -58,6 +59,16 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     if (lastDataRef.current === newTimeLabelsStr) {
       return;
     }
+    
+    // todaySchedules全体のJSON文字列を計算
+    const todaySchedulesStr = JSON.stringify(data.todaySchedules || []);
+    
+    // 前回のtodaySchedulesと同じ場合は何もしない（不要な実行を防止）
+    if (lastTodaySchedulesStrRef.current === todaySchedulesStr && lastDataRef.current !== '') {
+      return;
+    }
+    
+    lastTodaySchedulesStrRef.current = todaySchedulesStr;
     
     // 外部からの更新の場合のみ同期（ローカル更新中は同期しない）
     if (!isUpdatingRef.current) {
@@ -76,7 +87,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
       lastDataRef.current = newTimeLabelsStr;
     }
-  }, [data?.todaySchedules, today]);
+  }, [data, today]);
 
   // デバウンス保存関数
   const debouncedSave = useCallback(

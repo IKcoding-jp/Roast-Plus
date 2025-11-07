@@ -29,13 +29,12 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'ローストプラス',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#fef3c7',
 };
 
 export default function RootLayout({

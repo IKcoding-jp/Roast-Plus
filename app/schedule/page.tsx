@@ -41,8 +41,8 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-amber-50 py-2 sm:py-4 lg:py-6 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-screen bg-amber-50 py-2 sm:py-4 lg:py-6 px-2 sm:px-4 lg:px-6 flex flex-col">
+      <div className="w-full flex-1 flex flex-col">
         {/* ヘッダー */}
         <header className="mb-4">
           <Link
@@ -81,23 +81,27 @@ export default function SchedulePage() {
         </div>
 
         {/* コンテンツ */}
-        <main>
+        <main className="flex-1 flex flex-col min-h-0">
           {/* モバイル版：タブ切替 */}
-          <div className="block lg:hidden">
+          <div className="block lg:hidden flex-1 flex flex-col min-h-0">
             {activeTab === 'today' && (
-              <TodaySchedule data={data} onUpdate={updateData} />
+              <div className="flex-1 flex flex-col min-h-0">
+                <TodaySchedule data={data} onUpdate={updateData} />
+              </div>
             )}
             {activeTab === 'roast' && (
-              <RoastSchedulerTab data={data} onUpdate={updateData} />
+              <div className="flex-1 flex flex-col min-h-0">
+                <RoastSchedulerTab data={data} onUpdate={updateData} />
+              </div>
             )}
           </div>
 
           {/* デスクトップ版：横並び */}
-          <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6">
-            <div>
+          <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6 lg:flex-1 lg:min-h-0">
+            <div className="flex flex-col min-h-0">
               <TodaySchedule data={data} onUpdate={updateData} />
             </div>
-            <div>
+            <div className="flex flex-col min-h-0">
               <RoastSchedulerTab data={data} onUpdate={updateData} />
             </div>
           </div>

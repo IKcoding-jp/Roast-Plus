@@ -50,16 +50,19 @@ export interface TodaySchedule {
 // ローストスケジュール
 export interface RoastSchedule {
   id: string;
-  time: string; // HH:mm形式
-  bean: string; // 豆の種類
-  settings?: string; // 設定
-  roastLevel?: string; // 焙煎度
-  bagCount?: number; // 袋数
-  flags: {
-    preheat?: boolean; // 予熱
-    afterPurge?: boolean; // アフターパージ
-    roast?: boolean; // ロースト
-  };
+  time: string; // HH:mm形式（アフターパージの場合は空文字列も可）
+  // メモタイプ（排他的）
+  isRoasterOn?: boolean; // 焙煎機予熱
+  isRoast?: boolean; // ロースト
+  isAfterPurge?: boolean; // アフターパージ
+  // 焙煎機予熱用フィールド
+  beanName?: string; // 豆の名前
+  roastMachineMode?: 'G1' | 'G2' | 'G3'; // 焙煎機設定モード（豆選択で自動設定）
+  weight?: 200 | 300 | 500; // 重さ（g）
+  roastLevel?: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い
+  // ロースト用フィールド
+  roastCount?: number; // 何回目
+  bagCount?: 1 | 2; // 袋数
   order?: number; // 時間順ソート用
 }
 

@@ -11,6 +11,7 @@ interface TodayScheduleProps {
 
 export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   const [isComposing, setIsComposing] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUpdatingRef = useRef(false);
@@ -40,12 +41,33 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     timeLabels: [],
   };
 
-  const [localTimeLabels, setLocalTimeLabels] = useState<TimeLabel[]>([]);
+  // refを先に宣言（useStateの初期化関数で使用するため）
+  const lastDataRef = useRef<string>('');
+  const localTimeLabelsRef = useRef<TimeLabel[]>(todaySchedule.timeLabels || []);
+  const lastTodaySchedulesStrRef = useRef<string>('');
+  const isInitializedRef = useRef<boolean>(false);
+  const localTimeLabelsLengthRef = useRef<number>(todaySchedule.timeLabels?.length || 0);
+
+  // 初期値をdataから取得（useStateの初期化関数を使用して初回レンダリング時のみ評価）
+  const [localTimeLabels, setLocalTimeLabels] = useState<TimeLabel[]>(() => {
+    const initialLabels = todaySchedule.timeLabels || [];
+    // 初期化時にrefも設定
+    if (initialLabels.length > 0) {
+      originalTimeLabelsRef.current = JSON.parse(JSON.stringify(initialLabels));
+      localTimeLabelsRef.current = JSON.parse(JSON.stringify(initialLabels));
+      lastDataRef.current = JSON.stringify(initialLabels);
+      localTimeLabelsLengthRef.current = initialLabels.length;
+    }
+    return initialLabels;
+  });
   const [newHour, setNewHour] = useState<string>('');
   const [newMinute, setNewMinute] = useState<string>('');
-  const lastDataRef = useRef<string>('');
-  const localTimeLabelsRef = useRef<TimeLabel[]>([]);
-  const lastTodaySchedulesStrRef = useRef<string>('');
+
+  // localTimeLabelsの長さを追跡
+  useEffect(() => {
+    localTimeLabelsLengthRef.current = localTimeLabels.length;
+  }, [localTimeLabels.length]);
+
 
   // データが読み込まれたときにローカル状態を初期化・同期
   useEffect(() => {
@@ -54,6 +76,19 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     const currentSchedule = data.todaySchedules?.find((s) => s.date === today);
     const newTimeLabels = currentSchedule?.timeLabels || [];
     const newTimeLabelsStr = JSON.stringify(newTimeLabels);
+    
+    // 初期化されていない場合、またはローカル状態が空でデータがある場合は即座に初期化
+    if (!isInitializedRef.current || (localTimeLabelsLengthRef.current === 0 && newTimeLabels.length > 0)) {
+      setLocalTimeLabels(newTimeLabels);
+      localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+      originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+      todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+      lastDataRef.current = newTimeLabelsStr;
+      lastTodaySchedulesStrRef.current = JSON.stringify(data.todaySchedules || []);
+      isInitializedRef.current = true;
+      localTimeLabelsLengthRef.current = newTimeLabels.length;
+      return;
+    }
     
     // 前回のデータと同じ場合は何もしない（無限ループ防止）
     if (lastDataRef.current === newTimeLabelsStr) {
@@ -266,7 +301,18 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   };
 
   const deleteTimeLabel = (id: string) => {
-    setLocalTimeLabels(localTimeLabels.filter((label) => label.id !== id));
+    setDeleteConfirmId(id);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteConfirmId) {
+      setLocalTimeLabels(localTimeLabels.filter((label) => label.id !== deleteConfirmId));
+      setDeleteConfirmId(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmId(null);
   };
 
   const updateTimeLabel = (id: string, updates: Partial<TimeLabel>) => {
@@ -300,10 +346,10 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   }, [localTimeLabels]);
 
   return (
-    <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
+    <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md h-full flex flex-col">
       {/* デスクトップ版：タイトルと時間入力欄を横並び */}
       <div className="mb-4 hidden lg:flex flex-row items-center justify-between gap-2">
-        <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800 whitespace-nowrap">本日のスケジュール</h2>
+        <h2 className="hidden lg:block text-lg sm:text-xl font-semibold text-gray-800 whitespace-nowrap">本日のスケジュール</h2>
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           <div className="flex items-center gap-1">
             <input
@@ -339,7 +385,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
           <button
             onClick={addTimeLabel}
             disabled={!newHour || !newMinute}
-            className="flex items-center gap-1 sm:gap-2 rounded-md bg-amber-600 px-3 py-2 text-sm sm:text-base font-medium text-white transition-colors hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed min-w-[44px] min-h-[44px]"
+            className="flex items-center gap-1 sm:gap-2 rounded-md bg-amber-600 px-3 py-2 text-sm sm:text-base font-medium text-white transition-colors hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0"
             aria-label="時間ラベルを追加"
           >
             <HiPlus className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -349,17 +395,19 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       </div>
 
       {localTimeLabels.length === 0 ? (
-        <div className="py-8 text-center text-gray-500">
-          <p>時間ラベルがありません</p>
-          <p className="mt-2 text-sm">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
+        <div className="flex-1 flex items-center justify-center py-8 text-center text-gray-500">
+          <div>
+            <p>時間ラベルがありません</p>
+            <p className="mt-2 text-sm">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
+          </div>
         </div>
       ) : (
-        <div className="max-h-[600px] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           <div className="space-y-2">
             {sortedTimeLabels.slice(0, 10).map((label) => (
               <div
                 key={label.id}
-                className="flex items-center gap-1 py-2 border-b border-gray-200 last:border-b-0"
+                className="flex items-center gap-1 py-2"
               >
                 {/* 時間表示 */}
                 <div className="w-14 sm:w-16 flex-shrink-0">
@@ -443,6 +491,32 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
           <span className="hidden sm:inline">追加</span>
         </button>
       </div>
+
+      {/* 削除確認ダイアログ */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4" onClick={handleDeleteCancel}>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">時間ラベルを削除</h3>
+            <p className="text-gray-600 mb-6">
+              この時間ラベルを削除してもよろしいですか？この操作は取り消せません。
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors min-h-[44px]"
+              >
+                削除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

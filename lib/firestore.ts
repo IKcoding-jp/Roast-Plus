@@ -24,6 +24,29 @@ function getUserDocRef(userId: string) {
   return doc(db, 'users', userId);
 }
 
+// undefinedのフィールドを削除する関数（Firestoreはundefinedをサポートしていないため）
+function removeUndefinedFields(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefinedFields);
+  }
+  
+  if (typeof obj === 'object') {
+    const cleaned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = removeUndefinedFields(value);
+      }
+    }
+    return cleaned;
+  }
+  
+  return obj;
+}
+
 export async function getUserData(userId: string): Promise<AppData> {
   try {
     const userDocRef = getUserDocRef(userId);
@@ -33,7 +56,9 @@ export async function getUserData(userId: string): Promise<AppData> {
       return userDoc.data() as AppData;
     }
     
-    await setDoc(userDocRef, defaultData);
+    // undefinedのフィールドを削除してから保存
+    const cleanedDefaultData = removeUndefinedFields(defaultData);
+    await setDoc(userDocRef, cleanedDefaultData);
     return defaultData;
   } catch (error) {
     console.error('Failed to load data from Firestore:', error);
@@ -44,7 +69,9 @@ export async function getUserData(userId: string): Promise<AppData> {
 export async function saveUserData(userId: string, data: AppData): Promise<void> {
   try {
     const userDocRef = getUserDocRef(userId);
-    await setDoc(userDocRef, data);
+    // undefinedのフィールドを削除してから保存
+    const cleanedData = removeUndefinedFields(data);
+    await setDoc(userDocRef, cleanedData);
   } catch (error) {
     console.error('Failed to save data to Firestore:', error);
     throw error;

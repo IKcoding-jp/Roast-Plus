@@ -83,7 +83,7 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       return 'bg-blue-100 text-blue-800';
     }
     if (mode === 'G2') {
-      return 'bg-green-100 text-green-800';
+      return 'bg-yellow-100 text-yellow-900';
     }
     if (mode === 'G3') {
       return 'bg-purple-100 text-purple-800';
@@ -96,12 +96,12 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
     if (!weight) return 'bg-gray-100 text-gray-800';
     
     if (weight === '200g') {
-      // 明るい緑または明るい黄色（軽さ・新鮮さ）
-      return 'bg-green-200 text-green-900';
-    }
-    if (weight === '300g') {
       // 水色または落ち着いた緑（バランス・標準・穏やかさ）
       return 'bg-sky-100 text-sky-800';
+    }
+    if (weight === '300g') {
+      // 明るい緑または明るい黄色（軽さ・新鮮さ）
+      return 'bg-lime-100 text-lime-900';
     }
     if (weight === '500g') {
       // 暖色系（オレンジ、茶色）または赤

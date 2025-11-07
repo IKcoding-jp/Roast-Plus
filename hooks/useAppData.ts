@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth';
 import { getUserData, saveUserData, subscribeUserData } from '@/lib/firestore';
 import type { AppData } from '@/types';
@@ -15,6 +15,7 @@ export function useAppData() {
     assignmentHistory: [],
   });
   const [isLoading, setIsLoading] = useState(true);
+  const isUpdatingRef = useRef(false);
 
   useEffect(() => {
     if (!user) {
@@ -35,8 +36,11 @@ export function useAppData() {
 
     // リアルタイム監視
     const unsubscribe = subscribeUserData(user.uid, (data) => {
-      setData(data);
-      setIsLoading(false);
+      // 更新中でない場合のみ、Firestoreからの更新を受け入れる
+      if (!isUpdatingRef.current) {
+        setData(data);
+        setIsLoading(false);
+      }
     });
 
     return () => {
@@ -48,11 +52,17 @@ export function useAppData() {
     async (newData: AppData) => {
       if (!user) return;
 
+      isUpdatingRef.current = true;
       setData(newData);
       try {
         await saveUserData(user.uid, newData);
+        // 保存後にフラグをリセット（少し遅延させて、Firestoreからの更新が来る前に）
+        setTimeout(() => {
+          isUpdatingRef.current = false;
+        }, 100);
       } catch (error) {
         console.error('Failed to save data:', error);
+        isUpdatingRef.current = false;
         // エラー時は最新データを再取得
         getUserData(user.uid)
           .then((data) => {

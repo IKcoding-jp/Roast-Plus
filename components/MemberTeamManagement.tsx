@@ -98,11 +98,48 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
   }, [teams.length, data.members, localTeams.length]);
 
   const updateMember = (memberId: string, updates: Partial<Member>) => {
-    const updatedData: AppData = {
-      ...data,
-      members: data.members.map((m) => (m.id === memberId ? { ...m, ...updates } : m)),
-    };
-    onUpdate(updatedData);
+    const member = data.members.find((m) => m.id === memberId);
+    if (!member) return;
+
+    const updatedMembers = data.members.map((m) => (m.id === memberId ? { ...m, ...updates } : m));
+    
+    // メンバー名が入力された場合、その班のすべてのラベルに対して割り当てを作成
+    const updatedMember = { ...member, ...updates };
+    if (updatedMember.name && updatedMember.name.trim()) {
+      const today = new Date().toISOString().split('T')[0];
+      const existingAssignmentKeys = new Set(
+        data.assignments.map((a) => `${a.teamId}-${a.taskLabelId}`)
+      );
+
+      const newAssignments = data.taskLabels
+        .filter((label) => {
+          // 除外ラベルでない場合のみ追加
+          return !(updatedMember.excludedTaskLabelIds || []).includes(label.id);
+        })
+        .filter((label) => {
+          // 既存の割り当てがない場合のみ追加
+          return !existingAssignmentKeys.has(`${updatedMember.teamId}-${label.id}`);
+        })
+        .map((label) => ({
+          teamId: updatedMember.teamId,
+          taskLabelId: label.id,
+          memberId: null,
+          assignedDate: today,
+        }));
+
+      const updatedData: AppData = {
+        ...data,
+        members: updatedMembers,
+        assignments: [...data.assignments, ...newAssignments],
+      };
+      onUpdate(updatedData);
+    } else {
+      const updatedData: AppData = {
+        ...data,
+        members: updatedMembers,
+      };
+      onUpdate(updatedData);
+    }
   };
 
   return (
@@ -387,12 +424,13 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
                           excludedTaskLabelIds: [],
                         };
                         
-                        // 新しいメンバーに対して、すべてのラベルに対して空の割り当てを作成
+                        // 新しいメンバーに対して、その班のすべてのラベルに対して割り当てを確実に作成
                         const today = new Date().toISOString().split('T')[0];
                         const existingAssignmentKeys = new Set(
                           data.assignments.map((a) => `${a.teamId}-${a.taskLabelId}`)
                         );
                         
+                        // その班のすべてのラベルに対して割り当てを作成（既存のものは更新しない）
                         const newAssignments = data.taskLabels
                           .filter((label) => {
                             // 除外ラベルでない場合のみ追加

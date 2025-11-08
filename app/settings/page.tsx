@@ -1,20 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { useAppData } from '@/hooks/useAppData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { getSelectedMemberId, setSelectedMemberId } from '@/lib/localStorage';
 import { HiArrowLeft } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
-  const { isEnabled, isLoading, enableDeveloperMode, disableDeveloperMode } = useDeveloperMode();
+  const { data, isLoading: dataLoading } = useAppData();
+  const { isEnabled, isLoading: devModeLoading, enableDeveloperMode, disableDeveloperMode } = useDeveloperMode();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [selectedMember, setSelectedMember] = useState<string>('');
 
-  if (authLoading || isLoading) {
+  // ローカルストレージから選択されたメンバーIDを読み込み
+  useEffect(() => {
+    const memberId = getSelectedMemberId();
+    setSelectedMember(memberId || '');
+  }, []);
+
+  if (authLoading || devModeLoading || dataLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
         <div className="text-center">
@@ -27,6 +37,15 @@ export default function SettingsPage() {
   if (!user) {
     return <LoginPage />;
   }
+
+  const handleMemberChange = (memberId: string) => {
+    setSelectedMember(memberId);
+    if (memberId) {
+      setSelectedMemberId(memberId);
+    } else {
+      setSelectedMemberId(null);
+    }
+  };
 
   const handleToggleChange = (checked: boolean) => {
     if (checked) {
@@ -79,7 +98,36 @@ export default function SettingsPage() {
           </div>
         </header>
 
-        <main>
+        <main className="space-y-6">
+          {/* このデバイスは誰のものセクション */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              このデバイスは誰のもの
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              試飲記録を作成する際に、自動でこのメンバーが選択されます。
+            </p>
+            <select
+              value={selectedMember}
+              onChange={(e) => handleMemberChange(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
+            >
+              <option value="">選択しない</option>
+              {data.members
+                .filter((m) => m.active !== false)
+                .map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+            </select>
+            {selectedMember && (
+              <p className="mt-2 text-sm text-green-600">
+                設定が保存されました。次回の試飲記録作成時に自動で選択されます。
+              </p>
+            )}
+          </div>
+
           {/* 開発者モードセクション */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">

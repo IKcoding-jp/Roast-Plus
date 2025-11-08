@@ -15,6 +15,8 @@ export function useAppData() {
     assignmentHistory: [],
     todaySchedules: [],
     roastSchedules: [],
+    tastingRecords: [],
+    notifications: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const isUpdatingRef = useRef(false);

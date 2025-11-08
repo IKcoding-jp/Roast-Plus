@@ -104,14 +104,17 @@ export default function HomePage() {
           </button>
 
           {/* 試飲感想記録カード */}
-          <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
+          <button
+            onClick={() => router.push('/tasting')}
+            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+          >
             <div className="mb-4 flex justify-center">
               <FaCoffee className="h-16 w-16 text-orange-500" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               試飲感想記録
             </h2>
-          </div>
+          </button>
 
           {/* 設定カード */}
           <button

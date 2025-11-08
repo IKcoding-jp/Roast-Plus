@@ -66,6 +66,26 @@ export interface RoastSchedule {
   order?: number; // 時間順ソート用
 }
 
+// 試飲記録
+export interface TastingRecord {
+  id: string;
+  beanName: string; // 豆の名前
+  tastingDate: string; // YYYY-MM-DD形式
+  roastLevel: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い
+  // 評価項目（1.0〜5.0、0.125刻み）
+  bitterness: number; // 苦味
+  acidity: number; // 酸味
+  body: number; // ボディ
+  sweetness: number; // 甘み
+  aroma: number; // 香り
+  overallRating: number; // 総合（おいしさ）
+  overallImpression?: string; // 全体的な印象（テキスト）
+  createdAt: string; // ISO 8601形式
+  updatedAt: string; // ISO 8601形式
+  userId: string; // ユーザーID
+  memberId: string; // メンバーID（必須）
+}
+
 // アプリ全体のデータ構造
 export interface AppData {
   teams: Team[];
@@ -75,6 +95,8 @@ export interface AppData {
   assignmentHistory: Assignment[]; // 過去の履歴
   todaySchedules: TodaySchedule[]; // 本日のスケジュール
   roastSchedules: RoastSchedule[]; // ローストスケジュール
+  tastingRecords: TastingRecord[]; // 試飲記録
+  notifications: Notification[]; // 通知
 }
 
 // 通知

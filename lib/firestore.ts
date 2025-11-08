@@ -18,6 +18,8 @@ const defaultData: AppData = {
   assignmentHistory: [],
   todaySchedules: [],
   roastSchedules: [],
+  tastingRecords: [],
+  notifications: [],
 };
 
 function getUserDocRef(userId: string) {
@@ -47,13 +49,32 @@ function removeUndefinedFields(obj: any): any {
   return obj;
 }
 
+// データを正規化する関数（不足しているフィールドをデフォルト値で補完）
+function normalizeAppData(data: any): AppData {
+  return {
+    teams: Array.isArray(data?.teams) ? data.teams : [],
+    members: Array.isArray(data?.members) ? data.members : [],
+    taskLabels: Array.isArray(data?.taskLabels) ? data.taskLabels : [],
+    assignments: Array.isArray(data?.assignments) ? data.assignments : [],
+    assignmentHistory: Array.isArray(data?.assignmentHistory) ? data.assignmentHistory : [],
+    todaySchedules: Array.isArray(data?.todaySchedules) ? data.todaySchedules : [],
+    roastSchedules: Array.isArray(data?.roastSchedules) ? data.roastSchedules : [],
+    tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
+    notifications: Array.isArray(data?.notifications) ? data.notifications : [],
+  };
+}
+
 export async function getUserData(userId: string): Promise<AppData> {
   try {
     const userDocRef = getUserDocRef(userId);
     const userDoc = await getDoc(userDocRef);
     
     if (userDoc.exists()) {
-      return userDoc.data() as AppData;
+      const data = userDoc.data();
+      const normalizedData = normalizeAppData(data);
+      // 正規化したデータを保存（既存データに不足しているフィールドを追加）
+      await setDoc(userDocRef, normalizedData, { merge: true });
+      return normalizedData;
     }
     
     // undefinedのフィールドを削除してから保存
@@ -88,7 +109,9 @@ export function subscribeUserData(
     userDocRef,
     (snapshot) => {
       if (snapshot.exists()) {
-        callback(snapshot.data() as AppData);
+        const data = snapshot.data();
+        const normalizedData = normalizeAppData(data);
+        callback(normalizedData);
       } else {
         callback(defaultData);
       }

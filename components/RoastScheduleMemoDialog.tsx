@@ -97,7 +97,7 @@ export function RoastScheduleMemoDialog({
       }
     }
 
-    if (!isAfterPurge && !isChaffCleaning && (!hour || !minute)) {
+    if (!isAfterPurge && (!hour || !minute)) {
       alert('時間を入力してください');
       return;
     }
@@ -109,7 +109,7 @@ export function RoastScheduleMemoDialog({
 
     const newSchedule: RoastSchedule = {
       id: schedule?.id || `roast-${Date.now()}`,
-      time: (isAfterPurge || isChaffCleaning) ? '' : formattedTime, // アフターパージやチャフのお掃除の場合は時間なし
+      time: isAfterPurge ? '' : formattedTime, // アフターパージの場合は時間なし
       isRoasterOn: isRoasterOn || undefined,
       isRoast: isRoast || undefined,
       isAfterPurge: isAfterPurge || undefined,
@@ -196,7 +196,7 @@ export function RoastScheduleMemoDialog({
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4 max-w-md mx-auto">
             {/* 時間選択 */}
-            {!isAfterPurge && !isChaffCleaning && (
+            {!isAfterPurge && (
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700 text-center">
                   時間 <span className="text-red-500">*</span>
@@ -213,7 +213,7 @@ export function RoastScheduleMemoDialog({
                     }}
                     min="0"
                     max="23"
-                    required={!isAfterPurge && !isChaffCleaning}
+                    required={!isAfterPurge}
                     className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="時"
                   />
@@ -229,7 +229,7 @@ export function RoastScheduleMemoDialog({
                     }}
                     min="0"
                     max="59"
-                    required={!isAfterPurge && !isChaffCleaning}
+                    required={!isAfterPurge}
                     className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="分"
                   />

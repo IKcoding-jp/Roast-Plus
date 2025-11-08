@@ -50,7 +50,7 @@ export interface TodaySchedule {
 // ローストスケジュール
 export interface RoastSchedule {
   id: string;
-  time: string; // HH:mm形式（アフターパージやチャフのお掃除の場合は空文字列も可）
+  time: string; // HH:mm形式（アフターパージの場合は空文字列も可）
   // メモタイプ（排他的）
   isRoasterOn?: boolean; // 焙煎機予熱
   isRoast?: boolean; // ロースト

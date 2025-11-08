@@ -527,7 +527,7 @@ function ScheduleCard({
     >
       <div className="flex items-center gap-2.5">
         {/* 左側：時間バッジまたはアイコン */}
-        {(isAfterPurge || isChaffCleaning) ? (
+        {isAfterPurge ? (
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <div className="text-base sm:text-base font-medium text-gray-800 select-none min-w-[50px]">
               {/* スペーサーとして空のdivを使用 */}

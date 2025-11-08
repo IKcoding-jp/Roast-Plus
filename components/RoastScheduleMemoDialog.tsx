@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import type { RoastSchedule } from '@/types';
 import { ALL_BEANS, getRoastMachineMode, type BeanName } from '@/lib/beanConfig';
 import { HiX, HiFire } from 'react-icons/hi';
-import { FaCoffee, FaSnowflake } from 'react-icons/fa';
+import { FaSnowflake, FaBroom } from 'react-icons/fa';
+import { GiCoffeeBeans } from 'react-icons/gi';
 
 interface RoastScheduleMemoDialogProps {
   schedule: RoastSchedule | null;
@@ -32,6 +33,7 @@ export function RoastScheduleMemoDialog({
   const [isRoasterOn, setIsRoasterOn] = useState(schedule?.isRoasterOn || false);
   const [isRoast, setIsRoast] = useState(schedule?.isRoast || false);
   const [isAfterPurge, setIsAfterPurge] = useState(schedule?.isAfterPurge || false);
+  const [isChaffCleaning, setIsChaffCleaning] = useState(schedule?.isChaffCleaning || false);
   const [beanName, setBeanName] = useState<BeanName | ''>((schedule?.beanName as BeanName | undefined) || '');
   const [weight, setWeight] = useState<200 | 300 | 500 | ''>(schedule?.weight || '');
   const [roastLevel, setRoastLevel] = useState<
@@ -48,6 +50,7 @@ export function RoastScheduleMemoDialog({
     setIsRoasterOn(schedule?.isRoasterOn || false);
     setIsRoast(schedule?.isRoast || false);
     setIsAfterPurge(schedule?.isAfterPurge || false);
+    setIsChaffCleaning(schedule?.isChaffCleaning || false);
     setBeanName((schedule?.beanName as BeanName | undefined) || '');
     setWeight(schedule?.weight || '');
     setRoastLevel(schedule?.roastLevel || '');
@@ -64,17 +67,18 @@ export function RoastScheduleMemoDialog({
   }, [beanName, isRoasterOn]);
 
   // メモタイプの排他的選択
-  const handleMemoTypeChange = (type: 'roasterOn' | 'roast' | 'afterPurge') => {
+  const handleMemoTypeChange = (type: 'roasterOn' | 'roast' | 'afterPurge' | 'chaffCleaning') => {
     setIsRoasterOn(type === 'roasterOn');
     setIsRoast(type === 'roast');
     setIsAfterPurge(type === 'afterPurge');
+    setIsChaffCleaning(type === 'chaffCleaning');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // バリデーション
-    if (!isRoasterOn && !isRoast && !isAfterPurge) {
+    if (!isRoasterOn && !isRoast && !isAfterPurge && !isChaffCleaning) {
       alert('スケジュールタイプを選択してください');
       return;
     }
@@ -93,7 +97,7 @@ export function RoastScheduleMemoDialog({
       }
     }
 
-    if (!isAfterPurge && (!hour || !minute)) {
+    if (!isAfterPurge && !isChaffCleaning && (!hour || !minute)) {
       alert('時間を入力してください');
       return;
     }
@@ -105,10 +109,11 @@ export function RoastScheduleMemoDialog({
 
     const newSchedule: RoastSchedule = {
       id: schedule?.id || `roast-${Date.now()}`,
-      time: isAfterPurge ? '' : formattedTime, // アフターパージの場合は時間なし
+      time: (isAfterPurge || isChaffCleaning) ? '' : formattedTime, // アフターパージやチャフのお掃除の場合は時間なし
       isRoasterOn: isRoasterOn || undefined,
       isRoast: isRoast || undefined,
       isAfterPurge: isAfterPurge || undefined,
+      isChaffCleaning: isChaffCleaning || undefined,
       beanName: isRoasterOn ? (beanName as BeanName) : undefined,
       roastMachineMode,
       weight: isRoasterOn ? (weight as 200 | 300 | 500) : undefined,
@@ -149,6 +154,9 @@ export function RoastScheduleMemoDialog({
     if (isAfterPurge) {
       return 'アフターパージ';
     }
+    if (isChaffCleaning) {
+      return 'チャフのお掃除';
+    }
     return '';
   };
 
@@ -157,6 +165,7 @@ export function RoastScheduleMemoDialog({
     if (isRoasterOn) return 'bg-orange-100 border-orange-300 text-orange-800';
     if (isRoast) return 'bg-amber-100 border-amber-300 text-amber-800';
     if (isAfterPurge) return 'bg-blue-100 border-blue-300 text-blue-800';
+    if (isChaffCleaning) return 'bg-amber-100 border-amber-300 text-amber-800';
     return 'bg-gray-100 border-gray-300 text-gray-800';
   };
 
@@ -187,7 +196,7 @@ export function RoastScheduleMemoDialog({
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4 max-w-md mx-auto">
             {/* 時間選択 */}
-            {!isAfterPurge && (
+            {!isAfterPurge && !isChaffCleaning && (
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700 text-center">
                   時間 <span className="text-red-500">*</span>
@@ -204,7 +213,7 @@ export function RoastScheduleMemoDialog({
                     }}
                     min="0"
                     max="23"
-                    required={!isAfterPurge}
+                    required={!isAfterPurge && !isChaffCleaning}
                     className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="時"
                   />
@@ -220,7 +229,7 @@ export function RoastScheduleMemoDialog({
                     }}
                     min="0"
                     max="59"
-                    required={!isAfterPurge}
+                    required={!isAfterPurge && !isChaffCleaning}
                     className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="分"
                   />
@@ -260,6 +269,15 @@ export function RoastScheduleMemoDialog({
                     className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                   />
                   <span className="text-sm text-gray-700">アフターパージ</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isChaffCleaning}
+                    onChange={(e) => handleMemoTypeChange('chaffCleaning')}
+                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <span className="text-sm text-gray-700">チャフのお掃除</span>
                 </label>
               </div>
             </div>
@@ -363,12 +381,13 @@ export function RoastScheduleMemoDialog({
             )}
 
             {/* プレビュー */}
-            {(isRoasterOn || isRoast || isAfterPurge) && (
+            {(isRoasterOn || isRoast || isAfterPurge || isChaffCleaning) && (
               <div className={`rounded-md border-2 p-3 ${getPreviewColor()} flex justify-center`}>
                 <div className="flex items-center gap-2">
                   {isRoasterOn && <HiFire className="text-lg text-orange-500" />}
-                  {isRoast && <FaCoffee className="text-lg text-amber-700" />}
+                  {isRoast && <GiCoffeeBeans className="text-lg text-amber-700" />}
                   {isAfterPurge && <FaSnowflake className="text-lg text-blue-500" />}
+                  {isChaffCleaning && <FaBroom className="text-lg text-amber-800" />}
                   <div className="text-sm font-medium whitespace-pre-line">
                     {getPreviewText()}
                   </div>

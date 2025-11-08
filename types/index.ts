@@ -50,11 +50,12 @@ export interface TodaySchedule {
 // ローストスケジュール
 export interface RoastSchedule {
   id: string;
-  time: string; // HH:mm形式（アフターパージの場合は空文字列も可）
+  time: string; // HH:mm形式（アフターパージやチャフのお掃除の場合は空文字列も可）
   // メモタイプ（排他的）
   isRoasterOn?: boolean; // 焙煎機予熱
   isRoast?: boolean; // ロースト
   isAfterPurge?: boolean; // アフターパージ
+  isChaffCleaning?: boolean; // チャフのお掃除
   // 焙煎機予熱用フィールド
   beanName?: string; // 豆の名前
   roastMachineMode?: 'G1' | 'G2' | 'G3'; // 焙煎機設定モード（豆選択で自動設定）

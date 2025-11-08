@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react';
 import type { AppData, RoastSchedule } from '@/types';
 import { HiPlus, HiFire, HiCalendar } from 'react-icons/hi';
-import { FaCoffee, FaSnowflake } from 'react-icons/fa';
+import { FaSnowflake, FaBroom } from 'react-icons/fa';
+import { GiCoffeeBeans } from 'react-icons/gi';
 import { RoastScheduleMemoDialog } from './RoastScheduleMemoDialog';
 import { CountryFlagEmoji } from './CountryFlagEmoji';
 
@@ -38,7 +39,7 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       
       // 片方だけorderがある場合
       if (a.order !== undefined && b.order === undefined) {
-        // orderがある方が後ろ（アフターパージやアフターパージ後に追加されたスケジュール）
+        // orderがある方が後ろ（アフターパージ、チャフのお掃除やそれら後に追加されたスケジュール）
         return 1;
       }
       if (a.order === undefined && b.order !== undefined) {
@@ -129,8 +130,8 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       updatedSchedules[existingIndex] = schedule;
     } else {
       // 新しいスケジュールを追加
-      // アフターパージが存在する場合、最後のアフターパージの直後に追加
-      if (!schedule.isAfterPurge) {
+      // アフターパージやチャフのお掃除が存在する場合、最後のアフターパージの直後に追加
+      if (!schedule.isAfterPurge && !schedule.isChaffCleaning) {
         // 最後のアフターパージのインデックスとorder値を探す
         let lastAfterPurgeIndex = -1;
         let maxAfterPurgeOrder = -1;
@@ -155,11 +156,28 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
           // アフターパージが存在しない場合、orderを設定せずに追加（時間順でソートされる）
           updatedSchedules.push(schedule);
         }
-      } else {
+      } else if (schedule.isAfterPurge) {
         // 追加するのがアフターパージの場合は、orderに大きな値を設定して末尾に追加
         const newSchedule: RoastSchedule = {
           ...schedule,
           order: (updatedSchedules.length + 1) * 1000, // 末尾になるように大きな値を設定
+        };
+        updatedSchedules.push(newSchedule);
+      } else if (schedule.isChaffCleaning) {
+        // 追加するのがチャフのお掃除の場合は、最後のアフターパージの直後に追加
+        let maxAfterPurgeOrder = -1;
+        for (let i = updatedSchedules.length - 1; i >= 0; i--) {
+          if (updatedSchedules[i].isAfterPurge) {
+            const order = updatedSchedules[i].order ?? 0;
+            if (order > maxAfterPurgeOrder) {
+              maxAfterPurgeOrder = order;
+            }
+          }
+        }
+        
+        const newSchedule: RoastSchedule = {
+          ...schedule,
+          order: maxAfterPurgeOrder >= 0 ? maxAfterPurgeOrder + 500 : (updatedSchedules.length + 1) * 1000,
         };
         updatedSchedules.push(newSchedule);
       }
@@ -407,12 +425,14 @@ function ScheduleCard({
   const isRoasterOn = schedule.isRoasterOn;
   const isRoast = schedule.isRoast;
   const isAfterPurge = schedule.isAfterPurge;
+  const isChaffCleaning = schedule.isChaffCleaning;
 
   // アイコンの取得
   const getIcon = () => {
     if (isRoasterOn) return <HiFire className="text-xl text-orange-500" />;
-    if (isRoast) return <FaCoffee className="text-xl text-amber-700" />;
+    if (isRoast) return <GiCoffeeBeans className="text-xl text-amber-700" />;
     if (isAfterPurge) return <FaSnowflake className="text-xl text-blue-500" />;
+    if (isChaffCleaning) return <FaBroom className="text-xl text-amber-800" />;
     return null;
   };
 
@@ -461,6 +481,15 @@ function ScheduleCard({
         roastLevel: '',
       };
     }
+    if (isChaffCleaning) {
+      return {
+        firstLine: 'チャフのお掃除',
+        beanName: '',
+        mode: '',
+        weight: '',
+        roastLevel: '',
+      };
+    }
     return { firstLine: '', beanName: '', mode: '', weight: '', roastLevel: '' };
   };
 
@@ -498,7 +527,7 @@ function ScheduleCard({
     >
       <div className="flex items-center gap-2.5">
         {/* 左側：時間バッジまたはアイコン */}
-        {isAfterPurge ? (
+        {(isAfterPurge || isChaffCleaning) ? (
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <div className="text-base sm:text-base font-medium text-gray-800 select-none min-w-[50px]">
               {/* スペーサーとして空のdivを使用 */}

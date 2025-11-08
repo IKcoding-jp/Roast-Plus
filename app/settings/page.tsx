@@ -26,7 +26,7 @@ export default function SettingsPage() {
 
   if (authLoading || devModeLoading || dataLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
+      <div className="flex min-h-screen items-center justify-center bg-amber-50">
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -78,7 +78,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <header className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

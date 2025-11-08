@@ -77,7 +77,7 @@ export function TastingSessionForm({
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           placeholder="例: 2025年11月の試飲会"
         />
         <p className="mt-1 text-xs text-gray-500">
@@ -94,9 +94,9 @@ export function TastingSessionForm({
           type="text"
           value={beanName}
           onChange={(e) => setBeanName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           required
-          placeholder="例: エチオピア モカ"
+          placeholder="例: コロンビア　ブラジル"
         />
       </div>
 
@@ -112,7 +112,7 @@ export function TastingSessionForm({
               e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
             )
           }
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           required
         >
           {ROAST_LEVELS.map((level) => (
@@ -132,7 +132,7 @@ export function TastingSessionForm({
           type="date"
           value={createdAt}
           onChange={(e) => setCreatedAt(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           required
         />
       </div>
@@ -159,7 +159,7 @@ export function TastingSessionForm({
         )}
         <button
           type="submit"
-          className="flex-1 px-6 py-3 bg-[#8B4513] text-white rounded-lg hover:bg-[#6B3410] transition-colors font-medium"
+          className="flex-1 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
         >
           {isNew ? 'セッションを作成' : '更新'}
         </button>

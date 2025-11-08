@@ -72,6 +72,9 @@ export function TastingSessionDetail({
       // 編集モードを解除
       setEditingRecordId(null);
     }
+    
+    // 試飲記録一覧ページに遷移
+    router.push('/tasting');
   };
 
   const handleRecordDelete = (recordId: string) => {
@@ -87,6 +90,9 @@ export function TastingSessionDetail({
     if (editingRecordId === recordId) {
       setEditingRecordId(null);
     }
+    
+    // 試飲記録一覧ページに遷移
+    router.push('/tasting');
   };
 
   const handleCancel = () => {
@@ -101,7 +107,20 @@ export function TastingSessionDetail({
           <h2 className="text-2xl font-bold text-gray-800">
             {session.beanName}
           </h2>
-          <span className="px-3 py-1 bg-[#8B4513] text-white text-sm rounded-full">
+          <span 
+            className="px-3 py-1 text-white text-sm rounded-full"
+            style={
+              session.roastLevel === '深煎り' 
+                ? { backgroundColor: '#120C0A' }
+                : session.roastLevel === '中深煎り'
+                ? { backgroundColor: '#4E3526' }
+                : session.roastLevel === '中煎り'
+                ? { backgroundColor: '#745138' }
+                : session.roastLevel === '浅煎り'
+                ? { backgroundColor: '#C78F5D' }
+                : { backgroundColor: '#6B7280' }
+            }
+          >
             {session.roastLevel}
           </span>
         </div>
@@ -122,8 +141,8 @@ export function TastingSessionDetail({
         </div>
       ) : null}
 
-      {/* 自分の記録がない場合：記録追加フォームを表示 */}
-      {!hasOwnRecord && !editingRecord && (
+      {/* 記録追加フォームを表示 */}
+      {!editingRecord && (
         <div className="mb-6">
           <TastingRecordForm
             record={null}
@@ -131,6 +150,7 @@ export function TastingSessionDetail({
             sessionId={session.id}
             session={session}
             onSave={handleRecordSave}
+            onDelete={ownRecord ? handleRecordDelete : undefined}
             onCancel={() => router.push('/tasting')}
           />
         </div>

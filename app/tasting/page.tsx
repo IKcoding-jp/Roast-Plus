@@ -14,7 +14,7 @@ export default function TastingPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
+      <div className="flex min-h-screen items-center justify-center bg-amber-50">
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -28,7 +28,7 @@ export default function TastingPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
+      <div className="flex min-h-screen items-center justify-center bg-amber-50">
         <div className="text-center">
           <div className="text-lg text-gray-600">データを読み込み中...</div>
         </div>
@@ -37,7 +37,7 @@ export default function TastingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -64,7 +64,7 @@ export default function TastingPage() {
         {/* 新規セッション作成FAB */}
         <Link
           href="/tasting/sessions/new"
-          className="fixed bottom-8 right-8 w-14 h-14 bg-[#8B4513] text-white rounded-full shadow-lg hover:bg-[#6B3410] transition-colors flex items-center justify-center z-10"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-amber-600 text-white rounded-full shadow-lg hover:bg-amber-700 transition-colors flex items-center justify-center z-10"
           aria-label="新規セッション作成"
         >
           <HiPlus className="w-6 h-6" />

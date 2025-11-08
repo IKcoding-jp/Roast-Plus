@@ -99,7 +99,20 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                     {record.beanName}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <span className="px-3 py-1 bg-[#8B4513] text-white text-sm rounded-full">
+                    <span 
+                      className="px-3 py-1 text-white text-sm rounded-full"
+                      style={
+                        record.roastLevel === '深煎り' 
+                          ? { backgroundColor: '#120C0A' }
+                          : record.roastLevel === '中深煎り'
+                          ? { backgroundColor: '#4E3526' }
+                          : record.roastLevel === '中煎り'
+                          ? { backgroundColor: '#745138' }
+                          : record.roastLevel === '浅煎り'
+                          ? { backgroundColor: '#C78F5D' }
+                          : { backgroundColor: '#6B7280' }
+                      }
+                    >
                       {record.roastLevel}
                     </span>
                     <span className="text-sm text-gray-600">

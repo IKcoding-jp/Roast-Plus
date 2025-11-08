@@ -80,12 +80,12 @@ export default function NewTastingRecordPage() {
       tastingRecords: updatedRecords,
     });
 
-    // セッション詳細ページに遷移
-    router.push(`/tasting/sessions/${sessionId}`);
+    // 試飲記録一覧ページに遷移
+    router.push('/tasting');
   };
 
   const handleCancel = () => {
-    router.push(`/tasting/sessions/${sessionId}`);
+    router.push('/tasting');
   };
 
   return (
@@ -95,11 +95,11 @@ export default function NewTastingRecordPage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
-                href={`/tasting/sessions/${sessionId}`}
+                href="/tasting"
                 className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
               >
                 <HiArrowLeft className="text-lg flex-shrink-0" />
-                セッションに戻る
+                試飲記録一覧に戻る
               </Link>
             </div>
             <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">

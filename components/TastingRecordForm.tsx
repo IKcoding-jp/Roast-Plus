@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { TastingRecord, AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
-import { getSelectedMemberId } from '@/lib/localStorage';
+import { getSelectedMemberId, setSelectedMemberId } from '@/lib/localStorage';
 import {
   getActiveMemberCount,
   getRecordsBySessionId,
@@ -41,7 +41,6 @@ export function TastingRecordForm({
   onCancel,
   readOnly = false,
 }: TastingRecordFormProps) {
-  const isNew = !record;
   const selectedMemberId = getSelectedMemberId();
   
   // セッションIDの決定: 編集時はrecordから、新規作成時はpropsから
@@ -61,6 +60,15 @@ export function TastingRecordForm({
     ? getRecordsBySessionId(data.tastingRecords, currentSessionId)
     : [];
   const recordCount = sessionRecords.length;
+
+  // セッション内の自分の記録をチェック
+  const ownRecord = useMemo(() => {
+    if (!currentSessionId || !selectedMemberId) return null;
+    return sessionRecords.find((r) => r.memberId === selectedMemberId);
+  }, [currentSessionId, selectedMemberId, sessionRecords]);
+
+  // 既存の記録も自分の記録もない場合のみ「作成」
+  const isNew = !record && !ownRecord;
   const isLimitReached = isNew && recordCount >= activeMemberCount;
 
   const [beanName, setBeanName] = useState(record?.beanName || '');
@@ -203,7 +211,7 @@ export function TastingRecordForm({
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
         <label className="text-sm font-medium text-gray-700">{label}</label>
-        <span className="text-sm font-semibold text-[#8B4513]">{value.toFixed(1)}</span>
+        <span className="text-sm font-semibold text-amber-600">{value.toFixed(1)}</span>
       </div>
       <input
         type="range"
@@ -212,7 +220,7 @@ export function TastingRecordForm({
         step={STEP}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#8B4513]"
+        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
         disabled={readOnly}
       />
       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -234,7 +242,7 @@ export function TastingRecordForm({
           type="text"
           value={beanName}
           onChange={(e) => setBeanName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           placeholder="例: エチオピア"
           required
           disabled={readOnly}
@@ -252,7 +260,7 @@ export function TastingRecordForm({
           type="date"
           value={tastingDate}
           onChange={(e) => setTastingDate(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           required
           disabled={readOnly}
         />
@@ -270,7 +278,7 @@ export function TastingRecordForm({
           onChange={(e) =>
             setRoastLevel(e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り')
           }
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           required
           disabled={readOnly}
         >
@@ -291,8 +299,15 @@ export function TastingRecordForm({
           </label>
           <select
             value={memberId}
-            onChange={(e) => setMemberId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+            onChange={(e) => {
+              const newMemberId = e.target.value;
+              setMemberId(newMemberId);
+              // メンバー選択時に自動保存
+              if (newMemberId) {
+                setSelectedMemberId(newMemberId);
+              }
+            }}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
             required
             disabled={readOnly}
           >
@@ -324,23 +339,16 @@ export function TastingRecordForm({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
             disabled
           />
-          </div>
+        </div>
         </>
       )}
-      
+
       {/* 記録数制限警告（新規作成時のみ） */}
       {isNew && isLimitReached && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-sm text-red-800">
             記録数の上限（{activeMemberCount}件）に達しています。これ以上追加できません。
           </p>
-        </div>
-      )}
-
-      {/* 重複警告 */}
-      {duplicateWarning && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800">{duplicateWarning}</p>
         </div>
       )}
 
@@ -379,7 +387,7 @@ export function TastingRecordForm({
           value={overallImpression}
           onChange={(e) => setOverallImpression(e.target.value)}
           rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           placeholder="コーヒーの全体的な印象を記録してください"
           disabled={readOnly}
         />
@@ -397,16 +405,23 @@ export function TastingRecordForm({
               削除
             </button>
           )}
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-          >
-            キャンセル
-          </button>
+          {ownRecord && onDelete && (
+            <button
+              type="button"
+              onClick={() => {
+                const confirmDelete = window.confirm('この記録を削除しますか？');
+                if (confirmDelete) {
+                  onDelete(ownRecord.id);
+                }
+              }}
+              className="flex-1 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+            >
+              自分の記録を削除
+            </button>
+          )}
           <button
             type="submit"
-            className="flex-1 px-6 py-3 bg-[#8B4513] text-white rounded-lg hover:bg-[#6B3410] transition-colors font-medium"
+            className="flex-1 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
           >
             {isNew ? '作成' : '上書き'}
           </button>

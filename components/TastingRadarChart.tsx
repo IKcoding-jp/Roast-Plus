@@ -106,9 +106,9 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
         {/* データエリア */}
         <path
           d={pathData}
-          fill="#8B4513"
+          fill="#D97706"
           fillOpacity="0.3"
-          stroke="#8B4513"
+          stroke="#D97706"
           strokeWidth="2"
         />
 
@@ -119,7 +119,7 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
             cx={point.x}
             cy={point.y}
             r="4"
-            fill="#8B4513"
+            fill="#D97706"
           />
         ))}
 
@@ -145,7 +145,7 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
                 y={labelY + 14}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-xs fill-[#8B4513] font-semibold"
+                className="text-xs fill-amber-600 font-semibold"
               >
                 {point.value.toFixed(1)}
               </text>

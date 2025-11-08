@@ -33,7 +33,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
+      <div className="flex min-h-screen items-center justify-center bg-amber-50">
         <div className="text-gray-600">読み込み中...</div>
       </div>
     );
@@ -44,7 +44,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB]">
+    <div className="min-h-screen bg-amber-50">
       {/* ヘッダー */}
       <header className="flex items-center justify-between bg-white px-6 py-4 shadow-sm">
         <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export default function HomePage() {
               <FaCoffee className="h-16 w-16 text-orange-500" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
-              試飲感想記録　※開発中
+              試飲感想記録 β版
             </h2>
           </button>
 

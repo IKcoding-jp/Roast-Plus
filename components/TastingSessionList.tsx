@@ -222,14 +222,14 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="豆の名前またはセッション名で検索"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
             />
           </div>
           <div className="sm:w-48">
             <select
               value={sortOption}
               onChange={(e) => handleSortChange(e.target.value as SortOption)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
             >
               <option value="newest">新しい順</option>
               <option value="oldest">古い順</option>
@@ -258,7 +258,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                   type="date"
                   value={dateFrom}
                   onChange={(e) => handleDateFromChange(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
                 />
               </div>
               <div>
@@ -269,7 +269,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                   type="date"
                   value={dateTo}
                   onChange={(e) => handleDateToChange(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
                 />
               </div>
             </div>
@@ -289,7 +289,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                       type="checkbox"
                       checked={selectedRoastLevels.includes(level)}
                       onChange={() => handleRoastLevelToggle(level)}
-                      className="w-4 h-4 text-[#8B4513] border-gray-300 rounded focus:ring-[#8B4513]"
+                      className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-600"
                     />
                     <span className="text-sm text-gray-700">{level}</span>
                   </label>
@@ -306,7 +306,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                   setSelectedRoastLevels([]);
                   setCurrentPage(1);
                 }}
-                className="text-sm text-[#8B4513] hover:underline"
+                className="text-sm text-amber-600 hover:underline"
               >
                 フィルタをリセット
               </button>
@@ -385,7 +385,20 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                           <h3 className="text-base font-semibold text-gray-800">
                             {session.beanName}
                           </h3>
-                          <span className="px-2 py-0.5 bg-[#8B4513] text-white text-xs rounded-full flex-shrink-0">
+                          <span 
+                            className="px-2 py-0.5 text-white text-xs rounded-full flex-shrink-0"
+                            style={
+                              session.roastLevel === '深煎り' 
+                                ? { backgroundColor: '#120C0A' }
+                                : session.roastLevel === '中深煎り'
+                                ? { backgroundColor: '#4E3526' }
+                                : session.roastLevel === '中煎り'
+                                ? { backgroundColor: '#745138' }
+                                : session.roastLevel === '浅煎り'
+                                ? { backgroundColor: '#C78F5D' }
+                                : { backgroundColor: '#6B7280' }
+                            }
+                          >
                             {session.roastLevel}
                           </span>
                           <span className="px-2 py-0.5 bg-gray-800 text-white text-sm font-semibold rounded-full flex-shrink-0">
@@ -452,7 +465,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                           onClick={() => setCurrentPage(page)}
                           className={`px-3 py-2 rounded-lg transition-colors ${
                             currentPage === page
-                              ? 'bg-[#8B4513] text-white'
+                              ? 'bg-amber-600 text-white'
                               : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
                           }`}
                         >

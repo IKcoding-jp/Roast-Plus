@@ -58,6 +58,8 @@ export interface RoastSchedule {
   isChaffCleaning?: boolean; // チャフのお掃除
   // 焙煎機予熱用フィールド
   beanName?: string; // 豆の名前
+  beanName2?: string; // 2種類目の豆の名前（プレミックス用）
+  blendRatio?: string; // ブレンド割合（例：「5:5」「8:2」形式）
   roastMachineMode?: 'G1' | 'G2' | 'G3'; // 焙煎機設定モード（豆選択で自動設定）
   weight?: 200 | 300 | 500; // 重さ（g）
   roastLevel?: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い

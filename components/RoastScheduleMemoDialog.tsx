@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { RoastSchedule } from '@/types';
-import { ALL_BEANS, getRoastMachineMode, type BeanName } from '@/lib/beanConfig';
+import { ALL_BEANS, getRoastMachineMode, getRoastMachineModeForBlend, type BeanName } from '@/lib/beanConfig';
 import { HiX, HiFire } from 'react-icons/hi';
 import { FaSnowflake, FaBroom } from 'react-icons/fa';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
@@ -35,6 +35,8 @@ export function RoastScheduleMemoDialog({
   const [isAfterPurge, setIsAfterPurge] = useState(schedule?.isAfterPurge || false);
   const [isChaffCleaning, setIsChaffCleaning] = useState(schedule?.isChaffCleaning || false);
   const [beanName, setBeanName] = useState<BeanName | ''>((schedule?.beanName as BeanName | undefined) || '');
+  const [beanName2, setBeanName2] = useState<BeanName | ''>((schedule?.beanName2 as BeanName | undefined) || '');
+  const [blendRatio, setBlendRatio] = useState<string>(schedule?.blendRatio || '');
   const [weight, setWeight] = useState<200 | 300 | 500 | ''>(schedule?.weight || '');
   const [roastLevel, setRoastLevel] = useState<
     '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
@@ -52,6 +54,8 @@ export function RoastScheduleMemoDialog({
     setIsAfterPurge(schedule?.isAfterPurge || false);
     setIsChaffCleaning(schedule?.isChaffCleaning || false);
     setBeanName((schedule?.beanName as BeanName | undefined) || '');
+    setBeanName2((schedule?.beanName2 as BeanName | undefined) || '');
+    setBlendRatio(schedule?.blendRatio || '');
     setWeight(schedule?.weight || '');
     setRoastLevel(schedule?.roastLevel || '');
     setRoastCount(schedule?.roastCount?.toString() || '');
@@ -61,10 +65,10 @@ export function RoastScheduleMemoDialog({
   // 豆の名前が変更されたら、Gモードを自動設定
   useEffect(() => {
     if (beanName && isRoasterOn) {
-      const mode = getRoastMachineMode(beanName);
       // モードは自動設定されるが、UIには表示しない（内部で使用）
+      // ブレンド対応のため、getRoastMachineModeForBlendを使用
     }
-  }, [beanName, isRoasterOn]);
+  }, [beanName, beanName2, blendRatio, isRoasterOn]);
 
   // メモタイプの排他的選択
   const handleMemoTypeChange = (type: 'roasterOn' | 'roast' | 'afterPurge' | 'chaffCleaning') => {
@@ -88,6 +92,19 @@ export function RoastScheduleMemoDialog({
         alert('豆の名前、重さ、焙煎度合いを入力してください');
         return;
       }
+      // 2種類目の豆が選択されている場合は割合入力必須
+      if (beanName2 && !blendRatio) {
+        alert('ブレンド割合を入力してください（例：5:5、8:2）');
+        return;
+      }
+      // 割合形式の検証
+      if (beanName2 && blendRatio) {
+        const ratioMatch = blendRatio.match(/^(\d+):(\d+)$/);
+        if (!ratioMatch) {
+          alert('ブレンド割合は「5:5」「8:2」のような形式で入力してください');
+          return;
+        }
+      }
     }
 
     if (isRoast) {
@@ -102,7 +119,11 @@ export function RoastScheduleMemoDialog({
       return;
     }
 
-    const roastMachineMode = beanName ? getRoastMachineMode(beanName) : undefined;
+    const roastMachineMode = getRoastMachineModeForBlend(
+      beanName as BeanName | undefined,
+      beanName2 as BeanName | undefined,
+      blendRatio || undefined
+    );
 
     // 時・分をHH:mm形式に変換
     const formattedTime = hour && minute ? `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}` : '';
@@ -115,6 +136,8 @@ export function RoastScheduleMemoDialog({
       isAfterPurge: isAfterPurge || undefined,
       isChaffCleaning: isChaffCleaning || undefined,
       beanName: isRoasterOn ? (beanName as BeanName) : undefined,
+      beanName2: isRoasterOn && beanName2 ? (beanName2 as BeanName) : undefined,
+      blendRatio: isRoasterOn && beanName2 && blendRatio ? blendRatio : undefined,
       roastMachineMode,
       weight: isRoasterOn ? (weight as 200 | 300 | 500) : undefined,
       roastLevel: isRoasterOn ? (roastLevel as '浅煎り' | '中煎り' | '中深煎り' | '深煎り') : undefined,
@@ -136,8 +159,22 @@ export function RoastScheduleMemoDialog({
   // プレビューテキストの生成
   const getPreviewText = () => {
     if (isRoasterOn) {
-      const mode = beanName ? getRoastMachineMode(beanName) : '';
-      const beanText = beanName ? `${beanName} (${mode})` : '';
+      const mode = getRoastMachineModeForBlend(
+        beanName as BeanName | undefined,
+        beanName2 as BeanName | undefined,
+        blendRatio || undefined
+      );
+      
+      let beanText = '';
+      if (beanName2 && blendRatio) {
+        // ブレンドの場合
+        const [ratio1, ratio2] = blendRatio.split(':');
+        beanText = `${beanName}${ratio1}:${beanName2}${ratio2} (${mode})`;
+      } else if (beanName) {
+        // 単体の場合
+        beanText = `${beanName} (${mode})`;
+      }
+      
       const weightText = weight ? `${weight}g` : '';
       const levelText = roastLevel || '';
       return `焙煎機予熱\n${beanText} ${weightText} ${levelText}`.trim();
@@ -319,7 +356,15 @@ export function RoastScheduleMemoDialog({
                   </label>
                   <select
                     value={beanName}
-                    onChange={(e) => setBeanName(e.target.value as BeanName)}
+                    onChange={(e) => {
+                      const value = e.target.value as BeanName;
+                      setBeanName(value);
+                      // 1種類目が変更されたとき、2種類目が同じ豆の場合はクリア
+                      if (beanName2 === value) {
+                        setBeanName2('');
+                        setBlendRatio('');
+                      }
+                    }}
                     required={isRoasterOn}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
@@ -331,6 +376,50 @@ export function RoastScheduleMemoDialog({
                     ))}
                   </select>
                 </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    2種類目の豆の名前
+                  </label>
+                  <select
+                    value={beanName2}
+                    onChange={(e) => {
+                      const value = e.target.value as BeanName | '';
+                      setBeanName2(value);
+                      // 2種類目を「なし」にした場合は割合もクリア
+                      if (!value) {
+                        setBlendRatio('');
+                      }
+                    }}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="">なし</option>
+                    {ALL_BEANS.filter((bean) => bean !== beanName).map((bean) => (
+                      <option key={bean} value={bean}>
+                        {bean}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {beanName2 && (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      ブレンド割合 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={blendRatio}
+                      onChange={(e) => setBlendRatio(e.target.value)}
+                      placeholder="例：5:5、8:2"
+                      required={!!beanName2}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      割合をコロン区切りで入力してください（例：5:5、8:2）
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">

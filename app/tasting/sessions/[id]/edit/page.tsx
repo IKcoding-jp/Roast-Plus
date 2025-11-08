@@ -1,21 +1,20 @@
 'use client';
 
-import { useRouter, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
-import { TastingRecordForm } from '@/components/TastingRecordForm';
-import type { TastingRecord } from '@/types';
-import { getSelectedMemberId } from '@/lib/localStorage';
+import { TastingSessionForm } from '@/components/TastingSessionForm';
+import type { TastingSession } from '@/types';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
-export default function TastingDetailPageClient() {
+export default function EditTastingSessionPage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
   const params = useParams();
-  const recordId = params?.id as string;
+  const sessionId = params?.id as string;
 
   if (authLoading) {
     return (
@@ -41,17 +40,17 @@ export default function TastingDetailPageClient() {
     );
   }
 
-  const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
-  const record = tastingRecords.find((r) => r.id === recordId);
-  const selectedMemberId = getSelectedMemberId();
-  const isOwnRecord = record?.memberId === selectedMemberId;
+  const tastingSessions = Array.isArray(data.tastingSessions)
+    ? data.tastingSessions
+    : [];
+  const session = tastingSessions.find((s) => s.id === sessionId);
 
-  if (!record) {
+  if (!session) {
     return (
       <div className="min-h-screen bg-[#F5F1EB] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-gray-600 mb-4">記録が見つかりません</p>
+            <p className="text-gray-600 mb-4">セッションが見つかりません</p>
             <Link
               href="/tasting"
               className="text-[#8B4513] hover:underline"
@@ -64,58 +63,56 @@ export default function TastingDetailPageClient() {
     );
   }
 
-  const handleSave = (updatedRecord: TastingRecord) => {
-    if (!isOwnRecord) {
-      alert('自分の記録のみ編集できます');
-      return;
-    }
+  const handleSave = (updatedSession: TastingSession) => {
+    const sessionData: TastingSession = {
+      ...updatedSession,
+      userId: user.uid,
+    };
 
-    const updatedRecords = tastingRecords.map((r) =>
-      r.id === recordId ? { ...updatedRecord, userId: user.uid } : r
+    const updatedSessions = tastingSessions.map((s) =>
+      s.id === sessionId ? sessionData : s
     );
     updateData({
       ...data,
-      tastingRecords: updatedRecords,
+      tastingSessions: updatedSessions,
     });
 
-    // セッション詳細ページに戻る
-    if (record.sessionId) {
-      router.push(`/tasting/sessions/${record.sessionId}`);
-    } else {
-      router.push('/tasting');
-    }
-  };
-
-  const handleDelete = (id: string) => {
-    if (!isOwnRecord) {
-      alert('自分の記録のみ削除できます');
-      return;
-    }
-
-    const confirmDelete = window.confirm('この記録を削除しますか？');
-    if (!confirmDelete) return;
-
-    const updatedRecords = tastingRecords.filter((r) => r.id !== id);
-    updateData({
-      ...data,
-      tastingRecords: updatedRecords,
-    });
-
-    // セッション詳細ページに戻る
-    if (record.sessionId) {
-      router.push(`/tasting/sessions/${record.sessionId}`);
-    } else {
-      router.push('/tasting');
-    }
+    // 試飲記録一覧ページに遷移
+    router.push('/tasting');
   };
 
   const handleCancel = () => {
-    // セッション詳細ページに戻る
-    if (record?.sessionId) {
-      router.push(`/tasting/sessions/${record.sessionId}`);
-    } else {
-      router.push('/tasting');
-    }
+    router.push(`/tasting/sessions/${sessionId}`);
+  };
+
+  const handleDelete = (id: string) => {
+    const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
+    const recordCount = tastingRecords.filter((r) => r.sessionId === id).length;
+    const confirmMessage = recordCount > 0
+      ? `このセッションと関連する${recordCount}件の記録を削除しますか？この操作は取り消せません。`
+      : 'このセッションを削除しますか？この操作は取り消せません。';
+    
+    const confirmDelete = window.confirm(confirmMessage);
+    if (!confirmDelete) return;
+
+    // セッションに関連する記録も削除
+    const updatedRecords = tastingRecords.filter(
+      (r) => r.sessionId !== id
+    );
+    
+    // セッションを削除
+    const updatedSessions = tastingSessions.filter(
+      (s) => s.id !== id
+    );
+
+    updateData({
+      ...data,
+      tastingSessions: updatedSessions,
+      tastingRecords: updatedRecords,
+    });
+
+    // 試飲記録一覧ページに遷移
+    router.push('/tasting');
   };
 
   return (
@@ -125,36 +122,27 @@ export default function TastingDetailPageClient() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
-                href={record?.sessionId ? `/tasting/sessions/${record.sessionId}` : '/tasting'}
+                href="/tasting"
                 className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
               >
                 <HiArrowLeft className="text-lg flex-shrink-0" />
-                {record?.sessionId ? 'セッションに戻る' : '一覧に戻る'}
+                試飲記録一覧に戻る
               </Link>
             </div>
             <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
-              記録を編集
+              セッション編集
             </h1>
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
           </div>
         </header>
 
         <main>
-          {!isOwnRecord && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-              <p className="text-sm text-yellow-800">
-                この記録は他のメンバーのものです。閲覧のみ可能です。
-              </p>
-            </div>
-          )}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <TastingRecordForm
-              record={isOwnRecord ? record : null}
-              data={data}
+            <TastingSessionForm
+              session={session}
               onSave={handleSave}
-              onDelete={isOwnRecord ? handleDelete : undefined}
               onCancel={handleCancel}
-              readOnly={!isOwnRecord}
+              onDelete={handleDelete}
             />
           </div>
         </main>
@@ -162,5 +150,4 @@ export default function TastingDetailPageClient() {
     </div>
   );
 }
-
 

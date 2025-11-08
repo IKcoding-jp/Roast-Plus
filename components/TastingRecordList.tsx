@@ -105,7 +105,7 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                     <span className="text-sm text-gray-600">
                       {formatDate(record.tastingDate)}
                     </span>
-                    {isOwnRecord && onUpdate && (
+                    {isOwnRecord && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

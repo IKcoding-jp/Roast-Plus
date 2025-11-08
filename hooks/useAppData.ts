@@ -15,6 +15,7 @@ export function useAppData() {
     assignmentHistory: [],
     todaySchedules: [],
     roastSchedules: [],
+    tastingSessions: [],
     tastingRecords: [],
     notifications: [],
   });

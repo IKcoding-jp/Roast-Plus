@@ -1,13 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { TastingRecord, AppData } from '@/types';
+import type { TastingRecord, AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import { getSelectedMemberId } from '@/lib/localStorage';
+import {
+  getActiveMemberCount,
+  getRecordsBySessionId,
+} from '@/lib/tastingUtils';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
   data: AppData;
+  sessionId?: string; // 新規作成時のセッションID（必須）
+  session?: TastingSession; // セッション情報（オプショナル）
   onSave: (record: TastingRecord) => void;
   onDelete?: (id: string) => void;
   onCancel: () => void;
@@ -28,6 +34,8 @@ const STEP = 0.125;
 export function TastingRecordForm({
   record,
   data,
+  sessionId,
+  session,
   onSave,
   onDelete,
   onCancel,
@@ -35,6 +43,25 @@ export function TastingRecordForm({
 }: TastingRecordFormProps) {
   const isNew = !record;
   const selectedMemberId = getSelectedMemberId();
+  
+  // セッションIDの決定: 編集時はrecordから、新規作成時はpropsから
+  const currentSessionId = record?.sessionId || sessionId || '';
+  
+  // セッション情報の取得: propsから、またはdataから取得
+  const sessionInfo = session || (currentSessionId 
+    ? data.tastingSessions.find((s) => s.id === currentSessionId)
+    : undefined);
+  
+  // セッションから記録を作成する場合かどうか（新規作成時、または編集時でもセッション情報がある場合）
+  const isSessionMode = !!sessionInfo;
+  
+  // 記録数制限チェック（新規作成時のみ）
+  const activeMemberCount = getActiveMemberCount(data.members);
+  const sessionRecords = currentSessionId
+    ? getRecordsBySessionId(data.tastingRecords, currentSessionId)
+    : [];
+  const recordCount = sessionRecords.length;
+  const isLimitReached = isNew && recordCount >= activeMemberCount;
 
   const [beanName, setBeanName] = useState(record?.beanName || '');
   const [tastingDate, setTastingDate] = useState(
@@ -66,37 +93,36 @@ export function TastingRecordForm({
     }
   }, [record]);
 
-  // 重複チェック
+  // セッション情報から自動設定（新規作成時のみ）
   useEffect(() => {
-    if (!isNew && record) return; // 編集時は重複チェックしない
+    if (!record && sessionInfo) {
+      setBeanName(sessionInfo.beanName);
+      setRoastLevel(sessionInfo.roastLevel);
+      // 試飲日はセッションの作成日を使用
+      setTastingDate(sessionInfo.createdAt.split('T')[0]);
+    }
+  }, [record, session?.id, currentSessionId]);
 
-    const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
+  // 重複チェック（セッション内で同じメンバーの記録があるか）
+  useEffect(() => {
+    // 編集時は重複チェックしない
+    if (record !== null || !currentSessionId) return;
 
-    if (beanName && roastLevel && memberId) {
-      const duplicate = tastingRecords.find(
-        (r) =>
-          r.beanName === beanName &&
-          r.roastLevel === roastLevel &&
-          r.memberId === memberId &&
-          r.id !== record?.id
-      );
+    const duplicate = sessionRecords.find((r) => r.memberId === memberId);
 
       if (duplicate) {
         setDuplicateWarning(
-          `同じ豆名・焙煎度合いの記録が既に存在します（${duplicate.tastingDate}）。上書きしますか？`
+        `このセッションには既にあなたの記録が存在します（${duplicate.tastingDate}）。上書きしますか？`
         );
-      } else {
-        setDuplicateWarning(null);
-      }
     } else {
       setDuplicateWarning(null);
     }
-  }, [beanName, roastLevel, memberId, data.tastingRecords, isNew, record]);
+  }, [memberId, sessionRecords, isNew, record, currentSessionId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!beanName.trim()) {
+    if (!isSessionMode && !beanName.trim()) {
       alert('豆の名前を入力してください');
       return;
     }
@@ -106,12 +132,30 @@ export function TastingRecordForm({
       return;
     }
 
+    if (isNew && !currentSessionId) {
+      alert('セッションIDが設定されていません');
+      return;
+    }
+
+    if (isNew && isLimitReached) {
+      alert(`記録数の上限（${activeMemberCount}件）に達しています`);
+      return;
+    }
+
+    // セッションモードの場合はセッション情報から値を取得
+    const finalBeanName = isSessionMode && sessionInfo ? sessionInfo.beanName : beanName.trim();
+    const finalRoastLevel = isSessionMode && sessionInfo ? sessionInfo.roastLevel : roastLevel;
+    const finalTastingDate = isSessionMode && sessionInfo 
+      ? sessionInfo.createdAt.split('T')[0] 
+      : tastingDate;
+
     const now = new Date().toISOString();
     const newRecord: TastingRecord = {
       id: record?.id || `tasting_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      beanName: beanName.trim(),
-      tastingDate,
-      roastLevel,
+      sessionId: currentSessionId,
+      beanName: finalBeanName,
+      tastingDate: finalTastingDate,
+      roastLevel: finalRoastLevel,
       bitterness,
       acidity,
       body,
@@ -180,7 +224,8 @@ export function TastingRecordForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* 豆の名前 */}
+      {/* 豆の名前（セッションモードでは非表示） */}
+      {!isSessionMode && (
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           豆の名前 <span className="text-red-500">*</span>
@@ -195,8 +240,10 @@ export function TastingRecordForm({
           disabled={readOnly}
         />
       </div>
+      )}
 
-      {/* 試飲日 */}
+      {/* 試飲日（セッションモードでは非表示） */}
+      {!isSessionMode && (
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           試飲日 <span className="text-red-500">*</span>
@@ -210,8 +257,10 @@ export function TastingRecordForm({
           disabled={readOnly}
         />
       </div>
+      )}
 
-      {/* 焙煎度合い */}
+      {/* 焙煎度合い（セッションモードでは非表示） */}
+      {!isSessionMode && (
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           焙煎度合い <span className="text-red-500">*</span>
@@ -232,6 +281,7 @@ export function TastingRecordForm({
           ))}
         </select>
       </div>
+      )}
 
       {/* メンバー選択（新規作成時のみ、編集時は表示しない） */}
       {isNew && (
@@ -246,11 +296,11 @@ export function TastingRecordForm({
             required
             disabled={readOnly}
           >
-            <option value="">選択してください</option>
+            <option value="" className="text-gray-900">選択してください</option>
             {data.members
               .filter((m) => m.active !== false)
               .map((member) => (
-                <option key={member.id} value={member.id}>
+                <option key={member.id} value={member.id} className="text-gray-900">
                   {member.name}
                 </option>
               ))}
@@ -263,6 +313,7 @@ export function TastingRecordForm({
         </div>
       )}
       {!isNew && record && (
+        <>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             メンバー
@@ -273,6 +324,16 @@ export function TastingRecordForm({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
             disabled
           />
+          </div>
+        </>
+      )}
+      
+      {/* 記録数制限警告（新規作成時のみ） */}
+      {isNew && isLimitReached && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-sm text-red-800">
+            記録数の上限（{activeMemberCount}件）に達しています。これ以上追加できません。
+          </p>
         </div>
       )}
 
@@ -347,7 +408,7 @@ export function TastingRecordForm({
             type="submit"
             className="flex-1 px-6 py-3 bg-[#8B4513] text-white rounded-lg hover:bg-[#6B3410] transition-colors font-medium"
           >
-            {isNew ? '作成' : '更新'}
+            {isNew ? '作成' : '上書き'}
           </button>
         </div>
       )}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import type { TastingRecord } from '@/types';
 
 interface TastingRadarChartProps {
@@ -7,10 +8,33 @@ interface TastingRadarChartProps {
   size?: number;
 }
 
-export function TastingRadarChart({ record, size = 200 }: TastingRadarChartProps) {
-  const centerX = size / 2;
-  const centerY = size / 2;
-  const radius = size * 0.35;
+export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [chartSize, setChartSize] = useState(size || 200);
+
+  useEffect(() => {
+    if (size) {
+      setChartSize(size);
+      return;
+    }
+
+    const updateSize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        // コンテナの幅に基づいてサイズを計算（最大400px、最小60px）
+        const calculatedSize = Math.min(400, Math.max(60, containerWidth * 0.8));
+        setChartSize(calculatedSize);
+      }
+    };
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, [size]);
+
+  const centerX = chartSize / 2;
+  const centerY = chartSize / 2;
+  const radius = chartSize * 0.35;
   
   // 5軸のレーダーチャート（苦味、酸味、ボディ、甘み、香り）
   // 5つの軸を等間隔（72度ずつ）に配置
@@ -47,8 +71,8 @@ export function TastingRadarChart({ record, size = 200 }: TastingRadarChartProps
   }).join(' ') + ' Z';
 
   return (
-    <div className="flex flex-col items-center">
-      <svg width={size} height={size} className="overflow-visible">
+    <div ref={containerRef} className="flex flex-col items-center w-full">
+      <svg width={chartSize} height={chartSize} className="overflow-visible">
         {/* グリッド線（同心円） */}
         {[0.25, 0.5, 0.75, 1.0].map((scale) => (
           <circle

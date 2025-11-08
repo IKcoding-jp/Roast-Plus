@@ -66,9 +66,22 @@ export interface RoastSchedule {
   order?: number; // 時間順ソート用
 }
 
+// 試飲セッション
+export interface TastingSession {
+  id: string;
+  name?: string; // セッション名（任意）
+  beanName: string; // 豆の名前（必須）
+  roastLevel: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い（必須）
+  memo?: string; // メモ（任意）
+  createdAt: string; // ISO 8601形式
+  updatedAt: string; // ISO 8601形式
+  userId: string; // ユーザーID
+}
+
 // 試飲記録
 export interface TastingRecord {
   id: string;
+  sessionId: string; // セッションID（必須）
   beanName: string; // 豆の名前
   tastingDate: string; // YYYY-MM-DD形式
   roastLevel: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い
@@ -95,6 +108,7 @@ export interface AppData {
   assignmentHistory: Assignment[]; // 過去の履歴
   todaySchedules: TodaySchedule[]; // 本日のスケジュール
   roastSchedules: RoastSchedule[]; // ローストスケジュール
+  tastingSessions: TastingSession[]; // 試飲セッション
   tastingRecords: TastingRecord[]; // 試飲記録
   notifications: Notification[]; // 通知
 }

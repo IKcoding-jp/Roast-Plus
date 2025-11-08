@@ -112,7 +112,7 @@ export default function HomePage() {
               <FaCoffee className="h-16 w-16 text-orange-500" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
-              試飲感想記録
+              試飲感想記録　※開発中
             </h2>
           </button>
 

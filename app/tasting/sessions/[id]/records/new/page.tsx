@@ -5,17 +5,16 @@ import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { TastingRecordForm } from '@/components/TastingRecordForm';
 import type { TastingRecord } from '@/types';
-import { getSelectedMemberId } from '@/lib/localStorage';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
-export default function TastingDetailPageClient() {
+export default function NewTastingRecordPage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
   const params = useParams();
-  const recordId = params?.id as string;
+  const sessionId = params?.id as string;
 
   if (authLoading) {
     return (
@@ -41,17 +40,17 @@ export default function TastingDetailPageClient() {
     );
   }
 
-  const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
-  const record = tastingRecords.find((r) => r.id === recordId);
-  const selectedMemberId = getSelectedMemberId();
-  const isOwnRecord = record?.memberId === selectedMemberId;
+  const tastingSessions = Array.isArray(data.tastingSessions)
+    ? data.tastingSessions
+    : [];
+  const session = tastingSessions.find((s) => s.id === sessionId);
 
-  if (!record) {
+  if (!session) {
     return (
       <div className="min-h-screen bg-[#F5F1EB] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="text-gray-600 mb-4">記録が見つかりません</p>
+            <p className="text-gray-600 mb-4">セッションが見つかりません</p>
             <Link
               href="/tasting"
               className="text-[#8B4513] hover:underline"
@@ -64,58 +63,29 @@ export default function TastingDetailPageClient() {
     );
   }
 
-  const handleSave = (updatedRecord: TastingRecord) => {
-    if (!isOwnRecord) {
-      alert('自分の記録のみ編集できます');
-      return;
-    }
+  const tastingRecords = Array.isArray(data.tastingRecords)
+    ? data.tastingRecords
+    : [];
 
-    const updatedRecords = tastingRecords.map((r) =>
-      r.id === recordId ? { ...updatedRecord, userId: user.uid } : r
-    );
+  const handleSave = (record: TastingRecord) => {
+    const newRecord: TastingRecord = {
+      ...record,
+      userId: user.uid,
+      sessionId: sessionId, // セッションIDを確実に設定
+    };
+
+    const updatedRecords = [...tastingRecords, newRecord];
     updateData({
       ...data,
       tastingRecords: updatedRecords,
     });
 
-    // セッション詳細ページに戻る
-    if (record.sessionId) {
-      router.push(`/tasting/sessions/${record.sessionId}`);
-    } else {
-      router.push('/tasting');
-    }
-  };
-
-  const handleDelete = (id: string) => {
-    if (!isOwnRecord) {
-      alert('自分の記録のみ削除できます');
-      return;
-    }
-
-    const confirmDelete = window.confirm('この記録を削除しますか？');
-    if (!confirmDelete) return;
-
-    const updatedRecords = tastingRecords.filter((r) => r.id !== id);
-    updateData({
-      ...data,
-      tastingRecords: updatedRecords,
-    });
-
-    // セッション詳細ページに戻る
-    if (record.sessionId) {
-      router.push(`/tasting/sessions/${record.sessionId}`);
-    } else {
-      router.push('/tasting');
-    }
+    // セッション詳細ページに遷移
+    router.push(`/tasting/sessions/${sessionId}`);
   };
 
   const handleCancel = () => {
-    // セッション詳細ページに戻る
-    if (record?.sessionId) {
-      router.push(`/tasting/sessions/${record.sessionId}`);
-    } else {
-      router.push('/tasting');
-    }
+    router.push(`/tasting/sessions/${sessionId}`);
   };
 
   return (
@@ -125,36 +95,35 @@ export default function TastingDetailPageClient() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
-                href={record?.sessionId ? `/tasting/sessions/${record.sessionId}` : '/tasting'}
+                href={`/tasting/sessions/${sessionId}`}
                 className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
               >
                 <HiArrowLeft className="text-lg flex-shrink-0" />
-                {record?.sessionId ? 'セッションに戻る' : '一覧に戻る'}
+                セッションに戻る
               </Link>
             </div>
             <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
-              記録を編集
+              記録を追加
             </h1>
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
           </div>
         </header>
 
         <main>
-          {!isOwnRecord && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-              <p className="text-sm text-yellow-800">
-                この記録は他のメンバーのものです。閲覧のみ可能です。
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-700">
+                <span className="font-medium">セッション:</span>{' '}
+                {session.name || session.beanName}
               </p>
             </div>
-          )}
-          <div className="bg-white rounded-lg shadow-md p-6">
             <TastingRecordForm
-              record={isOwnRecord ? record : null}
+              record={null}
               data={data}
+              sessionId={sessionId}
+              session={session}
               onSave={handleSave}
-              onDelete={isOwnRecord ? handleDelete : undefined}
               onCancel={handleCancel}
-              readOnly={!isOwnRecord}
             />
           </div>
         </main>
@@ -162,5 +131,4 @@ export default function TastingDetailPageClient() {
     </div>
   );
 }
-
 

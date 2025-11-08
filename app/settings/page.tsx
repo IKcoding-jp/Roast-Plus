@@ -110,13 +110,13 @@ export default function SettingsPage() {
             <select
               value={selectedMember}
               onChange={(e) => handleMemberChange(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] text-gray-900"
             >
-              <option value="">選択しない</option>
+              <option value="" className="text-gray-900">選択しない</option>
               {data.members
                 .filter((m) => m.active !== false)
                 .map((member) => (
-                  <option key={member.id} value={member.id}>
+                  <option key={member.id} value={member.id} className="text-gray-900">
                     {member.name}
                   </option>
                 ))}

@@ -37,17 +37,28 @@ export function useNotifications() {
 
   // Firestoreから通知データを取得し、既存のlocalStorageデータを移行
   useEffect(() => {
-    if (appDataLoading || hasMigratedRef.current) {
-      if (!appDataLoading) {
-        setIsLoading(false);
-      }
+    if (appDataLoading) {
       return;
     }
 
+    // 移行処理は一度だけ実行
+    if (hasMigratedRef.current) {
+      setIsLoading(false);
+      return;
+    }
+
+    // 移行処理を実行
+    hasMigratedRef.current = true;
+    
     const migrateLocalStorageData = async () => {
       try {
         const oldStorageKey = 'roastplus_notifications';
         const stored = localStorage.getItem(oldStorageKey);
+        
+        // 現在のFirestoreデータを取得（最新の値を取得）
+        const currentData = data;
+        const firestoreNotifications = currentData.notifications || [];
+        const existingIds = new Set(firestoreNotifications.map(n => n.id));
         
         if (stored) {
           const oldData: { notifications: Notification[]; readIds: string[] } = JSON.parse(stored);
@@ -58,9 +69,7 @@ export function useNotifications() {
             setReadIds(oldData.readIds);
           }
           
-          // 通知データをFirestoreに移行（デフォルト通知とマージ）
-          const firestoreNotifications = data.notifications || [];
-          const existingIds = new Set(firestoreNotifications.map(n => n.id));
+          // 古い通知データを取得
           const oldNotifications = oldData.notifications || [];
           
           // デフォルト通知を追加（まだ存在しない場合）
@@ -74,9 +83,10 @@ export function useNotifications() {
             ...oldNotifications.filter(n => !existingIds.has(n.id) && !defaultIds.has(n.id)),
           ];
           
+          // 変更がある場合のみ更新
           if (newNotifications.length !== firestoreNotifications.length) {
             await updateData({
-              ...data,
+              ...currentData,
               notifications: newNotifications,
             });
           }
@@ -85,23 +95,19 @@ export function useNotifications() {
           localStorage.removeItem(oldStorageKey);
         } else {
           // localStorageにデータがない場合、デフォルト通知を追加
-          const firestoreNotifications = data.notifications || [];
-          const existingIds = new Set(firestoreNotifications.map(n => n.id));
           const missingDefaults = defaultNotifications.filter(n => !existingIds.has(n.id));
           
           if (missingDefaults.length > 0) {
             await updateData({
-              ...data,
+              ...currentData,
               notifications: [...firestoreNotifications, ...missingDefaults],
             });
           }
         }
         
-        hasMigratedRef.current = true;
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to migrate localStorage data:', error);
-        hasMigratedRef.current = true;
         setIsLoading(false);
       }
     };
@@ -109,12 +115,19 @@ export function useNotifications() {
     migrateLocalStorageData();
   }, [appDataLoading, data, updateData]);
 
-  // 通知データを取得（デフォルト通知とマージ）
+  // 通知データを取得（デフォルト通知とマージ、重複を排除）
   const notifications = (() => {
     const firestoreNotifications = data.notifications || [];
     const existingIds = new Set(firestoreNotifications.map(n => n.id));
     const missingDefaults = defaultNotifications.filter(n => !existingIds.has(n.id));
-    return [...firestoreNotifications, ...missingDefaults];
+    
+    // 重複を排除してマージ
+    const allNotifications = [...firestoreNotifications, ...missingDefaults];
+    const uniqueNotifications = Array.from(
+      new Map(allNotifications.map(n => [n.id, n])).values()
+    );
+    
+    return uniqueNotifications;
   })();
 
   // 未確認通知数を計算

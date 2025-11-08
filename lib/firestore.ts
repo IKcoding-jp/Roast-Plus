@@ -18,6 +18,7 @@ const defaultData: AppData = {
   assignmentHistory: [],
   todaySchedules: [],
   roastSchedules: [],
+  tastingSessions: [],
   tastingRecords: [],
   notifications: [],
 };
@@ -59,6 +60,7 @@ function normalizeAppData(data: any): AppData {
     assignmentHistory: Array.isArray(data?.assignmentHistory) ? data.assignmentHistory : [],
     todaySchedules: Array.isArray(data?.todaySchedules) ? data.todaySchedules : [],
     roastSchedules: Array.isArray(data?.roastSchedules) ? data.roastSchedules : [],
+    tastingSessions: Array.isArray(data?.tastingSessions) ? data.tastingSessions : [],
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],
   };

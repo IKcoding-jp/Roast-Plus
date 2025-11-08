@@ -17,6 +17,12 @@ function getTaskLabels(data: AppData) {
   return data.taskLabels;
 }
 
+function getJSTDayOfWeek(): number {
+  const now = new Date();
+  const jstTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+  return jstTime.getDay();
+}
+
 function shuffleAssignments(
   data: AppData,
   assignedDate: string = new Date().toISOString().split('T')[0]
@@ -147,6 +153,11 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
     const today = new Date().toISOString().split('T')[0];
     return assignments.some((a) => a.assignedDate === today);
   }, [assignments]);
+
+  const isWeekend = useMemo(() => {
+    const dayOfWeek = getJSTDayOfWeek();
+    return dayOfWeek === 0 || dayOfWeek === 6; // 0=日曜日, 6=土曜日
+  }, []);
 
   const getAssignment = (teamId: string, taskLabelId: string) => {
     return assignments.find((a) => a.teamId === teamId && a.taskLabelId === taskLabelId);
@@ -463,11 +474,13 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
               setIsAnimating(true);
             }, 0);
           }}
-          disabled={isShuffling || isAnimating || isAlreadyShuffled}
+          disabled={isShuffling || isAnimating || isAlreadyShuffled || isWeekend}
           className="px-6 py-3 sm:px-8 sm:py-4 bg-amber-700 text-white text-base sm:text-lg rounded-lg hover:bg-amber-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isShuffling || isAnimating
             ? 'シャッフル中...'
+            : isWeekend
+            ? '土日は休みです'
             : isAlreadyShuffled
             ? '既にシャッフル済みです'
             : 'シャッフルして担当を決める'}

@@ -34,9 +34,18 @@ export function RoastScheduleMemoDialog({
   const [isRoast, setIsRoast] = useState(schedule?.isRoast || false);
   const [isAfterPurge, setIsAfterPurge] = useState(schedule?.isAfterPurge || false);
   const [isChaffCleaning, setIsChaffCleaning] = useState(schedule?.isChaffCleaning || false);
+  // ブレンド割合をパースする関数
+  const parseBlendRatio = (ratio: string | undefined): { ratio1: string; ratio2: string } => {
+    if (!ratio) return { ratio1: '', ratio2: '' };
+    const [ratio1, ratio2] = ratio.split(':');
+    return { ratio1: ratio1 || '', ratio2: ratio2 || '' };
+  };
+
+  const initialBlendRatio = parseBlendRatio(schedule?.blendRatio);
   const [beanName, setBeanName] = useState<BeanName | ''>((schedule?.beanName as BeanName | undefined) || '');
   const [beanName2, setBeanName2] = useState<BeanName | ''>((schedule?.beanName2 as BeanName | undefined) || '');
-  const [blendRatio, setBlendRatio] = useState<string>(schedule?.blendRatio || '');
+  const [blendRatio1, setBlendRatio1] = useState<string>(initialBlendRatio.ratio1);
+  const [blendRatio2, setBlendRatio2] = useState<string>(initialBlendRatio.ratio2);
   const [weight, setWeight] = useState<200 | 300 | 500 | ''>(schedule?.weight || '');
   const [roastLevel, setRoastLevel] = useState<
     '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
@@ -55,12 +64,20 @@ export function RoastScheduleMemoDialog({
     setIsChaffCleaning(schedule?.isChaffCleaning || false);
     setBeanName((schedule?.beanName as BeanName | undefined) || '');
     setBeanName2((schedule?.beanName2 as BeanName | undefined) || '');
-    setBlendRatio(schedule?.blendRatio || '');
+    const parsedBlendRatio = parseBlendRatio(schedule?.blendRatio);
+    setBlendRatio1(parsedBlendRatio.ratio1);
+    setBlendRatio2(parsedBlendRatio.ratio2);
     setWeight(schedule?.weight || '');
     setRoastLevel(schedule?.roastLevel || '');
     setRoastCount(schedule?.roastCount?.toString() || '');
     setBagCount(schedule?.bagCount || '');
   }, [schedule]);
+
+  // ブレンド割合を結合する関数
+  const combineBlendRatio = (ratio1: string, ratio2: string): string | undefined => {
+    if (!ratio1 || !ratio2) return undefined;
+    return `${ratio1}:${ratio2}`;
+  };
 
   // 豆の名前が変更されたら、Gモードを自動設定
   useEffect(() => {
@@ -68,7 +85,7 @@ export function RoastScheduleMemoDialog({
       // モードは自動設定されるが、UIには表示しない（内部で使用）
       // ブレンド対応のため、getRoastMachineModeForBlendを使用
     }
-  }, [beanName, beanName2, blendRatio, isRoasterOn]);
+  }, [beanName, beanName2, blendRatio1, blendRatio2, isRoasterOn]);
 
   // メモタイプの排他的選択
   const handleMemoTypeChange = (type: 'roasterOn' | 'roast' | 'afterPurge' | 'chaffCleaning') => {
@@ -93,15 +110,16 @@ export function RoastScheduleMemoDialog({
         return;
       }
       // 2種類目の豆が選択されている場合は割合入力必須
-      if (beanName2 && !blendRatio) {
-        alert('ブレンド割合を入力してください（例：5:5、8:2）');
-        return;
-      }
-      // 割合形式の検証
-      if (beanName2 && blendRatio) {
-        const ratioMatch = blendRatio.match(/^(\d+):(\d+)$/);
-        if (!ratioMatch) {
-          alert('ブレンド割合は「5:5」「8:2」のような形式で入力してください');
+      if (beanName2) {
+        if (!blendRatio1 || !blendRatio2) {
+          alert('ブレンド割合を入力してください');
+          return;
+        }
+        // 合計が10になることを検証
+        const ratio1 = parseInt(blendRatio1, 10);
+        const ratio2 = parseInt(blendRatio2, 10);
+        if (isNaN(ratio1) || isNaN(ratio2) || ratio1 + ratio2 !== 10) {
+          alert('ブレンド割合の合計は10になる必要があります（例：5と5、8と2）');
           return;
         }
       }
@@ -119,10 +137,11 @@ export function RoastScheduleMemoDialog({
       return;
     }
 
+    const blendRatio = combineBlendRatio(blendRatio1, blendRatio2);
     const roastMachineMode = getRoastMachineModeForBlend(
       beanName as BeanName | undefined,
       beanName2 as BeanName | undefined,
-      blendRatio || undefined
+      blendRatio
     );
 
     // 時・分をHH:mm形式に変換
@@ -162,10 +181,11 @@ export function RoastScheduleMemoDialog({
       const mode = getRoastMachineModeForBlend(
         beanName as BeanName | undefined,
         beanName2 as BeanName | undefined,
-        blendRatio || undefined
+        combineBlendRatio(blendRatio1, blendRatio2)
       );
       
       let beanText = '';
+      const blendRatio = combineBlendRatio(blendRatio1, blendRatio2);
       if (beanName2 && blendRatio) {
         // ブレンドの場合
         const [ratio1, ratio2] = blendRatio.split(':');
@@ -362,7 +382,8 @@ export function RoastScheduleMemoDialog({
                       // 1種類目が変更されたとき、2種類目が同じ豆の場合はクリア
                       if (beanName2 === value) {
                         setBeanName2('');
-                        setBlendRatio('');
+                        setBlendRatio1('');
+                        setBlendRatio2('');
                       }
                     }}
                     required={isRoasterOn}
@@ -388,7 +409,8 @@ export function RoastScheduleMemoDialog({
                       setBeanName2(value);
                       // 2種類目を「なし」にした場合は割合もクリア
                       if (!value) {
-                        setBlendRatio('');
+                        setBlendRatio1('');
+                        setBlendRatio2('');
                       }
                     }}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -407,16 +429,50 @@ export function RoastScheduleMemoDialog({
                     <label className="mb-1 block text-sm font-medium text-gray-700">
                       ブレンド割合 <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="text"
-                      value={blendRatio}
-                      onChange={(e) => setBlendRatio(e.target.value)}
-                      placeholder="例：5:5、8:2"
-                      required={!!beanName2}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-gray-600">
+                          {beanName}の割合
+                        </label>
+                        <input
+                          type="number"
+                          value={blendRatio1}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 10)) {
+                              setBlendRatio1(value);
+                            }
+                          }}
+                          min="0"
+                          max="10"
+                          required={!!beanName2}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          placeholder="5"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-gray-600">
+                          {beanName2}の割合
+                        </label>
+                        <input
+                          type="number"
+                          value={blendRatio2}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 10)) {
+                              setBlendRatio2(value);
+                            }
+                          }}
+                          min="0"
+                          max="10"
+                          required={!!beanName2}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          placeholder="5"
+                        />
+                      </div>
+                    </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      割合をコロン区切りで入力してください（例：5:5、8:2）
+                      合計が10になるように入力してください（例：5と5、8と2）
                     </p>
                   </div>
                 )}

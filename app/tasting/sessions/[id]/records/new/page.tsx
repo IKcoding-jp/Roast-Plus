@@ -114,7 +114,7 @@ export default function NewTastingRecordPage() {
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-700">
                 <span className="font-medium">セッション:</span>{' '}
-                {session.name || session.beanName}
+                {session.beanName}
               </p>
             </div>
             <TastingRecordForm

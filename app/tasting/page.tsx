@@ -51,7 +51,7 @@ export default function TastingPage() {
               </Link>
             </div>
             <h1 className="hidden sm:block w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
-              試飲記録
+              試飲感想記録
             </h1>
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
           </div>

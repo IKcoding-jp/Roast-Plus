@@ -9,14 +9,13 @@ import {
   getActiveMemberCount,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
-import { HiPencil } from 'react-icons/hi';
 
 interface TastingSessionListProps {
   data: AppData;
   onUpdate: (data: AppData) => void;
 }
 
-type SortOption = 'newest' | 'oldest' | 'beanName' | 'sessionName';
+type SortOption = 'newest' | 'oldest' | 'beanName';
 
 const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
   '浅煎り',
@@ -58,8 +57,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (session) =>
-          session.beanName.toLowerCase().includes(query) ||
-          (session.name && session.name.toLowerCase().includes(query))
+          session.beanName.toLowerCase().includes(query)
       );
     }
 
@@ -95,10 +93,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
           );
         case 'beanName':
           return a.beanName.localeCompare(b.beanName, 'ja');
-        case 'sessionName':
-          const aName = a.name || a.beanName;
-          const bName = b.name || b.beanName;
-          return aName.localeCompare(bName, 'ja');
         default:
           return 0;
       }
@@ -160,11 +154,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
     router.push(`/tasting/sessions/${sessionId}`);
   };
 
-  const handleEditClick = (e: React.MouseEvent, sessionId: string) => {
-    e.stopPropagation();
-    router.push(`/tasting/sessions/${sessionId}/edit`);
-  };
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
@@ -221,7 +210,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="豆の名前またはセッション名で検索"
+              placeholder="豆の名前で検索"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
             />
           </div>
@@ -234,7 +223,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
               <option value="newest">新しい順</option>
               <option value="oldest">古い順</option>
               <option value="beanName">豆の名前順</option>
-              <option value="sessionName">セッション名順</option>
             </select>
           </div>
           <button
@@ -342,45 +330,12 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                   className="bg-white rounded-lg shadow-md p-3 cursor-pointer hover:shadow-lg transition-shadow flex flex-col"
                   onClick={() => handleCardClick(session.id)}
                 >
-                  {/* セッション名（左上）と編集ボタン（右上） */}
-                  <div className="relative mb-2">
-                    {session.name && (
-                      <h3 className="text-sm font-semibold text-gray-800 pr-8 line-clamp-1">
-                        {session.name}
-                      </h3>
-                    )}
-                    <button
-                      onClick={(e) => handleEditClick(e, session.id)}
-                      className="absolute top-0 right-0 p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
-                      aria-label="セッションを編集"
-                    >
-                      <HiPencil className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* レーダーチャート（記録がある場合のみ） */}
-                  {recordCount > 0 && (
-                    <div className="flex justify-center mb-2 w-full">
-                      <div className="w-full">
-                        <TastingRadarChart
-                          record={{
-                            bitterness: averageScores.bitterness,
-                            acidity: averageScores.acidity,
-                            body: averageScores.body,
-                            sweetness: averageScores.sweetness,
-                            aroma: averageScores.aroma,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
                   {/* セッション情報 */}
-                  <div className="flex-1 flex flex-col justify-end">
-                    <div className="flex flex-row justify-between items-end mt-auto">
+                  <div className="mb-2">
+                    <div className="flex flex-row justify-between items-start">
                       {/* 左下: 豆の名前、焙煎度合い、記録数、作成日 */}
                       <div className="flex-1 min-w-0">
-                        {/* 豆の名前、焙煎度合い、記録数 */}
+                        {/* 豆の名前、焙煎度合い */}
                         <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                           <h3 className="text-base font-semibold text-gray-800">
                             {session.beanName}
@@ -400,9 +355,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                             }
                           >
                             {session.roastLevel}
-                          </span>
-                          <span className="px-2 py-0.5 bg-gray-800 text-white text-sm font-semibold rounded-full flex-shrink-0">
-                            {recordCount}/{activeMemberCount}
                           </span>
                         </div>
 
@@ -434,6 +386,53 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                       )}
                     </div>
                   </div>
+
+                  {/* レーダーチャート（記録がある場合のみ） */}
+                  {recordCount > 0 && (
+                    <div className="flex justify-center mb-2 w-full">
+                      <div className="w-full">
+                        <TastingRadarChart
+                          record={{
+                            bitterness: averageScores.bitterness,
+                            acidity: averageScores.acidity,
+                            body: averageScores.body,
+                            sweetness: averageScores.sweetness,
+                            aroma: averageScores.aroma,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* みんなの感想 */}
+                  {(() => {
+                    // overallImpressionが存在する記録をフィルタリング
+                    const comments = sessionRecords
+                      .filter((record) => record.overallImpression && record.overallImpression.trim() !== '')
+                      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                      .map((record) => record.overallImpression!);
+
+                    if (comments.length === 0) return null;
+
+                    return (
+                      <div className="mb-2 bg-amber-50 rounded-lg p-3 border border-amber-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="text-sm font-semibold text-gray-800">みんなの感想</h4>
+                          <span className="px-2 py-0.5 bg-amber-600 text-white text-sm font-semibold rounded-full flex-shrink-0">
+                            {recordCount}/{activeMemberCount}
+                          </span>
+                        </div>
+                        <ul className="space-y-1.5">
+                          {comments.map((comment, index) => (
+                            <li key={index} className="text-sm text-gray-700 whitespace-pre-wrap">
+                              ・{comment}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })()}
+
                 </div>
               );
             })}

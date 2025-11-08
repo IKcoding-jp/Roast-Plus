@@ -25,7 +25,6 @@ export function TastingSessionForm({
 }: TastingSessionFormProps) {
   const isNew = !session;
 
-  const [name, setName] = useState(session?.name || '');
   const [beanName, setBeanName] = useState(session?.beanName || '');
   const [createdAt, setCreatedAt] = useState(
     session?.createdAt ? session.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]
@@ -54,7 +53,7 @@ export function TastingSessionForm({
     const createdAtDate = createdAt ? new Date(createdAt).toISOString() : now;
     const sessionData: TastingSession = {
       id: session?.id || crypto.randomUUID(),
-      name: name.trim() || undefined,
+      name: undefined,
       beanName: beanName.trim(),
       roastLevel,
       memo: undefined,
@@ -68,23 +67,6 @@ export function TastingSessionForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* セッション名（任意） */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          セッション名
-        </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-          placeholder="例: 2025年11月の試飲会"
-        />
-        <p className="mt-1 text-xs text-gray-500">
-          任意項目です。空欄の場合は豆名と焙煎度合いで表示されます。
-        </p>
-      </div>
-
       {/* 豆の名前（必須） */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">

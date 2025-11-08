@@ -46,16 +46,16 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-amber-50">
       {/* ヘッダー */}
-      <header className="flex items-center justify-between bg-white px-6 py-4 shadow-sm">
+      <header className="flex items-center justify-between bg-dark px-6 py-4 shadow-sm">
         <div className="flex items-center gap-2">
-          <PiCoffeeBeanFill className="h-6 w-6 text-[#8B4513]" />
-          <h1 className="text-xl font-bold text-gray-800">ローストプラス</h1>
+          <PiCoffeeBeanFill className="h-6 w-6 text-white" />
+          <h1 className="text-xl font-bold text-white">ローストプラス</h1>
         </div>
         <div className="flex items-center gap-4">
           {/* 通知マーク */}
           <button
             onClick={() => router.push('/notifications')}
-            className="relative p-2.5 text-gray-700 hover:text-gray-900 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="relative p-2.5 text-white hover:text-gray-200 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="通知"
           >
             <IoNotificationsOutline className="h-6 w-6" />
@@ -67,7 +67,7 @@ export default function HomePage() {
           </button>
           <button
             onClick={handleLogout}
-            className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            className="text-sm font-medium text-white hover:text-gray-200"
           >
             ログアウト
           </button>
@@ -83,7 +83,7 @@ export default function HomePage() {
             className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
           >
             <div className="mb-4 flex justify-center">
-              <HiUsers className="h-16 w-16 text-orange-500" />
+              <HiUsers className="h-16 w-16 text-primary" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               担当表
@@ -96,7 +96,7 @@ export default function HomePage() {
             className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
           >
             <div className="mb-4 flex justify-center">
-              <RiCalendarScheduleLine className="h-16 w-16 text-orange-500" />
+              <RiCalendarScheduleLine className="h-16 w-16 text-primary" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               スケジュール
@@ -109,7 +109,7 @@ export default function HomePage() {
             className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
           >
             <div className="mb-4 flex justify-center">
-              <FaCoffee className="h-16 w-16 text-orange-500" />
+              <FaCoffee className="h-16 w-16 text-primary" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               試飲感想記録 β版
@@ -122,7 +122,7 @@ export default function HomePage() {
             className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
           >
             <div className="mb-4 flex justify-center">
-              <IoSettings className="h-16 w-16 text-orange-500" />
+              <IoSettings className="h-16 w-16 text-primary" />
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               設定

@@ -30,12 +30,13 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'ローストプラス',
   },
 };
 
 export const viewport: Viewport = {
+  themeColor: '#211714',
 };
 
 export default function RootLayout({

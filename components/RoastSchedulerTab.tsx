@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import type { AppData, RoastSchedule } from '@/types';
 import { HiPlus, HiFire, HiCalendar } from 'react-icons/hi';
 import { FaSnowflake, FaBroom } from 'react-icons/fa';
-import { GiCoffeeBeans } from 'react-icons/gi';
+import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { RoastScheduleMemoDialog } from './RoastScheduleMemoDialog';
 import { CountryFlagEmoji } from './CountryFlagEmoji';
 
@@ -430,9 +430,9 @@ function ScheduleCard({
   // アイコンの取得
   const getIcon = () => {
     if (isRoasterOn) return <HiFire className="text-xl text-orange-500" />;
-    if (isRoast) return <GiCoffeeBeans className="text-xl text-amber-700" />;
+    if (isRoast) return <PiCoffeeBeanFill className="text-xl text-amber-700" />;
     if (isAfterPurge) return <FaSnowflake className="text-xl text-blue-500" />;
-    if (isChaffCleaning) return <FaBroom className="text-xl text-amber-800" />;
+    if (isChaffCleaning) return <FaBroom className="text-xl text-gray-600" />;
     return null;
   };
 

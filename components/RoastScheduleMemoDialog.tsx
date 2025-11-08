@@ -5,7 +5,7 @@ import type { RoastSchedule } from '@/types';
 import { ALL_BEANS, getRoastMachineMode, type BeanName } from '@/lib/beanConfig';
 import { HiX, HiFire } from 'react-icons/hi';
 import { FaSnowflake, FaBroom } from 'react-icons/fa';
-import { GiCoffeeBeans } from 'react-icons/gi';
+import { PiCoffeeBeanFill } from 'react-icons/pi';
 
 interface RoastScheduleMemoDialogProps {
   schedule: RoastSchedule | null;
@@ -165,7 +165,7 @@ export function RoastScheduleMemoDialog({
     if (isRoasterOn) return 'bg-orange-100 border-orange-300 text-orange-800';
     if (isRoast) return 'bg-amber-100 border-amber-300 text-amber-800';
     if (isAfterPurge) return 'bg-blue-100 border-blue-300 text-blue-800';
-    if (isChaffCleaning) return 'bg-amber-100 border-amber-300 text-amber-800';
+    if (isChaffCleaning) return 'bg-gray-100 border-gray-300 text-gray-800';
     return 'bg-gray-100 border-gray-300 text-gray-800';
   };
 
@@ -239,45 +239,73 @@ export function RoastScheduleMemoDialog({
 
             {/* スケジュールタイプ選択（排他的） */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 text-center">
+              <label className="mb-3 block text-sm font-medium text-gray-700 text-center">
                 スケジュールタイプ <span className="text-red-500">*</span>
               </label>
-              <div className="flex flex-wrap justify-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
+              <div className="grid grid-cols-2 gap-3">
+                <label className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  isRoasterOn 
+                    ? 'border-orange-500 bg-orange-50' 
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}>
                   <input
                     type="checkbox"
                     checked={isRoasterOn}
                     onChange={(e) => handleMemoTypeChange('roasterOn')}
-                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="sr-only"
                   />
-                  <span className="text-sm text-gray-700">焙煎機予熱</span>
+                  <HiFire className={`text-2xl ${isRoasterOn ? 'text-orange-500' : 'text-gray-400'}`} />
+                  <span className={`text-sm font-medium ${isRoasterOn ? 'text-orange-700' : 'text-gray-700'}`}>
+                    焙煎機予熱
+                  </span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  isRoast 
+                    ? 'border-amber-500 bg-amber-50' 
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}>
                   <input
                     type="checkbox"
                     checked={isRoast}
                     onChange={(e) => handleMemoTypeChange('roast')}
-                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="sr-only"
                   />
-                  <span className="text-sm text-gray-700">ロースト</span>
+                  <PiCoffeeBeanFill className={`text-2xl ${isRoast ? 'text-amber-700' : 'text-gray-400'}`} />
+                  <span className={`text-sm font-medium ${isRoast ? 'text-amber-700' : 'text-gray-700'}`}>
+                    ロースト
+                  </span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  isAfterPurge 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}>
                   <input
                     type="checkbox"
                     checked={isAfterPurge}
                     onChange={(e) => handleMemoTypeChange('afterPurge')}
-                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="sr-only"
                   />
-                  <span className="text-sm text-gray-700">アフターパージ</span>
+                  <FaSnowflake className={`text-2xl ${isAfterPurge ? 'text-blue-500' : 'text-gray-400'}`} />
+                  <span className={`text-sm font-medium ${isAfterPurge ? 'text-blue-700' : 'text-gray-700'}`}>
+                    アフターパージ
+                  </span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  isChaffCleaning 
+                    ? 'border-gray-500 bg-gray-50' 
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}>
                   <input
                     type="checkbox"
                     checked={isChaffCleaning}
                     onChange={(e) => handleMemoTypeChange('chaffCleaning')}
-                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="sr-only"
                   />
-                  <span className="text-sm text-gray-700">チャフのお掃除</span>
+                  <FaBroom className={`text-2xl ${isChaffCleaning ? 'text-gray-700' : 'text-gray-400'}`} />
+                  <span className={`text-sm font-medium ${isChaffCleaning ? 'text-gray-700' : 'text-gray-700'}`}>
+                    チャフのお掃除
+                  </span>
                 </label>
               </div>
             </div>
@@ -385,9 +413,9 @@ export function RoastScheduleMemoDialog({
               <div className={`rounded-md border-2 p-3 ${getPreviewColor()} flex justify-center`}>
                 <div className="flex items-center gap-2">
                   {isRoasterOn && <HiFire className="text-lg text-orange-500" />}
-                  {isRoast && <GiCoffeeBeans className="text-lg text-amber-700" />}
+                  {isRoast && <PiCoffeeBeanFill className="text-lg text-amber-700" />}
                   {isAfterPurge && <FaSnowflake className="text-lg text-blue-500" />}
-                  {isChaffCleaning && <FaBroom className="text-lg text-amber-800" />}
+                  {isChaffCleaning && <FaBroom className="text-lg text-gray-700" />}
                   <div className="text-sm font-medium whitespace-pre-line">
                     {getPreviewText()}
                   </div>

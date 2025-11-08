@@ -175,13 +175,13 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
     return (
       <div className="flex items-center gap-0.5">
         {Array.from({ length: fullStars }).map((_, i) => (
-          <span key={i} className="text-yellow-400 text-sm">★</span>
+          <span key={i} className="text-yellow-400 text-base">★</span>
         ))}
-        {hasHalfStar && <span className="text-yellow-400 text-sm">☆</span>}
+        {hasHalfStar && <span className="text-yellow-400 text-base">☆</span>}
         {Array.from({ length: emptyStars }).map((_, i) => (
-          <span key={i} className="text-gray-300 text-sm">★</span>
+          <span key={i} className="text-gray-300 text-base">★</span>
         ))}
-        <span className="ml-1 text-xs font-semibold text-gray-700">
+        <span className="ml-1 text-sm font-semibold text-gray-700">
           {rating.toFixed(1)}
         </span>
       </div>
@@ -332,7 +332,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                 >
                   {/* セッション情報 */}
                   <div className="mb-2">
-                    <div className="flex flex-row justify-between items-start">
+                    <div className="flex flex-row justify-between items-center">
                       {/* 左下: 豆の名前、焙煎度合い、記録数、作成日 */}
                       <div className="flex-1 min-w-0">
                         {/* 豆の名前、焙煎度合い */}
@@ -370,7 +370,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                       {recordCount > 0 && (
                         <div className="flex-shrink-0 ml-2">
                           <div className="text-right">
-                            <p className="text-xs font-medium text-gray-700 mb-0.5">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               総合点
                             </p>
                             {renderStars(averageScores.overallRating)}

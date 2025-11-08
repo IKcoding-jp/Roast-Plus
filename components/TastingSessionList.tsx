@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import {
@@ -148,10 +149,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
         : [...prev, level]
     );
     setCurrentPage(1);
-  };
-
-  const handleCardClick = (sessionId: string) => {
-    router.push(`/tasting/sessions/${sessionId}`);
   };
 
   const formatDate = (dateStr: string) => {
@@ -325,10 +322,10 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
               const averageScores = calculateAverageScores(sessionRecords);
 
               return (
-                <div
+                <Link
                   key={session.id}
-                  className="bg-white rounded-lg shadow-md p-3 cursor-pointer hover:shadow-lg transition-shadow flex flex-col"
-                  onClick={() => handleCardClick(session.id)}
+                  href={`/tasting/sessions/${session.id}`}
+                  className="bg-white rounded-lg shadow-md p-3 cursor-pointer hover:shadow-lg transition-shadow flex flex-col no-underline"
                 >
                   {/* セッション情報 */}
                   <div className="mb-2">
@@ -433,7 +430,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                     );
                   })()}
 
-                </div>
+                </Link>
               );
             })}
           </div>

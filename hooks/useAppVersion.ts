@@ -2,11 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-interface ServiceWorkerRegistration extends globalThis.ServiceWorkerRegistration {
-  waiting?: ServiceWorker | null;
-  installing?: ServiceWorker | null;
-}
-
 /**
  * アプリのバージョン情報とService Worker更新状態を管理するカスタムフック
  */
@@ -32,8 +27,8 @@ export function useAppVersion() {
       return;
     }
 
-    let registration: ServiceWorkerRegistration | null = null;
-    let intervalId: NodeJS.Timeout | null = null;
+    let registration: ServiceWorkerRegistration | null | undefined = null;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
     const checkForUpdate = async () => {
       try {

@@ -291,19 +291,12 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
           <p className="text-gray-600">検索条件に一致するセッションがありません</p>
         </div>
       ) : (
-        <>
-          <div className="text-sm text-gray-600">
-            {filteredAndSortedSessions.length}件のセッションが見つかりました
-          </div>
-
-          {/* カルーセルレイアウト */}
-          <TastingSessionCarousel
-            sessions={filteredAndSortedSessions}
-            tastingRecords={tastingRecords}
-            activeMemberCount={activeMemberCount}
-            router={router}
-          />
-        </>
+        <TastingSessionCarousel
+          sessions={filteredAndSortedSessions}
+          tastingRecords={tastingRecords}
+          activeMemberCount={activeMemberCount}
+          router={router}
+        />
       )}
     </div>
   );

@@ -328,7 +328,7 @@ export function TastingRecordForm({
       {isNew && !selectedMemberId && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800">
-            試飲感想記録を追加するには、設定画面から自分の名前を設定する必要があります。
+            この機能を使用するには、設定画面からデバイス使用者を設定する必要があります。
           </p>
         </div>
       )}

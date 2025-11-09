@@ -560,13 +560,13 @@ function ScheduleCard({
           <div className="text-base md:text-base font-medium text-gray-800 flex items-center gap-1.5 md:gap-1.5 flex-wrap">
             <span className="whitespace-nowrap">{memoContent.firstLine}</span>
             {memoContent.beanName && (
-              <span className="inline-flex items-center rounded px-2 md:px-3 py-1 md:py-1.5 text-base md:text-sm font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
+              <span className="inline-flex items-center rounded px-1.5 md:px-2 py-0.5 md:py-1 text-sm md:text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
                 {memoContent.beanName2 && memoContent.blendRatio ? (
                   <>
                     <span className="whitespace-nowrap">{memoContent.beanName}</span>
                     {' '}
                     <CountryFlagEmoji countryName={memoContent.beanName} />
-                    <span className="mx-1 md:mx-1.5 text-gray-400">×</span>
+                    <span className="mx-0.5 md:mx-1 text-gray-400">×</span>
                     <span className="whitespace-nowrap">{memoContent.beanName2}</span>
                     {' '}
                     <CountryFlagEmoji countryName={memoContent.beanName2} />

@@ -8,13 +8,11 @@ import { TastingSessionForm } from '@/components/TastingSessionForm';
 import type { TastingSession } from '@/types';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
-import { useToastContext } from '@/components/Toast';
 
 export default function NewTastingSessionPage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
-  const { showToast } = useToastContext();
   const hasRedirected = useRef(false);
 
   // 未認証時にログインページにリダイレクト
@@ -67,11 +65,10 @@ export default function NewTastingSessionPage() {
 
       // 保存が完了してから試飲記録一覧ページに遷移
       // 静的エクスポート時には動的ルートが存在しないため、一覧ページに遷移する
-      showToast('セッションを作成しました', 'success');
       router.push('/tasting');
     } catch (error) {
       console.error('Failed to save tasting session:', error);
-      showToast('セッションの保存に失敗しました。もう一度お試しください。', 'error');
+      alert('セッションの保存に失敗しました。もう一度お試しください。');
     }
   };
 

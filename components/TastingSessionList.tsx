@@ -329,7 +329,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                 >
                   {/* セッション情報 */}
                   <Link
-                    href={`/tasting/sessions/${session.id}`}
+                    href={`/tasting?sessionId=${session.id}`}
                     className="flex flex-col no-underline cursor-pointer"
                   >
                     <div className="mb-2">
@@ -362,7 +362,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              router.push(`/tasting/sessions/${session.id}/edit`);
+                              router.push(`/tasting?sessionId=${session.id}&edit=true`);
                             }}
                             className="p-1 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors flex-shrink-0"
                             aria-label="セッションを編集"

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { TastingSession } from '@/types';
+import { useToastContext } from '@/components/Toast';
 
 interface TastingSessionFormProps {
   session: TastingSession | null;
@@ -24,6 +25,7 @@ export function TastingSessionForm({
   onDelete,
 }: TastingSessionFormProps) {
   const isNew = !session;
+  const { showToast } = useToastContext();
 
   const [beanName, setBeanName] = useState(session?.beanName || '');
   const [createdAt, setCreatedAt] = useState(
@@ -45,7 +47,7 @@ export function TastingSessionForm({
     e.preventDefault();
 
     if (!beanName.trim()) {
-      alert('豆の名前を入力してください');
+      showToast('豆の名前を入力してください', 'warning');
       return;
     }
 
@@ -53,10 +55,8 @@ export function TastingSessionForm({
     const createdAtDate = createdAt ? new Date(createdAt).toISOString() : now;
     const sessionData: TastingSession = {
       id: session?.id || crypto.randomUUID(),
-      name: undefined,
       beanName: beanName.trim(),
       roastLevel,
-      memo: undefined,
       createdAt: createdAtDate,
       updatedAt: now,
       userId: session?.userId || '', // 呼び出し側で設定される想定

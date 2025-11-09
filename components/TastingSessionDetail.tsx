@@ -6,7 +6,6 @@ import { useAuth } from '@/lib/auth';
 import type { TastingSession, TastingRecord, AppData } from '@/types';
 import { TastingRecordForm } from './TastingRecordForm';
 import { getRecordsBySessionId } from '@/lib/tastingUtils';
-import { getSelectedMemberId } from '@/lib/localStorage';
 
 interface TastingSessionDetailProps {
   session: TastingSession;
@@ -21,7 +20,6 @@ export function TastingSessionDetail({
 }: TastingSessionDetailProps) {
   const router = useRouter();
   const { user } = useAuth();
-  const selectedMemberId = getSelectedMemberId();
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
   const tastingRecords = Array.isArray(data.tastingRecords)
@@ -29,18 +27,10 @@ export function TastingSessionDetail({
     : [];
   const sessionRecords = getRecordsBySessionId(tastingRecords, session.id);
   
-  // 自分の記録を取得
-  const ownRecord = sessionRecords.find(
-    (r) => r.memberId === selectedMemberId
-  );
-  
-  // 自分の記録がない場合
-  const hasOwnRecord = !!ownRecord;
-  
   // 編集対象の記録を取得（編集モードの場合）
   const editingRecord = editingRecordId
     ? sessionRecords.find((r) => r.id === editingRecordId) || null
-    : ownRecord ?? null;
+    : null;
 
 
   const handleRecordSave = async (record: TastingRecord) => {
@@ -145,7 +135,7 @@ export function TastingSessionDetail({
             sessionId={session.id}
             session={session}
             onSave={handleRecordSave}
-            onDelete={editingRecordId === ownRecord?.id ? handleRecordDelete : undefined}
+            onDelete={editingRecordId ? handleRecordDelete : undefined}
             onCancel={handleCancel}
           />
         </div>
@@ -160,7 +150,7 @@ export function TastingSessionDetail({
             sessionId={session.id}
             session={session}
             onSave={handleRecordSave}
-            onDelete={ownRecord ? handleRecordDelete : undefined}
+            onDelete={handleRecordDelete}
             onCancel={() => router.push('/tasting')}
           />
         </div>

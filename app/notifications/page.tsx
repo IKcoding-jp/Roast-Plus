@@ -1,22 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { HiArrowLeft } from 'react-icons/hi';
 import { IoAdd, IoCreateOutline, IoTrashOutline } from 'react-icons/io5';
 import type { Notification, NotificationType } from '@/types';
-import LoginPage from '@/app/login/page';
 
 export default function NotificationsPage() {
   const { user, loading: authLoading } = useAuth();
   const { notifications, readIds, markAllAsRead, addNotification, updateNotification, deleteNotification, isLoading } = useNotifications();
   const { isEnabled: isDeveloperMode, isLoading: isDeveloperModeLoading } = useDeveloperMode();
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [editingNotification, setEditingNotification] = useState<Notification | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const hasAuthRedirected = useRef(false);
+
+  // 未認証時にログインページにリダイレクト
+  useEffect(() => {
+    if (!authLoading && !user && !hasAuthRedirected.current) {
+      hasAuthRedirected.current = true;
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/notifications';
+      router.push(`/login?returnUrl=${encodeURIComponent(currentPath)}`);
+    }
+  }, [user, authLoading, router]);
 
   // ページを開いた時点で全て既読にする
   useEffect(() => {
@@ -30,7 +41,7 @@ export default function NotificationsPage() {
 
   if (authLoading || isLoading || isDeveloperModeLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
+      <div className="flex min-h-screen items-center justify-center bg-amber-50">
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -38,8 +49,9 @@ export default function NotificationsPage() {
     );
   }
 
+  // 未認証の場合はリダイレクト中なので何も表示しない
   if (!user) {
-    return <LoginPage />;
+    return null;
   }
 
   const formatDate = (dateString: string) => {

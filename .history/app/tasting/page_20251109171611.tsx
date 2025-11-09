@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, Suspense } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
@@ -14,7 +14,7 @@ import { HiArrowLeft } from 'react-icons/hi';
 import { HiPlus } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
-function TastingPageContent() {
+export default function TastingPage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
@@ -334,20 +334,6 @@ function TastingPageContent() {
         </Link>
       </div>
     </div>
-  );
-}
-
-export default function TastingPage() {
-  return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    }>
-      <TastingPageContent />
-    </Suspense>
   );
 }
 

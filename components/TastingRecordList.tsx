@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TastingRecord, AppData } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
-import { getSelectedMemberId } from '@/lib/localStorage';
 import { HiTrash } from 'react-icons/hi';
 
 interface TastingRecordListProps {
@@ -14,7 +13,6 @@ interface TastingRecordListProps {
 
 export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   const router = useRouter();
-  const selectedMemberId = getSelectedMemberId();
 
   // tastingRecordsが配列でない場合のフォールバック
   const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
@@ -42,7 +40,7 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   };
 
   const handleCardClick = (id: string) => {
-    router.push(`/tasting/${id}`);
+    router.push(`/tasting?recordId=${id}`);
   };
 
   const formatDate = (dateStr: string) => {
@@ -83,8 +81,6 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   return (
     <div className="space-y-4">
       {sortedRecords.map((record) => {
-        const isOwnRecord = record.memberId === selectedMemberId;
-
         return (
           <div
             key={record.id}
@@ -118,18 +114,16 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                     <span className="text-sm text-gray-600">
                       {formatDate(record.tastingDate)}
                     </span>
-                    {isOwnRecord && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(record.id);
-                        }}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
-                        aria-label="削除"
-                      >
-                        <HiTrash className="w-5 h-5" />
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(record.id);
+                      }}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
+                      aria-label="削除"
+                    >
+                      <HiTrash className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
 

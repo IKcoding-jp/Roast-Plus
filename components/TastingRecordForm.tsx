@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import type { TastingRecord, AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
-import { getSelectedMemberId, setSelectedMemberId } from '@/lib/localStorage';
 import {
   getActiveMemberCount,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
+import { useToastContext } from '@/components/Toast';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
@@ -41,7 +41,7 @@ export function TastingRecordForm({
   onCancel,
   readOnly = false,
 }: TastingRecordFormProps) {
-  const selectedMemberId = getSelectedMemberId();
+  const { showToast } = useToastContext();
   
   // セッションIDの決定: 編集時はrecordから、新規作成時はpropsから
   const currentSessionId = record?.sessionId || sessionId || '';
@@ -61,14 +61,8 @@ export function TastingRecordForm({
     : [];
   const recordCount = sessionRecords.length;
 
-  // セッション内の自分の記録をチェック
-  const ownRecord = useMemo(() => {
-    if (!currentSessionId || !selectedMemberId) return null;
-    return sessionRecords.find((r) => r.memberId === selectedMemberId);
-  }, [currentSessionId, selectedMemberId, sessionRecords]);
-
-  // 既存の記録も自分の記録もない場合のみ「作成」
-  const isNew = !record && !ownRecord;
+  // 既存の記録がない場合のみ「作成」
+  const isNew = !record;
   const isLimitReached = isNew && recordCount >= activeMemberCount;
 
   const [beanName, setBeanName] = useState(record?.beanName || '');
@@ -89,10 +83,8 @@ export function TastingRecordForm({
   );
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
 
-  // 新規作成時はローカルストレージからmemberIdを取得
-  const [memberId, setMemberId] = useState(
-    record?.memberId || selectedMemberId || ''
-  );
+  // メンバーIDは常に空の状態から開始（新規作成時）またはrecordから取得（編集時）
+  const [memberId, setMemberId] = useState(record?.memberId || '');
 
   // 編集時にrecordが変更されたらmemberIdを更新
   useEffect(() => {
@@ -131,22 +123,22 @@ export function TastingRecordForm({
     e.preventDefault();
 
     if (!isSessionMode && !beanName.trim()) {
-      alert('豆の名前を入力してください');
+      showToast('豆の名前を入力してください', 'warning');
       return;
     }
 
     if (!memberId) {
-      alert('メンバーを選択してください。設定画面で「このデバイスは誰のもの」を設定してください。');
+      showToast('メンバーを選択してください', 'warning');
       return;
     }
 
     if (isNew && !currentSessionId) {
-      alert('セッションIDが設定されていません');
+      showToast('セッションIDが設定されていません', 'error');
       return;
     }
 
     if (isNew && isLimitReached) {
-      alert(`記録数の上限（${activeMemberCount}件）に達しています`);
+      showToast(`記録数の上限（${activeMemberCount}件）に達しています`, 'warning');
       return;
     }
 
@@ -295,17 +287,12 @@ export function TastingRecordForm({
       {isNew && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            このデバイスは誰のもの <span className="text-red-500">*</span>
+            メンバー <span className="text-red-500">*</span>
           </label>
           <select
             value={memberId}
             onChange={(e) => {
-              const newMemberId = e.target.value;
-              setMemberId(newMemberId);
-              // メンバー選択時に自動保存
-              if (newMemberId) {
-                setSelectedMemberId(newMemberId);
-              }
+              setMemberId(e.target.value);
             }}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
             required
@@ -320,11 +307,6 @@ export function TastingRecordForm({
                 </option>
               ))}
           </select>
-          {!selectedMemberId && (
-            <p className="mt-1 text-xs text-gray-500">
-              設定画面で「このデバイスは誰のもの」を設定すると、次回から自動で選択されます。
-            </p>
-          )}
         </div>
       )}
       {!isNew && record && (
@@ -403,20 +385,6 @@ export function TastingRecordForm({
               className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
             >
               削除
-            </button>
-          )}
-          {ownRecord && onDelete && (
-            <button
-              type="button"
-              onClick={() => {
-                const confirmDelete = window.confirm('この記録を削除しますか？');
-                if (confirmDelete) {
-                  onDelete(ownRecord.id);
-                }
-              }}
-              className="flex-1 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
-            >
-              自分の記録を削除
             </button>
           )}
           <button

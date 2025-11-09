@@ -1,18 +1,29 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
-import { TastingRecordForm } from '@/components/TastingRecordForm';
-import type { TastingRecord } from '@/types';
+import { TastingSessionForm } from '@/components/TastingSessionForm';
+import type { TastingSession } from '@/types';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
-import LoginPage from '@/app/login/page';
+import { useToastContext } from '@/components/Toast';
 
-export default function NewTastingPage() {
+export default function NewTastingSessionPage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
+  const { showToast } = useToastContext();
+  const hasRedirected = useRef(false);
+
+  // 未認証時にログインページにリダイレクト
+  useEffect(() => {
+    if (!authLoading && !user && !hasRedirected.current) {
+      hasRedirected.current = true;
+      router.push('/login?returnUrl=/tasting/sessions/new');
+    }
+  }, [user, authLoading, router]);
 
   if (authLoading) {
     return (
@@ -24,8 +35,9 @@ export default function NewTastingPage() {
     );
   }
 
+  // 未認証の場合はリダイレクト中なので何も表示しない
   if (!user) {
-    return <LoginPage />;
+    return null;
   }
 
   if (isLoading) {
@@ -38,26 +50,27 @@ export default function NewTastingPage() {
     );
   }
 
-  const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
+  const tastingSessions = Array.isArray(data.tastingSessions) ? data.tastingSessions : [];
 
-  const handleSave = async (record: TastingRecord) => {
+  const handleSave = async (session: TastingSession) => {
     try {
-      const newRecord: TastingRecord = {
-        ...record,
+      const newSession: TastingSession = {
+        ...session,
         userId: user.uid,
       };
 
-      const updatedRecords = [...tastingRecords, newRecord];
+      const updatedSessions = [...tastingSessions, newSession];
       await updateData({
         ...data,
-        tastingRecords: updatedRecords,
+        tastingSessions: updatedSessions,
       });
 
       // 保存が完了してから試飲記録一覧ページに遷移
+      // 静的エクスポート時には動的ルートが存在しないため、一覧ページに遷移する
       router.push('/tasting');
     } catch (error) {
-      console.error('Failed to save tasting record:', error);
-      alert('記録の保存に失敗しました。もう一度お試しください。');
+      console.error('Failed to save tasting session:', error);
+      alert('セッションの保存に失敗しました。もう一度お試しください。');
     }
   };
 
@@ -66,7 +79,7 @@ export default function NewTastingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <header className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -80,7 +93,7 @@ export default function NewTastingPage() {
               </Link>
             </div>
             <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
-              新規作成
+              新規セッション作成
             </h1>
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
           </div>
@@ -88,9 +101,8 @@ export default function NewTastingPage() {
 
         <main>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <TastingRecordForm
-              record={null}
-              data={data}
+            <TastingSessionForm
+              session={null}
               onSave={handleSave}
               onCancel={handleCancel}
             />

@@ -3,15 +3,24 @@
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
+// 静的エクスポート用: generateStaticParams()が必要
+export async function generateStaticParams() {
+  return [
+    { id: 'dummy' },
+    { id: 'dummy2' },
+    { id: 'dummy3' },
+  ];
+}
+
 // 動的ルートからクエリパラメータ形式にリダイレクト
-export default function NewTastingRecordPageClient() {
+export default function TastingDetailPage() {
   const params = useParams();
   const router = useRouter();
 
   useEffect(() => {
     const id = params?.id;
     if (id && typeof id === 'string') {
-      router.replace(`/tasting?sessionId=${encodeURIComponent(id)}&newRecord=true`);
+      router.replace(`/tasting?recordId=${encodeURIComponent(id)}`);
     } else {
       router.replace('/tasting');
     }
@@ -25,4 +34,3 @@ export default function NewTastingRecordPageClient() {
     </div>
   );
 }
-

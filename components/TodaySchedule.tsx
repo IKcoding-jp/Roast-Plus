@@ -385,7 +385,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     <div className="rounded-lg bg-white p-3 md:p-4 lg:p-6 shadow-md h-full flex flex-col">
       {/* デスクトップ版：タイトルと時間入力欄を横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex flex-row items-center justify-between gap-2">
-        <h2 className="hidden lg:block text-base md:text-lg font-semibold text-gray-800 whitespace-nowrap">本日のスケジュール</h2>
+        <h2 className="hidden lg:block text-lg md:text-lg font-semibold text-gray-800 whitespace-nowrap">本日のスケジュール</h2>
         <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
           <div className="flex items-center gap-1">
             <input
@@ -407,14 +407,14 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
               }}
               min="0"
               max="23"
-              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-sm md:text-sm text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-sm text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
                 addError 
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
                   : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
               }`}
               placeholder="時"
             />
-            <span className="text-gray-600 text-sm md:text-sm">:</span>
+            <span className="text-gray-600 text-base md:text-sm">:</span>
             <input
               type="number"
               value={newMinute}
@@ -426,13 +426,13 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
               }}
               min="0"
               max="59"
-              className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-sm md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="分"
             />
           </div>
           <button
             onClick={addTimeLabel}
-            className="flex items-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-2 md:px-2.5 py-1 md:py-1.5 text-sm md:text-sm font-medium text-white transition-colors hover:bg-amber-700"
+            className="flex items-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-2 md:px-2.5 py-1 md:py-1.5 text-base md:text-sm font-medium text-white transition-colors hover:bg-amber-700"
             aria-label="時間ラベルを追加"
           >
             <HiPlus className="h-3 md:h-3.5 w-3 md:w-3.5" />
@@ -448,7 +448,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
               <HiClock className="h-12 w-12 md:h-16 md:w-16 text-gray-300" />
             </div>
             <p className="text-base md:text-base font-medium">時間ラベルがありません</p>
-            <p className="mt-1.5 md:mt-2 text-sm md:text-sm text-gray-400">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
+            <p className="mt-1.5 md:mt-2 text-base md:text-sm text-gray-400">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
           </div>
         </div>
       ) : (
@@ -463,7 +463,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
                 <div className="w-14 md:w-14 flex-shrink-0">
                   <div 
                     onClick={() => handleEditLabel(label.id)}
-                    className="text-base md:text-sm font-medium text-gray-700 select-none cursor-pointer hover:text-amber-600 transition-colors tabular-nums"
+                    className="text-lg md:text-sm font-medium text-gray-700 select-none cursor-pointer hover:text-amber-600 transition-colors tabular-nums"
                   >
                     {label.time || '--:--'}
                   </div>
@@ -477,14 +477,14 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
                     onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
                     onCompositionStart={handleCompositionStart}
                     onCompositionEnd={handleCompositionEnd}
-                    className="w-full bg-transparent border-0 border-b-2 border-gray-300 px-0 py-1 md:py-1 text-base md:text-sm text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-0"
+                    className="w-full bg-transparent border-0 border-b-2 border-gray-300 px-0 py-1 md:py-1 text-lg md:text-sm text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-0"
                     placeholder="内容を入力"
                   />
                 </div>
               </div>
             ))}
             {sortedTimeLabels.length > 10 && (
-              <div className="py-1.5 md:py-2 text-center text-sm md:text-sm text-gray-500">
+              <div className="py-1.5 md:py-2 text-center text-base md:text-sm text-gray-500">
                 最大10個まで表示しています（全{sortedTimeLabels.length}個）
               </div>
             )}
@@ -517,7 +517,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
                   }`}
                   placeholder="時"
                 />
-                <span className="text-gray-600 text-sm md:text-sm">:</span>
+                <span className="text-gray-600 text-base md:text-sm">:</span>
                 <input
                   type="number"
                   value={newMinute}
@@ -529,13 +529,13 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
                   }}
                   min="0"
                   max="59"
-                  className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-sm md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="分"
                 />
               </div>
               <button
                 onClick={addTimeLabel}
-                className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-2 md:px-2.5 py-1 md:py-1.5 text-sm md:text-sm font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
+                className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-2 md:px-2.5 py-1 md:py-1.5 text-base md:text-sm font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
                 aria-label="時間ラベルを追加"
               >
                 <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -569,14 +569,14 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
               }}
               min="0"
               max="23"
-              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-sm md:text-sm text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-sm text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
                 addError 
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
                   : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
               }`}
               placeholder="時"
             />
-            <span className="text-gray-600 text-sm md:text-sm">:</span>
+            <span className="text-gray-600 text-base md:text-sm">:</span>
             <input
               type="number"
               value={newMinute}
@@ -588,7 +588,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
               }}
               min="0"
               max="59"
-              className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-sm md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="分"
             />
           </div>

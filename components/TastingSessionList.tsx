@@ -274,7 +274,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                   setDateFrom('');
                   setDateTo('');
                   setSelectedRoastLevels([]);
-                  setCurrentPage(1);
                 }}
                 className="text-sm text-amber-600 hover:underline"
               >

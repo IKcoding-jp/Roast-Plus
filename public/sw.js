@@ -66,6 +66,13 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// メッセージリスナー（SKIP_WAITINGメッセージを処理）
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // フェッチ時の処理（Network First戦略）
 self.addEventListener('fetch', (event) => {
   // GETリクエストのみ処理

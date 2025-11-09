@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { useAppVersion } from '@/hooks/useAppVersion';
 import { getSelectedMemberId, setSelectedMemberId } from '@/lib/localStorage';
 import { HiArrowLeft } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
@@ -13,6 +14,7 @@ export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
   const { data, isLoading: dataLoading } = useAppData();
   const { isEnabled, isLoading: devModeLoading, enableDeveloperMode, disableDeveloperMode } = useDeveloperMode();
+  const { version, isUpdateAvailable, isChecking, checkForUpdates, applyUpdate } = useAppVersion();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -158,6 +160,54 @@ export default function SettingsPage() {
                   onChange={handleToggleChange}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* アプリバージョンセクション */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              アプリバージョン
+            </h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">現在のバージョン</p>
+                  <p className="text-lg font-medium text-gray-800">
+                    {version || '読み込み中...'}
+                  </p>
+                </div>
+                {isUpdateAvailable && (
+                  <div className="ml-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                      更新あり
+                    </span>
+                  </div>
+                )}
+              </div>
+              {isUpdateAvailable && (
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-600 mb-3">
+                    新しいバージョンが利用可能です。更新を適用してください。
+                  </p>
+                  <button
+                    onClick={applyUpdate}
+                    className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                  >
+                    更新する
+                  </button>
+                </div>
+              )}
+              {!isUpdateAvailable && process.env.NODE_ENV === 'production' && (
+                <div className="pt-4 border-t border-gray-200">
+                  <button
+                    onClick={checkForUpdates}
+                    disabled={isChecking}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isChecking ? '確認中...' : '更新を確認'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </main>

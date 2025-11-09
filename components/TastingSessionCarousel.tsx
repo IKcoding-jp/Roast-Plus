@@ -156,27 +156,27 @@ export function TastingSessionCarousel({
                     </div>
 
                     {/* みんなの感想 */}
-                    {(() => {
-                      if (comments.length === 0) return null;
-
-                      return (
-                        <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col flex-shrink-0 min-h-[12rem] max-h-[min(20rem,calc(100vh-28rem))] sm:max-h-[min(22rem,calc(100vh-30rem))] md:max-h-[min(24rem,calc(100vh-32rem))]">
-                          <div className="flex items-center gap-2 mb-2 flex-shrink-0">
-                            <h4 className="text-sm font-semibold text-gray-800">みんなの感想</h4>
-                            <span className="px-2 py-0.5 bg-amber-600 text-white text-sm font-semibold rounded-full flex-shrink-0">
-                              {recordCount}/{activeMemberCount}
-                            </span>
-                          </div>
-                          <ul className="space-y-1.5 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
-                            {comments.map((comment, commentIndex) => (
-                              <li key={commentIndex} className="text-sm text-gray-700 whitespace-pre-wrap break-words">
-                                ・{comment}
-                              </li>
-                            ))}
-                          </ul>
+                    <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col flex-shrink-0 min-h-[12rem] max-h-[min(20rem,calc(100vh-28rem))] sm:max-h-[min(22rem,calc(100vh-30rem))] md:max-h-[min(24rem,calc(100vh-32rem))]">
+                      <div className="flex items-center gap-2 mb-2 flex-shrink-0">
+                        <h4 className="text-sm font-semibold text-gray-800">みんなの感想</h4>
+                        <span className="px-2 py-0.5 bg-amber-600 text-white text-sm font-semibold rounded-full flex-shrink-0">
+                          {recordCount}/{activeMemberCount}
+                        </span>
+                      </div>
+                      {comments.length > 0 ? (
+                        <ul className="space-y-1.5 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
+                          {comments.map((comment, commentIndex) => (
+                            <li key={commentIndex} className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+                              ・{comment}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="flex items-center justify-center h-full min-h-[8rem]">
+                          <p className="text-sm text-gray-500">まだ感想がありません</p>
                         </div>
-                      );
-                    })()}
+                      )}
+                    </div>
                   </div>
                 </Link>
               </div>

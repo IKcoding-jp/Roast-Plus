@@ -6,17 +6,6 @@ import type { Notification } from '@/types';
 
 const READ_IDS_STORAGE_KEY = 'roastplus_notification_read_ids';
 
-// デフォルトの通知データ（初期表示用）
-const defaultNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'ローストプラスへようこそ',
-    content: 'ローストプラスをご利用いただきありがとうございます。BYSNでの仕事をサポートするための機能をご利用いただけます。',
-    date: new Date().toISOString().split('T')[0],
-    type: 'announcement',
-  },
-];
-
 export function useNotifications() {
   const { data, updateData, isLoading: appDataLoading } = useAppData();
   const [readIds, setReadIds] = useState<string[]>([]);
@@ -72,15 +61,10 @@ export function useNotifications() {
           // 古い通知データを取得
           const oldNotifications = oldData.notifications || [];
           
-          // デフォルト通知を追加（まだ存在しない場合）
-          const defaultIds = new Set(firestoreNotifications.map(n => n.id));
-          const missingDefaults = defaultNotifications.filter(n => !defaultIds.has(n.id));
-          
           // 古い通知データを追加（重複を避ける）
           const newNotifications = [
             ...firestoreNotifications,
-            ...missingDefaults,
-            ...oldNotifications.filter(n => !existingIds.has(n.id) && !defaultIds.has(n.id)),
+            ...oldNotifications.filter(n => !existingIds.has(n.id)),
           ];
           
           // 変更がある場合のみ更新
@@ -93,16 +77,6 @@ export function useNotifications() {
           
           // 古いストレージキーを削除
           localStorage.removeItem(oldStorageKey);
-        } else {
-          // localStorageにデータがない場合、デフォルト通知を追加
-          const missingDefaults = defaultNotifications.filter(n => !existingIds.has(n.id));
-          
-          if (missingDefaults.length > 0) {
-            await updateData({
-              ...currentData,
-              notifications: [...firestoreNotifications, ...missingDefaults],
-            });
-          }
         }
         
         setIsLoading(false);
@@ -115,20 +89,8 @@ export function useNotifications() {
     migrateLocalStorageData();
   }, [appDataLoading, data, updateData]);
 
-  // 通知データを取得（デフォルト通知とマージ、重複を排除）
-  const notifications = (() => {
-    const firestoreNotifications = data.notifications || [];
-    const existingIds = new Set(firestoreNotifications.map(n => n.id));
-    const missingDefaults = defaultNotifications.filter(n => !existingIds.has(n.id));
-    
-    // 重複を排除してマージ
-    const allNotifications = [...firestoreNotifications, ...missingDefaults];
-    const uniqueNotifications = Array.from(
-      new Map(allNotifications.map(n => [n.id, n])).values()
-    );
-    
-    return uniqueNotifications;
-  })();
+  // 通知データを取得
+  const notifications = data.notifications || [];
 
   // 未確認通知数を計算
   const unreadCount = notifications.filter(n => !readIds.includes(n.id)).length;

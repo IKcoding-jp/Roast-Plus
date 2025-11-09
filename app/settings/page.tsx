@@ -185,7 +185,7 @@ export default function SettingsPage() {
                       setPassword(e.target.value);
                       setPasswordError(null);
                     }}
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                    className={`w-full px-4 py-2 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                       passwordError ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="パスワードを入力"

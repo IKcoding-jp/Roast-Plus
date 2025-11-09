@@ -9,6 +9,7 @@ import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
 import { IoSettings } from "react-icons/io5";
 import { IoNotificationsOutline } from "react-icons/io5";
+import { MdTimer } from "react-icons/md";
 import { useNotifications } from '@/hooks/useNotifications';
 
 export default function HomePage() {
@@ -113,6 +114,22 @@ export default function HomePage() {
             </div>
             <h2 className="text-center text-lg font-semibold text-gray-800">
               試飲感想記録
+            </h2>
+          </button>
+
+          {/* ローストタイマーカード */}
+          <button
+            onClick={() => router.push('/roast-timer')}
+            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+          >
+            <div className="mb-4 flex justify-center">
+              <MdTimer className="h-16 w-16 text-primary" />
+            </div>
+            <h2 className="text-center text-lg font-semibold text-gray-800">
+              ローストタイマー
+              <span className="block text-sm font-normal text-gray-500 mt-1">
+                ※開発予定
+              </span>
             </h2>
           </button>
 

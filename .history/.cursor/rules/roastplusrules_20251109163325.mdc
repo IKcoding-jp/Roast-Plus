@@ -53,11 +53,7 @@ RoastPlusは、コーヒー豆加工業務をサポートするためのWebア�
 
 ### React/Next.js
 - Server Componentsを優先し、必要に応じてClient Componentsを使用
-- カスタムフックでロジックを分離
-  - `hooks/useAppData.ts`: Firestoreデータの取得とリアルタイム更新
-  - `hooks/useNotifications.ts`: 通知機能
-  - `hooks/useDeveloperMode.ts`: 開発者モード機能
-  - `lib/auth.ts`: Firebase認証（`useAuth`フック）
+- カスタムフックでロジックを分離（`useAppData`, `useAuth`）
 - コンポーネントは小さく、単一責任の原則に従う
 
 ### スタイリング

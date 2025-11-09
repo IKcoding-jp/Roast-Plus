@@ -20,8 +20,6 @@ RoastPlusは、コーヒー豆加工業務をサポートするためのWebア�
 - **スタイリング**: Tailwind CSS 4
 - **バックエンド**: Firebase (Authentication + Firestore)
 - **ビルド**: 本番環境では静的エクスポート (`output: 'export'`)
-- **設定ファイル**: `next.config.ts`（TypeScript形式）
-- **アイコンライブラリ**: react-icons, phosphor-react
 
 ## アーキテクチャの原則
 
@@ -53,11 +51,7 @@ RoastPlusは、コーヒー豆加工業務をサポートするためのWebア�
 
 ### React/Next.js
 - Server Componentsを優先し、必要に応じてClient Componentsを使用
-- カスタムフックでロジックを分離
-  - `hooks/useAppData.ts`: Firestoreデータの取得とリアルタイム更新
-  - `hooks/useNotifications.ts`: 通知機能
-  - `hooks/useDeveloperMode.ts`: 開発者モード機能
-  - `lib/auth.ts`: Firebase認証（`useAuth`フック）
+- カスタムフックでロジックを分離（`useAppData`, `useAuth`）
 - コンポーネントは小さく、単一責任の原則に従う
 
 ### スタイリング
@@ -82,16 +76,12 @@ RoastPlusは、コーヒー豆加工業務をサポートするためのWebア�
 - `Member`: メンバー情報（`teamId`で所属チームを参照、`excludedTaskLabelIds`で除外ラベルを管理）
 - `TaskLabel`: タスクラベル（`leftLabel`と`rightLabel`でペアを表現）
 - `Assignment`: 現在の割り当て（`memberId`が`null`の場合は未割り当て）
-- `TodaySchedule`: 本日のスケジュール（日次スケジュール、`TimeLabel`の配列を含む）
-- `RoastSchedule`: ローストスケジュール（焙煎機予熱、ロースト、アフターパージ、チャフのお掃除など）
-- `TastingSession`: 試飲セッション（豆の名前、焙煎度合い、メモなど）
-- `TastingRecord`: 試飲記録（評価項目：苦味、酸味、ボディ、甘み、香り、総合評価など）
-- `Notification`: 通知（`update`または`announcement`タイプ）
+- `AssignmentHistory`: 割り当て履歴
 
 ### データ操作の原則
 - データの追加・更新・削除は不変性を保つ（スプレッド演算子を使用）
 - 削除時は関連データも適切に処理（例: チーム削除時はメンバーと割り当ても削除）
-- データ操作関数は `lib/firestore.ts` に定義
+- データ操作関数は `src/lib/firestore.ts` に定義
 
 ## ビルドとデプロイ
 
@@ -101,19 +91,17 @@ RoastPlusは、コーヒー豆加工業務をサポートするためのWebア�
 
 ### 本番環境
 - `npm run build` で静的エクスポートを生成
-- **静的エクスポートの有効化**: `next.config.ts` で本番環境（`NODE_ENV === 'production'`）でのみ `output: 'export'` が有効化される
-- 開発環境では通常のNext.jsサーバーとして動作（動的ルートが正常に動作する）
+- `output: 'export'` により静的HTMLファイルを生成
 - 画像は `unoptimized: true` で最適化を無効化（静的エクスポートの制約）
-- ビルド出力は `out/` ディレクトリに生成される
+- ビルド出力は `roast-plus/out` ディレクトリに生成される
 
 ### Firebase Hosting
 - **デプロイ先**: Firebase Hosting
 - **設定ファイル**: `firebase.json` の `hosting` セクションで設定
-- **公開ディレクトリ**: `out/`（Next.jsの静的エクスポート出力先）
+- **公開ディレクトリ**: `roast-plus/out`（Next.jsの静的エクスポート出力先）
 - **SPAルーティング**: `rewrites` で全てのリクエストを `/index.html` にリダイレクト
 - **デプロイコマンド**: `firebase deploy --only hosting`（プロジェクトルートから実行）
 - **webmanifest**: `.webmanifest` ファイルに適切なContent-Typeヘッダーを設定
-- **キャッシュ設定**: HTMLファイルはキャッシュ無効化、静的アセット（JS/CSS/画像など）は長期キャッシュ
 
 ## エラーハンドリング
 
@@ -164,7 +152,7 @@ RoastPlusは、コーヒー豆加工業務をサポートするためのWebア�
 - **タッチ操作**: モバイルデバイスでの操作性を考慮したUI設計
 
 ### リファクタリング時
-- `lib/firestore.ts` の関数インターフェースを維持（既存コードとの互換性）
+- `src/lib/firestore.ts` の関数インターフェースを維持（既存コードとの互換性）
 - データ操作の不変性を保つ
 - テストを追加または更新
 

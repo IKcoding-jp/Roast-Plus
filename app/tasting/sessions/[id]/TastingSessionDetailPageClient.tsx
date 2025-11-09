@@ -6,8 +6,7 @@ import { useAppData } from '@/hooks/useAppData';
 import { TastingSessionDetail } from '@/components/TastingSessionDetail';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
-import LoginPage from '@/app/login/page';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export default function TastingSessionDetailPageClient() {
   const { user, loading: authLoading } = useAuth();
@@ -15,6 +14,7 @@ export default function TastingSessionDetailPageClient() {
   const router = useRouter();
   const params = useParams();
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const hasAuthRedirected = useRef(false); // 認証リダイレクト用のフラグ
 
   // 静的エクスポート時のフォールバック: useParams()が動作しない場合、window.location.pathnameから取得
   // クライアント側で確実にIDを取得するため、複数の方法を試す
@@ -47,6 +47,15 @@ export default function TastingSessionDetailPageClient() {
     }
   }, [params]);
 
+  // 未認証時にログインページにリダイレクト
+  useEffect(() => {
+    if (!authLoading && !user && !hasAuthRedirected.current) {
+      hasAuthRedirected.current = true;
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/tasting';
+      router.push(`/login?returnUrl=${encodeURIComponent(currentPath)}`);
+    }
+  }, [user, authLoading, router]);
+
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
@@ -57,8 +66,9 @@ export default function TastingSessionDetailPageClient() {
     );
   }
 
+  // 未認証の場合はリダイレクト中なので何も表示しない
   if (!user) {
-    return <LoginPage />;
+    return null;
   }
 
   if (isLoading) {

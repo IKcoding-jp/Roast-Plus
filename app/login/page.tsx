@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +39,10 @@ export default function LoginPage() {
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
       }
-      router.push('/');
+      // returnUrlがあればそのURLに、なければホームにリダイレクト
+      const returnUrl = searchParams.get('returnUrl');
+      const redirectUrl = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/';
+      router.push(redirectUrl);
     } catch (err: any) {
       const errorCode = err.code;
       let errorMessage = 'エラーが発生しました';

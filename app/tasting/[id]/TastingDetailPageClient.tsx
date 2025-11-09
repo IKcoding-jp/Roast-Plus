@@ -8,7 +8,6 @@ import type { TastingRecord } from '@/types';
 import { getSelectedMemberId } from '@/lib/localStorage';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
-import LoginPage from '@/app/login/page';
 import { useEffect, useState, useRef } from 'react';
 
 export default function TastingDetailPageClient() {
@@ -18,6 +17,7 @@ export default function TastingDetailPageClient() {
   const params = useParams();
   const [recordId, setRecordId] = useState<string | null>(null);
   const hasRedirected = useRef(false); // 無限ループを防ぐためのフラグ
+  const hasAuthRedirected = useRef(false); // 認証リダイレクト用のフラグ
 
   // 予約語のリスト
   const reservedWords = ['new', 'edit', 'sessions'];
@@ -72,6 +72,15 @@ export default function TastingDetailPageClient() {
     }
   }, [recordId]);
 
+  // 未認証時にログインページにリダイレクト
+  useEffect(() => {
+    if (!authLoading && !user && !hasAuthRedirected.current) {
+      hasAuthRedirected.current = true;
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/tasting';
+      router.push(`/login?returnUrl=${encodeURIComponent(currentPath)}`);
+    }
+  }, [user, authLoading, router]);
+
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
@@ -82,8 +91,9 @@ export default function TastingDetailPageClient() {
     );
   }
 
+  // 未認証の場合はリダイレクト中なので何も表示しない
   if (!user) {
-    return <LoginPage />;
+    return null;
   }
 
   if (isLoading) {

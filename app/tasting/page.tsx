@@ -1,16 +1,27 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { TastingSessionList } from '@/components/TastingSessionList';
 import { HiArrowLeft } from 'react-icons/hi';
 import { HiPlus } from 'react-icons/hi';
-import LoginPage from '@/app/login/page';
 
 export default function TastingPage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
+  const router = useRouter();
+  const hasRedirected = useRef(false);
+
+  // 未認証時にログインページにリダイレクト
+  useEffect(() => {
+    if (!authLoading && !user && !hasRedirected.current) {
+      hasRedirected.current = true;
+      router.push('/login?returnUrl=/tasting');
+    }
+  }, [user, authLoading, router]);
 
   if (authLoading) {
     return (
@@ -22,8 +33,9 @@ export default function TastingPage() {
     );
   }
 
+  // 未認証の場合はリダイレクト中なので何も表示しない
   if (!user) {
-    return <LoginPage />;
+    return null;
   }
 
   if (isLoading) {

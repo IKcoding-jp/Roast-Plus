@@ -429,10 +429,10 @@ function ScheduleCard({
 
   // アイコンの取得
   const getIcon = () => {
-    if (isRoasterOn) return <HiFire className="text-lg md:text-lg text-orange-500 flex-shrink-0" />;
-    if (isRoast) return <PiCoffeeBeanFill className="text-lg md:text-lg text-amber-700 flex-shrink-0" />;
-    if (isAfterPurge) return <FaSnowflake className="text-lg md:text-lg text-blue-500 flex-shrink-0" />;
-    if (isChaffCleaning) return <FaBroom className="text-lg md:text-lg text-gray-600 flex-shrink-0" />;
+    if (isRoasterOn) return <HiFire className="text-xl md:text-lg text-orange-500 flex-shrink-0" />;
+    if (isRoast) return <PiCoffeeBeanFill className="text-xl md:text-lg text-amber-700 flex-shrink-0" />;
+    if (isAfterPurge) return <FaSnowflake className="text-xl md:text-lg text-blue-500 flex-shrink-0" />;
+    if (isChaffCleaning) return <FaBroom className="text-xl md:text-lg text-gray-600 flex-shrink-0" />;
     return null;
   };
 
@@ -541,14 +541,14 @@ function ScheduleCard({
         {/* 左側：時間バッジまたはアイコン */}
         {isAfterPurge ? (
           <div className="flex items-center gap-1.5 md:gap-1 flex-shrink-0">
-            <div className="text-sm md:text-sm font-medium text-gray-600 select-none min-w-[45px] md:min-w-[45px]">
+            <div className="text-base md:text-sm font-medium text-gray-600 select-none min-w-[48px] md:min-w-[45px]">
               {/* スペーサーとして空のdivを使用 */}
             </div>
             {getIcon()}
           </div>
         ) : (
           <div className="flex items-center gap-1.5 md:gap-1 flex-shrink-0">
-            <div className="text-sm md:text-sm font-medium text-gray-700 select-none min-w-[45px] md:min-w-[45px] tabular-nums">
+            <div className="text-base md:text-sm font-medium text-gray-700 select-none min-w-[48px] md:min-w-[45px] tabular-nums">
               {schedule.time || ''}
             </div>
             {getIcon()}
@@ -557,10 +557,10 @@ function ScheduleCard({
 
         {/* 中央：メモ内容 */}
         <div className="flex-1 min-w-0 flex flex-col gap-1 md:gap-1">
-          <div className="text-sm md:text-sm font-medium text-gray-800 flex items-center gap-1.5 md:gap-1.5 flex-wrap">
+          <div className="text-base md:text-sm font-medium text-gray-800 flex items-center gap-1.5 md:gap-1.5 flex-wrap">
             <span className="whitespace-nowrap">{memoContent.firstLine}</span>
             {memoContent.beanName && (
-              <span className="inline-flex items-center rounded px-2 md:px-2 py-0.5 text-sm md:text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
+              <span className="inline-flex items-center rounded px-2 md:px-2 py-1 md:py-0.5 text-base md:text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
                 {memoContent.beanName2 && memoContent.blendRatio ? (
                   <>
                     <span className="whitespace-nowrap">{memoContent.beanName}</span>
@@ -582,20 +582,20 @@ function ScheduleCard({
             )}
           </div>
           {(memoContent.mode || memoContent.weight || memoContent.roastLevel) && (
-            <div className="text-xs flex items-center gap-1 flex-wrap">
+            <div className="text-sm md:text-xs flex items-center gap-1 flex-wrap">
               {memoContent.mode && (
-                <span className={`inline-block rounded px-2 md:px-2 py-0.5 text-xs font-medium ${getModeColor(memoContent.mode)} whitespace-nowrap`}>
+                <span className={`inline-block rounded px-2 md:px-2 py-1 md:py-0.5 text-sm md:text-xs font-medium ${getModeColor(memoContent.mode)} whitespace-nowrap`}>
                   {memoContent.mode}
                 </span>
               )}
               {memoContent.weight && (
-                <span className={`inline-block rounded px-2 md:px-2 py-0.5 text-xs font-medium ${getWeightColor(memoContent.weight)} whitespace-nowrap`}>
+                <span className={`inline-block rounded px-2 md:px-2 py-1 md:py-0.5 text-sm md:text-xs font-medium ${getWeightColor(memoContent.weight)} whitespace-nowrap`}>
                   {memoContent.weight}
                 </span>
               )}
               {memoContent.roastLevel && (
                 <span 
-                  className={`inline-block rounded px-2 md:px-2 py-0.5 text-xs font-medium ${getRoastLevelColor(memoContent.roastLevel)} whitespace-nowrap`}
+                  className={`inline-block rounded px-2 md:px-2 py-1 md:py-0.5 text-sm md:text-xs font-medium ${getRoastLevelColor(memoContent.roastLevel)} whitespace-nowrap`}
                   style={
                     memoContent.roastLevel === '深煎り' 
                       ? { backgroundColor: '#120C0A' }

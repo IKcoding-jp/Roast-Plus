@@ -665,13 +665,13 @@ function TimeEditDialog({
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full border-2 border-gray-300" onClick={(e) => e.stopPropagation()}>
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
-          <h3 className="text-base md:text-lg font-semibold text-gray-800">時間を編集</h3>
+          <h3 className="text-2xl md:text-lg font-semibold text-gray-800">時間を編集</h3>
           <button
             onClick={onCancel}
             className="rounded-md bg-gray-200 p-1.5 md:p-2 text-gray-700 transition-colors hover:bg-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="閉じる"
           >
-            <HiX className="h-4 w-4 md:h-5 md:w-5" />
+            <HiX className="h-6 w-6 md:h-5 md:w-5" />
           </button>
         </div>
 
@@ -680,7 +680,7 @@ function TimeEditDialog({
           <div className="space-y-3 md:space-y-4 max-w-md mx-auto">
             {/* 時間選択 */}
             <div>
-              <label className="mb-1 block text-xs md:text-sm font-medium text-gray-700 text-center">
+              <label className="mb-1 block text-base md:text-sm font-medium text-gray-700 text-center">
                 時間 <span className="text-red-500">*</span>
               </label>
               <div className="flex items-center justify-center gap-2">
@@ -696,10 +696,10 @@ function TimeEditDialog({
                   min="0"
                   max="23"
                   required
-                  className="w-16 md:w-20 rounded-md border border-gray-300 px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-16 md:w-20 rounded-md border border-gray-300 px-2 md:px-3 py-1.5 md:py-2 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="時"
                 />
-                <span className="text-gray-600 text-sm md:text-lg">:</span>
+                <span className="text-gray-600 text-base md:text-lg">:</span>
                 <input
                   type="number"
                   value={minute}
@@ -711,7 +711,7 @@ function TimeEditDialog({
                   }}
                   min="0"
                   max="59"
-                  className="w-16 md:w-20 rounded-md border border-gray-300 px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-16 md:w-20 rounded-md border border-gray-300 px-2 md:px-3 py-1.5 md:py-2 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="分"
                 />
               </div>
@@ -722,7 +722,7 @@ function TimeEditDialog({
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors min-h-[44px]"
+                className="px-3 md:px-4 py-1.5 md:py-2 text-base md:text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors min-h-[44px]"
               >
                 キャンセル
               </button>
@@ -732,14 +732,14 @@ function TimeEditDialog({
                   onDelete();
                   onCancel();
                 }}
-                className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors min-h-[44px]"
+                className="px-3 md:px-4 py-1.5 md:py-2 text-base md:text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors min-h-[44px]"
               >
                 削除
               </button>
               <button
                 type="submit"
                 disabled={!hour}
-                className="px-4 md:px-6 py-1.5 md:py-2 text-xs md:text-sm bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-4 md:px-6 py-1.5 md:py-2 text-base md:text-sm bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 保存
               </button>

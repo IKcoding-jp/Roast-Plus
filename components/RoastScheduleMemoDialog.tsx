@@ -189,15 +189,28 @@ export function RoastScheduleMemoDialog({
       if (beanName2 && blendRatio) {
         // ブレンドの場合
         const [ratio1, ratio2] = blendRatio.split(':');
-        beanText = `${beanName}${ratio1}:${beanName2}${ratio2} (${mode})`;
+        beanText = `${beanName}${ratio1}:${beanName2}${ratio2}`;
       } else if (beanName) {
         // 単体の場合
-        beanText = `${beanName} (${mode})`;
+        beanText = beanName;
       }
       
       const weightText = weight ? `${weight}g` : '';
       const levelText = roastLevel || '';
-      return `焙煎機予熱\n${beanText} ${weightText} ${levelText}`.trim();
+      const modeText = mode ? `(${mode})` : '';
+      
+      // スマホでのレイアウト: 3行に分ける
+      const parts = [];
+      parts.push('焙煎機予熱');
+      if (beanText) {
+        parts.push(beanText);
+      }
+      const detailParts = [modeText, weightText, levelText].filter(Boolean);
+      if (detailParts.length > 0) {
+        parts.push(detailParts.join(' '));
+      }
+      
+      return parts.join('\n');
     }
     if (isRoast) {
       const countText = roastCount ? `${roastCount}回目` : '?回目';
@@ -237,7 +250,7 @@ export function RoastScheduleMemoDialog({
       >
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-gray-800">
+          <h3 className="text-2xl md:text-xl font-semibold text-gray-800">
             {schedule ? 'スケジュールを編集' : 'スケジュールを追加'}
           </h3>
           <button
@@ -245,7 +258,7 @@ export function RoastScheduleMemoDialog({
             className="rounded-md bg-gray-200 p-2 text-gray-700 transition-colors hover:bg-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="閉じる"
           >
-            <HiX className="h-5 w-5" />
+            <HiX className="h-6 w-6 md:h-5 md:w-5" />
           </button>
         </div>
 
@@ -255,7 +268,7 @@ export function RoastScheduleMemoDialog({
             {/* 時間選択 */}
             {!isAfterPurge && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700 text-center">
+                <label className="mb-1 block text-base md:text-sm font-medium text-gray-700 text-center">
                   時間 <span className="text-red-500">*</span>
                 </label>
                 <div className="flex items-center justify-center gap-2">
@@ -271,7 +284,7 @@ export function RoastScheduleMemoDialog({
                     min="0"
                     max="23"
                     required={!isAfterPurge}
-                    className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-20 rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="時"
                   />
                   <span className="text-gray-600 text-lg">:</span>
@@ -287,7 +300,7 @@ export function RoastScheduleMemoDialog({
                     min="0"
                     max="59"
                     required={!isAfterPurge}
-                    className="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-20 rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="分"
                   />
                 </div>
@@ -296,7 +309,7 @@ export function RoastScheduleMemoDialog({
 
             {/* スケジュールタイプ選択（排他的） */}
             <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700 text-center">
+              <label className="mb-3 block text-base md:text-sm font-medium text-gray-700 text-center">
                 スケジュールタイプ <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -311,8 +324,8 @@ export function RoastScheduleMemoDialog({
                     onChange={(e) => handleMemoTypeChange('roasterOn')}
                     className="sr-only"
                   />
-                  <HiFire className={`text-2xl ${isRoasterOn ? 'text-orange-500' : 'text-gray-400'}`} />
-                  <span className={`text-sm font-medium ${isRoasterOn ? 'text-orange-700' : 'text-gray-700'}`}>
+                  <HiFire className={`text-3xl md:text-2xl ${isRoasterOn ? 'text-orange-500' : 'text-gray-400'}`} />
+                  <span className={`text-base md:text-sm font-medium ${isRoasterOn ? 'text-orange-700' : 'text-gray-700'}`}>
                     焙煎機予熱
                   </span>
                 </label>
@@ -327,8 +340,8 @@ export function RoastScheduleMemoDialog({
                     onChange={(e) => handleMemoTypeChange('roast')}
                     className="sr-only"
                   />
-                  <PiCoffeeBeanFill className={`text-2xl ${isRoast ? 'text-amber-700' : 'text-gray-400'}`} />
-                  <span className={`text-sm font-medium ${isRoast ? 'text-amber-700' : 'text-gray-700'}`}>
+                  <PiCoffeeBeanFill className={`text-3xl md:text-2xl ${isRoast ? 'text-amber-700' : 'text-gray-400'}`} />
+                  <span className={`text-base md:text-sm font-medium ${isRoast ? 'text-amber-700' : 'text-gray-700'}`}>
                     ロースト
                   </span>
                 </label>
@@ -343,8 +356,8 @@ export function RoastScheduleMemoDialog({
                     onChange={(e) => handleMemoTypeChange('afterPurge')}
                     className="sr-only"
                   />
-                  <FaSnowflake className={`text-2xl ${isAfterPurge ? 'text-blue-500' : 'text-gray-400'}`} />
-                  <span className={`text-sm font-medium ${isAfterPurge ? 'text-blue-700' : 'text-gray-700'}`}>
+                  <FaSnowflake className={`text-3xl md:text-2xl ${isAfterPurge ? 'text-blue-500' : 'text-gray-400'}`} />
+                  <span className={`text-base md:text-sm font-medium ${isAfterPurge ? 'text-blue-700' : 'text-gray-700'}`}>
                     アフターパージ
                   </span>
                 </label>
@@ -359,8 +372,8 @@ export function RoastScheduleMemoDialog({
                     onChange={(e) => handleMemoTypeChange('chaffCleaning')}
                     className="sr-only"
                   />
-                  <FaBroom className={`text-2xl ${isChaffCleaning ? 'text-gray-700' : 'text-gray-400'}`} />
-                  <span className={`text-sm font-medium ${isChaffCleaning ? 'text-gray-700' : 'text-gray-700'}`}>
+                  <FaBroom className={`text-3xl md:text-2xl ${isChaffCleaning ? 'text-gray-700' : 'text-gray-400'}`} />
+                  <span className={`text-base md:text-sm font-medium ${isChaffCleaning ? 'text-gray-700' : 'text-gray-700'}`}>
                     チャフのお掃除
                   </span>
                 </label>
@@ -371,7 +384,7 @@ export function RoastScheduleMemoDialog({
             {isRoasterOn && (
               <div className="space-y-3 border-t border-gray-200 pt-3">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-base md:text-sm font-medium text-gray-700">
                     豆の名前 <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -387,7 +400,7 @@ export function RoastScheduleMemoDialog({
                       }
                     }}
                     required={isRoasterOn}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>
                     {ALL_BEANS.map((bean) => (
@@ -399,7 +412,7 @@ export function RoastScheduleMemoDialog({
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-base md:text-sm font-medium text-gray-700">
                     2種類目の豆の名前
                   </label>
                   <select
@@ -413,7 +426,7 @@ export function RoastScheduleMemoDialog({
                         setBlendRatio2('');
                       }
                     }}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">なし</option>
                     {ALL_BEANS.filter((bean) => bean !== beanName).map((bean) => (
@@ -426,12 +439,12 @@ export function RoastScheduleMemoDialog({
 
                 {beanName2 && (
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-base md:text-sm font-medium text-gray-700">
                       ブレンド割合 <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-gray-600">
+                        <label className="mb-1 block text-sm md:text-xs font-medium text-gray-600">
                           {beanName}の割合
                         </label>
                         <input
@@ -446,12 +459,12 @@ export function RoastScheduleMemoDialog({
                           min="0"
                           max="10"
                           required={!!beanName2}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           placeholder="5"
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-gray-600">
+                        <label className="mb-1 block text-sm md:text-xs font-medium text-gray-600">
                           {beanName2}の割合
                         </label>
                         <input
@@ -466,26 +479,26 @@ export function RoastScheduleMemoDialog({
                           min="0"
                           max="10"
                           required={!!beanName2}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           placeholder="5"
                         />
                       </div>
                     </div>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-sm md:text-xs text-gray-500">
                       合計が10になるように入力してください（例：5と5、8と2）
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-base md:text-sm font-medium text-gray-700">
                     重さ <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={weight}
                     onChange={(e) => setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')}
                     required={isRoasterOn}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>
                     <option value="200">200g</option>
@@ -495,7 +508,7 @@ export function RoastScheduleMemoDialog({
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-base md:text-sm font-medium text-gray-700">
                     焙煎度合い <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -506,7 +519,7 @@ export function RoastScheduleMemoDialog({
                       )
                     }
                     required={isRoasterOn}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>
                     <option value="浅煎り">浅煎り</option>
@@ -522,7 +535,7 @@ export function RoastScheduleMemoDialog({
             {isRoast && (
               <div className="space-y-3 border-t border-gray-200 pt-3">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-base md:text-sm font-medium text-gray-700">
                     何回目 <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -531,19 +544,19 @@ export function RoastScheduleMemoDialog({
                     onChange={(e) => setRoastCount(e.target.value)}
                     required={isRoast}
                     min="1"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                     placeholder="回数を入力"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-base md:text-sm font-medium text-gray-700">
                     袋数
                   </label>
                   <select
                     value={bagCount}
                     onChange={(e) => setBagCount(e.target.value ? (parseInt(e.target.value, 10) as 1 | 2) : '')}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-base md:text-sm text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>
                     <option value="1">1袋</option>
@@ -557,11 +570,11 @@ export function RoastScheduleMemoDialog({
             {(isRoasterOn || isRoast || isAfterPurge || isChaffCleaning) && (
               <div className={`rounded-md border-2 p-3 ${getPreviewColor()} flex justify-center`}>
                 <div className="flex items-center gap-2">
-                  {isRoasterOn && <HiFire className="text-lg text-orange-500" />}
-                  {isRoast && <PiCoffeeBeanFill className="text-lg text-amber-700" />}
-                  {isAfterPurge && <FaSnowflake className="text-lg text-blue-500" />}
-                  {isChaffCleaning && <FaBroom className="text-lg text-gray-700" />}
-                  <div className="text-sm font-medium whitespace-pre-line">
+                  {isRoasterOn && <HiFire className="text-xl md:text-lg text-orange-500" />}
+                  {isRoast && <PiCoffeeBeanFill className="text-xl md:text-lg text-amber-700" />}
+                  {isAfterPurge && <FaSnowflake className="text-xl md:text-lg text-blue-500" />}
+                  {isChaffCleaning && <FaBroom className="text-xl md:text-lg text-gray-700" />}
+                  <div className="text-base md:text-sm font-medium whitespace-pre-line">
                     {getPreviewText()}
                   </div>
                 </div>
@@ -574,14 +587,14 @@ export function RoastScheduleMemoDialog({
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors min-h-[44px]"
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors min-h-[44px] text-base md:text-sm"
                 >
                   削除
                 </button>
               )}
               <button
                 type="submit"
-                className="px-6 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px]"
+                className="px-6 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px] text-base md:text-sm"
               >
                 保存
               </button>

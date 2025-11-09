@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 type TabType = 'login' | 'signup';
 
-export default function LoginPage() {
+function LoginForm() {
   const [activeTab, setActiveTab] = useState<TabType>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -292,6 +292,23 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB] px-4">
+        <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+          <h1 className="mb-8 text-center text-2xl font-bold text-gray-800">
+            ローストプラス
+          </h1>
+          <p className="text-center text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
 

@@ -312,7 +312,7 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
         </h2>
         <button
           onClick={handleAdd}
-          className="flex items-center gap-1 md:gap-2 rounded-md bg-amber-600 px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white transition-colors hover:bg-amber-700"
+          className="flex items-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white transition-colors hover:bg-amber-700"
           aria-label="スケジュールを追加"
         >
           <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -323,16 +323,16 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       {sortedSchedules.length === 0 ? (
         <div className="flex-1 flex items-center justify-center text-center text-gray-500">
           <div>
-            <div className="mb-3 md:mb-4 flex justify-center">
-              <HiCalendar className="h-12 w-12 md:h-16 md:w-16 text-gray-300" />
+            <div className="mb-3 md:mb-5 flex justify-center">
+              <HiCalendar className="h-12 w-12 md:h-20 md:w-20 text-gray-300" />
             </div>
-            <p className="text-sm md:text-base font-medium">スケジュールがありません</p>
-            <p className="mt-1.5 md:mt-2 text-xs md:text-sm text-gray-400">ボタンから新しいスケジュールを作成してください</p>
+            <p className="text-sm md:text-lg font-medium">スケジュールがありません</p>
+            <p className="mt-1.5 md:mt-3 text-xs md:text-base text-gray-400">ボタンから新しいスケジュールを作成してください</p>
           </div>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
-          <div className="space-y-2 md:space-y-2">
+          <div className="space-y-2 md:space-y-1">
             {sortedSchedules.map((schedule) => (
               <ScheduleCard
                 key={schedule.id}
@@ -354,10 +354,10 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
             <div className="mt-4 flex lg:hidden items-center justify-center pb-2">
               <button
                 onClick={handleAdd}
-                className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
+                className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-3 md:px-4 py-2 md:py-2 text-sm md:text-base font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
                 aria-label="スケジュールを追加"
               >
-                <HiPlus className="h-4 w-4" />
+                <HiPlus className="h-4 w-4 md:h-4 md:w-4" />
                 <span className="hidden sm:inline">追加</span>
               </button>
             </div>
@@ -370,10 +370,10 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
         <div className="mt-4 flex lg:hidden items-center justify-center">
           <button
             onClick={handleAdd}
-            className="flex items-center justify-center gap-1 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
+            className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-3 md:px-4 py-2 md:py-2 text-sm md:text-base font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
             aria-label="スケジュールを追加"
           >
-            <HiPlus className="h-4 w-4" />
+            <HiPlus className="h-4 w-4 md:h-4 md:w-4" />
             <span className="hidden sm:inline">追加</span>
           </button>
         </div>
@@ -429,10 +429,10 @@ function ScheduleCard({
 
   // アイコンの取得
   const getIcon = () => {
-    if (isRoasterOn) return <HiFire className="text-xl md:text-lg text-orange-500 flex-shrink-0" />;
-    if (isRoast) return <PiCoffeeBeanFill className="text-xl md:text-lg text-amber-700 flex-shrink-0" />;
-    if (isAfterPurge) return <FaSnowflake className="text-xl md:text-lg text-blue-500 flex-shrink-0" />;
-    if (isChaffCleaning) return <FaBroom className="text-xl md:text-lg text-gray-600 flex-shrink-0" />;
+    if (isRoasterOn) return <HiFire className="text-xl md:text-xl text-orange-500 flex-shrink-0" />;
+    if (isRoast) return <PiCoffeeBeanFill className="text-xl md:text-xl text-amber-700 flex-shrink-0" />;
+    if (isAfterPurge) return <FaSnowflake className="text-xl md:text-xl text-blue-500 flex-shrink-0" />;
+    if (isChaffCleaning) return <FaBroom className="text-xl md:text-xl text-gray-600 flex-shrink-0" />;
     return null;
   };
 
@@ -537,18 +537,18 @@ function ScheduleCard({
         isDragging ? 'opacity-50' : ''
       } ${isDragOver ? 'border-amber-500 border-2 bg-amber-50' : ''}`}
     >
-      <div className="flex items-center gap-2 md:gap-2">
+      <div className="flex items-center gap-2 md:gap-2.5">
         {/* 左側：時間バッジまたはアイコン */}
         {isAfterPurge ? (
-          <div className="flex items-center gap-1.5 md:gap-1 flex-shrink-0">
-            <div className="text-base md:text-sm font-medium text-gray-600 select-none min-w-[48px] md:min-w-[45px]">
+          <div className="flex items-center gap-1.5 md:gap-1.5 flex-shrink-0">
+            <div className="text-base md:text-base font-medium text-gray-600 select-none min-w-[48px] md:min-w-[48px]">
               {/* スペーサーとして空のdivを使用 */}
             </div>
             {getIcon()}
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 md:gap-1 flex-shrink-0">
-            <div className="text-base md:text-sm font-medium text-gray-700 select-none min-w-[48px] md:min-w-[45px] tabular-nums">
+          <div className="flex items-center gap-1.5 md:gap-1.5 flex-shrink-0">
+            <div className="text-base md:text-base font-medium text-gray-700 select-none min-w-[48px] md:min-w-[48px] tabular-nums">
               {schedule.time || ''}
             </div>
             {getIcon()}
@@ -556,17 +556,17 @@ function ScheduleCard({
         )}
 
         {/* 中央：メモ内容 */}
-        <div className="flex-1 min-w-0 flex flex-col gap-1 md:gap-1">
-          <div className="text-base md:text-sm font-medium text-gray-800 flex items-center gap-1.5 md:gap-1.5 flex-wrap">
+        <div className="flex-1 min-w-0 flex flex-col gap-1 md:gap-0.5">
+          <div className="text-base md:text-base font-medium text-gray-800 flex items-center gap-1.5 md:gap-1.5 flex-wrap">
             <span className="whitespace-nowrap">{memoContent.firstLine}</span>
             {memoContent.beanName && (
-              <span className="inline-flex items-center rounded px-2 md:px-2 py-1 md:py-0.5 text-base md:text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
+              <span className="inline-flex items-center rounded px-2 md:px-3 py-1 md:py-1.5 text-base md:text-sm font-medium bg-gray-50 text-gray-700 border border-gray-200 whitespace-nowrap">
                 {memoContent.beanName2 && memoContent.blendRatio ? (
                   <>
                     <span className="whitespace-nowrap">{memoContent.beanName}</span>
                     {' '}
                     <CountryFlagEmoji countryName={memoContent.beanName} />
-                    <span className="mx-1 md:mx-1 text-gray-400">×</span>
+                    <span className="mx-1 md:mx-1.5 text-gray-400">×</span>
                     <span className="whitespace-nowrap">{memoContent.beanName2}</span>
                     {' '}
                     <CountryFlagEmoji countryName={memoContent.beanName2} />
@@ -582,7 +582,7 @@ function ScheduleCard({
             )}
           </div>
           {(memoContent.mode || memoContent.weight || memoContent.roastLevel) && (
-            <div className="text-sm md:text-xs flex items-center gap-1 flex-wrap">
+            <div className="text-sm md:text-xs flex items-center gap-1 md:gap-1 flex-wrap">
               {memoContent.mode && (
                 <span className={`inline-block rounded px-2 md:px-2 py-1 md:py-0.5 text-sm md:text-xs font-medium ${getModeColor(memoContent.mode)} whitespace-nowrap`}>
                   {memoContent.mode}

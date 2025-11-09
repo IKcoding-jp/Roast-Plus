@@ -78,24 +78,24 @@ export default function SchedulePage() {
             href="/"
             className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors min-w-[44px] min-h-[44px] flex-shrink-0"
           >
-            <HiArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span className="text-sm sm:text-base">ホームに戻る</span>
+            <HiArrowLeft className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+            <span className="text-sm sm:text-base md:text-lg">ホームに戻る</span>
           </Link>
           <div className="flex-1 flex justify-end sm:justify-center items-center">
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-4 py-2 sm:px-5 sm:py-2.5 bg-white border border-gray-200 rounded-xl shadow-md">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-4 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 bg-white border border-gray-200 rounded-xl shadow-md">
               {/* 日付 */}
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <HiCalendar className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 flex-shrink-0 self-center" />
-                <span className="text-sm sm:text-base text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+              <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
+                <HiCalendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
+                <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
                   {formatDate(currentTime)}
                 </span>
               </div>
               {/* 区切り線（デスクトップのみ） */}
-              <div className="hidden sm:block w-px h-6 bg-gray-200 mx-1"></div>
+              <div className="hidden sm:block w-px h-6 md:h-7 bg-gray-200 mx-1"></div>
               {/* 時刻 */}
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <HiClock className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 flex-shrink-0 self-center" />
-                <span className="text-sm sm:text-base text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+              <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
+                <HiClock className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
+                <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
                   {formatTime(currentTime)}
                 </span>
               </div>
@@ -109,7 +109,7 @@ export default function SchedulePage() {
           <nav className="flex gap-2 bg-white rounded-lg shadow p-1 sm:p-2">
             <button
               onClick={() => setActiveTab('today')}
-              className={`flex-1 px-4 py-2 sm:px-6 sm:py-3 rounded transition-colors text-sm sm:text-base min-h-[44px] ${
+              className={`flex-1 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded transition-colors text-sm sm:text-base md:text-lg min-h-[44px] ${
                 activeTab === 'today'
                   ? 'bg-amber-600 text-white'
                   : 'text-gray-700 hover:bg-gray-100'
@@ -119,7 +119,7 @@ export default function SchedulePage() {
             </button>
             <button
               onClick={() => setActiveTab('roast')}
-              className={`flex-1 px-4 py-2 sm:px-6 sm:py-3 rounded transition-colors text-sm sm:text-base min-h-[44px] ${
+              className={`flex-1 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded transition-colors text-sm sm:text-base md:text-lg min-h-[44px] ${
                 activeTab === 'roast'
                   ? 'bg-amber-600 text-white'
                   : 'text-gray-700 hover:bg-gray-100'

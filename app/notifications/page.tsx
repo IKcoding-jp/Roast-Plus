@@ -68,8 +68,31 @@ export default function NotificationsPage() {
         return 'アップデート';
       case 'announcement':
         return 'お知らせ';
+      case 'improvement':
+        return '改善';
+      case 'request':
+        return 'お願い';
+      case 'bugfix':
+        return 'バグ修正';
       default:
         return '通知';
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'update':
+        return 'bg-orange-100 text-orange-800';
+      case 'announcement':
+        return 'bg-orange-100 text-orange-800';
+      case 'improvement':
+        return 'bg-blue-100 text-blue-800';
+      case 'request':
+        return 'bg-green-100 text-green-800';
+      case 'bugfix':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -140,7 +163,14 @@ export default function NotificationsPage() {
           ) : (
             <div className="space-y-4">
               {notifications
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .sort((a, b) => {
+                  const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
+                  if (dateDiff !== 0) {
+                    return dateDiff;
+                  }
+                  // 日付が同じ場合はIDで降順にソート（新しい順）
+                  return b.id.localeCompare(a.id);
+                })
                 .map((notification) => (
                   <div
                     key={notification.id}
@@ -148,7 +178,7 @@ export default function NotificationsPage() {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded">
+                        <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(notification.type)}`}>
                           {getTypeLabel(notification.type)}
                         </span>
                         <span className="text-sm text-gray-500">
@@ -400,6 +430,9 @@ function NotificationModal({ notification, onSave, onCancel }: NotificationModal
                 >
                   <option value="announcement">お知らせ</option>
                   <option value="update">アップデート</option>
+                  <option value="improvement">改善</option>
+                  <option value="request">お願い</option>
+                  <option value="bugfix">バグ修正</option>
                 </select>
               </div>
             </div>

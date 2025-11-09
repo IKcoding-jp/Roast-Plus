@@ -123,7 +123,7 @@ export interface AppData {
 }
 
 // 通知
-export type NotificationType = 'update' | 'announcement';
+export type NotificationType = 'update' | 'announcement' | 'improvement' | 'request' | 'bugfix';
 
 export interface Notification {
   id: string;

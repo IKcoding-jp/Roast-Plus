@@ -7,11 +7,15 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  preload: true,
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
+  display: "swap",
 });
 
 export const metadata: Metadata = {

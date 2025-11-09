@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { TastingRecord, AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import {
@@ -82,6 +82,10 @@ export function TastingRecordForm({
     record?.overallImpression || ''
   );
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
+  // 既存記録のIDを保持（上書き時に使用）
+  const [existingRecordId, setExistingRecordId] = useState<string | null>(null);
+  // 前回のメンバーIDを保持（無限ループ防止）
+  const prevMemberIdRef = useRef<string>('');
 
   // メンバーIDは常に空の状態から開始（新規作成時）またはrecordから取得（編集時）
   const [memberId, setMemberId] = useState(record?.memberId || '');
@@ -106,18 +110,48 @@ export function TastingRecordForm({
   // 重複チェック（セッション内で同じメンバーの記録があるか）
   useEffect(() => {
     // 編集時は重複チェックしない
-    if (record !== null || !currentSessionId) return;
-
-    const duplicate = sessionRecords.find((r) => r.memberId === memberId);
-
-      if (duplicate) {
-        setDuplicateWarning(
-        `このセッションには既にあなたの記録が存在します（${duplicate.tastingDate}）。上書きしますか？`
-        );
-    } else {
-      setDuplicateWarning(null);
+    if (record !== null || !currentSessionId || !memberId) {
+      if (prevMemberIdRef.current !== memberId) {
+        setExistingRecordId(null);
+        prevMemberIdRef.current = memberId;
+      }
+      return;
     }
-  }, [memberId, sessionRecords, isNew, record, currentSessionId]);
+
+    // メンバーIDが変更されていない場合はスキップ（無限ループ防止）
+    if (prevMemberIdRef.current === memberId) {
+      return;
+    }
+
+    prevMemberIdRef.current = memberId;
+
+    const existingRecord = sessionRecords.find((r) => r.memberId === memberId);
+
+    if (existingRecord) {
+      // 既存記録のIDを保持
+      setExistingRecordId(existingRecord.id);
+      // 既存記録のデータをフォームに反映
+      setBitterness(existingRecord.bitterness);
+      setAcidity(existingRecord.acidity);
+      setBody(existingRecord.body);
+      setSweetness(existingRecord.sweetness);
+      setAroma(existingRecord.aroma);
+      setOverallRating(existingRecord.overallRating);
+      setOverallImpression(existingRecord.overallImpression || '');
+    } else {
+      setExistingRecordId(null);
+      // 既存記録がない場合、デフォルト値にリセット
+      if (!record) {
+        setBitterness(3.0);
+        setAcidity(3.0);
+        setBody(3.0);
+        setSweetness(3.0);
+        setAroma(3.0);
+        setOverallRating(3.0);
+        setOverallImpression('');
+      }
+    }
+  }, [memberId, currentSessionId, record]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +185,7 @@ export function TastingRecordForm({
 
     const now = new Date().toISOString();
     const newRecord: TastingRecord = {
-      id: record?.id || `tasting_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: record?.id || existingRecordId || `tasting_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       sessionId: currentSessionId,
       beanName: finalBeanName,
       tastingDate: finalTastingDate,
@@ -163,19 +197,11 @@ export function TastingRecordForm({
       aroma,
       overallRating,
       overallImpression: overallImpression.trim() || undefined,
-      createdAt: record?.createdAt || now,
+      createdAt: record?.createdAt || (existingRecordId ? (sessionRecords.find((r) => r.id === existingRecordId)?.createdAt || now) : now),
       updatedAt: now,
       userId: record?.userId || '', // これは親コンポーネントで設定される
       memberId,
     };
-
-    // 重複がある場合は確認
-    if (duplicateWarning) {
-      const confirmOverwrite = window.confirm(duplicateWarning);
-      if (!confirmOverwrite) {
-        return;
-      }
-    }
 
     onSave(newRecord);
   };
@@ -391,7 +417,7 @@ export function TastingRecordForm({
             type="submit"
             className="flex-1 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
           >
-            {isNew ? '作成' : '上書き'}
+            {existingRecordId || record ? '上書き' : '作成'}
           </button>
         </div>
       )}

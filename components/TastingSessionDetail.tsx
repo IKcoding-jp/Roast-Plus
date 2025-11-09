@@ -41,9 +41,12 @@ export function TastingSessionDetail({
         sessionId: session.id,
       };
 
-      // 既存の記録を上書きする場合
-      const existingRecord = tastingRecords.find((r) => r.id === record.id);
-      if (existingRecord) {
+      // 既存の記録を上書きする場合（record.idが存在する、または同じセッション内で同じメンバーの記録がある場合）
+      const existingRecordById = tastingRecords.find((r) => r.id === record.id);
+      const existingRecordByMember = sessionRecords.find((r) => r.memberId === record.memberId && r.id !== record.id);
+      
+      if (existingRecordById) {
+        // IDで既存記録が見つかった場合（編集モード）
         const updatedRecords = tastingRecords.map((r) =>
           r.id === record.id ? newRecord : r
         );
@@ -53,6 +56,17 @@ export function TastingSessionDetail({
         });
         // 編集モードを解除
         setEditingRecordId(null);
+      } else if (existingRecordByMember) {
+        // 同じメンバーの記録が既にある場合（上書き）
+        const updatedRecords = tastingRecords.map((r) =>
+          r.id === existingRecordByMember.id ? newRecord : r
+        );
+        await onUpdate({
+          ...data,
+          tastingRecords: updatedRecords,
+        });
+        // 編集モードに切り替える
+        setEditingRecordId(existingRecordByMember.id);
       } else {
         // 新規追加の場合
         const updatedRecords = [...tastingRecords, newRecord];
@@ -60,8 +74,8 @@ export function TastingSessionDetail({
           ...data,
           tastingRecords: updatedRecords,
         });
-        // 編集モードを解除
-        setEditingRecordId(null);
+        // 編集モードに切り替える（新規作成した記録を編集モードにする）
+        setEditingRecordId(newRecord.id);
       }
       
       // 保存が完了してから試飲記録一覧ページに遷移

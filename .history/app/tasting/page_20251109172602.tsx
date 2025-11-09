@@ -112,6 +112,7 @@ function TastingPageContent() {
           tastingSessions: updatedSessions,
           tastingRecords: updatedRecords,
         });
+        showToast('セッションを削除しました', 'success');
         router.push('/tasting');
       } catch (error) {
         console.error('Failed to delete session:', error);

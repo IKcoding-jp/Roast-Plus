@@ -4,8 +4,10 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { IoCreateOutline } from 'react-icons/io5';
+import { FaCoffee } from 'react-icons/fa';
 import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
+import { TastingSessionCarousel } from './TastingSessionCarousel';
 import {
   calculateAverageScores,
   getActiveMemberCount,
@@ -26,8 +28,6 @@ const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎�
   '深煎り',
 ];
 
-const ITEMS_PER_PAGE = 12;
-
 export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) {
   const router = useRouter();
 
@@ -47,7 +47,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
   const [selectedRoastLevels, setSelectedRoastLevels] = useState<
     Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>
   >([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
   // フィルタリングとソート
@@ -110,35 +109,21 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
     selectedRoastLevels,
   ]);
 
-  // ページネーション
-  const totalPages = Math.ceil(filteredAndSortedSessions.length / ITEMS_PER_PAGE);
-  const paginatedSessions = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredAndSortedSessions.slice(
-      startIndex,
-      startIndex + ITEMS_PER_PAGE
-    );
-  }, [filteredAndSortedSessions, currentPage]);
-
-  // 検索・フィルタ変更時にページを1にリセット
+  // 検索・フィルタ変更時のハンドラー
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    setCurrentPage(1);
   };
 
   const handleSortChange = (value: SortOption) => {
     setSortOption(value);
-    setCurrentPage(1);
   };
 
   const handleDateFromChange = (value: string) => {
     setDateFrom(value);
-    setCurrentPage(1);
   };
 
   const handleDateToChange = (value: string) => {
     setDateTo(value);
-    setCurrentPage(1);
   };
 
   const handleRoastLevelToggle = (
@@ -149,7 +134,6 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
         ? prev.filter((l) => l !== level)
         : [...prev, level]
     );
-    setCurrentPage(1);
   };
 
   const formatDate = (dateStr: string) => {
@@ -312,203 +296,13 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
             {filteredAndSortedSessions.length}件のセッションが見つかりました
           </div>
 
-          {/* グリッドレイアウト */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {paginatedSessions.map((session) => {
-              const sessionRecords = getRecordsBySessionId(
-                tastingRecords,
-                session.id
-              );
-              const recordCount = sessionRecords.length;
-              const averageScores = calculateAverageScores(sessionRecords);
-
-              return (
-                <div
-                  key={session.id}
-                  className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow flex flex-col"
-                >
-                  {/* セッション情報 */}
-                  <Link
-                    href={`/tasting?sessionId=${session.id}`}
-                    className="flex flex-col no-underline cursor-pointer"
-                  >
-                    <div className="mb-2">
-                      <div className="flex flex-row justify-between items-center">
-                        {/* 左下: 豆の名前、焙煎度合い、記録数、作成日 */}
-                        <div className="flex-1 min-w-0">
-                        {/* 豆の名前、焙煎度合い */}
-                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                          <h3 className="text-base font-semibold text-gray-800">
-                            {session.beanName}
-                          </h3>
-                          <span 
-                            className="px-2 py-0.5 text-white text-xs rounded-full flex-shrink-0"
-                            style={
-                              session.roastLevel === '深煎り' 
-                                ? { backgroundColor: '#120C0A' }
-                                : session.roastLevel === '中深煎り'
-                                ? { backgroundColor: '#4E3526' }
-                                : session.roastLevel === '中煎り'
-                                ? { backgroundColor: '#745138' }
-                                : session.roastLevel === '浅煎り'
-                                ? { backgroundColor: '#C78F5D' }
-                                : { backgroundColor: '#6B7280' }
-                            }
-                          >
-                            {session.roastLevel}
-                          </span>
-                          {/* 編集アイコン */}
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              router.push(`/tasting?sessionId=${session.id}&edit=true`);
-                            }}
-                            className="p-1 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors flex-shrink-0"
-                            aria-label="セッションを編集"
-                          >
-                            <IoCreateOutline className="h-4 w-4" />
-                          </button>
-                        </div>
-
-                        {/* 作成日 */}
-                        <div>
-                          <span className="text-xs text-gray-600">
-                            {formatDate(session.createdAt)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* 右下: 総合点表示 */}
-                      {recordCount > 0 && (
-                        <div className="flex-shrink-0 ml-2">
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-gray-700 mb-1">
-                              総合点
-                            </p>
-                            {renderStars(averageScores.overallRating)}
-                          </div>
-                        </div>
-                      )}
-                      {recordCount === 0 && (
-                        <div className="flex-shrink-0 ml-2 text-right">
-                          <p className="text-xs text-gray-500">
-                            まだ記録がありません
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* レーダーチャート（記録がある場合のみ） */}
-                  {recordCount > 0 && (
-                    <div className="flex justify-center mb-2 w-full">
-                      <div className="w-full">
-                        <TastingRadarChart
-                          record={{
-                            bitterness: averageScores.bitterness,
-                            acidity: averageScores.acidity,
-                            body: averageScores.body,
-                            sweetness: averageScores.sweetness,
-                            aroma: averageScores.aroma,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* みんなの感想 */}
-                  {(() => {
-                    // overallImpressionが存在する記録をフィルタリング
-                    const comments = sessionRecords
-                      .filter((record) => record.overallImpression && record.overallImpression.trim() !== '')
-                      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                      .map((record) => record.overallImpression!);
-
-                    if (comments.length === 0) return null;
-
-                    return (
-                      <div className="mb-2 bg-amber-50 rounded-lg p-3 border border-amber-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h4 className="text-sm font-semibold text-gray-800">みんなの感想</h4>
-                          <span className="px-2 py-0.5 bg-amber-600 text-white text-sm font-semibold rounded-full flex-shrink-0">
-                            {recordCount}/{activeMemberCount}
-                          </span>
-                        </div>
-                        <ul className="space-y-1.5">
-                          {comments.map((comment, index) => (
-                            <li key={index} className="text-sm text-gray-700 whitespace-pre-wrap">
-                              ・{comment}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    );
-                  })()}
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* ページネーション */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-6">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
-              >
-                前へ
-              </button>
-              <div className="flex gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => {
-                    // ページ番号の表示ロジック（最大7個まで表示）
-                    if (
-                      totalPages <= 7 ||
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 1 && page <= currentPage + 1)
-                    ) {
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`px-3 py-2 rounded-lg transition-colors ${
-                            currentPage === page
-                              ? 'bg-amber-600 text-white'
-                              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    } else if (
-                      page === currentPage - 2 ||
-                      page === currentPage + 2
-                    ) {
-                      return (
-                        <span key={page} className="px-2 text-gray-500">
-                          ...
-                        </span>
-                      );
-                    }
-                    return null;
-                  }
-                )}
-              </div>
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                }
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
-              >
-                次へ
-              </button>
-            </div>
-          )}
+          {/* カルーセルレイアウト */}
+          <TastingSessionCarousel
+            sessions={filteredAndSortedSessions}
+            tastingRecords={tastingRecords}
+            activeMemberCount={activeMemberCount}
+            router={router}
+          />
         </>
       )}
     </div>

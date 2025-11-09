@@ -37,10 +37,8 @@ export function TastingSessionForm({
 
   const handleDelete = () => {
     if (!session || !onDelete) return;
-    const confirmDelete = window.confirm('このセッションを削除しますか？この操作は取り消せません。');
-    if (confirmDelete) {
+    // 確認ダイアログは親コンポーネントで表示されるため、ここでは削除処理を委譲
       onDelete(session.id);
-    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -70,7 +68,7 @@ export function TastingSessionForm({
       {/* 豆の名前（必須） */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          豆の名前 <span className="text-red-500">*</span>
+          試飲するコーヒーの名前 <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -78,7 +76,7 @@ export function TastingSessionForm({
           onChange={(e) => setBeanName(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           required
-          placeholder="例: コロンビア　ブラジル"
+          placeholder="例: コロンビア"
         />
       </div>
 
@@ -108,7 +106,7 @@ export function TastingSessionForm({
       {/* 作成日 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          作成日 <span className="text-red-500">*</span>
+          試飲日 <span className="text-red-500">*</span>
         </label>
         <input
           type="date"

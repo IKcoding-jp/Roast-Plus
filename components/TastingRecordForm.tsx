@@ -210,14 +210,21 @@ export function TastingRecordForm({
     label,
     value,
     onChange,
+    description,
   }: {
     label: string;
     value: number;
     onChange: (value: number) => void;
+    description?: string;
   }) => (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">{label}</label>
+          {description && (
+            <span className="text-xs text-gray-500">{description}</span>
+          )}
+        </div>
         <span className="text-sm font-semibold text-amber-600">{value.toFixed(1)}</span>
       </div>
       <input
@@ -329,12 +336,42 @@ export function TastingRecordForm({
       {/* 評価項目 */}
       <div className="bg-white rounded-lg p-6 border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">評価項目</h3>
-        <SliderInput label="苦味" value={bitterness} onChange={setBitterness} />
-        <SliderInput label="酸味" value={acidity} onChange={setAcidity} />
-        <SliderInput label="ボディ" value={body} onChange={setBody} />
-        <SliderInput label="甘み" value={sweetness} onChange={setSweetness} />
-        <SliderInput label="香り" value={aroma} onChange={setAroma} />
-        <SliderInput label="総合" value={overallRating} onChange={setOverallRating} />
+        <SliderInput 
+          label="苦味" 
+          value={bitterness} 
+          onChange={setBitterness}
+          description="コーヒーの苦みの強さ"
+        />
+        <SliderInput 
+          label="酸味" 
+          value={acidity} 
+          onChange={setAcidity}
+          description="コーヒーの酸っぱさや爽やかさ"
+        />
+        <SliderInput 
+          label="ボディ" 
+          value={body} 
+          onChange={setBody}
+          description="コーヒーの口当たりや重厚感"
+        />
+        <SliderInput 
+          label="甘み" 
+          value={sweetness} 
+          onChange={setSweetness}
+          description="コーヒーに感じられる甘さ"
+        />
+        <SliderInput 
+          label="香り" 
+          value={aroma} 
+          onChange={setAroma}
+          description="コーヒーの香りの強さや豊かさ"
+        />
+        <SliderInput 
+          label="総合" 
+          value={overallRating} 
+          onChange={setOverallRating}
+          description="コーヒーの全体的な評価"
+        />
       </div>
 
       {/* レーダーチャートプレビュー */}

@@ -175,9 +175,9 @@ export function TastingSessionCarousel({
                           </p>
                         </div>
                       )}
-                      {/* 星評価 - 右下に配置 */}
+                      {/* 星評価 - 中央よりに配置 */}
                       {recordCount > 0 && (
-                        <div className="absolute bottom-0 right-0">
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
                           {renderStars(averageScores.overallRating)}
                         </div>
                       )}

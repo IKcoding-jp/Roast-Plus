@@ -10,7 +10,11 @@ interface TastingRadarChartProps {
 
 export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
   const [chartSize, setChartSize] = useState(size || 200);
+  const [isVisible, setIsVisible] = useState(false);
+  const [pathLength, setPathLength] = useState(0);
 
   useEffect(() => {
     if (size) {
@@ -44,6 +48,44 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
       resizeObserver.disconnect();
     };
   }, [size]);
+
+  // Intersection Observerで表示領域に入ったことを検知
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isVisible) {
+            setIsVisible(true);
+          }
+        });
+      },
+      {
+        threshold: 0.1, // 10%以上表示されたら検知
+        rootMargin: '0px',
+      }
+    );
+
+    observer.observe(containerRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isVisible]);
+
+  // パスの長さを計算（recordやchartSizeが変更されたときに再計算）
+  useEffect(() => {
+    if (pathRef.current) {
+      // DOMの更新後にパスの長さを計算
+      requestAnimationFrame(() => {
+        if (pathRef.current) {
+          const length = pathRef.current.getTotalLength();
+          setPathLength(length);
+        }
+      });
+    }
+  }, [record.bitterness, record.acidity, record.body, record.sweetness, record.aroma, chartSize]);
 
   const centerX = chartSize / 2;
   const centerY = chartSize / 2;
@@ -84,8 +126,20 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
   }).join(' ') + ' Z';
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center justify-center w-full h-full">
-      <svg width={chartSize} height={chartSize} className="overflow-visible">
+    <div 
+      ref={containerRef} 
+      className="flex flex-col items-center justify-center w-full h-full"
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transition: 'opacity 0.2s ease-in',
+      }}
+    >
+      <svg 
+        ref={svgRef}
+        width={chartSize} 
+        height={chartSize} 
+        className="overflow-visible"
+      >
         {/* グリッド線（同心円） */}
         {[0.25, 0.5, 0.75, 1.0].map((scale) => (
           <circle
@@ -118,11 +172,19 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
 
         {/* データエリア */}
         <path
+          ref={pathRef}
           d={pathData}
           fill="#D97706"
-          fillOpacity="0.3"
+          fillOpacity={isVisible ? 0.3 : 0}
           stroke="#D97706"
           strokeWidth="2"
+          strokeDasharray={pathLength > 0 ? pathLength : 0}
+          strokeDashoffset={isVisible ? 0 : pathLength}
+          style={{
+            transition: isVisible 
+              ? 'stroke-dashoffset 1s ease-out, fill-opacity 0.3s ease-out 0.7s' 
+              : 'none',
+          }}
         />
 
         {/* データポイント */}
@@ -131,8 +193,15 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
             key={index}
             cx={point.x}
             cy={point.y}
-            r="4"
+            r={isVisible ? 4 : 0}
             fill="#D97706"
+            opacity={isVisible ? 1 : 0}
+            style={{
+              transition: isVisible
+                ? `r 0.3s ease-out ${0.7 + index * 0.1}s, opacity 0.3s ease-out ${0.7 + index * 0.1}s`
+                : 'none',
+              transformOrigin: `${point.x}px ${point.y}px`,
+            }}
           />
         ))}
 

@@ -17,12 +17,23 @@ export default function SettingsPage() {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [selectedMember, setSelectedMember] = useState<string>('');
+  const [showSaveMessage, setShowSaveMessage] = useState(false);
 
   // ローカルストレージから選択されたメンバーIDを読み込み
   useEffect(() => {
     const memberId = getSelectedMemberId();
     setSelectedMember(memberId || '');
   }, []);
+
+  // 保存メッセージを3秒後に非表示にする
+  useEffect(() => {
+    if (showSaveMessage) {
+      const timer = setTimeout(() => {
+        setShowSaveMessage(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSaveMessage]);
 
   if (authLoading || devModeLoading || dataLoading) {
     return (
@@ -42,8 +53,10 @@ export default function SettingsPage() {
     setSelectedMember(memberId);
     if (memberId) {
       setSelectedMemberId(memberId);
+      setShowSaveMessage(true);
     } else {
       setSelectedMemberId(null);
+      setShowSaveMessage(false);
     }
   };
 
@@ -121,7 +134,7 @@ export default function SettingsPage() {
                   </option>
                 ))}
             </select>
-            {selectedMember && (
+            {showSaveMessage && (
               <p className="mt-2 text-sm text-green-600">
                 設定が保存されました。次回の試飲記録作成時に自動で選択されます。
               </p>

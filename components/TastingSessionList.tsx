@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { IoCreateOutline } from 'react-icons/io5';
 import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import {
@@ -322,16 +323,19 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
               const averageScores = calculateAverageScores(sessionRecords);
 
               return (
-                <Link
+                <div
                   key={session.id}
-                  href={`/tasting/sessions/${session.id}`}
-                  className="bg-white rounded-lg shadow-md p-3 cursor-pointer hover:shadow-lg transition-shadow flex flex-col no-underline"
+                  className="bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow flex flex-col"
                 >
                   {/* セッション情報 */}
-                  <div className="mb-2">
-                    <div className="flex flex-row justify-between items-center">
-                      {/* 左下: 豆の名前、焙煎度合い、記録数、作成日 */}
-                      <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/tasting/sessions/${session.id}`}
+                    className="flex flex-col no-underline cursor-pointer"
+                  >
+                    <div className="mb-2">
+                      <div className="flex flex-row justify-between items-center">
+                        {/* 左下: 豆の名前、焙煎度合い、記録数、作成日 */}
+                        <div className="flex-1 min-w-0">
                         {/* 豆の名前、焙煎度合い */}
                         <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                           <h3 className="text-base font-semibold text-gray-800">
@@ -353,6 +357,18 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                           >
                             {session.roastLevel}
                           </span>
+                          {/* 編集アイコン */}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              router.push(`/tasting/sessions/${session.id}/edit`);
+                            }}
+                            className="p-1 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors flex-shrink-0"
+                            aria-label="セッションを編集"
+                          >
+                            <IoCreateOutline className="h-4 w-4" />
+                          </button>
                         </div>
 
                         {/* 作成日 */}
@@ -429,8 +445,8 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
                       </div>
                     );
                   })()}
-
-                </Link>
+                  </Link>
+                </div>
               );
             })}
           </div>

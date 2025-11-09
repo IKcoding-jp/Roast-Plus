@@ -94,7 +94,7 @@ export async function saveUserData(userId: string, data: AppData): Promise<void>
     const userDocRef = getUserDocRef(userId);
     // undefinedのフィールドを削除してから保存
     const cleanedData = removeUndefinedFields(data);
-    await setDoc(userDocRef, cleanedData);
+    await setDoc(userDocRef, cleanedData, { merge: true });
   } catch (error) {
     console.error('Failed to save data to Firestore:', error);
     throw error;

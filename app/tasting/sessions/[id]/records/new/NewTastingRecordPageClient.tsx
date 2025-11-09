@@ -8,13 +8,26 @@ import type { TastingRecord } from '@/types';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
+import { useEffect, useState } from 'react';
 
 export default function NewTastingRecordPageClient() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
   const params = useParams();
-  const sessionId = params?.id as string;
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  // 静的エクスポート時のフォールバック: useParams()が動作しない場合、window.location.pathnameから取得
+  useEffect(() => {
+    if (params?.id) {
+      setSessionId(params.id as string);
+    } else if (typeof window !== 'undefined') {
+      const pathMatch = window.location.pathname.match(/\/tasting\/sessions\/([^\/]+)\/records\/new/);
+      if (pathMatch && pathMatch[1]) {
+        setSessionId(pathMatch[1]);
+      }
+    }
+  }, [params]);
 
   if (authLoading) {
     return (
@@ -35,6 +48,25 @@ export default function NewTastingRecordPageClient() {
       <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB]">
         <div className="text-center">
           <div className="text-lg text-gray-600">データを読み込み中...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // セッションIDが取得できない場合
+  if (!sessionId) {
+    return (
+      <div className="min-h-screen bg-[#F5F1EB] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+            <p className="text-gray-600 mb-4">セッションIDが取得できません</p>
+            <Link
+              href="/tasting"
+              className="text-[#8B4513] hover:underline"
+            >
+              一覧に戻る
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -67,21 +99,26 @@ export default function NewTastingRecordPageClient() {
     ? data.tastingRecords
     : [];
 
-  const handleSave = (record: TastingRecord) => {
-    const newRecord: TastingRecord = {
-      ...record,
-      userId: user.uid,
-      sessionId: sessionId, // セッションIDを確実に設定
-    };
+  const handleSave = async (record: TastingRecord) => {
+    try {
+      const newRecord: TastingRecord = {
+        ...record,
+        userId: user.uid,
+        sessionId: sessionId, // セッションIDを確実に設定
+      };
 
-    const updatedRecords = [...tastingRecords, newRecord];
-    updateData({
-      ...data,
-      tastingRecords: updatedRecords,
-    });
+      const updatedRecords = [...tastingRecords, newRecord];
+      await updateData({
+        ...data,
+        tastingRecords: updatedRecords,
+      });
 
-    // 試飲記録一覧ページに遷移
-    router.push('/tasting');
+      // 保存が完了してから試飲記録一覧ページに遷移
+      router.push('/tasting');
+    } catch (error) {
+      console.error('Failed to save tasting record:', error);
+      alert('記録の保存に失敗しました。もう一度お試しください。');
+    }
   };
 
   const handleCancel = () => {

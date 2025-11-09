@@ -98,6 +98,7 @@ self.addEventListener('fetch', (event) => {
       });
 
       event.respondWith(
+        // まず、HTMLファイルパスを試す
         fetch(htmlRequest)
           .then((response) => {
             // レスポンスが有効な場合、元のリクエストとHTMLファイルパスの両方をキャッシュに保存
@@ -107,8 +108,19 @@ self.addEventListener('fetch', (event) => {
                 cache.put(event.request, responseToCache.clone());
                 cache.put(htmlRequest, responseToCache);
               });
+              return response;
             }
-            return response;
+            // 404の場合は、元のリクエストを試す（Firebase Hostingのrewritesが適用される可能性がある）
+            return fetch(event.request).then((originalResponse) => {
+              if (originalResponse && originalResponse.status === 200) {
+                const responseToCache = originalResponse.clone();
+                caches.open(RUNTIME_CACHE).then((cache) => {
+                  cache.put(event.request, responseToCache);
+                  cache.put(htmlRequest, responseToCache.clone());
+                });
+              }
+              return originalResponse;
+            });
           })
           .catch(() => {
             // ネットワークエラー時はキャッシュから取得
@@ -121,7 +133,7 @@ self.addEventListener('fetch', (event) => {
                 if (originalCached) {
                   return originalCached;
                 }
-                // それでも見つからない場合は、index.htmlを返す
+                // それでも見つからない場合は、index.htmlを返す（SPAフォールバック）
                 return caches.match('/index.html') || caches.match('/');
               });
             });
@@ -159,11 +171,11 @@ self.addEventListener('fetch', (event) => {
                 if (htmlCachedResponse) {
                   return htmlCachedResponse;
                 }
-                // それでも見つからない場合は、index.htmlを返す
+                // それでも見つからない場合は、index.htmlを返す（SPAフォールバック）
                 return caches.match('/index.html') || caches.match('/');
               });
             }
-            // HTMLファイルパスが同じ場合は、index.htmlを返す
+            // HTMLファイルパスが同じ場合は、index.htmlを返す（SPAフォールバック）
             return caches.match('/index.html') || caches.match('/');
           }
           

@@ -9,7 +9,13 @@ export async function generateStaticParams() {
   // 静的エクスポートでは、少なくとも1つのパラメータを返す必要がある
   // ビルド時にはFirestoreからデータを取得できないため、ダミーパラメータを返す
   // 実際のルーティングはクライアント側で処理される
-  return [{ id: 'dummy' }];
+  // 複数のダミーパラメータを返すことで、静的エクスポート時にHTMLファイルが生成される
+  // 予約語（new, edit, sessions）は静的ルートとして存在するため、動的ルートから除外する
+  return [
+    { id: 'dummy' },
+    { id: 'dummy2' },
+    { id: 'dummy3' },
+  ];
 }
 
 export default function TastingDetailPage() {

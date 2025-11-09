@@ -114,6 +114,9 @@ export default function HomePage() {
             <h2 className="text-center text-lg font-semibold text-gray-800">
               試飲感想記録 β版
             </h2>
+            <p className="text-center text-sm text-gray-500 mt-2">
+              ※まだ使えません。
+            </p>
           </button>
 
           {/* 設定カード */}

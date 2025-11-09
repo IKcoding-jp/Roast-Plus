@@ -63,29 +63,34 @@ export default function EditTastingSessionPageClient() {
     );
   }
 
-  const handleSave = (updatedSession: TastingSession) => {
-    const sessionData: TastingSession = {
-      ...updatedSession,
-      userId: user.uid,
-    };
+  const handleSave = async (updatedSession: TastingSession) => {
+    try {
+      const sessionData: TastingSession = {
+        ...updatedSession,
+        userId: user.uid,
+      };
 
-    const updatedSessions = tastingSessions.map((s) =>
-      s.id === sessionId ? sessionData : s
-    );
-    updateData({
-      ...data,
-      tastingSessions: updatedSessions,
-    });
+      const updatedSessions = tastingSessions.map((s) =>
+        s.id === sessionId ? sessionData : s
+      );
+      await updateData({
+        ...data,
+        tastingSessions: updatedSessions,
+      });
 
-    // 試飲記録一覧ページに遷移
-    router.push('/tasting');
+      // 保存が完了してから試飲記録一覧ページに遷移
+      router.push('/tasting');
+    } catch (error) {
+      console.error('Failed to save tasting session:', error);
+      alert('セッションの保存に失敗しました。もう一度お試しください。');
+    }
   };
 
   const handleCancel = () => {
     router.push(`/tasting/sessions/${sessionId}`);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
     const recordCount = tastingRecords.filter((r) => r.sessionId === id).length;
     const confirmMessage = recordCount > 0
@@ -95,24 +100,29 @@ export default function EditTastingSessionPageClient() {
     const confirmDelete = window.confirm(confirmMessage);
     if (!confirmDelete) return;
 
-    // セッションに関連する記録も削除
-    const updatedRecords = tastingRecords.filter(
-      (r) => r.sessionId !== id
-    );
-    
-    // セッションを削除
-    const updatedSessions = tastingSessions.filter(
-      (s) => s.id !== id
-    );
+    try {
+      // セッションに関連する記録も削除
+      const updatedRecords = tastingRecords.filter(
+        (r) => r.sessionId !== id
+      );
+      
+      // セッションを削除
+      const updatedSessions = tastingSessions.filter(
+        (s) => s.id !== id
+      );
 
-    updateData({
-      ...data,
-      tastingSessions: updatedSessions,
-      tastingRecords: updatedRecords,
-    });
+      await updateData({
+        ...data,
+        tastingSessions: updatedSessions,
+        tastingRecords: updatedRecords,
+      });
 
-    // 試飲記録一覧ページに遷移
-    router.push('/tasting');
+      // 削除が完了してから試飲記録一覧ページに遷移
+      router.push('/tasting');
+    } catch (error) {
+      console.error('Failed to delete tasting session:', error);
+      alert('セッションの削除に失敗しました。もう一度お試しください。');
+    }
   };
 
   return (

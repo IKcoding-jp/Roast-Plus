@@ -40,19 +40,25 @@ export default function NewTastingPage() {
 
   const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
 
-  const handleSave = (record: TastingRecord) => {
-    const newRecord: TastingRecord = {
-      ...record,
-      userId: user.uid,
-    };
+  const handleSave = async (record: TastingRecord) => {
+    try {
+      const newRecord: TastingRecord = {
+        ...record,
+        userId: user.uid,
+      };
 
-    const updatedRecords = [...tastingRecords, newRecord];
-    updateData({
-      ...data,
-      tastingRecords: updatedRecords,
-    });
+      const updatedRecords = [...tastingRecords, newRecord];
+      await updateData({
+        ...data,
+        tastingRecords: updatedRecords,
+      });
 
-    router.push('/tasting');
+      // 保存が完了してから試飲記録一覧ページに遷移
+      router.push('/tasting');
+    } catch (error) {
+      console.error('Failed to save tasting record:', error);
+      alert('記録の保存に失敗しました。もう一度お試しください。');
+    }
   };
 
   const handleCancel = () => {

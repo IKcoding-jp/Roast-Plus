@@ -40,20 +40,26 @@ export default function NewTastingSessionPage() {
 
   const tastingSessions = Array.isArray(data.tastingSessions) ? data.tastingSessions : [];
 
-  const handleSave = (session: TastingSession) => {
-    const newSession: TastingSession = {
-      ...session,
-      userId: user.uid,
-    };
+  const handleSave = async (session: TastingSession) => {
+    try {
+      const newSession: TastingSession = {
+        ...session,
+        userId: user.uid,
+      };
 
-    const updatedSessions = [...tastingSessions, newSession];
-    updateData({
-      ...data,
-      tastingSessions: updatedSessions,
-    });
+      const updatedSessions = [...tastingSessions, newSession];
+      await updateData({
+        ...data,
+        tastingSessions: updatedSessions,
+      });
 
-    // セッション作成後、そのセッションの詳細ページに遷移
-    router.push(`/tasting/sessions/${newSession.id}`);
+      // 保存が完了してから試飲記録一覧ページに遷移
+      // 静的エクスポート時には動的ルートが存在しないため、一覧ページに遷移する
+      router.push('/tasting');
+    } catch (error) {
+      console.error('Failed to save tasting session:', error);
+      alert('セッションの保存に失敗しました。もう一度お試しください。');
+    }
   };
 
   const handleCancel = () => {

@@ -62,18 +62,29 @@ export default function SettingsPage() {
     setPasswordError(null);
   };
 
-  const handleMemberChange = async (memberId: string) => {
+  const handleMemberChange = async (value: string) => {
     try {
       let updatedSettings;
-      if (memberId) {
-        updatedSettings = {
-          ...data.userSettings,
-          selectedMemberId: memberId,
-        };
+      if (value) {
+        // 値が"manager-"で始まる場合は管理者ID、それ以外はメンバーID
+        if (value.startsWith('manager-')) {
+          const managerId = value.replace('manager-', '');
+          updatedSettings = {
+            ...data.userSettings,
+            selectedMemberId: undefined,
+            selectedManagerId: managerId,
+          };
+        } else {
+          updatedSettings = {
+            ...data.userSettings,
+            selectedMemberId: value,
+            selectedManagerId: undefined,
+          };
+        }
       } else {
-        // 空文字列の場合はuserSettingsをundefinedにする（selectedMemberIdフィールドを削除）
+        // 空文字列の場合はuserSettingsをundefinedにする（フィールドを削除）
         updatedSettings = data.userSettings
-          ? { ...data.userSettings, selectedMemberId: undefined }
+          ? { ...data.userSettings, selectedMemberId: undefined, selectedManagerId: undefined }
           : undefined;
       }
       await updateData({
@@ -85,7 +96,12 @@ export default function SettingsPage() {
     }
   };
 
-  const selectedMemberId = data.userSettings?.selectedMemberId || '';
+  // 選択された値を取得（メンバーIDまたは管理者ID）
+  const selectedValue = data.userSettings?.selectedMemberId 
+    ? data.userSettings.selectedMemberId
+    : data.userSettings?.selectedManagerId
+    ? `manager-${data.userSettings.selectedManagerId}`
+    : '';
   const activeMembers = data.members.filter((m) => m.active !== false);
 
   return (
@@ -150,13 +166,18 @@ export default function SettingsPage() {
               </label>
               <select
                 id="member-select"
-                value={selectedMemberId}
+                value={selectedValue}
                 onChange={(e) => handleMemberChange(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
               >
                 <option value="" className="text-gray-900">
                   選択してください
                 </option>
+                {data.manager && (
+                  <option value={`manager-${data.manager.id}`} className="text-gray-900">
+                    {data.manager.name}（管理者）
+                  </option>
+                )}
                 {activeMembers.map((member) => (
                   <option key={member.id} value={member.id} className="text-gray-900">
                     {member.name}

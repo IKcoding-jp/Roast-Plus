@@ -15,6 +15,12 @@ export interface Member {
   order?: number;
 }
 
+// 管理者
+export interface Manager {
+  id: string;
+  name: string;
+}
+
 // 作業ラベル
 export interface TaskLabel {
   id: string;
@@ -105,12 +111,14 @@ export interface TastingRecord {
 // ユーザー設定
 export interface UserSettings {
   selectedMemberId?: string; // 試飲感想記録用のメンバーID
+  selectedManagerId?: string; // デバイス使用者設定用の管理者ID
 }
 
 // アプリ全体のデータ構造
 export interface AppData {
   teams: Team[];
   members: Member[];
+  manager?: Manager; // 管理者（全体で1人のみ）
   taskLabels: TaskLabel[];
   assignments: Assignment[]; // 現在の担当表（配列形式）
   assignmentHistory: Assignment[]; // 過去の履歴

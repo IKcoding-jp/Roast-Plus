@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { AppData, Team, Member } from '@/types';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { AppData, Team, Member, Manager } from '@/types';
 
 interface MemberTeamManagementProps {
   data: AppData | null;
@@ -21,6 +21,17 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
   const [localTeams, setLocalTeams] = useState<Array<{ id: string; name: string }>>([]);
   const [membersByTeam, setMembersByTeam] = useState<{ [teamId: string]: Array<Member & { excludedTaskLabelIds?: string[] }> }>({});
   const [expandedMembers, setExpandedMembers] = useState<{ [memberId: string]: boolean }>({});
+  const [localManager, setLocalManager] = useState<{ id: string; name: string }>(
+    data.manager ? { id: data.manager.id, name: data.manager.name } : { id: crypto.randomUUID(), name: '' }
+  );
+  const [isEditingManager, setIsEditingManager] = useState(false);
+  const localManagerRef = useRef<{ id: string; name: string } | null>(null);
+  const dataRef = useRef<AppData>(data);
+  const onUpdateRef = useRef(onUpdate);
+  const lastSavedManagerRef = useRef<{ id: string; name: string } | null>(
+    data.manager ? { id: data.manager.id, name: data.manager.name } : null
+  );
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (localTeams.length === 0 && teams.length > 0) {
@@ -97,6 +108,133 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
     });
   }, [teams.length, data.members, localTeams.length]);
 
+  // dataRefとonUpdateRefを常に最新の値で更新
+  useEffect(() => {
+    dataRef.current = data;
+    onUpdateRef.current = onUpdate;
+    // data.managerが更新されたら、lastSavedManagerRefも更新
+    if (data.manager) {
+      lastSavedManagerRef.current = { id: data.manager.id, name: data.manager.name };
+    } else {
+      lastSavedManagerRef.current = null;
+    }
+  }, [data, onUpdate]);
+
+  // localManagerRefを常に最新の値で更新
+  useEffect(() => {
+    localManagerRef.current = localManager;
+  }, [localManager]);
+
+  // デバウンス付き保存関数
+  const debouncedSaveManager = useCallback((managerName: string) => {
+    // 既存のタイマーをクリア
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    // 新しいタイマーを設定（500ms後に保存）
+    debounceTimerRef.current = setTimeout(() => {
+      const currentManager = localManagerRef.current;
+      if (!currentManager) return;
+
+      const trimmedName = managerName.trim();
+      
+      // 空の名前の場合はmanagerをundefinedにする
+      if (trimmedName === '') {
+        if (lastSavedManagerRef.current) {
+          const updatedData: AppData = {
+            ...dataRef.current,
+            manager: undefined,
+          };
+          onUpdateRef.current(updatedData);
+          lastSavedManagerRef.current = null;
+        }
+        return;
+      }
+
+      // 前回保存した値と比較して、変更がある場合のみ保存
+      if (!lastSavedManagerRef.current || 
+          lastSavedManagerRef.current.id !== currentManager.id ||
+          lastSavedManagerRef.current.name !== trimmedName) {
+        const updatedManager: Manager = {
+          id: currentManager.id,
+          name: trimmedName,
+        };
+        const updatedData: AppData = {
+          ...dataRef.current,
+          manager: updatedManager,
+        };
+        onUpdateRef.current(updatedData);
+        lastSavedManagerRef.current = { id: updatedManager.id, name: updatedManager.name };
+      }
+    }, 500);
+  }, []);
+
+  // コンポーネントのアンマウント時に保存
+  useEffect(() => {
+    return () => {
+      // デバウンスタイマーをクリア
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+
+      // アンマウント時に即座に保存（最新の値を参照、変更がある場合のみ）
+      if (localManagerRef.current) {
+        const trimmedName = localManagerRef.current.name.trim();
+        // 空の名前の場合はmanagerをundefinedにする
+        if (trimmedName === '') {
+          if (lastSavedManagerRef.current) {
+            const updatedData: AppData = {
+              ...dataRef.current,
+              manager: undefined,
+            };
+            onUpdateRef.current(updatedData);
+            lastSavedManagerRef.current = null;
+          }
+          return;
+        }
+        if (!lastSavedManagerRef.current || 
+            lastSavedManagerRef.current.id !== localManagerRef.current.id ||
+            lastSavedManagerRef.current.name !== trimmedName) {
+          const updatedManager: Manager = {
+            id: localManagerRef.current.id,
+            name: trimmedName,
+          };
+          const updatedData: AppData = {
+            ...dataRef.current,
+            manager: updatedManager,
+          };
+          onUpdateRef.current(updatedData);
+          lastSavedManagerRef.current = { id: updatedManager.id, name: updatedManager.name };
+        }
+      }
+    };
+  }, []);
+
+  // 管理者の同期（外部からの変更を反映）
+  useEffect(() => {
+    // 編集中の場合は外部からの変更を無視
+    if (isEditingManager) {
+      return;
+    }
+
+    if (data.manager) {
+      // localManagerが存在しないか、IDが異なる場合のみ更新
+      if (!localManager || localManager.id !== data.manager.id) {
+        setLocalManager({ id: data.manager.id, name: data.manager.name });
+      }
+      // IDが一致する場合は、localManagerの値を優先（編集中の可能性があるため）
+    } else {
+      // data.managerがundefinedの場合でも、localManagerは空の状態を保持
+      // localManagerが存在しない場合のみ初期化
+      if (!localManager) {
+        setLocalManager({ id: crypto.randomUUID(), name: '' });
+      }
+    }
+  }, [data.manager?.id, isEditingManager]);
+
   const updateMember = (memberId: string, updates: Partial<Member>) => {
     const member = data.members.find((m) => m.id === memberId);
     if (!member) return;
@@ -147,7 +285,7 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
       {/* 班管理 */}
       <div className="bg-white rounded-lg shadow p-4 sm:p-6">
         <div className="mb-4">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">班管理</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">班</h2>
         </div>
         <div className="space-y-3 mb-4">
           {localTeams.length === 0 ? (
@@ -233,9 +371,102 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
         </div>
       </div>
 
+      {/* 管理者管理 */}
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+        <div className="mb-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">管理者</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            管理者は担当表には表示されません。全体で1人のみ登録できます。
+          </p>
+        </div>
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 p-3 bg-gray-50 rounded border border-gray-200">
+          <input
+            type="text"
+            value={localManager?.name || ''}
+            onChange={(e) => {
+              const newManager = (() => {
+                if (!localManager) {
+                  return { id: crypto.randomUUID(), name: e.target.value };
+                }
+                return { ...localManager, name: e.target.value };
+              })();
+              setLocalManager(newManager);
+              // localManagerRefも即座に更新
+              localManagerRef.current = newManager;
+              // デバウンス付きで保存
+              debouncedSaveManager(e.target.value);
+            }}
+            onFocus={() => {
+              setIsEditingManager(true);
+            }}
+            onBlur={(e) => {
+              setIsEditingManager(false);
+              
+              // デバウンスタイマーをクリアして即座に保存
+              if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+                debounceTimerRef.current = null;
+              }
+
+              // localManagerRef.currentを使用して最新の値を取得
+              const currentManager = localManagerRef.current;
+              if (currentManager) {
+                const trimmedName = e.target.value.trim();
+                // 空の名前の場合はmanagerをundefinedにする
+                if (trimmedName === '') {
+                  if (lastSavedManagerRef.current) {
+                    const updatedData: AppData = {
+                      ...dataRef.current,
+                      manager: undefined,
+                    };
+                    onUpdateRef.current(updatedData);
+                    lastSavedManagerRef.current = null;
+                  }
+                  return;
+                }
+                // 前回保存した値と比較して、変更がある場合のみ保存
+                if (!lastSavedManagerRef.current || 
+                    lastSavedManagerRef.current.id !== currentManager.id ||
+                    lastSavedManagerRef.current.name !== trimmedName) {
+                  const updatedManager: Manager = {
+                    id: currentManager.id,
+                    name: trimmedName,
+                  };
+                  const updatedData: AppData = {
+                    ...dataRef.current,
+                    manager: updatedManager,
+                  };
+                  onUpdateRef.current(updatedData);
+                  lastSavedManagerRef.current = { id: updatedManager.id, name: updatedManager.name };
+                }
+              }
+            }}
+            placeholder="管理者名を入力"
+            className="flex-1 px-3 py-2 sm:py-3 border border-gray-300 rounded text-gray-900 text-sm sm:text-base placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+          {localManager && localManager.name.trim() && (
+            <button
+              onClick={() => {
+                if (confirm('管理者を削除しますか？')) {
+                  const updatedData: AppData = {
+                    ...data,
+                    manager: undefined,
+                  };
+                  onUpdate(updatedData);
+                  setLocalManager({ id: crypto.randomUUID(), name: '' });
+                }
+              }}
+              className="w-full md:w-auto px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors flex-shrink-0"
+            >
+              削除
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* メンバー管理 */}
       <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">メンバー管理</h2>
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">メンバー</h2>
         {teams.length === 0 ? (
           <p className="text-gray-500">まず班を作成してください</p>
         ) : (

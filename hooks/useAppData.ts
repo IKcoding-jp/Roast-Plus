@@ -74,6 +74,7 @@ export function useAppData() {
         tastingSessions: Array.isArray(newData.tastingSessions) ? newData.tastingSessions : data.tastingSessions,
         tastingRecords: Array.isArray(newData.tastingRecords) ? newData.tastingRecords : data.tastingRecords,
         notifications: Array.isArray(newData.notifications) ? newData.notifications : data.notifications,
+        manager: newData.manager !== undefined ? newData.manager : data.manager,
         userSettings: newData.userSettings || data.userSettings,
       };
 

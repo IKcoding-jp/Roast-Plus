@@ -63,6 +63,7 @@ function normalizeAppData(data: any): AppData {
   const normalized: AppData = {
     teams: Array.isArray(data?.teams) ? data.teams : [],
     members: Array.isArray(data?.members) ? data.members : [],
+    manager: data?.manager && typeof data.manager === 'object' ? data.manager : undefined,
     taskLabels: Array.isArray(data?.taskLabels) ? data.taskLabels : [],
     assignments: Array.isArray(data?.assignments) ? data.assignments : [],
     assignmentHistory: Array.isArray(data?.assignmentHistory) ? data.assignmentHistory : [],
@@ -73,11 +74,14 @@ function normalizeAppData(data: any): AppData {
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],
   };
   
-  // userSettingsは存在する場合のみ追加（selectedMemberIdがundefinedの場合はフィールドを削除）
+  // userSettingsは存在する場合のみ追加（selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除）
   if (data?.userSettings) {
     const cleanedUserSettings: any = {};
     if (data.userSettings.selectedMemberId !== undefined) {
       cleanedUserSettings.selectedMemberId = data.userSettings.selectedMemberId;
+    }
+    if (data.userSettings.selectedManagerId !== undefined) {
+      cleanedUserSettings.selectedManagerId = data.userSettings.selectedManagerId;
     }
     if (Object.keys(cleanedUserSettings).length > 0) {
       normalized.userSettings = cleanedUserSettings;

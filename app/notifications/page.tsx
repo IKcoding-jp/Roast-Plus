@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { HiArrowLeft } from 'react-icons/hi';
-import { IoAdd, IoCreateOutline, IoTrashOutline } from 'react-icons/io5';
+import { IoAdd, IoCreateOutline, IoTrashOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import type { Notification, NotificationType } from '@/types';
 
 export default function NotificationsPage() {
@@ -38,6 +38,32 @@ export default function NotificationsPage() {
       }
     }
   }, [isLoading, notifications, readIds, markAllAsRead]);
+
+  // ソート済み通知リスト（orderがある場合はorder順、ない場合は日付順）
+  const sortedNotifications = useMemo(() => {
+    return [...notifications].sort((a, b) => {
+      // 両方orderがある場合はorder順
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      
+      // 片方だけorderがある場合
+      if (a.order !== undefined && b.order === undefined) {
+        return -1; // orderがある方が前
+      }
+      if (a.order === undefined && b.order !== undefined) {
+        return 1; // orderがない方が後
+      }
+      
+      // 両方orderがない場合は日付順（新しい順）
+      const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+      // 日付が同じ場合はIDで降順にソート（新しい順）
+      return b.id.localeCompare(a.id);
+    });
+  }, [notifications]);
 
   if (authLoading || isLoading || isDeveloperModeLoading) {
     return (
@@ -121,6 +147,50 @@ export default function NotificationsPage() {
     setDeleteConfirmId(null);
   };
 
+  const handleMoveUp = async (id: string) => {
+    const currentIndex = sortedNotifications.findIndex((n) => n.id === id);
+    if (currentIndex <= 0) return; // 既に一番上
+
+    const targetIndex = currentIndex - 1;
+
+    // order値を更新
+    const notificationsWithOrder = sortedNotifications.map((n, index) => ({
+      ...n,
+      order: n.order ?? index * 10,
+    }));
+
+    const targetOrder = notificationsWithOrder[targetIndex].order!;
+    const prevOrder = targetIndex > 0
+      ? notificationsWithOrder[targetIndex - 1].order!
+      : targetOrder - 1000;
+    
+    const newOrder = (prevOrder + targetOrder) / 2;
+
+    await updateNotification(id, { order: newOrder });
+  };
+
+  const handleMoveDown = async (id: string) => {
+    const currentIndex = sortedNotifications.findIndex((n) => n.id === id);
+    if (currentIndex < 0 || currentIndex >= sortedNotifications.length - 1) return; // 既に一番下
+
+    const targetIndex = currentIndex + 1;
+
+    // order値を更新
+    const notificationsWithOrder = sortedNotifications.map((n, index) => ({
+      ...n,
+      order: n.order ?? index * 10,
+    }));
+
+    const targetOrder = notificationsWithOrder[targetIndex].order!;
+    const nextOrder = targetIndex < notificationsWithOrder.length - 1
+      ? notificationsWithOrder[targetIndex + 1].order!
+      : targetOrder + 1000;
+    
+    const newOrder = (targetOrder + nextOrder) / 2;
+
+    await updateNotification(id, { order: newOrder });
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F1EB] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -162,22 +232,42 @@ export default function NotificationsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {notifications
-                .sort((a, b) => {
-                  const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
-                  if (dateDiff !== 0) {
-                    return dateDiff;
-                  }
-                  // 日付が同じ場合はIDで降順にソート（新しい順）
-                  return b.id.localeCompare(a.id);
-                })
-                .map((notification) => (
+              {sortedNotifications.map((notification, index) => {
+                const isFirst = index === 0;
+                const isLast = index === sortedNotifications.length - 1;
+
+                return (
                   <div
                     key={notification.id}
                     className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
+                        {/* 開発者モード時のみ表示：上/下移動ボタン */}
+                        {isDeveloperMode && (
+                          <div className="flex flex-col gap-1">
+                            <button
+                              onClick={() => handleMoveUp(notification.id)}
+                              disabled={isFirst}
+                              className={`p-1 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
+                                isFirst ? 'opacity-30 cursor-not-allowed' : ''
+                              }`}
+                              aria-label="上に移動"
+                            >
+                              <IoChevronUp className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleMoveDown(notification.id)}
+                              disabled={isLast}
+                              className={`p-1 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
+                                isLast ? 'opacity-30 cursor-not-allowed' : ''
+                              }`}
+                              aria-label="下に移動"
+                            >
+                              <IoChevronDown className="h-4 w-4" />
+                            </button>
+                          </div>
+                        )}
                         <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(notification.type)}`}>
                           {getTypeLabel(notification.type)}
                         </span>
@@ -212,7 +302,8 @@ export default function NotificationsPage() {
                       {notification.content}
                     </p>
                   </div>
-                ))}
+                );
+              })}
             </div>
           )}
         </main>

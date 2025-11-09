@@ -131,5 +131,6 @@ export interface Notification {
   content: string;
   date: string; // YYYY-MM-DD形式
   type: NotificationType;
+  order?: number; // 表示順序（開発者モードで並び替え可能）
 }
 

@@ -299,9 +299,9 @@ function TastingPageContent() {
 
   // 一覧表示（デフォルト）
   return (
-    <div className="h-screen overflow-y-hidden bg-amber-50 flex flex-col px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-      <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
-        <header className="mb-6 sm:mb-8 flex-shrink-0">
+    <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
@@ -328,7 +328,7 @@ function TastingPageContent() {
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-hidden">
+        <main>
           <TastingSessionList data={data} onUpdate={updateData} />
         </main>
       </div>

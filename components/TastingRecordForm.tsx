@@ -63,7 +63,7 @@ export function TastingRecordForm({
   
   // 設定からメンバーIDを取得
   const selectedMemberId = data.userSettings?.selectedMemberId || '';
-  
+
   // メンバーID（新規作成時は設定から、編集時はrecordから）
   const memberId = record?.memberId || selectedMemberId;
 
@@ -220,7 +220,7 @@ export function TastingRecordForm({
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700">{label}</label>
+        <label className="text-sm font-medium text-gray-700">{label}</label>
           {description && (
             <span className="text-xs text-gray-500">{description}</span>
           )}

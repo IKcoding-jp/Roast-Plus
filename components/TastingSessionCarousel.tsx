@@ -77,17 +77,17 @@ export function TastingSessionCarousel({
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full h-full">
       {/* 横スクロール可能なグリッドレイアウト */}
       <div
         ref={scrollContainerRef}
-        className="overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="overflow-x-auto overflow-y-hidden h-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{
           WebkitOverflowScrolling: 'touch',
         }}
         onWheel={handleWheel}
       >
-        <div className="inline-flex gap-4 pb-4" style={{ minWidth: 'max-content' }}>
+        <div className="inline-flex gap-4 pb-4 h-full" style={{ minWidth: 'max-content' }}>
           {sessions.map((session) => {
             const sessionRecords = getRecordsBySessionId(
               tastingRecords,
@@ -103,15 +103,15 @@ export function TastingSessionCarousel({
             return (
               <div
                 key={session.id}
-                className="flex-shrink-0 w-[calc(100vw-2rem)] sm:w-80 md:w-96"
+                className="flex-shrink-0 w-[calc(100vw-2rem)] sm:w-80 md:w-96 h-full"
               >
                 <Link
                   href={`/tasting?sessionId=${session.id}`}
                   className="block h-full"
                 >
-                  <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col h-full min-h-[calc(100vh-200px)] md:min-h-[600px]">
+                  <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col h-full">
                     {/* ヘッダー部分 */}
-                    <div className="mb-4">
+                    <div className="mb-4 flex-shrink-0">
                       <div className="flex items-start justify-between mb-2 gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2 flex-wrap h-7">
@@ -196,14 +196,14 @@ export function TastingSessionCarousel({
                       if (comments.length === 0) return null;
 
                       return (
-                        <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col min-h-[200px] max-h-[240px]">
-                          <div className="flex items-center gap-2 mb-2">
+                        <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col flex-shrink-0 min-h-[200px] max-h-[240px]">
+                          <div className="flex items-center gap-2 mb-2 flex-shrink-0">
                             <h4 className="text-sm font-semibold text-gray-800">みんなの感想</h4>
                             <span className="px-2 py-0.5 bg-amber-600 text-white text-sm font-semibold rounded-full flex-shrink-0">
                               {recordCount}/{activeMemberCount}
                             </span>
                           </div>
-                          <ul className="space-y-1.5 flex-1 max-h-[calc(1.5rem*8+0.375rem*7)] overflow-y-auto">
+                          <ul className="space-y-1.5 flex-1 overflow-y-auto min-h-0">
                             {comments.map((comment, commentIndex) => (
                               <li key={commentIndex} className="text-sm text-gray-700 whitespace-pre-wrap">
                                 ・{comment}

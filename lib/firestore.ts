@@ -4,6 +4,7 @@ import {
   getDoc, 
   setDoc, 
   onSnapshot,
+  deleteField,
 } from 'firebase/firestore';
 import app from './firebase';
 import type { AppData } from '@/types';
@@ -120,6 +121,43 @@ export async function saveUserData(userId: string, data: AppData): Promise<void>
     const userDocRef = getUserDocRef(userId);
     // undefinedのフィールドを削除してから保存
     const cleanedData = removeUndefinedFields(data);
+    
+    // userSettingsの不要なフィールドを明示的に削除
+    // merge: trueを使う場合、undefinedを設定しても既存のフィールドは削除されないため、
+    // FieldValue.delete()を使って明示的に削除する必要がある
+    if (data.userSettings) {
+      // 元のdataオブジェクトからuserSettingsの状態を確認
+      const userSettingsUpdate: any = {};
+      
+      // selectedMemberIdが存在する場合は設定、undefinedの場合は削除
+      if (data.userSettings.selectedMemberId !== undefined) {
+        userSettingsUpdate.selectedMemberId = data.userSettings.selectedMemberId;
+      } else {
+        userSettingsUpdate.selectedMemberId = deleteField();
+      }
+      
+      // selectedManagerIdが存在する場合は設定、undefinedの場合は削除
+      if (data.userSettings.selectedManagerId !== undefined) {
+        userSettingsUpdate.selectedManagerId = data.userSettings.selectedManagerId;
+      } else {
+        userSettingsUpdate.selectedManagerId = deleteField();
+      }
+      
+      // 両方とも削除される場合はuserSettings全体を削除
+      const deleteFieldValue = deleteField();
+      const hasMemberId = data.userSettings.selectedMemberId !== undefined;
+      const hasManagerId = data.userSettings.selectedManagerId !== undefined;
+      
+      if (!hasMemberId && !hasManagerId) {
+        cleanedData.userSettings = deleteFieldValue as any;
+      } else {
+        cleanedData.userSettings = userSettingsUpdate;
+      }
+    } else if (data.userSettings === undefined) {
+      // userSettingsがundefinedの場合、既存のフィールドを削除
+      cleanedData.userSettings = deleteField() as any;
+    }
+    
     await setDoc(userDocRef, cleanedData, { merge: true });
   } catch (error) {
     console.error('Failed to save data to Firestore:', error);

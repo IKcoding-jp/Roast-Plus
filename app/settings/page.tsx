@@ -74,18 +74,21 @@ export default function SettingsPage() {
             selectedMemberId: undefined,
             selectedManagerId: managerId,
           };
+          console.log('管理者選択:', { managerId, updatedSettings, currentUserSettings: data.userSettings });
         } else {
           updatedSettings = {
             ...data.userSettings,
             selectedMemberId: value,
             selectedManagerId: undefined,
           };
+          console.log('メンバー選択:', { memberId: value, updatedSettings, currentUserSettings: data.userSettings });
         }
       } else {
         // 空文字列の場合はuserSettingsをundefinedにする（フィールドを削除）
         updatedSettings = data.userSettings
           ? { ...data.userSettings, selectedMemberId: undefined, selectedManagerId: undefined }
           : undefined;
+        console.log('選択解除:', { updatedSettings, currentUserSettings: data.userSettings });
       }
       await updateData({
         ...data,

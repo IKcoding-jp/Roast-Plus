@@ -7,6 +7,7 @@ import { IoCreateOutline } from 'react-icons/io5';
 import { FaCoffee } from 'react-icons/fa';
 import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
+import { StarRating } from './StarRating';
 import {
   calculateAverageScores,
   getActiveMemberCount,
@@ -37,35 +38,6 @@ export function TastingSessionCarousel({
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
-  };
-
-  const renderStars = (rating: number) => {
-    if (rating === 0) {
-      return (
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-500">評価なし</span>
-        </div>
-      );
-    }
-
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-    return (
-      <div className="flex items-center gap-0.5">
-        {Array.from({ length: fullStars }).map((_, i) => (
-          <span key={i} className="text-yellow-400 text-base">★</span>
-        ))}
-        {hasHalfStar && <span className="text-yellow-400 text-base">☆</span>}
-        {Array.from({ length: emptyStars }).map((_, i) => (
-          <span key={i} className="text-gray-300 text-base">★</span>
-        ))}
-        <span className="ml-1 text-sm font-semibold text-gray-700">
-          {rating.toFixed(1)}
-        </span>
-      </div>
-    );
   };
 
   if (sessions.length === 0) {
@@ -178,7 +150,7 @@ export function TastingSessionCarousel({
                       {/* 星評価 - 中央よりに配置 */}
                       {recordCount > 0 && (
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-                          {renderStars(averageScores.overallRating)}
+                          <StarRating rating={averageScores.overallRating} size="md" />
                         </div>
                       )}
                     </div>

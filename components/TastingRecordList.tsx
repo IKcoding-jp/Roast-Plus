@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TastingRecord, AppData } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
+import { StarRating } from './StarRating';
 import { HiTrash } from 'react-icons/hi';
 
 interface TastingRecordListProps {
@@ -46,27 +47,6 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
-  };
-
-  const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-    return (
-      <div className="flex items-center gap-1">
-        {Array.from({ length: fullStars }).map((_, i) => (
-          <span key={i} className="text-yellow-400 text-lg">★</span>
-        ))}
-        {hasHalfStar && <span className="text-yellow-400 text-lg">☆</span>}
-        {Array.from({ length: emptyStars }).map((_, i) => (
-          <span key={i} className="text-gray-300 text-lg">★</span>
-        ))}
-        <span className="ml-2 text-sm font-semibold text-gray-700">
-          {rating.toFixed(1)}
-        </span>
-      </div>
-    );
   };
 
   if (sortedRecords.length === 0) {
@@ -128,7 +108,9 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                 </div>
 
                 {/* 星評価 */}
-                <div className="mb-4">{renderStars(record.overallRating)}</div>
+                <div className="mb-4">
+                  <StarRating rating={record.overallRating} size="lg" />
+                </div>
 
                 {/* コメント */}
                 {record.overallImpression && (

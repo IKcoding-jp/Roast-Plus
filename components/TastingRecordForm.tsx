@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import type { TastingRecord, AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import {
-  getActiveMemberCount,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
 import { useToastContext } from '@/components/Toast';
@@ -54,16 +53,19 @@ export function TastingRecordForm({
   // セッションから記録を作成する場合かどうか（新規作成時、または編集時でもセッション情報がある場合）
   const isSessionMode = !!sessionInfo;
   
-  // 記録数制限チェック（新規作成時のみ）
-  const activeMemberCount = getActiveMemberCount(data.members);
+  // 既存の記録がない場合のみ「作成」
+  const isNew = !record;
+  
+  // セッション内の記録を取得（重複チェック用）
   const sessionRecords = currentSessionId
     ? getRecordsBySessionId(data.tastingRecords, currentSessionId)
     : [];
-  const recordCount = sessionRecords.length;
-
-  // 既存の記録がない場合のみ「作成」
-  const isNew = !record;
-  const isLimitReached = isNew && recordCount >= activeMemberCount;
+  
+  // 設定からメンバーIDを取得
+  const selectedMemberId = data.userSettings?.selectedMemberId || '';
+  
+  // メンバーID（新規作成時は設定から、編集時はrecordから）
+  const memberId = record?.memberId || selectedMemberId;
 
   const [beanName, setBeanName] = useState(record?.beanName || '');
   const [tastingDate, setTastingDate] = useState(
@@ -81,21 +83,10 @@ export function TastingRecordForm({
   const [overallImpression, setOverallImpression] = useState(
     record?.overallImpression || ''
   );
-  const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
   // 既存記録のIDを保持（上書き時に使用）
   const [existingRecordId, setExistingRecordId] = useState<string | null>(null);
   // 前回のメンバーIDを保持（無限ループ防止）
   const prevMemberIdRef = useRef<string>('');
-
-  // メンバーIDは常に空の状態から開始（新規作成時）またはrecordから取得（編集時）
-  const [memberId, setMemberId] = useState(record?.memberId || '');
-
-  // 編集時にrecordが変更されたらmemberIdを更新
-  useEffect(() => {
-    if (record?.memberId) {
-      setMemberId(record.memberId);
-    }
-  }, [record]);
 
   // セッション情報から自動設定（新規作成時のみ）
   useEffect(() => {
@@ -151,7 +142,7 @@ export function TastingRecordForm({
         setOverallImpression('');
       }
     }
-  }, [memberId, currentSessionId, record]);
+  }, [memberId, currentSessionId, record, sessionRecords, selectedMemberId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,18 +152,16 @@ export function TastingRecordForm({
       return;
     }
 
-    if (!memberId) {
-      showToast('メンバーを選択してください', 'warning');
+    // 新規作成時は設定からメンバーIDを取得
+    const finalMemberId = record?.memberId || selectedMemberId || '';
+    
+    if (!finalMemberId) {
+      showToast('設定画面から自分の名前を設定してください', 'warning');
       return;
     }
 
     if (isNew && !currentSessionId) {
       showToast('セッションIDが設定されていません', 'error');
-      return;
-    }
-
-    if (isNew && isLimitReached) {
-      showToast(`記録数の上限（${activeMemberCount}件）に達しています`, 'warning');
       return;
     }
 
@@ -200,7 +189,7 @@ export function TastingRecordForm({
       createdAt: record?.createdAt || (existingRecordId ? (sessionRecords.find((r) => r.id === existingRecordId)?.createdAt || now) : now),
       updatedAt: now,
       userId: record?.userId || '', // これは親コンポーネントで設定される
-      memberId,
+      memberId: finalMemberId,
     };
 
     onSave(newRecord);
@@ -309,53 +298,30 @@ export function TastingRecordForm({
       </div>
       )}
 
-      {/* メンバー選択（新規作成時のみ、編集時は表示しない） */}
-      {isNew && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            メンバー <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={memberId}
-            onChange={(e) => {
-              setMemberId(e.target.value);
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-            required
-            disabled={readOnly}
-          >
-            <option value="" className="text-gray-900">選択してください</option>
-            {data.members
-              .filter((m) => m.active !== false)
-              .map((member) => (
-                <option key={member.id} value={member.id} className="text-gray-900">
-                  {member.name}
-                </option>
-              ))}
-          </select>
-        </div>
-      )}
+      {/* メンバー表示（編集時のみ） */}
       {!isNew && record && (
-        <>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             メンバー
           </label>
           <input
             type="text"
-            value={data.members.find((m) => m.id === record.memberId)?.name || '不明'}
+            value={
+              record.memberId === selectedMemberId
+                ? data.members.find((m) => m.id === record.memberId)?.name || '不明'
+                : '匿名'
+            }
             className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
             disabled
           />
         </div>
-        </>
       )}
 
-      {/* 記録数制限警告（新規作成時のみ） */}
-      {isNew && isLimitReached && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-sm text-red-800">
-            記録数の上限（{activeMemberCount}件）に達しています。これ以上追加できません。
+      {/* メンバー未設定警告（新規作成時のみ） */}
+      {isNew && !selectedMemberId && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-sm text-yellow-800">
+            試飲感想記録を追加するには、設定画面から自分の名前を設定する必要があります。
           </p>
         </div>
       )}

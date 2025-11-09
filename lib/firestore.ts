@@ -41,7 +41,15 @@ function removeUndefinedFields(obj: any): any {
     const cleaned: any = {};
     for (const [key, value] of Object.entries(obj)) {
       if (value !== undefined) {
-        cleaned[key] = removeUndefinedFields(value);
+        const cleanedValue = removeUndefinedFields(value);
+        // 空のオブジェクトは削除
+        if (cleanedValue !== null && typeof cleanedValue === 'object' && !Array.isArray(cleanedValue)) {
+          if (Object.keys(cleanedValue).length > 0) {
+            cleaned[key] = cleanedValue;
+          }
+        } else {
+          cleaned[key] = cleanedValue;
+        }
       }
     }
     return cleaned;
@@ -52,7 +60,7 @@ function removeUndefinedFields(obj: any): any {
 
 // データを正規化する関数（不足しているフィールドをデフォルト値で補完）
 function normalizeAppData(data: any): AppData {
-  return {
+  const normalized: AppData = {
     teams: Array.isArray(data?.teams) ? data.teams : [],
     members: Array.isArray(data?.members) ? data.members : [],
     taskLabels: Array.isArray(data?.taskLabels) ? data.taskLabels : [],
@@ -64,6 +72,19 @@ function normalizeAppData(data: any): AppData {
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],
   };
+  
+  // userSettingsは存在する場合のみ追加（selectedMemberIdがundefinedの場合はフィールドを削除）
+  if (data?.userSettings) {
+    const cleanedUserSettings: any = {};
+    if (data.userSettings.selectedMemberId !== undefined) {
+      cleanedUserSettings.selectedMemberId = data.userSettings.selectedMemberId;
+    }
+    if (Object.keys(cleanedUserSettings).length > 0) {
+      normalized.userSettings = cleanedUserSettings;
+    }
+  }
+  
+  return normalized;
 }
 
 export async function getUserData(userId: string): Promise<AppData> {
@@ -74,8 +95,9 @@ export async function getUserData(userId: string): Promise<AppData> {
     if (userDoc.exists()) {
       const data = userDoc.data();
       const normalizedData = normalizeAppData(data);
-      // 正規化したデータを保存（既存データに不足しているフィールドを追加）
-      await setDoc(userDocRef, normalizedData, { merge: true });
+      // undefinedのフィールドを削除してから保存
+      const cleanedData = removeUndefinedFields(normalizedData);
+      await setDoc(userDocRef, cleanedData, { merge: true });
       return normalizedData;
     }
     

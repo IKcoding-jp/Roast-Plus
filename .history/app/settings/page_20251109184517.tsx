@@ -138,7 +138,7 @@ export default function SettingsPage() {
             <p className="text-sm text-gray-600 mb-4">
               このアプリは複数のデバイスで使用されるため、
               <br />
-              使用しているデバイスが誰のものかを区別するために、この画面で自分の名前を選択してください。
+              使用しているデバイスが誰のものかを区別するために、この画面で自分の名前を登録してください。
               <br />
             </p>
             <div className="mt-4">

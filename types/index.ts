@@ -102,6 +102,11 @@ export interface TastingRecord {
   memberId: string; // メンバーID（必須）
 }
 
+// ユーザー設定
+export interface UserSettings {
+  selectedMemberId?: string; // 試飲感想記録用のメンバーID
+}
+
 // アプリ全体のデータ構造
 export interface AppData {
   teams: Team[];
@@ -114,6 +119,7 @@ export interface AppData {
   tastingSessions: TastingSession[]; // 試飲セッション
   tastingRecords: TastingRecord[]; // 試飲記録
   notifications: Notification[]; // 通知
+  userSettings?: UserSettings; // ユーザー設定
 }
 
 // 通知

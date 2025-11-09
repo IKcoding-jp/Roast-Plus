@@ -21,15 +21,28 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
     const updateSize = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        // コンテナの幅に基づいてサイズを計算（最大400px、最小60px）
-        const calculatedSize = Math.min(400, Math.max(60, containerWidth * 0.8));
+        const containerHeight = containerRef.current.offsetHeight;
+        // コンテナの幅と高さの両方を考慮してサイズを計算
+        // 幅と高さの小さい方の80%を使用し、より大きなサイズを確保
+        const sizeBasedOnWidth = containerWidth * 0.85;
+        const sizeBasedOnHeight = containerHeight * 0.85;
+        // 幅と高さの両方を考慮し、より大きなサイズを選択（最大500px、最小60px）
+        const calculatedSize = Math.min(500, Math.max(60, Math.min(sizeBasedOnWidth, sizeBasedOnHeight)));
         setChartSize(calculatedSize);
       }
     };
 
     updateSize();
     window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    // ResizeObserverを使用してコンテナのサイズ変更を監視
+    const resizeObserver = new ResizeObserver(updateSize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      resizeObserver.disconnect();
+    };
   }, [size]);
 
   const centerX = chartSize / 2;
@@ -71,7 +84,7 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
   }).join(' ') + ' Z';
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center w-full">
+    <div ref={containerRef} className="flex flex-col items-center justify-center w-full h-full">
       <svg width={chartSize} height={chartSize} className="overflow-visible">
         {/* グリッド線（同心円） */}
         {[0.25, 0.5, 0.75, 1.0].map((scale) => (

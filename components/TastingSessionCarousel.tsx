@@ -87,7 +87,7 @@ export function TastingSessionCarousel({
         }}
         onWheel={handleWheel}
       >
-        <div className="inline-flex gap-4 pb-4 h-full" style={{ minWidth: 'max-content' }}>
+        <div className="inline-flex gap-4 pb-2 h-full" style={{ minWidth: 'max-content' }}>
           {sessions.map((session) => {
             const sessionRecords = getRecordsBySessionId(
               tastingRecords,
@@ -109,9 +109,9 @@ export function TastingSessionCarousel({
                   href={`/tasting?sessionId=${session.id}`}
                   className="block h-full"
                 >
-                  <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col h-full">
+                  <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col h-full min-h-0">
                     {/* ヘッダー部分 */}
-                    <div className="mb-4 flex-shrink-0">
+                    <div className="mb-0 flex-shrink-0">
                       <div className="flex items-start justify-between mb-2 gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2 flex-wrap h-7">
@@ -150,27 +150,13 @@ export function TastingSessionCarousel({
                             {formatDate(session.createdAt)}
                           </div>
                         </div>
-                        <div className="text-right flex-shrink-0 min-w-[100px] flex flex-col items-end">
-                          {recordCount > 0 ? (
-                            <>
-                              <div className="text-sm font-medium text-gray-700 mb-1 h-7 flex items-center">
-                                総合点
-                              </div>
-                              <div className="h-5 flex items-center">
-                                {renderStars(averageScores.overallRating)}
-                              </div>
-                            </>
-                          ) : (
-                            <div className="h-[3rem]"></div>
-                          )}
-                        </div>
                       </div>
                     </div>
 
                     {/* レーダーチャート */}
-                    <div className="mb-4 flex-1 flex items-center justify-center min-h-[200px]">
+                    <div className="mb-3 sm:mb-4 flex-1 flex items-center justify-center min-h-0 relative -mt-10">
                       {recordCount > 0 ? (
-                        <div className="w-full">
+                        <div className="w-full h-full flex items-center justify-center">
                           <TastingRadarChart
                             record={{
                               bitterness: averageScores.bitterness,
@@ -182,11 +168,17 @@ export function TastingSessionCarousel({
                           />
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center w-full min-h-[200px]">
-                          <FaCoffee className="w-16 h-16 text-gray-400 mb-2" />
+                        <div className="flex flex-col items-center justify-center w-full h-full">
+                          <FaCoffee className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mb-2" />
                           <p className="text-sm text-gray-500">
                             まだ記録がありません
                           </p>
+                        </div>
+                      )}
+                      {/* 星評価 - 右下に配置 */}
+                      {recordCount > 0 && (
+                        <div className="absolute bottom-0 right-0">
+                          {renderStars(averageScores.overallRating)}
                         </div>
                       )}
                     </div>
@@ -196,16 +188,16 @@ export function TastingSessionCarousel({
                       if (comments.length === 0) return null;
 
                       return (
-                        <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col flex-shrink-0 min-h-[200px] max-h-[240px]">
+                        <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col flex-shrink-0 min-h-[12rem] max-h-[min(20rem,calc(100vh-28rem))] sm:max-h-[min(22rem,calc(100vh-30rem))] md:max-h-[min(24rem,calc(100vh-32rem))]">
                           <div className="flex items-center gap-2 mb-2 flex-shrink-0">
                             <h4 className="text-sm font-semibold text-gray-800">みんなの感想</h4>
                             <span className="px-2 py-0.5 bg-amber-600 text-white text-sm font-semibold rounded-full flex-shrink-0">
                               {recordCount}/{activeMemberCount}
                             </span>
                           </div>
-                          <ul className="space-y-1.5 flex-1 overflow-y-auto min-h-0">
+                          <ul className="space-y-1.5 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
                             {comments.map((comment, commentIndex) => (
-                              <li key={commentIndex} className="text-sm text-gray-700 whitespace-pre-wrap">
+                              <li key={commentIndex} className="text-sm text-gray-700 whitespace-pre-wrap break-words">
                                 ・{comment}
                               </li>
                             ))}

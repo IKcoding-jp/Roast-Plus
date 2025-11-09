@@ -182,7 +182,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
   }
 
   return (
-    <div className="space-y-4 h-full flex flex-col min-h-0">
+    <div className="space-y-3 h-full flex flex-col min-h-0">
       {/* 検索・ソート・フィルタUI */}
       <div className="bg-white rounded-lg shadow-md p-4 space-y-4 flex-shrink-0">
         {/* 検索バーとソート */}

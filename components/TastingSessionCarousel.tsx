@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { IoCreateOutline } from 'react-icons/io5';
@@ -29,11 +29,21 @@ export function TastingSessionCarousel({
 }: TastingSessionCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!scrollContainerRef.current) return;
-    e.preventDefault();
-    scrollContainerRef.current.scrollLeft += e.deltaY;
-  };
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      container.scrollLeft += e.deltaY;
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -57,7 +67,6 @@ export function TastingSessionCarousel({
         style={{
           WebkitOverflowScrolling: 'touch',
         }}
-        onWheel={handleWheel}
       >
         <div className="inline-flex gap-4 pb-2 h-full" style={{ minWidth: 'max-content' }}>
           {sessions.map((session) => {

@@ -67,6 +67,17 @@ export function getActiveMemberCount(members: Member[]): number {
 }
 
 /**
+ * アクティブな参加者数（メンバー+管理者）を取得する
+ * @param data アプリデータ
+ * @returns アクティブな参加者数（メンバー数+管理者（存在する場合））
+ */
+export function getActiveParticipantCount(data: AppData): number {
+  const activeMemberCount = getActiveMemberCount(data.members);
+  // 管理者が存在する場合は+1
+  return activeMemberCount + (data.manager ? 1 : 0);
+}
+
+/**
  * セッションに紐づく記録を取得する
  * @param records 全記録の配列
  * @param sessionId セッションID

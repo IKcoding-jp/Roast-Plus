@@ -11,6 +11,22 @@ import type { AppData } from '@/types';
 
 const db = getFirestore(app);
 
+// 書き込み操作のデバウンスとキューイング
+const writeQueues = new Map<string, {
+  pendingData: AppData | null;
+  timeoutId: ReturnType<typeof setTimeout> | null;
+  isWriting: boolean;
+  retryCount: number;
+  pendingPromise: { resolve: () => void; reject: (error: any) => void } | null;
+}>();
+
+// デバウンス時間（ミリ秒）
+const DEBOUNCE_DELAY = 300;
+// 最大リトライ回数
+const MAX_RETRY_COUNT = 3;
+// リトライ間隔（ミリ秒）
+const RETRY_DELAY = 1000;
+
 const defaultData: AppData = {
   teams: [],
   members: [],
@@ -113,13 +129,12 @@ export async function getUserData(userId: string): Promise<AppData> {
     if (userDoc.exists()) {
       const data = userDoc.data();
       const normalizedData = normalizeAppData(data);
-      // undefinedのフィールドを削除してから保存
-      const cleanedData = removeUndefinedFields(normalizedData);
-      await setDoc(userDocRef, cleanedData, { merge: true });
+      // 読み込み時には書き込まない（不要な書き込みを避ける）
       return normalizedData;
     }
     
-    // undefinedのフィールドを削除してから保存
+    // ドキュメントが存在しない場合のみ、デフォルトデータを作成
+    // ただし、複数デバイスからの同時アクセスを考慮して、書き込みは最小限に
     const cleanedDefaultData = removeUndefinedFields(defaultData);
     await setDoc(userDocRef, cleanedDefaultData);
     return defaultData;
@@ -129,59 +144,165 @@ export async function getUserData(userId: string): Promise<AppData> {
   }
 }
 
-export async function saveUserData(userId: string, data: AppData): Promise<void> {
-  try {
-    const userDocRef = getUserDocRef(userId);
-    // undefinedのフィールドを削除してから保存
-    const cleanedData = removeUndefinedFields(data);
+// 実際の書き込み処理（内部関数）
+async function performWrite(userId: string, data: AppData): Promise<void> {
+  const userDocRef = getUserDocRef(userId);
+  // undefinedのフィールドを削除してから保存
+  const cleanedData = removeUndefinedFields(data);
+  
+  // userSettingsの不要なフィールドを明示的に削除
+  // merge: trueを使う場合、undefinedを設定しても既存のフィールドは削除されないため、
+  // FieldValue.delete()を使って明示的に削除する必要がある
+  if (data.userSettings) {
+    // 元のdataオブジェクトからuserSettingsの状態を確認
+    const userSettingsUpdate: any = {};
     
-    // userSettingsの不要なフィールドを明示的に削除
-    // merge: trueを使う場合、undefinedを設定しても既存のフィールドは削除されないため、
-    // FieldValue.delete()を使って明示的に削除する必要がある
-    if (data.userSettings) {
-      // 元のdataオブジェクトからuserSettingsの状態を確認
-      const userSettingsUpdate: any = {};
-      
-      // selectedMemberIdが存在する場合は設定、undefinedの場合は削除
-      if (data.userSettings.selectedMemberId !== undefined) {
-        userSettingsUpdate.selectedMemberId = data.userSettings.selectedMemberId;
-      } else {
-        userSettingsUpdate.selectedMemberId = deleteField();
-      }
-      
-      // selectedManagerIdが存在する場合は設定、undefinedの場合は削除
-      if (data.userSettings.selectedManagerId !== undefined) {
-        userSettingsUpdate.selectedManagerId = data.userSettings.selectedManagerId;
-      } else {
-        userSettingsUpdate.selectedManagerId = deleteField();
-      }
-      
-      // 両方とも削除される場合はuserSettings全体を削除
-      const deleteFieldValue = deleteField();
-      const hasMemberId = data.userSettings.selectedMemberId !== undefined;
-      const hasManagerId = data.userSettings.selectedManagerId !== undefined;
-      
-      if (!hasMemberId && !hasManagerId) {
-        cleanedData.userSettings = deleteFieldValue as any;
-      } else {
-        cleanedData.userSettings = userSettingsUpdate;
-      }
-    } else if (data.userSettings === undefined) {
-      // userSettingsがundefinedの場合、既存のフィールドを削除
-      cleanedData.userSettings = deleteField() as any;
+    // selectedMemberIdが存在する場合は設定、undefinedの場合は削除
+    if (data.userSettings.selectedMemberId !== undefined) {
+      userSettingsUpdate.selectedMemberId = data.userSettings.selectedMemberId;
+    } else {
+      userSettingsUpdate.selectedMemberId = deleteField();
     }
     
-    // shuffleEventの削除処理
-    if (data.shuffleEvent === undefined) {
-      // shuffleEventがundefinedの場合、既存のフィールドを削除
-      cleanedData.shuffleEvent = deleteField() as any;
+    // selectedManagerIdが存在する場合は設定、undefinedの場合は削除
+    if (data.userSettings.selectedManagerId !== undefined) {
+      userSettingsUpdate.selectedManagerId = data.userSettings.selectedManagerId;
+    } else {
+      userSettingsUpdate.selectedManagerId = deleteField();
     }
     
-    await setDoc(userDocRef, cleanedData, { merge: true });
-  } catch (error) {
-    console.error('Failed to save data to Firestore:', error);
-    throw error;
+    // 両方とも削除される場合はuserSettings全体を削除
+    const deleteFieldValue = deleteField();
+    const hasMemberId = data.userSettings.selectedMemberId !== undefined;
+    const hasManagerId = data.userSettings.selectedManagerId !== undefined;
+    
+    if (!hasMemberId && !hasManagerId) {
+      cleanedData.userSettings = deleteFieldValue as any;
+    } else {
+      cleanedData.userSettings = userSettingsUpdate;
+    }
+  } else if (data.userSettings === undefined) {
+    // userSettingsがundefinedの場合、既存のフィールドを削除
+    cleanedData.userSettings = deleteField() as any;
   }
+  
+  // shuffleEventの削除処理
+  if (data.shuffleEvent === undefined) {
+    // shuffleEventがundefinedの場合、既存のフィールドを削除
+    cleanedData.shuffleEvent = deleteField() as any;
+  }
+  
+  await setDoc(userDocRef, cleanedData, { merge: true });
+}
+
+// 書き込み操作を実行（リトライロジック付き）
+async function executeWrite(userId: string, data: AppData): Promise<void> {
+  const queue = writeQueues.get(userId);
+  if (!queue) {
+    throw new Error('Write queue not found');
+  }
+
+  queue.isWriting = true;
+  queue.retryCount = 0;
+  const currentPromise = queue.pendingPromise;
+
+  while (queue.retryCount <= MAX_RETRY_COUNT) {
+    try {
+      await performWrite(userId, data);
+      // 成功したらキューをクリア
+      queue.isWriting = false;
+      queue.retryCount = 0;
+      
+      // 現在のPromiseを解決（この書き込みに対応するPromise）
+      if (currentPromise) {
+        currentPromise.resolve();
+      }
+      
+      // キューに新しいデータがある場合は、次の書き込みを実行
+      if (queue.pendingData) {
+        const nextData = queue.pendingData;
+        queue.pendingData = null;
+        // 次の書き込みを即座に実行（デバウンスは既に経過している）
+        await executeWrite(userId, nextData);
+      } else {
+        queue.pendingData = null;
+        queue.pendingPromise = null;
+      }
+      
+      return;
+    } catch (error: any) {
+      queue.retryCount++;
+      
+      // resource-exhaustedエラーの場合、リトライ
+      if (error?.code === 'resource-exhausted' && queue.retryCount <= MAX_RETRY_COUNT) {
+        const delay = RETRY_DELAY * Math.pow(2, queue.retryCount - 1); // 指数バックオフ
+        console.warn(`Firestore write exhausted, retrying in ${delay}ms (attempt ${queue.retryCount}/${MAX_RETRY_COUNT})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // その他のエラーまたは最大リトライ回数に達した場合
+      queue.isWriting = false;
+      console.error('Failed to save data to Firestore:', error);
+      
+      // 現在のPromiseを拒否
+      if (currentPromise) {
+        currentPromise.reject(error);
+      }
+      queue.pendingPromise = null;
+      throw error;
+    }
+  }
+}
+
+export async function saveUserData(userId: string, data: AppData): Promise<void> {
+  // キューを初期化（存在しない場合）
+  if (!writeQueues.has(userId)) {
+    writeQueues.set(userId, {
+      pendingData: null,
+      timeoutId: null,
+      isWriting: false,
+      retryCount: 0,
+      pendingPromise: null,
+    });
+  }
+
+  const queue = writeQueues.get(userId)!;
+  
+  // 新しいPromiseを作成
+  const promise = new Promise<void>((resolve, reject) => {
+    // 既存のPromiseがある場合は、それを拒否して新しいPromiseに置き換え
+    if (queue.pendingPromise) {
+      queue.pendingPromise.reject(new Error('New write request superseded previous one'));
+    }
+    queue.pendingPromise = { resolve, reject };
+  });
+  
+  // 最新のデータをキューに保存
+  queue.pendingData = data;
+
+  // 既に書き込み中の場合は、デバウンスを待つ
+  if (queue.isWriting) {
+    return promise;
+  }
+
+  // 既存のタイマーをクリア
+  if (queue.timeoutId) {
+    clearTimeout(queue.timeoutId);
+    queue.timeoutId = null;
+  }
+
+  // デバウンスタイマーを設定
+  queue.timeoutId = setTimeout(async () => {
+    if (queue.pendingData) {
+      const dataToWrite = queue.pendingData;
+      queue.pendingData = null;
+      queue.timeoutId = null;
+      await executeWrite(userId, dataToWrite);
+    }
+  }, DEBOUNCE_DELAY);
+
+  return promise;
 }
 
 export function subscribeUserData(

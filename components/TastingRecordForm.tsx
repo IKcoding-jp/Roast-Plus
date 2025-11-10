@@ -61,16 +61,11 @@ export function TastingRecordForm({
     ? getRecordsBySessionId(data.tastingRecords, currentSessionId)
     : [];
   
-  // 設定からメンバーIDまたは管理者IDを取得
+  // 設定からメンバーIDを取得
   const selectedMemberId = data.userSettings?.selectedMemberId || '';
-  const selectedManagerId = data.userSettings?.selectedManagerId || '';
-  // メンバーIDまたは管理者IDのいずれかが設定されているか
-  const hasSelectedParticipant = !!(selectedMemberId || selectedManagerId);
-  // 実際に使用するID（メンバーIDが優先、なければ管理者ID）
-  const selectedParticipantId = selectedMemberId || selectedManagerId;
 
   // メンバーID（新規作成時は設定から、編集時はrecordから）
-  const memberId = record?.memberId || selectedParticipantId;
+  const memberId = record?.memberId || selectedMemberId;
 
   const [beanName, setBeanName] = useState(record?.beanName || '');
   const [tastingDate, setTastingDate] = useState(
@@ -147,7 +142,7 @@ export function TastingRecordForm({
         setOverallImpression('');
       }
     }
-  }, [memberId, currentSessionId, record, sessionRecords, selectedParticipantId]);
+  }, [memberId, currentSessionId, record, sessionRecords, selectedMemberId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,8 +152,8 @@ export function TastingRecordForm({
       return;
     }
 
-    // 新規作成時は設定からメンバーIDまたは管理者IDを取得
-    const finalMemberId = record?.memberId || selectedParticipantId || '';
+    // 新規作成時は設定からメンバーIDを取得
+    const finalMemberId = record?.memberId || selectedMemberId || '';
     
     if (!finalMemberId) {
       showToast('設定画面から自分の名前を設定してください', 'warning');
@@ -330,7 +325,7 @@ export function TastingRecordForm({
       )}
 
       {/* メンバー未設定警告（新規作成時のみ） */}
-      {isNew && !hasSelectedParticipant && (
+      {isNew && !selectedMemberId && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800">
             この機能を使用するには、設定画面からデバイス使用者を設定する必要があります。

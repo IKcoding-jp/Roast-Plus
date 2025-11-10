@@ -10,7 +10,7 @@ import { TastingRadarChart } from './TastingRadarChart';
 import { TastingSessionCarousel } from './TastingSessionCarousel';
 import {
   calculateAverageScores,
-  getActiveParticipantCount,
+  getActiveMemberCount,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
 
@@ -37,7 +37,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
   const tastingRecords = Array.isArray(data.tastingRecords)
     ? data.tastingRecords
     : [];
-  const activeMemberCount = getActiveParticipantCount(data);
+  const activeMemberCount = getActiveMemberCount(data.members);
 
   // 状態管理
   const [searchQuery, setSearchQuery] = useState('');

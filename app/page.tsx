@@ -77,17 +77,17 @@ export default function HomePage() {
       </header>
 
       {/* メインコンテンツ */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="flex flex-col gap-2 max-w-2xl mx-auto">
           {/* 担当表カード */}
           <button
             onClick={() => router.push('/assignment')}
-            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            className="flex items-center gap-4 rounded-lg bg-white p-4 shadow-md transition-shadow hover:shadow-lg min-h-[60px]"
           >
-            <div className="mb-4 flex justify-center">
-              <HiUsers className="h-16 w-16 text-primary" />
+            <div className="flex-shrink-0">
+              <HiUsers className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-center text-lg font-semibold text-gray-800">
+            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               担当表
             </h2>
           </button>
@@ -95,12 +95,12 @@ export default function HomePage() {
           {/* スケジュールカード */}
           <button
             onClick={() => router.push('/schedule')}
-            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            className="flex items-center gap-4 rounded-lg bg-white p-4 shadow-md transition-shadow hover:shadow-lg min-h-[60px]"
           >
-            <div className="mb-4 flex justify-center">
-              <RiCalendarScheduleLine className="h-16 w-16 text-primary" />
+            <div className="flex-shrink-0">
+              <RiCalendarScheduleLine className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-center text-lg font-semibold text-gray-800">
+            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               スケジュール
             </h2>
           </button>
@@ -108,12 +108,12 @@ export default function HomePage() {
           {/* 試飲感想記録カード */}
           <button
             onClick={() => router.push('/tasting')}
-            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            className="flex items-center gap-4 rounded-lg bg-white p-4 shadow-md transition-shadow hover:shadow-lg min-h-[60px]"
           >
-            <div className="mb-4 flex justify-center">
-              <FaCoffee className="h-16 w-16 text-primary" />
+            <div className="flex-shrink-0">
+              <FaCoffee className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-center text-lg font-semibold text-gray-800">
+            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               試飲感想記録
             </h2>
           </button>
@@ -121,60 +121,60 @@ export default function HomePage() {
           {/* ローストタイマーカード */}
           <button
             onClick={() => router.push('/roast-timer')}
-            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            className="flex items-center gap-4 rounded-lg bg-white p-4 shadow-md transition-shadow hover:shadow-lg min-h-[60px]"
           >
-            <div className="mb-4 flex justify-center">
-              <MdTimer className="h-16 w-16 text-primary" />
+            <div className="flex-shrink-0">
+              <MdTimer className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-center text-lg font-semibold text-gray-800">
+            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               ローストタイマー
-              <span className="block text-sm font-normal text-gray-500 mt-1">
-                ※開発予定
-              </span>
             </h2>
+            <span className="flex-shrink-0 text-xs sm:text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
+              開発予定
+            </span>
           </button>
 
           {/* 欠点豆図鑑カード */}
           <button
             onClick={() => router.push('/defect-beans')}
-            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            className="flex items-center gap-4 rounded-lg bg-white p-4 shadow-md transition-shadow hover:shadow-lg min-h-[60px]"
           >
-            <div className="mb-4 flex justify-center">
-              <RiBookFill className="h-16 w-16 text-primary" />
+            <div className="flex-shrink-0">
+              <RiBookFill className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-center text-lg font-semibold text-gray-800">
+            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               欠点豆図鑑
-              <span className="block text-sm font-normal text-gray-500 mt-1">
-                ※開発予定
-              </span>
             </h2>
+            <span className="flex-shrink-0 text-xs sm:text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
+              開発予定
+            </span>
           </button>
 
           {/* 作業進捗カード */}
           <button
             onClick={() => router.push('/progress')}
-            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            className="flex items-center gap-4 rounded-lg bg-white p-4 shadow-md transition-shadow hover:shadow-lg min-h-[60px]"
           >
-            <div className="mb-4 flex justify-center">
-              <MdTimeline className="h-16 w-16 text-primary" />
+            <div className="flex-shrink-0">
+              <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-center text-lg font-semibold text-gray-800">
+            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               作業進捗
-              <span className="block text-sm font-normal text-gray-500 mt-1">
-                ※開発予定
-              </span>
             </h2>
+            <span className="flex-shrink-0 text-xs sm:text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
+              開発予定
+            </span>
           </button>
 
           {/* 設定カード */}
           <button
             onClick={() => router.push('/settings')}
-            className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            className="flex items-center gap-4 rounded-lg bg-white p-4 shadow-md transition-shadow hover:shadow-lg min-h-[60px]"
           >
-            <div className="mb-4 flex justify-center">
-              <IoSettings className="h-16 w-16 text-primary" />
+            <div className="flex-shrink-0">
+              <IoSettings className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="text-center text-lg font-semibold text-gray-800">
+            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               設定
             </h2>
           </button>

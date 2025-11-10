@@ -70,7 +70,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="h-screen bg-amber-50 pt-2 pb-4 px-4 sm:py-4 sm:px-4 lg:py-6 lg:px-6 flex flex-col overflow-hidden">
+    <div className="h-screen md:h-[100dvh] lg:h-screen bg-amber-50 pt-2 pb-4 px-4 sm:py-4 sm:px-4 lg:py-6 lg:px-6 flex flex-col overflow-hidden">
       <div className="w-full flex-1 flex flex-col min-h-0 lg:max-w-7xl lg:mx-auto">
         {/* ヘッダー */}
         <header className="mb-4 flex-shrink-0 flex items-center justify-between">

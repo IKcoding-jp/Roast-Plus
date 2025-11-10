@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import type { AppData, RoastSchedule } from '@/types';
 import { HiPlus, HiFire, HiCalendar } from 'react-icons/hi';
 import { FaSnowflake, FaBroom } from 'react-icons/fa';
@@ -507,6 +507,7 @@ function ScheduleCard({
 
   const memoContent = getMemoContent();
   const [isDraggingCard, setIsDraggingCard] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
   const handleCardDragStart = () => {
     setIsDraggingCard(true);
@@ -521,6 +522,36 @@ function ScheduleCard({
     setIsDraggingCard(false);
   };
 
+  // タッチイベントハンドラー（iPad対応）
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now(),
+    };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    
+    // 一定の距離と時間を超えたらドラッグ開始とみなす
+    if ((deltaX > 10 || deltaY > 10) && deltaTime > 100) {
+      if (!isDraggingCard) {
+        handleCardDragStart();
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    touchStartRef.current = null;
+  };
+
   return (
     <div
       draggable
@@ -532,8 +563,11 @@ function ScheduleCard({
         setIsDraggingCard(false);
         onDragEnd();
       }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       onClick={handleCardClick}
-      className={`rounded-md border border-gray-200 bg-white p-3 md:p-2.5 cursor-move hover:shadow-sm hover:border-amber-300 transition-all ${
+      className={`rounded-md border border-gray-200 bg-white p-3 md:p-2.5 cursor-move hover:shadow-sm hover:border-amber-300 transition-all select-none touch-none ${
         isDragging ? 'opacity-50' : ''
       } ${isDragOver ? 'border-amber-500 border-2 bg-amber-50' : ''}`}
     >

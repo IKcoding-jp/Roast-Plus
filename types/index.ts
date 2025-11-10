@@ -114,6 +114,12 @@ export interface UserSettings {
   selectedManagerId?: string; // デバイス使用者設定用の管理者ID
 }
 
+// シャッフルイベント（マルチデバイス同期用）
+export interface ShuffleEvent {
+  startTime: string; // ISO 8601形式のタイムスタンプ
+  shuffledAssignments: Assignment[]; // シャッフル結果
+}
+
 // アプリ全体のデータ構造
 export interface AppData {
   teams: Team[];
@@ -128,6 +134,7 @@ export interface AppData {
   tastingRecords: TastingRecord[]; // 試飲記録
   notifications: Notification[]; // 通知
   userSettings?: UserSettings; // ユーザー設定
+  shuffleEvent?: ShuffleEvent; // シャッフルイベント（マルチデバイス同期用）
 }
 
 // 通知

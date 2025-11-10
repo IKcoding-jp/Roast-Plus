@@ -89,6 +89,19 @@ function normalizeAppData(data: any): AppData {
     }
   }
   
+  // shuffleEventは存在する場合のみ追加
+  if (data?.shuffleEvent && typeof data.shuffleEvent === 'object') {
+    if (
+      typeof data.shuffleEvent.startTime === 'string' &&
+      Array.isArray(data.shuffleEvent.shuffledAssignments)
+    ) {
+      normalized.shuffleEvent = {
+        startTime: data.shuffleEvent.startTime,
+        shuffledAssignments: data.shuffleEvent.shuffledAssignments,
+      };
+    }
+  }
+  
   return normalized;
 }
 
@@ -156,6 +169,12 @@ export async function saveUserData(userId: string, data: AppData): Promise<void>
     } else if (data.userSettings === undefined) {
       // userSettingsがundefinedの場合、既存のフィールドを削除
       cleanedData.userSettings = deleteField() as any;
+    }
+    
+    // shuffleEventの削除処理
+    if (data.shuffleEvent === undefined) {
+      // shuffleEventがundefinedの場合、既存のフィールドを削除
+      cleanedData.shuffleEvent = deleteField() as any;
     }
     
     await setDoc(userDocRef, cleanedData, { merge: true });

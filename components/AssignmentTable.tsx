@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import type { AppData, Assignment } from '@/types';
+import type { AppData, Assignment, ShuffleEvent } from '@/types';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
 interface AssignmentTableProps {
@@ -136,6 +136,7 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
   } | null>(null);
   const shuffleIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const shuffleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastShuffleEventRef = useRef<ShuffleEvent | null>(null);
 
   if (!data) {
     return (
@@ -181,6 +182,74 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
     });
   }, [assignments, taskLabels]);
 
+  // 他端末からのシャッフルイベントを検知
+  useEffect(() => {
+    if (!data?.shuffleEvent) {
+      // イベントが削除された場合、アニメーションを停止
+      if (lastShuffleEventRef.current && !isShuffling) {
+        // 既にアニメーションが終了している場合は何もしない
+        return;
+      }
+      lastShuffleEventRef.current = null;
+      return;
+    }
+
+    const event = data.shuffleEvent;
+    
+    // 同じイベントの場合は無視（無限ループ防止）
+    if (
+      lastShuffleEventRef.current &&
+      lastShuffleEventRef.current.startTime === event.startTime &&
+      JSON.stringify(lastShuffleEventRef.current.shuffledAssignments) ===
+        JSON.stringify(event.shuffledAssignments)
+    ) {
+      return;
+    }
+
+    lastShuffleEventRef.current = event;
+
+    // 既にシャッフル中の場合は無視
+    if (isShuffling) {
+      return;
+    }
+
+    // 開始タイムスタンプから経過時間を計算
+    const startTime = new Date(event.startTime).getTime();
+    const now = Date.now();
+    const elapsed = now - startTime;
+    const animationDuration = 3000; // 3秒
+
+    if (elapsed >= animationDuration) {
+      // 既にアニメーションが終了している場合、即座に結果を表示
+      const newAssignments = event.shuffledAssignments
+        .filter((a) => a.memberId !== null)
+        .map((a) => ({
+          teamId: a.teamId,
+          taskLabelId: a.taskLabelId,
+          memberId: a.memberId,
+          assignedDate: a.assignedDate,
+        }));
+
+      const updatedData: AppData = {
+        ...data,
+        assignments: event.shuffledAssignments,
+        assignmentHistory: [...data.assignmentHistory, ...newAssignments],
+        shuffleEvent: undefined,
+      };
+      onUpdate(updatedData);
+      return;
+    }
+
+    // 残り時間でアニメーションを開始
+    const remainingTime = animationDuration - elapsed;
+    setIsShuffling(true);
+    setIsAnimating(true);
+    setIsCompleted(false);
+    setSelectedCell(null);
+    setHighlightedCell(null);
+    setShuffledAssignments(event.shuffledAssignments);
+  }, [data?.shuffleEvent, data, isShuffling, onUpdate]);
+
   useEffect(() => {
     if (!isShuffling) {
       if (shuffleIntervalRef.current) {
@@ -225,6 +294,16 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
     updateShuffleDisplay();
     shuffleIntervalRef.current = setInterval(updateShuffleDisplay, 100);
 
+    // 残り時間を計算（他端末からのイベントの場合）
+    let timeoutDuration = 3000; // デフォルトは3秒
+    if (data.shuffleEvent && shuffledAssignments) {
+      const startTime = new Date(data.shuffleEvent.startTime).getTime();
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const animationDuration = 3000;
+      timeoutDuration = Math.max(0, animationDuration - elapsed);
+    }
+
     shuffleTimeoutRef.current = setTimeout(() => {
       setIsAnimating(false);
       setIsCompleted(true);
@@ -241,6 +320,7 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
           ...data,
           assignments: shuffledAssignments,
           assignmentHistory: [...data.assignmentHistory, ...newAssignments],
+          shuffleEvent: undefined, // アニメーション終了時にイベントを削除
         };
         onUpdate(updatedData);
         setShuffledAssignments(null);
@@ -255,7 +335,7 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
       setTimeout(() => {
         setIsCompleted(false);
       }, 500);
-    }, 3000);
+    }, timeoutDuration);
 
     return () => {
       if (shuffleIntervalRef.current) {
@@ -463,16 +543,26 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
       <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
         <button
           onClick={() => {
+            const shuffled = shuffleAssignments(data);
+            const shuffleEvent: ShuffleEvent = {
+              startTime: new Date().toISOString(),
+              shuffledAssignments: shuffled,
+            };
+            
+            // shuffleEventをFirestoreに書き込む
+            const updatedData: AppData = {
+              ...data,
+              shuffleEvent,
+            };
+            onUpdate(updatedData);
+            
+            // ローカルでもアニメーションを開始
             setIsShuffling(true);
             setIsAnimating(true);
             setIsCompleted(false);
             setSelectedCell(null);
             setHighlightedCell(null);
-            const shuffled = shuffleAssignments(data);
             setShuffledAssignments(shuffled);
-            setTimeout(() => {
-              setIsAnimating(true);
-            }, 0);
           }}
           disabled={isShuffling || isAnimating || isAlreadyShuffled || isWeekend}
           className="px-6 py-3 sm:px-8 sm:py-4 bg-amber-700 text-white text-base sm:text-lg rounded-lg hover:bg-amber-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
@@ -488,16 +578,26 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
         {isDeveloperModeEnabled && (
           <button
             onClick={() => {
+              const shuffled = shuffleAssignments(data);
+              const shuffleEvent: ShuffleEvent = {
+                startTime: new Date().toISOString(),
+                shuffledAssignments: shuffled,
+              };
+              
+              // shuffleEventをFirestoreに書き込む
+              const updatedData: AppData = {
+                ...data,
+                shuffleEvent,
+              };
+              onUpdate(updatedData);
+              
+              // ローカルでもアニメーションを開始
               setIsShuffling(true);
               setIsAnimating(true);
               setIsCompleted(false);
               setSelectedCell(null);
               setHighlightedCell(null);
-              const shuffled = shuffleAssignments(data);
               setShuffledAssignments(shuffled);
-              setTimeout(() => {
-                setIsAnimating(true);
-              }, 0);
             }}
             disabled={isShuffling || isAnimating}
             className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-600 text-white text-sm sm:text-base rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"

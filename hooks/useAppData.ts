@@ -76,6 +76,7 @@ export function useAppData() {
         notifications: Array.isArray(newData.notifications) ? newData.notifications : data.notifications,
         manager: newData.manager !== undefined ? newData.manager : data.manager,
         userSettings: newData.userSettings || data.userSettings,
+        shuffleEvent: newData.shuffleEvent !== undefined ? newData.shuffleEvent : data.shuffleEvent,
       };
 
       isUpdatingRef.current = true;

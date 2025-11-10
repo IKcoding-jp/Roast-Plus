@@ -5,11 +5,20 @@ import {
   setDoc, 
   onSnapshot,
   deleteField,
+  Firestore,
 } from 'firebase/firestore';
 import app from './firebase';
 import type { AppData } from '@/types';
 
-const db = getFirestore(app);
+// Firestoreインスタンスを遅延初期化
+let db: Firestore | null = null;
+
+function getDb(): Firestore {
+  if (!db) {
+    db = getFirestore(app);
+  }
+  return db;
+}
 
 // 書き込み操作のデバウンスとキューイング
 const writeQueues = new Map<string, {
@@ -41,7 +50,7 @@ const defaultData: AppData = {
 };
 
 function getUserDocRef(userId: string) {
-  return doc(db, 'users', userId);
+  return doc(getDb(), 'users', userId);
 }
 
 // undefinedのフィールドを削除する関数（Firestoreはundefinedをサポートしていないため）

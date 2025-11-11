@@ -135,6 +135,7 @@ export interface AppData {
   notifications: Notification[]; // 通知
   userSettings?: UserSettings; // ユーザー設定
   shuffleEvent?: ShuffleEvent; // シャッフルイベント（マルチデバイス同期用）
+  encouragementCount?: number; // 応援カウント（全ユーザーで共有）
 }
 
 // 通知

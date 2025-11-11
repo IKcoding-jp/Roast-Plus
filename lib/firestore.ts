@@ -47,6 +47,7 @@ const defaultData: AppData = {
   tastingSessions: [],
   tastingRecords: [],
   notifications: [],
+  encouragementCount: 0,
 };
 
 function getUserDocRef(userId: string) {
@@ -98,6 +99,7 @@ function normalizeAppData(data: any): AppData {
     tastingSessions: Array.isArray(data?.tastingSessions) ? data.tastingSessions : [],
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],
+    encouragementCount: typeof data?.encouragementCount === 'number' ? data.encouragementCount : 0,
   };
   
   // userSettingsは存在する場合のみ追加（selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除）
@@ -280,9 +282,11 @@ export async function saveUserData(userId: string, data: AppData): Promise<void>
   
   // 新しいPromiseを作成
   const promise = new Promise<void>((resolve, reject) => {
-    // 既存のPromiseがある場合は、それを拒否して新しいPromiseに置き換え
+    // 既存のPromiseがある場合は、それを解決して新しいPromiseに置き換え
+    // デバウンス機能による正常な動作なので、エラーを投げずに解決する
     if (queue.pendingPromise) {
-      queue.pendingPromise.reject(new Error('New write request superseded previous one'));
+      // 前のPromiseを解決（エラーを投げない）
+      queue.pendingPromise.resolve();
     }
     queue.pendingPromise = { resolve, reject };
   });

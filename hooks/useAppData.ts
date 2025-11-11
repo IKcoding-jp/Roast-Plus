@@ -18,6 +18,7 @@ export function useAppData() {
     tastingSessions: [],
     tastingRecords: [],
     notifications: [],
+    encouragementCount: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const isUpdatingRef = useRef(false);
@@ -77,6 +78,7 @@ export function useAppData() {
         manager: newData.manager !== undefined ? newData.manager : data.manager,
         userSettings: newData.userSettings || data.userSettings,
         shuffleEvent: newData.shuffleEvent !== undefined ? newData.shuffleEvent : data.shuffleEvent,
+        encouragementCount: typeof newData.encouragementCount === 'number' ? newData.encouragementCount : (data.encouragementCount ?? 0),
       };
 
       isUpdatingRef.current = true;

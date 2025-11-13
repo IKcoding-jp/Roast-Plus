@@ -272,19 +272,10 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
 }
 
 // 書き込み操作を実行（リトライロジック付き）
-// Write stream exhausted対策: エラーハンドリング強化とキューサイズ監視
 async function executeWrite(userId: string, data: AppData): Promise<void> {
   const queue = writeQueues.get(userId);
   if (!queue) {
     throw new Error('Write queue not found');
-  }
-
-  // 書き込みキューサイズを監視（グローバルキューとセマフォ待機キューを考慮）
-  const totalQueuedWrites = writeWaitQueue.length + activeWriteCount;
-  if (totalQueuedWrites >= MAX_QUEUE_SIZE) {
-    // キューが飽和している場合は待機
-    console.warn(`Firestore write queue size (${totalQueuedWrites}) exceeds limit (${MAX_QUEUE_SIZE}), waiting...`);
-    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
   }
 
   queue.isWriting = true;
@@ -318,24 +309,10 @@ async function executeWrite(userId: string, data: AppData): Promise<void> {
     } catch (error: any) {
       queue.retryCount++;
       
-      // Write stream exhaustedエラーを検出（エラーコードまたはメッセージで判定）
-      const isWriteStreamExhausted = 
-        error?.code === 'resource-exhausted' ||
-        (error?.message && typeof error.message === 'string' && 
-         error.message.toLowerCase().includes('write stream exhausted'));
-      
-      if (isWriteStreamExhausted && queue.retryCount <= MAX_RETRY_COUNT) {
-        // Write stream exhaustedエラーの場合は、より長い待機時間を設定
-        // 指数バックオフ + 追加の待機時間（キューが飽和している可能性が高いため）
-        const baseDelay = RETRY_DELAY * Math.pow(2, queue.retryCount - 1);
-        const additionalDelay = writeWaitQueue.length * 200; // 待機中の書き込み数に応じて追加待機
-        const delay = Math.min(baseDelay + additionalDelay, 10000); // 最大10秒
-        
-        console.warn(
-          `Firestore write stream exhausted, retrying in ${delay}ms ` +
-          `(attempt ${queue.retryCount}/${MAX_RETRY_COUNT}, ` +
-          `queued: ${writeWaitQueue.length}, active: ${activeWriteCount})`
-        );
+      // resource-exhaustedエラーの場合、リトライ
+      if (error?.code === 'resource-exhausted' && queue.retryCount <= MAX_RETRY_COUNT) {
+        const delay = RETRY_DELAY * Math.pow(2, queue.retryCount - 1); // 指数バックオフ
+        console.warn(`Firestore write exhausted, retrying in ${delay}ms (attempt ${queue.retryCount}/${MAX_RETRY_COUNT})`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }

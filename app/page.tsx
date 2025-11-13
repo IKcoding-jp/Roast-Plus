@@ -87,9 +87,14 @@ export default function HomePage() {
             <div className="flex-shrink-0">
               <HiUsers className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-            <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
-              担当表
-            </h2>
+            <div className="flex-1 text-left">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+                担当表
+              </h2>
+              <p className="text-xs sm:text-sm text-red-600 mt-1">
+                ※バグが発生していて、使えません。
+              </p>
+            </div>
           </button>
 
           {/* スケジュールカード */}

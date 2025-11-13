@@ -55,9 +55,14 @@ export default function AssignmentPage() {
                 ホームに戻る
               </Link>
             </div>
-            <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
-              担当表
-            </h1>
+            <div className="w-full sm:w-auto sm:flex-1 text-center">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                担当表
+              </h1>
+              <p className="text-xs sm:text-sm text-red-600 mt-1">
+                ※バグが発生していて、使えません。
+              </p>
+            </div>
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
           </div>
         </header>

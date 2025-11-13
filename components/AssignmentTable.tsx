@@ -565,7 +565,7 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
             setShuffledAssignments(shuffled);
           }}
           disabled={isShuffling || isAnimating || isAlreadyShuffled || isWeekend}
-          className="px-6 py-3 sm:px-8 sm:py-4 bg-amber-700 text-white text-base sm:text-lg rounded-lg hover:bg-amber-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="px-6 py-3 sm:px-8 sm:py-4 bg-orange-500 text-white text-base sm:text-lg rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isShuffling || isAnimating
             ? 'シャッフル中...'

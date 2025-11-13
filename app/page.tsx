@@ -5,20 +5,18 @@ import { useAuth, signOut } from '@/lib/auth';
 import { useEffect } from 'react';
 import { PiCoffeeBeanFill } from "react-icons/pi";
 import { RiCalendarScheduleLine, RiBookFill } from "react-icons/ri";
-import { FaCoffee, FaThumbsUp } from "react-icons/fa";
+import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
 import { IoSettings } from "react-icons/io5";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
 import { useNotifications } from '@/hooks/useNotifications';
-import { useAppData } from '@/hooks/useAppData';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const { unreadCount } = useNotifications();
-  const { data, updateData } = useAppData();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -32,25 +30,6 @@ export default function HomePage() {
       router.push('/login');
     } catch (error) {
       console.error('ログアウトエラー:', error);
-    }
-  };
-
-  const handleEncouragementClick = async () => {
-    try {
-      const currentCount = data.encouragementCount ?? 0;
-      await updateData({
-        ...data,
-        encouragementCount: currentCount + 1,
-      });
-    } catch (error: any) {
-      // Firestoreのデバウンス機能によるエラーは無視（正常な動作の一部）
-      if (error?.message === 'New write request superseded previous one') {
-        // このエラーは正常な動作の一部なので無視
-        // コンソールにエラーを表示しない
-        return;
-      }
-      // その他のエラーのみコンソールに表示
-      console.error('応援カウント更新エラー:', error);
     }
   };
 
@@ -96,18 +75,6 @@ export default function HomePage() {
           </button>
         </div>
       </header>
-
-      {/* 応援メッセージバナー */}
-      <div className="bg-amber-100 border-b border-amber-200 px-4 py-3">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center justify-center gap-2">
-            <FaThumbsUp className="h-5 w-5 text-amber-700 flex-shrink-0" />
-            <p className="text-sm text-amber-900 leading-relaxed text-center">
-              開発者は「ITパスポート」という資格試験を11月15日に受けるので、開発は来週までお休みします。応援してね！
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 py-6 sm:py-8">

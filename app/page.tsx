@@ -91,9 +91,6 @@ export default function HomePage() {
               <h2 className="text-base sm:text-lg font-semibold text-gray-800">
                 担当表
               </h2>
-              <p className="text-xs sm:text-sm text-red-600 mt-1">
-                ※バグが発生していて、使えません。
-              </p>
             </div>
           </button>
 

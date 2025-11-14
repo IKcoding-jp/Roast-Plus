@@ -59,9 +59,6 @@ export default function AssignmentPage() {
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
                 担当表
               </h1>
-              <p className="text-xs sm:text-sm text-red-600 mt-1">
-                ※バグが発生していて、使えません。
-              </p>
             </div>
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
           </div>

@@ -23,6 +23,70 @@ function getJSTDayOfWeek(): number {
   return jstTime.getDay();
 }
 
+// チームAとチームBを特定するヘルパー関数
+function findTeamsAAndB(teams: Array<{ id: string; name: string }>): {
+  teamA: { id: string; name: string } | null;
+  teamB: { id: string; name: string } | null;
+} {
+  const teamA = teams.find((t) => t.name === 'A') || null;
+  const teamB = teams.find((t) => t.name === 'B') || null;
+  return { teamA, teamB };
+}
+
+// ペアを正規化する関数（メンバーIDを辞書順でソート）
+function normalizePair(memberId1: string, memberId2: string): string {
+  return [memberId1, memberId2].sort().join('-');
+}
+
+// 過去7日間の履歴から、タスクラベルに関係なくA-Bペアを抽出する関数
+function getRecentPairs(
+  assignmentHistory: Assignment[],
+  teamAId: string,
+  teamBId: string
+): Set<string> {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 7);
+
+  // 過去7日間の履歴をフィルタリング（タスクラベルに関係なく）
+  const recentHistory = assignmentHistory.filter(
+    (h) =>
+      (h.teamId === teamAId || h.teamId === teamBId) &&
+      new Date(h.assignedDate) >= cutoffDate &&
+      h.memberId !== null
+  );
+
+  // 日付とタスクラベルごとにグループ化
+  const historyByDateAndLabel = new Map<string, Map<string, { teamA?: string; teamB?: string }>>();
+  for (const h of recentHistory) {
+    const date = h.assignedDate;
+    if (!historyByDateAndLabel.has(date)) {
+      historyByDateAndLabel.set(date, new Map());
+    }
+    const dayHistoryByLabel = historyByDateAndLabel.get(date)!;
+    if (!dayHistoryByLabel.has(h.taskLabelId)) {
+      dayHistoryByLabel.set(h.taskLabelId, {});
+    }
+    const dayHistory = dayHistoryByLabel.get(h.taskLabelId)!;
+    if (h.teamId === teamAId && h.memberId) {
+      dayHistory.teamA = h.memberId;
+    } else if (h.teamId === teamBId && h.memberId) {
+      dayHistory.teamB = h.memberId;
+    }
+  }
+
+  // AチームとBチームの両方にメンバーが割り当てられている日のペアを抽出（全タスクラベル）
+  const pairs = new Set<string>();
+  for (const dayHistoryByLabel of historyByDateAndLabel.values()) {
+    for (const dayHistory of dayHistoryByLabel.values()) {
+      if (dayHistory.teamA && dayHistory.teamB) {
+        pairs.add(normalizePair(dayHistory.teamA, dayHistory.teamB));
+      }
+    }
+  }
+
+  return pairs;
+}
+
 function shuffleAssignments(
   data: AppData,
   assignedDate: string = new Date().toISOString().split('T')[0]
@@ -30,35 +94,206 @@ function shuffleAssignments(
   const { teams, members, taskLabels, assignments, assignmentHistory } = data;
   const result: Assignment[] = [];
 
+  // チームAとチームBを特定
+  const { teamA, teamB } = findTeamsAAndB(teams);
+  const isPairCheckEnabled = teamA !== null && teamB !== null;
+
+  // 過去7日間のペア履歴を取得（タスクラベルに関係なく、一度だけ取得）
+  const recentPairs = isPairCheckEnabled && teamA && teamB
+    ? getRecentPairs(assignmentHistory, teamA.id, teamB.id)
+    : new Set<string>();
+
+  // 各チームのメンバーを事前に取得
+  const teamMembersMap = new Map<string, typeof members>();
+  const shuffledMembersMap = new Map<string, typeof members>();
+  const usedMembersMap = new Map<string, Set<string>>();
+
   for (const team of teams) {
     const teamMembers = members.filter((m) => m.teamId === team.id);
+    teamMembersMap.set(team.id, teamMembers);
+    shuffledMembersMap.set(team.id, [...teamMembers].sort(() => Math.random() - 0.5));
+    usedMembersMap.set(team.id, new Set<string>());
+  }
 
-    if (teamMembers.length === 0) {
-      for (const label of taskLabels) {
-        result.push({
-          teamId: team.id,
-          taskLabelId: label.id,
-          memberId: null,
-          assignedDate,
-        });
+  // 各タスクラベルに対して、全チームの割り当てを決定
+  const labels = [...taskLabels];
+  const maxLabelCount = Math.max(
+    ...teams.map((team) => {
+      const teamMembers = teamMembersMap.get(team.id) || [];
+      return Math.max(taskLabels.length, teamMembers.length);
+    })
+  );
+
+  for (let i = taskLabels.length; i < maxLabelCount; i++) {
+    // 空ラベルは最初のチームのIDを使用（既存ロジックとの互換性のため）
+    labels.push({
+      id: `empty-label-${teams[0]?.id || 'default'}-${i}`,
+      leftLabel: '',
+      rightLabel: null,
+    });
+  }
+
+  for (const label of labels) {
+    // 各チームの割り当てを決定
+    const labelAssignments: { teamId: string; memberId: string | null }[] = [];
+
+    // AチームとBチームの割り当てを先に決定（ペアチェックのため）
+    if (isPairCheckEnabled && teamA && teamB) {
+      const teamAMembers = teamMembersMap.get(teamA.id) || [];
+      const teamBMembers = teamMembersMap.get(teamB.id) || [];
+
+      if (teamAMembers.length > 0 || teamBMembers.length > 0) {
+        // Aチームの割り当てを決定
+        let teamAMemberId: string | null = null;
+        if (teamAMembers.length > 0) {
+          const shuffledTeamA = shuffledMembersMap.get(teamA.id) || [];
+          const usedTeamA = usedMembersMap.get(teamA.id) || new Set();
+
+          // 過去7日間の履歴を取得
+          const recentHistoryA = (() => {
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 7);
+            return assignmentHistory.filter(
+              (h) =>
+                h.teamId === teamA.id &&
+                h.taskLabelId === label.id &&
+                new Date(h.assignedDate) >= cutoffDate
+            );
+          })();
+          const recentMemberIdsA = recentHistoryA
+            .map((h) => h.memberId)
+            .filter((id) => id !== null) as string[];
+
+          const currentAssignmentA = assignments.find(
+            (a) => a.teamId === teamA.id && a.taskLabelId === label.id
+          );
+          const currentMemberIdA = currentAssignmentA?.memberId || null;
+
+          let availableMembersA = shuffledTeamA.filter(
+            (m) => !usedTeamA.has(m.id) && !(m.excludedTaskLabelIds || []).includes(label.id)
+          );
+
+          let filteredMembersA = availableMembersA.filter(
+            (m) => !recentMemberIdsA.includes(m.id) && m.id !== currentMemberIdA
+          );
+
+          if (filteredMembersA.length === 0) {
+            filteredMembersA = availableMembersA.filter((m) => m.id !== currentMemberIdA);
+          }
+
+          if (filteredMembersA.length === 0) {
+            filteredMembersA = availableMembersA;
+          }
+
+          teamAMemberId =
+            filteredMembersA.length > 0
+              ? filteredMembersA[Math.floor(Math.random() * filteredMembersA.length)].id
+              : null;
+
+          if (teamAMemberId) {
+            usedTeamA.add(teamAMemberId);
+          }
+        }
+
+        // Bチームの割り当てを決定（Aチームのメンバーとペアの連続チェック）
+        let teamBMemberId: string | null = null;
+        if (teamBMembers.length > 0) {
+          const shuffledTeamB = shuffledMembersMap.get(teamB.id) || [];
+          const usedTeamB = usedMembersMap.get(teamB.id) || new Set();
+
+          // 過去7日間の履歴を取得
+          const recentHistoryB = (() => {
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 7);
+            return assignmentHistory.filter(
+              (h) =>
+                h.teamId === teamB.id &&
+                h.taskLabelId === label.id &&
+                new Date(h.assignedDate) >= cutoffDate
+            );
+          })();
+          const recentMemberIdsB = recentHistoryB
+            .map((h) => h.memberId)
+            .filter((id) => id !== null) as string[];
+
+          const currentAssignmentB = assignments.find(
+            (a) => a.teamId === teamB.id && a.taskLabelId === label.id
+          );
+          const currentMemberIdB = currentAssignmentB?.memberId || null;
+
+          let availableMembersB = shuffledTeamB.filter(
+            (m) => !usedTeamB.has(m.id) && !(m.excludedTaskLabelIds || []).includes(label.id)
+          );
+
+          // 既存のフィルタリング（最近担当したメンバーと現在のメンバーを除外）
+          let filteredMembersB = availableMembersB.filter(
+            (m) => !recentMemberIdsB.includes(m.id) && m.id !== currentMemberIdB
+          );
+
+          // ペアの連続チェックを追加（Aチームのメンバーが決定済みの場合）
+          if (teamAMemberId) {
+            filteredMembersB = filteredMembersB.filter((m) => {
+              const pair = normalizePair(teamAMemberId!, m.id);
+              return !recentPairs.has(pair);
+            });
+          }
+
+          // フォールバック処理（段階的に緩和）
+          if (filteredMembersB.length === 0) {
+            // ペアチェックを緩和
+            if (teamAMemberId) {
+              filteredMembersB = availableMembersB.filter(
+                (m) => !recentMemberIdsB.includes(m.id) && m.id !== currentMemberIdB
+              );
+            } else {
+              filteredMembersB = availableMembersB.filter((m) => m.id !== currentMemberIdB);
+            }
+          }
+
+          if (filteredMembersB.length === 0) {
+            filteredMembersB = availableMembersB.filter((m) => m.id !== currentMemberIdB);
+          }
+
+          if (filteredMembersB.length === 0) {
+            filteredMembersB = availableMembersB;
+          }
+
+          teamBMemberId =
+            filteredMembersB.length > 0
+              ? filteredMembersB[Math.floor(Math.random() * filteredMembersB.length)].id
+              : null;
+
+          if (teamBMemberId) {
+            usedTeamB.add(teamBMemberId);
+          }
+        }
+
+        labelAssignments.push({ teamId: teamA.id, memberId: teamAMemberId });
+        labelAssignments.push({ teamId: teamB.id, memberId: teamBMemberId });
+      } else {
+        // メンバーがいない場合はnullを割り当て
+        labelAssignments.push({ teamId: teamA.id, memberId: null });
+        labelAssignments.push({ teamId: teamB.id, memberId: null });
       }
-      continue;
     }
 
-    const shuffledMembers = [...teamMembers].sort(() => Math.random() - 0.5);
-    const usedMembers = new Set<string>();
-    const labels = [...taskLabels];
-    const maxCount = Math.max(taskLabels.length, teamMembers.length);
+    // 他のチームの割り当てを決定（既存のロジックを使用）
+    for (const team of teams) {
+      // AチームとBチームは既に処理済み
+      if (isPairCheckEnabled && teamA && teamB && (team.id === teamA.id || team.id === teamB.id)) {
+        continue;
+      }
 
-    for (let i = taskLabels.length; i < maxCount; i++) {
-      labels.push({
-        id: `empty-label-${team.id}-${i}`,
-        leftLabel: '',
-        rightLabel: null,
-      });
-    }
+      const teamMembers = teamMembersMap.get(team.id) || [];
 
-    for (const label of labels) {
+      if (teamMembers.length === 0) {
+        labelAssignments.push({ teamId: team.id, memberId: null });
+        continue;
+      }
+
+      const shuffledMembers = shuffledMembersMap.get(team.id) || [];
+      const usedMembers = usedMembersMap.get(team.id) || new Set();
+
       // 過去7日間の履歴を取得
       const recentHistory = (() => {
         const cutoffDate = new Date();
@@ -102,16 +337,24 @@ function shuffleAssignments(
           ? filteredMembers[Math.floor(Math.random() * filteredMembers.length)]
           : null;
 
-      result.push({
+      labelAssignments.push({
         teamId: team.id,
-        taskLabelId: label.id,
         memberId: selectedMember?.id || null,
-        assignedDate,
       });
 
       if (selectedMember) {
         usedMembers.add(selectedMember.id);
       }
+    }
+
+    // 結果に追加
+    for (const assignment of labelAssignments) {
+      result.push({
+        teamId: assignment.teamId,
+        taskLabelId: label.id,
+        memberId: assignment.memberId,
+        assignedDate,
+      });
     }
   }
 

@@ -62,51 +62,6 @@ export default function SettingsPage() {
     setPasswordError(null);
   };
 
-  const handleMemberChange = async (value: string) => {
-    try {
-      let updatedSettings;
-      if (value) {
-        // 値が"manager-"で始まる場合は管理者ID、それ以外はメンバーID
-        if (value.startsWith('manager-')) {
-          const managerId = value.replace('manager-', '');
-          updatedSettings = {
-            ...data.userSettings,
-            selectedMemberId: undefined,
-            selectedManagerId: managerId,
-          };
-          console.log('管理者選択:', { managerId, updatedSettings, currentUserSettings: data.userSettings });
-        } else {
-          updatedSettings = {
-            ...data.userSettings,
-            selectedMemberId: value,
-            selectedManagerId: undefined,
-          };
-          console.log('メンバー選択:', { memberId: value, updatedSettings, currentUserSettings: data.userSettings });
-        }
-      } else {
-        // 空文字列の場合はuserSettingsをundefinedにする（フィールドを削除）
-        updatedSettings = data.userSettings
-          ? { ...data.userSettings, selectedMemberId: undefined, selectedManagerId: undefined }
-          : undefined;
-        console.log('選択解除:', { updatedSettings, currentUserSettings: data.userSettings });
-      }
-      await updateData({
-        ...data,
-        userSettings: updatedSettings,
-      });
-    } catch (error) {
-      console.error('Failed to update member setting:', error);
-    }
-  };
-
-  // 選択された値を取得（メンバーIDまたは管理者ID）
-  const selectedValue = data.userSettings?.selectedMemberId 
-    ? data.userSettings.selectedMemberId
-    : data.userSettings?.selectedManagerId
-    ? `manager-${data.userSettings.selectedManagerId}`
-    : '';
-  const activeMembers = data.members.filter((m) => m.active !== false);
-
   return (
     <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -146,47 +101,6 @@ export default function SettingsPage() {
                   onChange={handleToggleChange}
                 />
               </div>
-            </div>
-          </div>
-
-          {/* デバイス使用者設定セクション */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              デバイス使用者設定
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              このアプリは１つのアカウントを複数のデバイスで共有することを前提としたアプリなので、
-              <br />
-              使用しているデバイスが誰のものかを区別するために、この設定で自分の名前を選択してください。
-              <br />
-            </p>
-            <div className="mt-4">
-              <label
-                htmlFor="member-select"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                自分の名前
-              </label>
-              <select
-                id="member-select"
-                value={selectedValue}
-                onChange={(e) => handleMemberChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-              >
-                <option value="" className="text-gray-900">
-                  選択してください
-                </option>
-                {data.manager && (
-                  <option value={`manager-${data.manager.id}`} className="text-gray-900">
-                    {data.manager.name}（管理者）
-                  </option>
-                )}
-                {activeMembers.map((member) => (
-                  <option key={member.id} value={member.id} className="text-gray-900">
-                    {member.name}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
 

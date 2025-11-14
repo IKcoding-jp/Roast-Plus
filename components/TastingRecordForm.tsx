@@ -60,17 +60,14 @@ export function TastingRecordForm({
   const sessionRecords = currentSessionId
     ? getRecordsBySessionId(data.tastingRecords, currentSessionId)
     : [];
-  
-  // 設定からメンバーIDまたは管理者IDを取得
-  const selectedMemberId = data.userSettings?.selectedMemberId || '';
-  const selectedManagerId = data.userSettings?.selectedManagerId || '';
-  // メンバーIDまたは管理者IDのいずれかが設定されているか
-  const hasSelectedParticipant = !!(selectedMemberId || selectedManagerId);
-  // 実際に使用するID（メンバーIDが優先、なければ管理者ID）
-  const selectedParticipantId = selectedMemberId || selectedManagerId;
 
-  // メンバーID（新規作成時は設定から、編集時はrecordから）
-  const memberId = record?.memberId || selectedParticipantId;
+  // 全メンバーを取得（アクティブなメンバーのみ）
+  const activeMembers = data.members.filter((m) => m.active !== false);
+
+  // メンバー選択用のstate（新規作成時は空、編集時は既存のmemberIdを初期値）
+  const [selectedMemberId, setSelectedMemberId] = useState<string>(
+    record?.memberId || ''
+  );
 
   const [beanName, setBeanName] = useState(record?.beanName || '');
   const [tastingDate, setTastingDate] = useState(
@@ -103,25 +100,32 @@ export function TastingRecordForm({
     }
   }, [record, session?.id, currentSessionId]);
 
+  // 編集時にrecordが変更された場合、selectedMemberIdを更新
+  useEffect(() => {
+    if (record?.memberId) {
+      setSelectedMemberId(record.memberId);
+    }
+  }, [record?.id]);
+
   // 重複チェック（セッション内で同じメンバーの記録があるか）
   useEffect(() => {
     // 編集時は重複チェックしない
-    if (record !== null || !currentSessionId || !memberId) {
-      if (prevMemberIdRef.current !== memberId) {
+    if (record !== null || !currentSessionId || !selectedMemberId) {
+      if (prevMemberIdRef.current !== selectedMemberId) {
         setExistingRecordId(null);
-        prevMemberIdRef.current = memberId;
+        prevMemberIdRef.current = selectedMemberId;
       }
       return;
     }
 
     // メンバーIDが変更されていない場合はスキップ（無限ループ防止）
-    if (prevMemberIdRef.current === memberId) {
+    if (prevMemberIdRef.current === selectedMemberId) {
       return;
     }
 
-    prevMemberIdRef.current = memberId;
+    prevMemberIdRef.current = selectedMemberId;
 
-    const existingRecord = sessionRecords.find((r) => r.memberId === memberId);
+    const existingRecord = sessionRecords.find((r) => r.memberId === selectedMemberId);
 
     if (existingRecord) {
       // 既存記録のIDを保持
@@ -147,7 +151,7 @@ export function TastingRecordForm({
         setOverallImpression('');
       }
     }
-  }, [memberId, currentSessionId, record, sessionRecords, selectedParticipantId]);
+  }, [selectedMemberId, currentSessionId, record, sessionRecords]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,11 +161,9 @@ export function TastingRecordForm({
       return;
     }
 
-    // 新規作成時は設定からメンバーIDまたは管理者IDを取得
-    const finalMemberId = record?.memberId || selectedParticipantId || '';
-    
-    if (!finalMemberId) {
-      showToast('設定画面から自分の名前を設定してください', 'warning');
+    // メンバーIDの検証
+    if (!selectedMemberId) {
+      showToast('メンバーを選択してください', 'warning');
       return;
     }
 
@@ -194,7 +196,7 @@ export function TastingRecordForm({
       createdAt: record?.createdAt || (existingRecordId ? (sessionRecords.find((r) => r.id === existingRecordId)?.createdAt || now) : now),
       updatedAt: now,
       userId: record?.userId || '', // これは親コンポーネントで設定される
-      memberId: finalMemberId,
+      memberId: selectedMemberId,
     };
 
     onSave(newRecord);
@@ -310,33 +312,28 @@ export function TastingRecordForm({
       </div>
       )}
 
-      {/* メンバー表示（編集時のみ） */}
-      {!isNew && record && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            メンバー
-          </label>
-          <input
-            type="text"
-            value={
-              record.memberId === selectedMemberId
-                ? data.members.find((m) => m.id === record.memberId)?.name || '不明'
-                : '匿名'
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
-            disabled
-          />
-        </div>
-      )}
-
-      {/* メンバー未設定警告（新規作成時のみ） */}
-      {isNew && !hasSelectedParticipant && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-800">
-            この機能を使用するには、設定画面からデバイス使用者を設定する必要があります。
-          </p>
-        </div>
-      )}
+      {/* メンバー選択 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          メンバー <span className="text-red-500">*</span>
+        </label>
+        <select
+          value={selectedMemberId}
+          onChange={(e) => setSelectedMemberId(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+          required
+          disabled={readOnly}
+        >
+          <option value="" className="text-gray-900">
+            選択してください
+          </option>
+          {activeMembers.map((member) => (
+            <option key={member.id} value={member.id} className="text-gray-900">
+              {member.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* 評価項目 */}
       <div className="bg-white rounded-lg p-6 border border-gray-200">

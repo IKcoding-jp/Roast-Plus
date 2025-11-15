@@ -875,7 +875,7 @@ export async function addCompletedCountToWorkProgress(
   
   // 完成数を累積
   const completedCount = (existing.completedCount || 0) + count;
-  
+
   // 進捗履歴に新しいエントリを追加（完成数の追加も履歴として記録）
   const newProgressEntry: ProgressEntry = {
     id: crypto.randomUUID(),
@@ -883,13 +883,29 @@ export async function addCompletedCountToWorkProgress(
     amount: count, // 完成数もamountとして記録（単位は異なるが、履歴として統一）
     memo: memo?.trim() || undefined,
   };
-  
+
   const progressHistory = [...(existing.progressHistory || []), newProgressEntry];
-  
+
+  // 進捗状態の自動変更
+  let status = existing.status;
+  let startedAt = existing.startedAt;
+
+  // 完成数が0から増えた場合、pending → in_progress に自動変更
+  const previousCount = existing.completedCount || 0;
+  if (previousCount === 0 && completedCount > 0 && status === 'pending') {
+    status = 'in_progress';
+    // startedAtがない場合は設定
+    if (!startedAt) {
+      startedAt = now;
+    }
+  }
+
   const updatedWorkProgress: WorkProgress = {
     ...existing,
     completedCount,
     progressHistory,
+    status,
+    startedAt,
     updatedAt: now,
   };
   
@@ -945,18 +961,31 @@ export async function addProgressToWorkProgress(
     amount,
     memo: memo?.trim() || undefined,
   };
-  
+
   const progressHistory = [...(existing.progressHistory || []), newProgressEntry];
-  
-  // 目標量に達した場合は進捗状態をcompletedに自動変更
+
+  // 進捗状態の自動変更
   let status = existing.status;
   let completedAt = existing.completedAt;
+  let startedAt = existing.startedAt;
+
+  // 進捗量が0から増えた場合、pending → in_progress に自動変更
+  const previousAmount = existing.currentAmount || 0;
+  if (previousAmount === 0 && currentAmount > 0 && status === 'pending') {
+    status = 'in_progress';
+    // startedAtがない場合は設定
+    if (!startedAt) {
+      startedAt = now;
+    }
+  }
+
+  // 目標量に達した場合は進捗状態をcompletedに自動変更
   if (currentAmount >= existing.targetAmount && status !== 'completed') {
     status = 'completed';
     completedAt = now;
     // startedAtがない場合は設定
-    if (!existing.startedAt) {
-      existing.startedAt = now;
+    if (!startedAt) {
+      startedAt = now;
     }
   }
   
@@ -965,6 +994,7 @@ export async function addProgressToWorkProgress(
     currentAmount,
     progressHistory,
     status,
+    startedAt,
     completedAt,
     updatedAt: now,
   };

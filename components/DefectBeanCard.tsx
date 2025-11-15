@@ -56,7 +56,7 @@ export function DefectBeanCard({
       >
         {/* 画像 */}
         <div
-          className="relative w-full h-48 bg-gray-100 cursor-pointer"
+          className="relative w-full aspect-square bg-gray-100 cursor-pointer"
           onClick={(e) => {
             e.stopPropagation(); // カードクリックを防ぐ
             setShowImageModal(true);

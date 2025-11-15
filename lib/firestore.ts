@@ -654,21 +654,34 @@ export async function updateDefectBeanSetting(
 // ===== 作業進捗関連の関数 =====
 
 /**
- * weightフィールド（文字列、例：「10kg」）から目標量（数値）を抽出
- * @param weight 重量文字列（例：「10kg」「10.5kg」）
- * @returns 目標量（数値、kg単位）。抽出できない場合はundefined
+ * weightフィールド（文字列、例：「10kg」「5個」「3枚」）から目標量（数値）を抽出
+ * @param weight 数量文字列（例：「10kg」「5個」「3枚」「10.5kg」）
+ * @returns 目標量（数値）。抽出できない場合はundefined
  */
 function extractTargetAmount(weight?: string): number | undefined {
   if (!weight) return undefined;
   
-  // 正規表現で数値を抽出（小数点を含む）
-  const match = weight.match(/^(\d+(?:\.\d+)?)\s*kg$/i);
+  // 正規表現で数値を抽出（小数点を含む、単位はkg、個、枚などに対応）
+  const match = weight.match(/^(\d+(?:\.\d+)?)\s*(kg|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
   if (match && match[1]) {
     const amount = parseFloat(match[1]);
     return isNaN(amount) ? undefined : amount;
   }
   
   return undefined;
+}
+
+/**
+ * weightフィールドから単位を抽出
+ * @param weight 数量文字列（例：「10kg」「5個」「3枚」）
+ * @returns 単位（例：「kg」「個」「枚」）。単位がない場合は空文字列
+ */
+function extractUnit(weight?: string): string {
+  if (!weight) return '';
+  
+  // 正規表現で単位を抽出
+  const match = weight.match(/^\d+(?:\.\d+)?\s*(kg|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
+  return match && match[1] ? match[1] : '';
 }
 
 /**

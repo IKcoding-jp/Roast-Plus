@@ -435,8 +435,22 @@ export default function ProgressPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {/* 前（未着手）列 */}
             <div className="flex flex-col">
-              <div className="bg-gray-100 rounded-t-lg p-3 mb-3 sticky top-0 z-10">
-                <h2 className="text-lg font-semibold text-gray-800">前（未着手）</h2>
+              <div className="bg-gray-100 border-l-4 border-gray-300 rounded-lg p-3 mb-3 sticky top-0 z-10 shadow-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-lg font-semibold text-gray-600">前（未着手）</h2>
+                  {(() => {
+                    const pendingCount = 
+                      groupedWorkProgresses.groups
+                        .filter((group) => group.workProgresses.some((wp) => wp.status === 'pending'))
+                        .reduce((sum, group) => sum + group.workProgresses.filter((wp) => wp.status === 'pending').length, 0) +
+                      groupedWorkProgresses.ungrouped.filter((wp) => wp.status === 'pending').length;
+                    return pendingCount > 0 ? (
+                      <span className="bg-gray-200 text-gray-600 rounded-full px-2.5 py-1 text-xs font-semibold">
+                        {pendingCount}
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
               </div>
               <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
                 {/* pending状態のグループ化されたカード */}
@@ -754,8 +768,22 @@ export default function ProgressPage() {
 
             {/* 途中列 */}
             <div className="flex flex-col">
-              <div className="bg-gray-100 rounded-t-lg p-3 mb-3 sticky top-0 z-10">
-                <h2 className="text-lg font-semibold text-gray-800">途中</h2>
+              <div className="bg-amber-50 border-l-4 border-amber-300 rounded-lg p-3 mb-3 sticky top-0 z-10 shadow-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-lg font-semibold text-amber-700">途中</h2>
+                  {(() => {
+                    const inProgressCount = 
+                      groupedWorkProgresses.groups
+                        .filter((group) => group.workProgresses.some((wp) => wp.status === 'in_progress'))
+                        .reduce((sum, group) => sum + group.workProgresses.filter((wp) => wp.status === 'in_progress').length, 0) +
+                      groupedWorkProgresses.ungrouped.filter((wp) => wp.status === 'in_progress').length;
+                    return inProgressCount > 0 ? (
+                      <span className="bg-amber-100 text-amber-700 rounded-full px-2.5 py-1 text-xs font-semibold">
+                        {inProgressCount}
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
               </div>
               <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
                 {/* in_progress状態のグループ化されたカード */}
@@ -1073,8 +1101,22 @@ export default function ProgressPage() {
 
             {/* 済（完了）列 */}
             <div className="flex flex-col">
-              <div className="bg-gray-100 rounded-t-lg p-3 mb-3 sticky top-0 z-10">
-                <h2 className="text-lg font-semibold text-gray-800">済（完了）</h2>
+              <div className="bg-green-50 border-l-4 border-green-300 rounded-lg p-3 mb-3 sticky top-0 z-10 shadow-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-lg font-semibold text-green-700">済（完了）</h2>
+                  {(() => {
+                    const completedCount = 
+                      groupedWorkProgresses.groups
+                        .filter((group) => group.workProgresses.some((wp) => wp.status === 'completed'))
+                        .reduce((sum, group) => sum + group.workProgresses.filter((wp) => wp.status === 'completed').length, 0) +
+                      groupedWorkProgresses.ungrouped.filter((wp) => wp.status === 'completed').length;
+                    return completedCount > 0 ? (
+                      <span className="bg-green-100 text-green-700 rounded-full px-2.5 py-1 text-xs font-semibold">
+                        {completedCount}
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
               </div>
               <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
                 {/* completed状態のグループ化されたカード */}

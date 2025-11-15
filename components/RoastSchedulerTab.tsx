@@ -11,9 +11,11 @@ import { CountryFlagEmoji } from './CountryFlagEmoji';
 interface RoastSchedulerTabProps {
   data: AppData | null;
   onUpdate: (data: AppData) => void;
+  selectedDate: string; // YYYY-MM-DD形式
+  isToday: boolean; // 選択日が今日かどうか
 }
 
-export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
+export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: RoastSchedulerTabProps) {
   const [editingSchedule, setEditingSchedule] = useState<RoastSchedule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -27,7 +29,8 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
     );
   }
 
-  const roastSchedules = data.roastSchedules || [];
+  // 選択日のスケジュールのみをフィルタリング
+  const roastSchedules = (data.roastSchedules || []).filter((s) => s.date === selectedDate);
 
   // 時間順にソート（orderが設定されている場合はorder順、設定されていない場合は時間順）
   const sortedSchedules = useMemo(() => {
@@ -122,23 +125,32 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
   };
 
   const handleSave = (schedule: RoastSchedule) => {
-    const updatedSchedules = [...roastSchedules];
-    const existingIndex = updatedSchedules.findIndex((s) => s.id === schedule.id);
+    // 全スケジュールを取得（選択日でフィルタリングする前）
+    const allSchedules = data.roastSchedules || [];
+    const updatedSchedules = [...allSchedules];
+    
+    // 選択日のスケジュールのみを対象にする
+    const schedulesForSelectedDate = updatedSchedules.filter((s) => s.date === selectedDate);
+    const existingIndex = schedulesForSelectedDate.findIndex((s) => s.id === schedule.id);
+    const existingIndexInAll = updatedSchedules.findIndex((s) => s.id === schedule.id);
 
-    if (existingIndex >= 0) {
-      // 既存のスケジュールを更新
-      updatedSchedules[existingIndex] = schedule;
+    if (existingIndex >= 0 && existingIndexInAll >= 0) {
+      // 既存のスケジュールを更新（日付も更新）
+      updatedSchedules[existingIndexInAll] = {
+        ...schedule,
+        date: selectedDate,
+      };
     } else {
       // 新しいスケジュールを追加
       // アフターパージやチャフのお掃除が存在する場合、最後のアフターパージの直後に追加
       if (!schedule.isAfterPurge && !schedule.isChaffCleaning) {
-        // 最後のアフターパージのインデックスとorder値を探す
+        // 選択日のスケジュール内で最後のアフターパージのインデックスとorder値を探す
         let lastAfterPurgeIndex = -1;
         let maxAfterPurgeOrder = -1;
-        for (let i = updatedSchedules.length - 1; i >= 0; i--) {
-          if (updatedSchedules[i].isAfterPurge) {
+        for (let i = schedulesForSelectedDate.length - 1; i >= 0; i--) {
+          if (schedulesForSelectedDate[i].isAfterPurge) {
             lastAfterPurgeIndex = i;
-            const order = updatedSchedules[i].order ?? 0;
+            const order = schedulesForSelectedDate[i].order ?? 0;
             if (order > maxAfterPurgeOrder) {
               maxAfterPurgeOrder = order;
             }
@@ -149,26 +161,31 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
           // アフターパージの後に追加するため、orderに大きな値を設定
           const newSchedule: RoastSchedule = {
             ...schedule,
+            date: selectedDate,
             order: maxAfterPurgeOrder + 1000, // アフターパージより後になるように大きな値を設定
           };
           updatedSchedules.push(newSchedule);
         } else {
           // アフターパージが存在しない場合、orderを設定せずに追加（時間順でソートされる）
-          updatedSchedules.push(schedule);
+          updatedSchedules.push({
+            ...schedule,
+            date: selectedDate,
+          });
         }
       } else if (schedule.isAfterPurge) {
         // 追加するのがアフターパージの場合は、orderに大きな値を設定して末尾に追加
         const newSchedule: RoastSchedule = {
           ...schedule,
+          date: selectedDate,
           order: (updatedSchedules.length + 1) * 1000, // 末尾になるように大きな値を設定
         };
         updatedSchedules.push(newSchedule);
       } else if (schedule.isChaffCleaning) {
-        // 追加するのがチャフのお掃除の場合は、最後のアフターパージの直後に追加
+        // 追加するのがチャフのお掃除の場合は、選択日のスケジュール内で最後のアフターパージの直後に追加
         let maxAfterPurgeOrder = -1;
-        for (let i = updatedSchedules.length - 1; i >= 0; i--) {
-          if (updatedSchedules[i].isAfterPurge) {
-            const order = updatedSchedules[i].order ?? 0;
+        for (let i = schedulesForSelectedDate.length - 1; i >= 0; i--) {
+          if (schedulesForSelectedDate[i].isAfterPurge) {
+            const order = schedulesForSelectedDate[i].order ?? 0;
             if (order > maxAfterPurgeOrder) {
               maxAfterPurgeOrder = order;
             }
@@ -177,7 +194,8 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
         
         const newSchedule: RoastSchedule = {
           ...schedule,
-          order: maxAfterPurgeOrder >= 0 ? maxAfterPurgeOrder + 500 : (updatedSchedules.length + 1) * 1000,
+          date: selectedDate,
+          order: maxAfterPurgeOrder >= 0 ? maxAfterPurgeOrder + 500 : (schedulesForSelectedDate.length + 1) * 1000,
         };
         updatedSchedules.push(newSchedule);
       }
@@ -194,7 +212,9 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
   };
 
   const handleDelete = (id: string) => {
-    const updatedSchedules = roastSchedules.filter((s) => s.id !== id);
+    // 全スケジュールから削除（選択日でフィルタリングする前）
+    const allSchedules = data.roastSchedules || [];
+    const updatedSchedules = allSchedules.filter((s) => s.id !== id);
     const updatedData: AppData = {
       ...data,
       roastSchedules: updatedSchedules,
@@ -242,8 +262,9 @@ export function RoastSchedulerTab({ data, onUpdate }: RoastSchedulerTabProps) {
       return;
     }
 
-    // 順序を更新
-    const updatedSchedules = [...roastSchedules];
+    // 順序を更新（選択日のスケジュールのみを対象）
+    const allSchedules = data.roastSchedules || [];
+    const updatedSchedules = [...allSchedules];
     const draggedSchedule = updatedSchedules.find((s) => s.id === draggedId);
     const targetSchedule = updatedSchedules.find((s) => s.id === targetId);
 

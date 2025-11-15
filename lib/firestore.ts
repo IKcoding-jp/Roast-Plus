@@ -149,7 +149,13 @@ function normalizeAppData(data: any): AppData {
     assignments: Array.isArray(data?.assignments) ? data.assignments : [],
     assignmentHistory: Array.isArray(data?.assignmentHistory) ? data.assignmentHistory : [],
     todaySchedules: Array.isArray(data?.todaySchedules) ? data.todaySchedules : [],
-    roastSchedules: Array.isArray(data?.roastSchedules) ? data.roastSchedules : [],
+    roastSchedules: Array.isArray(data?.roastSchedules)
+      ? data.roastSchedules.map((schedule: any) => ({
+          ...schedule,
+          // dateがない場合は今日の日付を補完（後方互換性のため）
+          date: schedule.date || new Date().toISOString().split('T')[0],
+        }))
+      : [],
     tastingSessions: Array.isArray(data?.tastingSessions) ? data.tastingSessions : [],
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
-import { HiArrowLeft, HiCalendar, HiClock } from 'react-icons/hi';
+import { HiArrowLeft, HiCalendar, HiClock, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
 type TabType = 'today' | 'roast';
@@ -16,6 +16,16 @@ export default function SchedulePage() {
   const { data, updateData, isLoading } = useAppData();
   const [activeTab, setActiveTab] = useState<TabType>('today');
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  
+  // 選択中の日付を管理（YYYY-MM-DD形式）
+  const getTodayString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayString());
 
   // 時刻・日付・曜日を1秒ごとに更新
   useEffect(() => {
@@ -37,6 +47,11 @@ export default function SchedulePage() {
     return `${year}年${month}月${day}日（${weekday}）`;
   };
 
+  const formatDateString = (dateString: string): string => {
+    const date = new Date(dateString + 'T00:00:00');
+    return formatDate(date);
+  };
+
   const formatTime = (date: Date): string => {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -44,6 +59,34 @@ export default function SchedulePage() {
 
     return `${hours}:${minutes}:${seconds}`;
   };
+
+  // 日付移動関数
+  const moveToPreviousDay = () => {
+    const date = new Date(selectedDate + 'T00:00:00');
+    date.setDate(date.getDate() - 1);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    setSelectedDate(`${year}-${month}-${day}`);
+  };
+
+  const moveToNextDay = useCallback(() => {
+    const today = getTodayString();
+    
+    const date = new Date(selectedDate + 'T00:00:00');
+    date.setDate(date.getDate() + 1);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const nextDateString = `${year}-${month}-${day}`;
+    
+    // 今日を超えないようにする（今日まで移動可能）
+    if (nextDateString <= today) {
+      setSelectedDate(nextDateString);
+    }
+  }, [selectedDate]);
+
+  const isToday = selectedDate === getTodayString();
 
   if (authLoading) {
     return (
@@ -83,12 +126,33 @@ export default function SchedulePage() {
           </Link>
           <div className="flex-1 flex justify-end sm:justify-center items-center">
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-4 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 bg-white border border-gray-200 rounded-xl shadow-md">
-              {/* 日付 */}
+              {/* 日付ナビゲーション */}
               <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
-                <HiCalendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
-                <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
-                  {formatDate(currentTime)}
-                </span>
+                <button
+                  onClick={moveToPreviousDay}
+                  className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
+                  aria-label="前日"
+                >
+                  <HiChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                </button>
+                <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
+                  <HiCalendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
+                  <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+                    {formatDateString(selectedDate)}
+                  </span>
+                </div>
+                <button
+                  onClick={moveToNextDay}
+                  disabled={isToday}
+                  className={`flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md transition-colors ${
+                    isToday
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                  aria-label="翌日"
+                >
+                  <HiChevronRight className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                </button>
               </div>
               {/* 区切り線（デスクトップのみ） */}
               <div className="hidden sm:block w-px h-6 md:h-7 bg-gray-200 mx-1"></div>
@@ -136,12 +200,12 @@ export default function SchedulePage() {
           <div className="block lg:hidden flex-1 flex flex-col min-h-0">
             {activeTab === 'today' && (
               <div className="flex-1 flex flex-col min-h-0">
-                <TodaySchedule data={data} onUpdate={updateData} />
+                <TodaySchedule key={selectedDate} data={data} onUpdate={updateData} selectedDate={selectedDate} isToday={isToday} />
               </div>
             )}
             {activeTab === 'roast' && (
               <div className="flex-1 flex flex-col min-h-0">
-                <RoastSchedulerTab data={data} onUpdate={updateData} />
+                <RoastSchedulerTab data={data} onUpdate={updateData} selectedDate={selectedDate} isToday={isToday} />
               </div>
             )}
           </div>
@@ -149,10 +213,10 @@ export default function SchedulePage() {
           {/* デスクトップ版：横並び */}
           <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6 lg:flex-1 lg:min-h-0">
             <div className="flex flex-col min-h-0">
-              <TodaySchedule data={data} onUpdate={updateData} />
+              <TodaySchedule key={selectedDate} data={data} onUpdate={updateData} selectedDate={selectedDate} isToday={isToday} />
             </div>
             <div className="flex flex-col min-h-0">
-              <RoastSchedulerTab data={data} onUpdate={updateData} />
+              <RoastSchedulerTab data={data} onUpdate={updateData} selectedDate={selectedDate} isToday={isToday} />
             </div>
           </div>
         </main>

@@ -7,9 +7,11 @@ import { HiPlus, HiX, HiClock } from 'react-icons/hi';
 interface TodayScheduleProps {
   data: AppData | null;
   onUpdate: (data: AppData) => void;
+  selectedDate: string; // YYYY-MM-DD形式
+  isToday: boolean; // 選択日が今日かどうか
 }
 
-export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
+export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodayScheduleProps) {
   const [isComposing, setIsComposing] = useState(false);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [addError, setAddError] = useState<string>('');
@@ -36,23 +38,23 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     );
   }
 
-  const today = new Date().toISOString().split('T')[0];
-  const todaySchedule = data.todaySchedules?.find((s) => s.date === today) || {
-    id: `schedule-${today}`,
-    date: today,
+  const currentSchedule = data.todaySchedules?.find((s) => s.date === selectedDate) || {
+    id: `schedule-${selectedDate}`,
+    date: selectedDate,
     timeLabels: [],
   };
 
   // refを先に宣言（useStateの初期化関数で使用するため）
   const lastDataRef = useRef<string>('');
-  const localTimeLabelsRef = useRef<TimeLabel[]>(todaySchedule.timeLabels || []);
+  const localTimeLabelsRef = useRef<TimeLabel[]>(currentSchedule.timeLabels || []);
   const lastTodaySchedulesStrRef = useRef<string>('');
   const isInitializedRef = useRef<boolean>(false);
-  const localTimeLabelsLengthRef = useRef<number>(todaySchedule.timeLabels?.length || 0);
+  const localTimeLabelsLengthRef = useRef<number>(currentSchedule.timeLabels?.length || 0);
+  const lastSelectedDateRef = useRef<string>(selectedDate);
 
   // 初期値をdataから取得（useStateの初期化関数を使用して初回レンダリング時のみ評価）
   const [localTimeLabels, setLocalTimeLabels] = useState<TimeLabel[]>(() => {
-    const initialLabels = todaySchedule.timeLabels || [];
+    const initialLabels = currentSchedule.timeLabels || [];
     // 初期化時にrefも設定
     if (initialLabels.length > 0) {
       originalTimeLabelsRef.current = JSON.parse(JSON.stringify(initialLabels));
@@ -75,8 +77,33 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
   useEffect(() => {
     if (!data) return;
 
-    const currentSchedule = data.todaySchedules?.find((s) => s.date === today);
-    const newTimeLabels = currentSchedule?.timeLabels || [];
+    // 選択日が変わった場合は、ローカル状態を完全にリセット
+    if (lastSelectedDateRef.current !== selectedDate) {
+      // デバウンスタイマーをクリア
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+      
+      lastSelectedDateRef.current = selectedDate;
+      isInitializedRef.current = false;
+      
+      // 選択日が変わった時は、即座に新しい日付のデータを読み込む
+      const scheduleForSelectedDate = data.todaySchedules?.find((s) => s.date === selectedDate);
+      const newTimeLabels = scheduleForSelectedDate?.timeLabels || [];
+      setLocalTimeLabels(newTimeLabels);
+      localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+      originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+      todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
+      lastDataRef.current = JSON.stringify(newTimeLabels);
+      lastTodaySchedulesStrRef.current = JSON.stringify(data.todaySchedules || []);
+      isInitializedRef.current = true;
+      localTimeLabelsLengthRef.current = newTimeLabels.length;
+      return;
+    }
+
+    const scheduleForSelectedDate = data.todaySchedules?.find((s) => s.date === selectedDate);
+    const newTimeLabels = scheduleForSelectedDate?.timeLabels || [];
     const newTimeLabelsStr = JSON.stringify(newTimeLabels);
     
     // 初期化されていない場合、またはローカル状態とFirestoreの状態が不一致の場合は初期化
@@ -86,7 +113,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       setLocalTimeLabels(newTimeLabels);
       localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
       originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-      todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+      todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
       lastDataRef.current = newTimeLabelsStr;
       lastTodaySchedulesStrRef.current = JSON.stringify(data.todaySchedules || []);
       isInitializedRef.current = true;
@@ -117,7 +144,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         setLocalTimeLabels(newTimeLabels);
         localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
         originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
         lastDataRef.current = newTimeLabelsStr;
         localTimeLabelsLengthRef.current = newTimeLabels.length;
       }
@@ -128,7 +155,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       if (lastDataRef.current === newTimeLabelsStr) {
         // データが同じ場合でも、refを更新して整合性を保つ
         originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
         return;
       }
       
@@ -137,23 +164,28 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         setLocalTimeLabels(newTimeLabels);
         localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
         originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
         lastDataRef.current = newTimeLabelsStr;
         localTimeLabelsLengthRef.current = newTimeLabels.length;
       } else {
         // データが同じ場合でも、refを更新して整合性を保つ
         originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
         lastDataRef.current = newTimeLabelsStr;
       }
     }
-  }, [data, today]);
+  }, [data, selectedDate]);
 
   // デバウンス保存関数
   const debouncedSave = useCallback(
-    (newTimeLabels: TimeLabel[]) => {
+    (newTimeLabels: TimeLabel[], targetDate: string) => {
       if (isComposing) {
         return; // IME変換中は保存しない
+      }
+
+      // 選択日が変わった場合は保存しない（古い日付のデータを保存しないようにする）
+      if (targetDate !== selectedDate) {
+        return;
       }
 
       // 既存のタイマーをクリア
@@ -164,6 +196,11 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
 
       // 新しいタイマーを設定（500ms後に保存）
       debounceTimerRef.current = setTimeout(() => {
+        // 再度選択日をチェック（タイマー実行時にも選択日が変わっていないか確認）
+        if (targetDate !== selectedDate) {
+          return;
+        }
+
         const currentData = dataRef.current;
         if (!currentData) return;
 
@@ -176,11 +213,11 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
 
         isUpdatingRef.current = true;
         const updatedSchedules = [...(currentData.todaySchedules || [])];
-        const existingIndex = updatedSchedules.findIndex((s) => s.date === today);
+        const existingIndex = updatedSchedules.findIndex((s) => s.date === targetDate);
 
         const updatedSchedule: TodaySchedule = {
-          id: todayScheduleIdRef.current || `schedule-${today}`,
-          date: today,
+          id: todayScheduleIdRef.current || `schedule-${targetDate}`,
+          date: targetDate,
           timeLabels: newTimeLabels,
         };
 
@@ -210,13 +247,18 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         }, 100);
       }, 500);
     },
-    [today, isComposing]
+    [selectedDate, isComposing]
   );
 
   // ローカル状態が変更されたらデバウンス保存
   useEffect(() => {
     if (isUpdatingRef.current) {
       return; // 更新中は保存しない
+    }
+
+    // 選択日が変わった場合は保存しない
+    if (lastSelectedDateRef.current !== selectedDate) {
+      return;
     }
 
     // localTimeLabelsRefを更新
@@ -226,7 +268,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     
     // 長さが異なる場合
     if (localTimeLabels.length !== originalTimeLabels.length) {
-      debouncedSave(localTimeLabels);
+      debouncedSave(localTimeLabels, selectedDate);
       return;
     }
 
@@ -243,9 +285,9 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     });
 
     if (hasChanges) {
-      debouncedSave(localTimeLabels);
+      debouncedSave(localTimeLabels, selectedDate);
     }
-  }, [localTimeLabels, debouncedSave]);
+  }, [localTimeLabels, debouncedSave, selectedDate]);
 
   // クリーンアップ（アンマウント時に未保存の変更を保存）
   useEffect(() => {
@@ -260,6 +302,13 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       if (!isUpdatingRef.current) {
         const currentTimeLabels = localTimeLabelsRef.current;
         const originalTimeLabels = originalTimeLabelsRef.current;
+        const currentSelectedDate = lastSelectedDateRef.current;
+        
+        // 選択日が変わっている場合は保存しない
+        if (currentSelectedDate !== selectedDate) {
+          return;
+        }
+        
         const hasChanges = currentTimeLabels.length !== originalTimeLabels.length ||
           currentTimeLabels.some((label, index) => {
             const original = originalTimeLabels[index];
@@ -275,13 +324,12 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         if (hasChanges) {
           const currentData = dataRef.current;
           if (currentData) {
-            const currentToday = new Date().toISOString().split('T')[0];
             const updatedSchedules = [...(currentData.todaySchedules || [])];
-            const existingIndex = updatedSchedules.findIndex((s) => s.date === currentToday);
+            const existingIndex = updatedSchedules.findIndex((s) => s.date === currentSelectedDate);
 
             const updatedSchedule: TodaySchedule = {
-              id: todayScheduleIdRef.current || `schedule-${currentToday}`,
-              date: currentToday,
+              id: todayScheduleIdRef.current || `schedule-${currentSelectedDate}`,
+              date: currentSelectedDate,
               timeLabels: currentTimeLabels,
             };
 
@@ -309,7 +357,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         clearTimeout(errorTimeoutRef.current);
       }
     };
-  }, []);
+  }, [selectedDate]);
 
   const addTimeLabel = () => {
     if (!newHour) {
@@ -392,7 +440,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       clearTimeout(saveTimeoutRef.current);
     }
     saveTimeoutRef.current = setTimeout(() => {
-      debouncedSave(localTimeLabels);
+      debouncedSave(localTimeLabels, selectedDate);
     }, 300);
   };
 

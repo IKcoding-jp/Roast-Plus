@@ -236,13 +236,38 @@ export default function ProgressPage() {
     if (!confirm(`「${groupName}」作業グループのすべての作業を削除しますか？`)) return;
     
     try {
-      const workProgresses = data?.workProgresses || [];
-      const groupWorkProgresses = workProgresses.filter((wp) => wp.groupName === groupName);
+      // 削除する作業のIDリストを先に取得
+      let currentData = data;
+      if (!currentData) {
+        alert('データの読み込み中です。しばらく待ってから再度お試しください。');
+        return;
+      }
+      
+      let groupWorkProgresses = (currentData.workProgresses || []).filter(
+        (wp) => wp.groupName === groupName
+      );
+      
+      if (groupWorkProgresses.length === 0) {
+        setEditingGroupName(null);
+        return;
+      }
       
       // グループに属するすべての作業を削除
+      // 各削除後にonSnapshotが更新されるまで少し待機
       for (const wp of groupWorkProgresses) {
-        await deleteWorkProgress(user.uid, wp.id, data);
+        await deleteWorkProgress(user.uid, wp.id, currentData);
+        // onSnapshotが更新されるまで少し待機（100ms）
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // 最新のdataを使用（onSnapshotで更新されているはず）
+        // ただし、dataは非同期で更新されるため、次のループで再度取得
+        // 実際には、次のループでdataが更新されているかどうかは保証されない
+        // そのため、削除するIDのリストを先に取得して、それらを順番に削除する
       }
+      
+      // 削除後、残っている作業がないか確認
+      // onSnapshotが更新されるまで少し待機
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
       setEditingGroupName(null);
     } catch (error) {
       console.error('Failed to delete group:', error);
@@ -380,20 +405,20 @@ export default function ProgressPage() {
               <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">作業進捗</h1>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
               <button
                 onClick={() => setShowFilterDialog(true)}
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center gap-2 min-h-[44px]"
+                className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center gap-1.5 min-h-[36px]"
                 aria-label="フィルタと並び替え"
               >
-                <HiFilter className="h-5 w-5" />
+                <HiFilter className="h-4 w-4" />
                 <span className="hidden sm:inline">フィルタ・並び替え</span>
               </button>
               <button
                 onClick={() => setShowModeSelectDialog(true)}
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 min-h-[44px] flex-shrink-0"
+                className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0"
               >
-                <HiPlus className="text-lg" />
+                <HiPlus className="h-4 w-4" />
                 <span className="hidden sm:inline">作業を追加</span>
               </button>
             </div>

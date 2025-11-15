@@ -84,16 +84,16 @@ export function ContinuousRoastDialog({
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
           <button
-            onClick={onNo}
-            className="px-4 sm:px-6 py-3 bg-[#00b8d4] text-white rounded-lg font-semibold hover:bg-[#00a0b8] transition-colors text-sm sm:text-base min-h-[44px] whitespace-nowrap flex-1 sm:flex-none"
-          >
-            いいえ（アフターパージ）
-          </button>
-          <button
             onClick={onYes}
             className="px-4 sm:px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-sm sm:text-base min-h-[44px] whitespace-nowrap flex-1 sm:flex-none"
           >
             はい（連続焙煎）
+          </button>
+          <button
+            onClick={onNo}
+            className="px-4 sm:px-6 py-3 bg-[#00b8d4] text-white rounded-lg font-semibold hover:bg-[#00a0b8] transition-colors text-sm sm:text-base min-h-[44px] whitespace-nowrap flex-1 sm:flex-none"
+          >
+            いいえ（アフターパージ）
           </button>
         </div>
       </div>

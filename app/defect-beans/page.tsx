@@ -1,16 +1,74 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft, HiSearch, HiFilter, HiEye, HiUsers } from 'react-icons/hi';
-import { RiBookFill, RiDatabaseLine } from 'react-icons/ri';
-import { MdGridView, MdCompareArrows } from 'react-icons/md';
+import { HiArrowLeft, HiSearch, HiPlus, HiX } from 'react-icons/hi';
+import { RiBookFill } from 'react-icons/ri';
+import { MdCompareArrows } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
+import { useDefectBeans } from '@/hooks/useDefectBeans';
+import { useDefectBeanSettings } from '@/hooks/useDefectBeanSettings';
+import { DefectBeanCard } from '@/components/DefectBeanCard';
+import { DefectBeanForm } from '@/components/DefectBeanForm';
+import { DefectBeanCompare } from '@/components/DefectBeanCompare';
+import type { DefectBean } from '@/types';
+
+type FilterOption = 'all' | 'shouldRemove' | 'shouldNotRemove';
 
 export default function DefectBeansPage() {
   const { user, loading: authLoading } = useAuth();
+  const { allDefectBeans, isLoading, addDefectBean, removeDefectBean } = useDefectBeans();
+  const { settings, updateSetting } = useDefectBeanSettings();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterOption, setFilterOption] = useState<FilterOption>('all');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showCompare, setShowCompare] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
 
-  if (authLoading) {
+  // フィルタリングと検索（Hooksは早期リターンの前に呼び出す必要がある）
+  const filteredDefectBeans = useMemo(() => {
+    let filtered = [...allDefectBeans];
+
+    // 検索フィルタ
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (bean) =>
+          bean.name.toLowerCase().includes(query) ||
+          bean.characteristics.toLowerCase().includes(query) ||
+          bean.tasteImpact.toLowerCase().includes(query) ||
+          bean.removalReason.toLowerCase().includes(query)
+      );
+    }
+
+    // 設定フィルタ
+    if (filterOption === 'shouldRemove') {
+      filtered = filtered.filter(
+        (bean) => settings[bean.id]?.shouldRemove === true
+      );
+    } else if (filterOption === 'shouldNotRemove') {
+      filtered = filtered.filter(
+        (bean) => settings[bean.id]?.shouldRemove === false
+      );
+    }
+
+    // ソート（マスターを先に、その後ユーザー追加）
+    filtered.sort((a, b) => {
+      if (a.isMaster && !b.isMaster) return -1;
+      if (!a.isMaster && b.isMaster) return 1;
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      return a.name.localeCompare(b.name, 'ja');
+    });
+
+    return filtered;
+  }, [allDefectBeans, searchQuery, filterOption, settings]);
+
+  // 早期リターン（すべてのHooksの後）
+  if (authLoading || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-amber-50">
         <div className="text-center">
@@ -24,11 +82,80 @@ export default function DefectBeansPage() {
     return <LoginPage />;
   }
 
+  // 選択モードの切り替え
+  const toggleCompareMode = () => {
+    setCompareMode(!compareMode);
+    if (compareMode) {
+      setSelectedIds(new Set());
+    }
+  };
+
+  // カード選択
+  const handleSelect = (id: string) => {
+    if (!compareMode) return;
+
+    setSelectedIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  // 比較表示
+  const handleShowCompare = () => {
+    if (selectedIds.size > 0) {
+      setShowCompare(true);
+    }
+  };
+
+  // 欠点豆追加
+  const handleAddDefectBean = async (
+    defectBean: Omit<DefectBean, 'id' | 'createdAt' | 'updatedAt' | 'isMaster' | 'imageUrl'>,
+    imageFile: File
+  ) => {
+    try {
+      await addDefectBean(defectBean, imageFile);
+      setShowAddForm(false);
+    } catch (error) {
+      console.error('Failed to add defect bean:', error);
+      throw error;
+    }
+  };
+
+  // 欠点豆削除
+  const handleDeleteDefectBean = async (id: string, imageUrl: string) => {
+    try {
+      await removeDefectBean(id, imageUrl);
+    } catch (error) {
+      console.error('Failed to delete defect bean:', error);
+      alert('欠点豆の削除に失敗しました。');
+    }
+  };
+
+  // 設定更新
+  const handleToggleSetting = async (id: string, shouldRemove: boolean) => {
+    try {
+      await updateSetting(id, shouldRemove);
+    } catch (error) {
+      console.error('Failed to update setting:', error);
+      alert('設定の更新に失敗しました。');
+    }
+  };
+
+  const selectedDefectBeans = filteredDefectBeans.filter((bean) =>
+    selectedIds.has(bean.id)
+  );
+
   return (
     <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
+        {/* ヘッダー */}
         <header className="mb-6 sm:mb-8">
-          <div className="flex justify-start">
+          <div className="flex items-center justify-between mb-4">
             <Link
               href="/"
               className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
@@ -36,186 +163,147 @@ export default function DefectBeansPage() {
               <HiArrowLeft className="text-lg flex-shrink-0" />
               ホームに戻る
             </Link>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleCompareMode}
+                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] flex items-center gap-2 ${
+                  compareMode
+                    ? 'bg-amber-600 text-white hover:bg-amber-700'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                }`}
+              >
+                <MdCompareArrows className="h-5 w-5" />
+                {compareMode ? '選択モード' : '比較モード'}
+              </button>
+              {compareMode && selectedIds.size > 0 && (
+                <button
+                  onClick={handleShowCompare}
+                  className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-2"
+                >
+                  比較 ({selectedIds.size})
+                </button>
+              )}
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-2"
+              >
+                <HiPlus className="h-5 w-5" />
+                追加
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 mb-4">
+            <RiBookFill className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+              欠点豆図鑑
+            </h1>
           </div>
         </header>
 
-        <main className="space-y-6 sm:space-y-8">
-          {/* 全てのセクションを1つのカードに統合 */}
-          <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
-            {/* ヘロセクション */}
-            <div className="flex justify-center mb-6">
-              <RiBookFill className="h-16 w-16 text-amber-600" />
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-4">
-              欠点豆図鑑とは
-            </h2>
-            <p className="text-gray-600 text-center text-base sm:text-lg leading-relaxed mb-8">
-              コーヒー豆の欠点豆の種類や特徴を図鑑形式で表示する機能です。ハンドピック作業中に、欠点豆か正常豆か迷ったときに、正しい知識を確認して精度の高いハンドピックを実現します。
-            </p>
-
-            {/* 主な機能 */}
-            <div className="border-t border-gray-200 pt-6 mb-8">
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-6">
-                主な機能
-              </h3>
-              
-              <div className="space-y-6">
-                {/* グリッドレイアウト表示 */}
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <MdGridView className="h-8 w-8 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                      グリッドレイアウトでのカード表示
-                    </h4>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      欠点豆をカード形式で一覧表示します。各カードには画像、名称、特徴が表示され、一目で複数の欠点豆を確認できます。
-                    </p>
-                  </div>
-                </div>
-
-                {/* 検索機能 */}
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <HiSearch className="h-8 w-8 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                      検索機能
-                    </h4>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      欠点豆の種類で検索できます。名称や特徴を入力することで、目的の欠点豆を素早く見つけられます。
-                    </p>
-                  </div>
-                </div>
-
-                {/* フィルタ機能 */}
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <HiFilter className="h-8 w-8 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                      フィルタ機能
-                    </h4>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      カテゴリやタグでフィルタリングできます。見た目による分類や原因による分類など、様々な観点から欠点豆を絞り込めます。
-                    </p>
-                  </div>
-                </div>
-
-                {/* カード展開表示 */}
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <HiEye className="h-8 w-8 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                      カード展開表示
-                    </h4>
-                    <p className="text-gray-600 text-sm sm:text-base mb-2">
-                      カードをタップすると、カード内で展開して詳細情報を表示します。以下の情報が表示されます：
-                    </p>
-                    <ul className="text-gray-600 space-y-1 text-sm sm:text-base ml-4 mb-3">
-                      <li>• 欠点豆の名称</li>
-                      <li>• 画像</li>
-                      <li>• 特徴（見た目の説明）</li>
-                      <li>• 味への影響</li>
-                      <li>• 省く理由</li>
-                    </ul>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      さらに、カード内で<span className="font-semibold">「省く」「省かない」</span>を切り替えることができます。この設定により、チーム全体でどの欠点豆を省くべきかの共有認識を設定できます。
-                    </p>
-                  </div>
-                </div>
-
-                {/* チーム共有認識設定機能 */}
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <HiUsers className="h-8 w-8 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                      チーム共有認識設定機能
-                    </h4>
-                    <p className="text-gray-600 text-sm sm:text-base mb-2">
-                      各欠点豆について、チーム全体で<span className="font-semibold">「この豆は省く」「この豆は省かない」</span>という共有認識を設定できます。
-                    </p>
-                    <ul className="text-gray-600 space-y-1 text-sm sm:text-base ml-4">
-                      <li>• カードをタップして展開し、「省く」「省かない」を切り替え</li>
-                      <li>• 設定はチーム全体で共有され、全員が同じ認識でハンドピック作業を行えます</li>
-                      <li>• カードには現在の設定状態（省く/省かない）が視覚的に表示されます</li>
-                      <li>• チームの判断基準を統一することで、ハンドピックの品質を向上させます</li>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* 比較機能 */}
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <MdCompareArrows className="h-8 w-8 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                      比較機能
-                    </h4>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      複数の欠点豆を並べて比較表示できます。似たような欠点豆の違いを確認したり、複数の欠点豆の特徴を同時に比較したりできます。
-                    </p>
-                  </div>
-                </div>
+        {/* 検索とフィルタ */}
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* 検索 */}
+            <div className="flex-1">
+              <div className="relative">
+                <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="名称や特徴で検索..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[44px]"
+                />
               </div>
             </div>
 
-            {/* データ管理 */}
-            <div className="border-t border-gray-200 pt-6 mb-8">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="flex-shrink-0">
-                  <RiDatabaseLine className="h-8 w-8 text-amber-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3">
-                    データ管理
-                  </h3>
-                  <ul className="text-gray-700 space-y-2 text-sm sm:text-base">
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span><span className="font-semibold">読み取り専用：</span>ユーザーは欠点豆の情報を閲覧するのみです</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span><span className="font-semibold">開発者が事前登録：</span>欠点豆の情報は開発者が事前に登録します</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span><span className="font-semibold">不定期更新：</span>新しい欠点豆が発見された場合など、必要に応じて開発者が追加・更新します</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span><span className="font-semibold">画像管理：</span>既存の画像をアップロードして使用します</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span><span className="font-semibold">チーム設定の共有：</span>「省く」「省かない」の設定はチーム全体で共有され、Firestoreで管理されます</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* 開発予定の注記 */}
-            <div className="border-t border-gray-200 pt-6">
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4 text-center">
-                <p className="text-amber-800 font-medium text-sm sm:text-base">
-                  この機能は開発予定です。しばらくお待ちください。
-                </p>
-              </div>
+            {/* フィルタ */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilterOption('all')}
+                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] ${
+                  filterOption === 'all'
+                    ? 'bg-amber-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                全て
+              </button>
+              <button
+                onClick={() => setFilterOption('shouldRemove')}
+                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] ${
+                  filterOption === 'shouldRemove'
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                省く
+              </button>
+              <button
+                onClick={() => setFilterOption('shouldNotRemove')}
+                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] ${
+                  filterOption === 'shouldNotRemove'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                省かない
+              </button>
             </div>
           </div>
-        </main>
+        </div>
+
+        {/* グリッド表示 */}
+        {filteredDefectBeans.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <p className="text-gray-600">
+              {searchQuery || filterOption !== 'all'
+                ? '検索条件に一致する欠点豆がありません。'
+                : '欠点豆が登録されていません。'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {filteredDefectBeans.map((defectBean) => {
+              const isUserDefectBean = !defectBean.isMaster;
+              return (
+                <DefectBeanCard
+                  key={defectBean.id}
+                  defectBean={defectBean}
+                  shouldRemove={settings[defectBean.id]?.shouldRemove}
+                  isSelected={selectedIds.has(defectBean.id)}
+                  onSelect={compareMode ? handleSelect : undefined}
+                  onToggleSetting={handleToggleSetting}
+                  onDelete={isUserDefectBean ? handleDeleteDefectBean : undefined}
+                  isUserDefectBean={isUserDefectBean}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* 追加フォーム */}
+        {showAddForm && (
+          <DefectBeanForm
+            onSubmit={handleAddDefectBean}
+            onCancel={() => setShowAddForm(false)}
+          />
+        )}
+
+        {/* 比較表示 */}
+        {showCompare && selectedDefectBeans.length > 0 && (
+          <DefectBeanCompare
+            defectBeans={selectedDefectBeans}
+            settings={settings}
+            onClose={() => {
+              setShowCompare(false);
+              setSelectedIds(new Set());
+              setCompareMode(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );
 }
-

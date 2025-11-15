@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 欠点豆画像（ユーザー追加）
+    match /defect-beans/{userId}/{defectBeanId}/{fileName=**} {
+      // 認証済みユーザーのみアップロード・削除可能
+      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
+      // 全ユーザーが読み取り可能
+      allow read: if request.auth != null;
+    }
+    
+    // マスターデータの画像（開発者が手動でアップロード）
+    match /defect-beans-master/{fileName=**} {
+      // 全ユーザーが読み取り可能
+      allow read: if request.auth != null;
+      // 書き込みは管理者のみ（手動でFirebase Consoleから設定）
+      allow write: if false;
+    }
+  }
+}
+

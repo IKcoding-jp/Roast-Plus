@@ -5,10 +5,12 @@ import {
   setDoc, 
   onSnapshot,
   deleteField,
+  collection,
+  getDocs,
   Firestore,
 } from 'firebase/firestore';
 import app from './firebase';
-import type { AppData } from '@/types';
+import type { AppData, DefectBean, DefectBeanSettings } from '@/types';
 
 // Firestoreインスタンスを遅延初期化
 let db: Firestore | null = null;
@@ -203,6 +205,16 @@ function normalizeAppData(data: any): AppData {
   // roastTimerStateは存在する場合のみ追加
   if (data?.roastTimerState && typeof data.roastTimerState === 'object') {
     normalized.roastTimerState = data.roastTimerState;
+  }
+  
+  // defectBeansは存在する場合のみ追加
+  if (Array.isArray(data?.defectBeans)) {
+    normalized.defectBeans = data.defectBeans;
+  }
+  
+  // defectBeanSettingsは存在する場合のみ追加
+  if (data?.defectBeanSettings && typeof data.defectBeanSettings === 'object') {
+    normalized.defectBeanSettings = data.defectBeanSettings;
   }
   
   return normalized;
@@ -462,4 +474,130 @@ export function subscribeUserData(
       callback(defaultData);
     }
   );
+}
+
+// ===== 欠点豆関連の関数 =====
+
+/**
+ * 欠点豆マスターデータを取得
+ * @returns 欠点豆マスターデータの配列
+ */
+export async function getDefectBeanMasterData(): Promise<DefectBean[]> {
+  try {
+    const db = getDb();
+    const defectBeansRef = collection(db, 'defectBeans');
+    // orderフィールドがない場合も考慮して、まず全て取得してからソート
+    const querySnapshot = await getDocs(defectBeansRef);
+    
+    const defectBeans: DefectBean[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      defectBeans.push({
+        id: doc.id,
+        name: data.name || '',
+        imageUrl: data.imageUrl || '',
+        characteristics: data.characteristics || '',
+        tasteImpact: data.tasteImpact || '',
+        removalReason: data.removalReason || '',
+        isMaster: true,
+        order: typeof data.order === 'number' ? data.order : undefined,
+        createdAt: data.createdAt || new Date().toISOString(),
+        updatedAt: data.updatedAt || new Date().toISOString(),
+      });
+    });
+    
+    // クライアント側でソート（orderフィールドがあるもの優先、その後名前順）
+    defectBeans.sort((a, b) => {
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      if (a.order !== undefined) return -1;
+      if (b.order !== undefined) return 1;
+      return a.name.localeCompare(b.name, 'ja');
+    });
+    
+    return defectBeans;
+  } catch (error) {
+    console.error('Failed to get defect bean master data:', error);
+    return [];
+  }
+}
+
+/**
+ * ユーザー追加欠点豆を保存
+ * @param userId ユーザーID
+ * @param defectBean 欠点豆データ
+ * @param appData 現在のAppData
+ */
+export async function saveDefectBean(
+  userId: string,
+  defectBean: DefectBean,
+  appData: AppData
+): Promise<void> {
+  const updatedDefectBeans = [...(appData.defectBeans || [])];
+  const existingIndex = updatedDefectBeans.findIndex((db) => db.id === defectBean.id);
+  
+  if (existingIndex >= 0) {
+    updatedDefectBeans[existingIndex] = defectBean;
+  } else {
+    updatedDefectBeans.push(defectBean);
+  }
+  
+  const updatedData: AppData = {
+    ...appData,
+    defectBeans: updatedDefectBeans,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * ユーザー追加欠点豆を削除
+ * @param userId ユーザーID
+ * @param defectBeanId 削除する欠点豆ID
+ * @param appData 現在のAppData
+ */
+export async function deleteDefectBean(
+  userId: string,
+  defectBeanId: string,
+  appData: AppData
+): Promise<void> {
+  const updatedDefectBeans = (appData.defectBeans || []).filter(
+    (db) => db.id !== defectBeanId
+  );
+  
+  const updatedData: AppData = {
+    ...appData,
+    defectBeans: updatedDefectBeans.length > 0 ? updatedDefectBeans : undefined,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * 欠点豆設定（省く/省かない）を更新
+ * @param userId ユーザーID
+ * @param defectBeanId 欠点豆ID
+ * @param shouldRemove 省くかどうか
+ * @param appData 現在のAppData
+ */
+export async function updateDefectBeanSetting(
+  userId: string,
+  defectBeanId: string,
+  shouldRemove: boolean,
+  appData: AppData
+): Promise<void> {
+  const updatedSettings: DefectBeanSettings = {
+    ...(appData.defectBeanSettings || {}),
+    [defectBeanId]: {
+      shouldRemove,
+    },
+  };
+  
+  const updatedData: AppData = {
+    ...appData,
+    defectBeanSettings: updatedSettings,
+  };
+  
+  await saveUserData(userId, updatedData);
 }

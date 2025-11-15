@@ -180,6 +180,8 @@ export interface AppData {
   encouragementCount?: number; // 応援カウント（全ユーザーで共有）
   roastTimerRecords: RoastTimerRecord[]; // ローストタイマー記録
   roastTimerState?: RoastTimerState; // ローストタイマー状態
+  defectBeans?: DefectBean[]; // ユーザー追加欠点豆データ
+  defectBeanSettings?: DefectBeanSettings; // 欠点豆設定（省く/省かない）
 }
 
 // 通知
@@ -193,4 +195,27 @@ export interface Notification {
   type: NotificationType;
   order?: number; // 表示順序（開発者モードで並び替え可能）
 }
+
+// 欠点豆
+export interface DefectBean {
+  id: string;
+  name: string; // 欠点豆の名称
+  imageUrl: string; // Firebase Storageの画像URL
+  characteristics: string; // 特徴（見た目の説明）
+  tasteImpact: string; // 味への影響
+  removalReason: string; // 省く理由
+  isMaster: boolean; // マスターデータであることを示すフラグ
+  order?: number; // 表示順序
+  createdAt: string; // ISO 8601形式
+  updatedAt: string; // ISO 8601形式
+  userId?: string; // 追加したユーザーID（ユーザー追加データの場合）
+  createdBy?: string; // 追加したメンバーID（ユーザー追加データの場合）
+}
+
+// 欠点豆設定（省く/省かない）
+export type DefectBeanSettings = {
+  [defectBeanId: string]: {
+    shouldRemove: boolean; // true: 省く, false: 省かない
+  };
+};
 

@@ -61,8 +61,13 @@ export function useAppData() {
   }, [user, authLoading]);
 
   const updateData = useCallback(
-    async (newData: AppData) => {
+    async (newDataOrUpdater: AppData | ((currentData: AppData) => AppData)) => {
       if (!user) return;
+
+      // 関数の場合は現在のデータを渡して新しいデータを取得
+      const newData = typeof newDataOrUpdater === 'function' 
+        ? newDataOrUpdater(data)
+        : newDataOrUpdater;
 
       // データの完全性を検証
       const normalizedData = {
@@ -82,6 +87,8 @@ export function useAppData() {
         encouragementCount: typeof newData.encouragementCount === 'number' ? newData.encouragementCount : (data.encouragementCount ?? 0),
         roastTimerRecords: Array.isArray(newData.roastTimerRecords) ? newData.roastTimerRecords : data.roastTimerRecords,
         roastTimerState: newData.roastTimerState !== undefined ? newData.roastTimerState : data.roastTimerState,
+        defectBeans: newData.defectBeans !== undefined ? newData.defectBeans : data.defectBeans,
+        defectBeanSettings: newData.defectBeanSettings !== undefined ? newData.defectBeanSettings : data.defectBeanSettings,
       };
 
       isUpdatingRef.current = true;

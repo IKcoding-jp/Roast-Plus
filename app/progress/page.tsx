@@ -165,9 +165,36 @@ export default function ProgressPage() {
     if (!user) return;
     
     try {
-      await addWorkProgress(user.uid, workProgress, data);
+      // 同じグループ名のダミー作業（作業名が空の作業）が存在する場合は削除
+      // weightに関係なく、同じgroupNameのダミー作業をすべて削除
+      if (workProgress.groupName) {
+        let currentData = data;
+        const workProgresses = currentData?.workProgresses || [];
+        const dummyWorks = workProgresses.filter(
+          (wp) => wp.groupName === workProgress.groupName && (!wp.taskName || wp.taskName.trim() === '')
+        );
+        
+        // ダミー作業を削除（削除後にデータを更新）
+        for (const dummyWork of dummyWorks) {
+          await deleteWorkProgress(user.uid, dummyWork.id, currentData);
+          // 削除後のデータを更新（削除したIDを除外）
+          if (currentData) {
+            currentData = {
+              ...currentData,
+              workProgresses: currentData.workProgresses.filter((wp) => wp.id !== dummyWork.id),
+            };
+          }
+        }
+        
+        // 削除後のデータを使用して作業を追加
+        await addWorkProgress(user.uid, workProgress, currentData || data);
+      } else {
+        await addWorkProgress(user.uid, workProgress, data);
+      }
+      
       setShowAddForm(false);
       setAddingToGroupName(null);
+      setAddMode(null);
     } catch (error) {
       console.error('Failed to add work progress:', error);
       alert('作業の追加に失敗しました');
@@ -895,7 +922,7 @@ function GroupCreateForm({ onSave, onCancel }: GroupCreateFormProps) {
               id="groupName"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              placeholder="例: ブラジル10kg、シールなど"
+              placeholder="例: ブラジル、シールなど"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
               required
             />

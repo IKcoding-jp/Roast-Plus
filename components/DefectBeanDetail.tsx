@@ -44,7 +44,7 @@ export function DefectBeanDetail({
       <div className="border-t border-gray-200 p-4 space-y-4">
         {/* 画像（拡大表示可能） */}
         <div
-          className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
+          className="relative w-full max-w-xs mx-auto aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
           onClick={() => setShowImageModal(true)}
         >
           <Image
@@ -52,7 +52,7 @@ export function DefectBeanDetail({
             alt={defectBean.name}
             fill
             className="object-cover"
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, 320px"
             unoptimized
           />
         </div>

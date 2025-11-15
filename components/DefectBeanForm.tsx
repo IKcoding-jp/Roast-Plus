@@ -235,7 +235,7 @@ export function DefectBeanForm({
               value={characteristics}
               onChange={(e) => setCharacteristics(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[100px] resize-y text-gray-900 bg-white"
-              placeholder="例: 白いカビが生えている。表面がふわふわしている。"
+              placeholder="例: 黒いカビが生えている。表面が黒ずんでいる。"
             />
           </div>
 

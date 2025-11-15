@@ -58,14 +58,14 @@ export default function ProgressPage() {
     
     filtered.forEach((wp) => {
       if (wp.groupName) {
-        // groupNameが設定されている場合はグループ化
-        const key = `${wp.groupName}_${wp.weight || ''}`;
+        // groupNameが設定されている場合はグループ化（weightはグループ化のキーに含めない）
+        const key = wp.groupName;
         
         if (!groups.has(key)) {
           groups.set(key, {
             groupName: wp.groupName,
             taskName: wp.taskName || '',
-            weight: wp.weight || '',
+            weight: wp.weight || '', // 表示用（最初の作業のweightを表示）
             workProgresses: [],
           });
         }
@@ -306,6 +306,14 @@ export default function ProgressPage() {
     return Math.min(100, Math.max(0, percentage));
   };
 
+  // 数値を単位に応じてフォーマット（kgの場合は小数点第1位、それ以外は整数）
+  const formatAmount = (amount: number, unit: string): string => {
+    if (unit.toLowerCase() === 'kg') {
+      return amount.toFixed(1);
+    }
+    return Math.round(amount).toString();
+  };
+
   // 残量を計算
   const calculateRemaining = (wp: WorkProgress): number | null => {
     if (wp.targetAmount === undefined) return null;
@@ -415,7 +423,7 @@ export default function ProgressPage() {
               
               return (
               <div
-                key={`${groupKey}_${group.weight}_${groupIndex}`}
+                key={`${groupKey}_${groupIndex}`}
                 className="bg-white rounded-lg shadow-md p-4 sm:p-6"
               >
                 {/* カードヘッダー */}
@@ -541,7 +549,7 @@ export default function ProgressPage() {
                           <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-gray-700">
-                                {wp.currentAmount?.toFixed(1) || '0'}{unit} / {wp.targetAmount.toFixed(1)}{unit}
+                                {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
                               </span>
                               <span className="font-semibold text-gray-800">
                                 {calculateProgressPercentage(wp).toFixed(0)}%
@@ -560,9 +568,9 @@ export default function ProgressPage() {
                                   if (remaining === null) return null;
                                   if (remaining <= 0) {
                                     const over = Math.abs(remaining);
-                                    return over > 0 ? `目標達成（+${over.toFixed(1)}${unit}）` : '完了';
+                                    return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
                                   }
-                                  return `残り${remaining.toFixed(1)}${unit}`;
+                                  return `残り${formatAmount(remaining, unit)}${unit}`;
                                 })()}
                               </div>
                               <button
@@ -681,7 +689,7 @@ export default function ProgressPage() {
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-700">
-                          {wp.currentAmount?.toFixed(1) || '0'}{unit} / {wp.targetAmount.toFixed(1)}{unit}
+                          {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
                         </span>
                         <span className="font-semibold text-gray-800">
                           {calculateProgressPercentage(wp).toFixed(0)}%
@@ -700,9 +708,9 @@ export default function ProgressPage() {
                             if (remaining === null) return null;
                             if (remaining <= 0) {
                               const over = Math.abs(remaining);
-                              return over > 0 ? `目標達成（+${over.toFixed(1)}${unit}）` : '完了';
+                              return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
                             }
-                            return `残り${remaining.toFixed(1)}${unit}`;
+                            return `残り${formatAmount(remaining, unit)}${unit}`;
                           })()}
                         </div>
                         <button
@@ -1165,6 +1173,14 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
     return match && match[1] ? match[1] : '';
   };
 
+  // 数値を単位に応じてフォーマット（kgの場合は小数点第1位、それ以外は整数）
+  const formatAmount = (amount: number, unit: string): string => {
+    if (unit.toLowerCase() === 'kg') {
+      return amount.toFixed(1);
+    }
+    return Math.round(amount).toString();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -1304,8 +1320,8 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               const unit = extractUnit(workProgress.weight);
               return (
                 <div className="mt-2 p-2 bg-amber-50 rounded text-xs text-gray-700">
-                  <p>現在の目標量: {workProgress.targetAmount.toFixed(1)}{unit}</p>
-                  <p>現在の進捗: {workProgress.currentAmount?.toFixed(1) || '0'}{unit}</p>
+                  <p>現在の目標量: {formatAmount(workProgress.targetAmount, unit)}{unit}</p>
+                  <p>現在の進捗: {formatAmount(workProgress.currentAmount || 0, unit)}{unit}</p>
                 </div>
               );
             })()}
@@ -1556,6 +1572,14 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
     return match && match[1] ? match[1] : '';
   };
 
+  // 数値を単位に応じてフォーマット（kgの場合は小数点第1位、それ以外は整数）
+  const formatAmount = (amount: number, unit: string): string => {
+    if (unit.toLowerCase() === 'kg') {
+      return amount.toFixed(1);
+    }
+    return Math.round(amount).toString();
+  };
+
   const unit = extractUnit(workProgress.weight);
 
   return (
@@ -1584,8 +1608,8 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
             )}
             {workProgress.targetAmount !== undefined ? (
               <p className="text-xs text-gray-600">
-                目標: {workProgress.targetAmount.toFixed(1)}{unit}
-                {remaining !== null && remaining > 0 && ` / 残り: ${remaining.toFixed(1)}${unit}`}
+                目標: {formatAmount(workProgress.targetAmount, unit)}{unit}
+                {remaining !== null && remaining > 0 && ` / 残り: ${formatAmount(remaining, unit)}${unit}`}
               </p>
             ) : (
               <p className="text-xs text-gray-600">
@@ -1678,6 +1702,14 @@ function ProgressHistorySection({ workProgress }: ProgressHistorySectionProps) {
     return match && match[1] ? match[1] : '';
   };
 
+  // 数値を単位に応じてフォーマット（kgの場合は小数点第1位、それ以外は整数）
+  const formatAmount = (amount: number, unit: string): string => {
+    if (unit.toLowerCase() === 'kg') {
+      return amount.toFixed(1);
+    }
+    return Math.round(amount).toString();
+  };
+
   const unit = extractUnit(workProgress.weight);
 
   return (
@@ -1703,7 +1735,7 @@ function ProgressHistorySection({ workProgress }: ProgressHistorySectionProps) {
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="font-semibold text-gray-800">
-                  +{entry.amount.toFixed(1)}{unit ? ` ${unit}` : ''}
+                  +{formatAmount(entry.amount, unit)}{unit ? ` ${unit}` : ''}
                 </span>
                 <span className="text-gray-500">
                   {formatDateTime(entry.date)}

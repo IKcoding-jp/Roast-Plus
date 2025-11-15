@@ -11,8 +11,8 @@ service cloud.firestore {
     match /defectBeans/{defectBeanId} {
       // 全ユーザーが読み取り可能
       allow read: if request.auth != null;
-      // 書き込みは管理者のみ（手動でFirebase Consoleから設定）
-      allow write: if false;
+      // 認証済みユーザーが編集可能
+      allow write: if request.auth != null;
     }
   }
 }

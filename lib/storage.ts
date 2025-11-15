@@ -13,7 +13,7 @@ function getStorageInstance(): Storage {
 
 /**
  * 欠点豆の画像をFirebase Storageにアップロード
- * @param userId ユーザーID
+ * @param userId ユーザーID（空文字列の場合はマスターデータ）
  * @param defectBeanId 欠点豆ID
  * @param file 画像ファイル
  * @returns ダウンロードURL
@@ -25,7 +25,13 @@ export async function uploadDefectBeanImage(
 ): Promise<string> {
   try {
     const storageInstance = getStorageInstance();
-    const storageRef = ref(storageInstance, `defect-beans/${userId}/${defectBeanId}/${Date.now()}_${file.name}`);
+    
+    // マスターデータの場合は別のパスを使用
+    const storagePath = userId
+      ? `defect-beans/${userId}/${defectBeanId}/${Date.now()}_${file.name}`
+      : `defect-beans-master/${defectBeanId}/${Date.now()}_${file.name}`;
+    
+    const storageRef = ref(storageInstance, storagePath);
     
     // ファイルをアップロード
     await uploadBytes(storageRef, file);

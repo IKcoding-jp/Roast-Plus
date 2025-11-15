@@ -1,19 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { HiX, HiCamera } from 'react-icons/hi';
+import { useState, useEffect } from 'react';
+import { HiX, HiCamera, HiTrash } from 'react-icons/hi';
 import { CameraCapture } from './CameraCapture';
 import type { DefectBean } from '@/types';
 
 interface DefectBeanFormProps {
+  mode?: 'add' | 'edit';
+  defectBean?: DefectBean; // 編集モード時に既存データを渡す
   onSubmit: (
     defectBean: Omit<DefectBean, 'id' | 'createdAt' | 'updatedAt' | 'isMaster' | 'imageUrl'>,
-    imageFile: File
+    imageFile: File | null // 編集モード時はnullの可能性がある
   ) => Promise<void>;
+  onUpdate?: (
+    defectBean: Omit<DefectBean, 'id' | 'createdAt' | 'updatedAt' | 'isMaster' | 'imageUrl'>,
+    imageFile: File | null
+  ) => Promise<void>;
+  onDelete?: () => Promise<void>;
   onCancel: () => void;
 }
 
-export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
+export function DefectBeanForm({
+  mode = 'add',
+  defectBean,
+  onSubmit,
+  onUpdate,
+  onDelete,
+  onCancel,
+}: DefectBeanFormProps) {
   const [showCamera, setShowCamera] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -22,6 +36,18 @@ export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
   const [tasteImpact, setTasteImpact] = useState('');
   const [removalReason, setRemovalReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // 編集モード時に既存データをフォームに設定
+  useEffect(() => {
+    if (mode === 'edit' && defectBean) {
+      setName(defectBean.name);
+      setCharacteristics(defectBean.characteristics);
+      setTasteImpact(defectBean.tasteImpact);
+      setRemovalReason(defectBean.removalReason);
+      setImagePreview(defectBean.imageUrl);
+    }
+  }, [mode, defectBean]);
 
   const handleCameraCapture = (file: File) => {
     setImageFile(file);
@@ -48,7 +74,8 @@ export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!imageFile) {
+    // 追加モード時は画像が必須
+    if (mode === 'add' && !imageFile) {
       alert('画像を選択してください。');
       return;
     }
@@ -58,37 +85,47 @@ export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
       return;
     }
 
-    if (!characteristics.trim()) {
-      alert('特徴を入力してください。');
-      return;
-    }
-
-    if (!tasteImpact.trim()) {
-      alert('味への影響を入力してください。');
-      return;
-    }
-
-    if (!removalReason.trim()) {
-      alert('省く理由を入力してください。');
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      await onSubmit(
-        {
-          name: name.trim(),
-          characteristics: characteristics.trim(),
-          tasteImpact: tasteImpact.trim(),
-          removalReason: removalReason.trim(),
-        },
-        imageFile
-      );
+      const defectBeanData = {
+        name: name.trim(),
+        characteristics: characteristics.trim() || '',
+        tasteImpact: tasteImpact.trim() || '',
+        removalReason: removalReason.trim() || '',
+      };
+
+      if (mode === 'edit' && onUpdate) {
+        await onUpdate(defectBeanData, imageFile);
+      } else {
+        if (!imageFile) {
+          alert('画像を選択してください。');
+          return;
+        }
+        await onSubmit(defectBeanData, imageFile);
+      }
     } catch (error) {
-      console.error('Failed to submit defect bean:', error);
-      alert('欠点豆の追加に失敗しました。');
+      console.error(`Failed to ${mode === 'edit' ? 'update' : 'submit'} defect bean:`, error);
+      alert(`欠点豆の${mode === 'edit' ? '更新' : '追加'}に失敗しました。`);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete) return;
+
+    if (!window.confirm('この欠点豆を削除しますか？')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await onDelete();
+    } catch (error) {
+      console.error('Failed to delete defect bean:', error);
+      alert('欠点豆の削除に失敗しました。');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -106,7 +143,9 @@ export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-800">欠点豆を追加</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            {mode === 'edit' ? '欠点豆を編集' : '欠点豆を追加'}
+          </h2>
           <button
             onClick={onCancel}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -120,7 +159,7 @@ export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
           {/* 画像選択 */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              画像 <span className="text-red-500">*</span>
+              画像 {mode === 'add' && <span className="text-red-500">*</span>}
             </label>
             {imagePreview ? (
               <div className="relative">
@@ -133,7 +172,12 @@ export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
                   type="button"
                   onClick={() => {
                     setImageFile(null);
-                    setImagePreview(null);
+                    if (mode === 'edit' && defectBean) {
+                      // 編集モード時は既存画像URLに戻す
+                      setImagePreview(defectBean.imageUrl);
+                    } else {
+                      setImagePreview(null);
+                    }
                   }}
                   className="absolute top-2 right-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
@@ -182,62 +226,78 @@ export function DefectBeanForm({ onSubmit, onCancel }: DefectBeanFormProps) {
           {/* 特徴 */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              特徴（見た目の説明） <span className="text-red-500">*</span>
+              特徴（見た目の説明）
             </label>
             <textarea
               value={characteristics}
               onChange={(e) => setCharacteristics(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[100px] resize-y text-gray-900 bg-white"
               placeholder="例: 白いカビが生えている。表面がふわふわしている。"
-              required
             />
           </div>
 
           {/* 味への影響 */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              味への影響 <span className="text-red-500">*</span>
+              味への影響
             </label>
             <textarea
               value={tasteImpact}
               onChange={(e) => setTasteImpact(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[100px] resize-y text-gray-900 bg-white"
               placeholder="例: カビ臭さがコーヒーの風味を損なう。"
-              required
             />
           </div>
 
           {/* 省く理由 */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              省く理由 <span className="text-red-500">*</span>
+              省く理由
             </label>
             <textarea
               value={removalReason}
               onChange={(e) => setRemovalReason(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[100px] resize-y text-gray-900 bg-white"
               placeholder="例: 品質を保つため、カビ豆は必ず除去する。"
-              required
             />
           </div>
 
           {/* ボタン */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors min-h-[44px]"
-              disabled={isSubmitting}
-            >
-              キャンセル
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? '追加中...' : '追加'}
-            </button>
+          <div className={`flex gap-3 pt-4 border-t border-gray-200 ${mode === 'edit' && onDelete ? 'justify-between' : 'justify-end'}`}>
+            {mode === 'edit' && onDelete && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                disabled={isSubmitting || isDeleting}
+              >
+                <HiTrash className="h-5 w-5" />
+                {isDeleting ? '削除中...' : '削除'}
+              </button>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors min-h-[44px]"
+                disabled={isSubmitting || isDeleting}
+              >
+                キャンセル
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                disabled={isSubmitting || isDeleting}
+              >
+                {isSubmitting
+                  ? mode === 'edit'
+                    ? '更新中...'
+                    : '追加中...'
+                  : mode === 'edit'
+                    ? '更新'
+                    : '追加'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

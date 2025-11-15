@@ -18,11 +18,12 @@ type FilterOption = 'all' | 'shouldRemove' | 'shouldNotRemove';
 
 export default function DefectBeansPage() {
   const { user, loading: authLoading } = useAuth();
-  const { allDefectBeans, isLoading, addDefectBean, removeDefectBean } = useDefectBeans();
+  const { allDefectBeans, isLoading, addDefectBean, updateDefectBean, removeDefectBean } = useDefectBeans();
   const { settings, updateSetting } = useDefectBeanSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOption, setFilterOption] = useState<FilterOption>('all');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingDefectBeanId, setEditingDefectBeanId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
@@ -126,7 +127,53 @@ export default function DefectBeansPage() {
     }
   };
 
-  // 欠点豆削除
+  // 欠点豆編集
+  const handleEditDefectBean = (id: string) => {
+    setEditingDefectBeanId(id);
+  };
+
+  // 欠点豆更新
+  const handleUpdateDefectBean = async (
+    defectBean: Omit<DefectBean, 'id' | 'createdAt' | 'updatedAt' | 'isMaster' | 'imageUrl'>,
+    imageFile: File | null
+  ) => {
+    if (!editingDefectBeanId) return;
+
+    try {
+      const existingBean = allDefectBeans.find((db) => db.id === editingDefectBeanId);
+      if (!existingBean) {
+        throw new Error('Defect bean not found');
+      }
+
+      await updateDefectBean(editingDefectBeanId, defectBean, imageFile, existingBean.imageUrl);
+      setEditingDefectBeanId(null);
+    } catch (error) {
+      console.error('Failed to update defect bean:', error);
+      alert('欠点豆の更新に失敗しました。');
+      throw error;
+    }
+  };
+
+  // 欠点豆削除（編集ダイアログから）
+  const handleDeleteDefectBeanFromEdit = async () => {
+    if (!editingDefectBeanId) return;
+
+    try {
+      const existingBean = allDefectBeans.find((db) => db.id === editingDefectBeanId);
+      if (!existingBean) {
+        throw new Error('Defect bean not found');
+      }
+
+      await removeDefectBean(editingDefectBeanId, existingBean.imageUrl);
+      setEditingDefectBeanId(null);
+    } catch (error) {
+      console.error('Failed to delete defect bean:', error);
+      alert('欠点豆の削除に失敗しました。');
+      throw error;
+    }
+  };
+
+  // 欠点豆削除（旧関数、互換性のため残す）
   const handleDeleteDefectBean = async (id: string, imageUrl: string) => {
     try {
       await removeDefectBean(id, imageUrl);
@@ -282,6 +329,8 @@ export default function DefectBeansPage() {
                   onToggleSetting={handleToggleSetting}
                   onDelete={isUserDefectBean ? handleDeleteDefectBean : undefined}
                   isUserDefectBean={isUserDefectBean}
+                  onEdit={!compareMode ? handleEditDefectBean : undefined}
+                  compareMode={compareMode}
                 />
               );
             })}
@@ -291,10 +340,28 @@ export default function DefectBeansPage() {
         {/* 追加フォーム */}
         {showAddForm && (
           <DefectBeanForm
+            mode="add"
             onSubmit={handleAddDefectBean}
             onCancel={() => setShowAddForm(false)}
           />
         )}
+
+        {/* 編集フォーム */}
+        {editingDefectBeanId && (() => {
+          const editingBean = allDefectBeans.find((db) => db.id === editingDefectBeanId);
+          if (!editingBean) return null;
+          
+          return (
+            <DefectBeanForm
+              mode="edit"
+              defectBean={editingBean}
+              onSubmit={handleAddDefectBean} // 使用されないが型のため必要
+              onUpdate={handleUpdateDefectBean}
+              onDelete={handleDeleteDefectBeanFromEdit}
+              onCancel={() => setEditingDefectBeanId(null)}
+            />
+          );
+        })()}
 
         {/* 比較表示 */}
         {showCompare && selectedDefectBeans.length > 0 && (

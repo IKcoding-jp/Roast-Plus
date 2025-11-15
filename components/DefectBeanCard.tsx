@@ -13,6 +13,8 @@ interface DefectBeanCardProps {
   onToggleSetting?: (id: string, shouldRemove: boolean) => void;
   onDelete?: (id: string, imageUrl: string) => void;
   isUserDefectBean?: boolean;
+  onEdit?: (id: string) => void;
+  compareMode?: boolean;
 }
 
 export function DefectBeanCard({
@@ -23,12 +25,18 @@ export function DefectBeanCard({
   onToggleSetting,
   onDelete,
   isUserDefectBean = false,
+  onEdit,
+  compareMode = false,
 }: DefectBeanCardProps) {
   const [showImageModal, setShowImageModal] = useState(false);
 
   const handleCardClick = () => {
-    if (onSelect) {
+    if (compareMode && onSelect) {
+      // 比較モード中は選択のみ
       onSelect(defectBean.id);
+    } else if (!compareMode && onEdit) {
+      // 通常モードでは編集ダイアログを開く
+      onEdit(defectBean.id);
     }
   };
 
@@ -43,12 +51,16 @@ export function DefectBeanCard({
       <div
         className={`bg-white rounded-lg shadow-md overflow-hidden transition-all ${
           isSelected ? 'ring-2 ring-amber-500' : ''
-        } hover:shadow-lg`}
+        } hover:shadow-lg ${!compareMode && onEdit ? 'cursor-pointer' : ''}`}
+        onClick={handleCardClick}
       >
         {/* 画像 */}
         <div
           className="relative w-full h-48 bg-gray-100 cursor-pointer"
-          onClick={() => setShowImageModal(true)}
+          onClick={(e) => {
+            e.stopPropagation(); // カードクリックを防ぐ
+            setShowImageModal(true);
+          }}
         >
           <Image
             src={defectBean.imageUrl}
@@ -58,21 +70,6 @@ export function DefectBeanCard({
             sizes="(max-width: 768px) 50vw, 25vw"
             unoptimized
           />
-          {/* 削除アイコン（ユーザー追加データのみ） */}
-          {onDelete && isUserDefectBean && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // 画像拡大を防ぐ
-                if (window.confirm('この欠点豆を削除しますか？')) {
-                  onDelete(defectBean.id, defectBean.imageUrl);
-                }
-              }}
-              className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors z-10 shadow-md"
-              title="削除"
-            >
-              <HiX className="h-3.5 w-3.5" />
-            </button>
-          )}
           {/* 選択バッジ */}
           {isSelected && (
             <div className="absolute top-1 left-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
@@ -116,7 +113,7 @@ export function DefectBeanCard({
 
           {/* 設定切り替え */}
           {onToggleSetting && (
-            <div className="flex gap-1.5 pt-1.5 border-t border-gray-200">
+            <div className="flex gap-1.5 pt-1.5 border-t border-gray-200" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => handleToggleSetting(true)}
                 className={`flex-1 px-2 py-1.5 rounded text-xs font-semibold transition-colors min-h-[36px] flex items-center justify-center gap-1 ${

@@ -142,8 +142,8 @@ export default function HomePage() {
             <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               ローストタイマー
             </h2>
-            <span className="flex-shrink-0 text-xs sm:text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              β版
+            <span className="flex-shrink-0 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
+              New!
             </span>
           </button>
 
@@ -158,8 +158,8 @@ export default function HomePage() {
             <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               欠点豆図鑑
             </h2>
-            <span className="flex-shrink-0 text-xs sm:text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              β版
+            <span className="flex-shrink-0 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
+              New!
             </span>
           </button>
 
@@ -174,6 +174,9 @@ export default function HomePage() {
             <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               作業進捗
             </h2>
+            <span className="flex-shrink-0 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
+              New!
+            </span>
           </button>
 
           {/* 設定カード */}

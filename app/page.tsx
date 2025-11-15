@@ -2,21 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth, signOut } from '@/lib/auth';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PiCoffeeBeanFill } from "react-icons/pi";
 import { RiCalendarScheduleLine, RiBookFill } from "react-icons/ri";
 import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
-import { IoSettings } from "react-icons/io5";
-import { IoNotificationsOutline } from "react-icons/io5";
+import { IoSettings, IoClose } from "react-icons/io5";
 import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
-import { useNotifications } from '@/hooks/useNotifications';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const { unreadCount } = useNotifications();
+  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -54,19 +52,6 @@ export default function HomePage() {
           <h1 className="text-xl font-bold text-white">ローストプラス</h1>
         </div>
         <div className="flex items-center gap-4">
-          {/* 通知マーク */}
-          <button
-            onClick={() => router.push('/notifications')}
-            className="relative p-2.5 text-white hover:text-gray-200 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-            aria-label="通知"
-          >
-            <IoNotificationsOutline className="h-6 w-6" />
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            )}
-          </button>
           <button
             onClick={handleLogout}
             className="text-sm font-medium text-white hover:text-gray-200"
@@ -75,6 +60,28 @@ export default function HomePage() {
           </button>
         </div>
       </header>
+
+      {/* バナー通知 */}
+      {showBanner && (
+        <div className="bg-gradient-to-r from-amber-100 to-orange-50 border-b border-amber-300 shadow-sm">
+          <div className="container mx-auto px-3 py-2 sm:px-4 sm:py-2.5">
+            <div className="flex items-start gap-2 max-w-2xl mx-auto">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm leading-relaxed text-gray-800 font-medium">
+                  ITパスポートは合格しました。ローストタイマーと欠点豆図鑑がある程度完成したので、確認してみてください！
+                </p>
+              </div>
+              <button
+                onClick={() => setShowBanner(false)}
+                className="flex-shrink-0 p-0.5 hover:bg-amber-200 rounded transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center text-gray-700"
+                aria-label="バナーを閉じる"
+              >
+                <IoClose className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 pt-2 sm:pt-3 pb-6 sm:pb-8">
@@ -147,6 +154,9 @@ export default function HomePage() {
             <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
               欠点豆図鑑
             </h2>
+            <span className="flex-shrink-0 text-xs sm:text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
+              β版
+            </span>
           </button>
 
           {/* 作業進捗カード */}

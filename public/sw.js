@@ -1,6 +1,6 @@
 // Service Worker for PWA
-const CACHE_NAME = 'roast-plus-v2';
-const RUNTIME_CACHE = 'roast-plus-runtime-v2';
+const CACHE_NAME = 'roast-plus-v3';
+const RUNTIME_CACHE = 'roast-plus-runtime-v3';
 
 // キャッシュするリソース
 const PRECACHE_URLS = [

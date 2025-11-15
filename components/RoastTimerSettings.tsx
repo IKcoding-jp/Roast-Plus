@@ -1,0 +1,240 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/auth';
+import { useAppData } from '@/hooks/useAppData';
+import {
+  loadRoastTimerSettings,
+  saveRoastTimerSettings,
+  clearRoastTimerSettingsCache,
+} from '@/lib/roastTimerSettings';
+import type { RoastTimerSettings } from '@/types';
+
+interface RoastTimerSettingsProps {
+  onClose: () => void;
+}
+
+export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
+  const { user } = useAuth();
+  const { data } = useAppData();
+  const [settings, setSettings] = useState<RoastTimerSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      loadRoastTimerSettings(user.uid)
+        .then((loadedSettings) => {
+          setSettings(loadedSettings);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Failed to load settings:', error);
+          setIsLoading(false);
+        });
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user || !settings) return;
+
+    setIsSaving(true);
+    try {
+      await saveRoastTimerSettings(user.uid, settings, data);
+      clearRoastTimerSettingsCache();
+      onClose();
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      alert('設定の保存に失敗しました');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading || !settings) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="text-center text-gray-600">読み込み中...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">タイマー設定</h2>
+
+      <div className="space-y-6">
+        {/* 焙煎室に行くまでの時間 */}
+        <div>
+          <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+            焙煎室に行くまでの時間（秒）
+          </label>
+          <input
+            type="number"
+            min="1"
+            value={settings.goToRoastRoomTimeSeconds}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                goToRoastRoomTimeSeconds: parseInt(e.target.value, 10) || 60,
+              })
+            }
+            className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+          />
+          <p className="mt-1 text-xs sm:text-sm text-gray-500">
+            おすすめ焙煎タイマーで使用される時間です。平均焙煎時間からこの秒数を引いた値がおすすめタイマー時間として提案されます。
+          </p>
+        </div>
+
+        {/* タイマー音の設定 */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">タイマー音</h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={settings.timerSoundEnabled}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      timerSoundEnabled: e.target.checked,
+                    })
+                  }
+                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
+                />
+                <span className="text-sm sm:text-base text-gray-700">タイマー音を有効にする</span>
+              </label>
+            </div>
+
+            {settings.timerSoundEnabled && (
+              <>
+                <div>
+                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                    タイマー音ファイル
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.timerSoundFile}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        timerSoundFile: e.target.value,
+                      })
+                    }
+                    placeholder="sounds/alarm/alarm01.mp3"
+                    className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                    音量: {Math.round(settings.timerSoundVolume * 100)}%
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={settings.timerSoundVolume}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        timerSoundVolume: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 通知音の設定 */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">通知音</h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={settings.notificationSoundEnabled}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      notificationSoundEnabled: e.target.checked,
+                    })
+                  }
+                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
+                />
+                <span className="text-sm sm:text-base text-gray-700">通知音を有効にする</span>
+              </label>
+            </div>
+
+            {settings.notificationSoundEnabled && (
+              <>
+                <div>
+                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                    通知音ファイル
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.notificationSoundFile}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        notificationSoundFile: e.target.value,
+                      })
+                    }
+                    placeholder="sounds/alarm/alarm01.mp3"
+                    className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                    音量: {Math.round(settings.notificationSoundVolume * 100)}%
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={settings.notificationSoundVolume}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        notificationSoundVolume: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-3 sm:gap-4 justify-end mt-6 pt-6 border-t">
+        <button
+          onClick={onClose}
+          className="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors text-base sm:text-lg min-h-[44px]"
+        >
+          キャンセル
+        </button>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-base sm:text-lg min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          {isSaving ? '保存中...' : '保存'}
+        </button>
+      </div>
+    </div>
+  );
+}
+

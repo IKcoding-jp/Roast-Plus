@@ -1,6 +1,7 @@
 // ローカルストレージ管理
 
 const SELECTED_MEMBER_ID_KEY = 'roastplus_selected_member_id';
+const ROAST_TIMER_STATE_KEY = 'roastplus_roast_timer_state';
 
 /**
  * 選択されたメンバーIDを保存
@@ -22,5 +23,35 @@ export function getSelectedMemberId(): string | null {
   if (typeof window === 'undefined') return null;
   
   return localStorage.getItem(SELECTED_MEMBER_ID_KEY);
+}
+
+/**
+ * ローストタイマー状態を保存
+ */
+export function setRoastTimerState(state: any): void {
+  if (typeof window === 'undefined') return;
+  
+  if (state === null || state === undefined) {
+    localStorage.removeItem(ROAST_TIMER_STATE_KEY);
+  } else {
+    localStorage.setItem(ROAST_TIMER_STATE_KEY, JSON.stringify(state));
+  }
+}
+
+/**
+ * ローストタイマー状態を取得
+ */
+export function getRoastTimerState(): any | null {
+  if (typeof window === 'undefined') return null;
+  
+  const stored = localStorage.getItem(ROAST_TIMER_STATE_KEY);
+  if (!stored) return null;
+  
+  try {
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error('Failed to parse roast timer state from localStorage:', error);
+    return null;
+  }
 }
 

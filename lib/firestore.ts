@@ -62,6 +62,7 @@ const defaultData: AppData = {
   tastingRecords: [],
   notifications: [],
   encouragementCount: 0,
+  roastTimerRecords: [],
 };
 
 function getUserDocRef(userId: string) {
@@ -148,6 +149,15 @@ function normalizeAppData(data: any): AppData {
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],
     encouragementCount: typeof data?.encouragementCount === 'number' ? data.encouragementCount : 0,
+    roastTimerRecords: Array.isArray(data?.roastTimerRecords)
+      ? data.roastTimerRecords.map((record: any) => ({
+          ...record,
+          // roastDateがない場合はcreatedAtから日付を抽出、それもない場合は今日の日付
+          roastDate:
+            record.roastDate ||
+            (record.createdAt ? record.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
+        }))
+      : [],
   };
   
   // userSettingsは存在する場合のみ追加（selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除）
@@ -158,6 +168,19 @@ function normalizeAppData(data: any): AppData {
     }
     if (data.userSettings.selectedManagerId !== undefined) {
       cleanedUserSettings.selectedManagerId = data.userSettings.selectedManagerId;
+    }
+    // roastTimerSettingsを正規化
+    if (data.userSettings.roastTimerSettings && typeof data.userSettings.roastTimerSettings === 'object') {
+      const settings = data.userSettings.roastTimerSettings;
+      cleanedUserSettings.roastTimerSettings = {
+        goToRoastRoomTimeSeconds: typeof settings.goToRoastRoomTimeSeconds === 'number' ? settings.goToRoastRoomTimeSeconds : 60,
+        timerSoundEnabled: typeof settings.timerSoundEnabled === 'boolean' ? settings.timerSoundEnabled : true,
+        timerSoundFile: typeof settings.timerSoundFile === 'string' ? settings.timerSoundFile : '/sounds/alarm/alarm01.mp3',
+        timerSoundVolume: typeof settings.timerSoundVolume === 'number' ? Math.max(0, Math.min(1, settings.timerSoundVolume)) : 0.5,
+        notificationSoundEnabled: typeof settings.notificationSoundEnabled === 'boolean' ? settings.notificationSoundEnabled : true,
+        notificationSoundFile: typeof settings.notificationSoundFile === 'string' ? settings.notificationSoundFile : '/sounds/alarm/alarm01.mp3',
+        notificationSoundVolume: typeof settings.notificationSoundVolume === 'number' ? Math.max(0, Math.min(1, settings.notificationSoundVolume)) : 0.5,
+      };
     }
     if (Object.keys(cleanedUserSettings).length > 0) {
       normalized.userSettings = cleanedUserSettings;
@@ -175,6 +198,11 @@ function normalizeAppData(data: any): AppData {
         shuffledAssignments: data.shuffleEvent.shuffledAssignments,
       };
     }
+  }
+  
+  // roastTimerStateは存在する場合のみ追加
+  if (data?.roastTimerState && typeof data.roastTimerState === 'object') {
+    normalized.roastTimerState = data.roastTimerState;
   }
   
   return normalized;
@@ -262,6 +290,12 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
     if (data.shuffleEvent === undefined) {
       // shuffleEventがundefinedの場合、既存のフィールドを削除
       cleanedData.shuffleEvent = deleteField() as any;
+    }
+    
+    // roastTimerStateの削除処理
+    if (data.roastTimerState === undefined) {
+      // roastTimerStateがundefinedの場合、既存のフィールドを削除
+      cleanedData.roastTimerState = deleteField() as any;
     }
     
     await setDoc(userDocRef, cleanedData, { merge: true });

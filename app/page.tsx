@@ -132,7 +132,7 @@ export default function HomePage() {
               ローストタイマー
             </h2>
             <span className="flex-shrink-0 text-xs sm:text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              開発予定
+              β版
             </span>
           </button>
 

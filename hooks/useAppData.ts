@@ -19,6 +19,7 @@ export function useAppData() {
     tastingRecords: [],
     notifications: [],
     encouragementCount: 0,
+    roastTimerRecords: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const isUpdatingRef = useRef(false);
@@ -79,6 +80,8 @@ export function useAppData() {
         userSettings: newData.userSettings || data.userSettings,
         shuffleEvent: newData.shuffleEvent !== undefined ? newData.shuffleEvent : data.shuffleEvent,
         encouragementCount: typeof newData.encouragementCount === 'number' ? newData.encouragementCount : (data.encouragementCount ?? 0),
+        roastTimerRecords: Array.isArray(newData.roastTimerRecords) ? newData.roastTimerRecords : data.roastTimerRecords,
+        roastTimerState: newData.roastTimerState !== undefined ? newData.roastTimerState : data.roastTimerState,
       };
 
       isUpdatingRef.current = true;

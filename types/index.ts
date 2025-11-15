@@ -108,16 +108,58 @@ export interface TastingRecord {
   memberId: string; // メンバーID（必須）
 }
 
+// ローストタイマー設定
+export interface RoastTimerSettings {
+  goToRoastRoomTimeSeconds: number; // 焙煎室に行くまでの時間（秒、デフォルト60秒）
+  timerSoundEnabled: boolean; // タイマー音の有効/無効
+  timerSoundFile: string; // タイマー音ファイルパス（デフォルト: sounds/alarm/alarm01.mp3）
+  timerSoundVolume: number; // タイマー音量（0.0～1.0、デフォルト0.5）
+  notificationSoundEnabled: boolean; // 通知音の有効/無効
+  notificationSoundFile: string; // 通知音ファイルパス
+  notificationSoundVolume: number; // 通知音量（0.0～1.0）
+}
+
 // ユーザー設定
 export interface UserSettings {
   selectedMemberId?: string; // 試飲感想記録用のメンバーID
   selectedManagerId?: string; // デバイス使用者設定用の管理者ID
+  roastTimerSettings?: RoastTimerSettings; // ローストタイマー設定
 }
 
 // シャッフルイベント（マルチデバイス同期用）
 export interface ShuffleEvent {
   startTime: string; // ISO 8601形式のタイムスタンプ
   shuffledAssignments: Assignment[]; // シャッフル結果
+}
+
+// ローストタイマー記録
+export interface RoastTimerRecord {
+  id: string;
+  beanName: string; // 豆の名前
+  weight: 200 | 300 | 500; // 重さ（g）
+  roastLevel: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い
+  duration: number; // 実際のロースト時間（秒）
+  roastDate: string; // 焙煎日（YYYY-MM-DD形式）
+  createdAt: string; // ISO 8601形式
+  userId: string; // ユーザーID
+  groupId?: string; // グループID（グループ記録用、オプショナル）
+}
+
+// ローストタイマー状態
+export type RoastTimerStatus = 'idle' | 'running' | 'paused' | 'completed';
+
+export interface RoastTimerState {
+  status: RoastTimerStatus; // タイマーの状態
+  duration: number; // 設定時間（秒）
+  elapsed: number; // 経過時間（秒）
+  remaining: number; // 残り時間（秒）
+  beanName?: string; // 豆の名前
+  weight?: 200 | 300 | 500; // 重さ（g）
+  roastLevel?: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い
+  startedAt?: string; // 開始時刻（ISO 8601形式）
+  pausedAt?: string; // 一時停止時刻（ISO 8601形式）
+  lastUpdatedAt: string; // 最終更新時刻（ISO 8601形式）
+  notificationId?: number; // 通知ID（2=手動、3=おすすめ）
 }
 
 // アプリ全体のデータ構造
@@ -136,6 +178,8 @@ export interface AppData {
   userSettings?: UserSettings; // ユーザー設定
   shuffleEvent?: ShuffleEvent; // シャッフルイベント（マルチデバイス同期用）
   encouragementCount?: number; // 応援カウント（全ユーザーで共有）
+  roastTimerRecords: RoastTimerRecord[]; // ローストタイマー記録
+  roastTimerState?: RoastTimerState; // ローストタイマー状態
 }
 
 // 通知

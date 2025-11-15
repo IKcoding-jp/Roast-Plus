@@ -5,6 +5,8 @@
 
 let timerAudio: HTMLAudioElement | null = null;
 let notificationAudio: HTMLAudioElement | null = null;
+let timerErrorHandler: ((e: Event) => void) | null = null;
+let notificationErrorHandler: ((e: Event) => void) | null = null;
 
 /**
  * タイマー音を再生（ループ再生）
@@ -16,6 +18,11 @@ export async function playTimerSound(
   try {
     // 既存の音声を停止
     if (timerAudio) {
+      // エラーイベントリスナーを削除
+      if (timerErrorHandler) {
+        timerAudio.removeEventListener('error', timerErrorHandler);
+        timerErrorHandler = null;
+      }
       timerAudio.pause();
       timerAudio = null;
     }
@@ -24,11 +31,24 @@ export async function playTimerSound(
     const audioPath = soundFile.startsWith('/') ? soundFile : `/${soundFile}`;
     const audio = new Audio(audioPath);
     
-    // エラーハンドリングを追加
-    audio.addEventListener('error', (e) => {
-      console.error('Audio loading error:', e);
-      console.error('Failed to load audio file:', audioPath);
-    });
+    // エラーハンドリングを追加（参照を保持して削除可能にする）
+    timerErrorHandler = (e: Event) => {
+      const error = audio.error;
+      if (error) {
+        console.error('Audio loading error:', {
+          code: error.code,
+          message: error.message,
+          MEDIA_ERR_ABORTED: error.MEDIA_ERR_ABORTED,
+          MEDIA_ERR_NETWORK: error.MEDIA_ERR_NETWORK,
+          MEDIA_ERR_DECODE: error.MEDIA_ERR_DECODE,
+          MEDIA_ERR_SRC_NOT_SUPPORTED: error.MEDIA_ERR_SRC_NOT_SUPPORTED,
+        });
+        console.error('Failed to load audio file:', audioPath);
+      } else {
+        console.error('Audio error event fired but no error details available');
+      }
+    };
+    audio.addEventListener('error', timerErrorHandler);
 
     audio.loop = true;
     audio.volume = Math.max(0, Math.min(1, volume));
@@ -50,13 +70,23 @@ export async function playTimerSound(
 export function stopTimerSound(): void {
   if (timerAudio) {
     try {
+      // エラーイベントリスナーを削除
+      if (timerErrorHandler) {
+        timerAudio.removeEventListener('error', timerErrorHandler);
+        timerErrorHandler = null;
+      }
+      // 音声を停止
       timerAudio.pause();
       timerAudio.currentTime = 0;
       timerAudio.loop = false; // ループを無効化
+      // Audioオブジェクトを完全に停止
+      timerAudio.src = '';
+      timerAudio.load(); // リソースを解放
       timerAudio = null;
     } catch (error) {
       console.error('Failed to stop timer sound:', error);
       timerAudio = null;
+      timerErrorHandler = null;
     }
   }
 }
@@ -71,6 +101,11 @@ export async function playNotificationSound(
   try {
     // 既存の音声を停止
     if (notificationAudio) {
+      // エラーイベントリスナーを削除
+      if (notificationErrorHandler) {
+        notificationAudio.removeEventListener('error', notificationErrorHandler);
+        notificationErrorHandler = null;
+      }
       notificationAudio.pause();
       notificationAudio = null;
     }
@@ -79,11 +114,24 @@ export async function playNotificationSound(
     const audioPath = soundFile.startsWith('/') ? soundFile : `/${soundFile}`;
     const audio = new Audio(audioPath);
     
-    // エラーハンドリングを追加
-    audio.addEventListener('error', (e) => {
-      console.error('Audio loading error:', e);
-      console.error('Failed to load audio file:', audioPath);
-    });
+    // エラーハンドリングを追加（参照を保持して削除可能にする）
+    notificationErrorHandler = (e: Event) => {
+      const error = audio.error;
+      if (error) {
+        console.error('Audio loading error:', {
+          code: error.code,
+          message: error.message,
+          MEDIA_ERR_ABORTED: error.MEDIA_ERR_ABORTED,
+          MEDIA_ERR_NETWORK: error.MEDIA_ERR_NETWORK,
+          MEDIA_ERR_DECODE: error.MEDIA_ERR_DECODE,
+          MEDIA_ERR_SRC_NOT_SUPPORTED: error.MEDIA_ERR_SRC_NOT_SUPPORTED,
+        });
+        console.error('Failed to load audio file:', audioPath);
+      } else {
+        console.error('Audio error event fired but no error details available');
+      }
+    };
+    audio.addEventListener('error', notificationErrorHandler);
 
     audio.loop = false;
     audio.volume = Math.max(0, Math.min(1, volume));
@@ -104,6 +152,11 @@ export async function playNotificationSound(
  */
 export function stopNotificationSound(): void {
   if (notificationAudio) {
+    // エラーイベントリスナーを削除
+    if (notificationErrorHandler) {
+      notificationAudio.removeEventListener('error', notificationErrorHandler);
+      notificationErrorHandler = null;
+    }
     notificationAudio.pause();
     notificationAudio.currentTime = 0;
     notificationAudio = null;
@@ -127,6 +180,10 @@ export function stopAudio(audio: HTMLAudioElement | null | undefined): void {
       audio.pause();
       audio.currentTime = 0;
       audio.loop = false;
+      // Audioオブジェクトを完全に停止
+      // srcを空にしてload()を呼び出すと、イベントリスナーも自動的に削除される
+      audio.src = '';
+      audio.load(); // リソースを解放
     } catch (error) {
       console.error('Failed to stop audio:', error);
     }

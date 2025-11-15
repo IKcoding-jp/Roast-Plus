@@ -523,12 +523,25 @@ export function useRoastTimer() {
 
   // サウンドを停止（完了ダイアログのOKボタンで呼ばれる）
   const stopSound = useCallback(() => {
-    // soundAudioRefに保存されているAudioオブジェクトも直接停止
+    // まず、soundAudioRefに保存されているAudioオブジェクトを直接停止
     if (soundAudioRef.current) {
-      stopAudio(soundAudioRef.current);
-      soundAudioRef.current = null;
+      try {
+        const audio = soundAudioRef.current;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.loop = false;
+        // すべてのイベントリスナーを削除
+        audio.removeEventListener('error', () => {});
+        // Audioオブジェクトを完全に停止
+        audio.src = '';
+        audio.load(); // リソースを解放
+        soundAudioRef.current = null;
+      } catch (error) {
+        console.error('Failed to stop sound audio ref:', error);
+        soundAudioRef.current = null;
+      }
     }
-    // グローバルなタイマー音も停止
+    // グローバルなタイマー音も停止（二重に停止することで確実に停止）
     stopAllSounds();
   }, []);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
@@ -35,6 +35,11 @@ export default function ProgressPage() {
   const [showModeSelectDialog, setShowModeSelectDialog] = useState(false);
   const [addMode, setAddMode] = useState<'group' | 'work' | null>(null);
   const [showAddGroupForm, setShowAddGroupForm] = useState(false);
+  // ドラッグ&ドロップ用の状態管理
+  const [draggedWorkProgressId, setDraggedWorkProgressId] = useState<string | null>(null);
+  const [dragOverStatus, setDragOverStatus] = useState<WorkProgressStatus | null>(null);
+  const [isDraggingCard, setIsDraggingCard] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number; time: number; workProgressId: string } | null>(null);
 
   // 作業をグループ化（groupNameが設定されている場合のみグループ化、未入力の場合は個別カードとして表示）
   // 注意: すべてのフックは早期リターンの前に呼び出す必要がある
@@ -309,6 +314,123 @@ export default function ProgressPage() {
     await handleUpdateWorkProgress(workProgressId, { status: newStatus });
   };
 
+  // ドラッグ&ドロップハンドラー
+  const handleDragStart = (e: React.DragEvent, workProgressId: string) => {
+    setDraggedWorkProgressId(workProgressId);
+    setIsDraggingCard(true);
+    // ドラッグ中の画像を非表示にする
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', workProgressId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, status: WorkProgressStatus) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedWorkProgressId) {
+      setDragOverStatus(status);
+      e.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    // 子要素への移動を除外
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+      setDragOverStatus(null);
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetStatus: WorkProgressStatus) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!draggedWorkProgressId) return;
+
+    const workProgress = data?.workProgresses?.find((wp) => wp.id === draggedWorkProgressId);
+    if (!workProgress || workProgress.status === targetStatus) {
+      setDraggedWorkProgressId(null);
+      setDragOverStatus(null);
+      setIsDraggingCard(false);
+      return;
+    }
+
+    // ステータスを変更
+    await handleStatusChange(draggedWorkProgressId, targetStatus);
+    
+    setDraggedWorkProgressId(null);
+    setDragOverStatus(null);
+    setIsDraggingCard(false);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedWorkProgressId(null);
+    setDragOverStatus(null);
+    setIsDraggingCard(false);
+  };
+
+  // タッチデバイス対応
+  const handleTouchStart = (e: React.TouchEvent, workProgressId: string) => {
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now(),
+      workProgressId,
+    };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    
+    // 一定の距離と時間を超えたらドラッグ開始とみなす
+    if ((deltaX > 10 || deltaY > 10) && deltaTime > 100) {
+      if (!isDraggingCard) {
+        setDraggedWorkProgressId(touchStartRef.current.workProgressId);
+        setIsDraggingCard(true);
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current || !draggedWorkProgressId) {
+      touchStartRef.current = null;
+      return;
+    }
+
+    // タッチ終了位置からドロップ先の列を検出
+    const touch = e.changedTouches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    
+    if (element) {
+      // 親要素を遡って列のコンテナを探す
+      let current: HTMLElement | null = element as HTMLElement;
+      while (current) {
+        const dragOverStatus = current.getAttribute('data-drop-status') as WorkProgressStatus | null;
+        if (dragOverStatus) {
+          const workProgress = data?.workProgresses?.find((wp) => wp.id === draggedWorkProgressId);
+          if (workProgress && workProgress.status !== dragOverStatus) {
+            handleStatusChange(draggedWorkProgressId, dragOverStatus);
+          }
+          break;
+        }
+        current = current.parentElement;
+      }
+    }
+
+    touchStartRef.current = null;
+    setDraggedWorkProgressId(null);
+    setDragOverStatus(null);
+    setIsDraggingCard(false);
+  };
+
   // 進捗量を追加
   const handleAddProgress = async (workProgressId: string, amount: number, memo?: string) => {
     if (!user) return;
@@ -452,7 +574,15 @@ export default function ProgressPage() {
                   })()}
                 </div>
               </div>
-              <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
+              <div
+                data-drop-status="pending"
+                className={`space-y-3 flex-1 min-h-0 overflow-y-auto pb-4 transition-colors ${
+                  dragOverStatus === 'pending' ? 'bg-gray-50 border-2 border-dashed border-gray-400 rounded-lg' : ''
+                }`}
+                onDragOver={(e) => handleDragOver(e, 'pending')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'pending')}
+              >
                 {/* pending状態のグループ化されたカード */}
                 {groupedWorkProgresses.groups
                   .filter((group) => group.workProgresses.some((wp) => wp.status === 'pending'))
@@ -497,8 +627,20 @@ export default function ProgressPage() {
                         <div className="space-y-2">
                           {pendingTasks.map((wp) => {
                             const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+                            const isDragging = draggedWorkProgressId === wp.id;
                             return (
-                              <div key={wp.id} className="border border-gray-200 rounded-lg p-2 space-y-2">
+                              <div
+                                key={wp.id}
+                                draggable={!isDummyWork}
+                                onDragStart={(e) => !isDummyWork && handleDragStart(e, wp.id)}
+                                onDragEnd={handleDragEnd}
+                                onTouchStart={(e) => !isDummyWork && handleTouchStart(e, wp.id)}
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={handleTouchEnd}
+                                className={`border border-gray-200 rounded-lg p-2 space-y-2 ${
+                                  isDragging ? 'opacity-50 cursor-move' : 'cursor-move'
+                                } ${!isDummyWork ? 'hover:shadow-md transition-shadow' : ''}`}
+                              >
                                 {/* 作業名と進捗状態 */}
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex-1 min-w-0">
@@ -643,8 +785,20 @@ export default function ProgressPage() {
                 {groupedWorkProgresses.ungrouped
                   .filter((wp) => wp.status === 'pending')
                   .map((wp) => {
+                    const isDragging = draggedWorkProgressId === wp.id;
                     return (
-                      <div key={wp.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+                      <div
+                        key={wp.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, wp.id)}
+                        onDragEnd={handleDragEnd}
+                        onTouchStart={(e) => handleTouchStart(e, wp.id)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                        className={`bg-white rounded-lg shadow-md p-3 sm:p-4 ${
+                          isDragging ? 'opacity-50 cursor-move' : 'cursor-move hover:shadow-lg transition-shadow'
+                        }`}
+                      >
                         {/* 作業名と進捗状態 */}
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex-1 min-w-0">
@@ -785,7 +939,15 @@ export default function ProgressPage() {
                   })()}
                 </div>
               </div>
-              <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
+              <div
+                data-drop-status="in_progress"
+                className={`space-y-3 flex-1 min-h-0 overflow-y-auto pb-4 transition-colors ${
+                  dragOverStatus === 'in_progress' ? 'bg-amber-50 border-2 border-dashed border-amber-400 rounded-lg' : ''
+                }`}
+                onDragOver={(e) => handleDragOver(e, 'in_progress')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'in_progress')}
+              >
                 {/* in_progress状態のグループ化されたカード */}
                 {groupedWorkProgresses.groups
                   .filter((group) => group.workProgresses.some((wp) => wp.status === 'in_progress'))
@@ -830,8 +992,20 @@ export default function ProgressPage() {
                         <div className="space-y-2">
                           {inProgressTasks.map((wp) => {
                             const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+                            const isDragging = draggedWorkProgressId === wp.id;
                             return (
-                              <div key={wp.id} className="border border-gray-200 rounded-lg p-2 space-y-2">
+                              <div
+                                key={wp.id}
+                                draggable={!isDummyWork}
+                                onDragStart={(e) => !isDummyWork && handleDragStart(e, wp.id)}
+                                onDragEnd={handleDragEnd}
+                                onTouchStart={(e) => !isDummyWork && handleTouchStart(e, wp.id)}
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={handleTouchEnd}
+                                className={`border border-gray-200 rounded-lg p-2 space-y-2 ${
+                                  isDragging ? 'opacity-50 cursor-move' : 'cursor-move'
+                                } ${!isDummyWork ? 'hover:shadow-md transition-shadow' : ''}`}
+                              >
                                 {/* 作業名と進捗状態 */}
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex-1 min-w-0">
@@ -976,8 +1150,20 @@ export default function ProgressPage() {
                 {groupedWorkProgresses.ungrouped
                   .filter((wp) => wp.status === 'in_progress')
                   .map((wp) => {
+                    const isDragging = draggedWorkProgressId === wp.id;
                     return (
-                      <div key={wp.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+                      <div
+                        key={wp.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, wp.id)}
+                        onDragEnd={handleDragEnd}
+                        onTouchStart={(e) => handleTouchStart(e, wp.id)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                        className={`bg-white rounded-lg shadow-md p-3 sm:p-4 ${
+                          isDragging ? 'opacity-50 cursor-move' : 'cursor-move hover:shadow-lg transition-shadow'
+                        }`}
+                      >
                         {/* 作業名と進捗状態 */}
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex-1 min-w-0">
@@ -1118,7 +1304,15 @@ export default function ProgressPage() {
                   })()}
                 </div>
               </div>
-              <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
+              <div
+                data-drop-status="completed"
+                className={`space-y-3 flex-1 min-h-0 overflow-y-auto pb-4 transition-colors ${
+                  dragOverStatus === 'completed' ? 'bg-green-50 border-2 border-dashed border-green-400 rounded-lg' : ''
+                }`}
+                onDragOver={(e) => handleDragOver(e, 'completed')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'completed')}
+              >
                 {/* completed状態のグループ化されたカード */}
                 {groupedWorkProgresses.groups
                   .filter((group) => group.workProgresses.some((wp) => wp.status === 'completed'))
@@ -1163,8 +1357,20 @@ export default function ProgressPage() {
                         <div className="space-y-2">
                           {completedTasks.map((wp) => {
                             const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+                            const isDragging = draggedWorkProgressId === wp.id;
                             return (
-                              <div key={wp.id} className="border border-gray-200 rounded-lg p-2 space-y-2">
+                              <div
+                                key={wp.id}
+                                draggable={!isDummyWork}
+                                onDragStart={(e) => !isDummyWork && handleDragStart(e, wp.id)}
+                                onDragEnd={handleDragEnd}
+                                onTouchStart={(e) => !isDummyWork && handleTouchStart(e, wp.id)}
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={handleTouchEnd}
+                                className={`border border-gray-200 rounded-lg p-2 space-y-2 ${
+                                  isDragging ? 'opacity-50 cursor-move' : 'cursor-move'
+                                } ${!isDummyWork ? 'hover:shadow-md transition-shadow' : ''}`}
+                              >
                                 {/* 作業名と進捗状態 */}
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex-1 min-w-0">
@@ -1309,8 +1515,20 @@ export default function ProgressPage() {
                 {groupedWorkProgresses.ungrouped
                   .filter((wp) => wp.status === 'completed')
                   .map((wp) => {
+                    const isDragging = draggedWorkProgressId === wp.id;
                     return (
-                      <div key={wp.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+                      <div
+                        key={wp.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, wp.id)}
+                        onDragEnd={handleDragEnd}
+                        onTouchStart={(e) => handleTouchStart(e, wp.id)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                        className={`bg-white rounded-lg shadow-md p-3 sm:p-4 ${
+                          isDragging ? 'opacity-50 cursor-move' : 'cursor-move hover:shadow-lg transition-shadow'
+                        }`}
+                      >
                         {/* 作業名と進捗状態 */}
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex-1 min-w-0">

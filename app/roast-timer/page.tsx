@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft } from 'react-icons/hi';
+import { HiArrowLeft, HiClock } from 'react-icons/hi';
 import { RoastTimer } from '@/components/RoastTimer';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { requestNotificationPermission } from '@/lib/notifications';
@@ -36,13 +36,21 @@ export default function RoastTimerPage() {
     <div className="h-screen bg-amber-50 flex flex-col overflow-hidden">
       <div className="max-w-4xl mx-auto w-full flex flex-col flex-1 min-h-0 px-4 sm:px-6 py-4 sm:py-6">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
-          <div className="flex justify-start">
+          <div className="flex items-center justify-between">
             <Link
               href="/"
               className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
             >
               <HiArrowLeft className="text-lg flex-shrink-0" />
               ホームに戻る
+            </Link>
+            <Link
+              href="/roast-record"
+              className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
+              aria-label="ロースト履歴一覧"
+            >
+              <HiClock className="text-lg flex-shrink-0" />
+              <span className="hidden sm:inline">ロースト履歴</span>
             </Link>
           </div>
         </header>

@@ -400,7 +400,7 @@ export default function ProgressPage() {
           </div>
         </header>
 
-        {/* カードグリッド */}
+        {/* かんばん形式のレイアウト */}
         {groupedWorkProgresses.groups.length === 0 && groupedWorkProgresses.ungrouped.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <p className="text-gray-600">
@@ -410,73 +410,38 @@ export default function ProgressPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* グループ化されたカード */}
-            {groupedWorkProgresses.groups.map((group, groupIndex) => {
-              // グループキーの生成（優先順位: groupName > taskName）
-              const groupKey = group.groupName || group.taskName || '';
-              // グループ表示名の生成（優先順位: groupName > taskName > デフォルト）
-              const groupDisplayName = group.groupName || group.taskName || '(作業名なし)';
-              
-              // グループ内の最初の作業項目を取得
-              const firstWorkProgress = group.workProgresses[0];
-              
-              return (
-              <div
-                key={`${groupKey}_${groupIndex}`}
-                className="bg-white rounded-lg shadow-md p-4 sm:p-6"
-              >
-                {/* カードヘッダー */}
-                <div className="border-b border-gray-200 pb-3 mb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-0 rounded-t-lg">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div 
-                      className="cursor-pointer hover:bg-gray-50 rounded-t-lg -mx-4 sm:-mx-6 px-4 sm:px-6 pt-0 pb-2 transition-colors flex-1"
-                      onClick={() => group.groupName && setEditingGroupName(group.groupName)}
-                    >
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1">
-                        {groupDisplayName}
-                      </h3>
-                      {group.weight && (
-                        <p className="text-sm text-gray-600">数量: {group.weight}</p>
-                      )}
-                    </div>
-                    {/* ダミー作業が存在する場合は「作業を追加」ボタンを非表示 */}
-                    {!group.workProgresses.some((wp) => !wp.taskName || wp.taskName.trim() === '') && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setAddingToGroupName(group.groupName || null);
-                          setAddMode('work');
-                          setShowAddForm(true);
-                        }}
-                        className="px-3 py-1.5 text-xs sm:text-sm font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors flex items-center gap-1.5 min-h-[32px] flex-shrink-0"
-                      >
-                        <HiPlus className="h-4 w-4" />
-                        作業を追加
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* 作業リスト */}
-                <div className="space-y-3">
-                  {group.workProgresses.map((wp) => {
-                    // グループ作成時のダミー作業かどうかを判定（作業名が空）
-                    const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {/* 前（未着手）列 */}
+            <div className="flex flex-col">
+              <div className="bg-gray-100 rounded-t-lg p-3 mb-3 sticky top-0 z-10">
+                <h2 className="text-lg font-semibold text-gray-800">前（未着手）</h2>
+              </div>
+              <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
+                {/* pending状態のグループ化されたカード */}
+                {groupedWorkProgresses.groups
+                  .filter((group) => group.workProgresses.some((wp) => wp.status === 'pending'))
+                  .map((group, groupIndex) => {
+                    const groupKey = group.groupName || group.taskName || '';
+                    const groupDisplayName = group.groupName || group.taskName || '(作業名なし)';
+                    const pendingTasks = group.workProgresses.filter((wp) => wp.status === 'pending');
                     
                     return (
-                    <div
-                      key={wp.id}
-                      className="border border-gray-200 rounded-lg p-3 space-y-2"
-                    >
-                      {/* 作業名と進捗状態 */}
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          {isDummyWork ? (
-                            <div className="text-center py-4">
-                              <p className="text-sm text-gray-600 mb-2">
-                                新しく作業を追加してください
-                              </p>
+                      <div
+                        key={`${groupKey}_pending_${groupIndex}`}
+                        className="bg-white rounded-lg shadow-md p-3 sm:p-4"
+                      >
+                        {/* グループヘッダー */}
+                        <div className="border-b border-gray-200 pb-2 mb-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div 
+                              className="cursor-pointer hover:bg-gray-50 rounded transition-colors flex-1"
+                              onClick={() => group.groupName && setEditingGroupName(group.groupName)}
+                            >
+                              <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+                                {groupDisplayName}
+                              </h3>
+                            </div>
+                            {!group.workProgresses.some((wp) => !wp.taskName || wp.taskName.trim() === '') && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -484,280 +449,924 @@ export default function ProgressPage() {
                                   setAddMode('work');
                                   setShowAddForm(true);
                                 }}
-                                className="px-4 py-2 text-sm font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[36px]"
+                                className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors flex items-center gap-1 min-h-[28px] flex-shrink-0"
                               >
+                                <HiPlus className="h-3 w-3" />
                                 作業を追加
                               </button>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="flex items-center gap-2 flex-wrap mb-1">
-                                {wp.taskName && (
-                                  <p className="text-base font-semibold text-gray-800">
-                                    {wp.taskName}
-                                  </p>
-                                )}
-                                <select
-                                  value={wp.status}
-                                  onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
-                                  className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[32px]`}
-                                >
-                                  <option value="pending">前</option>
-                                  <option value="in_progress">途中</option>
-                                  <option value="completed">済</option>
-                                </select>
-                              </div>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                {wp.startedAt && (
-                                  <span className="text-xs text-gray-500">
-                                    開始: {formatDateTime(wp.startedAt)}
-                                  </span>
-                                )}
-                                {wp.completedAt && (
-                                  <span className="text-xs text-gray-500">
-                                    完了: {formatDateTime(wp.completedAt)}
-                                  </span>
-                                )}
-                              </div>
-                            </>
-                          )}
+                            )}
+                          </div>
                         </div>
-                        {!isDummyWork && (
+                        {/* pending状態の作業のみ表示 */}
+                        <div className="space-y-2">
+                          {pendingTasks.map((wp) => {
+                            const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+                            return (
+                              <div key={wp.id} className="border border-gray-200 rounded-lg p-2 space-y-2">
+                                {/* 作業名と進捗状態 */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    {isDummyWork ? (
+                                      <div className="text-center py-2">
+                                        <p className="text-xs text-gray-600 mb-1">新しく作業を追加してください</p>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setAddingToGroupName(group.groupName || null);
+                                            setAddMode('work');
+                                            setShowAddForm(true);
+                                          }}
+                                          className="px-3 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                                        >
+                                          作業を追加
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                                          {wp.taskName && (
+                                            <p className="text-sm font-semibold text-gray-800">{wp.taskName}</p>
+                                          )}
+                                          <select
+                                            value={wp.status}
+                                            onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
+                                            className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
+                                          >
+                                            <option value="pending">前</option>
+                                            <option value="in_progress">途中</option>
+                                            <option value="completed">済</option>
+                                          </select>
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          {wp.startedAt && (
+                                            <span className="text-xs text-gray-500">開始: {formatDateTime(wp.startedAt)}</span>
+                                          )}
+                                          {wp.completedAt && (
+                                            <span className="text-xs text-gray-500">完了: {formatDateTime(wp.completedAt)}</span>
+                                          )}
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                  {!isDummyWork && (
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                      <button
+                                        onClick={() => setEditingWorkProgressId(wp.id)}
+                                        className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                                        aria-label="編集"
+                                      >
+                                        <HiPencil className="h-3.5 w-3.5" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteWorkProgress(wp.id)}
+                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                                        aria-label="削除"
+                                      >
+                                        <HiTrash className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* プログレスバーと進捗情報 */}
+                                {!isDummyWork && wp.targetAmount !== undefined && (() => {
+                                  const unit = extractUnit(wp.weight);
+                                  return (
+                                    <div className="space-y-1.5">
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-gray-700">
+                                          {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                                        </span>
+                                        <span className="font-semibold text-gray-800">
+                                          {calculateProgressPercentage(wp).toFixed(0)}%
+                                        </span>
+                                      </div>
+                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                          className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                          style={{ width: `${calculateProgressPercentage(wp)}%` }}
+                                        />
+                                      </div>
+                                      <div className="flex items-center justify-between">
+                                        <div className="text-xs text-gray-600">
+                                          {(() => {
+                                            const remaining = calculateRemaining(wp);
+                                            if (remaining === null) return null;
+                                            if (remaining <= 0) {
+                                              const over = Math.abs(remaining);
+                                              return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
+                                            }
+                                            return `残り${formatAmount(remaining, unit)}${unit}`;
+                                          })()}
+                                        </div>
+                                        <button
+                                          onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                          className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                        >
+                                          進捗追加
+                                        </button>
+                                      </div>
+                                      {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                                        <div className="text-xs text-gray-600 pt-0.5">
+                                          完成数: {wp.completedCount}個
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+
+                                {/* 完成数の表示（目標量がない場合） */}
+                                {!isDummyWork && wp.targetAmount === undefined && (
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-gray-700 font-semibold">
+                                        完成数: {wp.completedCount || 0}個
+                                      </span>
+                                      <button
+                                        onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                        className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                      >
+                                        完成数を追加
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* メモ */}
+                                {!isDummyWork && wp.memo && (
+                                  <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2">{wp.memo}</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                {/* pending状態の個別カード */}
+                {groupedWorkProgresses.ungrouped
+                  .filter((wp) => wp.status === 'pending')
+                  .map((wp) => {
+                    return (
+                      <div key={wp.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+                        {/* 作業名と進捗状態 */}
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              {wp.taskName && (
+                                <p className="text-sm font-semibold text-gray-800">{wp.taskName}</p>
+                              )}
+                              <select
+                                value={wp.status}
+                                onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
+                                className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
+                              >
+                                <option value="pending">前</option>
+                                <option value="in_progress">途中</option>
+                                <option value="completed">済</option>
+                              </select>
+                            </div>
+                            {wp.weight && (
+                              <p className="text-xs text-gray-600 mb-1">数量: {wp.weight}</p>
+                            )}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {wp.startedAt && (
+                                <span className="text-xs text-gray-500">開始: {formatDateTime(wp.startedAt)}</span>
+                              )}
+                              {wp.completedAt && (
+                                <span className="text-xs text-gray-500">完了: {formatDateTime(wp.completedAt)}</span>
+                              )}
+                            </div>
+                          </div>
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <button
                               onClick={() => setEditingWorkProgressId(wp.id)}
-                              className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center"
+                              className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
                               aria-label="編集"
                             >
-                              <HiPencil className="h-4 w-4" />
+                              <HiPencil className="h-3.5 w-3.5" />
                             </button>
                             <button
                               onClick={() => handleDeleteWorkProgress(wp.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center"
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
                               aria-label="削除"
                             >
-                              <HiTrash className="h-4 w-4" />
+                              <HiTrash className="h-3.5 w-3.5" />
                             </button>
                           </div>
-                        )}
-                      </div>
+                        </div>
 
-                      {/* プログレスバーと進捗情報 */}
-                      {!isDummyWork && wp.targetAmount !== undefined && (() => {
-                        const unit = extractUnit(wp.weight);
-                        return (
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-700">
-                                {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
-                              </span>
-                              <span className="font-semibold text-gray-800">
-                                {calculateProgressPercentage(wp).toFixed(0)}%
-                              </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
-                              <div
-                                className={`h-2.5 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
-                                style={{ width: `${calculateProgressPercentage(wp)}%` }}
-                              />
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="text-xs text-gray-600">
-                                {(() => {
-                                  const remaining = calculateRemaining(wp);
-                                  if (remaining === null) return null;
-                                  if (remaining <= 0) {
-                                    const over = Math.abs(remaining);
-                                    return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
-                                  }
-                                  return `残り${formatAmount(remaining, unit)}${unit}`;
-                                })()}
+                        {/* プログレスバーと進捗情報 */}
+                        {wp.targetAmount !== undefined && (() => {
+                          const unit = extractUnit(wp.weight);
+                          return (
+                            <div className="space-y-1.5 mb-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-gray-700">
+                                  {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                                </span>
+                                <span className="font-semibold text-gray-800">
+                                  {calculateProgressPercentage(wp).toFixed(0)}%
+                                </span>
                               </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                  style={{ width: `${calculateProgressPercentage(wp)}%` }}
+                                />
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs text-gray-600">
+                                  {(() => {
+                                    const remaining = calculateRemaining(wp);
+                                    if (remaining === null) return null;
+                                    if (remaining <= 0) {
+                                      const over = Math.abs(remaining);
+                                      return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
+                                    }
+                                    return `残り${formatAmount(remaining, unit)}${unit}`;
+                                  })()}
+                                </div>
+                                <button
+                                  onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                  className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                >
+                                  進捗追加
+                                </button>
+                              </div>
+                              {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                                <div className="text-xs text-gray-600 pt-0.5">
+                                  完成数: {wp.completedCount}個
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
+                        {/* 完成数の表示（目標量がない場合） */}
+                        {wp.targetAmount === undefined && (
+                          <div className="space-y-1.5 mb-2">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-gray-700 font-semibold">
+                                完成数: {wp.completedCount || 0}個
+                              </span>
                               <button
                                 onClick={() => setAddingProgressWorkProgressId(wp.id)}
-                                className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                                className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
                               >
-                                進捗追加
+                                完成数を追加
                               </button>
                             </div>
-                            {/* 完成数の表示（目標量がある場合も補助情報として表示） */}
-                            {wp.completedCount !== undefined && wp.completedCount > 0 && (
-                              <div className="text-xs text-gray-600 pt-1">
-                                完成数: {wp.completedCount}個
-                              </div>
+                          </div>
+                        )}
+
+                        {/* メモ */}
+                        {wp.memo && (
+                          <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 mb-2">{wp.memo}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* 途中列 */}
+            <div className="flex flex-col">
+              <div className="bg-gray-100 rounded-t-lg p-3 mb-3 sticky top-0 z-10">
+                <h2 className="text-lg font-semibold text-gray-800">途中</h2>
+              </div>
+              <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
+                {/* in_progress状態のグループ化されたカード */}
+                {groupedWorkProgresses.groups
+                  .filter((group) => group.workProgresses.some((wp) => wp.status === 'in_progress'))
+                  .map((group, groupIndex) => {
+                    const groupKey = group.groupName || group.taskName || '';
+                    const groupDisplayName = group.groupName || group.taskName || '(作業名なし)';
+                    const inProgressTasks = group.workProgresses.filter((wp) => wp.status === 'in_progress');
+                    
+                    return (
+                      <div
+                        key={`${groupKey}_in_progress_${groupIndex}`}
+                        className="bg-white rounded-lg shadow-md p-3 sm:p-4"
+                      >
+                        {/* グループヘッダー */}
+                        <div className="border-b border-gray-200 pb-2 mb-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div 
+                              className="cursor-pointer hover:bg-gray-50 rounded transition-colors flex-1"
+                              onClick={() => group.groupName && setEditingGroupName(group.groupName)}
+                            >
+                              <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+                                {groupDisplayName}
+                              </h3>
+                            </div>
+                            {!group.workProgresses.some((wp) => !wp.taskName || wp.taskName.trim() === '') && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setAddingToGroupName(group.groupName || null);
+                                  setAddMode('work');
+                                  setShowAddForm(true);
+                                }}
+                                className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors flex items-center gap-1 min-h-[28px] flex-shrink-0"
+                              >
+                                <HiPlus className="h-3 w-3" />
+                                作業を追加
+                              </button>
                             )}
                           </div>
-                        );
-                      })()}
-
-                      {/* 完成数の表示（目標量がない場合） */}
-                      {!isDummyWork && wp.targetAmount === undefined && (
+                        </div>
+                        {/* in_progress状態の作業のみ表示 */}
                         <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-700 font-semibold">
-                              完成数: {wp.completedCount || 0}個
-                            </span>
+                          {inProgressTasks.map((wp) => {
+                            const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+                            return (
+                              <div key={wp.id} className="border border-gray-200 rounded-lg p-2 space-y-2">
+                                {/* 作業名と進捗状態 */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    {isDummyWork ? (
+                                      <div className="text-center py-2">
+                                        <p className="text-xs text-gray-600 mb-1">新しく作業を追加してください</p>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setAddingToGroupName(group.groupName || null);
+                                            setAddMode('work');
+                                            setShowAddForm(true);
+                                          }}
+                                          className="px-3 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                                        >
+                                          作業を追加
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                                          {wp.taskName && (
+                                            <p className="text-sm font-semibold text-gray-800">{wp.taskName}</p>
+                                          )}
+                                          <select
+                                            value={wp.status}
+                                            onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
+                                            className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
+                                          >
+                                            <option value="pending">前</option>
+                                            <option value="in_progress">途中</option>
+                                            <option value="completed">済</option>
+                                          </select>
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          {wp.startedAt && (
+                                            <span className="text-xs text-gray-500">開始: {formatDateTime(wp.startedAt)}</span>
+                                          )}
+                                          {wp.completedAt && (
+                                            <span className="text-xs text-gray-500">完了: {formatDateTime(wp.completedAt)}</span>
+                                          )}
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                  {!isDummyWork && (
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                      <button
+                                        onClick={() => setEditingWorkProgressId(wp.id)}
+                                        className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                                        aria-label="編集"
+                                      >
+                                        <HiPencil className="h-3.5 w-3.5" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteWorkProgress(wp.id)}
+                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                                        aria-label="削除"
+                                      >
+                                        <HiTrash className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* プログレスバーと進捗情報 */}
+                                {!isDummyWork && wp.targetAmount !== undefined && (() => {
+                                  const unit = extractUnit(wp.weight);
+                                  return (
+                                    <div className="space-y-1.5">
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-gray-700">
+                                          {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                                        </span>
+                                        <span className="font-semibold text-gray-800">
+                                          {calculateProgressPercentage(wp).toFixed(0)}%
+                                        </span>
+                                      </div>
+                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                          className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                          style={{ width: `${calculateProgressPercentage(wp)}%` }}
+                                        />
+                                      </div>
+                                      <div className="flex items-center justify-between">
+                                        <div className="text-xs text-gray-600">
+                                          {(() => {
+                                            const remaining = calculateRemaining(wp);
+                                            if (remaining === null) return null;
+                                            if (remaining <= 0) {
+                                              const over = Math.abs(remaining);
+                                              return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
+                                            }
+                                            return `残り${formatAmount(remaining, unit)}${unit}`;
+                                          })()}
+                                        </div>
+                                        <button
+                                          onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                          className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                        >
+                                          進捗追加
+                                        </button>
+                                      </div>
+                                      {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                                        <div className="text-xs text-gray-600 pt-0.5">
+                                          完成数: {wp.completedCount}個
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+
+                                {/* 完成数の表示（目標量がない場合） */}
+                                {!isDummyWork && wp.targetAmount === undefined && (
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-gray-700 font-semibold">
+                                        完成数: {wp.completedCount || 0}個
+                                      </span>
+                                      <button
+                                        onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                        className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                      >
+                                        完成数を追加
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* メモ */}
+                                {!isDummyWork && wp.memo && (
+                                  <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2">{wp.memo}</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                {/* in_progress状態の個別カード */}
+                {groupedWorkProgresses.ungrouped
+                  .filter((wp) => wp.status === 'in_progress')
+                  .map((wp) => {
+                    return (
+                      <div key={wp.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+                        {/* 作業名と進捗状態 */}
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              {wp.taskName && (
+                                <p className="text-sm font-semibold text-gray-800">{wp.taskName}</p>
+                              )}
+                              <select
+                                value={wp.status}
+                                onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
+                                className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
+                              >
+                                <option value="pending">前</option>
+                                <option value="in_progress">途中</option>
+                                <option value="completed">済</option>
+                              </select>
+                            </div>
+                            {wp.weight && (
+                              <p className="text-xs text-gray-600 mb-1">数量: {wp.weight}</p>
+                            )}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {wp.startedAt && (
+                                <span className="text-xs text-gray-500">開始: {formatDateTime(wp.startedAt)}</span>
+                              )}
+                              {wp.completedAt && (
+                                <span className="text-xs text-gray-500">完了: {formatDateTime(wp.completedAt)}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
                             <button
-                              onClick={() => setAddingProgressWorkProgressId(wp.id)}
-                              className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                              onClick={() => setEditingWorkProgressId(wp.id)}
+                              className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                              aria-label="編集"
                             >
-                              完成数を追加
+                              <HiPencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteWorkProgress(wp.id)}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                              aria-label="削除"
+                            >
+                              <HiTrash className="h-3.5 w-3.5" />
                             </button>
                           </div>
                         </div>
-                      )}
 
-                      {/* メモ */}
-                      {!isDummyWork && wp.memo && (
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{wp.memo}</p>
-                      )}
+                        {/* プログレスバーと進捗情報 */}
+                        {wp.targetAmount !== undefined && (() => {
+                          const unit = extractUnit(wp.weight);
+                          return (
+                            <div className="space-y-1.5 mb-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-gray-700">
+                                  {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                                </span>
+                                <span className="font-semibold text-gray-800">
+                                  {calculateProgressPercentage(wp).toFixed(0)}%
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                  style={{ width: `${calculateProgressPercentage(wp)}%` }}
+                                />
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs text-gray-600">
+                                  {(() => {
+                                    const remaining = calculateRemaining(wp);
+                                    if (remaining === null) return null;
+                                    if (remaining <= 0) {
+                                      const over = Math.abs(remaining);
+                                      return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
+                                    }
+                                    return `残り${formatAmount(remaining, unit)}${unit}`;
+                                  })()}
+                                </div>
+                                <button
+                                  onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                  className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                >
+                                  進捗追加
+                                </button>
+                              </div>
+                              {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                                <div className="text-xs text-gray-600 pt-0.5">
+                                  完成数: {wp.completedCount}個
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
 
-                      {/* 進捗履歴 */}
-                      {!isDummyWork && wp.progressHistory && wp.progressHistory.length > 0 && (
-                        <ProgressHistorySection workProgress={wp} />
-                      )}
-                    </div>
-                  );
+                        {/* 完成数の表示（目標量がない場合） */}
+                        {wp.targetAmount === undefined && (
+                          <div className="space-y-1.5 mb-2">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-gray-700 font-semibold">
+                                完成数: {wp.completedCount || 0}個
+                              </span>
+                              <button
+                                onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                              >
+                                完成数を追加
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* メモ */}
+                        {wp.memo && (
+                          <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 mb-2">{wp.memo}</p>
+                        )}
+                      </div>
+                    );
                   })}
-                </div>
               </div>
-              );
-            })}
-            {/* グループ化されていない個別カード */}
-            {groupedWorkProgresses.ungrouped.map((wp) => (
-              <div
-                key={wp.id}
-                className="bg-white rounded-lg shadow-md p-4 sm:p-6"
-              >
-                {/* 作業名と進捗状態 */}
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      {wp.taskName && (
-                        <p className="text-base font-semibold text-gray-800">
-                          {wp.taskName}
-                        </p>
-                      )}
-                      <select
-                        value={wp.status}
-                        onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
-                        className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[32px]`}
-                      >
-                        <option value="pending">前</option>
-                        <option value="in_progress">途中</option>
-                        <option value="completed">済</option>
-                      </select>
-                    </div>
-                    {wp.weight && (
-                      <p className="text-sm text-gray-600 mb-1">数量: {wp.weight}</p>
-                    )}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {wp.startedAt && (
-                        <span className="text-xs text-gray-500">
-                          開始: {formatDateTime(wp.startedAt)}
-                        </span>
-                      )}
-                      {wp.completedAt && (
-                        <span className="text-xs text-gray-500">
-                          完了: {formatDateTime(wp.completedAt)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      onClick={() => setEditingWorkProgressId(wp.id)}
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center"
-                      aria-label="編集"
-                    >
-                      <HiPencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteWorkProgress(wp.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center"
-                      aria-label="削除"
-                    >
-                      <HiTrash className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
+            </div>
 
-                {/* プログレスバーと進捗情報 */}
-                {wp.targetAmount !== undefined && (() => {
-                  const unit = extractUnit(wp.weight);
-                  return (
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-700">
-                          {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
-                        </span>
-                        <span className="font-semibold text-gray-800">
-                          {calculateProgressPercentage(wp).toFixed(0)}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
-                        <div
-                          className={`h-2.5 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
-                          style={{ width: `${calculateProgressPercentage(wp)}%` }}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs text-gray-600">
-                          {(() => {
-                            const remaining = calculateRemaining(wp);
-                            if (remaining === null) return null;
-                            if (remaining <= 0) {
-                              const over = Math.abs(remaining);
-                              return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
-                            }
-                            return `残り${formatAmount(remaining, unit)}${unit}`;
-                          })()}
-                        </div>
-                        <button
-                          onClick={() => setAddingProgressWorkProgressId(wp.id)}
-                          className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
-                        >
-                          進捗追加
-                        </button>
-                      </div>
-                      {/* 完成数の表示（目標量がある場合も補助情報として表示） */}
-                      {wp.completedCount !== undefined && wp.completedCount > 0 && (
-                        <div className="text-xs text-gray-600 pt-1">
-                          完成数: {wp.completedCount}個
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-
-                {/* 完成数の表示（目標量がない場合） */}
-                {wp.targetAmount === undefined && (
-                  <div className="space-y-2 mb-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-700 font-semibold">
-                        完成数: {wp.completedCount || 0}個
-                      </span>
-                      <button
-                        onClick={() => setAddingProgressWorkProgressId(wp.id)}
-                        className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
-                      >
-                        完成数を追加
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* メモ */}
-                {wp.memo && (
-                  <p className="text-sm text-gray-600 whitespace-pre-wrap mb-3">{wp.memo}</p>
-                )}
-
-                {/* 進捗履歴 */}
-                {wp.progressHistory && wp.progressHistory.length > 0 && (
-                  <ProgressHistorySection workProgress={wp} />
-                )}
+            {/* 済（完了）列 */}
+            <div className="flex flex-col">
+              <div className="bg-gray-100 rounded-t-lg p-3 mb-3 sticky top-0 z-10">
+                <h2 className="text-lg font-semibold text-gray-800">済（完了）</h2>
               </div>
-            ))}
+              <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pb-4">
+                {/* completed状態のグループ化されたカード */}
+                {groupedWorkProgresses.groups
+                  .filter((group) => group.workProgresses.some((wp) => wp.status === 'completed'))
+                  .map((group, groupIndex) => {
+                    const groupKey = group.groupName || group.taskName || '';
+                    const groupDisplayName = group.groupName || group.taskName || '(作業名なし)';
+                    const completedTasks = group.workProgresses.filter((wp) => wp.status === 'completed');
+                    
+                    return (
+                      <div
+                        key={`${groupKey}_completed_${groupIndex}`}
+                        className="bg-white rounded-lg shadow-md p-3 sm:p-4"
+                      >
+                        {/* グループヘッダー */}
+                        <div className="border-b border-gray-200 pb-2 mb-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div 
+                              className="cursor-pointer hover:bg-gray-50 rounded transition-colors flex-1"
+                              onClick={() => group.groupName && setEditingGroupName(group.groupName)}
+                            >
+                              <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+                                {groupDisplayName}
+                              </h3>
+                            </div>
+                            {!group.workProgresses.some((wp) => !wp.taskName || wp.taskName.trim() === '') && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setAddingToGroupName(group.groupName || null);
+                                  setAddMode('work');
+                                  setShowAddForm(true);
+                                }}
+                                className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors flex items-center gap-1 min-h-[28px] flex-shrink-0"
+                              >
+                                <HiPlus className="h-3 w-3" />
+                                作業を追加
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        {/* completed状態の作業のみ表示 */}
+                        <div className="space-y-2">
+                          {completedTasks.map((wp) => {
+                            const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+                            return (
+                              <div key={wp.id} className="border border-gray-200 rounded-lg p-2 space-y-2">
+                                {/* 作業名と進捗状態 */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    {isDummyWork ? (
+                                      <div className="text-center py-2">
+                                        <p className="text-xs text-gray-600 mb-1">新しく作業を追加してください</p>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setAddingToGroupName(group.groupName || null);
+                                            setAddMode('work');
+                                            setShowAddForm(true);
+                                          }}
+                                          className="px-3 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                                        >
+                                          作業を追加
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                                          {wp.taskName && (
+                                            <p className="text-sm font-semibold text-gray-800">{wp.taskName}</p>
+                                          )}
+                                          <select
+                                            value={wp.status}
+                                            onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
+                                            className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
+                                          >
+                                            <option value="pending">前</option>
+                                            <option value="in_progress">途中</option>
+                                            <option value="completed">済</option>
+                                          </select>
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          {wp.startedAt && (
+                                            <span className="text-xs text-gray-500">開始: {formatDateTime(wp.startedAt)}</span>
+                                          )}
+                                          {wp.completedAt && (
+                                            <span className="text-xs text-gray-500">完了: {formatDateTime(wp.completedAt)}</span>
+                                          )}
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                  {!isDummyWork && (
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                      <button
+                                        onClick={() => setEditingWorkProgressId(wp.id)}
+                                        className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                                        aria-label="編集"
+                                      >
+                                        <HiPencil className="h-3.5 w-3.5" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteWorkProgress(wp.id)}
+                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                                        aria-label="削除"
+                                      >
+                                        <HiTrash className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* プログレスバーと進捗情報 */}
+                                {!isDummyWork && wp.targetAmount !== undefined && (() => {
+                                  const unit = extractUnit(wp.weight);
+                                  return (
+                                    <div className="space-y-1.5">
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-gray-700">
+                                          {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                                        </span>
+                                        <span className="font-semibold text-gray-800">
+                                          {calculateProgressPercentage(wp).toFixed(0)}%
+                                        </span>
+                                      </div>
+                                      <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                          className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                          style={{ width: `${calculateProgressPercentage(wp)}%` }}
+                                        />
+                                      </div>
+                                      <div className="flex items-center justify-between">
+                                        <div className="text-xs text-gray-600">
+                                          {(() => {
+                                            const remaining = calculateRemaining(wp);
+                                            if (remaining === null) return null;
+                                            if (remaining <= 0) {
+                                              const over = Math.abs(remaining);
+                                              return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
+                                            }
+                                            return `残り${formatAmount(remaining, unit)}${unit}`;
+                                          })()}
+                                        </div>
+                                        <button
+                                          onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                          className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                        >
+                                          進捗追加
+                                        </button>
+                                      </div>
+                                      {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                                        <div className="text-xs text-gray-600 pt-0.5">
+                                          完成数: {wp.completedCount}個
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+
+                                {/* 完成数の表示（目標量がない場合） */}
+                                {!isDummyWork && wp.targetAmount === undefined && (
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-gray-700 font-semibold">
+                                        完成数: {wp.completedCount || 0}個
+                                      </span>
+                                      <button
+                                        onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                        className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                      >
+                                        完成数を追加
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* メモ */}
+                                {!isDummyWork && wp.memo && (
+                                  <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2">{wp.memo}</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                {/* completed状態の個別カード */}
+                {groupedWorkProgresses.ungrouped
+                  .filter((wp) => wp.status === 'completed')
+                  .map((wp) => {
+                    return (
+                      <div key={wp.id} className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+                        {/* 作業名と進捗状態 */}
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              {wp.taskName && (
+                                <p className="text-sm font-semibold text-gray-800">{wp.taskName}</p>
+                              )}
+                              <select
+                                value={wp.status}
+                                onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
+                                className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
+                              >
+                                <option value="pending">前</option>
+                                <option value="in_progress">途中</option>
+                                <option value="completed">済</option>
+                              </select>
+                            </div>
+                            {wp.weight && (
+                              <p className="text-xs text-gray-600 mb-1">数量: {wp.weight}</p>
+                            )}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {wp.startedAt && (
+                                <span className="text-xs text-gray-500">開始: {formatDateTime(wp.startedAt)}</span>
+                              )}
+                              {wp.completedAt && (
+                                <span className="text-xs text-gray-500">完了: {formatDateTime(wp.completedAt)}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => setEditingWorkProgressId(wp.id)}
+                              className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                              aria-label="編集"
+                            >
+                              <HiPencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteWorkProgress(wp.id)}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
+                              aria-label="削除"
+                            >
+                              <HiTrash className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* プログレスバーと進捗情報 */}
+                        {wp.targetAmount !== undefined && (() => {
+                          const unit = extractUnit(wp.weight);
+                          return (
+                            <div className="space-y-1.5 mb-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-gray-700">
+                                  {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                                </span>
+                                <span className="font-semibold text-gray-800">
+                                  {calculateProgressPercentage(wp).toFixed(0)}%
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                  style={{ width: `${calculateProgressPercentage(wp)}%` }}
+                                />
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs text-gray-600">
+                                  {(() => {
+                                    const remaining = calculateRemaining(wp);
+                                    if (remaining === null) return null;
+                                    if (remaining <= 0) {
+                                      const over = Math.abs(remaining);
+                                      return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
+                                    }
+                                    return `残り${formatAmount(remaining, unit)}${unit}`;
+                                  })()}
+                                </div>
+                                <button
+                                  onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                  className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                                >
+                                  進捗追加
+                                </button>
+                              </div>
+                              {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                                <div className="text-xs text-gray-600 pt-0.5">
+                                  完成数: {wp.completedCount}個
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
+                        {/* 完成数の表示（目標量がない場合） */}
+                        {wp.targetAmount === undefined && (
+                          <div className="space-y-1.5 mb-2">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-gray-700 font-semibold">
+                                完成数: {wp.completedCount || 0}個
+                              </span>
+                              <button
+                                onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                                className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                              >
+                                完成数を追加
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* メモ */}
+                        {wp.memo && (
+                          <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 mb-2">{wp.memo}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
           </div>
         )}
 

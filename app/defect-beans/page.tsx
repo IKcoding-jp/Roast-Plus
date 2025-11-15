@@ -155,7 +155,9 @@ export default function DefectBeansPage() {
       <div className="max-w-7xl mx-auto">
         {/* ヘッダー */}
         <header className="mb-6 sm:mb-8">
+          {/* タイトルとナビゲーション（一番上、同じ行） */}
           <div className="flex items-center justify-between mb-4">
+            {/* 左側: ホームに戻る */}
             <Link
               href="/"
               className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
@@ -163,7 +165,17 @@ export default function DefectBeansPage() {
               <HiArrowLeft className="text-lg flex-shrink-0" />
               ホームに戻る
             </Link>
-            <div className="flex items-center gap-2">
+
+            {/* 中央: タイトル */}
+            <div className="flex items-center gap-4 flex-1 justify-center">
+              <RiBookFill className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                欠点豆図鑑
+              </h1>
+            </div>
+
+            {/* 右側: アクションボタン */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={toggleCompareMode}
                 className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] flex items-center gap-2 ${
@@ -192,13 +204,6 @@ export default function DefectBeansPage() {
               </button>
             </div>
           </div>
-
-          <div className="flex items-center gap-4 mb-4">
-            <RiBookFill className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-              欠点豆図鑑
-            </h1>
-          </div>
         </header>
 
         {/* 検索とフィルタ */}
@@ -213,7 +218,7 @@ export default function DefectBeansPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="名称や特徴で検索..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[44px]"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400"
                 />
               </div>
             </div>
@@ -264,7 +269,7 @@ export default function DefectBeansPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3">
             {filteredDefectBeans.map((defectBean) => {
               const isUserDefectBean = !defectBean.isMaster;
               return (

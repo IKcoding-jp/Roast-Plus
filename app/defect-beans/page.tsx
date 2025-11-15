@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft, HiSearch, HiPlus, HiX } from 'react-icons/hi';
+import { HiArrowLeft, HiSearch, HiPlus, HiX, HiCheckCircle, HiXCircle, HiCollection } from 'react-icons/hi';
 import { RiBookFill } from 'react-icons/ri';
 import { MdCompareArrows } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
@@ -198,25 +198,26 @@ export default function DefectBeansPage() {
   );
 
   return (
-    <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-amber-50 py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* ヘッダー */}
-        <header className="mb-6 sm:mb-8">
+        <header className="mb-4">
           {/* タイトルとナビゲーション（一番上、同じ行） */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             {/* 左側: ホームに戻る */}
             <Link
               href="/"
-              className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
+              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-1.5 flex-shrink-0 min-h-[40px]"
+              title="ホームに戻る"
             >
               <HiArrowLeft className="text-lg flex-shrink-0" />
-              ホームに戻る
+              <span className="hidden sm:inline">ホームに戻る</span>
             </Link>
 
             {/* 中央: タイトル */}
-            <div className="flex items-center gap-4 flex-1 justify-center">
-              <RiBookFill className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            <div className="flex items-center gap-3 flex-1 justify-center">
+              <RiBookFill className="h-7 w-7 sm:h-8 sm:w-8 text-amber-600" />
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
                 欠点豆図鑑
               </h1>
             </div>
@@ -225,37 +226,41 @@ export default function DefectBeansPage() {
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={toggleCompareMode}
-                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] flex items-center gap-2 ${
+                className={`px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1.5 ${
                   compareMode
                     ? 'bg-amber-600 text-white hover:bg-amber-700'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                 }`}
+                title={compareMode ? '選択モード' : '比較モード'}
               >
                 <MdCompareArrows className="h-5 w-5" />
-                {compareMode ? '選択モード' : '比較モード'}
+                <span className="hidden sm:inline text-sm">
+                  {compareMode ? '選択モード' : '比較'}
+                </span>
               </button>
               {compareMode && selectedIds.size > 0 && (
                 <button
                   onClick={handleShowCompare}
-                  className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-2"
+                  className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1.5 text-sm"
+                  title="比較を表示"
                 >
                   比較 ({selectedIds.size})
                 </button>
               )}
               <button
                 onClick={() => setShowAddForm(true)}
-                className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-2"
+                className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center justify-center"
+                title="欠点豆を追加"
               >
                 <HiPlus className="h-5 w-5" />
-                追加
               </button>
             </div>
           </div>
         </header>
 
         {/* 検索とフィルタ */}
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             {/* 検索 */}
             <div className="flex-1">
               <div className="relative">
@@ -265,42 +270,48 @@ export default function DefectBeansPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="名称や特徴で検索..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[40px] text-sm text-gray-900 bg-white placeholder:text-gray-400"
                 />
               </div>
             </div>
 
             {/* フィルタ */}
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <button
                 onClick={() => setFilterOption('all')}
-                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] ${
+                className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${
                   filterOption === 'all'
                     ? 'bg-amber-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
+                title="全て表示"
               >
-                全て
+                <HiCollection className="h-4 w-4" />
+                <span className="hidden sm:inline">全て</span>
               </button>
               <button
                 onClick={() => setFilterOption('shouldRemove')}
-                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] ${
+                className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${
                   filterOption === 'shouldRemove'
                     ? 'bg-red-500 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
+                title="省く設定のもの"
               >
-                省く
+                <HiXCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">省く</span>
               </button>
               <button
                 onClick={() => setFilterOption('shouldNotRemove')}
-                className={`px-4 py-2 rounded-lg transition-colors min-h-[44px] ${
+                className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${
                   filterOption === 'shouldNotRemove'
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
+                title="省かない設定のもの"
               >
-                省かない
+                <HiCheckCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">省かない</span>
               </button>
             </div>
           </div>

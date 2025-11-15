@@ -91,22 +91,22 @@ export function DefectBeanCard({
           <div className="space-y-1.5">
             <div>
               <h4 className="text-xs font-semibold text-gray-700 mb-0.5">特徴</h4>
-              <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2">
-                {defectBean.characteristics}
+              <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 min-h-[2.5rem]">
+                {defectBean.characteristics || <span className="text-gray-400">未入力</span>}
               </p>
             </div>
 
             <div>
               <h4 className="text-xs font-semibold text-gray-700 mb-0.5">味への影響</h4>
-              <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2">
-                {defectBean.tasteImpact}
+              <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 min-h-[2.5rem]">
+                {defectBean.tasteImpact || <span className="text-gray-400">未入力</span>}
               </p>
             </div>
 
             <div>
               <h4 className="text-xs font-semibold text-gray-700 mb-0.5">省く理由</h4>
-              <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2">
-                {defectBean.removalReason}
+              <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 min-h-[2.5rem]">
+                {defectBean.removalReason || <span className="text-gray-400">未入力</span>}
               </p>
             </div>
           </div>

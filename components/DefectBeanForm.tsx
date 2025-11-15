@@ -166,20 +166,23 @@ export function DefectBeanForm({
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full max-w-md mx-auto aspect-square object-cover rounded-lg"
+                  className="w-full max-w-xs mx-auto aspect-square object-cover rounded-lg"
                 />
                 <button
                   type="button"
-                  onClick={() => {
-                    setImageFile(null);
-                    if (mode === 'edit' && defectBean) {
-                      // 編集モード時は既存画像URLに戻す
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (mode === 'edit' && defectBean && imageFile) {
+                      // 編集モードで新しい画像を選択していた場合、既存画像に戻す
+                      setImageFile(null);
                       setImagePreview(defectBean.imageUrl);
                     } else {
+                      // 追加モード、または編集モードで既存画像を表示している場合、画像選択UIに戻す
+                      setImageFile(null);
                       setImagePreview(null);
                     }
                   }}
-                  className="absolute top-2 right-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="absolute top-2 right-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center z-10"
                 >
                   <HiX className="h-5 w-5" />
                 </button>

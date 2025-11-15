@@ -160,6 +160,8 @@ export interface RoastTimerState {
   pausedAt?: string; // 一時停止時刻（ISO 8601形式）
   lastUpdatedAt: string; // 最終更新時刻（ISO 8601形式）
   notificationId?: number; // 通知ID（2=手動、3=おすすめ）
+  triggeredByDeviceId?: string; // 操作を実行したデバイスID
+  completedByDeviceId?: string; // 完了を検出したデバイスID
 }
 
 // アプリ全体のデータ構造

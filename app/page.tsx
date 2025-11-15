@@ -12,7 +12,7 @@ import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
 
 // バージョン情報（package.jsonと同期）
-const APP_VERSION = '0.2.2';
+const APP_VERSION = '0.2.3';
 
 export default function HomePage() {
   const { user, loading } = useAuth();

@@ -2,6 +2,7 @@
 
 const SELECTED_MEMBER_ID_KEY = 'roastplus_selected_member_id';
 const ROAST_TIMER_STATE_KEY = 'roastplus_roast_timer_state';
+const DEVICE_ID_KEY = 'roastplus_device_id';
 
 /**
  * 選択されたメンバーIDを保存
@@ -53,5 +54,25 @@ export function getRoastTimerState(): any | null {
     console.error('Failed to parse roast timer state from localStorage:', error);
     return null;
   }
+}
+
+/**
+ * デバイスIDを取得（存在しない場合は生成）
+ */
+export function getDeviceId(): string {
+  if (typeof window === 'undefined') {
+    // SSR時は一時的なIDを返す（実際には使用されない）
+    return `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+  
+  let deviceId = localStorage.getItem(DEVICE_ID_KEY);
+  
+  if (!deviceId) {
+    // デバイスIDが存在しない場合は生成
+    deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(DEVICE_ID_KEY, deviceId);
+  }
+  
+  return deviceId;
 }
 

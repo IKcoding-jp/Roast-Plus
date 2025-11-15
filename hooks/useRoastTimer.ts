@@ -10,7 +10,6 @@ import { playTimerSound, stopTimerSound, stopAllSounds, stopAudio } from '@/lib/
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 
 const UPDATE_INTERVAL = 100; // 100msごとに更新
-const FIRESTORE_SYNC_INTERVAL = 5000; // 5秒ごとにFirestoreに保存
 
 /**
  * 開始時刻と一時停止時刻から経過時間を計算
@@ -45,141 +44,58 @@ export function useRoastTimer() {
   const { data, updateData } = useAppData();
   const [localState, setLocalState] = useState<RoastTimerState | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const firestoreSyncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastUpdateRef = useRef<number>(Date.now());
   const soundAudioRef = useRef<HTMLAudioElement | null>(null);
   const hasResetRef = useRef(false); // リセットが実行されたかどうかを追跡
   const isInitialMountRef = useRef(true); // 初回マウントかどうかを追跡
   const pausedElapsedRef = useRef<number>(0); // 一時停止の累積時間（秒）
-  const lastSyncedStateRef = useRef<RoastTimerState | null>(null); // 最後に同期した状態（無限ループ防止用）
 
-  /**
-   * 状態を適用する（経過時間の再計算とpausedElapsedRefの更新を含む）
-   */
-  const applyState = useCallback((state: RoastTimerState, source: 'firestore' | 'local') => {
-    // 完了状態の場合は読み込まない（ページを開いた時に完了画面が表示されるのを防ぐ）
-    if (state.status === 'completed') {
-      return;
-    }
-
-    // 実行中または一時停止中の場合は、開始時刻から経過時間を再計算
-    if ((state.status === 'running' || state.status === 'paused') && state.startedAt) {
-      // Firestoreから読み込む場合、elapsedからpausedElapsedRefを逆算
-      if (source === 'firestore' && state.elapsed !== undefined) {
-        const startTime = new Date(state.startedAt).getTime();
-        if (state.status === 'paused' && state.pausedAt) {
-          // 一時停止中の場合: elapsed = (pausedAt - startedAt) / 1000 - pausedElapsed
-          const pausedTime = new Date(state.pausedAt).getTime();
-          const totalElapsed = (pausedTime - startTime) / 1000;
-          pausedElapsedRef.current = Math.max(0, totalElapsed - state.elapsed);
-        } else if (state.status === 'running') {
-          // 実行中の場合: elapsed = (now - startedAt) / 1000 - pausedElapsed
-          // ただし、Firestoreのelapsedは保存時点の値なので、現在時刻で再計算する
-          // pausedElapsedRefは、保存時点のelapsedから逆算する
-          const now = Date.now();
-          const totalElapsed = (now - startTime) / 1000;
-          // 保存時点のelapsedから逆算（近似値）
-          // 実際には、保存時点のlastUpdatedAtを使用して正確に計算できるが、
-          // 簡略化のため、現在のelapsedを使用
-          if (state.lastUpdatedAt) {
-            const savedTime = new Date(state.lastUpdatedAt).getTime();
-            const totalElapsedAtSave = (savedTime - startTime) / 1000;
-            pausedElapsedRef.current = Math.max(0, totalElapsedAtSave - state.elapsed);
-          } else {
-            // lastUpdatedAtがない場合は0にリセット
-            pausedElapsedRef.current = 0;
-          }
-        }
-      }
-
-      const elapsed = calculateElapsedTime(
-        state.startedAt,
-        state.pausedAt,
-        pausedElapsedRef.current,
-        state.status
-      );
-      const remaining = Math.max(0, state.duration - elapsed);
-
-      const restoredState: RoastTimerState = {
-        ...state,
-        elapsed,
-        remaining,
-        lastUpdatedAt: state.lastUpdatedAt || new Date().toISOString(),
-      };
-
-      setLocalState(restoredState);
-      saveLocalState(restoredState);
-      lastSyncedStateRef.current = restoredState;
-    } else {
-      setLocalState(state);
-      saveLocalState(state);
-      lastSyncedStateRef.current = state;
-    }
-  }, []);
-
-  // 初回マウント時の初期化（Firestore優先）
+  // ローカルストレージから状態を読み込む
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!isInitialMountRef.current) return;
-
-    // リセットが実行された場合は、Firestoreから状態を読み込まない
+    
+    // リセットが実行された場合は、状態を読み込まない
     if (hasResetRef.current) {
       hasResetRef.current = false;
       isInitialMountRef.current = false;
       return;
     }
-
-    // Firestoreの状態を優先的に読み込む
-    if (data.roastTimerState) {
-      applyState(data.roastTimerState, 'firestore');
-      isInitialMountRef.current = false;
-      return;
-    }
-
-    // Firestoreの状態がない場合のみ、ローカルストレージから読み込む（オフライン時のフォールバック）
+    
     const storedState = loadLocalState();
     if (storedState) {
-      applyState(storedState, 'local');
-    }
-
-    isInitialMountRef.current = false;
-  }, [data.roastTimerState, applyState]);
-
-  // Firestoreからのリアルタイム更新を監視（初回マウント後）
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (isInitialMountRef.current) return; // 初回マウント時はスキップ
-    if (hasResetRef.current) return; // リセット中はスキップ
-
-    // Firestoreの状態が変更された場合
-    if (data.roastTimerState) {
-      const firestoreState = data.roastTimerState;
-      const currentState = lastSyncedStateRef.current;
-
-      // タイムスタンプ比較：Firestoreの状態が新しい場合のみ適用
-      if (!currentState || !currentState.lastUpdatedAt) {
-        // 現在の状態がない、またはタイムスタンプがない場合は適用
-        applyState(firestoreState, 'firestore');
+      // 完了状態の場合は読み込まない（ページを開いた時に完了画面が表示されるのを防ぐ）
+      if (storedState.status === 'completed') {
+        isInitialMountRef.current = false;
+        return;
+      }
+      
+      // ローカルストレージから読み込んだ場合、開始時刻から経過時間を再計算
+      if (storedState.status === 'running' && storedState.startedAt) {
+        const elapsed = calculateElapsedTime(
+          storedState.startedAt,
+          storedState.pausedAt,
+          pausedElapsedRef.current,
+          storedState.status
+        );
+        const remaining = Math.max(0, storedState.duration - elapsed);
+        
+        const restoredState: RoastTimerState = {
+          ...storedState,
+          elapsed,
+          remaining,
+          lastUpdatedAt: new Date().toISOString(),
+        };
+        
+        setLocalState(restoredState);
+        saveLocalState(restoredState);
       } else {
-        const firestoreTime = new Date(firestoreState.lastUpdatedAt).getTime();
-        const currentTime = new Date(currentState.lastUpdatedAt).getTime();
-
-        // Firestoreの状態が新しい場合のみ適用
-        if (firestoreTime > currentTime) {
-          applyState(firestoreState, 'firestore');
-        }
+        setLocalState(storedState);
       }
-    } else if (data.roastTimerState === undefined && lastSyncedStateRef.current) {
-      // Firestoreの状態が削除された場合（リセットされた場合）
-      // ただし、自分がリセットした場合は無視（hasResetRefで制御）
-      if (!hasResetRef.current) {
-        setLocalState(null);
-        saveLocalState(null);
-        lastSyncedStateRef.current = null;
-        pausedElapsedRef.current = 0;
-      }
+      isInitialMountRef.current = false;
+    } else {
+      isInitialMountRef.current = false;
     }
-  }, [data.roastTimerState, applyState]);
+  }, []);
 
   // タイマーの更新処理（開始時刻ベースで計算）
   const updateTimer = useCallback(async () => {
@@ -225,13 +141,7 @@ export function useRoastTimer() {
           console.error('Failed to play timer sound:', error);
         }
 
-        // 完了状態をFirestoreに保存（アプリ復帰時の完了検出用）
-        const updatedData = {
-          ...data,
-          roastTimerState: updatedState,
-        };
-
-        // 記録を保存
+        // 記録をFirestoreに保存
         if (
           updatedState.beanName &&
           updatedState.weight &&
@@ -243,55 +153,25 @@ export function useRoastTimer() {
             weight: updatedState.weight,
             roastLevel: updatedState.roastLevel,
             duration: Math.round(updatedState.elapsed),
-            roastDate: new Date().toISOString().split('T')[0], // 今日の日付をデフォルトとして設定
+            roastDate: new Date().toISOString().split('T')[0],
             createdAt: new Date().toISOString(),
             userId: user.uid,
           };
 
-          updatedData.roastTimerRecords = [...data.roastTimerRecords, newRecord];
+          try {
+            await updateData({
+              ...data,
+              roastTimerRecords: [...data.roastTimerRecords, newRecord],
+            });
+          } catch (error) {
+            console.error('Failed to save roast timer record:', error);
+          }
         }
-
-        await updateData(updatedData);
       }
 
       // ローカルストレージに保存
       saveLocalState(updatedState);
       setLocalState(updatedState);
-      lastSyncedStateRef.current = updatedState;
-    }
-  }, [localState, user, data, updateData]);
-
-  // Firestoreへの定期的な同期（バックグラウンド動作のため）
-  const syncToFirestore = useCallback(async () => {
-    if (!localState || !user || localState.status !== 'running') return;
-
-    try {
-      // 開始時刻から経過時間を再計算
-      const elapsed = calculateElapsedTime(
-        localState.startedAt,
-        localState.pausedAt,
-        pausedElapsedRef.current,
-        localState.status
-      );
-      const remaining = Math.max(0, localState.duration - elapsed);
-
-      const syncedState: RoastTimerState = {
-        ...localState,
-        elapsed,
-        remaining,
-        lastUpdatedAt: new Date().toISOString(),
-      };
-
-      // Firestoreに保存（完了状態でない場合のみ）
-      if (syncedState.status !== 'completed') {
-        await updateData({
-          ...data,
-          roastTimerState: syncedState,
-        });
-        lastSyncedStateRef.current = syncedState;
-      }
-    } catch (error) {
-      console.error('Failed to sync timer state to Firestore:', error);
     }
   }, [localState, user, data, updateData]);
 
@@ -314,25 +194,6 @@ export function useRoastTimer() {
       }
     };
   }, [localState?.status, updateTimer]);
-
-  // Firestoreへの定期的な同期（バックグラウンド動作のため）
-  useEffect(() => {
-    if (localState?.status === 'running' && user) {
-      firestoreSyncIntervalRef.current = setInterval(syncToFirestore, FIRESTORE_SYNC_INTERVAL);
-    } else {
-      if (firestoreSyncIntervalRef.current) {
-        clearInterval(firestoreSyncIntervalRef.current);
-        firestoreSyncIntervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (firestoreSyncIntervalRef.current) {
-        clearInterval(firestoreSyncIntervalRef.current);
-        firestoreSyncIntervalRef.current = null;
-      }
-    };
-  }, [localState?.status, user, syncToFirestore]);
 
   // ページの可視性変更を監視（バックグラウンドから復帰時に状態を更新）
   useEffect(() => {
@@ -366,7 +227,7 @@ export function useRoastTimer() {
         saveLocalState(updatedState);
         setLocalState(updatedState);
 
-        // 完了している場合はFirestoreに保存
+        // 完了している場合は完了処理を実行
         if (updatedState.status === 'completed' && user) {
           updateTimer();
         }
@@ -411,28 +272,17 @@ export function useRoastTimer() {
       saveLocalState(newState);
       setLocalState(newState);
       lastUpdateRef.current = Date.now();
-      lastSyncedStateRef.current = newState;
-
-      // Firestoreに保存（バックグラウンド動作のため）
-      try {
-        await updateData({
-          ...data,
-          roastTimerState: newState,
-        });
-      } catch (error) {
-        console.error('Failed to save timer state to Firestore:', error);
-      }
 
       // 通知をスケジュール
       const scheduledTime = Date.now() + duration * 1000;
       await scheduleNotification(notificationId, scheduledTime);
     },
-    [user, data, updateData]
+    [user]
   );
 
   // タイマーを一時停止
-  const pauseTimer = useCallback(async () => {
-    if (!localState || localState.status !== 'running' || !user) return;
+  const pauseTimer = useCallback(() => {
+    if (!localState || localState.status !== 'running') return;
 
     // 現在の経過時間を計算
     const elapsed = calculateElapsedTime(
@@ -455,22 +305,11 @@ export function useRoastTimer() {
     // ローカルストレージに保存
     saveLocalState(updatedState);
     setLocalState(updatedState);
-    lastSyncedStateRef.current = updatedState;
-
-    // Firestoreに保存
-    try {
-      await updateData({
-        ...data,
-        roastTimerState: updatedState,
-      });
-    } catch (error) {
-      console.error('Failed to save timer state to Firestore:', error);
-    }
-  }, [localState, user, data, updateData]);
+  }, [localState]);
 
   // タイマーを再開
-  const resumeTimer = useCallback(async () => {
-    if (!localState || localState.status !== 'paused' || !user) return;
+  const resumeTimer = useCallback(() => {
+    if (!localState || localState.status !== 'paused') return;
 
     // 一時停止期間を累積時間に加算
     if (localState.pausedAt && localState.startedAt) {
@@ -492,29 +331,18 @@ export function useRoastTimer() {
     saveLocalState(updatedState);
     setLocalState(updatedState);
     lastUpdateRef.current = Date.now();
-    lastSyncedStateRef.current = updatedState;
-
-    // Firestoreに保存
-    try {
-      await updateData({
-        ...data,
-        roastTimerState: updatedState,
-      });
-    } catch (error) {
-      console.error('Failed to save timer state to Firestore:', error);
-    }
 
     // 通知を再スケジュール
     if (updatedState.notificationId) {
       const remainingTime = updatedState.remaining * 1000;
       const scheduledTime = Date.now() + remainingTime;
-      await scheduleNotification(updatedState.notificationId, scheduledTime);
+      scheduleNotification(updatedState.notificationId, scheduledTime);
     }
-  }, [localState, user, data, updateData]);
+  }, [localState]);
 
   // タイマーをスキップ（残り時間を1秒に設定）
-  const skipTimer = useCallback(async () => {
-    if (!localState || !localState.startedAt || !user) return;
+  const skipTimer = useCallback(() => {
+    if (!localState || !localState.startedAt) return;
 
     // 残り時間を1秒にするため、開始時刻を調整
     // 経過時間を duration - 1 にするため、開始時刻を (duration - 1)秒前に設定
@@ -536,23 +364,12 @@ export function useRoastTimer() {
     // ローカルストレージに保存
     saveLocalState(updatedState);
     setLocalState(updatedState);
-    lastSyncedStateRef.current = updatedState;
-
-    // Firestoreに保存
-    try {
-      await updateData({
-        ...data,
-        roastTimerState: updatedState,
-      });
-    } catch (error) {
-      console.error('Failed to save timer state to Firestore:', error);
-    }
     // 次回のカウントダウンで完了処理が実行される
-  }, [localState, user, data, updateData]);
+  }, [localState]);
 
   // タイマーをリセット
-  const resetTimer = useCallback(async () => {
-    // リセットフラグを設定（Firestoreから状態を読み込まないようにする）
+  const resetTimer = useCallback(() => {
+    // リセットフラグを設定（状態を読み込まないようにする）
     hasResetRef.current = true;
     
     // 一時停止の累積時間をリセット
@@ -571,20 +388,7 @@ export function useRoastTimer() {
     // ローカルストレージから削除
     saveLocalState(null);
     setLocalState(null);
-    lastSyncedStateRef.current = null;
-
-    // Firestoreからも削除（undefinedを設定することでdeleteField()が使用される）
-    if (user) {
-      try {
-        await updateData({
-          ...data,
-          roastTimerState: undefined,
-        });
-      } catch (error) {
-        console.error('Failed to reset timer state in Firestore:', error);
-      }
-    }
-  }, [user, data, updateData]);
+  }, []);
 
   // サウンドを停止（完了ダイアログのOKボタンで呼ばれる）
   const stopSound = useCallback(() => {
@@ -620,4 +424,3 @@ export function useRoastTimer() {
     stopSound,
   };
 }
-

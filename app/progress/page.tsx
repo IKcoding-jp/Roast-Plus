@@ -816,7 +816,7 @@ function GroupCreateForm({ onSave, onCancel }: GroupCreateFormProps) {
               id="groupName"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
               placeholder="例: シール"
               autoFocus
             />
@@ -891,7 +891,7 @@ function GroupEditForm({ groupName: initialGroupName, workProgresses, onSave, on
               id="editGroupName"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
               placeholder="例: シール"
             />
           </div>
@@ -1059,7 +1059,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                       setGroupName(e.target.value);
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
                 >
                   <option value="">（グループなし）</option>
                   {existingGroups.map((g) => (
@@ -1075,7 +1075,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
                     placeholder="新しいグループ名を入力"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
                     autoFocus
                   />
                 )}
@@ -1091,7 +1091,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               id="taskName"
               value={taskName}
               onChange={(e) => setTaskName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
               placeholder="例: シール貼り"
             />
           </div>
@@ -1104,7 +1104,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               id="weight"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
               placeholder="例: 200枚、10kg、5個"
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -1119,7 +1119,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value as WorkProgressStatus)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
             >
               <option value="pending">前（未着手）</option>
               <option value="in_progress">途中</option>
@@ -1136,7 +1136,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               value={completedCount}
               onChange={(e) => setCompletedCount(e.target.value)}
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
               placeholder="例: 5"
             />
           </div>
@@ -1149,7 +1149,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[100px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[100px] text-gray-900"
               placeholder="メモや備考を入力してください"
             />
           </div>
@@ -1213,7 +1213,7 @@ function FilterSortDialog({
             <select
               value={sortOption}
               onChange={(e) => onSortChange(e.target.value as SortOption)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
             >
               <option value="createdAt">作成日時（新しい順）</option>
               <option value="beanName">作業名（あいうえお順）</option>
@@ -1229,7 +1229,7 @@ function FilterSortDialog({
               id="filterTaskName"
               value={filterTaskName}
               onChange={(e) => onFilterTaskNameChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
               placeholder="作業名を入力"
             />
           </div>
@@ -1241,7 +1241,7 @@ function FilterSortDialog({
               id="filterStatus"
               value={filterStatus}
               onChange={(e) => onFilterStatusChange(e.target.value as WorkProgressStatus | 'all')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
             >
               <option value="all">すべて</option>
               <option value="pending">前（未着手）</option>
@@ -1317,7 +1317,7 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
               onChange={(e) => setAmount(e.target.value)}
               step={unit === 'kg' ? '0.1' : '1'}
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
               placeholder={workProgress.targetAmount !== undefined ? `例: 50${unit}` : '例: 5'}
               autoFocus
             />
@@ -1331,7 +1331,7 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[100px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[100px] text-gray-900"
               placeholder="メモや備考を入力してください"
             />
           </div>

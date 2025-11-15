@@ -67,12 +67,26 @@ export function RoastTimer() {
   const prevStatusRef = useRef<string | undefined>(undefined);
   const hasInitializedRef = useRef(false);
 
-  // ページを開いた時の初期化（完了状態の自動リセットは削除）
+  // ページを開いた時の初期化（完了状態の場合は自動リセット）
   useEffect(() => {
     if (!hasInitializedRef.current) {
       hasInitializedRef.current = true;
+      
+      // 完了状態の場合は自動的にリセットして、手動スタート画面を表示
+      if (state?.status === 'completed') {
+        resetTimer();
+        setInputMode(null);
+        setDurationMinutes('');
+        setDurationSeconds('');
+        setBeanName('');
+        setWeight('');
+        setRoastLevel('');
+        setShowCompletionDialog(false);
+        setShowContinuousRoastDialog(false);
+        setShowAfterPurgeDialog(false);
+      }
     }
-  }, []);
+  }, [state?.status, resetTimer]);
 
   // 記録がある豆のリストを生成（平均焙煎時間が計算できる豆のみ）
   useEffect(() => {

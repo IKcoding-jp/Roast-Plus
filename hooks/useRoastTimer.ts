@@ -64,6 +64,12 @@ export function useRoastTimer() {
     
     const storedState = loadLocalState();
     if (storedState) {
+      // 完了状態の場合は読み込まない（ページを開いた時に完了画面が表示されるのを防ぐ）
+      if (storedState.status === 'completed') {
+        isInitialMountRef.current = false;
+        return;
+      }
+      
       // ローカルストレージから読み込んだ場合、開始時刻から経過時間を再計算
       if (storedState.status === 'running' && storedState.startedAt) {
         const elapsed = calculateElapsedTime(
@@ -91,8 +97,8 @@ export function useRoastTimer() {
       // Firestoreから状態を読み込む
       const firestoreState = data.roastTimerState;
       
-      // 初回マウント時は、完了状態を読み込まない（ページを開いた時に完了画面が表示されるのを防ぐ）
-      if (isInitialMountRef.current && firestoreState.status === 'completed') {
+      // 完了状態の場合は読み込まない（ページを開いた時に完了画面が表示されるのを防ぐ）
+      if (firestoreState.status === 'completed') {
         isInitialMountRef.current = false;
         return;
       }

@@ -233,7 +233,7 @@ export default function ProgressPage() {
   // グループを削除（そのグループに属するすべての作業を削除）
   const handleDeleteGroup = async (groupName: string) => {
     if (!user) return;
-    if (!confirm(`「${groupName}」グループのすべての作業を削除しますか？`)) return;
+    if (!confirm(`「${groupName}」作業グループのすべての作業を削除しますか？`)) return;
     
     try {
       const workProgresses = data?.workProgresses || [];
@@ -246,7 +246,7 @@ export default function ProgressPage() {
       setEditingGroupName(null);
     } catch (error) {
       console.error('Failed to delete group:', error);
-      alert('グループの削除に失敗しました');
+      alert('作業グループの削除に失敗しました');
     }
   };
 
@@ -269,7 +269,7 @@ export default function ProgressPage() {
       setEditingGroupName(null);
     } catch (error) {
       console.error('Failed to update group:', error);
-      alert('グループの更新に失敗しました');
+      alert('作業グループの更新に失敗しました');
     }
   };
 
@@ -1403,7 +1403,7 @@ export default function ProgressPage() {
                 setAddMode(null);
               } catch (error) {
                 console.error('Failed to create group:', error);
-                alert('グループの作成に失敗しました');
+                alert('作業グループの作成に失敗しました');
               }
             }}
             onCancel={() => {
@@ -1531,7 +1531,7 @@ function ModeSelectDialog({ onSelectGroup, onSelectWork, onCancel }: ModeSelectD
             onClick={onSelectGroup}
             className="w-full px-4 py-3 text-left bg-amber-50 hover:bg-amber-100 border-2 border-amber-300 rounded-lg transition-colors min-h-[60px] flex flex-col justify-center"
           >
-            <div className="font-semibold text-gray-800 text-base">グループを作成</div>
+            <div className="font-semibold text-gray-800 text-base">作業グループを作成</div>
             <div className="text-sm text-gray-600 mt-1">新しい作業グループを作成します</div>
           </button>
           <button
@@ -1539,7 +1539,7 @@ function ModeSelectDialog({ onSelectGroup, onSelectWork, onCancel }: ModeSelectD
             className="w-full px-4 py-3 text-left bg-blue-50 hover:bg-blue-100 border-2 border-blue-300 rounded-lg transition-colors min-h-[60px] flex flex-col justify-center"
           >
             <div className="font-semibold text-gray-800 text-base">作業を追加</div>
-            <div className="text-sm text-gray-600 mt-1">既存のグループに作業を追加します</div>
+            <div className="text-sm text-gray-600 mt-1">既存の作業グループに作業を追加します</div>
           </button>
         </div>
       </div>
@@ -1559,7 +1559,7 @@ function GroupCreateForm({ onSave, onCancel }: GroupCreateFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!groupName.trim()) {
-      alert('グループ名を入力してください');
+      alert('作業グループ名を入力してください');
       return;
     }
     onSave(groupName);
@@ -1571,7 +1571,7 @@ function GroupCreateForm({ onSave, onCancel }: GroupCreateFormProps) {
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            グループを作成
+            作業グループを作成
           </h2>
           <button
             onClick={onCancel}
@@ -1661,7 +1661,7 @@ function GroupEditForm({ groupName: initialGroupName, workProgresses, onSave, on
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            グループを編集
+            作業グループを編集
           </h2>
           <button
             onClick={onCancel}
@@ -1692,7 +1692,7 @@ function GroupEditForm({ groupName: initialGroupName, workProgresses, onSave, on
           {/* グループ内の作業一覧 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              グループ内の作業 ({workProgresses.length}件)
+              作業グループ内の作業 ({workProgresses.length}件)
             </label>
             <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 max-h-64 overflow-y-auto">
               {workProgresses.map((wp) => (
@@ -1727,7 +1727,7 @@ function GroupEditForm({ groupName: initialGroupName, workProgresses, onSave, on
               onClick={onDelete}
               className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors min-h-[44px]"
             >
-              グループを削除
+              作業グループを削除
             </button>
             <div className="flex gap-3">
               <button
@@ -1859,13 +1859,13 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
                   >
-                    <option value="">グループを選択してください</option>
+                    <option value="">作業グループを選択してください</option>
                     {existingGroups.map((group) => (
                       <option key={group} value={group}>
                         {group}
                       </option>
                     ))}
-                    <option value="new">+ 新しいグループを作成</option>
+                    <option value="new">+ 新しい作業グループを作成</option>
                   </select>
                   {isNewGroup && (
                     <input
@@ -2078,7 +2078,7 @@ function FilterSortDialog({
               className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
             >
               <option value="createdAt">追加日時順</option>
-              <option value="beanName">グループ名・作業名順</option>
+              <option value="beanName">作業グループ名・作業名順</option>
               <option value="status">進捗状態順</option>
             </select>
           </div>

@@ -116,8 +116,11 @@ export default function DefectBeansPage() {
   // 欠点豆追加
   const handleAddDefectBean = async (
     defectBean: Omit<DefectBean, 'id' | 'createdAt' | 'updatedAt' | 'isMaster' | 'imageUrl'>,
-    imageFile: File
+    imageFile: File | null
   ) => {
+    if (!imageFile) {
+      throw new Error('Image file is required');
+    }
     try {
       await addDefectBean(defectBean, imageFile);
       setShowAddForm(false);

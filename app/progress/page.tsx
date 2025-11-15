@@ -161,17 +161,23 @@ export default function ProgressPage() {
   }
 
   // 作業進捗を追加
-  const handleAddWorkProgress = async (workProgress: Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAddWorkProgress = async (workProgress: Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'> | Partial<Omit<WorkProgress, 'id' | 'createdAt'>>) => {
     if (!user) return;
     
     try {
+      // Partial型の場合は、必要なフィールドを補完
+      const fullWorkProgress: Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'> = {
+        ...workProgress,
+        status: workProgress.status || 'pending',
+      } as Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'>;
+      
       // 同じグループ名のダミー作業（作業名が空の作業）が存在する場合は削除
       // weightに関係なく、同じgroupNameのダミー作業をすべて削除
-      if (workProgress.groupName) {
+      if (fullWorkProgress.groupName) {
         let currentData = data;
         const workProgresses = currentData?.workProgresses || [];
         const dummyWorks = workProgresses.filter(
-          (wp) => wp.groupName === workProgress.groupName && (!wp.taskName || wp.taskName.trim() === '')
+          (wp) => wp.groupName === fullWorkProgress.groupName && (!wp.taskName || wp.taskName.trim() === '')
         );
         
         // ダミー作業を削除（削除後にデータを更新）
@@ -187,9 +193,9 @@ export default function ProgressPage() {
         }
         
         // 削除後のデータを使用して作業を追加
-        await addWorkProgress(user.uid, workProgress, currentData || data);
+        await addWorkProgress(user.uid, fullWorkProgress, currentData || data);
       } else {
-        await addWorkProgress(user.uid, workProgress, data);
+        await addWorkProgress(user.uid, fullWorkProgress, data);
       }
       
       setShowAddForm(false);
@@ -313,9 +319,9 @@ export default function ProgressPage() {
       
       // 目標量がある場合は進捗量を追加、ない場合は完成数を追加
       if (workProgress.targetAmount !== undefined) {
-        await addProgressToWorkProgress(user.uid, workProgressId, amount, memo, data);
+        await addProgressToWorkProgress(user.uid, workProgressId, amount, data, memo);
       } else {
-        await addCompletedCountToWorkProgress(user.uid, workProgressId, amount, memo, data);
+        await addCompletedCountToWorkProgress(user.uid, workProgressId, amount, data, memo);
       }
       setAddingProgressWorkProgressId(null);
     } catch (error) {

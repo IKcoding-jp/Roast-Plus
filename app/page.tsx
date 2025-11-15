@@ -12,7 +12,7 @@ import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
 
 // バージョン情報（package.jsonと同期）
-const APP_VERSION = '0.1.13';
+const APP_VERSION = '0.2.0';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -72,7 +72,7 @@ export default function HomePage() {
             <div className="flex items-start gap-2 max-w-2xl mx-auto">
               <div className="flex-1">
                 <p className="text-xs sm:text-sm leading-relaxed text-gray-800 font-medium">
-                  ITパスポートは合格しました。ローストタイマーと欠点豆図鑑がある程度完成したので、確認してみてください！
+                  ITパスポートは合格しました。ローストタイマーと欠点豆図鑑、作業進捗がある程度完成したので、確認してみてください！
                 </p>
               </div>
               <button
@@ -140,7 +140,7 @@ export default function HomePage() {
               <MdTimer className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
             <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
-              ローストタイマー
+              ローストタイマー β版
             </h2>
             <span className="flex-shrink-0 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
               New!
@@ -156,7 +156,7 @@ export default function HomePage() {
               <RiBookFill className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
             <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
-              欠点豆図鑑
+              欠点豆図鑑 β版
             </h2>
             <span className="flex-shrink-0 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
               New!
@@ -172,7 +172,7 @@ export default function HomePage() {
               <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
             <h2 className="flex-1 text-left text-base sm:text-lg font-semibold text-gray-800">
-              作業進捗
+              作業進捗 β版
             </h2>
             <span className="flex-shrink-0 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
               New!

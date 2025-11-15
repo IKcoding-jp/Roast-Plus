@@ -860,8 +860,8 @@ export async function addCompletedCountToWorkProgress(
   userId: string,
   workProgressId: string,
   count: number,
-  memo?: string,
-  appData: AppData
+  appData: AppData,
+  memo?: string
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
@@ -916,8 +916,8 @@ export async function addProgressToWorkProgress(
   userId: string,
   workProgressId: string,
   amount: number,
-  memo?: string,
-  appData: AppData
+  appData: AppData,
+  memo?: string
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);

@@ -84,7 +84,7 @@ select option {
 }
 
 .new-label-gradient {
-  background: linear-gradient(90deg, #ef4444, #f87171, #fca5a5, #f87171, #ef4444);
+  background: linear-gradient(90deg, #dc2626, #ef4444, #f87171, #ef4444, #dc2626);
   background-size: 200% 100%;
   animation: gradient-shift 3s ease infinite;
 }

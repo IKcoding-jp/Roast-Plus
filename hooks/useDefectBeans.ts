@@ -51,7 +51,7 @@ export function useDefectBeans() {
   // ユーザー追加欠点豆を保存
   const addDefectBean = useCallback(
     async (
-      defectBean: Omit<DefectBean, 'id' | 'createdAt' | 'updatedAt' | 'isMaster'>,
+      defectBean: Omit<DefectBean, 'id' | 'createdAt' | 'updatedAt' | 'isMaster' | 'imageUrl'>,
       imageFile: File
     ): Promise<void> => {
       if (!user) {

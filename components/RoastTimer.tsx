@@ -273,9 +273,9 @@ export function RoastTimer() {
     await startTimer(
       finalDuration,
       notificationId,
-      inputMode === 'recommended' ? beanName : undefined,
-      inputMode === 'recommended' ? weight : undefined,
-      inputMode === 'recommended' ? roastLevel : undefined
+      inputMode === 'recommended' && beanName !== '' ? beanName : undefined,
+      inputMode === 'recommended' && weight !== '' ? weight : undefined,
+      inputMode === 'recommended' && roastLevel !== '' ? roastLevel : undefined
     );
   };
 

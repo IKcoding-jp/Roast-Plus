@@ -43,7 +43,7 @@ export function RoastRecordForm({
   const isEditMode = !!record;
 
   const [beanName, setBeanName] = useState<BeanName | ''>(
-    record?.beanName || initialValues?.beanName || ''
+    (record?.beanName || initialValues?.beanName || '') as BeanName | ''
   );
   const [weight, setWeight] = useState<200 | 300 | 500 | ''>(
     record?.weight || initialValues?.weight || ''
@@ -66,7 +66,7 @@ export function RoastRecordForm({
   // 初期値が設定された時にフォームに反映（recordが優先）
   useEffect(() => {
     if (record) {
-      setBeanName(record.beanName);
+      setBeanName(record.beanName as BeanName | '');
       setWeight(record.weight);
       setRoastLevel(record.roastLevel);
       const minutes = Math.floor(record.duration / 60);

@@ -1,10 +1,10 @@
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, Storage } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, type FirebaseStorage } from 'firebase/storage';
 import app from './firebase';
 
 // Storageインスタンスを遅延初期化
-let storage: Storage | null = null;
+let storage: FirebaseStorage | null = null;
 
-function getStorageInstance(): Storage {
+function getStorageInstance(): FirebaseStorage {
   if (!storage) {
     storage = getStorage(app);
   }

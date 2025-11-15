@@ -46,7 +46,7 @@ export default function RoastTimerPage() {
             </Link>
             <Link
               href="/roast-record"
-              className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
+              className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all flex items-center gap-2 flex-shrink-0 min-h-[44px]"
               aria-label="ロースト履歴一覧"
             >
               <HiClock className="text-lg flex-shrink-0" />

@@ -79,8 +79,10 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     const newTimeLabels = currentSchedule?.timeLabels || [];
     const newTimeLabelsStr = JSON.stringify(newTimeLabels);
     
-    // 初期化されていない場合、またはローカル状態が空でデータがある場合は即座に初期化
-    if (!isInitializedRef.current || (localTimeLabelsLengthRef.current === 0 && newTimeLabels.length > 0)) {
+    // 初期化されていない場合、またはローカル状態とFirestoreの状態が不一致の場合は初期化
+    if (!isInitializedRef.current || 
+        (localTimeLabelsLengthRef.current === 0 && newTimeLabels.length > 0) ||
+        (localTimeLabelsLengthRef.current > 0 && newTimeLabels.length === 0)) {
       setLocalTimeLabels(newTimeLabels);
       localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
       originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
@@ -92,16 +94,11 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
       return;
     }
     
-    // 前回のデータと同じ場合は何もしない（無限ループ防止）
-    if (lastDataRef.current === newTimeLabelsStr) {
-      return;
-    }
-    
     // todaySchedules全体のJSON文字列を計算
     const todaySchedulesStr = JSON.stringify(data.todaySchedules || []);
     
-    // 前回のtodaySchedulesと同じ場合は何もしない（不要な実行を防止）
-    if (lastTodaySchedulesStrRef.current === todaySchedulesStr && lastDataRef.current !== '') {
+    // 前回のtodaySchedulesと同じで、かつ更新中でない場合は何もしない（不要な実行を防止）
+    if (lastTodaySchedulesStrRef.current === todaySchedulesStr && lastDataRef.current !== '' && !isUpdatingRef.current) {
       return;
     }
     
@@ -109,6 +106,11 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
     
     // 外部からの更新の場合のみ同期
     if (!isUpdatingRef.current) {
+      // 前回のデータと同じ場合は何もしない（無限ループ防止）
+      if (lastDataRef.current === newTimeLabelsStr) {
+        return;
+      }
+      
       // originalTimeLabelsRefと比較して、異なる場合のみ更新
       const originalStr = JSON.stringify(originalTimeLabelsRef.current);
       if (originalStr !== newTimeLabelsStr) {
@@ -117,10 +119,19 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
         todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
         lastDataRef.current = newTimeLabelsStr;
+        localTimeLabelsLengthRef.current = newTimeLabels.length;
       }
     } else {
       // ローカル更新中でも、Firestoreからの更新が来た場合は、localTimeLabelsの状態も更新する
       // これにより、ラベルが消えることを防ぐ
+      // 前回のデータと同じ場合は何もしない（無限ループ防止）
+      if (lastDataRef.current === newTimeLabelsStr) {
+        // データが同じ場合でも、refを更新して整合性を保つ
+        originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
+        todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
+        return;
+      }
+      
       const originalStr = JSON.stringify(originalTimeLabelsRef.current);
       if (originalStr !== newTimeLabelsStr) {
         setLocalTimeLabels(newTimeLabels);
@@ -128,6 +139,7 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
         todayScheduleIdRef.current = currentSchedule?.id || `schedule-${today}`;
         lastDataRef.current = newTimeLabelsStr;
+        localTimeLabelsLengthRef.current = newTimeLabels.length;
       } else {
         // データが同じ場合でも、refを更新して整合性を保つ
         originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
@@ -192,9 +204,10 @@ export function TodaySchedule({ data, onUpdate }: TodayScheduleProps) {
         onUpdateRef.current(updatedData);
         
         // 更新フラグをリセット（FirestoreのonSnapshotが発火する前に）
+        // useAppData.tsとタイミングを整合させるため100msに設定
         setTimeout(() => {
           isUpdatingRef.current = false;
-        }, 500);
+        }, 100);
       }, 500);
     },
     [today, isComposing]

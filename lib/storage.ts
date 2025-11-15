@@ -49,13 +49,16 @@ export async function deleteDefectBeanImage(imageUrl: string): Promise<void> {
     const storageInstance = getStorageInstance();
     
     // URLからStorage参照を取得
-    // URL形式: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{path}?alt=media&token={token}
-    // パス部分を抽出
+    // URL形式: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{encodedPath}?alt=media&token={token}
+    // または: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{encodedPath}?alt=media
     const url = new URL(imageUrl);
-    const pathMatch = url.pathname.match(/\/o\/(.+)\?/);
+    
+    // パス部分を抽出（/o/ の後の部分）
+    // クエリパラメータの有無に関わらず動作するように改善
+    const pathMatch = url.pathname.match(/\/o\/(.+)$/);
     
     if (!pathMatch || !pathMatch[1]) {
-      throw new Error('Invalid image URL format');
+      throw new Error(`Invalid image URL format: ${imageUrl}`);
     }
     
     // URLデコード（%2F -> / など）

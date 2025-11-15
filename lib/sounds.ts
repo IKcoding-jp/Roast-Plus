@@ -49,9 +49,15 @@ export async function playTimerSound(
  */
 export function stopTimerSound(): void {
   if (timerAudio) {
-    timerAudio.pause();
-    timerAudio.currentTime = 0;
-    timerAudio = null;
+    try {
+      timerAudio.pause();
+      timerAudio.currentTime = 0;
+      timerAudio.loop = false; // ループを無効化
+      timerAudio = null;
+    } catch (error) {
+      console.error('Failed to stop timer sound:', error);
+      timerAudio = null;
+    }
   }
 }
 
@@ -110,5 +116,20 @@ export function stopNotificationSound(): void {
 export function stopAllSounds(): void {
   stopTimerSound();
   stopNotificationSound();
+}
+
+/**
+ * 特定のAudioオブジェクトを停止（外部から渡されたAudioオブジェクト用）
+ */
+export function stopAudio(audio: HTMLAudioElement | null | undefined): void {
+  if (audio) {
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.loop = false;
+    } catch (error) {
+      console.error('Failed to stop audio:', error);
+    }
+  }
 }
 

@@ -116,25 +116,25 @@ export function DefectBeanCard({
             <div className="flex gap-1.5 pt-1.5 border-t border-gray-200" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => handleToggleSetting(true)}
-                className={`flex-1 px-2 py-1.5 rounded text-xs font-semibold transition-colors min-h-[36px] flex items-center justify-center gap-1 ${
+                className={`flex-1 px-1.5 sm:px-2 py-1.5 rounded text-[10px] sm:text-xs font-semibold transition-colors min-h-[36px] flex items-center justify-center gap-0.5 sm:gap-1 whitespace-nowrap ${
                   shouldRemove === true
                     ? 'bg-red-500 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                <HiXCircle className="h-4 w-4" />
-                省く
+                <HiXCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span>省く</span>
               </button>
               <button
                 onClick={() => handleToggleSetting(false)}
-                className={`flex-1 px-2 py-1.5 rounded text-xs font-semibold transition-colors min-h-[36px] flex items-center justify-center gap-1 ${
+                className={`flex-1 px-1.5 sm:px-2 py-1.5 rounded text-[10px] sm:text-xs font-semibold transition-colors min-h-[36px] flex items-center justify-center gap-0.5 sm:gap-1 whitespace-nowrap ${
                   shouldRemove === false
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                <HiCheck className="h-4 w-4" />
-                省かない
+                <HiCheck className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span>省かない</span>
               </button>
             </div>
           )}

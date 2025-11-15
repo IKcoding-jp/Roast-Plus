@@ -6,7 +6,7 @@ import { useAppData } from '@/hooks/useAppData';
 import type { RoastTimerState, RoastTimerRecord } from '@/types';
 import { setRoastTimerState as saveLocalState, getRoastTimerState as loadLocalState } from '@/lib/localStorage';
 import { notifyRoastTimerComplete, scheduleNotification, cancelAllScheduledNotifications } from '@/lib/notifications';
-import { playTimerSound, stopTimerSound, stopAllSounds } from '@/lib/sounds';
+import { playTimerSound, stopTimerSound, stopAllSounds, stopAudio } from '@/lib/sounds';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 
 const UPDATE_INTERVAL = 100; // 100msごとに更新
@@ -498,8 +498,11 @@ export function useRoastTimer() {
     cancelAllScheduledNotifications();
     
     // サウンドを停止
+    if (soundAudioRef.current) {
+      stopAudio(soundAudioRef.current);
+      soundAudioRef.current = null;
+    }
     stopAllSounds();
-    soundAudioRef.current = null;
 
     // ローカルストレージから削除
     saveLocalState(null);
@@ -520,8 +523,13 @@ export function useRoastTimer() {
 
   // サウンドを停止（完了ダイアログのOKボタンで呼ばれる）
   const stopSound = useCallback(() => {
+    // soundAudioRefに保存されているAudioオブジェクトも直接停止
+    if (soundAudioRef.current) {
+      stopAudio(soundAudioRef.current);
+      soundAudioRef.current = null;
+    }
+    // グローバルなタイマー音も停止
     stopAllSounds();
-    soundAudioRef.current = null;
   }, []);
 
   return {

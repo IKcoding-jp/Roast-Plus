@@ -9,7 +9,7 @@ let timerErrorHandler: ((e: Event) => void) | null = null;
 let notificationErrorHandler: ((e: Event) => void) | null = null;
 
 /**
- * タイマー音を再生（ループ再生）
+ * タイマー音を再生（1回のみ）
  */
 export async function playTimerSound(
   soundFile: string,
@@ -53,7 +53,7 @@ export async function playTimerSound(
     };
     audio.addEventListener('error', timerErrorHandler);
 
-    audio.loop = true;
+    audio.loop = false;
     audio.volume = Math.max(0, Math.min(1, volume));
     
     await audio.play();

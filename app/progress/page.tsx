@@ -721,7 +721,7 @@ export default function ProgressPage() {
                                       </div>
                                       <div className="w-full bg-gray-200 rounded-full h-2">
                                         <div
-                                          className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                          className={`h-2 rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
                                           style={{ width: `${calculateProgressPercentage(wp)}%` }}
                                         />
                                       </div>
@@ -861,7 +861,7 @@ export default function ProgressPage() {
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                  className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                  className={`h-2 rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
                                   style={{ width: `${calculateProgressPercentage(wp)}%` }}
                                 />
                               </div>
@@ -1086,7 +1086,7 @@ export default function ProgressPage() {
                                       </div>
                                       <div className="w-full bg-gray-200 rounded-full h-2">
                                         <div
-                                          className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                          className={`h-2 rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
                                           style={{ width: `${calculateProgressPercentage(wp)}%` }}
                                         />
                                       </div>
@@ -1226,7 +1226,7 @@ export default function ProgressPage() {
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                  className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                  className={`h-2 rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
                                   style={{ width: `${calculateProgressPercentage(wp)}%` }}
                                 />
                               </div>
@@ -1451,7 +1451,7 @@ export default function ProgressPage() {
                                       </div>
                                       <div className="w-full bg-gray-200 rounded-full h-2">
                                         <div
-                                          className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                          className={`h-2 rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
                                           style={{ width: `${calculateProgressPercentage(wp)}%` }}
                                         />
                                       </div>
@@ -1591,7 +1591,7 @@ export default function ProgressPage() {
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                  className={`h-2 rounded-full transition-all ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                                  className={`h-2 rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
                                   style={{ width: `${calculateProgressPercentage(wp)}%` }}
                                 />
                               </div>

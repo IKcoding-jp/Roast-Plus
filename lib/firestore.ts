@@ -163,7 +163,12 @@ function normalizeAppData(data: any): AppData {
             (record.createdAt ? record.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
         }))
       : [],
-    workProgresses: Array.isArray(data?.workProgresses) ? data.workProgresses : [],
+    workProgresses: Array.isArray(data?.workProgresses)
+      ? data.workProgresses.map((wp: any) => ({
+          ...wp,
+          completedCount: typeof wp.completedCount === 'number' ? wp.completedCount : undefined,
+        }))
+      : [],
   };
   
   // userSettingsは存在する場合のみ追加（selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除）
@@ -716,6 +721,8 @@ export async function addWorkProgress(
     targetAmount,
     currentAmount: targetAmount !== undefined ? 0 : undefined,
     progressHistory: [],
+    // 完成数の初期化（指定されていない場合は0で初期化、またはundefinedのまま）
+    completedCount: workProgress.completedCount !== undefined ? workProgress.completedCount : undefined,
   };
   
   const updatedWorkProgresses = [...(appData.workProgresses || []), newWorkProgress];
@@ -832,6 +839,62 @@ export async function deleteWorkProgress(
   const updatedWorkProgresses = (appData.workProgresses || []).filter(
     (wp) => wp.id !== workProgressId
   );
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * 作業進捗に完成数を追加
+ * @param userId ユーザーID
+ * @param workProgressId 作業進捗ID
+ * @param count 追加する完成数（数値）
+ * @param memo メモ（任意）
+ * @param appData 現在のAppData
+ */
+export async function addCompletedCountToWorkProgress(
+  userId: string,
+  workProgressId: string,
+  count: number,
+  memo?: string,
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
+  
+  if (existingIndex < 0) {
+    throw new Error(`WorkProgress with id ${workProgressId} not found`);
+  }
+  
+  const existing = workProgresses[existingIndex];
+  const now = new Date().toISOString();
+  
+  // 完成数を累積
+  const completedCount = (existing.completedCount || 0) + count;
+  
+  // 進捗履歴に新しいエントリを追加（完成数の追加も履歴として記録）
+  const newProgressEntry: ProgressEntry = {
+    id: crypto.randomUUID(),
+    date: now,
+    amount: count, // 完成数もamountとして記録（単位は異なるが、履歴として統一）
+    memo: memo?.trim() || undefined,
+  };
+  
+  const progressHistory = [...(existing.progressHistory || []), newProgressEntry];
+  
+  const updatedWorkProgress: WorkProgress = {
+    ...existing,
+    completedCount,
+    progressHistory,
+    updatedAt: now,
+  };
+  
+  const updatedWorkProgresses = [...workProgresses];
+  updatedWorkProgresses[existingIndex] = updatedWorkProgress;
   
   const updatedData: AppData = {
     ...appData,

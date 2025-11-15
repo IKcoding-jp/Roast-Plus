@@ -246,5 +246,6 @@ export interface WorkProgress {
   targetAmount?: number; // 目標量（数値、単位はweightフィールドから取得）
   currentAmount?: number; // 現在の進捗量（累積、数値、単位はweightフィールドから取得）
   progressHistory?: ProgressEntry[]; // 進捗記録の履歴
+  completedCount?: number; // 完成数（目標量がない場合も記録可能、累積）
 }
 

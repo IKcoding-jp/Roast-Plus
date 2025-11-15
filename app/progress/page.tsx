@@ -5,7 +5,7 @@ import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
-import { addWorkProgress, updateWorkProgress, deleteWorkProgress, addProgressToWorkProgress } from '@/lib/firestore';
+import { addWorkProgress, updateWorkProgress, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress } from '@/lib/firestore';
 import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
@@ -283,11 +283,19 @@ export default function ProgressPage() {
     if (!user) return;
     
     try {
-      await addProgressToWorkProgress(user.uid, workProgressId, amount, memo, data);
+      const workProgress = data?.workProgresses?.find((wp) => wp.id === workProgressId);
+      if (!workProgress) return;
+      
+      // 目標量がある場合は進捗量を追加、ない場合は完成数を追加
+      if (workProgress.targetAmount !== undefined) {
+        await addProgressToWorkProgress(user.uid, workProgressId, amount, memo, data);
+      } else {
+        await addCompletedCountToWorkProgress(user.uid, workProgressId, amount, memo, data);
+      }
       setAddingProgressWorkProgressId(null);
     } catch (error) {
       console.error('Failed to add progress:', error);
-      alert('進捗量の追加に失敗しました');
+      alert('進捗の追加に失敗しました');
     }
   };
 
@@ -430,7 +438,8 @@ export default function ProgressPage() {
                         onClick={(e) => {
                           e.stopPropagation();
                           setAddingToGroupName(group.groupName || null);
-                          setShowModeSelectDialog(true);
+                          setAddMode('work');
+                          setShowAddForm(true);
                         }}
                         className="px-3 py-1.5 text-xs sm:text-sm font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors flex items-center gap-1.5 min-h-[32px] flex-shrink-0"
                       >
@@ -563,9 +572,32 @@ export default function ProgressPage() {
                                 進捗追加
                               </button>
                             </div>
+                            {/* 完成数の表示（目標量がある場合も補助情報として表示） */}
+                            {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                              <div className="text-xs text-gray-600 pt-1">
+                                完成数: {wp.completedCount}個
+                              </div>
+                            )}
                           </div>
                         );
                       })()}
+
+                      {/* 完成数の表示（目標量がない場合） */}
+                      {!isDummyWork && wp.targetAmount === undefined && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-700 font-semibold">
+                              完成数: {wp.completedCount || 0}個
+                            </span>
+                            <button
+                              onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                              className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                            >
+                              完成数を追加
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       {/* メモ */}
                       {!isDummyWork && wp.memo && (
@@ -680,9 +712,32 @@ export default function ProgressPage() {
                           進捗追加
                         </button>
                       </div>
+                      {/* 完成数の表示（目標量がある場合も補助情報として表示） */}
+                      {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                        <div className="text-xs text-gray-600 pt-1">
+                          完成数: {wp.completedCount}個
+                        </div>
+                      )}
                     </div>
                   );
                 })()}
+
+                {/* 完成数の表示（目標量がない場合） */}
+                {wp.targetAmount === undefined && (
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-700 font-semibold">
+                        完成数: {wp.completedCount || 0}個
+                      </span>
+                      <button
+                        onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                        className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                      >
+                        完成数を追加
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* メモ */}
                 {wp.memo && (
@@ -1101,6 +1156,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
   const [taskName, setTaskName] = useState(workProgress?.taskName || initialValues?.taskName || '');
   const [status, setStatus] = useState<WorkProgressStatus>(workProgress?.status || 'pending');
   const [memo, setMemo] = useState(workProgress?.memo || '');
+  const [completedCount, setCompletedCount] = useState<string>(workProgress?.completedCount?.toString() || '');
 
   // 単位を抽出
   const extractUnit = (weight?: string): string => {
@@ -1112,6 +1168,8 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const completedCountNum = completedCount.trim() ? parseFloat(completedCount.trim()) : undefined;
+    
     if (workProgress) {
       // 編集モード
       onSave({
@@ -1120,6 +1178,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
         taskName: taskName.trim() || undefined,
         status,
         memo: memo.trim() || undefined,
+        completedCount: completedCountNum !== undefined && !isNaN(completedCountNum) ? completedCountNum : undefined,
       });
     } else {
       // 追加モード
@@ -1129,6 +1188,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
         taskName: taskName.trim() || undefined,
         status,
         memo: memo.trim() || undefined,
+        completedCount: completedCountNum !== undefined && !isNaN(completedCountNum) ? completedCountNum : undefined,
       });
     }
   };
@@ -1249,6 +1309,31 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                 </div>
               );
             })()}
+          </div>
+
+          {/* 完成数 */}
+          <div>
+            <label htmlFor="completedCount" className="block text-sm font-medium text-gray-700 mb-2">
+              完成数（目標量がない場合に使用）
+            </label>
+            <input
+              type="number"
+              id="completedCount"
+              value={completedCount}
+              onChange={(e) => setCompletedCount(e.target.value)}
+              placeholder="例: 15個、20枚など"
+              step="1"
+              min="0"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              目標量がない場合でも、完成数を記録できます
+            </p>
+            {workProgress && workProgress.completedCount !== undefined && (
+              <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-gray-700">
+                <p>現在の完成数: {workProgress.completedCount}個</p>
+              </div>
+            )}
           </div>
 
           {/* 進捗状態 */}
@@ -1453,7 +1538,7 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
     
     const amountNum = parseFloat(amount);
     if (isNaN(amountNum) || amountNum <= 0) {
-      alert('有効な進捗量を入力してください');
+      alert(workProgress.targetAmount !== undefined ? '有効な進捗量を入力してください' : '有効な完成数を入力してください');
       return;
     }
     
@@ -1479,7 +1564,7 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            進捗を追加
+            {workProgress.targetAmount !== undefined ? '進捗を追加' : '完成数を追加'}
           </h2>
           <button
             onClick={onCancel}
@@ -1497,27 +1582,31 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
             {workProgress.taskName && (
               <p className="text-sm font-semibold text-gray-800">{workProgress.taskName}</p>
             )}
-            {workProgress.targetAmount !== undefined && (
+            {workProgress.targetAmount !== undefined ? (
               <p className="text-xs text-gray-600">
                 目標: {workProgress.targetAmount.toFixed(1)}{unit}
                 {remaining !== null && remaining > 0 && ` / 残り: ${remaining.toFixed(1)}${unit}`}
               </p>
+            ) : (
+              <p className="text-xs text-gray-600">
+                現在の完成数: {workProgress.completedCount || 0}個
+              </p>
             )}
           </div>
 
-          {/* 進捗量 */}
+          {/* 進捗量/完成数 */}
           <div>
             <label htmlFor="progressAmount" className="block text-sm font-medium text-gray-700 mb-2">
-              進捗量{unit && `（${unit}）`} <span className="text-red-500">*</span>
+              {workProgress.targetAmount !== undefined ? `進捗量${unit ? `（${unit}）` : ''}` : '完成数（個）'} <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
               id="progressAmount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder={`例: 2.5${unit ? ` ${unit}` : ''}`}
-              step="0.1"
-              min="0.1"
+              placeholder={workProgress.targetAmount !== undefined ? `例: 2.5${unit ? ` ${unit}` : ''}` : '例: 5個'}
+              step={workProgress.targetAmount !== undefined ? "0.1" : "1"}
+              min={workProgress.targetAmount !== undefined ? "0.1" : "1"}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
             />

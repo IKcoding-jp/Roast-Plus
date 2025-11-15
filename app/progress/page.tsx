@@ -432,16 +432,7 @@ export default function ProgressPage() {
         </header>
 
         {/* かんばん形式のレイアウト */}
-        {groupedWorkProgresses.groups.length === 0 && groupedWorkProgresses.ungrouped.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-600">
-              {filterTaskName || filterStatus !== 'all'
-                ? '検索条件に一致する作業がありません。'
-                : '作業が登録されていません。'}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {/* 前（未着手）列 */}
             <div className="flex flex-col">
               <div className="bg-gray-100 rounded-t-lg p-3 mb-3 sticky top-0 z-10">
@@ -1399,7 +1390,6 @@ export default function ProgressPage() {
               </div>
             </div>
           </div>
-        )}
 
         {/* モード選択ダイアログ */}
         {showModeSelectDialog && (

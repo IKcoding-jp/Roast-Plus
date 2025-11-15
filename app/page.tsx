@@ -11,6 +11,9 @@ import { IoSettings, IoClose } from "react-icons/io5";
 import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
 
+// バージョン情報（package.jsonと同期）
+const APP_VERSION = '0.1.13';
+
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -50,6 +53,7 @@ export default function HomePage() {
         <div className="flex items-center gap-2">
           <PiCoffeeBeanFill className="h-6 w-6 text-gold" />
           <h1 className="text-xl font-bold text-white">ローストプラス</h1>
+          <span className="text-sm font-normal text-gray-300">v{APP_VERSION}</span>
         </div>
         <div className="flex items-center gap-4">
           <button

@@ -182,6 +182,7 @@ export interface AppData {
   roastTimerState?: RoastTimerState; // ローストタイマー状態
   defectBeans?: DefectBean[]; // ユーザー追加欠点豆データ
   defectBeanSettings?: DefectBeanSettings; // 欠点豆設定（省く/省かない）
+  workProgresses: WorkProgress[]; // 作業進捗
 }
 
 // 通知
@@ -218,4 +219,32 @@ export type DefectBeanSettings = {
     shouldRemove: boolean; // true: 省く, false: 省かない
   };
 };
+
+// 作業進捗状態
+export type WorkProgressStatus = 'pending' | 'in_progress' | 'completed';
+
+// 進捗記録エントリ
+export interface ProgressEntry {
+  id: string;
+  date: string; // 日付（ISO 8601形式）
+  amount: number; // 進捗量（kg単位、数値）
+  memo?: string; // メモ（任意）
+}
+
+// 作業進捗
+export interface WorkProgress {
+  id: string;
+  beanName?: string; // 豆の名前（任意）
+  weight?: string; // 重量（文字列、例：「10kg」）（任意）
+  taskName?: string; // 作業名（任意）
+  status: WorkProgressStatus; // 進捗状態
+  memo?: string; // メモ・備考（任意）
+  startedAt?: string; // 開始日時（ISO 8601形式、進捗状態が「途中」になったときに記録）
+  completedAt?: string; // 完了日時（ISO 8601形式、進捗状態が「済」になったときに記録）
+  createdAt: string; // 作成日時（ISO 8601形式）
+  updatedAt: string; // 更新日時（ISO 8601形式）
+  targetAmount?: number; // 目標量（kg単位、数値）
+  currentAmount?: number; // 現在の進捗量（累積、kg単位、数値）
+  progressHistory?: ProgressEntry[]; // 進捗記録の履歴
+}
 

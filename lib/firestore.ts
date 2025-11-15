@@ -12,7 +12,7 @@ import {
   Firestore,
 } from 'firebase/firestore';
 import app from './firebase';
-import type { AppData, DefectBean, DefectBeanSettings } from '@/types';
+import type { AppData, DefectBean, DefectBeanSettings, WorkProgress, ProgressEntry } from '@/types';
 
 // Firestoreインスタンスを遅延初期化
 let db: Firestore | null = null;
@@ -67,6 +67,7 @@ const defaultData: AppData = {
   notifications: [],
   encouragementCount: 0,
   roastTimerRecords: [],
+  workProgresses: [],
 };
 
 function getUserDocRef(userId: string) {
@@ -162,6 +163,7 @@ function normalizeAppData(data: any): AppData {
             (record.createdAt ? record.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
         }))
       : [],
+    workProgresses: Array.isArray(data?.workProgresses) ? data.workProgresses : [],
   };
   
   // userSettingsは存在する場合のみ追加（selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除）
@@ -644,6 +646,259 @@ export async function updateDefectBeanSetting(
   const updatedData: AppData = {
     ...appData,
     defectBeanSettings: updatedSettings,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+// ===== 作業進捗関連の関数 =====
+
+/**
+ * weightフィールド（文字列、例：「10kg」）から目標量（数値）を抽出
+ * @param weight 重量文字列（例：「10kg」「10.5kg」）
+ * @returns 目標量（数値、kg単位）。抽出できない場合はundefined
+ */
+function extractTargetAmount(weight?: string): number | undefined {
+  if (!weight) return undefined;
+  
+  // 正規表現で数値を抽出（小数点を含む）
+  const match = weight.match(/^(\d+(?:\.\d+)?)\s*kg$/i);
+  if (match && match[1]) {
+    const amount = parseFloat(match[1]);
+    return isNaN(amount) ? undefined : amount;
+  }
+  
+  return undefined;
+}
+
+/**
+ * 作業進捗を追加
+ * @param userId ユーザーID
+ * @param workProgress 作業進捗データ（id, createdAt, updatedAtは自動設定）
+ * @param appData 現在のAppData
+ */
+export async function addWorkProgress(
+  userId: string,
+  workProgress: Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'>,
+  appData: AppData
+): Promise<void> {
+  const now = new Date().toISOString();
+  
+  // weightフィールドから目標量を抽出
+  const targetAmount = extractTargetAmount(workProgress.weight);
+  
+  const newWorkProgress: WorkProgress = {
+    ...workProgress,
+    id: crypto.randomUUID(),
+    createdAt: now,
+    updatedAt: now,
+    // 進捗状態に応じて日時を設定
+    startedAt: workProgress.status === 'in_progress' || workProgress.status === 'completed' 
+      ? now 
+      : undefined,
+    completedAt: workProgress.status === 'completed' 
+      ? now 
+      : undefined,
+    // 目標量と現在の進捗量を設定
+    targetAmount,
+    currentAmount: targetAmount !== undefined ? 0 : undefined,
+    progressHistory: [],
+  };
+  
+  const updatedWorkProgresses = [...(appData.workProgresses || []), newWorkProgress];
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * 作業進捗を更新
+ * @param userId ユーザーID
+ * @param workProgressId 作業進捗ID
+ * @param updates 更新するフィールド
+ * @param appData 現在のAppData
+ */
+export async function updateWorkProgress(
+  userId: string,
+  workProgressId: string,
+  updates: Partial<Omit<WorkProgress, 'id' | 'createdAt'>>,
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
+  
+  if (existingIndex < 0) {
+    throw new Error(`WorkProgress with id ${workProgressId} not found`);
+  }
+  
+  const existing = workProgresses[existingIndex];
+  const now = new Date().toISOString();
+  
+  // weightフィールドが変更された場合、目標量を再計算
+  let targetAmount = existing.targetAmount;
+  if (updates.weight !== undefined && updates.weight !== existing.weight) {
+    targetAmount = extractTargetAmount(updates.weight);
+    // 目標量が変更された場合、現在の進捗量を調整（目標量が削除された場合はundefined）
+    if (targetAmount === undefined) {
+      updates.currentAmount = undefined;
+      updates.progressHistory = undefined;
+    } else if (existing.currentAmount === undefined) {
+      updates.currentAmount = 0;
+    }
+  }
+  
+  // 進捗状態の変更を検出して日時を適切に設定
+  let startedAt = existing.startedAt;
+  let completedAt = existing.completedAt;
+  
+  if (updates.status !== undefined && updates.status !== existing.status) {
+    const oldStatus = existing.status;
+    const newStatus = updates.status;
+    
+    if (oldStatus === 'pending' && newStatus === 'in_progress') {
+      // pending → in_progress: startedAtを設定
+      startedAt = now;
+    } else if (oldStatus === 'pending' && newStatus === 'completed') {
+      // pending → completed: startedAtとcompletedAtを設定
+      startedAt = now;
+      completedAt = now;
+    } else if (oldStatus === 'in_progress' && newStatus === 'completed') {
+      // in_progress → completed: completedAtを設定（startedAtがない場合は設定）
+      if (!startedAt) {
+        startedAt = now;
+      }
+      completedAt = now;
+    } else if (oldStatus === 'completed' && newStatus === 'in_progress') {
+      // completed → in_progress: completedAtを削除
+      completedAt = undefined;
+    } else if (oldStatus === 'completed' && newStatus === 'pending') {
+      // completed → pending: startedAtとcompletedAtを削除
+      startedAt = undefined;
+      completedAt = undefined;
+    } else if (oldStatus === 'in_progress' && newStatus === 'pending') {
+      // in_progress → pending: startedAtを削除
+      startedAt = undefined;
+    }
+  }
+  
+  const updatedWorkProgress: WorkProgress = {
+    ...existing,
+    ...updates,
+    updatedAt: now,
+    startedAt,
+    completedAt,
+    targetAmount: targetAmount !== undefined ? targetAmount : updates.targetAmount,
+  };
+  
+  const updatedWorkProgresses = [...workProgresses];
+  updatedWorkProgresses[existingIndex] = updatedWorkProgress;
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * 作業進捗を削除
+ * @param userId ユーザーID
+ * @param workProgressId 削除する作業進捗ID
+ * @param appData 現在のAppData
+ */
+export async function deleteWorkProgress(
+  userId: string,
+  workProgressId: string,
+  appData: AppData
+): Promise<void> {
+  const updatedWorkProgresses = (appData.workProgresses || []).filter(
+    (wp) => wp.id !== workProgressId
+  );
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * 作業進捗に進捗量を追加
+ * @param userId ユーザーID
+ * @param workProgressId 作業進捗ID
+ * @param amount 追加する進捗量（kg単位、数値）
+ * @param memo メモ（任意）
+ * @param appData 現在のAppData
+ */
+export async function addProgressToWorkProgress(
+  userId: string,
+  workProgressId: string,
+  amount: number,
+  memo?: string,
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
+  
+  if (existingIndex < 0) {
+    throw new Error(`WorkProgress with id ${workProgressId} not found`);
+  }
+  
+  const existing = workProgresses[existingIndex];
+  
+  // 目標量が設定されていない場合はエラー
+  if (existing.targetAmount === undefined) {
+    throw new Error('Target amount is not set');
+  }
+  
+  const now = new Date().toISOString();
+  
+  // 進捗量を累積
+  const currentAmount = (existing.currentAmount || 0) + amount;
+  
+  // 進捗履歴に新しいエントリを追加
+  const newProgressEntry: ProgressEntry = {
+    id: crypto.randomUUID(),
+    date: now,
+    amount,
+    memo: memo?.trim() || undefined,
+  };
+  
+  const progressHistory = [...(existing.progressHistory || []), newProgressEntry];
+  
+  // 目標量に達した場合は進捗状態をcompletedに自動変更
+  let status = existing.status;
+  let completedAt = existing.completedAt;
+  if (currentAmount >= existing.targetAmount && status !== 'completed') {
+    status = 'completed';
+    completedAt = now;
+    // startedAtがない場合は設定
+    if (!existing.startedAt) {
+      existing.startedAt = now;
+    }
+  }
+  
+  const updatedWorkProgress: WorkProgress = {
+    ...existing,
+    currentAmount,
+    progressHistory,
+    status,
+    completedAt,
+    updatedAt: now,
+  };
+  
+  const updatedWorkProgresses = [...workProgresses];
+  updatedWorkProgresses[existingIndex] = updatedWorkProgress;
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
   };
   
   await saveUserData(userId, updatedData);

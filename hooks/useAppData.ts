@@ -20,6 +20,7 @@ export function useAppData() {
     notifications: [],
     encouragementCount: 0,
     roastTimerRecords: [],
+    workProgresses: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const isUpdatingRef = useRef(false);
@@ -89,6 +90,7 @@ export function useAppData() {
         roastTimerState: newData.roastTimerState !== undefined ? newData.roastTimerState : data.roastTimerState,
         defectBeans: newData.defectBeans !== undefined ? newData.defectBeans : data.defectBeans,
         defectBeanSettings: newData.defectBeanSettings !== undefined ? newData.defectBeanSettings : data.defectBeanSettings,
+        workProgresses: Array.isArray(newData.workProgresses) ? newData.workProgresses : data.workProgresses,
       };
 
       isUpdatingRef.current = true;

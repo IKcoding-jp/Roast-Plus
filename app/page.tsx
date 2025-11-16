@@ -18,12 +18,24 @@ import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 // バージョン情報（package.jsonと同期）
 const APP_VERSION = '0.2.4';
 
+const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間（3秒）
+
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [showVersionModal, setShowVersionModal] = useState(false);
   const [showLoadingDebugModal, setShowLoadingDebugModal] = useState(false);
+  const [splashVisible, setSplashVisible] = useState(true);
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
+
+  // スプラッシュ画面の表示時間を管理
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSplashVisible(false);
+    }, SPLASH_DISPLAY_TIME + 300); // フェードアウト時間も考慮
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -68,7 +80,8 @@ export default function HomePage() {
     }
   };
 
-  if (loading) {
+  // スプラッシュ画面が表示されている間は、Loadingを表示しない
+  if (loading && !splashVisible) {
     return <Loading />;
   }
 

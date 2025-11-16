@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { ToastProvider } from "@/components/Toast";
+import { SplashScreen } from "@/components/SplashScreen";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
         <ServiceWorkerRegistration />
+        <SplashScreen />
         <ToastProvider>
           {children}
         </ToastProvider>

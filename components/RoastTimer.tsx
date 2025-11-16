@@ -497,7 +497,7 @@ export function RoastTimer() {
 
       {/* タイマー表示（実行中・一時停止中・完了時のみ表示） */}
       {!isIdle && (
-        <div className="flex-1 flex flex-col items-center justify-center min-h-0 relative px-4 sm:px-6">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-0 relative px-4 sm:px-6 py-8">
           {/* ヘッダーボタン（オーバーレイ） */}
           <Link
             href="/"
@@ -519,28 +519,28 @@ export function RoastTimer() {
           <div className="flex flex-col items-center justify-center w-full">
             {/* タイトル */}
             {(isRunning || isPaused) && (
-              <div className="text-center space-y-1 flex-shrink-0 -mt-4 sm:-mt-6 mb-2 sm:mb-3">
-                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shadow-lg mb-1">
-                  <MdLocalFireDepartment className="text-2xl sm:text-3xl md:text-4xl text-white" />
+              <div className="text-center space-y-2 flex-shrink-0 mb-4 sm:mb-6">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shadow-lg mb-2">
+                  <MdLocalFireDepartment className="text-3xl sm:text-4xl md:text-5xl text-white" />
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">
                   焙煎中
                 </h2>
               </div>
             )}
             {isCompleted && (
-              <div className="text-center space-y-1 flex-shrink-0 -mt-4 sm:-mt-6 mb-2 sm:mb-3">
-                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg mb-1">
-                  <HiCheckCircle className="text-2xl sm:text-3xl md:text-4xl text-white" />
+              <div className="text-center space-y-2 flex-shrink-0 mb-4 sm:mb-6">
+                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg mb-2">
+                  <HiCheckCircle className="text-3xl sm:text-4xl md:text-5xl text-white" />
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">
                   焙煎完了
                 </h2>
               </div>
             )}
 
             {/* 円形プログレスバー */}
-            <div className="relative flex-shrink-0 mb-2 sm:mb-3" style={{ width: circleSize, height: circleSize }}>
+            <div className="relative flex-shrink-0 mb-4 sm:mb-6" style={{ width: circleSize, height: circleSize }}>
               <svg
                 width={circleSize}
                 height={circleSize}
@@ -577,17 +577,17 @@ export function RoastTimer() {
                   {formatTime(Math.floor(remaining))}
                 </div>
                 {state && (
-                  <div className="text-base sm:text-lg md:text-xl text-gray-500 mt-1 sm:mt-2">
+                  <div className="text-base sm:text-lg md:text-xl text-gray-500 mt-2 sm:mt-3">
                     {formatTime(Math.floor(state.elapsed))} / {formatTime(state.duration)}
                   </div>
                 )}
                 {isCompleted && (
-                  <div className="text-sm sm:text-base md:text-lg font-semibold text-green-600 mt-1 sm:mt-2">
+                  <div className="text-sm sm:text-base md:text-lg font-semibold text-green-600 mt-2 sm:mt-3">
                     ロースト完了！
                   </div>
                 )}
                 {isPaused && (
-                  <div className="text-xs sm:text-sm text-amber-600 mt-1 sm:mt-2 font-medium">
+                  <div className="text-xs sm:text-sm md:text-base text-amber-600 mt-2 sm:mt-3 font-medium">
                     一時停止中
                   </div>
                 )}
@@ -596,7 +596,7 @@ export function RoastTimer() {
 
             {/* 実行中の情報表示 */}
             {state && (isRunning || isPaused || isCompleted) && (
-              <div className="text-center space-y-0.5 text-xs sm:text-sm text-gray-600 flex-shrink-0 mb-2 sm:mb-3">
+              <div className="text-center space-y-0.5 text-sm sm:text-base text-gray-600 flex-shrink-0 mb-4 sm:mb-6">
                 {state.beanName && <div>豆の名前: {state.beanName}</div>}
                 {state.weight && <div>重さ: {state.weight}g</div>}
                 {state.roastLevel && <div>焙煎度合い: {state.roastLevel}</div>}
@@ -604,21 +604,21 @@ export function RoastTimer() {
             )}
 
             {/* 操作ボタン */}
-            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center w-full max-w-md flex-shrink-0">
+            <div className="flex flex-wrap gap-3 sm:gap-4 justify-center w-full max-w-md flex-shrink-0">
               {isRunning && (
                 <>
                   <button
                     onClick={handlePause}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-yellow-600 hover:to-yellow-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[52px]"
+                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-yellow-600 hover:to-yellow-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
                   >
-                    <HiPause className="text-xl" />
+                    <HiPause className="text-xl sm:text-2xl" />
                     一時停止
                   </button>
                   <button
                     onClick={handleSkip}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[52px]"
+                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
                   >
-                    <HiFastForward className="text-xl" />
+                    <HiFastForward className="text-xl sm:text-2xl" />
                     スキップ
                   </button>
                 </>
@@ -627,23 +627,23 @@ export function RoastTimer() {
                 <>
                   <button
                     onClick={handleResume}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[52px]"
+                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
                   >
-                    <HiPlay className="text-xl" />
+                    <HiPlay className="text-xl sm:text-2xl" />
                     再開
                   </button>
                   <button
                     onClick={handleSkip}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[52px]"
+                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
                   >
-                    <HiFastForward className="text-xl" />
+                    <HiFastForward className="text-xl sm:text-2xl" />
                     スキップ
                   </button>
                   <button
                     onClick={handleReset}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[52px]"
+                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
                   >
-                    <HiRefresh className="text-xl" />
+                    <HiRefresh className="text-xl sm:text-2xl" />
                     リセット
                   </button>
                 </>
@@ -651,9 +651,9 @@ export function RoastTimer() {
               {isCompleted && (
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[52px]"
+                  className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
                 >
-                  <HiRefresh className="text-xl" />
+                  <HiRefresh className="text-xl sm:text-2xl" />
                   リセット
                 </button>
               )}
@@ -686,28 +686,28 @@ export function RoastTimer() {
           </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）
-            <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6">
+            <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8">
               {/* タイトルセクション */}
-              <div className="text-center space-y-3 mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-md mb-2">
-                  <MdTimer className="text-white text-3xl" />
+              <div className="text-center space-y-4 mb-10 sm:mb-12">
+                <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg mb-3">
+                  <MdTimer className="text-white text-4xl sm:text-5xl" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
+                <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
                   ローストタイマー
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-base sm:text-lg text-gray-500">
                   焙煎時間を設定してスタート
                 </p>
               </div>
 
               {/* 手動入力フィールド */}
-              <div className="space-y-3 max-w-md mx-auto w-full">
-                <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
+              <div className="space-y-4 max-w-md mx-auto w-full mb-8 sm:mb-10">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 uppercase tracking-wide">
                   時間設定
                 </label>
-                <div className="flex gap-3">
+                <div className="flex gap-3 sm:gap-4">
                   <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
                       分 <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -716,14 +716,14 @@ export function RoastTimer() {
                       value={durationMinutes}
                       onChange={(e) => handleDurationMinutesChange(e.target.value)}
                       placeholder="10"
-                      className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                      className="w-full rounded-lg border-2 border-gray-200 px-4 py-3.5 sm:py-4 text-lg sm:text-xl text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[56px] shadow-sm hover:border-gray-300"
                     />
                   </div>
                   <div className="flex items-end pb-2">
-                    <span className="text-2xl font-bold text-gray-400">:</span>
+                    <span className="text-3xl font-bold text-gray-400">:</span>
                   </div>
                   <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-600 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
                       秒
                     </label>
                     <input
@@ -733,14 +733,14 @@ export function RoastTimer() {
                       onChange={(e) => handleDurationSecondsChange(e.target.value)}
                       placeholder="30"
                       maxLength={2}
-                      className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                      className="w-full rounded-lg border-2 border-gray-200 px-4 py-3.5 sm:py-4 text-lg sm:text-xl text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[56px] shadow-sm hover:border-gray-300"
                     />
                   </div>
                 </div>
               </div>
 
               {/* ボタンセクション */}
-              <div className="space-y-3 pt-6 max-w-md mx-auto w-full">
+              <div className="space-y-3 sm:space-y-4 max-w-md mx-auto w-full">
                 {/* 手動スタートボタン */}
                 <button
                   onClick={async () => {
@@ -758,9 +758,9 @@ export function RoastTimer() {
                     await startTimer(duration, 2); // 通知ID: 2=手動
                   }}
                   disabled={!durationMinutes || durationMinutes.trim() === ''}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-bold text-base shadow-md hover:shadow-lg hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[60px] sm:min-h-[64px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
                 >
-                  <HiPlay className="text-xl" />
+                  <HiPlay className="text-xl sm:text-2xl" />
                   <span>手動で焙煎スタート</span>
                 </button>
 
@@ -772,12 +772,12 @@ export function RoastTimer() {
                     setDurationSeconds('');
                     setInputMode('recommended');
                   }}
-                  className="w-full flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-4 py-4 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-lg font-bold text-base shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[56px]"
+                  className="w-full flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-xl font-bold text-base sm:text-lg shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[60px] sm:min-h-[64px]"
                 >
-                  <MdLightbulb className="text-xl text-amber-600" />
-                  <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1">
+                  <MdLightbulb className="text-xl sm:text-2xl text-amber-600" />
+                  <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5">
                     <span>おすすめ焙煎でスタート</span>
-                    <span>※未完成</span>
+                    <span className="text-sm sm:text-base">※未完成</span>
                   </span>
                 </button>
               </div>

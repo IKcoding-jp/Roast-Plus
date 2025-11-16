@@ -7,9 +7,11 @@ import { useAppData } from '@/hooks/useAppData';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
 import { Loading } from '@/components/Loading';
-import { HiHome, HiCalendar, HiClock, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { HiHome, HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCamera } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
+import { ScheduleOCRCapture } from '@/components/ScheduleOCRCapture';
 import LoginPage from '@/app/login/page';
+import type { TimeLabel } from '@/types';
 
 type TabType = 'today' | 'roast';
 
@@ -19,6 +21,7 @@ export default function SchedulePage() {
   const [activeTab, setActiveTab] = useState<TabType>('today');
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [showOCRCapture, setShowOCRCapture] = useState(false);
   
   // 選択中の日付を管理（YYYY-MM-DD形式）
   const getTodayString = () => {
@@ -99,9 +102,24 @@ export default function SchedulePage() {
     return `${year}年${month}月${day}日（${weekday}）`;
   };
 
+  // モバイル用の短縮日付フォーマット関数
+  const formatDateShort = (date: Date): string => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+    const weekday = weekdays[date.getDay()];
+
+    return `${month}/${day}（${weekday}）`;
+  };
+
   const formatDateString = (dateString: string): string => {
     const date = new Date(dateString + 'T00:00:00');
     return formatDate(date);
+  };
+
+  const formatDateStringShort = (dateString: string): string => {
+    const date = new Date(dateString + 'T00:00:00');
+    return formatDateShort(date);
   };
 
   const formatTime = (date: Date): string => {
@@ -135,6 +153,56 @@ export default function SchedulePage() {
   const effectiveToday = isWeekend(today) ? getPreviousWeekday(today) : today;
   const isToday = selectedDate === today; // 実際の今日の日付と比較
 
+  // OCR結果をTimeLabelとして追加
+  const handleOCRComplete = (timeLabels: TimeLabel[]) => {
+    if (!data) return;
+    
+    const todaySchedule = data.todaySchedules?.find(s => s.date === selectedDate);
+    const existingLabels = todaySchedule?.timeLabels || [];
+    
+    // 既存のTimeLabelとマージ（重複を避けるため、時間でチェック）
+    const existingTimes = new Set(existingLabels.map((label) => label.time));
+    const newLabels = timeLabels.filter((label) => !existingTimes.has(label.time));
+    
+    // orderを再設定
+    const maxOrder = existingLabels.length > 0 
+      ? Math.max(...existingLabels.map((label) => label.order || 0))
+      : -1;
+    
+    const labelsWithOrder = newLabels.map((label, index) => ({
+      ...label,
+      order: maxOrder + 1 + index,
+    }));
+
+    const updatedLabels = [...existingLabels, ...labelsWithOrder];
+    
+    // todaySchedulesを更新
+    const existingScheduleIndex = data.todaySchedules?.findIndex(s => s.date === selectedDate) ?? -1;
+    let updatedTodaySchedules: typeof data.todaySchedules;
+    
+    if (existingScheduleIndex >= 0 && data.todaySchedules) {
+      // 既存の日付を更新
+      updatedTodaySchedules = data.todaySchedules.map((s, index) =>
+        index === existingScheduleIndex
+          ? { ...s, timeLabels: updatedLabels }
+          : s
+      );
+    } else {
+      // 新しい日付を追加
+      updatedTodaySchedules = [
+        ...(data.todaySchedules || []),
+        { date: selectedDate, timeLabels: updatedLabels }
+      ];
+    }
+    
+    updateData({
+      ...data,
+      todaySchedules: updatedTodaySchedules,
+    });
+    
+    setShowOCRCapture(false);
+  };
+
   if (authLoading) {
     return <Loading />;
   }
@@ -160,60 +228,77 @@ export default function SchedulePage() {
           >
             <HiHome className="h-6 w-6 flex-shrink-0" />
           </Link>
-          <div className="flex-1 flex justify-end sm:justify-center items-center">
-            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 md:gap-4 px-2 py-0.5 sm:px-5 sm:py-1 md:px-6 md:py-1.5 bg-white border border-gray-200 rounded-md sm:rounded-xl shadow-md">
+          <div className="flex-1 flex justify-end sm:justify-center lg:justify-end items-center">
+            <div className="flex flex-row items-center gap-2.5 sm:gap-3 md:gap-4 px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-white border border-gray-200 rounded-md sm:rounded-xl shadow-md">
               {/* 日付ナビゲーション */}
-              <div className="flex items-center gap-0.5 sm:gap-2.5 md:gap-3">
+              <div className="flex items-center gap-1 sm:gap-2 md:gap-2.5">
                 <button
                   onClick={moveToPreviousDay}
-                  className="flex items-center justify-center min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
+                  className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
                   aria-label="前日"
                 >
-                  <HiChevronLeft className="h-3.5 w-3.5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                  <HiChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </button>
                 <button
                   onClick={() => setIsDatePickerOpen(true)}
-                  className="flex items-center gap-0.5 sm:gap-2.5 md:gap-3 cursor-pointer hover:bg-gray-50 rounded-md px-1 py-0.5 sm:px-2 sm:py-1 transition-colors"
+                  className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 cursor-pointer hover:bg-gray-50 rounded-md px-1.5 py-1 sm:px-2 sm:py-1.5 transition-colors"
                   aria-label="日付を選択"
                 >
-                  <HiCalendar className="h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
-                  <span className="text-base sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
-                    {formatDateString(selectedDate)}
+                  <HiCalendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0" />
+                  <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+                    <span className="sm:hidden">{formatDateStringShort(selectedDate)}</span>
+                    <span className="hidden sm:inline">{formatDateString(selectedDate)}</span>
                   </span>
                 </button>
                 <button
                   onClick={moveToNextDay}
                   disabled={isToday}
-                  className={`flex items-center justify-center min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] rounded-md transition-colors ${
+                  className={`flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-md transition-colors ${
                     isToday
                       ? 'text-gray-300 cursor-not-allowed'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                   aria-label="翌日"
                 >
-                  <HiChevronRight className="h-3.5 w-3.5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                  <HiChevronRight className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </button>
               </div>
-              {/* 区切り線（デスクトップのみ） */}
-              <div className="hidden sm:block w-px h-6 md:h-7 bg-gray-200 mx-1"></div>
+              {/* 区切り線 */}
+              <div className="flex-shrink-0 h-6 sm:h-7 md:h-8 flex items-center">
+                <div className="w-px h-full bg-gray-200"></div>
+              </div>
               {/* 時刻 */}
-              <div className="flex items-center gap-0.5 sm:gap-2.5 md:gap-3">
-                <HiClock className="h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
-                <span className="text-base sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+              <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5">
+                <HiClock className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0" />
+                <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
                   {formatTime(currentTime)}
                 </span>
               </div>
+              {/* 区切り線（デスクトップ版のみ） */}
+              <div className="hidden sm:flex flex-shrink-0 h-6 sm:h-7 md:h-8 items-center">
+                <div className="w-px h-full bg-gray-200"></div>
+              </div>
+              {/* OCRボタン（デスクトップ版のみ） */}
+              <button
+                onClick={() => setShowOCRCapture(true)}
+                className="hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-md bg-primary px-3 sm:px-3.5 md:px-4 py-1.5 sm:py-2 md:py-2 text-xs sm:text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark flex-shrink-0"
+                aria-label="OCRでスケジュールを読み取る"
+                title="ホワイトボードのスケジュールを撮影して読み取る"
+              >
+                <HiCamera className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-4.5 md:w-4.5" />
+                <span>OCR</span>
+              </button>
             </div>
           </div>
           <div className="hidden sm:block flex-shrink-0 w-[140px]"></div>
         </header>
 
-        {/* タブナビゲーション（モバイル版） */}
-        <div className="mb-4 block lg:hidden flex-shrink-0">
-          <nav className="flex gap-2 bg-white rounded-lg shadow p-1 sm:p-2">
+        {/* タブナビゲーション（モバイル版：画面下部に固定） */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-20 px-4 pb-4">
+          <nav className="flex gap-1.5 sm:gap-2 bg-white border-t border-gray-200 shadow-lg p-1.5 sm:p-2">
             <button
               onClick={() => setActiveTab('today')}
-              className={`flex-1 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded transition-colors text-sm sm:text-base md:text-lg min-h-[44px] ${
+              className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-colors text-xs sm:text-sm min-h-[44px] ${
                 activeTab === 'today'
                   ? 'bg-amber-600 text-white'
                   : 'text-gray-700 hover:bg-gray-100'
@@ -221,9 +306,19 @@ export default function SchedulePage() {
             >
               本日のスケジュール
             </button>
+            {/* OCRボタン（モバイル版：タブナビゲーション内） */}
+            <button
+              onClick={() => setShowOCRCapture(true)}
+              className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-md bg-primary w-11 h-11 sm:w-12 sm:h-12 text-xs sm:text-sm font-medium text-white transition-colors hover:bg-primary-dark flex-shrink-0"
+              aria-label="OCRでスケジュールを読み取る"
+              title="ホワイトボードのスケジュールを撮影して読み取る"
+            >
+              <HiCamera className="h-5 w-5 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">OCR</span>
+            </button>
             <button
               onClick={() => setActiveTab('roast')}
-              className={`flex-1 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded transition-colors text-sm sm:text-base md:text-lg min-h-[44px] ${
+              className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-colors text-xs sm:text-sm min-h-[44px] ${
                 activeTab === 'roast'
                   ? 'bg-amber-600 text-white'
                   : 'text-gray-700 hover:bg-gray-100'
@@ -235,7 +330,7 @@ export default function SchedulePage() {
         </div>
 
         {/* コンテンツ */}
-        <main className="flex-1 flex flex-col min-h-0">
+        <main className="flex-1 flex flex-col min-h-0 pb-20 lg:pb-0">
           {/* モバイル版：タブ切替 */}
           <div className="block lg:hidden flex-1 flex flex-col min-h-0">
             {activeTab === 'today' && (
@@ -273,6 +368,14 @@ export default function SchedulePage() {
           onCancel={() => setIsDatePickerOpen(false)}
           isWeekend={isWeekend}
           getTodayString={getTodayString}
+        />
+      )}
+
+      {/* OCRキャプチャコンポーネント */}
+      {showOCRCapture && (
+        <ScheduleOCRCapture
+          onComplete={handleOCRComplete}
+          onCancel={() => setShowOCRCapture(false)}
         />
       )}
     </div>

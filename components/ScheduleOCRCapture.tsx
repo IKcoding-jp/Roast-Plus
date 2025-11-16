@@ -443,7 +443,7 @@ export function ScheduleOCRCapture({ onComplete, onCancel }: ScheduleOCRCaptureP
             </button>
             <button
               onClick={processOCR}
-              className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors min-h-[44px] flex items-center justify-center gap-2"
             >
               <HiCheck className="h-5 w-5" />
               OCR実行

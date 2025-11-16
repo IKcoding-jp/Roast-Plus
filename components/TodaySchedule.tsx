@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { AppData, TodaySchedule, TimeLabel } from '@/types';
-import { HiPlus, HiX, HiClock, HiCamera } from 'react-icons/hi';
-import { ScheduleOCRCapture } from './ScheduleOCRCapture';
+import { HiPlus, HiX, HiClock } from 'react-icons/hi';
 
 interface TodayScheduleProps {
   data: AppData | null;
@@ -67,7 +66,6 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
   });
   const [newHour, setNewHour] = useState<string>('');
   const [newMinute, setNewMinute] = useState<string>('');
-  const [showOCRCapture, setShowOCRCapture] = useState(false);
 
   // localTimeLabelsの長さを追跡
   useEffect(() => {
@@ -431,25 +429,6 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
     );
   };
 
-  // OCR結果をTimeLabelとして追加
-  const handleOCRComplete = (timeLabels: TimeLabel[]) => {
-    // 既存のTimeLabelとマージ（重複を避けるため、時間でチェック）
-    const existingTimes = new Set(localTimeLabels.map((label) => label.time));
-    const newLabels = timeLabels.filter((label) => !existingTimes.has(label.time));
-    
-    // orderを再設定
-    const maxOrder = localTimeLabels.length > 0 
-      ? Math.max(...localTimeLabels.map((label) => label.order || 0))
-      : -1;
-    
-    const labelsWithOrder = newLabels.map((label, index) => ({
-      ...label,
-      order: maxOrder + 1 + index,
-    }));
-
-    setLocalTimeLabels([...localTimeLabels, ...labelsWithOrder]);
-    setShowOCRCapture(false);
-  };
 
   const handleCompositionStart = () => {
     setIsComposing(true);
@@ -481,15 +460,6 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
       <div className="mb-3 md:mb-4 hidden lg:flex flex-row items-center justify-between gap-2">
         <h2 className="hidden lg:block text-base md:text-lg font-semibold text-gray-800 whitespace-nowrap">本日のスケジュール</h2>
         <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
-          <button
-            onClick={() => setShowOCRCapture(true)}
-            className="flex items-center gap-1 md:gap-1.5 rounded-md bg-blue-600 px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-blue-700 min-h-[44px]"
-            aria-label="OCRでスケジュールを読み取る"
-            title="ホワイトボードのスケジュールを撮影して読み取る"
-          >
-            <HiCamera className="h-3 md:h-3.5 w-3 md:w-3.5" />
-            <span className="hidden sm:inline">OCR</span>
-          </button>
           <div className="flex items-center gap-1 md:gap-1.5">
             <input
               type="number"
@@ -535,7 +505,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
           </div>
           <button
             onClick={addTimeLabel}
-            className="flex items-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-amber-700"
+            className="flex items-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark"
             aria-label="時間ラベルを追加"
           >
             <HiPlus className="h-3 md:h-3.5 w-3 md:w-3.5" />
@@ -546,14 +516,14 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
 
       {localTimeLabels.length === 0 ? (
         <div className="flex-1 flex items-center justify-center text-center text-gray-500">
-          <div>
-            <div className="mb-3 md:mb-5 flex justify-center">
-              <HiClock className="h-12 w-12 md:h-20 md:w-20 text-gray-300" />
+            <div>
+              <div className="mb-3 md:mb-5 flex justify-center">
+                <HiClock className="h-12 w-12 md:h-20 md:w-20 text-gray-300" />
+              </div>
+              <p className="text-base md:text-lg font-medium">時間ラベルがありません</p>
+              <p className="mt-1.5 md:mt-3 text-base md:text-base text-gray-400">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
             </div>
-            <p className="text-base md:text-lg font-medium">時間ラベルがありません</p>
-            <p className="mt-1.5 md:mt-3 text-base md:text-base text-gray-400">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
           </div>
-        </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
           <div className="space-y-2 md:space-y-1">
@@ -588,15 +558,6 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
             ))}
             {/* モバイル版：時間入力欄をスケジュールの下に表示 */}
             <div className="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2 pb-2">
-              <button
-                onClick={() => setShowOCRCapture(true)}
-                className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-blue-600 px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-base font-medium text-white transition-colors hover:bg-blue-700 min-w-[44px] min-h-[44px]"
-                aria-label="OCRでスケジュールを読み取る"
-                title="ホワイトボードのスケジュールを撮影して読み取る"
-              >
-                <HiCamera className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                <span className="hidden sm:inline">OCR</span>
-              </button>
               <div className="flex items-center gap-1 md:gap-1.5">
                 <input
                   type="number"
@@ -642,7 +603,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
               </div>
               <button
                 onClick={addTimeLabel}
-                className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
+                className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
                 aria-label="時間ラベルを追加"
               >
                 <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -701,7 +662,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
           </div>
           <button
             onClick={addTimeLabel}
-            className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-amber-600 px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-base font-medium text-white transition-colors hover:bg-amber-700 min-w-[44px] min-h-[44px]"
+            className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
             aria-label="時間ラベルを追加"
           >
             <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -710,13 +671,6 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
         </div>
       )}
 
-      {/* OCRキャプチャコンポーネント */}
-      {showOCRCapture && (
-        <ScheduleOCRCapture
-          onComplete={handleOCRComplete}
-          onCancel={() => setShowOCRCapture(false)}
-        />
-      )}
 
       {/* 時間編集ダイアログ */}
       {editingLabelId && (() => {

@@ -10,7 +10,7 @@ import { TastingSessionDetail } from '@/components/TastingSessionDetail';
 import { TastingRecordForm } from '@/components/TastingRecordForm';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import type { TastingSession, TastingRecord } from '@/types';
-import { HiHome, HiPlus } from 'react-icons/hi';
+import { HiHome, HiPlus, HiFilter } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
 function TastingPageContent() {
@@ -304,7 +304,7 @@ function TastingPageContent() {
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex justify-start w-full sm:w-auto sm:flex-1">
+            <div className="flex justify-between items-center w-full sm:w-auto sm:flex-1">
               <Link
                 href="/"
                 className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
@@ -313,6 +313,7 @@ function TastingPageContent() {
               >
                 <HiHome className="h-6 w-6 flex-shrink-0" />
               </Link>
+              <div id="filter-button-container"></div>
             </div>
             <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-bold text-gray-800">
               試飲感想記録
@@ -333,7 +334,11 @@ function TastingPageContent() {
         </header>
 
         <main className="flex-1 min-h-0 overflow-hidden pb-20 sm:pb-0">
-          <TastingSessionList data={data} onUpdate={updateData} />
+          <TastingSessionList 
+            data={data} 
+            onUpdate={updateData}
+            filterButtonContainerId="filter-button-container"
+          />
         </main>
 
         {/* スマホ用：一番下に固定表示する「セッションを作成」ボタン */}

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaCoffee } from 'react-icons/fa';
-import { HiSearch, HiPlus } from 'react-icons/hi';
+import { HiSearch, HiPlus, HiX, HiFilter } from 'react-icons/hi';
 import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import { TastingSessionCarousel } from './TastingSessionCarousel';
@@ -17,6 +18,7 @@ import {
 interface TastingSessionListProps {
   data: AppData;
   onUpdate: (data: AppData) => void;
+  filterButtonContainerId?: string;
 }
 
 type SortOption = 'newest' | 'oldest' | 'beanName';
@@ -28,7 +30,7 @@ const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎�
   '深煎り',
 ];
 
-export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) {
+export function TastingSessionList({ data, onUpdate, filterButtonContainerId }: TastingSessionListProps) {
   const router = useRouter();
 
   const tastingSessions = Array.isArray(data.tastingSessions)
@@ -47,7 +49,16 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
   const [selectedRoastLevels, setSelectedRoastLevels] = useState<
     Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>
   >([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  
+  // モーダル内で使用する一時的なフィルター状態
+  const [tempSearchQuery, setTempSearchQuery] = useState('');
+  const [tempSortOption, setTempSortOption] = useState<SortOption>('newest');
+  const [tempDateFrom, setTempDateFrom] = useState('');
+  const [tempDateTo, setTempDateTo] = useState('');
+  const [tempSelectedRoastLevels, setTempSelectedRoastLevels] = useState<
+    Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>
+  >([]);
 
   // フィルタリングとソート
   const filteredAndSortedSessions = useMemo(() => {
@@ -136,6 +147,74 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
     );
   };
 
+  // モーダル内での焙煎度合いトグル
+  const handleTempRoastLevelToggle = (
+    level: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
+  ) => {
+    setTempSelectedRoastLevels((prev) =>
+      prev.includes(level)
+        ? prev.filter((l) => l !== level)
+        : [...prev, level]
+    );
+  };
+
+  // フィルターモーダルを開く
+  const handleOpenFilterModal = () => {
+    setTempSearchQuery(searchQuery);
+    setTempSortOption(sortOption);
+    setTempDateFrom(dateFrom);
+    setTempDateTo(dateTo);
+    setTempSelectedRoastLevels(selectedRoastLevels);
+    setIsFilterModalOpen(true);
+  };
+
+  // フィルターモーダルを閉じる
+  const handleCloseFilterModal = () => {
+    setIsFilterModalOpen(false);
+  };
+
+  // フィルターを適用
+  const handleApplyFilters = () => {
+    setSearchQuery(tempSearchQuery);
+    setSortOption(tempSortOption);
+    setDateFrom(tempDateFrom);
+    setDateTo(tempDateTo);
+    setSelectedRoastLevels(tempSelectedRoastLevels);
+    setIsFilterModalOpen(false);
+  };
+
+  // フィルターをリセット
+  const handleResetFilters = () => {
+    setTempSearchQuery('');
+    setTempSortOption('newest');
+    setTempDateFrom('');
+    setTempDateTo('');
+    setTempSelectedRoastLevels([]);
+  };
+
+  // ESCキーでモーダルを閉じる
+  useEffect(() => {
+    if (isFilterModalOpen) {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          handleCloseFilterModal();
+        }
+      };
+      window.addEventListener('keydown', handleEscape);
+      return () => window.removeEventListener('keydown', handleEscape);
+    }
+  }, [isFilterModalOpen]);
+
+  // アクティブなフィルターの数を計算
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (searchQuery.trim()) count++;
+    if (dateFrom) count++;
+    if (dateTo) count++;
+    if (selectedRoastLevels.length > 0) count++;
+    return count;
+  }, [searchQuery, dateFrom, dateTo, selectedRoastLevels]);
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
@@ -176,108 +255,178 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
     );
   }
 
+  // フィルターボタンを外部コンテナにレンダリング
+  const [filterButtonContainer, setFilterButtonContainer] = useState<HTMLElement | null>(null);
+  
+  useEffect(() => {
+    if (filterButtonContainerId) {
+      const container = document.getElementById(filterButtonContainerId);
+      setFilterButtonContainer(container);
+    }
+  }, [filterButtonContainerId]);
+
+  const filterButton = (
+    <button
+      onClick={handleOpenFilterModal}
+      className={`px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] relative ${
+        activeFilterCount > 0 ? 'text-amber-600' : ''
+      }`}
+      title="フィルター"
+      aria-label="フィルター"
+    >
+      <HiFilter className="h-6 w-6 flex-shrink-0" />
+      {activeFilterCount > 0 && (
+        <span className="absolute -top-1 -right-1 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold">
+          {activeFilterCount}
+        </span>
+      )}
+    </button>
+  );
+
   return (
-    <div className="space-y-3 h-full flex flex-col min-h-0">
-      {/* 検索・ソート・フィルタUI */}
-      <div className="bg-white rounded-lg shadow-md p-4 space-y-4 flex-shrink-0">
-        {/* 検索バーとソート */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="豆の名前で検索"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-            />
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={sortOption}
-              onChange={(e) => handleSortChange(e.target.value as SortOption)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-            >
-              <option value="newest">新しい順</option>
-              <option value="oldest">古い順</option>
-              <option value="beanName">豆の名前順</option>
-            </select>
-          </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap"
+    <>
+      {/* フィルターボタンを外部コンテナにPortalでレンダリング */}
+      {filterButtonContainer && createPortal(filterButton, filterButtonContainer)}
+      
+      <div className="space-y-3 h-full flex flex-col min-h-0">
+
+      {/* フィルターモーダル */}
+      {isFilterModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={handleCloseFilterModal}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            {showFilters ? 'フィルタを閉じる' : 'フィルタ'}
-          </button>
-        </div>
-
-        {/* フィルタパネル */}
-        {showFilters && (
-          <div className="border-t border-gray-200 pt-4 space-y-4">
-            {/* 日付範囲 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  開始日
-                </label>
-                <input
-                  type="date"
-                  value={dateFrom}
-                  onChange={(e) => handleDateFromChange(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  終了日
-                </label>
-                <input
-                  type="date"
-                  value={dateTo}
-                  onChange={(e) => handleDateToChange(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-                />
-              </div>
-            </div>
-
-            {/* 焙煎度合い */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                焙煎度合い
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {ROAST_LEVELS.map((level) => (
-                  <label
-                    key={level}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedRoastLevels.includes(level)}
-                      onChange={() => handleRoastLevelToggle(level)}
-                      className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-600"
-                    />
-                    <span className="text-sm text-gray-700">{level}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* フィルタリセット */}
-            {(dateFrom || dateTo || selectedRoastLevels.length > 0) && (
+            {/* ヘッダー */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between z-10">
+              <h2 className="text-xl font-bold text-gray-800">フィルター</h2>
               <button
-                onClick={() => {
-                  setDateFrom('');
-                  setDateTo('');
-                  setSelectedRoastLevels([]);
-                }}
-                className="text-sm text-amber-600 hover:underline"
+                onClick={handleCloseFilterModal}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="閉じる"
               >
-                フィルタをリセット
+                <HiX className="h-6 w-6 text-gray-600" />
               </button>
-            )}
+            </div>
+
+            {/* コンテンツ */}
+            <div className="p-4 sm:p-6 space-y-6">
+              {/* 検索バー */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  豆の名前で検索
+                </label>
+                <input
+                  type="text"
+                  value={tempSearchQuery}
+                  onChange={(e) => setTempSearchQuery(e.target.value)}
+                  placeholder="豆の名前で検索"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+                />
+              </div>
+
+              {/* ソート */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  並び順
+                </label>
+                <select
+                  value={tempSortOption}
+                  onChange={(e) => setTempSortOption(e.target.value as SortOption)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+                >
+                  <option value="newest">新しい順</option>
+                  <option value="oldest">古い順</option>
+                  <option value="beanName">豆の名前順</option>
+                </select>
+              </div>
+
+              {/* 日付範囲 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  日付範囲
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      開始日
+                    </label>
+                    <input
+                      type="date"
+                      value={tempDateFrom}
+                      onChange={(e) => setTempDateFrom(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      終了日
+                    </label>
+                    <input
+                      type="date"
+                      value={tempDateTo}
+                      onChange={(e) => setTempDateTo(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 焙煎度合い */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  焙煎度合い
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {ROAST_LEVELS.map((level) => (
+                    <label
+                      key={level}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={tempSelectedRoastLevels.includes(level)}
+                        onChange={() => handleTempRoastLevelToggle(level)}
+                        className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-600"
+                      />
+                      <span className="text-sm text-gray-700">{level}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* フィルタリセット */}
+              {(tempSearchQuery.trim() || tempDateFrom || tempDateTo || tempSelectedRoastLevels.length > 0) && (
+                <button
+                  onClick={handleResetFilters}
+                  className="text-sm text-amber-600 hover:underline"
+                >
+                  フィルタをリセット
+                </button>
+              )}
+            </div>
+
+            {/* フッター */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 sm:px-6 py-4 flex gap-3">
+              <button
+                onClick={handleCloseFilterModal}
+                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium min-h-[44px]"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleApplyFilters}
+                className="flex-1 px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium min-h-[44px]"
+              >
+                適用
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* 結果数表示 */}
       {filteredAndSortedSessions.length === 0 ? (
@@ -312,6 +461,7 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
           />
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

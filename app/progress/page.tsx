@@ -451,8 +451,8 @@ export default function ProgressPage() {
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             {isDummyWork ? (
-              <div className="text-center py-4 px-3 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
-                <p className="text-sm text-gray-500 mb-1">新しく作業を追加してください</p>
+              <div className="text-center py-6 px-4 bg-gray-50/50 border-2 border-dashed border-gray-300 rounded-lg">
+                <p className="text-sm text-gray-600 mb-3">新しく作業を追加してください</p>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -460,9 +460,10 @@ export default function ProgressPage() {
                     setAddMode('work');
                     setShowAddForm(true);
                   }}
-                  className="px-3 py-1 text-xs font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[32px] shadow-sm"
+                  className="w-full px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center gap-1.5"
                 >
-                  作業を追加
+                  <HiPlus className="h-3.5 w-3.5" />
+                  <span>作業を追加</span>
                 </button>
               </div>
             ) : (
@@ -506,6 +507,7 @@ export default function ProgressPage() {
           const unit = extractUnit(wp.weight);
           return (
             <div className="space-y-3">
+              {/* 進捗バー */}
               <div className="relative w-full bg-gray-100 rounded-full h-3 sm:h-3.5 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
@@ -523,32 +525,34 @@ export default function ProgressPage() {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-xs sm:text-sm">
-                <span className="text-sm font-semibold text-gray-700">
-                  {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="text-xs sm:text-sm text-gray-600">
-                  {(() => {
-                    const remaining = calculateRemaining(wp);
-                    if (remaining === null) return null;
-                    if (remaining <= 0) {
-                      const over = Math.abs(remaining);
-                      return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
-                    }
-                    return `残り${formatAmount(remaining, unit)}${unit}`;
-                  })()}
+              
+              {/* 数量と残り情報 */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-gray-800 mb-1">
+                    {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {(() => {
+                      const remaining = calculateRemaining(wp);
+                      if (remaining === null) return null;
+                      if (remaining <= 0) {
+                        const over = Math.abs(remaining);
+                        return over > 0 ? `目標達成（+${formatAmount(over, unit)}${unit}）` : '完了';
+                      }
+                      return `残り${formatAmount(remaining, unit)}${unit}`;
+                    })()}
+                  </div>
                 </div>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setAddingProgressWorkProgressId(wp.id);
                   }}
-                  className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center gap-1.5 ml-auto whitespace-nowrap shadow-sm"
+                  className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center flex-shrink-0 whitespace-nowrap shadow-sm"
+                  aria-label="進捗を記録"
                 >
-                  <HiPlus className="h-3.5 w-3.5" />
-                  進捗を記録
+                  <HiPlus className="h-4 w-4" />
                 </button>
               </div>
               {wp.completedCount !== undefined && wp.completedCount > 0 && (
@@ -578,10 +582,10 @@ export default function ProgressPage() {
                   e.stopPropagation();
                   setAddingProgressWorkProgressId(wp.id);
                 }}
-                className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center gap-1.5 ml-auto whitespace-nowrap shadow-sm"
+                className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center ml-auto whitespace-nowrap shadow-sm"
+                aria-label="完成数を増減"
               >
-                <HiPencil className="h-3.5 w-3.5" />
-                完成数を増減
+                <HiPencil className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -679,11 +683,11 @@ export default function ProgressPage() {
                 <span className="hidden sm:inline">フィルタ・並び替え</span>
               </button>
               <button
-                onClick={() => setShowModeSelectDialog(true)}
-                className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0"
+                onClick={() => setShowAddGroupForm(true)}
+                className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0 shadow-sm"
               >
                 <HiPlus className="h-4 w-4" />
-                <span className="hidden sm:inline">作業を追加</span>
+                <span>作業グループを作成</span>
               </button>
             </div>
           </div>
@@ -729,30 +733,14 @@ export default function ProgressPage() {
                           className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 w-full"
                         >
                           {/* グループヘッダー */}
-                          <div className="border-b border-gray-200 pb-2 mb-2">
-                            <div className="flex items-start justify-between gap-2">
-                              <div 
-                                className="cursor-pointer hover:bg-gray-50 rounded transition-colors flex-1"
-                                onClick={() => group.groupName && setEditingGroupName(group.groupName)}
-                              >
-                                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
-                                  {groupDisplayName}
-                                </h3>
-                              </div>
-                              {!group.workProgresses.some((wp) => !wp.taskName || wp.taskName.trim() === '') && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setAddingToGroupName(group.groupName || null);
-                                    setAddMode('work');
-                                    setShowAddForm(true);
-                                  }}
-                                  className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] sm:min-h-[40px] flex-shrink-0 shadow-sm"
-                                >
-                                  <HiPlus className="h-3.5 w-3.5" />
-                                  作業を追加
-                                </button>
-                              )}
+                          <div className="border-b border-gray-200 pb-2 mb-3">
+                            <div 
+                              className="cursor-pointer hover:bg-gray-50 rounded transition-colors"
+                              onClick={() => group.groupName && setEditingGroupName(group.groupName)}
+                            >
+                              <h3 className="text-lg sm:text-xl font-bold text-gray-900">
+                                {groupDisplayName}
+                              </h3>
                             </div>
                           </div>
                           {/* グループ内の全作業を状態に関係なく表示 */}
@@ -762,6 +750,23 @@ export default function ProgressPage() {
                                 {renderWorkProgressCard(wp, true, group.groupName)}
                               </div>
                             ))}
+                            {/* 作業を追加ボタン */}
+                            {!group.workProgresses.some((wp) => !wp.taskName || wp.taskName.trim() === '') && (
+                              <div className="pt-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAddingToGroupName(group.groupName || null);
+                                    setAddMode('work');
+                                    setShowAddForm(true);
+                                  }}
+                                  className="w-full px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center gap-1.5"
+                                >
+                                  <HiPlus className="h-3.5 w-3.5" />
+                                  <span>作業を追加</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );

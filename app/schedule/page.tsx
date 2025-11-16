@@ -259,16 +259,18 @@ export default function SchedulePage() {
     <div className="h-screen md:h-[100dvh] lg:h-screen pt-2 pb-4 px-4 sm:py-4 sm:px-4 lg:py-6 lg:px-6 flex flex-col overflow-hidden" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="w-full flex-1 flex flex-col min-h-0 lg:max-w-7xl lg:mx-auto">
         {/* ヘッダー */}
-        <header className="mb-4 flex-shrink-0 flex items-center justify-between">
-          <Link
-            href="/"
-            className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-            title="ホームに戻る"
-            aria-label="ホームに戻る"
-          >
-            <HiHome className="h-6 w-6 flex-shrink-0" />
-          </Link>
-          <div className="flex-1 flex justify-end sm:justify-center lg:justify-end items-center">
+        <header className="mb-4 flex-shrink-0 flex items-center">
+          <div className="flex-1 flex justify-start items-center">
+            <Link
+              href="/"
+              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+              title="ホームに戻る"
+              aria-label="ホームに戻る"
+            >
+              <HiHome className="h-6 w-6 flex-shrink-0" />
+            </Link>
+          </div>
+          <div className="flex-1 flex justify-center items-center">
             <div className="flex flex-row items-center gap-2.5 sm:gap-3 md:gap-4 px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-white border border-gray-200 rounded-md sm:rounded-xl shadow-md">
               {/* 日付ナビゲーション */}
               <div className="flex items-center gap-1 sm:gap-2 md:gap-2.5">
@@ -320,16 +322,18 @@ export default function SchedulePage() {
               </div>
             </div>
           </div>
-          <div className="hidden sm:flex flex-shrink-0 items-center gap-2">
-            <button
-              onClick={() => setIsOCROpen(true)}
-              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center gap-2 min-h-[44px]"
-              title="画像から読み取り"
-              aria-label="画像から読み取り"
-            >
-              <HiCamera className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
-              <span className="hidden md:inline text-sm font-medium">画像から読み取り</span>
-            </button>
+          <div className="flex-1 flex justify-end items-center">
+            <div className="hidden sm:flex items-center gap-2">
+              <button
+                onClick={() => setIsOCROpen(true)}
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                title="画像から読み取り"
+                aria-label="画像から読み取り"
+              >
+                <HiCamera className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
+                <span className="hidden md:inline text-sm font-medium">画像から読み取り</span>
+              </button>
+            </div>
           </div>
         </header>
 

@@ -191,7 +191,7 @@ export default function SchedulePage() {
       // 新しい日付を追加
       updatedTodaySchedules = [
         ...(data.todaySchedules || []),
-        { date: selectedDate, timeLabels: updatedLabels }
+        { id: `today-${selectedDate}`, date: selectedDate, timeLabels: updatedLabels }
       ];
     }
     

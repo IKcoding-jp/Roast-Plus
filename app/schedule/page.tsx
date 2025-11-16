@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
-import { HiArrowLeft, HiCalendar, HiClock, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { HiHome, HiCalendar, HiClock, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
 import LoginPage from '@/app/login/page';
 
@@ -165,10 +165,11 @@ export default function SchedulePage() {
         <header className="mb-4 flex-shrink-0 flex items-center justify-between">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors min-w-[44px] min-h-[44px] flex-shrink-0"
+            className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+            title="ホームに戻る"
+            aria-label="ホームに戻る"
           >
-            <HiArrowLeft className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
-            <span className="text-sm sm:text-base md:text-lg">ホームに戻る</span>
+            <HiHome className="h-6 w-6 flex-shrink-0" />
           </Link>
           <div className="flex-1 flex justify-end sm:justify-center items-center">
             <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 md:gap-4 px-2 py-0.5 sm:px-5 sm:py-1 md:px-6 md:py-1.5 bg-white border border-gray-200 rounded-md sm:rounded-xl shadow-md">

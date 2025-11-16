@@ -10,8 +10,7 @@ import { TastingSessionDetail } from '@/components/TastingSessionDetail';
 import { TastingRecordForm } from '@/components/TastingRecordForm';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import type { TastingSession, TastingRecord } from '@/types';
-import { HiArrowLeft } from 'react-icons/hi';
-import { HiPlus } from 'react-icons/hi';
+import { HiHome, HiPlus } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
 function TastingPageContent() {
@@ -308,10 +307,11 @@ function TastingPageContent() {
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
                 href="/"
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                title="ホームに戻る"
+                aria-label="ホームに戻る"
               >
-                <HiArrowLeft className="text-lg flex-shrink-0" />
-                ホームに戻る
+                <HiHome className="h-6 w-6 flex-shrink-0" />
               </Link>
             </div>
             <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-bold text-gray-800">

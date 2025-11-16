@@ -211,11 +211,11 @@ export default function DefectBeansPage() {
             <div className="flex justify-start">
               <Link
                 href="/"
-                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-1.5 flex-shrink-0 min-h-[40px]"
                 title="ホームに戻る"
-                aria-label="ホームに戻る"
               >
-                <HiHome className="h-6 w-6 flex-shrink-0" />
+                <HiArrowLeft className="text-lg flex-shrink-0" />
+                <span className="hidden sm:inline">ホームに戻る</span>
               </Link>
             </div>
 

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress } from '@/lib/firestore';
-import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection } from 'react-icons/hi';
+import { HiHome, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
@@ -679,17 +679,18 @@ export default function ProgressPage() {
             <div className="flex justify-start">
               <Link
                 href="/"
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                title="ホームに戻る"
+                aria-label="ホームに戻る"
               >
-                <HiArrowLeft className="text-lg flex-shrink-0" />
-                ホームに戻る
+                <HiHome className="h-6 w-6 flex-shrink-0" />
               </Link>
             </div>
 
             {/* 中央: タイトル */}
-            <div className="flex justify-center items-center gap-2 sm:gap-4">
-              <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">作業進捗</h1>
+            <div className="flex justify-center items-center gap-2 sm:gap-4 min-w-0">
+              <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
+              <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">作業進捗</h1>
             </div>
 
             {/* 右側: アクションボタン */}

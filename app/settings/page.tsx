@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
-import { HiArrowLeft } from 'react-icons/hi';
+import { HiHome } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
 export default function SettingsPage() {
@@ -70,10 +70,11 @@ export default function SettingsPage() {
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
                 href="/"
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                title="ホームに戻る"
+                aria-label="ホームに戻る"
               >
-                <HiArrowLeft className="text-lg flex-shrink-0" />
-                ホームに戻る
+                <HiHome className="h-6 w-6 flex-shrink-0" />
               </Link>
             </div>
             <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">

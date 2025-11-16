@@ -7,7 +7,7 @@ import { useAppData } from '@/hooks/useAppData';
 import { AssignmentTable } from '@/components/AssignmentTable';
 import { MemberTeamManagement } from '@/components/MemberTeamManagement';
 import { TaskLabelManagement } from '@/components/TaskLabelManagement';
-import { HiArrowLeft, HiCalendar, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { HiHome, HiCalendar, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
 import LoginPage from '@/app/login/page';
 
@@ -149,10 +149,11 @@ export default function AssignmentPage() {
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
                 href="/"
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                title="ホームに戻る"
+                aria-label="ホームに戻る"
               >
-                <HiArrowLeft className="text-lg flex-shrink-0" />
-                ホームに戻る
+                <HiHome className="h-6 w-6 flex-shrink-0" />
               </Link>
             </div>
             {/* 日付ナビゲーション（担当表タブの時のみ表示） */}

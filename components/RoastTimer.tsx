@@ -10,7 +10,7 @@ import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
-import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiArrowLeft, HiClock } from 'react-icons/hi';
+import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiHome, HiClock } from 'react-icons/hi';
 import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
 import Link from 'next/link';
 
@@ -501,10 +501,11 @@ export function RoastTimer() {
           {/* ヘッダーボタン（オーバーレイ） */}
           <Link
             href="/"
-            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-2 flex-shrink-0"
+            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+            title="ホームに戻る"
+            aria-label="ホームに戻る"
           >
-            <HiArrowLeft className="text-lg flex-shrink-0" />
-            <span className="hidden sm:inline">ホームに戻る</span>
+            <HiHome className="h-6 w-6 flex-shrink-0" />
           </Link>
           <Link
             href="/roast-record"
@@ -667,10 +668,11 @@ export function RoastTimer() {
           {/* ヘッダーボタン（オーバーレイ） */}
           <Link
             href="/"
-            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-2 flex-shrink-0"
+            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+            title="ホームに戻る"
+            aria-label="ホームに戻る"
           >
-            <HiArrowLeft className="text-lg flex-shrink-0" />
-            <span className="hidden sm:inline">ホームに戻る</span>
+            <HiHome className="h-6 w-6 flex-shrink-0" />
           </Link>
           <Link
             href="/roast-record"

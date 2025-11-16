@@ -614,7 +614,12 @@ export default function ProgressPage() {
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              <span>進捗追加履歴 ({wp.progressHistory!.length}件)</span>
+              <span>
+                {wp.targetAmount !== undefined 
+                  ? `目標量追加履歴 (${wp.progressHistory!.length}件)`
+                  : `完成数追加履歴 (${wp.progressHistory!.length}件)`
+                }
+              </span>
               {isHistoryExpanded ? (
                 <HiChevronUp className="h-3.5 w-3.5" />
               ) : (

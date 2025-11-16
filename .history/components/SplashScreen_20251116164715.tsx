@@ -63,8 +63,16 @@ export function SplashScreen() {
       }`}
       style={{ backgroundColor: '#F5F1EB' }}
     >
-      <div className="text-center space-y-8">
-        {/* タイトルを上に */}
+      <div className="text-center">
+        <div className="flex justify-center mb-6">
+          {animationData && (
+            <Lottie
+              animationData={animationData}
+              loop={true}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
+        </div>
         <div
           className={`transition-opacity duration-500 ${
             isTextVisible ? 'opacity-100' : 'opacity-0'
@@ -82,16 +90,6 @@ export function SplashScreen() {
               <div className="h-px w-16 bg-[#8B7355] opacity-30"></div>
             </div>
           </div>
-        </div>
-        {/* アニメーションを下に */}
-        <div className="flex justify-center">
-          {animationData && (
-            <Lottie
-              animationData={animationData}
-              loop={true}
-              style={{ width: 200, height: 200 }}
-            />
-          )}
         </div>
       </div>
     </div>

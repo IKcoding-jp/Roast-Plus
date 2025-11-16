@@ -61,30 +61,10 @@ export function SplashScreen() {
       className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-300 ${
         isFadingOut ? 'opacity-0' : 'opacity-100'
       }`}
-      style={{ backgroundColor: '#F5F1EB' }}
+      style={{ backgroundColor: '#F7F7F5' }}
     >
-      <div className="text-center space-y-8">
-        {/* タイトルを上に */}
-        <div
-          className={`transition-opacity duration-500 ${
-            isTextVisible ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold text-[#2C1810] tracking-[0.1em] leading-tight">
-              ローストプラス
-            </h1>
-            <div className="flex items-center justify-center gap-2">
-              <div className="h-px w-16 bg-[#8B7355] opacity-30"></div>
-              <p className="text-xs text-[#6B5B52] font-light tracking-[0.3em] uppercase">
-                Roast Plus
-              </p>
-              <div className="h-px w-16 bg-[#8B7355] opacity-30"></div>
-            </div>
-          </div>
-        </div>
-        {/* アニメーションを下に */}
-        <div className="flex justify-center">
+      <div className="text-center border-2 border-[#211714] rounded-lg px-12 py-8">
+        <div className="flex justify-center mb-6">
           {animationData && (
             <Lottie
               animationData={animationData}
@@ -92,6 +72,18 @@ export function SplashScreen() {
               style={{ width: 200, height: 200 }}
             />
           )}
+        </div>
+        <div
+          className={`transition-opacity duration-500 ${
+            isTextVisible ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <h1 className="text-4xl font-bold text-[#211714] mb-2">
+            ローストプラス
+          </h1>
+          <p className="text-base text-gray-600 font-light">
+            Roast Plus
+          </p>
         </div>
       </div>
     </div>

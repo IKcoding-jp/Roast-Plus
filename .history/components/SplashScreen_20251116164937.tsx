@@ -71,12 +71,18 @@ export function SplashScreen() {
           }`}
         >
           <div className="space-y-4">
-            <h1 className="text-5xl font-bold text-[#2C1810] tracking-[0.1em] leading-tight">
+            <h1 
+              className="text-5xl font-bold text-[#2C1810] tracking-[0.1em] leading-tight"
+              style={{ fontFamily: 'var(--font-noto-serif-jp)' }}
+            >
               ローストプラス
             </h1>
             <div className="flex items-center justify-center gap-2">
               <div className="h-px w-16 bg-[#8B7355] opacity-30"></div>
-              <p className="text-xs text-[#6B5B52] font-light tracking-[0.3em] uppercase">
+              <p 
+                className="text-xs text-[#6B5B52] font-light tracking-[0.3em] uppercase"
+                style={{ fontFamily: 'var(--font-playfair)' }}
+              >
                 Roast Plus
               </p>
               <div className="h-px w-16 bg-[#8B7355] opacity-30"></div>

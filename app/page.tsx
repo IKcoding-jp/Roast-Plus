@@ -7,7 +7,7 @@ import { PiCoffeeBeanFill } from "react-icons/pi";
 import { RiCalendarScheduleLine, RiBookFill } from "react-icons/ri";
 import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
-import { IoSettings, IoClose, IoInformationCircleOutline } from "react-icons/io5";
+import { IoSettings, IoInformationCircleOutline } from "react-icons/io5";
 import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
 import { VersionUpdateModal } from '@/components/VersionUpdateModal';
@@ -20,7 +20,6 @@ const APP_VERSION = '0.2.4';
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [showBanner, setShowBanner] = useState(true);
   const [showVersionModal, setShowVersionModal] = useState(false);
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
 
@@ -110,28 +109,6 @@ export default function HomePage() {
           </button>
         </div>
       </header>
-
-      {/* バナー通知 */}
-      {showBanner && (
-        <div className="bg-gradient-to-r from-amber-100 to-orange-50 border-b border-amber-300 shadow-sm">
-          <div className="container mx-auto px-3 py-2 sm:px-4 sm:py-2.5">
-            <div className="flex items-start gap-2 max-w-2xl mx-auto">
-              <div className="flex-1">
-                <p className="text-xs sm:text-sm leading-relaxed text-gray-800 font-medium">
-                  ITパスポートは合格しました。ローストタイマーと欠点豆図鑑、作業進捗がある程度完成したので、確認してみてください！
-                </p>
-              </div>
-              <button
-                onClick={() => setShowBanner(false)}
-                className="flex-shrink-0 p-0.5 hover:bg-amber-200 rounded transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center text-gray-700"
-                aria-label="バナーを閉じる"
-              >
-                <IoClose className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 pt-2 sm:pt-3 pb-6 sm:pb-8">

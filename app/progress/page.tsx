@@ -703,7 +703,7 @@ export default function ProgressPage() {
                     aria-label="フィルタと並び替え"
                   >
                     <HiFilter className="h-4 w-4" />
-                    <span className="hidden sm:inline">フィルタ・並び替え</span>
+                    <span className="hidden sm:inline">フィルタ</span>
                   </button>
                   <button
                     onClick={() => setShowAddGroupForm(true)}

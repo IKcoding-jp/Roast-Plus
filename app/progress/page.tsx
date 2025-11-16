@@ -444,7 +444,7 @@ export default function ProgressPage() {
     return (
       <div
         key={wp.id}
-        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-3 space-y-3 bg-white' : 'bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md hover:border-gray-300 transition-all cursor-pointer' : ''}`}
+        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-3 space-y-2.5 bg-white' : 'bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md hover:border-gray-300 transition-all cursor-pointer' : ''}`}
         onClick={!isDummyWork ? () => setEditingWorkProgressId(wp.id) : undefined}
       >
         {/* 作業名と進捗状態 */}
@@ -468,7 +468,7 @@ export default function ProgressPage() {
               </div>
             ) : (
               <>
-                <div className="flex items-center gap-2 flex-wrap mb-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   {wp.taskName && (
                     <p className="text-base font-semibold text-gray-800">{wp.taskName}</p>
                   )}
@@ -479,7 +479,7 @@ export default function ProgressPage() {
                       handleStatusChange(wp.id, e.target.value as WorkProgressStatus);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className={`px-2 py-1 text-sm font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[32px] hover:bg-gray-50 pointer-events-auto`}
+                    className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px] hover:bg-gray-50 pointer-events-auto`}
                   >
                     <option value="pending">前</option>
                     <option value="in_progress">途中</option>
@@ -487,16 +487,8 @@ export default function ProgressPage() {
                   </select>
                 </div>
                 {!isInGroup && wp.weight && (
-                  <p className="text-xs text-gray-600 mb-1">数量: {wp.weight}</p>
+                  <p className="text-xs text-gray-600 mt-1">数量: {wp.weight}</p>
                 )}
-                <div className="flex items-center gap-3 flex-wrap mt-2">
-                  {wp.startedAt && (
-                    <span className="text-xs text-gray-800">開始: {formatDateTime(wp.startedAt)}</span>
-                  )}
-                  {wp.completedAt && (
-                    <span className="text-xs text-gray-800">完了: {formatDateTime(wp.completedAt)}</span>
-                  )}
-                </div>
               </>
             )}
           </div>
@@ -506,33 +498,14 @@ export default function ProgressPage() {
         {!isDummyWork && wp.targetAmount !== undefined && (() => {
           const unit = extractUnit(wp.weight);
           return (
-            <div className="space-y-3">
-              {/* 進捗バー */}
-              <div className="relative w-full bg-gray-100 rounded-full h-3 sm:h-3.5 overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
-                  style={{ width: `${calculateProgressPercentage(wp)}%` }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className={`text-xs sm:text-sm font-bold drop-shadow-sm ${
-                    calculateProgressPercentage(wp) >= 90 
-                      ? 'text-white' 
-                      : calculateProgressPercentage(wp) >= 50 
-                      ? 'text-amber-900' 
-                      : 'text-gray-800'
-                  }`}>
-                    {calculateProgressPercentage(wp).toFixed(0)}%
-                  </span>
-                </div>
-              </div>
-              
-              {/* 数量と残り情報 */}
-              <div className="flex items-center justify-between gap-3">
+            <div className="space-y-2.5">
+              {/* 数量とボタン */}
+              <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-gray-800 mb-1">
+                  <div className="text-sm font-semibold text-gray-800">
                     {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
                   </div>
-                  <div className="text-xs text-gray-600">
+                  <div className="text-xs text-gray-500 mt-0.5">
                     {(() => {
                       const remaining = calculateRemaining(wp);
                       if (remaining === null) return null;
@@ -549,12 +522,43 @@ export default function ProgressPage() {
                     e.stopPropagation();
                     setAddingProgressWorkProgressId(wp.id);
                   }}
-                  className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center flex-shrink-0 whitespace-nowrap shadow-sm"
+                  className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center flex-shrink-0 whitespace-nowrap shadow-sm"
                   aria-label="進捗を記録"
                 >
-                  <HiPlus className="h-4 w-4" />
+                  <HiPlus className="h-3.5 w-3.5" />
                 </button>
               </div>
+              
+              {/* 進捗バー */}
+              <div className="relative w-full bg-gray-100 rounded-full h-2.5 sm:h-3 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                  style={{ width: `${calculateProgressPercentage(wp)}%` }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className={`text-xs font-bold drop-shadow-sm ${
+                    calculateProgressPercentage(wp) >= 90 
+                      ? 'text-white' 
+                      : calculateProgressPercentage(wp) >= 50 
+                      ? 'text-amber-900' 
+                      : 'text-gray-800'
+                  }`}>
+                    {calculateProgressPercentage(wp).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
+              
+              {/* 日付情報 */}
+              {isInGroup && (wp.startedAt || wp.completedAt) && (
+                <div className="flex items-center gap-2.5 flex-wrap text-xs text-gray-500">
+                  {wp.startedAt && (
+                    <span>開始: {formatDateTime(wp.startedAt)}</span>
+                  )}
+                  {wp.completedAt && (
+                    <span>完了: {formatDateTime(wp.completedAt)}</span>
+                  )}
+                </div>
+              )}
               {wp.completedCount !== undefined && wp.completedCount > 0 && (
                 <div className="mt-3 flex items-center gap-1.5">
                   <span className="text-xs text-gray-600">完成数:</span>
@@ -582,10 +586,10 @@ export default function ProgressPage() {
                   e.stopPropagation();
                   setAddingProgressWorkProgressId(wp.id);
                 }}
-                className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center ml-auto whitespace-nowrap shadow-sm"
+                className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center ml-auto whitespace-nowrap shadow-sm"
                 aria-label="完成数を増減"
               >
-                <HiPencil className="h-4 w-4" />
+                <HiPencil className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -593,32 +597,32 @@ export default function ProgressPage() {
 
         {/* メモ */}
         {!isDummyWork && wp.memo && (
-          <p className={`text-xs text-gray-500 whitespace-pre-wrap line-clamp-2 ${!isInGroup ? 'mb-2' : ''}`}>{wp.memo}</p>
+          <p className={`text-xs text-gray-500 whitespace-pre-wrap line-clamp-2 ${!isInGroup ? 'mb-2' : 'mt-2'}`}>{wp.memo}</p>
         )}
 
         {/* 進捗追加履歴 */}
         {!isDummyWork && hasProgressHistory && (
-          <div className="mt-3 pt-3 border-t border-gray-200 bg-gray-50 rounded-lg p-2 -mx-2">
+          <div className="mt-2.5 pt-2 border-t border-gray-100">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleHistory(wp.id);
               }}
-              className={`w-full flex items-center justify-between text-xs transition-colors rounded-lg px-2 py-1.5 ${
+              className={`w-full flex items-center justify-between text-xs transition-colors px-1 py-1 ${
                 isHistoryExpanded 
-                  ? 'bg-gray-50 text-gray-800' 
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'text-gray-700' 
+                  : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              <span className="font-medium">進捗追加履歴 ({wp.progressHistory!.length}件)</span>
+              <span>進捗追加履歴 ({wp.progressHistory!.length}件)</span>
               {isHistoryExpanded ? (
-                <HiChevronUp className="h-4 w-4 text-amber-600" />
+                <HiChevronUp className="h-3.5 w-3.5" />
               ) : (
-                <HiChevronDown className="h-4 w-4" />
+                <HiChevronDown className="h-3.5 w-3.5" />
               )}
             </button>
             {isHistoryExpanded && (
-              <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+              <div className="mt-1.5 space-y-1.5 max-h-64 overflow-y-auto">
                 {[...wp.progressHistory!]
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .map((entry) => {
@@ -627,24 +631,23 @@ export default function ProgressPage() {
                     return (
                       <div
                         key={entry.id}
-                        className="bg-gray-50 rounded p-2.5 text-xs border border-gray-200"
+                        className="text-xs text-gray-600 py-1"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-gray-800">
-                              {formatAmount(entry.amount, unit)}{unit}
-                              {isCompletedCount && '（完成数）'}
-                            </div>
-                            <div className="text-sm text-gray-500 mt-1 mb-1">
-                              {formatDateTime(entry.date)}
-                            </div>
-                            {entry.memo && (
-                              <div className="text-gray-700 mt-1 whitespace-pre-wrap">
-                                {entry.memo}
-                              </div>
-                            )}
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-700">
+                            {formatAmount(entry.amount, unit)}{unit}
+                            {isCompletedCount && '（完成数）'}
+                          </span>
+                          <span className="text-gray-400">·</span>
+                          <span className="text-gray-500">
+                            {formatDateTime(entry.date)}
+                          </span>
                         </div>
+                        {entry.memo && (
+                          <div className="text-gray-500 mt-0.5 text-xs whitespace-pre-wrap">
+                            {entry.memo}
+                          </div>
+                        )}
                       </div>
                     );
                   })}

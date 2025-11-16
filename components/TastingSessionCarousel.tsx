@@ -7,7 +7,6 @@ import { IoCreateOutline } from 'react-icons/io5';
 import { FaCoffee } from 'react-icons/fa';
 import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
-import { StarRating } from './StarRating';
 import {
   calculateAverageScores,
   getActiveMemberCount,
@@ -154,12 +153,6 @@ export function TastingSessionCarousel({
                           <p className="text-sm text-gray-500">
                             まだ記録がありません
                           </p>
-                        </div>
-                      )}
-                      {/* 星評価 - 中央よりに配置 */}
-                      {recordCount > 0 && (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-                          <StarRating rating={averageScores.overallRating} size="md" />
                         </div>
                       )}
                     </div>

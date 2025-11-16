@@ -368,12 +368,6 @@ export function TastingRecordForm({
           onChange={setAroma}
           description="コーヒーの香りの強さや豊かさ"
         />
-        <SliderInput 
-          label="総合" 
-          value={overallRating} 
-          onChange={setOverallRating}
-          description="コーヒーの全体的な評価"
-        />
       </div>
 
       {/* レーダーチャートプレビュー */}

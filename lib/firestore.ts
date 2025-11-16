@@ -679,8 +679,8 @@ export async function updateDefectBeanSetting(
 function extractTargetAmount(weight?: string): number | undefined {
   if (!weight) return undefined;
   
-  // 正規表現で数値を抽出（小数点を含む、単位はkg、個、枚などに対応）
-  const match = weight.match(/^(\d+(?:\.\d+)?)\s*(kg|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
+  // 正規表現で数値を抽出（小数点を含む、単位はkg、g、個、枚などに対応）
+  const match = weight.match(/^(\d+(?:\.\d+)?)\s*(kg|g|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
   if (match && match[1]) {
     const amount = parseFloat(match[1]);
     return isNaN(amount) ? undefined : amount;
@@ -698,7 +698,7 @@ function extractUnit(weight?: string): string {
   if (!weight) return '';
   
   // 正規表現で単位を抽出
-  const match = weight.match(/^\d+(?:\.\d+)?\s*(kg|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
+  const match = weight.match(/^\d+(?:\.\d+)?\s*(kg|g|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
   return match && match[1] ? match[1] : '';
 }
 

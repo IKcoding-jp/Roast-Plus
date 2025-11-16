@@ -1159,23 +1159,40 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
     : null;
   const [progressType, setProgressType] = useState<'target' | 'count' | null>(initialProgressType);
   
-  // 進捗管理方式に応じて初期値を設定
-  const initialWeight = (initialProgressType === 'target') 
-    ? (workProgress?.weight || initialValues?.weight || '')
-    : '';
-  const initialCompletedCount = (initialProgressType === 'count')
-    ? (workProgress?.completedCount?.toString() || '')
-    : '';
-  
-  const [weight, setWeight] = useState(initialWeight);
-  const [completedCount, setCompletedCount] = useState<string>(initialCompletedCount);
-
   // 単位を抽出
   const extractUnit = (weight?: string): string => {
     if (!weight) return '';
-    const match = weight.match(/^\d+(?:\.\d+)?\s*(kg|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
+    const match = weight.match(/^\d+(?:\.\d+)?\s*(kg|g|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
     return match && match[1] ? match[1] : '';
   };
+
+  // 数値と単位を分離
+  const parseWeight = (weightStr?: string): { amount: string; unit: string } => {
+    if (!weightStr) return { amount: '', unit: '個' };
+    const match = weightStr.match(/^(\d+(?:\.\d+)?)\s*(kg|g|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
+    if (match) {
+      return { amount: match[1] || '', unit: match[2] || '個' };
+    }
+    return { amount: '', unit: '個' };
+  };
+
+  // 進捗管理方式に応じて初期値を設定
+  const initialWeightData = (initialProgressType === 'target') 
+    ? parseWeight(workProgress?.weight || initialValues?.weight)
+    : { amount: '', unit: '個' };
+  const initialCompletedCountData = (initialProgressType === 'count')
+    ? { 
+        amount: (workProgress?.completedCount?.toString() || ''), 
+        unit: extractUnit(workProgress?.weight || initialValues?.weight) || '個' 
+      }
+    : { amount: '', unit: '個' };
+  
+  const [weightAmount, setWeightAmount] = useState(initialWeightData.amount);
+  const [weightUnit, setWeightUnit] = useState(initialWeightData.unit);
+  const [completedCountAmount, setCompletedCountAmount] = useState<string>(initialCompletedCountData.amount);
+  const [completedCountUnit, setCompletedCountUnit] = useState<string>(initialCompletedCountData.unit);
+  
+  const availableUnits = ['kg', 'g', '個', '枚', '袋', '箱'];
 
   // 数値を単位に応じてフォーマット（kgの場合は小数点第1位、それ以外は整数）
   const formatAmount = (amount: number, unit: string): string => {
@@ -1206,39 +1223,39 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
     // 選択された進捗管理方式に応じてデータを設定
     if (progressType === 'target') {
       // 目標量で管理する場合
-      workProgressData.weight = weight.trim() || undefined;
-      workProgressData.completedCount = undefined; // 目標量を選択した場合は完成数をクリア
-      
-      // weightから目標量を抽出
-      if (weight.trim()) {
-        const match = weight.trim().match(/^(\d+(?:\.\d+)?)\s*(kg|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
-        if (match) {
-          const amount = parseFloat(match[1]);
-          if (!isNaN(amount) && amount > 0) {
-            workProgressData.targetAmount = amount;
-          }
+      if (weightAmount.trim()) {
+        const amount = parseFloat(weightAmount.trim());
+        if (!isNaN(amount) && amount > 0) {
+          workProgressData.weight = `${amount}${weightUnit}`;
+          workProgressData.targetAmount = amount;
+        } else {
+          workProgressData.weight = undefined;
+          workProgressData.targetAmount = undefined;
         }
       } else {
+        workProgressData.weight = undefined;
         workProgressData.targetAmount = undefined;
       }
+      workProgressData.completedCount = undefined; // 目標量を選択した場合は完成数をクリア
     } else if (progressType === 'count') {
       // 完成数で管理する場合
-      workProgressData.weight = undefined;
+      if (completedCountAmount.trim()) {
+        const count = parseInt(completedCountAmount.trim(), 10);
+        if (!isNaN(count) && count >= 0) {
+          workProgressData.completedCount = count;
+          // 完成数にも単位を保存（weightフィールドに保存）
+          workProgressData.weight = `${count}${completedCountUnit}`;
+        } else {
+          workProgressData.completedCount = 0;
+          workProgressData.weight = `0${completedCountUnit}`;
+        }
+      } else {
+        workProgressData.completedCount = 0;
+        workProgressData.weight = `0${completedCountUnit}`;
+      }
       workProgressData.targetAmount = undefined; // 完成数を選択した場合は目標量をクリア
       workProgressData.currentAmount = undefined; // 進捗量もクリア
       workProgressData.progressHistory = undefined; // 進捗履歴もクリア
-      
-      // completedCountが入力されている場合は数値に変換、未入力の場合は0を設定
-      if (completedCount.trim()) {
-        const count = parseInt(completedCount.trim(), 10);
-        if (!isNaN(count) && count >= 0) {
-          workProgressData.completedCount = count;
-        } else {
-          workProgressData.completedCount = 0; // 無効な値の場合は0を設定
-        }
-      } else {
-        workProgressData.completedCount = 0; // 未入力の場合は0を設定
-      }
     } else {
       // 未選択の場合、両方ともクリア
       workProgressData.weight = undefined;
@@ -1347,8 +1364,8 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                   checked={progressType === null}
                   onChange={(e) => {
                     setProgressType(null);
-                    setWeight('');
-                    setCompletedCount('');
+                    setWeightAmount('');
+                    setCompletedCountAmount('');
                   }}
                   className="w-4 h-4 text-amber-600 border-gray-300 focus:ring-amber-500"
                 />
@@ -1362,10 +1379,10 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                   checked={progressType === 'target'}
                   onChange={(e) => {
                     setProgressType('target');
-                    setCompletedCount(''); // 切り替え時にクリア
+                    setCompletedCountAmount(''); // 切り替え時にクリア
                     // 既存のweightがない場合は空にする
                     if (!workProgress?.weight && !initialValues?.weight) {
-                      setWeight('');
+                      setWeightAmount('');
                     }
                   }}
                   className="w-4 h-4 text-amber-600 border-gray-300 focus:ring-amber-500"
@@ -1380,10 +1397,10 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                   checked={progressType === 'count'}
                   onChange={(e) => {
                     setProgressType('count');
-                    setWeight(''); // 切り替え時にクリア
+                    setWeightAmount(''); // 切り替え時にクリア
                     // 既存のcompletedCountがない場合は空にする
                     if (workProgress?.completedCount === undefined && initialValues?.completedCount === undefined) {
-                      setCompletedCount('');
+                      setCompletedCountAmount('');
                     }
                   }}
                   className="w-4 h-4 text-amber-600 border-gray-300 focus:ring-amber-500"
@@ -1398,16 +1415,31 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               <label htmlFor="weight" className="block text-sm font-medium text-gray-700 mb-2">
                 数量（目標量）
               </label>
-              <input
-                type="text"
-                id="weight"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
-                placeholder="例: 200枚、10kg、5個"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  id="weight"
+                  value={weightAmount}
+                  onChange={(e) => setWeightAmount(e.target.value)}
+                  step="0.1"
+                  min="0"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                  placeholder="例: 200"
+                />
+                <select
+                  value={weightUnit}
+                  onChange={(e) => setWeightUnit(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                >
+                  {availableUnits.map((unit) => (
+                    <option key={unit} value={unit}>
+                      {unit}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <p className="mt-1 text-xs text-gray-500">
-                単位付きで入力してください（例: 200枚、10kg、5個）。目標量として使用されます。
+                数量と単位を選択してください。目標量として使用されます。
               </p>
             </div>
           )}
@@ -1417,17 +1449,30 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               <label htmlFor="completedCount" className="block text-sm font-medium text-gray-700 mb-2">
                 完成数（任意）
               </label>
-              <input
-                type="number"
-                id="completedCount"
-                value={completedCount}
-                onChange={(e) => setCompletedCount(e.target.value)}
-                min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
-                placeholder="例: 120"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  id="completedCount"
+                  value={completedCountAmount}
+                  onChange={(e) => setCompletedCountAmount(e.target.value)}
+                  min="0"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                  placeholder="例: 120"
+                />
+                <select
+                  value={completedCountUnit}
+                  onChange={(e) => setCompletedCountUnit(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                >
+                  {availableUnits.map((unit) => (
+                    <option key={unit} value={unit}>
+                      {unit}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <p className="mt-1 text-xs text-gray-500">
-                完成した個数を入力してください。
+                完成した数量と単位を選択してください。
               </p>
             </div>
           )}

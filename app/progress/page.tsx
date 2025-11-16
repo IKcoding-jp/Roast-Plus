@@ -479,7 +479,7 @@ export default function ProgressPage() {
                       handleStatusChange(wp.id, e.target.value as WorkProgressStatus);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className="px-2 py-1 text-xs font-medium rounded border bg-gray-50 text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] hover:bg-gray-100 pointer-events-auto"
+                    className="px-2 py-1 md:px-1.5 md:py-0.5 text-xs md:text-[10px] font-medium rounded border bg-gray-50 text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] md:min-h-[32px] hover:bg-gray-100 pointer-events-auto"
                   >
                     <option value="pending">前</option>
                     <option value="in_progress">途中</option>
@@ -522,10 +522,10 @@ export default function ProgressPage() {
                     e.stopPropagation();
                     setAddingProgressWorkProgressId(wp.id);
                   }}
-                  className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center gap-1 flex-shrink-0 whitespace-nowrap shadow-sm"
+                  className="px-2.5 py-1 md:px-2 md:py-0.5 text-xs md:text-[10px] font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors min-h-[44px] md:min-h-[32px] min-w-[44px] md:min-w-[32px] flex items-center justify-center gap-1 md:gap-0.5 flex-shrink-0 whitespace-nowrap shadow-sm"
                   aria-label="進捗を記録"
                 >
-                  <HiPlus className="h-3 w-3" />
+                  <HiPlus className="h-3 w-3 md:h-2.5 md:w-2.5" />
                   <span>記録</span>
                 </button>
               </div>
@@ -585,10 +585,10 @@ export default function ProgressPage() {
                   e.stopPropagation();
                   setAddingProgressWorkProgressId(wp.id);
                 }}
-                className="ml-auto px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center gap-1 whitespace-nowrap shadow-sm"
+                className="ml-auto px-2.5 py-1 md:px-2 md:py-0.5 text-xs md:text-[10px] font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors min-h-[44px] md:min-h-[32px] min-w-[44px] md:min-w-[32px] flex items-center justify-center gap-1 md:gap-0.5 whitespace-nowrap shadow-sm"
                 aria-label="完成数を記録"
               >
-                <HiPlus className="h-3 w-3" />
+                <HiPlus className="h-3 w-3 md:h-2.5 md:w-2.5" />
                 <span>記録</span>
               </button>
             </div>

@@ -509,7 +509,7 @@ export function RoastTimer() {
           </Link>
           <Link
             href="/roast-record"
-            className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
             aria-label="ロースト履歴一覧"
           >
             <HiClock className="text-lg flex-shrink-0" />
@@ -664,49 +664,51 @@ export function RoastTimer() {
 
       {/* 設定フォーム（idle状態のみ表示） */}
       {isIdle && (
-        <div className="bg-white rounded-2xl shadow-xl pt-16 sm:pt-20 p-4 sm:p-6 flex-1 flex flex-col min-h-0 overflow-y-auto relative max-w-sm sm:max-w-2xl md:max-w-4xl mx-auto w-full">
-          {/* ヘッダーボタン（オーバーレイ） */}
-          <Link
-            href="/"
-            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-            title="ホームに戻る"
-            aria-label="ホームに戻る"
-          >
-            <HiHome className="h-6 w-6 flex-shrink-0" />
-          </Link>
-          <Link
-            href="/roast-record"
-            className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
-            aria-label="ロースト履歴一覧"
-          >
-            <HiClock className="text-lg flex-shrink-0" />
-            <span className="whitespace-nowrap">ロースト履歴</span>
-          </Link>
+        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
+          {/* ヘッダーボタン */}
+          <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start pointer-events-none">
+            <Link
+              href="/"
+              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] pointer-events-auto"
+              title="ホームに戻る"
+              aria-label="ホームに戻る"
+            >
+              <HiHome className="h-6 w-6 flex-shrink-0" />
+            </Link>
+            <Link
+              href="/roast-record"
+              className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0 pointer-events-auto"
+              aria-label="ロースト履歴一覧"
+            >
+              <HiClock className="text-lg flex-shrink-0" />
+              <span className="whitespace-nowrap">ロースト履歴</span>
+            </Link>
+          </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）
-            <div className="flex-1 flex flex-col items-center justify-center space-y-6 sm:space-y-8">
-              {/* タイトルセクション */}
-              <div className="text-center space-y-2">
-                <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg mb-4">
-                  <MdTimer className="text-white text-3xl sm:text-4xl" />
+            <div className="flex-1 flex flex-col items-center justify-center p-4">
+              <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8 space-y-7">
+                {/* タイトルセクション */}
+                <div className="text-center space-y-3">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-md mb-2">
+                    <MdTimer className="text-white text-3xl" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    ローストタイマー
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    焙煎時間を設定してスタート
+                  </p>
                 </div>
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-                  ローストタイマー
-                </h3>
-                <p className="text-sm sm:text-base text-gray-500 mt-2">
-                  焙煎時間を設定してスタート
-                </p>
-              </div>
 
-              <div className="w-full max-w-md space-y-6">
                 {/* 手動入力フィールド */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
                     時間設定
                   </label>
-                  <div className="flex gap-3 sm:gap-4">
+                  <div className="flex gap-3">
                     <div className="flex-1">
-                      <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
+                      <label className="block text-xs font-medium text-gray-600 mb-2">
                         分 <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -715,14 +717,14 @@ export function RoastTimer() {
                         value={durationMinutes}
                         onChange={(e) => handleDurationMinutesChange(e.target.value)}
                         placeholder="10"
-                        className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                        className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
                       />
                     </div>
                     <div className="flex items-end pb-2">
                       <span className="text-2xl font-bold text-gray-400">:</span>
                     </div>
                     <div className="flex-1">
-                      <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
+                      <label className="block text-xs font-medium text-gray-600 mb-2">
                         秒
                       </label>
                       <input
@@ -732,7 +734,7 @@ export function RoastTimer() {
                         onChange={(e) => handleDurationSecondsChange(e.target.value)}
                         placeholder="30"
                         maxLength={2}
-                        className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                        className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
                       />
                     </div>
                   </div>
@@ -757,9 +759,9 @@ export function RoastTimer() {
                       await startTimer(duration, 2); // 通知ID: 2=手動
                     }}
                     disabled={!durationMinutes || durationMinutes.trim() === ''}
-                    className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-bold text-base shadow-md hover:shadow-lg hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
                   >
-                    <HiPlay className="text-2xl" />
+                    <HiPlay className="text-xl" />
                     <span>手動で焙煎スタート</span>
                   </button>
 
@@ -771,9 +773,9 @@ export function RoastTimer() {
                       setDurationSeconds('');
                       setInputMode('recommended');
                     }}
-                    className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-xl font-bold text-base sm:text-lg shadow-md hover:shadow-lg hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[56px]"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-lg font-bold text-base shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[56px]"
                   >
-                    <MdLightbulb className="text-2xl text-amber-600" />
+                    <MdLightbulb className="text-xl text-amber-600" />
                     <span>おすすめ焙煎でスタート</span>
                   </button>
                 </div>
@@ -781,7 +783,7 @@ export function RoastTimer() {
             </div>
           ) : inputMode === 'manual' ? (
             // 手動入力モード
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col pt-16 px-4 sm:px-6">
               <div className="flex items-center justify-between mb-6 flex-shrink-0">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
@@ -850,7 +852,7 @@ export function RoastTimer() {
             </div>
           ) : (
             // おすすめモード
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col pt-16 px-4 sm:px-6">
               <div className="flex items-center justify-between mb-6 flex-shrink-0">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">

@@ -8,7 +8,7 @@ import { useAppData } from '@/hooks/useAppData';
 import { RoastRecordForm } from '@/components/RoastRecordForm';
 import { RoastRecordList } from '@/components/RoastRecordList';
 import type { RoastTimerRecord } from '@/types';
-import { HiHome, HiPlus } from 'react-icons/hi';
+import { HiHome, HiPlus, HiArrowLeft } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
 function RoastRecordPageContent() {

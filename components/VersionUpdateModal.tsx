@@ -26,7 +26,7 @@ const SLIDES: Slide[] = [
   },
   {
     icon: <RiBookFill className="h-16 w-16 sm:h-20 sm:w-20 text-amber-600" />,
-    title: '欠点豆図鑑 β版',
+    title: 'コーヒー豆図鑑 β版',
     description: '欠点豆の種類を確認・学習できる図鑑機能です。各欠点豆の特徴や見分け方を詳しく学べます。',
   },
   {

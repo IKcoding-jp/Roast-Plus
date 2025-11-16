@@ -664,6 +664,11 @@ export default function ProgressPage() {
     );
   };
 
+  // エンプティステートの条件を判定
+  const isEmpty = groupedWorkProgresses.groups.length === 0 && groupedWorkProgresses.ungrouped.length === 0;
+  const hasFilters = filterTaskName || filterStatus !== 'all';
+  const showEmptyState = isEmpty && !hasFilters;
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-7xl">
@@ -681,23 +686,25 @@ export default function ProgressPage() {
               <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">作業進捗</h1>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
-              <button
-                onClick={() => setShowFilterDialog(true)}
-                className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center gap-1.5 min-h-[36px]"
-                aria-label="フィルタと並び替え"
-              >
-                <HiFilter className="h-4 w-4" />
-                <span className="hidden sm:inline">フィルタ・並び替え</span>
-              </button>
-              <button
-                onClick={() => setShowAddGroupForm(true)}
-                className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0 shadow-sm"
-              >
-                <HiPlus className="h-4 w-4" />
-                <span>作業グループを作成</span>
-              </button>
-            </div>
+            {!showEmptyState && (
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
+                <button
+                  onClick={() => setShowFilterDialog(true)}
+                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center gap-1.5 min-h-[36px]"
+                  aria-label="フィルタと並び替え"
+                >
+                  <HiFilter className="h-4 w-4" />
+                  <span className="hidden sm:inline">フィルタ・並び替え</span>
+                </button>
+                <button
+                  onClick={() => setShowAddGroupForm(true)}
+                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0 shadow-sm"
+                >
+                  <HiPlus className="h-4 w-4" />
+                  <span>作業グループを作成</span>
+                </button>
+              </div>
+            )}
           </div>
         </header>
 

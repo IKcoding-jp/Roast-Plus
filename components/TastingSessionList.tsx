@@ -3,8 +3,8 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { IoCreateOutline } from 'react-icons/io5';
 import { FaCoffee } from 'react-icons/fa';
+import { HiSearch, HiPlus } from 'react-icons/hi';
 import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import { TastingSessionCarousel } from './TastingSessionCarousel';
@@ -143,11 +143,35 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
 
   if (tastingSessions.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-600">試飲セッションがありません</p>
-        <p className="text-sm text-gray-500 mt-2">
-          右下のボタンから新規セッションを作成できます
-        </p>
+      <div className="py-12 sm:py-16 text-center">
+        <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
+          {/* アイコン */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-amber-100 rounded-full blur-xl opacity-50"></div>
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-amber-50 flex items-center justify-center">
+              <FaCoffee className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+            </div>
+          </div>
+          
+          {/* メッセージ */}
+          <div className="space-y-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+              試飲セッションがありません
+            </h3>
+            <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
+              最初の試飲セッションを作成して、コーヒーの感想を記録しましょう。
+            </p>
+          </div>
+          
+          {/* アクションボタン */}
+          <Link
+            href="/tasting/sessions/new"
+            className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+          >
+            <HiPlus className="w-5 h-5" />
+            <span className="font-medium">セッションを作成</span>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -257,8 +281,26 @@ export function TastingSessionList({ data, onUpdate }: TastingSessionListProps) 
 
       {/* 結果数表示 */}
       {filteredAndSortedSessions.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-md flex-shrink-0">
-          <p className="text-gray-600">検索条件に一致するセッションがありません</p>
+        <div className="py-12 sm:py-16 text-center flex-shrink-0">
+          <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
+            {/* アイコン */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-amber-100 rounded-full blur-xl opacity-50"></div>
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-amber-50 flex items-center justify-center">
+                <HiSearch className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+              </div>
+            </div>
+            
+            {/* メッセージ */}
+            <div className="space-y-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                検索条件に一致するセッションがありません
+              </h3>
+              <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
+                別のキーワードで検索するか、フィルタを変更してみてください。
+              </p>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="flex-1 min-h-0 overflow-y-hidden">

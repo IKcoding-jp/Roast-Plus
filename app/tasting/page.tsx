@@ -298,11 +298,13 @@ function TastingPageContent() {
   }
 
   // 一覧表示（デフォルト）
+  const isEmpty = tastingSessions.length === 0;
+  
   return (
     <div className="h-screen overflow-y-hidden bg-amber-50 flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4">
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
               <Link
                 href="/"
@@ -312,18 +314,20 @@ function TastingPageContent() {
                 ホームに戻る
               </Link>
             </div>
-            <h1 className="hidden sm:block w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
+            <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-bold text-gray-800">
               試飲感想記録
             </h1>
             <div className="flex justify-end w-full sm:w-auto sm:flex-1">
-              <Link
-                href="/tasting/sessions/new"
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
-                aria-label="新規セッション作成"
-              >
-                <HiPlus className="text-lg flex-shrink-0" />
-                <span className="whitespace-nowrap">セッションを作成</span>
-              </Link>
+              {!isEmpty && (
+                <Link
+                  href="/tasting/sessions/new"
+                  className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+                  aria-label="新規セッション作成"
+                >
+                  <HiPlus className="text-lg flex-shrink-0" />
+                  <span className="whitespace-nowrap">セッションを作成</span>
+                </Link>
+              )}
             </div>
           </div>
         </header>

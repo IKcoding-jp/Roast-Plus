@@ -206,7 +206,7 @@ export default function DefectBeansPage() {
         {/* ヘッダー */}
         <header className="mb-4">
           {/* タイトルとナビゲーション（一番上、同じ行） */}
-          <div className="flex items-center justify-between mb-3">
+          <div className="relative flex items-center mb-3">
             {/* 左側: ホームに戻る */}
             <Link
               href="/"
@@ -218,7 +218,7 @@ export default function DefectBeansPage() {
             </Link>
 
             {/* 中央: タイトル */}
-            <div className="flex items-center gap-3 flex-1 justify-center">
+            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
               <RiBookFill className="h-7 w-7 sm:h-8 sm:w-8 text-amber-600" />
               <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
                 欠点豆図鑑
@@ -226,37 +226,41 @@ export default function DefectBeansPage() {
             </div>
 
             {/* 右側: アクションボタン */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <button
-                onClick={toggleCompareMode}
-                className={`px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1.5 ${
-                  compareMode
-                    ? 'bg-amber-600 text-white hover:bg-amber-700'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                }`}
-                title={compareMode ? '選択モード' : '比較モード'}
-              >
-                <MdCompareArrows className="h-5 w-5" />
-                <span className="hidden sm:inline text-sm">
-                  {compareMode ? '選択モード' : '比較'}
-                </span>
-              </button>
-              {compareMode && selectedIds.size > 0 && (
-                <button
-                  onClick={handleShowCompare}
-                  className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1.5 text-sm"
-                  title="比較を表示"
-                >
-                  比較 ({selectedIds.size})
-                </button>
+            <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+              {!(filteredDefectBeans.length === 0 && !searchQuery && filterOption === 'all') && (
+                <>
+                  <button
+                    onClick={toggleCompareMode}
+                    className={`px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1.5 ${
+                      compareMode
+                        ? 'bg-amber-600 text-white hover:bg-amber-700'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                    }`}
+                    title={compareMode ? '選択モード' : '比較モード'}
+                  >
+                    <MdCompareArrows className="h-5 w-5" />
+                    <span className="hidden sm:inline text-sm">
+                      {compareMode ? '選択モード' : '比較'}
+                    </span>
+                  </button>
+                  {compareMode && selectedIds.size > 0 && (
+                    <button
+                      onClick={handleShowCompare}
+                      className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1.5 text-sm"
+                      title="比較を表示"
+                    >
+                      比較 ({selectedIds.size})
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowAddForm(true)}
+                    className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center justify-center"
+                    title="欠点豆を追加"
+                  >
+                    <HiPlus className="h-5 w-5" />
+                  </button>
+                </>
               )}
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center justify-center"
-                title="欠点豆を追加"
-              >
-                <HiPlus className="h-5 w-5" />
-              </button>
             </div>
           </div>
         </header>

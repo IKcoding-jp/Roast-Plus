@@ -34,8 +34,8 @@ export default function RoastTimerPage() {
 
   return (
     <div className="h-screen overflow-hidden flex flex-col px-2 sm:px-4 py-2 sm:py-4" style={{ backgroundColor: '#F7F7F5' }}>
-      <div className="flex-1 min-h-0">
-        <RoastTimer />
+          <div className="flex-1 min-h-0">
+            <RoastTimer />
       </div>
     </div>
   );

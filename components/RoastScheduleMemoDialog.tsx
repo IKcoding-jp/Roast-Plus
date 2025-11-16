@@ -107,10 +107,6 @@ export function RoastScheduleMemoDialog({
     }
 
     if (isRoasterOn) {
-      if (!beanName || !weight || !roastLevel) {
-        alert('豆の名前、重さ、焙煎度合いを入力してください');
-        return;
-      }
       // 2種類目の豆が選択されている場合は割合入力必須
       if (beanName2) {
         if (!blendRatio1 || !blendRatio2) {
@@ -388,7 +384,7 @@ export function RoastScheduleMemoDialog({
               <div className="space-y-3 md:space-y-4 border-t border-gray-200 pt-3 md:pt-4">
                 <div>
                   <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    豆の名前 <span className="text-red-500">*</span>
+                    豆の名前
                   </label>
                   <select
                     value={beanName}
@@ -402,7 +398,6 @@ export function RoastScheduleMemoDialog({
                         setBlendRatio2('');
                       }
                     }}
-                    required={isRoasterOn}
                     className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>
@@ -495,12 +490,11 @@ export function RoastScheduleMemoDialog({
 
                 <div>
                   <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    重さ <span className="text-red-500">*</span>
+                    重さ
                   </label>
                   <select
                     value={weight}
                     onChange={(e) => setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')}
-                    required={isRoasterOn}
                     className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>
@@ -512,7 +506,7 @@ export function RoastScheduleMemoDialog({
 
                 <div>
                   <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    焙煎度合い <span className="text-red-500">*</span>
+                    焙煎度合い
                   </label>
                   <select
                     value={roastLevel}
@@ -521,7 +515,6 @@ export function RoastScheduleMemoDialog({
                         e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
                       )
                     }
-                    required={isRoasterOn}
                     className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     <option value="">選択してください</option>

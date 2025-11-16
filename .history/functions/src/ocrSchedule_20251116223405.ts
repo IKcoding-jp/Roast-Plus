@@ -9,8 +9,21 @@ interface TimeLabel {
   order?: number;
 }
 
+interface RoastSchedule {
+  id: string;
+  date: string; // YYYY-MM-DD形式
+  time: string; // HH:mm形式（アフターパージの場合は空文字列も可）
+  isRoasterOn?: boolean; // 焙煎機予熱
+  isRoast?: boolean; // ロースト
+  isAfterPurge?: boolean; // アフターパージ
+  isChaffCleaning?: boolean; // チャフのお掃除
+  roastCount?: number; // 何回目
+  order?: number; // 時間順ソート用
+}
+
 interface OCRScheduleResult {
   timeLabels: TimeLabel[];
+  roastSchedules: RoastSchedule[];
 }
 
 /**
@@ -44,10 +57,11 @@ export async function ocrSchedule(imageBase64: string): Promise<OCRScheduleResul
   }
 
   // GPT-5 nanoでスケジュール形式に整形
-  const timeLabels = await formatScheduleWithGPT(fullText);
+  const result = await formatScheduleWithGPT(fullText);
 
   return {
-    timeLabels,
+    timeLabels: result.timeLabels,
+    roastSchedules: result.roastSchedules,
   };
 }
 

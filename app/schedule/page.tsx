@@ -7,21 +7,23 @@ import { useAppData } from '@/hooks/useAppData';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
 import { Loading } from '@/components/Loading';
+import { useToastContext } from '@/components/Toast';
 import { HiHome, HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCamera } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
-import { ScheduleOCRCapture } from '@/components/ScheduleOCRCapture';
+import { ScheduleOCRModal } from '@/components/ScheduleOCRModal';
 import LoginPage from '@/app/login/page';
-import type { TimeLabel } from '@/types';
+import type { TimeLabel, RoastSchedule } from '@/types';
 
 type TabType = 'today' | 'roast';
 
 export default function SchedulePage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
+  const { showToast } = useToastContext();
   const [activeTab, setActiveTab] = useState<TabType>('today');
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [showOCRCapture, setShowOCRCapture] = useState(false);
+  const [isOCROpen, setIsOCROpen] = useState(false);
   
   // 選択中の日付を管理（YYYY-MM-DD形式）
   const getTodayString = () => {
@@ -153,55 +155,100 @@ export default function SchedulePage() {
   const effectiveToday = isWeekend(today) ? getPreviousWeekday(today) : today;
   const isToday = selectedDate === today; // 実際の今日の日付と比較
 
-  // OCR結果をTimeLabelとして追加
-  const handleOCRComplete = (timeLabels: TimeLabel[]) => {
-    if (!data) return;
-    
-    const todaySchedule = data.todaySchedules?.find(s => s.date === selectedDate);
-    const existingLabels = todaySchedule?.timeLabels || [];
-    
-    // 既存のTimeLabelとマージ（重複を避けるため、時間でチェック）
-    const existingTimes = new Set(existingLabels.map((label) => label.time));
-    const newLabels = timeLabels.filter((label) => !existingTimes.has(label.time));
-    
-    // orderを再設定
-    const maxOrder = existingLabels.length > 0 
-      ? Math.max(...existingLabels.map((label) => label.order || 0))
-      : -1;
-    
-    const labelsWithOrder = newLabels.map((label, index) => ({
-      ...label,
-      order: maxOrder + 1 + index,
-    }));
+  // OCR結果を反映する処理
+  const handleOCRSuccess = useCallback(
+    (timeLabels: TimeLabel[], roastSchedules: RoastSchedule[]) => {
+      if (!data) return;
 
-    const updatedLabels = [...existingLabels, ...labelsWithOrder];
-    
-    // todaySchedulesを更新
-    const existingScheduleIndex = data.todaySchedules?.findIndex(s => s.date === selectedDate) ?? -1;
-    let updatedTodaySchedules: typeof data.todaySchedules;
-    
-    if (existingScheduleIndex >= 0 && data.todaySchedules) {
-      // 既存の日付を更新
-      updatedTodaySchedules = data.todaySchedules.map((s, index) =>
-        index === existingScheduleIndex
-          ? { ...s, timeLabels: updatedLabels }
-          : s
-      );
-    } else {
-      // 新しい日付を追加
-      updatedTodaySchedules = [
-        ...(data.todaySchedules || []),
-        { id: `today-${selectedDate}`, date: selectedDate, timeLabels: updatedLabels }
-      ];
-    }
-    
-    updateData({
-      ...data,
-      todaySchedules: updatedTodaySchedules,
-    });
-    
-    setShowOCRCapture(false);
-  };
+      // 既存のデータとマージするか確認
+      const existingTodaySchedule = data.todaySchedules?.find((s) => s.date === selectedDate);
+      const existingRoastSchedules = data.roastSchedules?.filter((s) => s.date === selectedDate) || [];
+
+      const shouldReplace =
+        existingTodaySchedule?.timeLabels.length === 0 && existingRoastSchedules.length === 0
+          ? true
+          : window.confirm(
+              '既存のスケジュールがあります。置き換えますか？\n（キャンセルを選択すると既存のスケジュールに追加されます）'
+            );
+
+      if (shouldReplace) {
+        // 置き換え
+        const updatedTodaySchedules = [...(data.todaySchedules || [])];
+        const existingTodayIndex = updatedTodaySchedules.findIndex((s) => s.date === selectedDate);
+        const newTodaySchedule = {
+          id: existingTodaySchedule?.id || `schedule-${selectedDate}`,
+          date: selectedDate,
+          timeLabels,
+        };
+
+        if (existingTodayIndex >= 0) {
+          updatedTodaySchedules[existingTodayIndex] = newTodaySchedule;
+        } else {
+          updatedTodaySchedules.push(newTodaySchedule);
+        }
+
+        // ローストスケジュールを置き換え
+        const updatedRoastSchedules = [
+          ...(data.roastSchedules || []).filter((s) => s.date !== selectedDate),
+          ...roastSchedules,
+        ];
+
+        updateData({
+          ...data,
+          todaySchedules: updatedTodaySchedules,
+          roastSchedules: updatedRoastSchedules,
+        });
+      } else {
+        // 追加（既存のスケジュールに追加）
+        const updatedTodaySchedules = [...(data.todaySchedules || [])];
+        const existingTodayIndex = updatedTodaySchedules.findIndex((s) => s.date === selectedDate);
+
+        if (existingTodayIndex >= 0) {
+          // 既存のスケジュールに追加（重複を避ける）
+          const existingTimeLabels = updatedTodaySchedules[existingTodayIndex].timeLabels || [];
+          const mergedTimeLabels = [...existingTimeLabels];
+          
+          timeLabels.forEach((newLabel) => {
+            // 同じ時間のラベルが既に存在するかチェック
+            const exists = existingTimeLabels.some((label) => label.time === newLabel.time);
+            if (!exists) {
+              mergedTimeLabels.push(newLabel);
+            }
+          });
+
+          // 時間順にソート
+          mergedTimeLabels.sort((a, b) => a.time.localeCompare(b.time));
+          mergedTimeLabels.forEach((label, index) => {
+            label.order = index;
+          });
+
+          updatedTodaySchedules[existingTodayIndex] = {
+            ...updatedTodaySchedules[existingTodayIndex],
+            timeLabels: mergedTimeLabels,
+          };
+        } else {
+          updatedTodaySchedules.push({
+            id: `schedule-${selectedDate}`,
+            date: selectedDate,
+            timeLabels,
+          });
+        }
+
+        // ローストスケジュールを追加
+        const updatedRoastSchedules = [...(data.roastSchedules || []), ...roastSchedules];
+
+        updateData({
+          ...data,
+          todaySchedules: updatedTodaySchedules,
+          roastSchedules: updatedRoastSchedules,
+        });
+      }
+
+      setIsOCROpen(false);
+      showToast('スケジュールを読み取りました。', 'success');
+    },
+    [data, selectedDate, updateData, showToast]
+  );
 
   if (authLoading) {
     return <Loading />;
@@ -278,19 +325,19 @@ export default function SchedulePage() {
               <div className="hidden sm:flex flex-shrink-0 h-6 sm:h-7 md:h-8 items-center">
                 <div className="w-px h-full bg-gray-200"></div>
               </div>
-              {/* OCRボタン（デスクトップ版のみ） */}
-              <button
-                onClick={() => setShowOCRCapture(true)}
-                className="hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-md bg-primary px-3 sm:px-3.5 md:px-4 py-1.5 sm:py-2 md:py-2 text-xs sm:text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark flex-shrink-0"
-                aria-label="OCRでスケジュールを読み取る"
-                title="ホワイトボードのスケジュールを撮影して読み取る"
-              >
-                <HiCamera className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-4.5 md:w-4.5" />
-                <span>OCR</span>
-              </button>
             </div>
           </div>
-          <div className="hidden sm:block flex-shrink-0 w-[140px]"></div>
+          <div className="hidden sm:flex flex-shrink-0 items-center gap-2">
+            <button
+              onClick={() => setIsOCROpen(true)}
+              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+              title="画像から読み取り"
+              aria-label="画像から読み取り"
+            >
+              <HiCamera className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
+              <span className="hidden md:inline text-sm font-medium">画像から読み取り</span>
+            </button>
+          </div>
         </header>
 
         {/* タブナビゲーション（モバイル版：画面下部に固定） */}
@@ -306,16 +353,6 @@ export default function SchedulePage() {
             >
               本日のスケジュール
             </button>
-            {/* OCRボタン（モバイル版：タブナビゲーション内） */}
-            <button
-              onClick={() => setShowOCRCapture(true)}
-              className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-md bg-primary w-11 h-11 sm:w-12 sm:h-12 text-xs sm:text-sm font-medium text-white transition-colors hover:bg-primary-dark flex-shrink-0"
-              aria-label="OCRでスケジュールを読み取る"
-              title="ホワイトボードのスケジュールを撮影して読み取る"
-            >
-              <HiCamera className="h-5 w-5 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline">OCR</span>
-            </button>
             <button
               onClick={() => setActiveTab('roast')}
               className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-colors text-xs sm:text-sm min-h-[44px] ${
@@ -325,6 +362,14 @@ export default function SchedulePage() {
               }`}
             >
               ローストスケジュール
+            </button>
+            <button
+              onClick={() => setIsOCROpen(true)}
+              className="px-3 py-2 sm:px-4 sm:py-2.5 text-gray-700 hover:bg-gray-100 rounded transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center"
+              title="画像から読み取り"
+              aria-label="画像から読み取り"
+            >
+              <HiCamera className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           </nav>
         </div>
@@ -371,13 +416,15 @@ export default function SchedulePage() {
         />
       )}
 
-      {/* OCRキャプチャコンポーネント */}
-      {showOCRCapture && (
-        <ScheduleOCRCapture
-          onComplete={handleOCRComplete}
-          onCancel={() => setShowOCRCapture(false)}
+      {/* OCRモーダル */}
+      {isOCROpen && (
+        <ScheduleOCRModal
+          selectedDate={selectedDate}
+          onSuccess={handleOCRSuccess}
+          onCancel={() => setIsOCROpen(false)}
         />
       )}
+
     </div>
   );
 }

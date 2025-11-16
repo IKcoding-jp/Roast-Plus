@@ -1,15 +1,77 @@
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { getApp } from 'firebase/app';
-import type { TimeLabel } from '@/types';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from './firebase';
+import type { TimeLabel, RoastSchedule } from '@/types';
 
+// Firebase Functionsのレスポンス型
 interface OCRScheduleResponse {
   timeLabels: TimeLabel[];
+  roastSchedules: Omit<RoastSchedule, 'date'>[]; // dateはクライアント側で設定
 }
 
 /**
- * 画像をBase64に変換
+ * 画像をBase64エンコードしてFirebase Functionsに送信し、スケジュールを抽出
  */
-export function imageToBase64(file: File): Promise<string> {
+export async function extractScheduleFromImage(
+  imageFile: File,
+  selectedDate: string
+): Promise<{ timeLabels: TimeLabel[]; roastSchedules: RoastSchedule[] }> {
+  // 画像をBase64に変換
+  const base64 = await fileToBase64(imageFile);
+
+  // Firebase Functionsを呼び出し
+  const ocrScheduleFromImage = httpsCallable<{ imageBase64: string }, OCRScheduleResponse>(
+    functions,
+    'ocrScheduleFromImage'
+  );
+
+  try {
+    const result = await ocrScheduleFromImage({ imageBase64: base64 });
+    const data = result.data;
+
+    // dateを設定してRoastScheduleを完成させる
+    const roastSchedules: RoastSchedule[] = data.roastSchedules.map((schedule) => ({
+      ...schedule,
+      date: selectedDate,
+    }));
+
+    return {
+      timeLabels: data.timeLabels,
+      roastSchedules,
+    };
+  } catch (error: any) {
+    console.error('OCR処理エラー:', error);
+    console.error('エラー詳細:', {
+      code: error?.code,
+      message: error?.message,
+      details: error?.details,
+      stack: error?.stack,
+    });
+    
+    // Firebase Functionsのエラーを適切に処理
+    if (error?.code) {
+      // Firebase Functionsのエラーコードをそのまま伝播
+      const errorMessage = error.message || 'スケジュールの読み取りに失敗しました。';
+      const newError = new Error(errorMessage);
+      (newError as any).code = error.code;
+      (newError as any).details = error.details;
+      throw newError;
+    }
+    
+    // ネットワークエラーやFunctionsが存在しない場合
+    if (error?.message?.includes('not-found') || error?.message?.includes('404')) {
+      const newError = new Error('Firebase Functionsが見つかりません。デプロイを確認してください。');
+      (newError as any).code = 'functions/not-found';
+      throw newError;
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * FileをBase64文字列に変換
+ */
+function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -21,50 +83,5 @@ export function imageToBase64(file: File): Promise<string> {
     };
     reader.readAsDataURL(file);
   });
-}
-
-/**
- * Firebase Functionsを呼び出してOCR処理を実行
- */
-export async function processScheduleOCR(imageFile: File): Promise<TimeLabel[]> {
-  try {
-    // 画像をBase64に変換
-    const imageBase64 = await imageToBase64(imageFile);
-
-    // Firebase Functionsを呼び出し
-    const app = getApp();
-    // Firebase Functions v2ではリージョンを指定する必要がある
-    const functions = getFunctions(app, 'us-central1');
-    const processScheduleOCRFunction = httpsCallable<{ imageBase64: string }, OCRScheduleResponse>(
-      functions,
-      'processScheduleOCR'
-    );
-
-    const result = await processScheduleOCRFunction({ imageBase64 });
-
-    if (!result.data || !result.data.timeLabels) {
-      throw new Error('OCR処理の結果が不正です');
-    }
-
-    return result.data.timeLabels;
-  } catch (error: any) {
-    console.error('OCR処理エラー:', error);
-    
-    // エラーメッセージを適切に処理
-    if (error.code === 'unauthenticated') {
-      throw new Error('認証が必要です。ログインしてください。');
-    } else if (error.code === 'invalid-argument') {
-      throw new Error('画像データが正しくありません。');
-    } else if (error.code === 'functions/unavailable') {
-      throw new Error('サービスが一時的に利用できません。しばらく待ってから再度お試しください。');
-    } else if (error.code === 'functions/deadline-exceeded') {
-      throw new Error('処理に時間がかかりすぎました。画像を確認して再度お試しください。');
-    } else if (error.message) {
-      // Firebase Functionsからのエラーメッセージをそのまま使用
-      throw new Error(error.message);
-    } else {
-      throw new Error('OCR処理中にエラーが発生しました。ネットワーク接続を確認してください。');
-    }
-  }
 }
 

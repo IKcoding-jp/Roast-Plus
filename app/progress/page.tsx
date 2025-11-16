@@ -460,7 +460,7 @@ export default function ProgressPage() {
                     setAddMode('work');
                     setShowAddForm(true);
                   }}
-                  className="w-full px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
                 >
                   <HiPlus className="h-3.5 w-3.5" />
                   <span>作業を追加</span>
@@ -479,7 +479,7 @@ export default function ProgressPage() {
                       handleStatusChange(wp.id, e.target.value as WorkProgressStatus);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className="px-2 py-1 text-xs font-medium rounded border bg-gray-50 text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px] hover:bg-gray-100 pointer-events-auto"
+                    className="px-2 py-1 text-xs font-medium rounded border bg-gray-50 text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] hover:bg-gray-100 pointer-events-auto"
                   >
                     <option value="pending">前</option>
                     <option value="in_progress">途中</option>
@@ -522,7 +522,7 @@ export default function ProgressPage() {
                     e.stopPropagation();
                     setAddingProgressWorkProgressId(wp.id);
                   }}
-                  className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center gap-1 flex-shrink-0 whitespace-nowrap shadow-sm"
+                  className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center gap-1 flex-shrink-0 whitespace-nowrap shadow-sm"
                   aria-label="進捗を記録"
                 >
                   <HiPlus className="h-3 w-3" />
@@ -585,7 +585,7 @@ export default function ProgressPage() {
                   e.stopPropagation();
                   setAddingProgressWorkProgressId(wp.id);
                 }}
-                className="ml-auto px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center gap-1 whitespace-nowrap shadow-sm"
+                className="ml-auto px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center gap-1 whitespace-nowrap shadow-sm"
                 aria-label="完成数を記録"
               >
                 <HiPlus className="h-3 w-3" />
@@ -608,7 +608,7 @@ export default function ProgressPage() {
                 e.stopPropagation();
                 toggleHistory(wp.id);
               }}
-              className={`w-full flex items-center justify-between text-xs transition-colors px-1 py-1 ${
+              className={`w-full flex items-center justify-between text-xs transition-colors px-1 py-1 min-h-[44px] ${
                 isHistoryExpanded 
                   ? 'text-gray-700' 
                   : 'text-gray-500 hover:text-gray-700'
@@ -699,7 +699,7 @@ export default function ProgressPage() {
                 <>
                   <button
                     onClick={() => setShowFilterDialog(true)}
-                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center gap-1.5 min-h-[36px]"
+                    className="p-0 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] sm:min-w-auto sm:justify-start"
                     aria-label="フィルタと並び替え"
                   >
                     <HiFilter className="h-4 w-4" />
@@ -707,7 +707,7 @@ export default function ProgressPage() {
                   </button>
                   <button
                     onClick={() => setShowAddGroupForm(true)}
-                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0 shadow-sm"
+                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[44px] flex-shrink-0 shadow-sm"
                   >
                     <HiPlus className="h-4 w-4" />
                     <span>作業グループを作成</span>
@@ -769,7 +769,7 @@ export default function ProgressPage() {
                   {!hasFilters && (
                     <button
                       onClick={() => setShowAddGroupForm(true)}
-                      className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+                      className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all min-h-[44px]"
                     >
                       <HiPlus className="w-5 h-5" />
                       <span className="font-medium">作業グループを作成</span>
@@ -832,7 +832,7 @@ export default function ProgressPage() {
                                     setAddMode('work');
                                     setShowAddForm(true);
                                   }}
-                                  className="w-full px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center gap-1.5"
+                                  className="w-full px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
                                 >
                                   <HiPlus className="h-3.5 w-3.5" />
                                   <span>作業を追加</span>
@@ -1095,13 +1095,13 @@ function GroupCreateForm({ onSave, onCancel }: GroupCreateFormProps) {
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px] min-w-[44px]"
             >
               キャンセル
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
+              className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] min-w-[44px]"
             >
               作成
             </button>
@@ -1201,7 +1201,7 @@ function GroupEditForm({ groupName: initialGroupName, workProgresses, onSave, on
             <button
               type="button"
               onClick={onDelete}
-              className="px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition-colors min-h-[44px]"
+              className="px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition-colors min-h-[44px] min-w-[44px]"
             >
               グループを削除
             </button>
@@ -1209,13 +1209,13 @@ function GroupEditForm({ groupName: initialGroupName, workProgresses, onSave, on
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px] min-w-[44px]"
               >
                 キャンセル
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
+                className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] min-w-[44px]"
               >
                 保存
               </button>
@@ -1451,7 +1451,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               進捗管理方式
             </label>
             <div className="space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-2 cursor-pointer min-h-[44px]">
                 <input
                   type="radio"
                   name="progressType"
@@ -1466,7 +1466,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                 />
                 <span className="text-sm text-gray-700">未選択</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-2 cursor-pointer min-h-[44px]">
                 <input
                   type="radio"
                   name="progressType"
@@ -1484,7 +1484,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
                 />
                 <span className="text-sm text-gray-700">目標量で管理（進捗バー表示）</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-2 cursor-pointer min-h-[44px]">
                 <input
                   type="radio"
                   name="progressType"
@@ -1605,7 +1605,7 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               <button
                 type="button"
                 onClick={onDelete}
-                className="px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition-colors min-h-[44px]"
+                className="px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition-colors min-h-[44px] min-w-[44px]"
               >
                 削除
               </button>
@@ -1614,13 +1614,13 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px] min-w-[44px]"
               >
                 キャンセル
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
+                className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] min-w-[44px]"
               >
                 {workProgress ? '更新' : '追加'}
               </button>
@@ -1710,7 +1710,7 @@ function FilterSortDialog({
           <div className="flex justify-end pt-4 border-t border-gray-200">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
+              className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] min-w-[44px]"
             >
               閉じる
             </button>
@@ -1803,13 +1803,13 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px] min-w-[44px]"
             >
               キャンセル
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
+              className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] min-w-[44px]"
             >
               更新
             </button>

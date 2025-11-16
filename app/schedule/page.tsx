@@ -188,7 +188,7 @@ export default function SchedulePage() {
                   aria-label="日付を選択"
                 >
                   <HiCalendar className="h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
-                  <span className="text-xs sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+                  <span className="text-base sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
                     {formatDateString(selectedDate)}
                   </span>
                 </button>
@@ -210,7 +210,7 @@ export default function SchedulePage() {
               {/* 時刻 */}
               <div className="flex items-center gap-0.5 sm:gap-2.5 md:gap-3">
                 <HiClock className="h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
-                <span className="text-xs sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+                <span className="text-base sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
                   {formatTime(currentTime)}
                 </span>
               </div>

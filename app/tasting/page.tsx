@@ -317,7 +317,7 @@ function TastingPageContent() {
             <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-bold text-gray-800">
               試飲感想記録
             </h1>
-            <div className="flex justify-end w-full sm:w-auto sm:flex-1">
+            <div className="hidden sm:flex justify-end w-full sm:w-auto sm:flex-1">
               {!isEmpty && (
                 <Link
                   href="/tasting/sessions/new"
@@ -332,9 +332,23 @@ function TastingPageContent() {
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-hidden">
+        <main className="flex-1 min-h-0 overflow-hidden pb-20 sm:pb-0">
           <TastingSessionList data={data} onUpdate={updateData} />
         </main>
+
+        {/* スマホ用：一番下に固定表示する「セッションを作成」ボタン */}
+        {!isEmpty && (
+          <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-10">
+            <Link
+              href="/tasting/sessions/new"
+              className="w-full px-4 py-3 text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
+              aria-label="新規セッション作成"
+            >
+              <HiPlus className="text-lg flex-shrink-0" />
+              <span className="whitespace-nowrap font-medium">セッションを作成</span>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

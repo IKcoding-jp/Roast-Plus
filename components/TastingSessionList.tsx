@@ -19,6 +19,7 @@ interface TastingSessionListProps {
   data: AppData;
   onUpdate: (data: AppData) => void;
   filterButtonContainerId?: string;
+  filterButtonContainerIdMobile?: string;
 }
 
 type SortOption = 'newest' | 'oldest' | 'beanName';
@@ -30,7 +31,7 @@ const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎�
   '深煎り',
 ];
 
-export function TastingSessionList({ data, onUpdate, filterButtonContainerId }: TastingSessionListProps) {
+export function TastingSessionList({ data, onUpdate, filterButtonContainerId, filterButtonContainerIdMobile }: TastingSessionListProps) {
   const router = useRouter();
 
   const tastingSessions = Array.isArray(data.tastingSessions)
@@ -257,6 +258,7 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId }: 
 
   // フィルターボタンを外部コンテナにレンダリング
   const [filterButtonContainer, setFilterButtonContainer] = useState<HTMLElement | null>(null);
+  const [filterButtonContainerMobile, setFilterButtonContainerMobile] = useState<HTMLElement | null>(null);
   
   useEffect(() => {
     if (filterButtonContainerId) {
@@ -264,6 +266,13 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId }: 
       setFilterButtonContainer(container);
     }
   }, [filterButtonContainerId]);
+
+  useEffect(() => {
+    if (filterButtonContainerIdMobile) {
+      const container = document.getElementById(filterButtonContainerIdMobile);
+      setFilterButtonContainerMobile(container);
+    }
+  }, [filterButtonContainerIdMobile]);
 
   const filterButton = (
     <button
@@ -287,6 +296,7 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId }: 
     <>
       {/* フィルターボタンを外部コンテナにPortalでレンダリング */}
       {filterButtonContainer && createPortal(filterButton, filterButtonContainer)}
+      {filterButtonContainerMobile && createPortal(filterButton, filterButtonContainerMobile)}
       
       <div className="space-y-3 h-full flex flex-col min-h-0">
 

@@ -10,7 +10,7 @@ import { TastingSessionDetail } from '@/components/TastingSessionDetail';
 import { TastingRecordForm } from '@/components/TastingRecordForm';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import type { TastingSession, TastingRecord } from '@/types';
-import { HiHome, HiPlus, HiFilter } from 'react-icons/hi';
+import { HiHome, HiPlus, HiFilter, HiArrowLeft } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
 function TastingPageContent() {
@@ -123,7 +123,7 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-2xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -215,7 +215,7 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-2xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -269,7 +269,7 @@ function TastingPageContent() {
     }
 
     return (
-      <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-4xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -313,12 +313,13 @@ function TastingPageContent() {
               >
                 <HiHome className="h-6 w-6 flex-shrink-0" />
               </Link>
-              <div id="filter-button-container"></div>
+              <div id="filter-button-container-mobile" className="sm:hidden"></div>
             </div>
             <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-bold text-gray-800">
               試飲感想記録
             </h1>
-            <div className="hidden sm:flex justify-end w-full sm:w-auto sm:flex-1">
+            <div className="hidden sm:flex justify-end items-center gap-3 w-full sm:w-auto sm:flex-1">
+              <div id="filter-button-container"></div>
               {!isEmpty && (
                 <Link
                   href="/tasting/sessions/new"
@@ -338,6 +339,7 @@ function TastingPageContent() {
             data={data} 
             onUpdate={updateData}
             filterButtonContainerId="filter-button-container"
+            filterButtonContainerIdMobile="filter-button-container-mobile"
           />
         </main>
 

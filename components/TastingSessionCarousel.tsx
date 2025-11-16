@@ -90,17 +90,17 @@ export function TastingSessionCarousel({
                   href={`/tasting?sessionId=${session.id}`}
                   className="block h-full"
                 >
-                  <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col h-full min-h-0">
+                  <div className="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-all flex flex-col h-full min-h-0 border border-gray-100">
                     {/* ヘッダー部分 */}
                     <div className="mb-0 flex-shrink-0">
                       <div className="flex items-start justify-between mb-2 gap-4">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2 flex-wrap h-7">
-                            <h3 className="text-lg md:text-xl font-semibold text-gray-800">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap min-h-[32px] sm:min-h-[28px]">
+                            <h3 className="text-xl sm:text-xl md:text-2xl font-bold text-gray-800">
                               {session.beanName}
                             </h3>
                             <span
-                              className="px-2 py-1 text-white text-xs rounded-full flex-shrink-0"
+                              className="px-2.5 py-1.5 text-white text-sm sm:text-xs rounded-full flex-shrink-0"
                               style={
                                 session.roastLevel === '深煎り'
                                   ? { backgroundColor: '#120C0A' }
@@ -127,7 +127,7 @@ export function TastingSessionCarousel({
                               <IoCreateOutline className="h-4 w-4" />
                             </button>
                           </div>
-                          <div className="text-sm text-gray-600 h-5 flex items-center">
+                          <div className="text-base sm:text-sm text-gray-500 h-6 sm:h-5 flex items-center">
                             {formatDate(session.createdAt)}
                           </div>
                         </div>
@@ -165,7 +165,7 @@ export function TastingSessionCarousel({
                     </div>
 
                     {/* みんなの感想 */}
-                    <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col flex-shrink-0 min-h-[12rem] max-h-[min(20rem,calc(100vh-28rem))] sm:max-h-[min(22rem,calc(100vh-30rem))] md:max-h-[min(24rem,calc(100vh-32rem))]">
+                    <div className="bg-amber-50 rounded-lg p-3 border border-amber-200 flex flex-col flex-shrink-0 min-h-[12rem] max-h-[min(20rem,calc(100vh-28rem))] sm:max-h-[min(22rem,calc(100vh-30rem))] md:max-h-[min(24rem,calc(100vh-32rem))]">
                       <div className="flex items-center gap-2 mb-2 flex-shrink-0">
                         <h4 className="text-sm font-semibold text-gray-800">みんなの感想</h4>
                         <span className="px-2 py-0.5 bg-amber-600 text-white text-sm font-semibold rounded-full flex-shrink-0">

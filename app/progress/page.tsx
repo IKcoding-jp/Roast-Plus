@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress } from '@/lib/firestore';
-import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus } from 'react-icons/hi';
+import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
@@ -715,6 +715,53 @@ export default function ProgressPage() {
           groupedWorkProgresses.ungrouped.forEach((wp, index) => {
             allCards.push({ type: 'ungrouped', data: wp, index });
           });
+          
+          // エンプティステート
+          if (allCards.length === 0) {
+            const hasFilters = filterTaskName || filterStatus !== 'all';
+            return (
+              <div className="py-12 sm:py-16 text-center">
+                <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
+                  {/* アイコン */}
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-amber-100 rounded-full blur-xl opacity-50"></div>
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-amber-50 flex items-center justify-center">
+                      {hasFilters ? (
+                        <HiSearch className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+                      ) : (
+                        <HiOutlineCollection className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* メッセージ */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                      {hasFilters
+                        ? '検索条件に一致する作業がありません'
+                        : '作業が登録されていません'}
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
+                      {hasFilters
+                        ? '別のキーワードで検索するか、フィルタを変更してみてください。'
+                        : '最初の作業グループを作成して、作業進捗を管理しましょう。'}
+                    </p>
+                  </div>
+                  
+                  {/* アクションボタン（フィルタがない場合のみ表示） */}
+                  {!hasFilters && (
+                    <button
+                      onClick={() => setShowAddGroupForm(true)}
+                      className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+                    >
+                      <HiPlus className="w-5 h-5" />
+                      <span className="font-medium">作業グループを作成</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          }
           
           // カードをカラムに分配（横方向に流れる）
           const columns: Array<typeof allCards> = Array.from({ length: columnCount }, () => []);

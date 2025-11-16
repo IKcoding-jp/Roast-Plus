@@ -784,6 +784,14 @@ export async function updateWorkProgress(
     }
   }
   
+  // targetAmountが明示的にundefinedとして渡された場合（進捗管理方式の変更など）
+  if ('targetAmount' in updates && updates.targetAmount === undefined) {
+    targetAmount = undefined;
+    // 目標量が削除される場合、関連するデータもクリア
+    updates.currentAmount = undefined;
+    updates.progressHistory = undefined;
+  }
+  
   // 進捗状態の変更を検出して日時を適切に設定
   let startedAt = existing.startedAt;
   let completedAt = existing.completedAt;
@@ -824,7 +832,7 @@ export async function updateWorkProgress(
     updatedAt: now,
     startedAt,
     completedAt,
-    targetAmount: targetAmount !== undefined ? targetAmount : updates.targetAmount,
+    targetAmount: 'targetAmount' in updates ? updates.targetAmount : targetAmount,
   };
   
   const updatedWorkProgresses = [...workProgresses];
@@ -836,6 +844,96 @@ export async function updateWorkProgress(
   };
   
   await saveUserData(userId, updatedData);
+}
+
+/**
+ * 複数の作業進捗を一度に更新（グループ名の一括更新などに使用）
+ * @param userId ユーザーID
+ * @param updates 更新対象の作業進捗IDと更新内容のマップ
+ * @param appData 現在のAppData
+ */
+export async function updateWorkProgresses(
+  userId: string,
+  updates: Map<string, Partial<Omit<WorkProgress, 'id' | 'createdAt'>>>,
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const now = new Date().toISOString();
+  const updatedWorkProgresses = [...workProgresses];
+  let hasChanges = false;
+
+  for (const [workProgressId, updateData] of updates.entries()) {
+    const existingIndex = updatedWorkProgresses.findIndex((wp) => wp.id === workProgressId);
+    
+    if (existingIndex < 0) {
+      console.warn(`WorkProgress with id ${workProgressId} not found`);
+      continue;
+    }
+
+    const existing = updatedWorkProgresses[existingIndex];
+    
+    // weightフィールドが変更された場合、目標量を再計算
+    let targetAmount = existing.targetAmount;
+    if (updateData.weight !== undefined && updateData.weight !== existing.weight) {
+      targetAmount = extractTargetAmount(updateData.weight);
+      // 目標量が変更された場合、現在の進捗量を調整（目標量が削除された場合はundefined）
+      if (targetAmount === undefined) {
+        updateData.currentAmount = undefined;
+        updateData.progressHistory = undefined;
+      } else if (existing.currentAmount === undefined) {
+        updateData.currentAmount = 0;
+      }
+    }
+
+    // 進捗状態の変更を検出して日時を適切に設定
+    let startedAt = existing.startedAt;
+    let completedAt = existing.completedAt;
+
+    if (updateData.status !== undefined && updateData.status !== existing.status) {
+      const oldStatus = existing.status;
+      const newStatus = updateData.status;
+
+      if (oldStatus === 'pending' && newStatus === 'in_progress') {
+        startedAt = now;
+      } else if (oldStatus === 'pending' && newStatus === 'completed') {
+        startedAt = now;
+        completedAt = now;
+      } else if (oldStatus === 'in_progress' && newStatus === 'completed') {
+        if (!startedAt) {
+          startedAt = now;
+        }
+        completedAt = now;
+      } else if (oldStatus === 'completed' && newStatus === 'in_progress') {
+        completedAt = undefined;
+      } else if (oldStatus === 'completed' && newStatus === 'pending') {
+        startedAt = undefined;
+        completedAt = undefined;
+      } else if (oldStatus === 'in_progress' && newStatus === 'pending') {
+        startedAt = undefined;
+      }
+    }
+
+    const updatedWorkProgress: WorkProgress = {
+      ...existing,
+      ...updateData,
+      updatedAt: now,
+      startedAt,
+      completedAt,
+      targetAmount: targetAmount !== undefined ? targetAmount : updateData.targetAmount,
+    };
+
+    updatedWorkProgresses[existingIndex] = updatedWorkProgress;
+    hasChanges = true;
+  }
+
+  if (hasChanges) {
+    const updatedData: AppData = {
+      ...appData,
+      workProgresses: updatedWorkProgresses,
+    };
+
+    await saveUserData(userId, updatedData);
+  }
 }
 
 /**
@@ -886,8 +984,8 @@ export async function addCompletedCountToWorkProgress(
   const existing = workProgresses[existingIndex];
   const now = new Date().toISOString();
   
-  // 完成数を累積
-  const completedCount = (existing.completedCount || 0) + count;
+  // 完成数を累積（マイナスの値も受け付ける）
+  const completedCount = Math.max(0, (existing.completedCount || 0) + count);
 
   // 進捗履歴に新しいエントリを追加（完成数の追加も履歴として記録）
   const newProgressEntry: ProgressEntry = {

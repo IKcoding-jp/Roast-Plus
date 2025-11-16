@@ -497,11 +497,11 @@ export function RoastTimer() {
 
       {/* タイマー表示（実行中・一時停止中・完了時のみ表示） */}
       {!isIdle && (
-        <div className="bg-white rounded-2xl shadow-xl pt-16 sm:pt-20 p-4 sm:p-6 flex-1 flex flex-col items-center justify-center min-h-0 relative max-w-sm sm:max-w-2xl md:max-w-4xl mx-auto w-full">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-0 relative px-4 sm:px-6">
           {/* ヘッダーボタン（オーバーレイ） */}
           <Link
             href="/"
-            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+            className="absolute top-4 left-4 z-10 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
             title="ホームに戻る"
             aria-label="ホームに戻る"
           >
@@ -509,7 +509,7 @@ export function RoastTimer() {
           </Link>
           <Link
             href="/roast-record"
-            className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+            className="absolute top-4 right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
             aria-label="ロースト履歴一覧"
           >
             <HiClock className="text-lg flex-shrink-0" />
@@ -686,102 +686,100 @@ export function RoastTimer() {
           </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）
-            <div className="flex-1 flex flex-col items-center justify-center p-4">
-              <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8 space-y-7">
-                {/* タイトルセクション */}
-                <div className="text-center space-y-3">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-md mb-2">
-                    <MdTimer className="text-white text-3xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
-                    ローストタイマー
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    焙煎時間を設定してスタート
-                  </p>
+            <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6">
+              {/* タイトルセクション */}
+              <div className="text-center space-y-3 mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-md mb-2">
+                  <MdTimer className="text-white text-3xl" />
                 </div>
+                <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  ローストタイマー
+                </h3>
+                <p className="text-sm text-gray-500">
+                  焙煎時間を設定してスタート
+                </p>
+              </div>
 
-                {/* 手動入力フィールド */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                    時間設定
-                  </label>
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-600 mb-2">
-                        分 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={durationMinutes}
-                        onChange={(e) => handleDurationMinutesChange(e.target.value)}
-                        placeholder="10"
-                        className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
-                      />
-                    </div>
-                    <div className="flex items-end pb-2">
-                      <span className="text-2xl font-bold text-gray-400">:</span>
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-600 mb-2">
-                        秒
-                      </label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={durationSeconds}
-                        onChange={(e) => handleDurationSecondsChange(e.target.value)}
-                        placeholder="30"
-                        maxLength={2}
-                        className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
-                      />
-                    </div>
+              {/* 手動入力フィールド */}
+              <div className="space-y-3 max-w-md mx-auto w-full">
+                <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  時間設定
+                </label>
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-2">
+                      分 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={durationMinutes}
+                      onChange={(e) => handleDurationMinutesChange(e.target.value)}
+                      placeholder="10"
+                      className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                    />
+                  </div>
+                  <div className="flex items-end pb-2">
+                    <span className="text-2xl font-bold text-gray-400">:</span>
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-2">
+                      秒
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={durationSeconds}
+                      onChange={(e) => handleDurationSecondsChange(e.target.value)}
+                      placeholder="30"
+                      maxLength={2}
+                      className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-lg text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                    />
                   </div>
                 </div>
+              </div>
 
-                {/* ボタンセクション */}
-                <div className="space-y-3 pt-2">
-                  {/* 手動スタートボタン */}
-                  <button
-                    onClick={async () => {
-                      if (!durationMinutes) {
-                        alert('分を入力してください');
-                        return;
-                      }
-                      const minutes = parseInt(durationMinutes, 10) || 0;
-                      const seconds = parseInt(durationSeconds, 10) || 0;
-                      const duration = minutes * 60 + seconds;
-                      if (duration <= 0) {
-                        alert('有効な時間を入力してください');
-                        return;
-                      }
-                      await startTimer(duration, 2); // 通知ID: 2=手動
-                    }}
-                    disabled={!durationMinutes || durationMinutes.trim() === ''}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-bold text-base shadow-md hover:shadow-lg hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
-                  >
-                    <HiPlay className="text-xl" />
-                    <span>手動で焙煎スタート</span>
-                  </button>
+              {/* ボタンセクション */}
+              <div className="space-y-3 pt-6 max-w-md mx-auto w-full">
+                {/* 手動スタートボタン */}
+                <button
+                  onClick={async () => {
+                    if (!durationMinutes) {
+                      alert('分を入力してください');
+                      return;
+                    }
+                    const minutes = parseInt(durationMinutes, 10) || 0;
+                    const seconds = parseInt(durationSeconds, 10) || 0;
+                    const duration = minutes * 60 + seconds;
+                    if (duration <= 0) {
+                      alert('有効な時間を入力してください');
+                      return;
+                    }
+                    await startTimer(duration, 2); // 通知ID: 2=手動
+                  }}
+                  disabled={!durationMinutes || durationMinutes.trim() === ''}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-bold text-base shadow-md hover:shadow-lg hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
+                >
+                  <HiPlay className="text-xl" />
+                  <span>手動で焙煎スタート</span>
+                </button>
 
-                  {/* おすすめ焙煎ボタン */}
-                  <button
-                    onClick={() => {
-                      // おすすめモードに切り替わる時は、手動入力の値をクリア
-                      setDurationMinutes('');
-                      setDurationSeconds('');
-                      setInputMode('recommended');
-                    }}
-                    className="w-full flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-4 py-4 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-lg font-bold text-base shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[56px]"
-                  >
-                    <MdLightbulb className="text-xl text-amber-600" />
-                    <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1">
-                      <span>おすすめ焙煎でスタート</span>
-                      <span>※未完成</span>
-                    </span>
-                  </button>
-                </div>
+                {/* おすすめ焙煎ボタン */}
+                <button
+                  onClick={() => {
+                    // おすすめモードに切り替わる時は、手動入力の値をクリア
+                    setDurationMinutes('');
+                    setDurationSeconds('');
+                    setInputMode('recommended');
+                  }}
+                  className="w-full flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-4 py-4 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-lg font-bold text-base shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[56px]"
+                >
+                  <MdLightbulb className="text-xl text-amber-600" />
+                  <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1">
+                    <span>おすすめ焙煎でスタート</span>
+                    <span>※未完成</span>
+                  </span>
+                </button>
               </div>
             </div>
           ) : inputMode === 'manual' ? (

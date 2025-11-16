@@ -9,6 +9,7 @@ import { PiCoffeeBeanFill } from 'react-icons/pi';
 
 interface RoastScheduleMemoDialogProps {
   schedule: RoastSchedule | null;
+  selectedDate: string; // YYYY-MM-DD形式
   onSave: (schedule: RoastSchedule) => void;
   onDelete?: (id: string) => void;
   onCancel: () => void;
@@ -16,6 +17,7 @@ interface RoastScheduleMemoDialogProps {
 
 export function RoastScheduleMemoDialog({
   schedule,
+  selectedDate,
   onSave,
   onDelete,
   onCancel,
@@ -149,6 +151,7 @@ export function RoastScheduleMemoDialog({
 
     const newSchedule: RoastSchedule = {
       id: schedule?.id || `roast-${Date.now()}`,
+      date: schedule?.date || selectedDate, // 既存の場合はschedule.date、新規の場合はselectedDate
       time: isAfterPurge ? '' : formattedTime, // アフターパージの場合は時間なし
       isRoasterOn: isRoasterOn || undefined,
       isRoast: isRoast || undefined,

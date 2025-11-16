@@ -404,6 +404,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
       {(isAdding || editingSchedule) && (
         <RoastScheduleMemoDialog
           schedule={editingSchedule}
+          selectedDate={selectedDate}
           onSave={handleSave}
           onDelete={editingSchedule ? () => handleDelete(editingSchedule.id) : undefined}
           onCancel={handleDialogCancel}

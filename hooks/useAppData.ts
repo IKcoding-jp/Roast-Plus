@@ -11,6 +11,7 @@ export function useAppData() {
     teams: [],
     members: [],
     taskLabels: [],
+    taskLabelHistory: [],
     assignments: [],
     assignmentHistory: [],
     todaySchedules: [],
@@ -71,10 +72,11 @@ export function useAppData() {
         : newDataOrUpdater;
 
       // データの完全性を検証
-      const normalizedData = {
+      const normalizedData: AppData = {
         teams: Array.isArray(newData.teams) ? newData.teams : data.teams,
         members: Array.isArray(newData.members) ? newData.members : data.members,
         taskLabels: Array.isArray(newData.taskLabels) ? newData.taskLabels : data.taskLabels,
+        taskLabelHistory: Array.isArray(newData.taskLabelHistory) ? newData.taskLabelHistory : data.taskLabelHistory,
         assignments: Array.isArray(newData.assignments) ? newData.assignments : data.assignments,
         assignmentHistory: Array.isArray(newData.assignmentHistory) ? newData.assignmentHistory : data.assignmentHistory,
         todaySchedules: Array.isArray(newData.todaySchedules) ? newData.todaySchedules : data.todaySchedules,

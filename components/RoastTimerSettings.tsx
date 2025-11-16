@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
+import { Loading } from '@/components/Loading';
 import {
   loadRoastTimerSettings,
   saveRoastTimerSettings,
@@ -54,7 +55,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
   if (isLoading || !settings) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="text-center text-gray-600">読み込み中...</div>
+        <Loading fullScreen={false} />
       </div>
     );
   }

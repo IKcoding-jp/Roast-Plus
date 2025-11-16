@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { HiArrowLeft, HiClock } from 'react-icons/hi';
 import { RoastTimer } from '@/components/RoastTimer';
+import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { requestNotificationPermission } from '@/lib/notifications';
 import LoginPage from '@/app/login/page';
@@ -19,13 +20,7 @@ export default function RoastTimerPage() {
   }, []);
 
   if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {

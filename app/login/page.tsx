@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { Loading } from '@/components/Loading';
 
 type TabType = 'login' | 'signup';
 
@@ -303,7 +304,7 @@ export default function LoginPage() {
           <h1 className="mb-8 text-center text-2xl font-bold text-gray-800">
             ローストプラス
           </h1>
-          <p className="text-center text-gray-600">読み込み中...</p>
+          <Loading fullScreen={false} />
         </div>
       </div>
     }>

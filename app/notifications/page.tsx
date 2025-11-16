@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { Loading } from '@/components/Loading';
 import { HiHome } from 'react-icons/hi';
 import { IoAdd, IoCreateOutline, IoTrashOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import type { Notification, NotificationType } from '@/types';
@@ -66,13 +67,7 @@ export default function NotificationsPage() {
   }, [notifications]);
 
   if (authLoading || isLoading || isDeveloperModeLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   // 未認証の場合はリダイレクト中なので何も表示しない

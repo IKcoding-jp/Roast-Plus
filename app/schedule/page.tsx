@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
+import { Loading } from '@/components/Loading';
 import { HiHome, HiCalendar, HiClock, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
 import LoginPage from '@/app/login/page';
@@ -135,13 +136,7 @@ export default function SchedulePage() {
   const isToday = selectedDate === today; // 実際の今日の日付と比較
 
   if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {
@@ -149,13 +144,7 @@ export default function SchedulePage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">データを読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading message="データを読み込み中..." />;
   }
 
   return (

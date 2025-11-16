@@ -5,6 +5,7 @@ import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
+import { Loading } from '@/components/Loading';
 import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress } from '@/lib/firestore';
 import { HiHome, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
@@ -166,13 +167,7 @@ export default function ProgressPage() {
   }, [data?.workProgresses, sortOption, filterTaskName, filterStatus]);
 
   if (authLoading || isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {

@@ -7,6 +7,7 @@ import { useAppData } from '@/hooks/useAppData';
 import { AssignmentTable } from '@/components/AssignmentTable';
 import { MemberTeamManagement } from '@/components/MemberTeamManagement';
 import { TaskLabelManagement } from '@/components/TaskLabelManagement';
+import { Loading } from '@/components/Loading';
 import { HiHome, HiCalendar, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
 import LoginPage from '@/app/login/page';
@@ -118,13 +119,7 @@ export default function AssignmentPage() {
   };
 
   if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {
@@ -132,13 +127,7 @@ export default function AssignmentPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">データを読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading message="データを読み込み中..." />;
   }
 
   return (

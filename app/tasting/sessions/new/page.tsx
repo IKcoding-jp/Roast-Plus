@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
+import { Loading } from '@/components/Loading';
 import type { TastingSession } from '@/types';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
@@ -26,13 +27,7 @@ export default function NewTastingSessionPage() {
   }, [user, authLoading, router]);
 
   if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   // 未認証の場合はリダイレクト中なので何も表示しない
@@ -41,13 +36,7 @@ export default function NewTastingSessionPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">データを読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading message="データを読み込み中..." />;
   }
 
   const tastingSessions = Array.isArray(data.tastingSessions) ? data.tastingSessions : [];

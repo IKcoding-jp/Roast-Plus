@@ -11,6 +11,7 @@ import { IoSettings, IoInformationCircleOutline } from "react-icons/io5";
 import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
 import { VersionUpdateModal } from '@/components/VersionUpdateModal';
+import { Loading } from '@/components/Loading';
 import { shouldShowVersionModal, setLastShownVersion } from '@/lib/versionManager';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
@@ -62,11 +63,7 @@ export default function HomePage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-gray-600">読み込み中...</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {

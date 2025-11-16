@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
+import { Loading } from '@/components/Loading';
 import { HiHome } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
@@ -19,13 +20,7 @@ export default function SettingsPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   if (authLoading || devModeLoading || dataLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="text-center">
-          <div className="text-lg text-gray-600">読み込み中...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {

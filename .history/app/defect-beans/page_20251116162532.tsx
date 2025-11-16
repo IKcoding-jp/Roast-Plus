@@ -71,7 +71,13 @@ export default function DefectBeansPage() {
 
   // 早期リターン（すべてのHooksの後）
   if (authLoading || isLoading) {
-    return <Loading />;
+    return (
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className="text-center">
+          <div className="text-lg text-gray-600">読み込み中...</div>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {

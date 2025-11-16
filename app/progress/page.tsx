@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress } from '@/lib/firestore';
-import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter } from 'react-icons/hi';
+import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
@@ -444,7 +444,7 @@ export default function ProgressPage() {
     return (
       <div
         key={wp.id}
-        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-3 space-y-2.5 bg-white' : 'bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md hover:border-gray-300 transition-all cursor-pointer' : ''}`}
+        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-3 space-y-2.5 bg-white shadow-md' : 'bg-white rounded-lg shadow-md border border-gray-100 p-4 sm:p-5 md:p-6 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-lg hover:border-gray-300 transition-all cursor-pointer' : ''}`}
         onClick={!isDummyWork ? () => setEditingWorkProgressId(wp.id) : undefined}
       >
         {/* 作業名と進捗状態 */}
@@ -479,7 +479,7 @@ export default function ProgressPage() {
                       handleStatusChange(wp.id, e.target.value as WorkProgressStatus);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px] hover:bg-gray-50 pointer-events-auto`}
+                    className="px-2 py-1 text-xs font-medium rounded border bg-gray-50 text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px] hover:bg-gray-100 pointer-events-auto"
                   >
                     <option value="pending">前</option>
                     <option value="in_progress">途中</option>
@@ -522,10 +522,11 @@ export default function ProgressPage() {
                     e.stopPropagation();
                     setAddingProgressWorkProgressId(wp.id);
                   }}
-                  className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center flex-shrink-0 whitespace-nowrap shadow-sm"
+                  className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center gap-1 flex-shrink-0 whitespace-nowrap shadow-sm"
                   aria-label="進捗を記録"
                 >
-                  <HiPlus className="h-3.5 w-3.5" />
+                  <HiPlus className="h-3 w-3" />
+                  <span>記録</span>
                 </button>
               </div>
               
@@ -560,9 +561,9 @@ export default function ProgressPage() {
                 </div>
               )}
               {wp.completedCount !== undefined && wp.completedCount > 0 && (
-                <div className="mt-3 flex items-center gap-1.5">
-                  <span className="text-xs text-gray-600">完成数:</span>
-                  <span className="px-2.5 py-1 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded">
+                <div className="mt-3 flex items-baseline gap-0">
+                  <span className="text-xs text-gray-500">完成数:</span>
+                  <span className="text-base font-bold text-gray-900">
                     {wp.completedCount}個
                   </span>
                 </div>
@@ -574,22 +575,21 @@ export default function ProgressPage() {
         {/* 完成数の表示（目標量がない場合、完成数が入力されている場合のみ） */}
         {!isDummyWork && wp.targetAmount === undefined && wp.completedCount !== undefined && (
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-gray-600">完成数:</span>
-                <span className="px-2.5 py-1 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded">
-                  {wp.completedCount}個
-                </span>
-              </div>
+            <div className="flex items-baseline gap-0">
+              <span className="text-xs text-gray-500">完成数:</span>
+              <span className="text-base font-bold text-gray-900">
+                {wp.completedCount}個
+              </span>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setAddingProgressWorkProgressId(wp.id);
                 }}
-                className="px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center ml-auto whitespace-nowrap shadow-sm"
-                aria-label="完成数を増減"
+                className="ml-auto px-2.5 py-1 text-xs font-medium text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[28px] sm:h-[32px] flex items-center justify-center gap-1 whitespace-nowrap shadow-sm"
+                aria-label="完成数を記録"
               >
-                <HiPencil className="h-3.5 w-3.5" />
+                <HiPlus className="h-3 w-3" />
+                <span>記録</span>
               </button>
             </div>
           </div>
@@ -1684,7 +1684,7 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            {workProgress.targetAmount !== undefined ? '進捗を追加' : '完成数を変更'}
+            {workProgress.targetAmount !== undefined ? '進捗を増減' : '完成数を増減'}
           </h2>
           <button
             onClick={onCancel}
@@ -1697,7 +1697,7 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           <div>
             <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
-              {workProgress.targetAmount !== undefined ? `進捗量（${unit}）` : '完成数の増減（個）'}
+              {workProgress.targetAmount !== undefined ? `進捗量の増減（${unit}）` : '完成数の増減（個）'}
             </label>
             <input
               type="number"
@@ -1705,16 +1705,17 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               step={unit === 'kg' ? '0.1' : '1'}
-              min={workProgress.targetAmount !== undefined ? '0' : undefined}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
-              placeholder={workProgress.targetAmount !== undefined ? `例: 50${unit}` : '例: +10 または -5'}
+              placeholder={workProgress.targetAmount !== undefined ? `例: +50${unit} または -10${unit}` : '例: +10 または -5'}
               autoFocus
             />
-            {workProgress.targetAmount === undefined && (
-              <p className="mt-1 text-xs text-gray-500">
-                正の値を入力すると増加、負の値を入力すると減少します。現在の完成数: {workProgress.completedCount || 0}個
-              </p>
-            )}
+            <p className="mt-1 text-xs text-gray-500">
+              正の値を入力すると増加、負の値を入力すると減少します。
+              {workProgress.targetAmount !== undefined 
+                ? `現在の進捗: ${workProgress.currentAmount || 0}${unit} / ${workProgress.targetAmount}${unit}`
+                : `現在の完成数: ${workProgress.completedCount || 0}個`
+              }
+            </p>
           </div>
           <div>
             <label htmlFor="progressMemo" className="block text-sm font-medium text-gray-700 mb-2">
@@ -1741,7 +1742,7 @@ function ProgressInputDialog({ workProgress, onSave, onCancel }: ProgressInputDi
               type="submit"
               className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
             >
-              {workProgress.targetAmount !== undefined ? '追加' : '更新'}
+              更新
             </button>
           </div>
         </form>

@@ -1062,8 +1062,8 @@ export async function addProgressToWorkProgress(
   
   const now = new Date().toISOString();
   
-  // 進捗量を累積
-  const currentAmount = (existing.currentAmount || 0) + amount;
+  // 進捗量を累積（負の値にならないように保護）
+  const currentAmount = Math.max(0, (existing.currentAmount || 0) + amount);
   
   // 進捗履歴に新しいエントリを追加
   const newProgressEntry: ProgressEntry = {

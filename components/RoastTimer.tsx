@@ -10,8 +10,9 @@ import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
-import { HiPlay, HiPause, HiRefresh, HiFastForward } from 'react-icons/hi';
-import { MdTimer, MdLightbulb } from 'react-icons/md';
+import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiArrowLeft, HiClock } from 'react-icons/hi';
+import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
+import Link from 'next/link';
 
 const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
   '浅煎り',
@@ -403,10 +404,60 @@ export function RoastTimer() {
   const progress = getProgress();
   const remaining = state ? Math.max(0, state.remaining) : 0;
   
-  // SVG円形プログレスバーの設定
-  const size = 280;
-  const strokeWidth = 12;
-  const radius = (size - strokeWidth) / 2;
+  // SVG円形プログレスバーの設定（レスポンシブ対応、余白を活用して大きく表示）
+  const [circleSize, setCircleSize] = useState(340);
+  const strokeWidth = 16;
+  
+  // 画面サイズに応じて円のサイズを調整（スマホでは控えめに、デスクトップでは大きく表示）
+  useEffect(() => {
+    const updateSize = () => {
+      // 画面の高さを考慮してサイズを決定
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      
+      // スマホ（640px未満）の場合は控えめなサイズ
+      if (viewportWidth < 640) {
+        if (viewportHeight >= 900) {
+          setCircleSize(300);
+        } else if (viewportHeight >= 700) {
+          setCircleSize(280);
+        } else {
+          setCircleSize(260);
+        }
+      } else if (viewportHeight >= 900) {
+        // 大きな画面
+        if (viewportWidth >= 1024) {
+          setCircleSize(480); // lg以上
+        } else if (viewportWidth >= 768) {
+          setCircleSize(440); // md以上
+        } else {
+          setCircleSize(400); // sm以上
+        }
+      } else if (viewportHeight >= 700) {
+        // 中程度の画面
+        if (viewportWidth >= 1024) {
+          setCircleSize(440);
+        } else if (viewportWidth >= 768) {
+          setCircleSize(400);
+        } else {
+          setCircleSize(360);
+        }
+      } else {
+        // 小さな画面
+        if (viewportWidth >= 768) {
+          setCircleSize(360);
+        } else {
+          setCircleSize(320);
+        }
+      }
+    };
+    
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  
+  const radius = (circleSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (progress / 100) * circumference;
 
@@ -446,49 +497,66 @@ export function RoastTimer() {
 
       {/* タイマー表示（実行中・一時停止中・完了時のみ表示） */}
       {!isIdle && (
-        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 flex-1 flex flex-col items-center justify-center min-h-0">
-          <div className="flex flex-col items-center justify-center space-y-6 w-full">
+        <div className="bg-white rounded-2xl shadow-xl pt-16 sm:pt-20 p-4 sm:p-6 flex-1 flex flex-col items-center justify-center min-h-0 relative max-w-sm sm:max-w-2xl md:max-w-4xl mx-auto w-full">
+          {/* ヘッダーボタン（オーバーレイ） */}
+          <Link
+            href="/"
+            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-2 flex-shrink-0"
+          >
+            <HiArrowLeft className="text-lg flex-shrink-0" />
+            <span className="hidden sm:inline">ホームに戻る</span>
+          </Link>
+          <Link
+            href="/roast-record"
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+            aria-label="ロースト履歴一覧"
+          >
+            <HiClock className="text-lg flex-shrink-0" />
+            <span className="whitespace-nowrap">ロースト履歴</span>
+          </Link>
+          
+          <div className="flex flex-col items-center justify-center w-full">
             {/* タイトル */}
             {(isRunning || isPaused) && (
-              <div className="text-center space-y-2">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shadow-lg mb-2">
-                  <span className="text-2xl">🔥</span>
+              <div className="text-center space-y-1 flex-shrink-0 -mt-4 sm:-mt-6 mb-2 sm:mb-3">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shadow-lg mb-1">
+                  <MdLocalFireDepartment className="text-2xl sm:text-3xl md:text-4xl text-white" />
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
                   焙煎中
                 </h2>
               </div>
             )}
             {isCompleted && (
-              <div className="text-center space-y-2">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg mb-2">
-                  <span className="text-2xl">✅</span>
+              <div className="text-center space-y-1 flex-shrink-0 -mt-4 sm:-mt-6 mb-2 sm:mb-3">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg mb-1">
+                  <HiCheckCircle className="text-2xl sm:text-3xl md:text-4xl text-white" />
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
                   焙煎完了
                 </h2>
               </div>
             )}
 
             {/* 円形プログレスバー */}
-            <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+            <div className="relative flex-shrink-0 mb-2 sm:mb-3" style={{ width: circleSize, height: circleSize }}>
               <svg
-                width={size}
-                height={size}
+                width={circleSize}
+                height={circleSize}
                 className="transform -rotate-90"
                 style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))' }}
               >
                 <circle
-                  cx={size / 2}
-                  cy={size / 2}
+                  cx={circleSize / 2}
+                  cy={circleSize / 2}
                   r={radius}
                   fill="none"
                   stroke="#e5e7eb"
                   strokeWidth={strokeWidth}
                 />
                 <circle
-                  cx={size / 2}
-                  cy={size / 2}
+                  cx={circleSize / 2}
+                  cy={circleSize / 2}
                   r={radius}
                   fill="none"
                   stroke={progressColor}
@@ -504,11 +572,11 @@ export function RoastTimer() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-amber-600 font-mono">
+                <div className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-amber-600 font-sans">
                   {formatTime(Math.floor(remaining))}
                 </div>
                 {state && (
-                  <div className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">
+                  <div className="text-base sm:text-lg md:text-xl text-gray-500 mt-1 sm:mt-2">
                     {formatTime(Math.floor(state.elapsed))} / {formatTime(state.duration)}
                   </div>
                 )}
@@ -527,7 +595,7 @@ export function RoastTimer() {
 
             {/* 実行中の情報表示 */}
             {state && (isRunning || isPaused || isCompleted) && (
-              <div className="text-center space-y-1 text-xs sm:text-sm text-gray-600">
+              <div className="text-center space-y-0.5 text-xs sm:text-sm text-gray-600 flex-shrink-0 mb-2 sm:mb-3">
                 {state.beanName && <div>豆の名前: {state.beanName}</div>}
                 {state.weight && <div>重さ: {state.weight}g</div>}
                 {state.roastLevel && <div>焙煎度合い: {state.roastLevel}</div>}
@@ -535,7 +603,7 @@ export function RoastTimer() {
             )}
 
             {/* 操作ボタン */}
-            <div className="flex flex-wrap gap-3 sm:gap-4 justify-center w-full max-w-md">
+            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center w-full max-w-md flex-shrink-0">
               {isRunning && (
                 <>
                   <button
@@ -595,7 +663,23 @@ export function RoastTimer() {
 
       {/* 設定フォーム（idle状態のみ表示） */}
       {isIdle && (
-        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 flex-1 flex flex-col min-h-0 overflow-y-auto">
+        <div className="bg-white rounded-2xl shadow-xl pt-16 sm:pt-20 p-4 sm:p-6 flex-1 flex flex-col min-h-0 overflow-y-auto relative max-w-sm sm:max-w-2xl md:max-w-4xl mx-auto w-full">
+          {/* ヘッダーボタン（オーバーレイ） */}
+          <Link
+            href="/"
+            className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-2 flex-shrink-0"
+          >
+            <HiArrowLeft className="text-lg flex-shrink-0" />
+            <span className="hidden sm:inline">ホームに戻る</span>
+          </Link>
+          <Link
+            href="/roast-record"
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+            aria-label="ロースト履歴一覧"
+          >
+            <HiClock className="text-lg flex-shrink-0" />
+            <span className="whitespace-nowrap">ロースト履歴</span>
+          </Link>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）
             <div className="flex-1 flex flex-col items-center justify-center space-y-6 sm:space-y-8">

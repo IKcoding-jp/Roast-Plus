@@ -33,34 +33,9 @@ export default function RoastTimerPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#F7F7F5' }}>
-      <div className="max-w-4xl mx-auto w-full flex flex-col flex-1 min-h-0 px-4 sm:px-6 py-4 sm:py-6">
-        <header className="mb-4 sm:mb-6 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/"
-              className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
-            >
-              <HiArrowLeft className="text-lg flex-shrink-0" />
-              ホームに戻る
-            </Link>
-            <Link
-              href="/roast-record"
-              className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all flex items-center gap-2 flex-shrink-0 min-h-[44px]"
-              aria-label="ロースト履歴一覧"
-            >
-              <HiClock className="text-lg flex-shrink-0" />
-              <span className="hidden sm:inline">ロースト履歴</span>
-            </Link>
-          </div>
-        </header>
-
-        <main className="flex-1 flex flex-col min-h-0">
-          {/* タイマーコンポーネント */}
-          <div className="flex-1 min-h-0">
-            <RoastTimer />
-          </div>
-        </main>
+    <div className="h-screen overflow-hidden flex flex-col px-2 sm:px-4 py-2 sm:py-4" style={{ backgroundColor: '#F7F7F5' }}>
+      <div className="flex-1 min-h-0">
+        <RoastTimer />
       </div>
     </div>
   );

@@ -167,7 +167,7 @@ export default function ProgressPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -378,9 +378,9 @@ export default function ProgressPage() {
 
   // プログレスバーの色を取得
   const getProgressBarColor = (percentage: number): string => {
-    if (percentage >= 90) return 'bg-green-500';
-    if (percentage >= 50) return 'bg-amber-500';
-    return 'bg-gray-400';
+    if (percentage >= 90) return 'bg-green-600';
+    if (percentage >= 50) return 'bg-amber-600';
+    return 'bg-gray-500';
   };
 
   // 単位を抽出（weightフィールドから）
@@ -404,11 +404,11 @@ export default function ProgressPage() {
   const getStatusColor = (status: WorkProgressStatus): string => {
     switch (status) {
       case 'pending':
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-gray-50 text-gray-700 border-gray-300';
       case 'in_progress':
-        return 'bg-amber-100 text-amber-800 border-amber-300';
+        return 'bg-amber-50 text-amber-700 border-amber-400';
       case 'completed':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-green-50 text-green-700 border-green-400';
     }
   };
 
@@ -444,15 +444,15 @@ export default function ProgressPage() {
     return (
       <div
         key={wp.id}
-        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-2 space-y-2' : 'bg-white rounded-lg shadow-md p-3 sm:p-4 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md transition-shadow cursor-pointer' : ''}`}
+        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-3 space-y-3 bg-white' : 'bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md hover:border-gray-300 transition-all cursor-pointer' : ''}`}
         onClick={!isDummyWork ? () => setEditingWorkProgressId(wp.id) : undefined}
       >
         {/* 作業名と進捗状態 */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             {isDummyWork ? (
-              <div className="text-center py-2">
-                <p className="text-xs text-gray-600 mb-1">新しく作業を追加してください</p>
+              <div className="text-center py-4 px-3 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                <p className="text-sm text-gray-500 mb-1">新しく作業を追加してください</p>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -460,16 +460,16 @@ export default function ProgressPage() {
                     setAddMode('work');
                     setShowAddForm(true);
                   }}
-                  className="px-3 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[32px]"
+                  className="px-3 py-1 text-xs font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[32px] shadow-sm"
                 >
                   作業を追加
                 </button>
               </div>
             ) : (
               <>
-                <div className="flex items-center gap-2 flex-wrap mb-1">
+                <div className="flex items-center gap-2 flex-wrap mb-2">
                   {wp.taskName && (
-                    <p className="text-sm font-semibold text-gray-800">{wp.taskName}</p>
+                    <p className="text-base font-semibold text-gray-800">{wp.taskName}</p>
                   )}
                   <select
                     value={wp.status}
@@ -478,7 +478,7 @@ export default function ProgressPage() {
                       handleStatusChange(wp.id, e.target.value as WorkProgressStatus);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
+                    className={`px-2 py-1 text-sm font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[32px] hover:bg-gray-50 pointer-events-auto`}
                   >
                     <option value="pending">前</option>
                     <option value="in_progress">途中</option>
@@ -488,12 +488,12 @@ export default function ProgressPage() {
                 {!isInGroup && wp.weight && (
                   <p className="text-xs text-gray-600 mb-1">数量: {wp.weight}</p>
                 )}
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-3 flex-wrap mt-2">
                   {wp.startedAt && (
-                    <span className="text-xs text-gray-500">開始: {formatDateTime(wp.startedAt)}</span>
+                    <span className="text-xs text-gray-800">開始: {formatDateTime(wp.startedAt)}</span>
                   )}
                   {wp.completedAt && (
-                    <span className="text-xs text-gray-500">完了: {formatDateTime(wp.completedAt)}</span>
+                    <span className="text-xs text-gray-800">完了: {formatDateTime(wp.completedAt)}</span>
                   )}
                 </div>
               </>
@@ -505,23 +505,31 @@ export default function ProgressPage() {
         {!isDummyWork && wp.targetAmount !== undefined && (() => {
           const unit = extractUnit(wp.weight);
           return (
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-700">
-                  {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
-                </span>
-                <span className="font-semibold text-gray-800">
-                  {calculateProgressPercentage(wp).toFixed(0)}%
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="space-y-3">
+              <div className="relative w-full bg-gray-100 rounded-full h-3 sm:h-3.5 overflow-hidden">
                 <div
-                  className={`h-2 rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
+                  className={`h-full rounded-full transition-[width,background-color] duration-700 ease-out ${getProgressBarColor(calculateProgressPercentage(wp))}`}
                   style={{ width: `${calculateProgressPercentage(wp)}%` }}
                 />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className={`text-xs sm:text-sm font-bold drop-shadow-sm ${
+                    calculateProgressPercentage(wp) >= 90 
+                      ? 'text-white' 
+                      : calculateProgressPercentage(wp) >= 50 
+                      ? 'text-amber-900' 
+                      : 'text-gray-800'
+                  }`}>
+                    {calculateProgressPercentage(wp).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <span className="text-sm font-semibold text-gray-700">
+                  {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                </span>
               </div>
               <div className="flex items-center justify-between">
-                <div className="text-xs text-gray-600">
+                <div className="text-xs sm:text-sm text-gray-600">
                   {(() => {
                     const remaining = calculateRemaining(wp);
                     if (remaining === null) return null;
@@ -537,15 +545,16 @@ export default function ProgressPage() {
                     e.stopPropagation();
                     setAddingProgressWorkProgressId(wp.id);
                   }}
-                  className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                  className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center gap-1.5 ml-auto whitespace-nowrap shadow-sm"
                 >
+                  <HiPlus className="h-3.5 w-3.5" />
                   進捗を記録
                 </button>
               </div>
               {wp.completedCount !== undefined && wp.completedCount > 0 && (
-                <div className="mt-1.5 flex items-center gap-1.5">
+                <div className="mt-3 flex items-center gap-1.5">
                   <span className="text-xs text-gray-600">完成数:</span>
-                  <span className="px-2 py-0.5 text-xs font-medium text-green-800 bg-green-100 border border-green-300 rounded">
+                  <span className="px-2.5 py-1 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded">
                     {wp.completedCount}個
                   </span>
                 </div>
@@ -556,11 +565,11 @@ export default function ProgressPage() {
 
         {/* 完成数の表示（目標量がない場合、完成数が入力されている場合のみ） */}
         {!isDummyWork && wp.targetAmount === undefined && wp.completedCount !== undefined && (
-          <div className="space-y-1.5">
+          <div className="space-y-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs text-gray-600">完成数:</span>
-                <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 border border-green-300 rounded">
+                <span className="px-2.5 py-1 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded">
                   {wp.completedCount}個
                 </span>
               </div>
@@ -569,8 +578,9 @@ export default function ProgressPage() {
                   e.stopPropagation();
                   setAddingProgressWorkProgressId(wp.id);
                 }}
-                className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
+                className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors h-[36px] sm:h-[40px] flex items-center justify-center gap-1.5 ml-auto whitespace-nowrap shadow-sm"
               >
+                <HiPencil className="h-3.5 w-3.5" />
                 完成数を増減
               </button>
             </div>
@@ -579,22 +589,26 @@ export default function ProgressPage() {
 
         {/* メモ */}
         {!isDummyWork && wp.memo && (
-          <p className={`text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 ${!isInGroup ? 'mb-2' : ''}`}>{wp.memo}</p>
+          <p className={`text-xs text-gray-500 whitespace-pre-wrap line-clamp-2 ${!isInGroup ? 'mb-2' : ''}`}>{wp.memo}</p>
         )}
 
         {/* 進捗追加履歴 */}
         {!isDummyWork && hasProgressHistory && (
-          <div className="mt-2 pt-2 border-t border-gray-200">
+          <div className="mt-3 pt-3 border-t border-gray-200 bg-gray-50 rounded-lg p-2 -mx-2">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleHistory(wp.id);
               }}
-              className="w-full flex items-center justify-between text-xs text-gray-600 hover:text-gray-800 transition-colors"
+              className={`w-full flex items-center justify-between text-xs transition-colors rounded-lg px-2 py-1.5 ${
+                isHistoryExpanded 
+                  ? 'bg-gray-50 text-gray-800' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
             >
               <span className="font-medium">進捗追加履歴 ({wp.progressHistory!.length}件)</span>
               {isHistoryExpanded ? (
-                <HiChevronUp className="h-4 w-4" />
+                <HiChevronUp className="h-4 w-4 text-amber-600" />
               ) : (
                 <HiChevronDown className="h-4 w-4" />
               )}
@@ -609,7 +623,7 @@ export default function ProgressPage() {
                     return (
                       <div
                         key={entry.id}
-                        className="bg-gray-50 rounded p-2 text-xs border border-gray-200"
+                        className="bg-gray-50 rounded p-2.5 text-xs border border-gray-200"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
@@ -617,11 +631,11 @@ export default function ProgressPage() {
                               {formatAmount(entry.amount, unit)}{unit}
                               {isCompletedCount && '（完成数）'}
                             </div>
-                            <div className="text-gray-500 mt-0.5">
+                            <div className="text-sm text-gray-500 mt-1 mb-1">
                               {formatDateTime(entry.date)}
                             </div>
                             {entry.memo && (
-                              <div className="text-gray-600 mt-1 whitespace-pre-wrap">
+                              <div className="text-gray-700 mt-1 whitespace-pre-wrap">
                                 {entry.memo}
                               </div>
                             )}
@@ -639,7 +653,7 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-7xl">
         {/* ヘッダー */}
         <header className="mb-6 sm:mb-8">
@@ -700,9 +714,9 @@ export default function ProgressPage() {
           });
           
           return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {columns.map((column, columnIndex) => (
-                <div key={columnIndex} className="flex flex-col gap-4 sm:gap-6">
+                <div key={columnIndex} className="flex flex-col gap-4 sm:gap-6 md:gap-8">
                   {column.map((card) => {
                     if (card.type === 'group') {
                       const group = card.data as GroupedWorkProgress;
@@ -712,7 +726,7 @@ export default function ProgressPage() {
                       return (
                         <div
                           key={`group_${groupKey}_${card.index}`}
-                          className="bg-white rounded-lg shadow-md p-3 sm:p-4 w-full"
+                          className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 w-full"
                         >
                           {/* グループヘッダー */}
                           <div className="border-b border-gray-200 pb-2 mb-2">
@@ -721,7 +735,7 @@ export default function ProgressPage() {
                                 className="cursor-pointer hover:bg-gray-50 rounded transition-colors flex-1"
                                 onClick={() => group.groupName && setEditingGroupName(group.groupName)}
                               >
-                                <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+                                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
                                   {groupDisplayName}
                                 </h3>
                               </div>
@@ -733,17 +747,21 @@ export default function ProgressPage() {
                                     setAddMode('work');
                                     setShowAddForm(true);
                                   }}
-                                  className="px-2 py-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors flex items-center gap-1 min-h-[28px] flex-shrink-0"
+                                  className="px-3 py-1.5 text-sm font-semibold text-white bg-amber-600 border border-amber-600 rounded-lg hover:bg-amber-700 hover:border-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] sm:min-h-[40px] flex-shrink-0 shadow-sm"
                                 >
-                                  <HiPlus className="h-3 w-3" />
+                                  <HiPlus className="h-3.5 w-3.5" />
                                   作業を追加
                                 </button>
                               )}
                             </div>
                           </div>
                           {/* グループ内の全作業を状態に関係なく表示 */}
-                          <div className="space-y-2">
-                            {group.workProgresses.map((wp) => renderWorkProgressCard(wp, true, group.groupName))}
+                          <div className="space-y-3">
+                            {group.workProgresses.map((wp, index) => (
+                              <div key={wp.id} className={index < group.workProgresses.length - 1 ? 'border-b border-gray-100 pb-3' : ''}>
+                                {renderWorkProgressCard(wp, true, group.groupName)}
+                              </div>
+                            ))}
                           </div>
                         </div>
                       );

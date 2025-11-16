@@ -7,6 +7,8 @@ import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 interface AssignmentTableProps {
   data: AppData | null;
   onUpdate: (data: AppData) => void;
+  selectedDate: string; // YYYY-MM-DD形式
+  isToday: boolean; // 選択日が今日かどうか
 }
 
 function getMembersByTeam(data: AppData, teamId?: string) {
@@ -361,7 +363,7 @@ function shuffleAssignments(
   return result;
 }
 
-export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
+export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: AssignmentTableProps) {
   const { isEnabled: isDeveloperModeEnabled } = useDeveloperMode();
   const [isShuffling, setIsShuffling] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -391,7 +393,19 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
 
   const teams = data.teams;
   const taskLabels = getTaskLabels(data);
-  const assignments = data.assignments;
+  
+  // 選択日に応じて表示する割り当てを決定
+  const displayAssignments = useMemo(() => {
+    if (isToday) {
+      // 今日の場合は現在の割り当てを表示
+      return data.assignments;
+    } else {
+      // 過去の場合は履歴から該当日の割り当てを取得
+      return data.assignmentHistory.filter((a) => a.assignedDate === selectedDate);
+    }
+  }, [data.assignments, data.assignmentHistory, selectedDate, isToday]);
+  
+  const assignments = displayAssignments;
 
   const isAlreadyShuffled = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -405,6 +419,22 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
 
   const getAssignment = (teamId: string, taskLabelId: string) => {
     return assignments.find((a) => a.teamId === teamId && a.taskLabelId === taskLabelId);
+  };
+
+  // 履歴を更新するヘルパー関数
+  const updateAssignmentHistory = (newAssignments: Assignment[], targetDate: string) => {
+    const updatedHistory = [...data.assignmentHistory];
+    
+    // 該当日の既存の履歴を削除
+    const filteredHistory = updatedHistory.filter((a) => a.assignedDate !== targetDate);
+    
+    // 新しい割り当てを履歴に追加
+    const historyEntries = newAssignments.map((a) => ({
+      ...a,
+      assignedDate: targetDate,
+    }));
+    
+    return [...filteredHistory, ...historyEntries];
   };
 
   // 表示用のラベルリスト（割り当てに含まれるラベルも含める）
@@ -464,19 +494,13 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
 
     if (elapsed >= animationDuration) {
       // 既にアニメーションが終了している場合、即座に結果を表示
-      const newAssignments = event.shuffledAssignments
-        .filter((a) => a.memberId !== null)
-        .map((a) => ({
-          teamId: a.teamId,
-          taskLabelId: a.taskLabelId,
-          memberId: a.memberId,
-          assignedDate: a.assignedDate,
-        }));
+      const today = new Date().toISOString().split('T')[0];
+      const updatedHistory = updateAssignmentHistory(event.shuffledAssignments, today);
 
       const updatedData: AppData = {
         ...data,
         assignments: event.shuffledAssignments,
-        assignmentHistory: [...data.assignmentHistory, ...newAssignments],
+        assignmentHistory: updatedHistory,
         shuffleEvent: undefined,
       };
       onUpdate(updatedData);
@@ -552,17 +576,14 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
       setIsCompleted(true);
 
       if (shuffledAssignments) {
-        const newAssignments = shuffledAssignments.filter((a) => a.memberId !== null).map((a) => ({
-          teamId: a.teamId,
-          taskLabelId: a.taskLabelId,
-          memberId: a.memberId,
-          assignedDate: a.assignedDate,
-        }));
-
+        // 今日の場合はassignmentsと履歴の両方を更新
+        const today = new Date().toISOString().split('T')[0];
+        const updatedHistory = updateAssignmentHistory(shuffledAssignments, today);
+        
         const updatedData: AppData = {
           ...data,
           assignments: shuffledAssignments,
-          assignmentHistory: [...data.assignmentHistory, ...newAssignments],
+          assignmentHistory: updatedHistory,
           shuffleEvent: undefined, // アニメーション終了時にイベントを削除
         };
         onUpdate(updatedData);
@@ -660,7 +681,7 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
                       selectedCell &&
                       selectedCell.teamId === team.id &&
                       selectedCell.taskLabelId === label.id;
-                    const canInteract = !isShuffling && !isAnimating;
+                    const canInteract = !isShuffling && !isAnimating && isToday;
 
                     return (
                       <td
@@ -742,11 +763,24 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
                                   });
                                 }
 
-                                const updatedData: AppData = {
-                                  ...data,
-                                  assignments: updatedAssignments,
-                                };
-                                onUpdate(updatedData);
+                                // 今日の場合はassignmentsと履歴の両方を更新
+                                if (isToday) {
+                                  const updatedHistory = updateAssignmentHistory(updatedAssignments, today);
+                                  const updatedData: AppData = {
+                                    ...data,
+                                    assignments: updatedAssignments,
+                                    assignmentHistory: updatedHistory,
+                                  };
+                                  onUpdate(updatedData);
+                                } else {
+                                  // 過去の場合は履歴のみ更新（表示用）
+                                  const updatedHistory = updateAssignmentHistory(updatedAssignments, selectedDate);
+                                  const updatedData: AppData = {
+                                    ...data,
+                                    assignmentHistory: updatedHistory,
+                                  };
+                                  onUpdate(updatedData);
+                                }
                                 setSelectedCell(null);
                                 setHighlightedCell(null);
                               }
@@ -759,7 +793,7 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
                                 : isHighlighted
                                 ? 'border-orange-500 bg-orange-100 text-gray-900 scale-105 shadow-lg'
                                 : 'border-orange-400 bg-orange-50 text-gray-900'
-                            } ${canInteract ? 'hover:opacity-80 cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+                            } ${canInteract ? 'hover:opacity-80 cursor-pointer' : 'cursor-not-allowed'}`}
                             disabled={!canInteract}
                           >
                             {displayName || '\u00A0'}
@@ -783,45 +817,12 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
           </table>
         </div>
       </div>
-      <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-        <button
-          onClick={() => {
-            const shuffled = shuffleAssignments(data);
-            const shuffleEvent: ShuffleEvent = {
-              startTime: new Date().toISOString(),
-              shuffledAssignments: shuffled,
-            };
-            
-            // shuffleEventをFirestoreに書き込む
-            const updatedData: AppData = {
-              ...data,
-              shuffleEvent,
-            };
-            onUpdate(updatedData);
-            
-            // ローカルでもアニメーションを開始
-            setIsShuffling(true);
-            setIsAnimating(true);
-            setIsCompleted(false);
-            setSelectedCell(null);
-            setHighlightedCell(null);
-            setShuffledAssignments(shuffled);
-          }}
-          disabled={isShuffling || isAnimating || isAlreadyShuffled || isWeekend}
-          className="px-6 py-3 sm:px-8 sm:py-4 bg-orange-500 text-white text-base sm:text-lg rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-        >
-          {isShuffling || isAnimating
-            ? 'シャッフル中...'
-            : isWeekend
-            ? '土日は休みです'
-            : isAlreadyShuffled
-            ? '既にシャッフル済みです'
-            : 'シャッフルして担当を決める'}
-        </button>
-        {isDeveloperModeEnabled && (
+      {/* シャッフルボタンは平日かつ今日の場合のみ表示 */}
+      {isToday && !isWeekend && (
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={() => {
-              const shuffled = shuffleAssignments(data);
+              const shuffled = shuffleAssignments(data, selectedDate);
               const shuffleEvent: ShuffleEvent = {
                 startTime: new Date().toISOString(),
                 shuffledAssignments: shuffled,
@@ -842,14 +843,48 @@ export function AssignmentTable({ data, onUpdate }: AssignmentTableProps) {
               setHighlightedCell(null);
               setShuffledAssignments(shuffled);
             }}
-            disabled={isShuffling || isAnimating}
-            className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-600 text-white text-sm sm:text-base rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            title="開発用: 制限なしでシャッフル"
+            disabled={isShuffling || isAnimating || isAlreadyShuffled}
+            className="px-6 py-3 sm:px-8 sm:py-4 bg-orange-500 text-white text-base sm:text-lg rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {isShuffling || isAnimating ? 'シャッフル中...' : '開発用: 強制シャッフル'}
+            {isShuffling || isAnimating
+              ? 'シャッフル中...'
+              : isAlreadyShuffled
+              ? '既にシャッフル済みです'
+              : 'シャッフルして担当を決める'}
           </button>
-        )}
-      </div>
+          {isDeveloperModeEnabled && (
+            <button
+              onClick={() => {
+                const shuffled = shuffleAssignments(data, selectedDate);
+                const shuffleEvent: ShuffleEvent = {
+                  startTime: new Date().toISOString(),
+                  shuffledAssignments: shuffled,
+                };
+                
+                // shuffleEventをFirestoreに書き込む
+                const updatedData: AppData = {
+                  ...data,
+                  shuffleEvent,
+                };
+                onUpdate(updatedData);
+                
+                // ローカルでもアニメーションを開始
+                setIsShuffling(true);
+                setIsAnimating(true);
+                setIsCompleted(false);
+                setSelectedCell(null);
+                setHighlightedCell(null);
+                setShuffledAssignments(shuffled);
+              }}
+              disabled={isShuffling || isAnimating}
+              className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-600 text-white text-sm sm:text-base rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              title="開発用: 制限なしでシャッフル"
+            >
+              {isShuffling || isAnimating ? 'シャッフル中...' : '開発用: 強制シャッフル'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

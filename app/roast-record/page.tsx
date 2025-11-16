@@ -129,7 +129,7 @@ function RoastRecordPageContent() {
     };
 
     return (
-      <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-2xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -199,7 +199,7 @@ function RoastRecordPageContent() {
     };
 
     return (
-      <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-2xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -235,7 +235,7 @@ function RoastRecordPageContent() {
 
   // 一覧表示（デフォルト）
   return (
-    <div className="h-screen overflow-y-hidden bg-amber-50 flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4">
+    <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

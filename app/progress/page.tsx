@@ -674,7 +674,7 @@ export default function ProgressPage() {
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-7xl">
         {/* ヘッダー */}
         <header className="mb-6 sm:mb-8">
-          <div className="grid grid-cols-3 items-center mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 items-center mb-4">
             {/* 左側: ホームに戻る */}
             <div className="flex justify-start">
               <Link
@@ -688,7 +688,7 @@ export default function ProgressPage() {
             </div>
 
             {/* 中央: タイトル */}
-            <div className="flex justify-center items-center gap-2 sm:gap-4 min-w-0">
+            <div className="hidden sm:flex justify-center items-center gap-2 sm:gap-4 min-w-0">
               <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
               <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">作業進捗</h1>
             </div>

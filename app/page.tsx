@@ -22,6 +22,7 @@ export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [showVersionModal, setShowVersionModal] = useState(false);
+  const [showLoadingDebugModal, setShowLoadingDebugModal] = useState(false);
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
 
   useEffect(() => {
@@ -53,6 +54,11 @@ export default function HomePage() {
     setShowVersionModal(true);
   };
 
+  // 開発用: Lottieアニメーション確認モーダルを表示
+  const handleShowLoadingDebugModal = () => {
+    setShowLoadingDebugModal(true);
+  };
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -79,6 +85,42 @@ export default function HomePage() {
         currentVersion={APP_VERSION}
       />
 
+      {/* 開発用: Lottieアニメーション確認モーダル */}
+      {showLoadingDebugModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowLoadingDebugModal(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-8 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Lottieアニメーション確認</h2>
+              <button
+                onClick={() => setShowLoadingDebugModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                aria-label="閉じる"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mb-4">
+              <Loading fullScreen={false} message="読み込み中..." />
+            </div>
+            <div className="mb-4">
+              <Loading fullScreen={false} message="データを読み込み中..." />
+            </div>
+            <button
+              onClick={() => setShowLoadingDebugModal(false)}
+              className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ヘッダー */}
       <header className="flex items-center justify-between bg-dark px-6 py-4 shadow-sm">
         <div className="flex items-center gap-2">
@@ -89,14 +131,24 @@ export default function HomePage() {
         <div className="flex items-center gap-4">
           {/* 開発者モード: バージョンアップモーダル表示ボタン */}
           {isDeveloperMode && (
-            <button
-              onClick={handleShowVersionModalForDev}
-              className="p-2 text-white hover:text-gray-200 hover:bg-dark-light rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-              aria-label="バージョンアップモーダルを表示"
-              title="開発用: バージョンアップモーダルを表示"
-            >
-              <IoInformationCircleOutline className="h-6 w-6" />
-            </button>
+            <>
+              <button
+                onClick={handleShowVersionModalForDev}
+                className="p-2 text-white hover:text-gray-200 hover:bg-dark-light rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="バージョンアップモーダルを表示"
+                title="開発用: バージョンアップモーダルを表示"
+              >
+                <IoInformationCircleOutline className="h-6 w-6" />
+              </button>
+              <button
+                onClick={handleShowLoadingDebugModal}
+                className="p-2 text-white hover:text-gray-200 hover:bg-dark-light rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Lottieアニメーション確認"
+                title="開発用: Lottieアニメーション確認"
+              >
+                <PiCoffeeBeanFill className="h-6 w-6" />
+              </button>
+            </>
           )}
           <button
             onClick={handleLogout}

@@ -42,14 +42,14 @@ export function Loading({ message = '読み込み中...', fullScreen = true }: L
       <div className="text-center">
         <div className="flex justify-center mb-4">
           {isLoading || !animationData ? (
-            <div className="w-[120px] h-[120px] flex items-center justify-center">
+            <div className="w-[200px] h-[200px] flex items-center justify-center">
               <div className="text-gray-400">読み込み中...</div>
             </div>
           ) : (
             <Lottie
               animationData={animationData}
               loop={true}
-              style={{ width: 120, height: 120 }}
+              style={{ width: 200, height: 200 }}
             />
           )}
         </div>

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
 
 const SPLASH_DISPLAY_TIME = 3000; // 3秒
-const SPLASH_SHOWN_KEY = 'roastplus_splash_shown'; // セッション開始時のフラグ
 
 export function SplashScreen() {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,19 +12,6 @@ export function SplashScreen() {
   const [isTextVisible, setIsTextVisible] = useState(false);
 
   useEffect(() => {
-    // セッション開始時（ページが最初に読み込まれた時）のみ表示
-    // sessionStorageを使用することで、タブが開いている間は一度だけ表示される
-    if (typeof window === 'undefined') return;
-
-    const splashShown = sessionStorage.getItem(SPLASH_SHOWN_KEY);
-    if (splashShown === 'true') {
-      // 既に表示済みの場合は何もしない
-      return;
-    }
-
-    // セッション開始フラグを設定
-    sessionStorage.setItem(SPLASH_SHOWN_KEY, 'true');
-
     // Lottieアニメーションを読み込む
     const loadAnimation = async () => {
       try {

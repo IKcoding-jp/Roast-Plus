@@ -63,6 +63,12 @@ export function TastingRecordForm({
 
   // 全メンバーを取得（アクティブなメンバーのみ）
   const activeMembers = data.members.filter((m) => m.active !== false);
+  
+  // 管理者も選択可能にする（管理者が存在する場合）
+  const selectableMembers = [
+    ...activeMembers,
+    ...(data.manager ? [{ id: data.manager.id, name: data.manager.name }] : [])
+  ];
 
   // メンバー選択用のstate（新規作成時は空、編集時は既存のmemberIdを初期値）
   const [selectedMemberId, setSelectedMemberId] = useState<string>(
@@ -327,7 +333,7 @@ export function TastingRecordForm({
           <option value="" className="text-gray-900">
             選択してください
           </option>
-          {activeMembers.map((member) => (
+          {selectableMembers.map((member) => (
             <option key={member.id} value={member.id} className="text-gray-900">
               {member.name}
             </option>

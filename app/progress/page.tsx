@@ -502,10 +502,7 @@ export default function ProgressPage() {
               {/* 数量とボタン */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-gray-800">
-                    {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-0.5">
+                  <div className="text-xs text-gray-500 mb-0.5">
                     {(() => {
                       const remaining = calculateRemaining(wp);
                       if (remaining === null) return null;
@@ -515,6 +512,9 @@ export default function ProgressPage() {
                       }
                       return `残り${formatAmount(remaining, unit)}${unit}`;
                     })()}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-800">
+                    {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
                   </div>
                 </div>
                 <button

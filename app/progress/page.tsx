@@ -35,6 +35,7 @@ export default function ProgressPage() {
   const [showModeSelectDialog, setShowModeSelectDialog] = useState(false);
   const [addMode, setAddMode] = useState<'group' | 'work' | null>(null);
   const [showAddGroupForm, setShowAddGroupForm] = useState(false);
+  const [expandedHistoryIds, setExpandedHistoryIds] = useState<Set<string>>(new Set());
 
   // 作業をグループ化（groupNameが設定されている場合のみグループ化、未入力の場合は個別カードとして表示）
   // 注意: すべてのフックは早期リターンの前に呼び出す必要がある
@@ -363,14 +364,29 @@ export default function ProgressPage() {
     return `${month}/${day} ${hours}:${minutes}`;
   };
 
+  // 進捗履歴の折りたたみ状態を切り替え
+  const toggleHistory = (workProgressId: string) => {
+    setExpandedHistoryIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(workProgressId)) {
+        newSet.delete(workProgressId);
+      } else {
+        newSet.add(workProgressId);
+      }
+      return newSet;
+    });
+  };
+
   // 作業カードをレンダリングする関数
   const renderWorkProgressCard = (wp: WorkProgress, isInGroup: boolean = false, groupName?: string) => {
     const isDummyWork = !wp.taskName || wp.taskName.trim() === '';
+    const isHistoryExpanded = expandedHistoryIds.has(wp.id);
+    const hasProgressHistory = wp.progressHistory && wp.progressHistory.length > 0;
     
     return (
       <div
         key={wp.id}
-        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-2 space-y-2' : 'bg-white rounded-lg shadow-md p-3 sm:p-4'} ${!isDummyWork ? 'hover:shadow-md transition-shadow' : ''}`}
+        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-2 space-y-2' : 'bg-white rounded-lg shadow-md p-3 sm:p-4 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md transition-shadow' : ''}`}
       >
         {/* 作業名と進捗状態 */}
         <div className="flex items-start justify-between gap-2">
@@ -508,6 +524,56 @@ export default function ProgressPage() {
         {!isDummyWork && wp.memo && (
           <p className={`text-xs text-gray-600 whitespace-pre-wrap line-clamp-2 ${!isInGroup ? 'mb-2' : ''}`}>{wp.memo}</p>
         )}
+
+        {/* 進捗追加履歴 */}
+        {!isDummyWork && hasProgressHistory && (
+          <div className="mt-2 pt-2 border-t border-gray-200">
+            <button
+              onClick={() => toggleHistory(wp.id)}
+              className="w-full flex items-center justify-between text-xs text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <span className="font-medium">進捗追加履歴 ({wp.progressHistory!.length}件)</span>
+              {isHistoryExpanded ? (
+                <HiChevronUp className="h-4 w-4" />
+              ) : (
+                <HiChevronDown className="h-4 w-4" />
+              )}
+            </button>
+            {isHistoryExpanded && (
+              <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+                {[...wp.progressHistory!]
+                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                  .map((entry) => {
+                    const unit = extractUnit(wp.weight);
+                    const isCompletedCount = wp.targetAmount === undefined;
+                    return (
+                      <div
+                        key={entry.id}
+                        className="bg-gray-50 rounded p-2 text-xs border border-gray-200"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-800">
+                              {formatAmount(entry.amount, unit)}{unit}
+                              {isCompletedCount && '（完成数）'}
+                            </div>
+                            <div className="text-gray-500 mt-0.5">
+                              {formatDateTime(entry.date)}
+                            </div>
+                            {entry.memo && (
+                              <div className="text-gray-600 mt-1 whitespace-pre-wrap">
+                                {entry.memo}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -550,7 +616,7 @@ export default function ProgressPage() {
         </header>
 
         {/* シンプルなカンバン形式のレイアウト */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 sm:gap-6">
           {/* グループ化されたカード */}
           {groupedWorkProgresses.groups.map((group, groupIndex) => {
             const groupKey = group.groupName || group.taskName || '';
@@ -559,7 +625,7 @@ export default function ProgressPage() {
             return (
               <div
                 key={`group_${groupKey}_${groupIndex}`}
-                className="bg-white rounded-lg shadow-md p-3 sm:p-4"
+                className="bg-white rounded-lg shadow-md p-3 sm:p-4 break-inside-avoid mb-4 sm:mb-6 w-full inline-block"
               >
                 {/* グループヘッダー */}
                 <div className="border-b border-gray-200 pb-2 mb-2">

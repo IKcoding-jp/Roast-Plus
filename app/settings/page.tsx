@@ -85,6 +85,38 @@ export default function SettingsPage() {
         </header>
 
         <main className="space-y-6">
+          {/* テーマ設定セクション */}
+          <Link
+            href="/settings/theme"
+            className="block bg-white rounded-lg shadow-md p-6 transition-shadow hover:shadow-lg"
+          >
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              テーマ設定
+            </h2>
+            <p className="text-sm text-gray-600">
+              アプリのカラースキームを選択できます
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              開発予定
+            </p>
+          </Link>
+
+          {/* フォント設定セクション */}
+          <Link
+            href="/settings/font"
+            className="block bg-white rounded-lg shadow-md p-6 transition-shadow hover:shadow-lg"
+          >
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              フォント設定
+            </h2>
+            <p className="text-sm text-gray-600">
+              フォントファミリーとフォントサイズを調整できます
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              開発予定
+            </p>
+          </Link>
+
           {/* 開発者モードセクション */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">

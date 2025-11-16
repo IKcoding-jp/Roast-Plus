@@ -577,7 +577,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
                   }}
                   min="0"
                   max="23"
-                  className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-sm md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                  className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
                     addError 
                       ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
                       : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'

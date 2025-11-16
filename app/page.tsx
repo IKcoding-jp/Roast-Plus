@@ -36,7 +36,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-gray-600">読み込み中...</div>
       </div>
     );
@@ -47,7 +47,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#F7F7F5' }}>
       {/* ヘッダー */}
       <header className="flex items-center justify-between bg-dark px-6 py-4 shadow-sm">
         <div className="flex items-center gap-2">

@@ -136,7 +136,7 @@ export default function SchedulePage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -150,7 +150,7 @@ export default function SchedulePage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">データを読み込み中...</div>
         </div>
@@ -159,7 +159,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="h-screen md:h-[100dvh] lg:h-screen bg-amber-50 pt-2 pb-4 px-4 sm:py-4 sm:px-4 lg:py-6 lg:px-6 flex flex-col overflow-hidden">
+    <div className="h-screen md:h-[100dvh] lg:h-screen pt-2 pb-4 px-4 sm:py-4 sm:px-4 lg:py-6 lg:px-6 flex flex-col overflow-hidden" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="w-full flex-1 flex flex-col min-h-0 lg:max-w-7xl lg:mx-auto">
         {/* ヘッダー */}
         <header className="mb-4 flex-shrink-0 flex items-center justify-between">

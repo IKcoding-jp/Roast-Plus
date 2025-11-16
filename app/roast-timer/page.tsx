@@ -20,7 +20,7 @@ export default function RoastTimerPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -33,7 +33,7 @@ export default function RoastTimerPage() {
   }
 
   return (
-    <div className="h-screen bg-amber-50 flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-4xl mx-auto w-full flex flex-col flex-1 min-h-0 px-4 sm:px-6 py-4 sm:py-6">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="flex items-center justify-between">

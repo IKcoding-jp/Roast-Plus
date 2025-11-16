@@ -45,7 +45,7 @@ function RoastRecordPageContent() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -60,7 +60,7 @@ function RoastRecordPageContent() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">データを読み込み中...</div>
         </div>
@@ -77,7 +77,7 @@ function RoastRecordPageContent() {
     const record = roastTimerRecords.find((r) => r.id === recordId);
     if (!record) {
       return (
-        <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
               <p className="text-gray-600 mb-4">記録が見つかりません</p>
@@ -277,7 +277,7 @@ export default function RoastRecordPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-amber-50">
+        <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
           <div className="text-center">
             <div className="text-lg text-gray-600">読み込み中...</div>
           </div>

@@ -18,7 +18,7 @@ export default function TastingDetailPageClient() {
   }, [params, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="text-center">
         <div className="text-lg text-gray-600">リダイレクト中...</div>
       </div>

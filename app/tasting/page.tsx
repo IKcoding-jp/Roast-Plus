@@ -38,7 +38,7 @@ function TastingPageContent() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>
@@ -53,7 +53,7 @@ function TastingPageContent() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">データを読み込み中...</div>
         </div>
@@ -69,7 +69,7 @@ function TastingPageContent() {
     const session = tastingSessions.find((s) => s.id === sessionId);
     if (!session) {
       return (
-        <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
               <p className="text-gray-600 mb-4">セッションが見つかりません</p>
@@ -163,7 +163,7 @@ function TastingPageContent() {
     const record = tastingRecords.find((r) => r.id === recordId);
     if (!record) {
       return (
-        <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
               <p className="text-gray-600 mb-4">記録が見つかりません</p>
@@ -256,7 +256,7 @@ function TastingPageContent() {
     const session = tastingSessions.find((s) => s.id === sessionId);
     if (!session) {
       return (
-        <div className="min-h-screen bg-amber-50 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
               <p className="text-gray-600 mb-4">セッションが見つかりません</p>
@@ -301,7 +301,7 @@ function TastingPageContent() {
   const isEmpty = tastingSessions.length === 0;
   
   return (
-    <div className="h-screen overflow-y-hidden bg-amber-50 flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4">
+    <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -343,7 +343,7 @@ function TastingPageContent() {
 export default function TastingPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-amber-50">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="text-center">
           <div className="text-lg text-gray-600">読み込み中...</div>
         </div>

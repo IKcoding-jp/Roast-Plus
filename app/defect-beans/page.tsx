@@ -268,7 +268,7 @@ export default function DefectBeansPage() {
         </header>
 
         {/* 検索とフィルタ */}
-        {filteredDefectBeans.length > 0 && (
+        {allDefectBeans.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-4">
             <div className="flex flex-col sm:flex-row gap-3">
               {/* 検索 */}

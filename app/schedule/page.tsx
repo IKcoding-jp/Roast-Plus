@@ -157,21 +157,14 @@ export default function SchedulePage() {
 
   // OCR結果を反映する処理
   const handleOCRSuccess = useCallback(
-    (timeLabels: TimeLabel[], roastSchedules: RoastSchedule[]) => {
+    (mode: 'replace' | 'add', timeLabels: TimeLabel[], roastSchedules: RoastSchedule[]) => {
       if (!data) return;
 
       // 既存のデータとマージするか確認
       const existingTodaySchedule = data.todaySchedules?.find((s) => s.date === selectedDate);
       const existingRoastSchedules = data.roastSchedules?.filter((s) => s.date === selectedDate) || [];
 
-      const shouldReplace =
-        existingTodaySchedule?.timeLabels.length === 0 && existingRoastSchedules.length === 0
-          ? true
-          : window.confirm(
-              '既存のスケジュールがあります。置き換えますか？\n（キャンセルを選択すると既存のスケジュールに追加されます）'
-            );
-
-      if (shouldReplace) {
+      if (mode === 'replace') {
         // 置き換え
         const updatedTodaySchedules = [...(data.todaySchedules || [])];
         const existingTodayIndex = updatedTodaySchedules.findIndex((s) => s.date === selectedDate);

@@ -3,24 +3,29 @@
 import { useState, useRef, useEffect } from 'react';
 import { CameraCapture } from './CameraCapture';
 import { Loading } from './Loading';
+import { OCRConfirmModal } from './OCRConfirmModal';
 import { extractScheduleFromImage } from '@/lib/scheduleOCR';
 import type { TimeLabel, RoastSchedule } from '@/types';
 import { HiX, HiPhotograph } from 'react-icons/hi';
 import { useToastContext } from './Toast';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { useAppData } from '@/hooks/useAppData';
 
 interface ScheduleOCRModalProps {
   selectedDate: string;
-  onSuccess: (timeLabels: TimeLabel[], roastSchedules: RoastSchedule[]) => void;
+  onSuccess: (mode: 'replace' | 'add', timeLabels: TimeLabel[], roastSchedules: RoastSchedule[]) => void;
   onCancel: () => void;
 }
 
 export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: ScheduleOCRModalProps) {
   const { showToast } = useToastContext();
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
+  const { data } = useAppData();
   const [showCamera, setShowCamera] = useState(false); // 初期状態は選択画面
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ocrResult, setOcrResult] = useState<{ timeLabels: TimeLabel[]; roastSchedules: RoastSchedule[] } | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 開発者モードの状態に応じて初期表示を設定
@@ -38,7 +43,8 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
 
     try {
       const { timeLabels, roastSchedules } = await extractScheduleFromImage(file, selectedDate);
-      onSuccess(timeLabels, roastSchedules);
+      setOcrResult({ timeLabels, roastSchedules });
+      setShowConfirm(true);
     } catch (err: any) {
       console.error('OCR処理エラー:', err);
       console.error('エラー詳細:', {
@@ -114,8 +120,44 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
     }
   };
 
+  // 確認画面を表示
+  if (showConfirm && ocrResult) {
+    const existingTodaySchedule = data?.todaySchedules?.find((s) => s.date === selectedDate);
+    const existingTimeLabels = existingTodaySchedule?.timeLabels || [];
+    const existingRoastSchedules = data?.roastSchedules?.filter((s) => s.date === selectedDate) || [];
+
+    return (
+      <OCRConfirmModal
+        timeLabels={ocrResult.timeLabels}
+        roastSchedules={ocrResult.roastSchedules}
+        selectedDate={selectedDate}
+        existingTimeLabels={existingTimeLabels}
+        existingRoastSchedules={existingRoastSchedules}
+        onSave={(mode, timeLabels, roastSchedules) => {
+          setShowConfirm(false);
+          setOcrResult(null);
+          onSuccess(mode, timeLabels, roastSchedules);
+        }}
+        onCancel={() => {
+          setShowConfirm(false);
+          setOcrResult(null);
+          onCancel();
+        }}
+        onRetry={() => {
+          setShowConfirm(false);
+          setOcrResult(null);
+          if (isDeveloperMode) {
+            setShowCamera(false);
+          } else {
+            setShowCamera(true);
+          }
+        }}
+      />
+    );
+  }
+
   // 開発者モードの場合は選択画面を表示
-  if (isDeveloperMode && !showCamera && !isProcessing && !error) {
+  if (isDeveloperMode && !showCamera && !isProcessing && !error && !showConfirm) {
     return (
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">

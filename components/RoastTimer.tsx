@@ -776,7 +776,7 @@ export function RoastTimer() {
                     className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-lg font-bold text-base shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[56px]"
                   >
                     <MdLightbulb className="text-xl text-amber-600" />
-                    <span>おすすめ焙煎でスタート</span>
+                    <span>おすすめ焙煎でスタート ※未完成</span>
                   </button>
                 </div>
               </div>

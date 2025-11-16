@@ -444,7 +444,8 @@ export default function ProgressPage() {
     return (
       <div
         key={wp.id}
-        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-2 space-y-2' : 'bg-white rounded-lg shadow-md p-3 sm:p-4 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md transition-shadow' : ''}`}
+        className={`${isInGroup ? 'border border-gray-200 rounded-lg p-2 space-y-2' : 'bg-white rounded-lg shadow-md p-3 sm:p-4 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'} ${!isDummyWork ? 'hover:shadow-md transition-shadow cursor-pointer' : ''}`}
+        onClick={!isDummyWork ? () => setEditingWorkProgressId(wp.id) : undefined}
       >
         {/* 作業名と進捗状態 */}
         <div className="flex items-start justify-between gap-2">
@@ -472,7 +473,11 @@ export default function ProgressPage() {
                   )}
                   <select
                     value={wp.status}
-                    onChange={(e) => handleStatusChange(wp.id, e.target.value as WorkProgressStatus)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleStatusChange(wp.id, e.target.value as WorkProgressStatus);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                     className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(wp.status)} focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[28px]`}
                   >
                     <option value="pending">前</option>
@@ -494,24 +499,6 @@ export default function ProgressPage() {
               </>
             )}
           </div>
-          {!isDummyWork && (
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <button
-                onClick={() => setEditingWorkProgressId(wp.id)}
-                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
-                aria-label="編集"
-              >
-                <HiPencil className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() => handleDeleteWorkProgress(wp.id)}
-                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
-                aria-label="削除"
-              >
-                <HiTrash className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
         </div>
         
         {/* プログレスバーと進捗情報 */}
@@ -546,7 +533,10 @@ export default function ProgressPage() {
                   })()}
                 </div>
                 <button
-                  onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAddingProgressWorkProgressId(wp.id);
+                  }}
                   className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
                 >
                   進捗を記録
@@ -575,7 +565,10 @@ export default function ProgressPage() {
                 </span>
               </div>
               <button
-                onClick={() => setAddingProgressWorkProgressId(wp.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setAddingProgressWorkProgressId(wp.id);
+                }}
                 className="px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded hover:bg-amber-100 transition-colors min-h-[24px]"
               >
                 完成数を増減
@@ -593,7 +586,10 @@ export default function ProgressPage() {
         {!isDummyWork && hasProgressHistory && (
           <div className="mt-2 pt-2 border-t border-gray-200">
             <button
-              onClick={() => toggleHistory(wp.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleHistory(wp.id);
+              }}
               className="w-full flex items-center justify-between text-xs text-gray-600 hover:text-gray-800 transition-colors"
             >
               <span className="font-medium">進捗追加履歴 ({wp.progressHistory!.length}件)</span>
@@ -869,6 +865,10 @@ export default function ProgressPage() {
                 return Array.from(groups).sort();
               })()}
               onSave={(updates) => handleUpdateWorkProgress(editingWorkProgressId, updates)}
+              onDelete={() => {
+                setEditingWorkProgressId(null);
+                handleDeleteWorkProgress(editingWorkProgressId);
+              }}
               onCancel={() => setEditingWorkProgressId(null)}
             />
           );
@@ -1017,7 +1017,6 @@ function GroupCreateForm({ onSave, onCancel }: GroupCreateFormProps) {
   );
 }
 
-// グループ編集フォームコンポーネント
 interface GroupEditFormProps {
   groupName: string;
   workProgresses: WorkProgress[];
@@ -1141,9 +1140,10 @@ interface WorkProgressFormProps {
   existingGroups?: string[];
   onSave: (workProgress: Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'> | Partial<Omit<WorkProgress, 'id' | 'createdAt'>>) => void;
   onCancel: () => void;
+  onDelete?: () => void;
 }
 
-function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideGroupName, existingGroups = [], onSave, onCancel }: WorkProgressFormProps) {
+function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideGroupName, existingGroups = [], onSave, onCancel, onDelete }: WorkProgressFormProps) {
   const [groupName, setGroupName] = useState(workProgress?.groupName || initialGroupName || initialValues?.groupName || '');
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [taskName, setTaskName] = useState(workProgress?.taskName || initialValues?.taskName || '');
@@ -1505,20 +1505,31 @@ function WorkProgressForm({ workProgress, initialValues, initialGroupName, hideG
               placeholder="メモや備考を入力してください"
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
-            >
-              キャンセル
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
-            >
-              {workProgress ? '更新' : '追加'}
-            </button>
+          <div className="flex justify-between items-center gap-3 pt-4 border-t border-gray-200">
+            {workProgress && onDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                className="px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition-colors min-h-[44px]"
+              >
+                削除
+              </button>
+            )}
+            <div className="flex gap-3 ml-auto">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors min-h-[44px]"
+              >
+                キャンセル
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]"
+              >
+                {workProgress ? '更新' : '追加'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

@@ -674,37 +674,46 @@ export default function ProgressPage() {
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-7xl">
         {/* ヘッダー */}
         <header className="mb-6 sm:mb-8">
-          <div className="relative flex items-center justify-between mb-4">
-            <Link
-              href="/"
-              className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
-            >
-              <HiArrowLeft className="text-lg flex-shrink-0" />
-              ホームに戻る
-            </Link>
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2 sm:gap-4">
+          <div className="grid grid-cols-3 items-center mb-4">
+            {/* 左側: ホームに戻る */}
+            <div className="flex justify-start">
+              <Link
+                href="/"
+                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0 min-h-[44px]"
+              >
+                <HiArrowLeft className="text-lg flex-shrink-0" />
+                ホームに戻る
+              </Link>
+            </div>
+
+            {/* 中央: タイトル */}
+            <div className="flex justify-center items-center gap-2 sm:gap-4">
               <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600" />
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">作業進捗</h1>
             </div>
-            {!showEmptyState && (
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
-                <button
-                  onClick={() => setShowFilterDialog(true)}
-                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center gap-1.5 min-h-[36px]"
-                  aria-label="フィルタと並び替え"
-                >
-                  <HiFilter className="h-4 w-4" />
-                  <span className="hidden sm:inline">フィルタ・並び替え</span>
-                </button>
-                <button
-                  onClick={() => setShowAddGroupForm(true)}
-                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0 shadow-sm"
-                >
-                  <HiPlus className="h-4 w-4" />
-                  <span>作業グループを作成</span>
-                </button>
-              </div>
-            )}
+
+            {/* 右側: アクションボタン */}
+            <div className="flex justify-end items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              {!showEmptyState && (
+                <>
+                  <button
+                    onClick={() => setShowFilterDialog(true)}
+                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center gap-1.5 min-h-[36px]"
+                    aria-label="フィルタと並び替え"
+                  >
+                    <HiFilter className="h-4 w-4" />
+                    <span className="hidden sm:inline">フィルタ・並び替え</span>
+                  </button>
+                  <button
+                    onClick={() => setShowAddGroupForm(true)}
+                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[36px] flex-shrink-0 shadow-sm"
+                  >
+                    <HiPlus className="h-4 w-4" />
+                    <span>作業グループを作成</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </header>
 

@@ -58,6 +58,7 @@ const defaultData: AppData = {
   teams: [],
   members: [],
   taskLabels: [],
+  taskLabelHistory: [],
   assignments: [],
   assignmentHistory: [],
   todaySchedules: [],
@@ -146,6 +147,12 @@ function normalizeAppData(data: any): AppData {
     members: Array.isArray(data?.members) ? data.members : [],
     manager: data?.manager && typeof data.manager === 'object' ? data.manager : undefined,
     taskLabels: Array.isArray(data?.taskLabels) ? data.taskLabels : [],
+    taskLabelHistory: Array.isArray(data?.taskLabelHistory)
+      ? data.taskLabelHistory.map((snapshot: any) => ({
+          date: typeof snapshot.date === 'string' ? snapshot.date : '',
+          labels: Array.isArray(snapshot.labels) ? snapshot.labels : [],
+        }))
+      : [],
     assignments: Array.isArray(data?.assignments) ? data.assignments : [],
     assignmentHistory: Array.isArray(data?.assignmentHistory) ? data.assignmentHistory : [],
     todaySchedules: Array.isArray(data?.todaySchedules) ? data.todaySchedules : [],

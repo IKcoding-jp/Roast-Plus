@@ -29,6 +29,12 @@ export interface TaskLabel {
   order?: number;
 }
 
+// 作業ラベルの日付別スナップショット
+export interface TaskLabelSnapshot {
+  date: string; // YYYY-MM-DD形式
+  labels: TaskLabel[]; // その日付の作業ラベル
+}
+
 // 割り当て（1つの担当）
 export interface Assignment {
   teamId: string;
@@ -170,7 +176,8 @@ export interface AppData {
   teams: Team[];
   members: Member[];
   manager?: Manager; // 管理者（全体で1人のみ）
-  taskLabels: TaskLabel[];
+  taskLabels: TaskLabel[]; // 現在の作業ラベル（今日の基準）
+  taskLabelHistory: TaskLabelSnapshot[]; // 作業ラベルの日付別履歴
   assignments: Assignment[]; // 現在の担当表（配列形式）
   assignmentHistory: Assignment[]; // 過去の履歴
   todaySchedules: TodaySchedule[]; // 本日のスケジュール

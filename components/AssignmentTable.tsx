@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import type { AppData, Assignment, ShuffleEvent } from '@/types';
+import type { AppData, Assignment, ShuffleEvent, TaskLabel } from '@/types';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { getTaskLabelsForDate, upsertTaskLabelSnapshot } from '@/lib/taskLabels';
 
 interface AssignmentTableProps {
   data: AppData | null;
@@ -392,7 +393,6 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   }
 
   const teams = data.teams;
-  const taskLabels = getTaskLabels(data);
   
   // 選択日に応じて表示する割り当てを決定
   const displayAssignments = useMemo(() => {
@@ -407,15 +407,38 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   
   const assignments = displayAssignments;
 
+  // 選択日の作業ラベルを取得（履歴から、または直近の過去から、または現在のtaskLabelsから）
+  const dateTaskLabels = useMemo(() => {
+    return getTaskLabelsForDate(data, selectedDate);
+  }, [data, selectedDate]);
+
+  // 初回アクセス時に履歴が存在しない場合は自動的に作成
+  useEffect(() => {
+    if (!data.taskLabelHistory || !Array.isArray(data.taskLabelHistory)) {
+      return;
+    }
+    const snapshot = data.taskLabelHistory.find((s) => s.date === selectedDate);
+    if (!snapshot && !isToday) {
+      // 履歴が存在しない場合、直近の過去の履歴または現在のtaskLabelsを複製
+      const labelsToCopy = getTaskLabelsForDate(data, selectedDate);
+      if (labelsToCopy.length > 0) {
+        const updatedData = upsertTaskLabelSnapshot(data, selectedDate, labelsToCopy);
+        onUpdate(updatedData);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, data.taskLabelHistory, isToday]);
+
   const isAlreadyShuffled = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
     return assignments.some((a) => a.assignedDate === today);
   }, [assignments]);
 
   const isWeekend = useMemo(() => {
-    const dayOfWeek = getJSTDayOfWeek();
+    const date = new Date(selectedDate + 'T00:00:00');
+    const dayOfWeek = date.getDay();
     return dayOfWeek === 0 || dayOfWeek === 6; // 0=日曜日, 6=土曜日
-  }, []);
+  }, [selectedDate]);
 
   const getAssignment = (teamId: string, taskLabelId: string) => {
     return assignments.find((a) => a.teamId === teamId && a.taskLabelId === taskLabelId);
@@ -441,10 +464,10 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   const displayLabels = useMemo(() => {
     const labelSet = new Set<string>();
     assignments.forEach((a) => labelSet.add(a.taskLabelId));
-    taskLabels.forEach((l) => labelSet.add(l.id));
+    dateTaskLabels.forEach((l) => labelSet.add(l.id));
 
     return Array.from(labelSet).map((id) => {
-      const label = taskLabels.find((l) => l.id === id);
+      const label = dateTaskLabels.find((l) => l.id === id);
       return (
         label || {
           id,
@@ -453,7 +476,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
         }
       );
     });
-  }, [assignments, taskLabels]);
+  }, [assignments, dateTaskLabels]);
 
   // 他端末からのシャッフルイベントを検知
   useEffect(() => {
@@ -613,7 +636,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
     };
   }, [isShuffling, shuffledAssignments, teams, displayLabels, data, onUpdate]);
 
-  if (teams.length === 0 || taskLabels.length === 0) {
+  if (teams.length === 0 || dateTaskLabels.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <p className="text-gray-500">班と作業ラベルを設定してください</p>
@@ -645,7 +668,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
               </tr>
             </thead>
             <tbody>
-              {displayLabels.map((label) => (
+              {displayLabels.map((label) => {
+                return (
                 <tr key={label.id}>
                   <td className="border border-gray-300 p-2 sm:p-3 bg-gray-50 w-32 sm:w-40">
                     <div className="flex items-center justify-center">
@@ -681,7 +705,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                       selectedCell &&
                       selectedCell.teamId === team.id &&
                       selectedCell.taskLabelId === label.id;
-                    const canInteract = !isShuffling && !isAnimating && isToday;
+                    const canInteract = !isShuffling && !isAnimating;
 
                     return (
                       <td
@@ -812,7 +836,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                     )}
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>

@@ -129,10 +129,10 @@ export default function SchedulePage() {
     }
   }, [selectedDate, getNextWeekday, getPreviousWeekday, isWeekend]);
 
-  // 選択日が今日かどうか（今日が土日の場合は前の平日と比較）
+  // 選択日が今日かどうか（実際の今日の日付と比較）
   const today = getTodayString();
   const effectiveToday = isWeekend(today) ? getPreviousWeekday(today) : today;
-  const isToday = selectedDate === effectiveToday;
+  const isToday = selectedDate === today; // 実際の今日の日付と比較
 
   if (authLoading) {
     return (

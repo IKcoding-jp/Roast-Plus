@@ -354,19 +354,18 @@ export function RoastTimer() {
     stopSound();
     setShowContinuousRoastDialog(false);
     
-    // タイマー状態から情報を取得してクエリパラメータとして渡す
-    if (state && state.beanName && state.weight && state.roastLevel && state.elapsed > 0) {
-      const params = new URLSearchParams({
-        beanName: state.beanName,
-        weight: state.weight.toString(),
-        roastLevel: state.roastLevel,
-        duration: Math.round(state.elapsed).toString(),
-      });
-      router.push(`/roast-record?${params.toString()}`);
-    } else {
-      // タイマー情報がない場合は、空の状態で遷移
-      router.push('/roast-record');
-    }
+    // タイマーをリセット
+    resetTimer();
+    setInputMode(null);
+    setRecommendedMode('weight');
+    setDurationMinutes('');
+    setDurationSeconds('');
+    setBeanName('');
+    setWeight('');
+    setRoastLevel('');
+    
+    // 連続焙煎の場合は、ローストタイマー画面に戻る
+    router.push('/roast-timer');
   };
 
   // 連続焙煎ダイアログの「いいえ」

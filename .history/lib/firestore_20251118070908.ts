@@ -41,11 +41,10 @@ const MAX_RETRY_COUNT = 3;
 const RETRY_DELAY = 1000;
 
 // ===== Write stream exhausted対策 =====
-// SDK内部キュー飽和を防ぐセマフォ制御
-// 9台のデバイス同時アクセスでも順番待ちできるよう同時実行数を最小化
-// 同時実行数は1つのみ許可し、残りは待機キューに入れる
-const MAX_CONCURRENT_WRITES = 1;
-// Limit concurrent writes to a single slot so the 9-device shared account drains the SDK queue sequentially.
+// 同時実行数を制限するセマフォ（Firestore SDKの書き込みキュー飽和を防ぐ）
+// 9台のデバイスから同時アクセス時でも、SDKキューへの負荷を軽減
+// より保守的な値に設定して、キュー飽和を防ぐ
+const MAX_CONCURRENT_WRITES = 2;
 let activeWriteCount = 0;
 const writeWaitQueue: Array<() => void> = [];
 
@@ -53,9 +52,8 @@ const writeWaitQueue: Array<() => void> = [];
 // 9台のデバイスからの同時アクセスを考慮して、キューサイズを増加
 const MAX_QUEUE_SIZE = 20;
 
-// 連続書き込み時の最小間隔（ミリ秒）: 応答性を保ちつつ負荷を下げるため200msに設定
-// 200ms spacing keeps the UI responsive while avoiding SDK queue saturation across devices.
-const MIN_WRITE_INTERVAL = 200;
+// 連続書き込み時の最小間隔（ミリ秒）
+const MIN_WRITE_INTERVAL = 100;
 let lastWriteTime = 0;
 
 const defaultData: AppData = {
@@ -345,30 +343,19 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
 
 // 書き込み操作を実行（リトライロジック付き）
 // Write stream exhausted対策: エラーハンドリング強化とキューサイズ監視
-async function executeWrite(userId: string, data: AppData, hasWaitedForQueue = false): Promise<void> {
+async function executeWrite(userId: string, data: AppData): Promise<void> {
   const queue = writeQueues.get(userId);
   if (!queue) {
     throw new Error('Write queue not found');
   }
 
-  // 書き込みキューサイズを監視（グローバルキューとセマフォ待機の両方）
+  // 書き込みキューサイズを監視（グローバルキューとセマフォ待機キューを考慮）
   const totalQueuedWrites = writeWaitQueue.length + activeWriteCount;
   if (totalQueuedWrites >= MAX_QUEUE_SIZE) {
+    // キューが飽和している場合は待機
     console.warn(`Firestore write queue size (${totalQueuedWrites}) exceeds limit (${MAX_QUEUE_SIZE}), waiting...`);
-    if (!hasWaitedForQueue) {
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * 2));
-      const refreshedQueuedWrites = writeWaitQueue.length + activeWriteCount;
-      if (refreshedQueuedWrites >= MAX_QUEUE_SIZE) {
-        console.warn(`Firestore write queue still saturated (${refreshedQueuedWrites}/${MAX_QUEUE_SIZE}) after extended wait, retrying once...`);
-        await executeWrite(userId, data, true);
-        return;
-      }
-    } else {
-      console.warn(`Firestore write queue remains saturated (${writeWaitQueue.length + activeWriteCount}/${MAX_QUEUE_SIZE}) after extended wait; proceeding to avoid infinite recursion.`);
-    }
+    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
   }
-
-
 
   queue.isWriting = true;
   queue.retryCount = 0;
@@ -411,7 +398,7 @@ async function executeWrite(userId: string, data: AppData, hasWaitedForQueue = f
         // Write stream exhaustedエラーの場合は、より長い待機時間を設定
         // 指数バックオフ + 追加の待機時間（キューが飽和している可能性が高いため）
         const baseDelay = RETRY_DELAY * Math.pow(2, queue.retryCount - 1);
-        const additionalDelay = writeWaitQueue.length * 300; // 待機中の書き込み数に応じて追加待機
+        const additionalDelay = writeWaitQueue.length * 200; // 待機中の書き込み数に応じて追加待機
         const delay = Math.min(baseDelay + additionalDelay, 10000); // 最大10秒
         
         console.warn(

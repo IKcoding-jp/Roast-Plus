@@ -11,7 +11,7 @@ import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
 import { RoastTimerSettings } from './RoastTimerSettings';
-import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiHome, HiClock } from 'react-icons/hi';
+import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiHome, HiClock, HiArrowLeft } from 'react-icons/hi';
 import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
 import { IoSettings } from 'react-icons/io5';
 import Link from 'next/link';
@@ -50,6 +50,7 @@ export function RoastTimer() {
   } = useRoastTimer();
 
   const [inputMode, setInputMode] = useState<'manual' | 'recommended' | null>(null);
+  const [recommendedMode, setRecommendedMode] = useState<'weight' | 'history'>('weight');
   const [beanName, setBeanName] = useState<BeanName | ''>('');
   const [weight, setWeight] = useState<200 | 300 | 500 | ''>('');
   const [roastLevel, setRoastLevel] = useState<
@@ -80,6 +81,7 @@ export function RoastTimer() {
       if (state?.status === 'completed') {
         resetTimer();
         setInputMode(null);
+        setRecommendedMode('weight');
         setDurationMinutes('');
         setDurationSeconds('');
         setBeanName('');
@@ -108,8 +110,9 @@ export function RoastTimer() {
   }, [stopSound]);
 
   // 記録がある豆のリストを生成（平均焙煎時間が計算できる豆のみ）
+  // 過去の記録モードの場合のみ実行
   useEffect(() => {
-    if (inputMode === 'recommended' && user) {
+    if (inputMode === 'recommended' && recommendedMode === 'history' && user) {
       const loadAvailableBeans = async () => {
         try {
           const allRecords = await getAllRoastTimerRecords(user.uid, data);
@@ -150,7 +153,7 @@ export function RoastTimer() {
     } else {
       setAvailableBeans([]);
     }
-  }, [inputMode, user, data]);
+  }, [inputMode, recommendedMode, user, data]);
 
   // 完了状態を検出してダイアログを表示（runningからcompletedに変化した時のみ）
   useEffect(() => {
@@ -173,9 +176,10 @@ export function RoastTimer() {
   }, [state?.status, showCompletionDialog, showContinuousRoastDialog, showAfterPurgeDialog]);
 
   // 重さに応じてデフォルト時間を設定（200g→8分、300g→9分、500g→10分）
+  // 重さモードの場合のみ適用
   const prevWeightRef = useRef<200 | 300 | 500 | ''>('');
   useEffect(() => {
-    if (inputMode === 'recommended' && weight !== '') {
+    if (inputMode === 'recommended' && recommendedMode === 'weight' && weight !== '') {
       const defaultMinutes: Record<200 | 300 | 500, number> = {
         200: 8,
         300: 9,
@@ -192,11 +196,11 @@ export function RoastTimer() {
     } else {
       prevWeightRef.current = '';
     }
-  }, [inputMode, weight, durationMinutes]);
+  }, [inputMode, recommendedMode, weight, durationMinutes]);
 
-  // おすすめ時間を計算（豆と焙煎度合いが選択されている場合のみ）
+  // おすすめ時間を計算（過去の記録モードで、豆と焙煎度合いが選択されている場合のみ）
   useEffect(() => {
-    if (inputMode === 'recommended' && beanName && weight !== '' && roastLevel && user) {
+    if (inputMode === 'recommended' && recommendedMode === 'history' && beanName && weight !== '' && roastLevel && user) {
       const calculateRecommended = async () => {
         try {
           const settings = await loadRoastTimerSettings(user.uid);
@@ -221,7 +225,7 @@ export function RoastTimer() {
     } else {
       setRecommendedTimeInfo(null);
     }
-  }, [beanName, weight, roastLevel, inputMode, user, data, durationMinutes]);
+  }, [beanName, weight, roastLevel, inputMode, recommendedMode, user, data, durationMinutes]);
 
   const handleStart = async () => {
     if (!user) return;
@@ -244,25 +248,46 @@ export function RoastTimer() {
         return;
       }
 
-      // おすすめ時間の確認ダイアログ（豆と焙煎度合いが選択されている場合のみ）
-      if (recommendedTimeInfo && beanName && roastLevel) {
-        const confirmed = confirm(
-          `過去の記録から、平均焙煎時間は${formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}、おすすめタイマー時間は${formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}です。\nこの時間でタイマーを開始しますか？`
-        );
-        if (!confirmed) {
+      if (recommendedMode === 'history') {
+        // 過去の記録モード：豆の名前と焙煎度合いも必須
+        if (!beanName) {
+          alert('豆の名前を選択してください');
           return;
         }
-        // おすすめ時間を使用
-        finalDuration = recommendedTimeInfo.recommendedDuration;
+        if (!roastLevel) {
+          alert('焙煎度合いを選択してください');
+          return;
+        }
+        
+        // 過去の記録モード：おすすめ時間の確認ダイアログ（豆と焙煎度合いが選択されている場合のみ）
+        if (recommendedTimeInfo && beanName && roastLevel) {
+          const confirmed = confirm(
+            `過去の記録から、平均焙煎時間は${formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}、おすすめタイマー時間は${formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}です。\nこの時間でタイマーを開始しますか？`
+          );
+          if (!confirmed) {
+            return;
+          }
+          // おすすめ時間を使用
+          finalDuration = recommendedTimeInfo.recommendedDuration;
+        } else {
+          // おすすめ時間が計算されていない場合は、重さに応じたデフォルト時間を使用
+          const defaultMinutes: Record<200 | 300 | 500, number> = {
+            200: 8,
+            300: 9,
+            500: 10,
+          };
+          const defaultMin = defaultMinutes[weight];
+          finalDuration = defaultMin * 60;
+        }
       } else {
-        // おすすめ時間が計算されていない場合は、入力された時間を使用
-        if (!durationMinutes) {
-          alert('時間を入力してください');
-          return;
-        }
-        const minutes = parseInt(durationMinutes, 10) || 0;
-        const seconds = parseInt(durationSeconds, 10) || 0;
-        finalDuration = minutes * 60 + seconds;
+        // 重さモード：重さに応じたデフォルト時間を使用
+        const defaultMinutes: Record<200 | 300 | 500, number> = {
+          200: 8,
+          300: 9,
+          500: 10,
+        };
+        const defaultMin = defaultMinutes[weight];
+        finalDuration = defaultMin * 60;
       }
     }
     
@@ -297,6 +322,7 @@ export function RoastTimer() {
       stopSound();
       resetTimer();
       setInputMode(null);
+      setRecommendedMode('weight');
       setDurationMinutes('');
       setDurationSeconds('');
       setBeanName('');
@@ -328,6 +354,7 @@ export function RoastTimer() {
     stopSound();
     setShowContinuousRoastDialog(false);
     setInputMode(null);
+    setRecommendedMode('weight');
     setDurationMinutes('');
     setDurationSeconds('');
     setBeanName('');
@@ -370,6 +397,7 @@ export function RoastTimer() {
     setShowAfterPurgeDialog(false);
     resetTimer();
     setInputMode(null);
+    setRecommendedMode('weight');
     setDurationMinutes('');
     setBeanName('');
     setWeight('');
@@ -680,32 +708,36 @@ export function RoastTimer() {
         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
           {/* ヘッダーボタン */}
           <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start pointer-events-none">
-            <Link
-              href="/"
+            <button
+              onClick={() => {
+                if (inputMode === null) {
+                  router.back();
+                } else {
+                  setInputMode(null);
+                  setRecommendedMode('weight');
+                  setBeanName('');
+                  setWeight('');
+                  setRoastLevel('');
+                }
+              }}
               className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] pointer-events-auto"
-              title="ホームに戻る"
-              aria-label="ホームに戻る"
+              title="戻る"
+              aria-label="戻る"
             >
-              <HiHome className="h-6 w-6 flex-shrink-0" />
-            </Link>
-            <div className="flex items-center gap-2 pointer-events-auto">
-              <button
-                onClick={() => setShowSettings(true)}
-                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                title="設定"
-                aria-label="設定"
-              >
-                <IoSettings className="h-6 w-6 flex-shrink-0" />
-              </button>
-              <Link
-                href="/roast-record"
-                className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
-                aria-label="ロースト履歴一覧"
-              >
-                <HiClock className="text-lg flex-shrink-0" />
-                <span className="whitespace-nowrap">ロースト履歴</span>
-              </Link>
-            </div>
+              <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
+            </button>
+            {inputMode !== 'recommended' && (
+              <div className="flex items-center gap-2 pointer-events-auto">
+                <Link
+                  href="/roast-record"
+                  className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+                  aria-label="ロースト履歴一覧"
+                >
+                  <HiClock className="text-lg flex-shrink-0" />
+                  <span className="whitespace-nowrap">ロースト履歴</span>
+                </Link>
+              </div>
+            )}
           </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）
@@ -793,15 +825,13 @@ export function RoastTimer() {
                     // おすすめモードに切り替わる時は、手動入力の値をクリア
                     setDurationMinutes('');
                     setDurationSeconds('');
+                    setRecommendedMode('weight'); // デフォルトは重さモード
                     setInputMode('recommended');
                   }}
                   className="w-full flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-xl font-bold text-base sm:text-lg shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[60px] sm:min-h-[64px]"
                 >
                   <MdLightbulb className="text-xl sm:text-2xl text-amber-600" />
-                  <span className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5">
-                    <span>おすすめ焙煎でスタート</span>
-                    <span className="text-sm sm:text-base">※未完成</span>
-                  </span>
+                  <span>おすすめ焙煎でスタート</span>
                 </button>
               </div>
             </div>
@@ -815,12 +845,6 @@ export function RoastTimer() {
                   </div>
                   手動入力
                 </h3>
-                <button
-                  onClick={() => setInputMode(null)}
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100"
-                >
-                  戻る
-                </button>
               </div>
 
               <div className="space-y-6 flex-1">
@@ -876,164 +900,195 @@ export function RoastTimer() {
             </div>
           ) : (
             // おすすめモード
-            <div className="flex-1 flex flex-col pt-16 px-4 sm:px-6">
-              <div className="flex items-center justify-between mb-6 flex-shrink-0">
+            <div className="flex-1 flex flex-col px-4 sm:px-6">
+              <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center py-8">
+              <div className="flex items-center justify-center mb-6 flex-shrink-0">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
                     <MdLightbulb className="text-white text-lg" />
                   </div>
                   おすすめ焙煎
                 </h3>
-                <button
-                  onClick={() => setInputMode(null)}
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100"
-                >
-                  戻る
-                </button>
+              </div>
+
+              {/* モード切り替えタブ */}
+              <div className="mb-6 flex-shrink-0">
+                <div className="flex gap-2 bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => {
+                      setRecommendedMode('weight');
+                      setBeanName('');
+                      setRoastLevel('');
+                      setRecommendedTimeInfo(null);
+                    }}
+                    className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${
+                      recommendedMode === 'weight'
+                        ? 'bg-white text-amber-700 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    重さで設定
+                  </button>
+                  <button
+                    onClick={() => {
+                      setRecommendedMode('history');
+                    }}
+                    className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${
+                      recommendedMode === 'history'
+                        ? 'bg-white text-amber-700 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    過去の記録から設定
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-5 flex-1">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                    重さ <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={weight}
-                    onChange={(e) =>
-                      setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')
-                    }
-                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
-                  >
-                    <option value="">選択してください</option>
-                    {WEIGHTS.map((w) => (
-                      <option key={w} value={w}>
-                        {w}g
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                    豆の名前
-                  </label>
-                  <select
-                    value={beanName}
-                    onChange={(e) => setBeanName(e.target.value as BeanName)}
-                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
-                  >
-                    <option value="">選択してください（任意）</option>
-                    {availableBeans.length > 0 ? (
-                      availableBeans.map((bean) => (
-                        <option key={bean} value={bean}>
-                          {bean}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="" disabled>
-                        記録がありません（2件以上の記録が必要です）
-                      </option>
-                    )}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                    焙煎度合い
-                  </label>
-                  <select
-                    value={roastLevel}
-                    onChange={(e) =>
-                      setRoastLevel(
-                        e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
-                      )
-                    }
-                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
-                  >
-                    <option value="">選択してください（任意）</option>
-                    {ROAST_LEVELS.map((level) => (
-                      <option key={level} value={level}>
-                        {level}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {!recommendedTimeInfo && beanName && weight !== '' && roastLevel && (
-                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 shadow-sm">
-                    <p className="text-sm sm:text-base text-yellow-800">
-                      この組み合わせの記録が2件未満のため、平均焙煎時間を計算できません。時間を手動で入力してください。
-                    </p>
-                  </div>
-                )}
-
-                {recommendedTimeInfo && (
-                  <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-xl p-4 shadow-sm">
-                    <p className="text-sm sm:text-base text-gray-700">
-                      過去の記録から、平均焙煎時間は{' '}
-                      <span className="font-bold text-amber-800">
-                        {formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}
-                      </span>
-                      、おすすめタイマー時間は{' '}
-                      <span className="font-bold text-amber-800">
-                        {formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}
-                      </span>{' '}
-                      です
-                    </p>
-                  </div>
-                )}
-
-                {/* 時間入力フィールド（おすすめ時間が計算されていない場合、または手動調整が必要な場合） */}
-                {(!recommendedTimeInfo || !beanName || !roastLevel) && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                      時間設定 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
-                          分
-                        </label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={durationMinutes}
-                          onChange={(e) => handleDurationMinutesChange(e.target.value)}
-                          placeholder="10"
-                          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
-                        />
-                      </div>
-                      <div className="flex items-end pb-2">
-                        <span className="text-2xl font-bold text-gray-400">:</span>
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
-                          秒
-                        </label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={durationSeconds}
-                          onChange={(e) => handleDurationSecondsChange(e.target.value)}
-                          placeholder="30"
-                          maxLength={2}
-                          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
-                        />
-                      </div>
+                {recommendedMode === 'weight' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                        重さ <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={weight}
+                        onChange={(e) =>
+                          setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')
+                        }
+                        className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
+                      >
+                        <option value="">選択してください</option>
+                        {WEIGHTS.map((w) => (
+                          <option key={w} value={w}>
+                            {w}g
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  </div>
+
+                    {weight !== '' && (
+                      <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-xl p-4 shadow-sm">
+                        <p className="text-sm sm:text-base text-gray-700">
+                          重さに応じたおすすめ時間は{' '}
+                          <span className="font-bold text-amber-800">
+                            {weight === 200 ? '8分' : weight === 300 ? '9分' : '10分'}
+                          </span>{' '}
+                          です
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {recommendedMode === 'history' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                        豆の名前 <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={beanName}
+                        onChange={(e) => setBeanName(e.target.value as BeanName)}
+                        className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
+                      >
+                        <option value="">選択してください</option>
+                        {availableBeans.length > 0 ? (
+                          availableBeans.map((bean) => (
+                            <option key={bean} value={bean}>
+                              {bean}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="" disabled>
+                            記録がありません（2件以上の記録が必要です）
+                          </option>
+                        )}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                        焙煎度合い <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={roastLevel}
+                        onChange={(e) =>
+                          setRoastLevel(
+                            e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
+                          )
+                        }
+                        className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
+                      >
+                        <option value="">選択してください</option>
+                        {ROAST_LEVELS.map((level) => (
+                          <option key={level} value={level}>
+                            {level}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                        重さ <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={weight}
+                        onChange={(e) =>
+                          setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')
+                        }
+                        className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
+                      >
+                        <option value="">選択してください</option>
+                        {WEIGHTS.map((w) => (
+                          <option key={w} value={w}>
+                            {w}g
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {!recommendedTimeInfo && beanName && weight !== '' && roastLevel && (
+                      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 shadow-sm">
+                        <p className="text-sm sm:text-base text-yellow-800">
+                          この組み合わせの記録が2件未満のため、平均焙煎時間を計算できません。重さに応じたデフォルト時間（{weight === 200 ? '8分' : weight === 300 ? '9分' : '10分'}）でタイマーを開始します。
+                        </p>
+                      </div>
+                    )}
+
+                    {recommendedTimeInfo && (
+                      <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-xl p-4 shadow-sm">
+                        <p className="text-sm sm:text-base text-gray-700">
+                          過去の記録から、平均焙煎時間は{' '}
+                          <span className="font-bold text-amber-800">
+                            {formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}
+                          </span>
+                          、おすすめタイマー時間は{' '}
+                          <span className="font-bold text-amber-800">
+                            {formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}
+                          </span>{' '}
+                          です
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <div className="pt-2 flex-shrink-0">
                   <button
                     onClick={handleStart}
-                    disabled={!weight || !durationMinutes}
+                    disabled={
+                      !weight ||
+                      (recommendedMode === 'history' && (!beanName || !roastLevel))
+                    }
                     className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
                   >
                     <HiPlay className="text-2xl" />
                     <span>スタート</span>
                   </button>
                 </div>
+              </div>
               </div>
             </div>
           )}

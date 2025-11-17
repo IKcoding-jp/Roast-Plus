@@ -49,7 +49,7 @@ export function DefectBeanCompare({
             {defectBeans.map((defectBean) => (
               <div
                 key={defectBean.id}
-                className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                className="bg-gray-50 rounded-lg p-4 border border-gray-200 max-h-[60vh] md:max-h-[70vh] overflow-y-auto overflow-x-hidden"
               >
                 <DefectBeanDetail
                   defectBean={defectBean}

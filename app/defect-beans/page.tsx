@@ -113,6 +113,13 @@ export default function DefectBeansPage() {
     };
   }, [showSortMenu]);
 
+  // 2つ選択されたら自動的に比較を表示
+  useEffect(() => {
+    if (compareMode && selectedIds.size === 2 && !showCompare) {
+      setShowCompare(true);
+    }
+  }, [compareMode, selectedIds.size, showCompare]);
+
   // 早期リターン（すべてのHooksの後）
   if (authLoading || isLoading) {
     return <Loading />;
@@ -352,7 +359,7 @@ export default function DefectBeansPage() {
                       {compareMode ? '選択モード' : '比較'}
                     </span>
                   </button>
-                  {compareMode && selectedIds.size > 0 && (
+                  {compareMode && selectedIds.size > 0 && selectedIds.size < 2 && (
                     <button
                       onClick={handleShowCompare}
                       className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1.5 text-sm"

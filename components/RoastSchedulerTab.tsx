@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { AppData, RoastSchedule } from '@/types';
 import { HiPlus, HiFire, HiCalendar } from 'react-icons/hi';
 import { FaSnowflake, FaBroom } from 'react-icons/fa';
@@ -401,14 +402,15 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
       )}
 
       {/* モーダルダイアログ */}
-      {(isAdding || editingSchedule) && (
+      {typeof window !== 'undefined' && (isAdding || editingSchedule) && createPortal(
         <RoastScheduleMemoDialog
           schedule={editingSchedule}
           selectedDate={selectedDate}
           onSave={handleSave}
           onDelete={editingSchedule ? () => handleDelete(editingSchedule.id) : undefined}
           onCancel={handleDialogCancel}
-        />
+        />,
+        document.body
       )}
     </div>
   );
@@ -589,27 +591,22 @@ function ScheduleCard({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onClick={handleCardClick}
-      className={`rounded-md border border-gray-200 bg-white p-3 md:p-2.5 cursor-move hover:shadow-sm hover:border-amber-300 transition-all select-none touch-none ${
+      className={`rounded-md border border-gray-200 bg-gray-50 hover:bg-amber-50 p-3 md:p-2.5 cursor-move hover:shadow-sm hover:border-amber-300 transition-all select-none touch-none ${
         isDragging ? 'opacity-50' : ''
       } ${isDragOver ? 'border-amber-500 border-2 bg-amber-50' : ''}`}
     >
       <div className="flex items-center gap-2 md:gap-2.5">
         {/* 左側：時間バッジまたはアイコン */}
-        {isAfterPurge ? (
-          <div className="flex items-center gap-1.5 md:gap-1.5 flex-shrink-0">
-            <div className="text-base md:text-base font-medium text-gray-600 select-none min-w-[48px] md:min-w-[48px]">
-              {/* スペーサーとして空のdivを使用 */}
+        <div className="flex items-center gap-1.5 md:gap-1.5 flex-shrink-0">
+          {schedule.time ? (
+            <div className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 bg-white rounded-md text-sm md:text-base font-semibold text-gray-800 tabular-nums shadow-sm">
+              {schedule.time}
             </div>
-            {getIcon()}
-          </div>
-        ) : (
-          <div className="flex items-center gap-1.5 md:gap-1.5 flex-shrink-0">
-            <div className="text-base md:text-base font-medium text-gray-700 select-none min-w-[48px] md:min-w-[48px] tabular-nums">
-              {schedule.time || ''}
-            </div>
-            {getIcon()}
-          </div>
-        )}
+          ) : (
+            <div className="flex-shrink-0 w-16 md:w-18"></div>
+          )}
+          {getIcon()}
+        </div>
 
         {/* 中央：メモ内容 */}
         <div className="flex-1 min-w-0 flex flex-col gap-1 md:gap-0.5">

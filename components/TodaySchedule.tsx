@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import type { AppData, TodaySchedule, TimeLabel } from '@/types';
 import { HiPlus, HiX, HiClock } from 'react-icons/hi';
 
@@ -671,7 +672,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
 
 
       {/* 時間編集ダイアログ */}
-      {editingLabelId && (() => {
+      {editingLabelId && typeof window !== 'undefined' && (() => {
         const editingLabel = localTimeLabels.find((label) => label.id === editingLabelId);
         if (!editingLabel) return null;
         
@@ -683,14 +684,15 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
         
         const initialTime = parseTime(editingLabel.time);
         
-        return (
+        return createPortal(
           <TimeEditDialog
             initialHour={initialTime.hour}
             initialMinute={initialTime.minute}
             onSave={(hour, minute) => handleEditSave(editingLabelId, hour, minute)}
             onDelete={() => deleteTimeLabel(editingLabelId)}
             onCancel={handleEditCancel}
-          />
+          />,
+          document.body
         );
       })()}
     </div>
@@ -728,7 +730,7 @@ function TimeEditDialog({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4" onClick={onCancel}>
+    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-[100] p-4" onClick={onCancel}>
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full border-2 border-gray-300" onClick={(e) => e.stopPropagation()}>
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-5 flex items-center justify-between">

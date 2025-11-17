@@ -337,9 +337,9 @@ export default function SchedulePage() {
           </div>
         </header>
 
-        {/* タブナビゲーション（モバイル版：画面下部に固定） */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-20 px-4 pb-4">
-          <nav className="flex gap-1.5 sm:gap-2 bg-white border-t border-gray-200 shadow-lg p-1.5 sm:p-2">
+        {/* タブナビゲーション（モバイル版：ヘッダーの下に配置） */}
+        <div className="lg:hidden mb-4 flex-shrink-0">
+          <nav className="flex gap-1.5 sm:gap-2 bg-white border border-gray-200 rounded-lg shadow p-1.5 sm:p-2">
             <button
               onClick={() => setActiveTab('today')}
               className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-colors text-xs sm:text-sm min-h-[44px] ${
@@ -372,7 +372,7 @@ export default function SchedulePage() {
         </div>
 
         {/* コンテンツ */}
-        <main className="flex-1 flex flex-col min-h-0 pb-20 lg:pb-0">
+        <main className="flex-1 flex flex-col min-h-0">
           {/* モバイル版：タブ切替 */}
           <div className="block lg:hidden flex-1 flex flex-col min-h-0">
             {activeTab === 'today' && (

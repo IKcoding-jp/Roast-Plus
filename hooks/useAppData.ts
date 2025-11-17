@@ -5,6 +5,10 @@ import { useAuth } from '@/lib/auth';
 import { getUserData, saveUserData, subscribeUserData } from '@/lib/firestore';
 import type { AppData } from '@/types';
 
+function hasOwn<T extends object>(obj: T, key: PropertyKey): boolean {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
 export function useAppData() {
   const { user, loading: authLoading } = useAuth();
   const [data, setData] = useState<AppData>({
@@ -71,6 +75,8 @@ export function useAppData() {
         ? newDataOrUpdater(data)
         : newDataOrUpdater;
 
+      const hasRoastTimerStateOverride = Object.prototype.hasOwnProperty.call(newData, 'roastTimerState');
+
       // データの完全性を検証
       const normalizedData: AppData = {
         teams: Array.isArray(newData.teams) ? newData.teams : data.teams,
@@ -89,7 +95,7 @@ export function useAppData() {
         shuffleEvent: newData.shuffleEvent !== undefined ? newData.shuffleEvent : data.shuffleEvent,
         encouragementCount: typeof newData.encouragementCount === 'number' ? newData.encouragementCount : (data.encouragementCount ?? 0),
         roastTimerRecords: Array.isArray(newData.roastTimerRecords) ? newData.roastTimerRecords : data.roastTimerRecords,
-        roastTimerState: newData.roastTimerState !== undefined ? newData.roastTimerState : data.roastTimerState,
+        roastTimerState: hasRoastTimerStateOverride ? newData.roastTimerState : data.roastTimerState,
         defectBeans: newData.defectBeans !== undefined ? newData.defectBeans : data.defectBeans,
         defectBeanSettings: newData.defectBeanSettings !== undefined ? newData.defectBeanSettings : data.defectBeanSettings,
         workProgresses: Array.isArray(newData.workProgresses) ? newData.workProgresses : data.workProgresses,

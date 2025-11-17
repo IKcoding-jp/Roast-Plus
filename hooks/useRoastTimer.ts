@@ -72,13 +72,15 @@ export function useRoastTimer() {
         // 初回マウント時は完了状態を読み込まない（ページを開いた時に完了画面が表示されるのを防ぐ）
         if (isInitialMountRef.current) {
           isInitialMountRef.current = false;
+          saveLocalState(null);
+          setLocalState(null);
           // 初回マウント時に完了状態が残っている場合は、Firestoreから削除
           // （リセットが完了していない可能性があるため）
           if (user) {
-            updateData({
-              ...data,
+            updateData((currentData) => ({
+              ...currentData,
               roastTimerState: undefined,
-            }).catch((error) => {
+            })).catch((error) => {
               console.error('Failed to clear completed state on mount:', error);
             });
           }
@@ -153,6 +155,8 @@ export function useRoastTimer() {
         if (storedState) {
           // 完了状態の場合は読み込まない
           if (storedState.status === 'completed') {
+            saveLocalState(null);
+            setLocalState(null);
             isInitialMountRef.current = false;
             return;
           }
@@ -555,17 +559,17 @@ export function useRoastTimer() {
 
     // Firestoreから削除（確実に削除するため、awaitで待機）
     try {
-      await updateData({
-        ...data,
+      await updateData((currentData) => ({
+        ...currentData,
         roastTimerState: undefined,
-      });
+      }));
       // 削除が完了したら、リセットフラグを維持（次のuseEffect実行時まで）
       // ただし、Firestoreの状態変更監視により、undefinedが反映されるまで待つ
     } catch (error) {
       console.error('Failed to delete roast timer state from Firestore:', error);
       // エラーが発生しても、リセットフラグは維持する
     }
-  }, [user, data, updateData]);
+  }, [user, updateData]);
 
   // サウンドを停止（完了ダイアログのOKボタンで呼ばれる）
   const stopSound = useCallback(() => {

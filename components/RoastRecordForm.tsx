@@ -170,8 +170,6 @@ export function RoastRecordForm({
       setDurationSeconds('');
       setRoastDate(new Date().toISOString().split('T')[0]);
     }
-
-    showToast(isEditMode ? 'ロースト記録を更新しました' : 'ロースト記録を保存しました', 'success');
   };
 
   return (

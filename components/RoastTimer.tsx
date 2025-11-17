@@ -353,14 +353,20 @@ export function RoastTimer() {
     // 音を確実に停止
     stopSound();
     setShowContinuousRoastDialog(false);
-    setInputMode(null);
-    setRecommendedMode('weight');
-    setDurationMinutes('');
-    setDurationSeconds('');
-    setBeanName('');
-    setWeight('');
-    setRoastLevel('');
-    resetTimer();
+    
+    // タイマー状態から情報を取得してクエリパラメータとして渡す
+    if (state && state.beanName && state.weight && state.roastLevel && state.elapsed > 0) {
+      const params = new URLSearchParams({
+        beanName: state.beanName,
+        weight: state.weight.toString(),
+        roastLevel: state.roastLevel,
+        duration: Math.round(state.elapsed).toString(),
+      });
+      router.push(`/roast-record?${params.toString()}`);
+    } else {
+      // タイマー情報がない場合は、空の状態で遷移
+      router.push('/roast-record');
+    }
   };
 
   // 連続焙煎ダイアログの「いいえ」
@@ -538,24 +544,26 @@ export function RoastTimer() {
           >
             <HiHome className="h-6 w-6 flex-shrink-0" />
           </Link>
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-            <button
-              onClick={() => setShowSettings(true)}
-              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-              title="設定"
-              aria-label="設定"
-            >
-              <IoSettings className="h-6 w-6 flex-shrink-0" />
-            </button>
-            <Link
-              href="/roast-record"
-              className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
-              aria-label="ロースト履歴一覧"
-            >
-              <HiClock className="text-lg flex-shrink-0" />
-              <span className="whitespace-nowrap">ロースト履歴</span>
-            </Link>
-          </div>
+          {state?.status === 'completed' && (
+            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+              <button
+                onClick={() => setShowSettings(true)}
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                title="設定"
+                aria-label="設定"
+              >
+                <IoSettings className="h-6 w-6 flex-shrink-0" />
+              </button>
+              <Link
+                href="/roast-record"
+                className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+                aria-label="ロースト履歴一覧"
+              >
+                <HiClock className="text-lg flex-shrink-0" />
+                <span className="whitespace-nowrap">ロースト履歴</span>
+              </Link>
+            </div>
+          )}
           
           <div className="flex flex-col items-center justify-center w-full">
             {/* タイトル */}
@@ -645,60 +653,55 @@ export function RoastTimer() {
             )}
 
             {/* 操作ボタン */}
-            <div className="flex flex-wrap gap-3 sm:gap-4 justify-center w-full max-w-md flex-shrink-0">
-              {isRunning && (
-                <>
-                  <button
-                    onClick={handlePause}
-                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-yellow-600 hover:to-yellow-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
-                  >
-                    <HiPause className="text-xl sm:text-2xl" />
-                    一時停止
-                  </button>
-                  <button
-                    onClick={handleSkip}
-                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
-                  >
-                    <HiFastForward className="text-xl sm:text-2xl" />
-                    スキップ
-                  </button>
-                </>
-              )}
-              {isPaused && (
-                <>
-                  <button
-                    onClick={handleResume}
-                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
-                  >
-                    <HiPlay className="text-xl sm:text-2xl" />
-                    再開
-                  </button>
-                  <button
-                    onClick={handleSkip}
-                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
-                  >
-                    <HiFastForward className="text-xl sm:text-2xl" />
-                    スキップ
-                  </button>
-                  <button
-                    onClick={handleReset}
-                    className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
-                  >
-                    <HiRefresh className="text-xl sm:text-2xl" />
-                    リセット
-                  </button>
-                </>
-              )}
-              {isCompleted && (
+            {isRunning && (
+              <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-md flex-shrink-0">
+                <button
+                  onClick={handlePause}
+                  className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-yellow-600 hover:to-yellow-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+                >
+                  <HiPause className="text-xl sm:text-2xl flex-shrink-0" />
+                  <span>一時停止</span>
+                </button>
+                <button
+                  onClick={handleSkip}
+                  className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+                >
+                  <HiFastForward className="text-xl sm:text-2xl flex-shrink-0" />
+                  <span>スキップ</span>
+                </button>
+              </div>
+            )}
+            {isPaused && (
+              <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-md flex-shrink-0">
+                <button
+                  onClick={handleResume}
+                  className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+                >
+                  <HiPlay className="text-xl sm:text-2xl flex-shrink-0" />
+                  <span>再開</span>
+                </button>
+                <button
+                  onClick={handleSkip}
+                  className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+                >
+                  <HiFastForward className="text-xl sm:text-2xl flex-shrink-0" />
+                  <span>スキップ</span>
+                </button>
+              </div>
+            )}
+            {isCompleted && (
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-md flex-shrink-0">
+                <div></div>
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[60px] sm:min-h-[64px]"
+                  className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] min-w-[44px]"
                 >
-                  <HiRefresh className="text-xl sm:text-2xl" />
-                  リセット
+                  <HiRefresh className="text-xl sm:text-2xl flex-shrink-0" />
+                  <span>リセット</span>
                 </button>
-              )}
-            </div>
+                <div></div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -726,18 +729,6 @@ export function RoastTimer() {
             >
               <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
             </button>
-            {inputMode !== 'recommended' && (
-              <div className="flex items-center gap-2 pointer-events-auto">
-                <Link
-                  href="/roast-record"
-                  className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
-                  aria-label="ロースト履歴一覧"
-                >
-                  <HiClock className="text-lg flex-shrink-0" />
-                  <span className="whitespace-nowrap">ロースト履歴</span>
-                </Link>
-              </div>
-            )}
           </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）
@@ -828,10 +819,10 @@ export function RoastTimer() {
                     setRecommendedMode('weight'); // デフォルトは重さモード
                     setInputMode('recommended');
                   }}
-                  className="w-full flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-xl font-bold text-base sm:text-lg shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[60px] sm:min-h-[64px]"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border-2 border-amber-200 rounded-xl font-bold text-base sm:text-lg shadow-sm hover:shadow-md hover:from-amber-100 hover:to-amber-200 hover:border-amber-300 active:scale-[0.98] transition-all duration-200 min-h-[60px] sm:min-h-[64px]"
                 >
                   <MdLightbulb className="text-xl sm:text-2xl text-amber-600" />
-                  <span>おすすめ焙煎でスタート</span>
+                  <span>おすすめタイマー</span>
                 </button>
               </div>
             </div>
@@ -907,7 +898,7 @@ export function RoastTimer() {
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
                     <MdLightbulb className="text-white text-lg" />
                   </div>
-                  おすすめ焙煎
+                  おすすめタイマー
                 </h3>
               </div>
 

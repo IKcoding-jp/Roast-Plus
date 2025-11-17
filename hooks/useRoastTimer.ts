@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
-import type { RoastTimerState, RoastTimerRecord } from '@/types';
+import type { RoastTimerState } from '@/types';
 import { setRoastTimerState as saveLocalState, getRoastTimerState as loadLocalState, getDeviceId } from '@/lib/localStorage';
 import { notifyRoastTimerComplete, scheduleNotification, cancelAllScheduledNotifications } from '@/lib/notifications';
 import { playTimerSound, stopTimerSound, stopAllSounds, stopAudio } from '@/lib/sounds';
@@ -261,33 +261,6 @@ export function useRoastTimer() {
           });
         } catch (error) {
           console.error('Failed to save roast timer state to Firestore:', error);
-        }
-
-        // 記録をFirestoreに保存
-        if (
-          updatedState.beanName &&
-          updatedState.weight &&
-          updatedState.roastLevel
-        ) {
-          const newRecord: RoastTimerRecord = {
-            id: `record-${Date.now()}`,
-            beanName: updatedState.beanName,
-            weight: updatedState.weight,
-            roastLevel: updatedState.roastLevel,
-            duration: Math.round(updatedState.elapsed),
-            roastDate: new Date().toISOString().split('T')[0],
-            createdAt: new Date().toISOString(),
-            userId: user.uid,
-          };
-
-          try {
-            await updateData({
-              ...data,
-              roastTimerRecords: [...data.roastTimerRecords, newRecord],
-            });
-          } catch (error) {
-            console.error('Failed to save roast timer record:', error);
-          }
         }
       }
 

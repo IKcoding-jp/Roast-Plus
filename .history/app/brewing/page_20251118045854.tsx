@@ -66,7 +66,7 @@ export default function BrewingPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-amber-600 mt-1">•</span>
-                      <span>ストップウォッチ</span>
+                      <span>抽出パラメータの記録と管理</span>
                     </li>
                   </ul>
                 </div>

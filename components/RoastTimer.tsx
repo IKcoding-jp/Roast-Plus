@@ -573,7 +573,7 @@ export function RoastTimer() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-amber-600 font-sans">
+                <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-amber-600 font-sans">
                   {formatTime(Math.floor(remaining))}
                 </div>
                 {state && (

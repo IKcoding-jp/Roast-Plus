@@ -172,9 +172,6 @@ export default function HomePage() {
             onClick={() => router.push('/roast-timer')}
             className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
           >
-            <span className="absolute top-2 right-2 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
-              New!
-            </span>
             <MdTimer className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
               ローストタイマー β版
@@ -186,9 +183,6 @@ export default function HomePage() {
             onClick={() => router.push('/defect-beans')}
             className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
           >
-            <span className="absolute top-2 right-2 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
-              New!
-            </span>
             <RiBookFill className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
               コーヒー豆図鑑 β版
@@ -200,9 +194,6 @@ export default function HomePage() {
             onClick={() => router.push('/progress')}
             className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
           >
-            <span className="absolute top-2 right-2 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
-              New!
-            </span>
             <MdTimeline className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
               作業進捗 β版

@@ -715,8 +715,15 @@ export async function addWorkProgress(
 ): Promise<void> {
   const now = new Date().toISOString();
   
-  // weightフィールドから目標量を抽出
-  const targetAmount = extractTargetAmount(workProgress.weight);
+  // targetAmountが明示的にundefinedとして渡されている場合（完成数で管理する場合など）、
+  // extractTargetAmountの結果を無視してundefinedを使用
+  let targetAmount: number | undefined;
+  if ('targetAmount' in workProgress && workProgress.targetAmount === undefined) {
+    targetAmount = undefined;
+  } else {
+    // weightフィールドから目標量を抽出
+    targetAmount = extractTargetAmount(workProgress.weight);
+  }
   
   const newWorkProgress: WorkProgress = {
     ...workProgress,
@@ -733,7 +740,8 @@ export async function addWorkProgress(
     // 目標量と現在の進捗量を設定
     targetAmount,
     currentAmount: targetAmount !== undefined ? 0 : undefined,
-    progressHistory: [],
+    // 完成数で管理する場合（targetAmount === undefined）、progressHistoryもundefinedにする
+    progressHistory: targetAmount !== undefined ? [] : undefined,
     // 完成数の初期化（指定されていない場合は0で初期化、またはundefinedのまま）
     completedCount: workProgress.completedCount !== undefined ? workProgress.completedCount : undefined,
   };

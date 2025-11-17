@@ -34,7 +34,7 @@ const writeQueues = new Map<string, {
 }>();
 
 // デバウンス時間（ミリ秒）
-const DEBOUNCE_DELAY = 300;
+export const SAVE_USER_DATA_DEBOUNCE_MS = 300;
 // 最大リトライ回数
 const MAX_RETRY_COUNT = 3;
 // リトライ間隔（ミリ秒）
@@ -484,7 +484,7 @@ export async function saveUserData(userId: string, data: AppData): Promise<void>
       queue.timeoutId = null;
       await executeWrite(userId, dataToWrite);
     }
-  }, DEBOUNCE_DELAY);
+  }, SAVE_USER_DATA_DEBOUNCE_MS);
 
   return promise;
 }

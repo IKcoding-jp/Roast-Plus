@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { Loading } from '@/components/Loading';
-import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress } from '@/lib/firestore';
-import { HiHome, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection } from 'react-icons/hi';
+import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress, archiveWorkProgress, unarchiveWorkProgress } from '@/lib/firestore';
+import { HiHome, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection, HiArchive } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
@@ -38,6 +38,7 @@ export default function ProgressPage() {
   const [showAddGroupForm, setShowAddGroupForm] = useState(false);
   const [expandedHistoryIds, setExpandedHistoryIds] = useState<Set<string>>(new Set());
   const [columnCount, setColumnCount] = useState(3);
+  const [viewMode, setViewMode] = useState<'normal' | 'archived'>('normal');
 
   // レスポンシブなカラム数を取得
   useEffect(() => {
@@ -61,8 +62,12 @@ export default function ProgressPage() {
   const groupedWorkProgresses = useMemo(() => {
     const workProgresses = data?.workProgresses || [];
     
-    // フィルタリング
+    // フィルタリング（アーカイブ済み作業は除外）
     let filtered = workProgresses.filter((wp) => {
+      // アーカイブ済み作業は除外
+      if (wp.archivedAt) {
+        return false;
+      }
       if (filterTaskName && wp.taskName && !wp.taskName.toLowerCase().includes(filterTaskName.toLowerCase())) {
         return false;
       }
@@ -165,6 +170,41 @@ export default function ProgressPage() {
 
     return { groups: sortedGroups, ungrouped: ungroupedWorkProgresses };
   }, [data?.workProgresses, sortOption, filterTaskName, filterStatus]);
+
+  // アーカイブ一覧を日ごとにグループ化
+  const archivedWorkProgressesByDate = useMemo(() => {
+    const workProgresses = data?.workProgresses || [];
+    const archived = workProgresses.filter((wp) => wp.archivedAt);
+    
+    // アーカイブ日でグループ化（日付部分のみで比較）
+    const groups = new Map<string, WorkProgress[]>();
+    
+    archived.forEach((wp) => {
+      if (!wp.archivedAt) return;
+      const date = new Date(wp.archivedAt);
+      const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD形式
+      
+      if (!groups.has(dateKey)) {
+        groups.set(dateKey, []);
+      }
+      groups.get(dateKey)!.push(wp);
+    });
+    
+    // 各グループ内でソート（アーカイブ日時の降順）
+    const sortedGroups = Array.from(groups.entries()).map(([dateKey, items]) => ({
+      date: dateKey,
+      workProgresses: items.sort((a, b) => {
+        const aTime = a.archivedAt ? new Date(a.archivedAt).getTime() : 0;
+        const bTime = b.archivedAt ? new Date(b.archivedAt).getTime() : 0;
+        return bTime - aTime; // 降順
+      }),
+    }));
+    
+    // 日付でソート（降順：新しい日付が先）
+    sortedGroups.sort((a, b) => b.date.localeCompare(a.date));
+    
+    return sortedGroups;
+  }, [data?.workProgresses]);
 
   if (authLoading || isLoading) {
     return <Loading />;
@@ -278,6 +318,30 @@ export default function ProgressPage() {
     } catch (error) {
       console.error('Failed to delete work progress:', error);
       alert('作業の削除に失敗しました');
+    }
+  };
+
+  // 作業進捗をアーカイブ
+  const handleArchiveWorkProgress = async (workProgressId: string) => {
+    if (!user || !data) return;
+    
+    try {
+      await archiveWorkProgress(user.uid, workProgressId, data);
+    } catch (error) {
+      console.error('Failed to archive work progress:', error);
+      alert('作業のアーカイブに失敗しました');
+    }
+  };
+
+  // 作業進捗のアーカイブを解除
+  const handleUnarchiveWorkProgress = async (workProgressId: string) => {
+    if (!user || !data) return;
+    
+    try {
+      await unarchiveWorkProgress(user.uid, workProgressId, data);
+    } catch (error) {
+      console.error('Failed to unarchive work progress:', error);
+      alert('アーカイブの解除に失敗しました');
     }
   };
 
@@ -487,6 +551,20 @@ export default function ProgressPage() {
               </>
             )}
           </div>
+          {/* アーカイブボタン（完了した作業のみ） */}
+          {!isDummyWork && wp.status === 'completed' && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleArchiveWorkProgress(wp.id);
+              }}
+              className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 hover:border-gray-400 transition-colors min-h-[44px] md:min-h-[32px] min-w-[44px] md:min-w-[32px] flex items-center justify-center flex-shrink-0"
+              aria-label="アーカイブ"
+              title="アーカイブ"
+            >
+              <HiArchive className="h-4 w-4" />
+            </button>
+          )}
         </div>
         
         {/* プログレスバーと進捗情報 */}
@@ -684,22 +762,41 @@ export default function ProgressPage() {
 
             {/* 中央: タイトル */}
             <div className="hidden sm:flex justify-center items-center gap-2 sm:gap-4 min-w-0">
-              <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
-              <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">作業進捗</h1>
+              {viewMode === 'archived' ? (
+                <>
+                  <HiArchive className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
+                  <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">アーカイブ済み作業</h1>
+                </>
+              ) : (
+                <>
+                  <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
+                  <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">作業進捗</h1>
+                </>
+              )}
             </div>
 
             {/* 右側: アクションボタン */}
             <div className="flex justify-end items-center gap-1.5 sm:gap-2 flex-shrink-0">
-              {!showEmptyState && (
+              {viewMode === 'normal' && !showEmptyState && (
                 <>
                   <button
                     onClick={() => setShowFilterDialog(true)}
-                    className="p-0 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] sm:min-w-auto sm:justify-start"
+                    className="p-0 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
                     aria-label="フィルタと並び替え"
+                    title="フィルタと並び替え"
                   >
                     <HiFilter className="h-4 w-4" />
-                    <span className="hidden sm:inline">フィルタ</span>
                   </button>
+                  {archivedWorkProgressesByDate.length > 0 && (
+                    <button
+                      onClick={() => setViewMode('archived')}
+                      className="p-0 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                      aria-label="アーカイブ一覧"
+                      title="アーカイブ一覧"
+                    >
+                      <HiArchive className="h-4 w-4" />
+                    </button>
+                  )}
                   <button
                     onClick={() => setShowAddGroupForm(true)}
                     className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-1.5 min-h-[44px] flex-shrink-0 shadow-sm"
@@ -709,12 +806,22 @@ export default function ProgressPage() {
                   </button>
                 </>
               )}
+              {viewMode === 'archived' && (
+                <button
+                  onClick={() => setViewMode('normal')}
+                  className="p-0 sm:px-3 sm:py-2 text-xs sm:text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                  aria-label="通常の一覧に戻る"
+                  title="通常の一覧に戻る"
+                >
+                  <HiX className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
         </header>
 
-        {/* 横方向に流れるメイソンレイアウト */}
-        {(() => {
+        {/* 通常の作業一覧 */}
+        {viewMode === 'normal' && (() => {
           // すべてのカードを1つの配列にまとめる
           const allCards: Array<{ type: 'group' | 'ungrouped'; data: GroupedWorkProgress | WorkProgress; index: number }> = [];
           
@@ -851,6 +958,97 @@ export default function ProgressPage() {
             </div>
           );
         })()}
+
+        {/* アーカイブ一覧 */}
+        {viewMode === 'archived' && (
+          <div className="space-y-6">
+            {archivedWorkProgressesByDate.length === 0 ? (
+              <div className="py-12 sm:py-16 text-center">
+                <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-amber-100 rounded-full blur-xl opacity-50"></div>
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-amber-50 flex items-center justify-center">
+                      <HiArchive className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                      アーカイブ済み作業がありません
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
+                      完了した作業をアーカイブすると、ここに表示されます。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              archivedWorkProgressesByDate.map((group) => {
+                const date = new Date(group.date);
+                const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                return (
+                  <div key={group.date} className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                      {dateStr}
+                    </h3>
+                    <div className="space-y-4">
+                      {group.workProgresses.map((wp) => (
+                        <div
+                          key={wp.id}
+                          className="bg-gray-50 rounded-lg border border-gray-200 p-4"
+                        >
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex-1 min-w-0">
+                              {wp.taskName && (
+                                <p className="text-base font-semibold text-gray-800">{wp.taskName}</p>
+                              )}
+                              {wp.weight && (
+                                <p className="text-xs text-gray-600 mt-1">数量: {wp.weight}</p>
+                              )}
+                              {wp.memo && (
+                                <p className="text-xs text-gray-500 mt-2 whitespace-pre-wrap">{wp.memo}</p>
+                              )}
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUnarchiveWorkProgress(wp.id);
+                              }}
+                              className="px-2 py-1 text-xs font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors min-h-[44px] md:min-h-[32px] min-w-[44px] md:min-w-[32px] flex items-center justify-center flex-shrink-0"
+                              aria-label="アーカイブ解除"
+                              title="アーカイブ解除"
+                            >
+                              <HiArchive className="h-4 w-4" />
+                            </button>
+                          </div>
+                          {wp.targetAmount !== undefined && (
+                            <div className="text-sm text-gray-700 mt-2">
+                              {(() => {
+                                const unit = extractUnit(wp.weight);
+                                return (
+                                  <>
+                                    {formatAmount(wp.currentAmount || 0, unit)}{unit} / {formatAmount(wp.targetAmount, unit)}{unit}
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          )}
+                          {wp.completedCount !== undefined && wp.completedCount > 0 && (
+                            <div className="text-sm text-gray-700 mt-2">
+                              完成数: {wp.completedCount}個
+                            </div>
+                          )}
+                          <div className="text-xs text-gray-500 mt-2">
+                            アーカイブ日時: {formatDateTime(wp.archivedAt)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
 
         {/* モード選択ダイアログ */}
         {showModeSelectDialog && (

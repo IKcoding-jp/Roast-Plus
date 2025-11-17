@@ -1128,3 +1128,79 @@ export async function addProgressToWorkProgress(
   
   await saveUserData(userId, updatedData);
 }
+
+/**
+ * 作業進捗をアーカイブ
+ * @param userId ユーザーID
+ * @param workProgressId 作業進捗ID
+ * @param appData 現在のAppData
+ */
+export async function archiveWorkProgress(
+  userId: string,
+  workProgressId: string,
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
+  
+  if (existingIndex < 0) {
+    throw new Error(`WorkProgress with id ${workProgressId} not found`);
+  }
+  
+  const existing = workProgresses[existingIndex];
+  const now = new Date().toISOString();
+  
+  const updatedWorkProgress: WorkProgress = {
+    ...existing,
+    archivedAt: now,
+    updatedAt: now,
+  };
+  
+  const updatedWorkProgresses = [...workProgresses];
+  updatedWorkProgresses[existingIndex] = updatedWorkProgress;
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * 作業進捗のアーカイブを解除
+ * @param userId ユーザーID
+ * @param workProgressId 作業進捗ID
+ * @param appData 現在のAppData
+ */
+export async function unarchiveWorkProgress(
+  userId: string,
+  workProgressId: string,
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
+  
+  if (existingIndex < 0) {
+    throw new Error(`WorkProgress with id ${workProgressId} not found`);
+  }
+  
+  const existing = workProgresses[existingIndex];
+  const now = new Date().toISOString();
+  
+  const updatedWorkProgress: WorkProgress = {
+    ...existing,
+    archivedAt: undefined,
+    updatedAt: now,
+  };
+  
+  const updatedWorkProgresses = [...workProgresses];
+  updatedWorkProgresses[existingIndex] = updatedWorkProgress;
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}

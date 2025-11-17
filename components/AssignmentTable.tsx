@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type { AppData, Assignment, ShuffleEvent, TaskLabel } from '@/types';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { getTaskLabelsForDate, upsertTaskLabelSnapshot } from '@/lib/taskLabels';
@@ -384,6 +384,39 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   const shuffleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastShuffleEventRef = useRef<ShuffleEvent | null>(null);
 
+  // 翌日の平日を取得する関数（土日をスキップ）
+  const getNextWeekday = useCallback((dateString: string): string => {
+    const date = new Date(dateString + 'T00:00:00');
+    date.setDate(date.getDate() + 1);
+    
+    // 土日をスキップ
+    while (date.getDay() === 0 || date.getDay() === 6) {
+      date.setDate(date.getDate() + 1);
+    }
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  // シャッフル対象の日付を取得（16:45以降の場合は翌日）
+  // shuffleTimeが指定されている場合はその時刻を基準に判定（他端末からのイベント用）
+  const getShuffleTargetDate = useCallback((shuffleTime?: string): string => {
+    const now = shuffleTime ? new Date(shuffleTime) : new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    
+    // 16:45以降の場合は翌日の平日を使用
+    if (hours > 16 || (hours === 16 && minutes >= 45)) {
+      const today = now.toISOString().split('T')[0];
+      return getNextWeekday(today);
+    }
+    
+    // それ以外は今日の日付を使用
+    return now.toISOString().split('T')[0];
+  }, [getNextWeekday]);
+
   if (!data) {
     return (
       <div className="rounded-lg bg-white p-6 shadow-md">
@@ -430,9 +463,9 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   }, [selectedDate, data.taskLabelHistory, isToday]);
 
   const isAlreadyShuffled = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
-    return assignments.some((a) => a.assignedDate === today);
-  }, [assignments]);
+    const targetDate = getShuffleTargetDate();
+    return assignments.some((a) => a.assignedDate === targetDate);
+  }, [assignments, getShuffleTargetDate]);
 
   const isWeekend = useMemo(() => {
     const date = new Date(selectedDate + 'T00:00:00');
@@ -517,8 +550,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
     if (elapsed >= animationDuration) {
       // 既にアニメーションが終了している場合、即座に結果を表示
-      const today = new Date().toISOString().split('T')[0];
-      const updatedHistory = updateAssignmentHistory(event.shuffledAssignments, today);
+      const targetDate = getShuffleTargetDate(event.startTime);
+      const updatedHistory = updateAssignmentHistory(event.shuffledAssignments, targetDate);
 
       const updatedData: AppData = {
         ...data,
@@ -538,7 +571,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
     setSelectedCell(null);
     setHighlightedCell(null);
     setShuffledAssignments(event.shuffledAssignments);
-  }, [data?.shuffleEvent, data, isShuffling, onUpdate]);
+  }, [data?.shuffleEvent, data, isShuffling, onUpdate, getShuffleTargetDate]);
 
   useEffect(() => {
     if (!isShuffling) {
@@ -599,9 +632,10 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
       setIsCompleted(true);
 
       if (shuffledAssignments) {
-        // 今日の場合はassignmentsと履歴の両方を更新
-        const today = new Date().toISOString().split('T')[0];
-        const updatedHistory = updateAssignmentHistory(shuffledAssignments, today);
+        // シャッフルイベントの開始時刻を基準に日付を決定
+        const shuffleTime = data.shuffleEvent?.startTime;
+        const targetDate = getShuffleTargetDate(shuffleTime);
+        const updatedHistory = updateAssignmentHistory(shuffledAssignments, targetDate);
         
         const updatedData: AppData = {
           ...data,
@@ -634,7 +668,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
         shuffleTimeoutRef.current = null;
       }
     };
-  }, [isShuffling, shuffledAssignments, teams, displayLabels, data, onUpdate]);
+  }, [isShuffling, shuffledAssignments, teams, displayLabels, data, onUpdate, getShuffleTargetDate]);
 
   if (teams.length === 0 || dateTaskLabels.length === 0) {
     return (
@@ -755,7 +789,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                                     : a
                                 );
 
-                                const today = new Date().toISOString().split('T')[0];
+                                // 今日の場合は16:45以降なら翌日、それ以外は今日の日付を使用
+                                const targetDate = isToday ? getShuffleTargetDate() : selectedDate;
 
                                 // 新しい割り当てが存在しない場合は追加
                                 if (
@@ -767,7 +802,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                                     teamId: team.id,
                                     taskLabelId: label.id,
                                     memberId: selectedMemberId,
-                                    assignedDate: today,
+                                    assignedDate: targetDate,
                                   });
                                 }
 
@@ -783,13 +818,13 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                                     teamId: selectedCell.teamId,
                                     taskLabelId: selectedCell.taskLabelId,
                                     memberId: otherMemberId,
-                                    assignedDate: today,
+                                    assignedDate: targetDate,
                                   });
                                 }
 
                                 // 今日の場合はassignmentsと履歴の両方を更新
                                 if (isToday) {
-                                  const updatedHistory = updateAssignmentHistory(updatedAssignments, today);
+                                  const updatedHistory = updateAssignmentHistory(updatedAssignments, targetDate);
                                   const updatedData: AppData = {
                                     ...data,
                                     assignments: updatedAssignments,
@@ -847,7 +882,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={() => {
-              const shuffled = shuffleAssignments(data, selectedDate);
+              const targetDate = getShuffleTargetDate();
+              const shuffled = shuffleAssignments(data, targetDate);
               const shuffleEvent: ShuffleEvent = {
                 startTime: new Date().toISOString(),
                 shuffledAssignments: shuffled,
@@ -880,7 +916,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
           {isDeveloperModeEnabled && (
             <button
               onClick={() => {
-                const shuffled = shuffleAssignments(data, selectedDate);
+                const targetDate = getShuffleTargetDate();
+                const shuffled = shuffleAssignments(data, targetDate);
                 const shuffleEvent: ShuffleEvent = {
                   startTime: new Date().toISOString(),
                   shuffledAssignments: shuffled,

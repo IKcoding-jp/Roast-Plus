@@ -455,7 +455,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
   }, [localTimeLabels]);
 
   return (
-    <div className="rounded-lg bg-white p-3 md:p-4 lg:p-6 shadow-md h-full flex flex-col">
+    <div className="rounded-2xl bg-white p-4 md:p-6 shadow-xl border-2 border-gray-300 h-full flex flex-col backdrop-blur-sm">
       {/* デスクトップ版：タイトルと時間入力欄を横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex flex-row items-center justify-between gap-2">
         <h2 className="hidden lg:block text-base md:text-lg font-semibold text-gray-800 whitespace-nowrap">本日のスケジュール</h2>
@@ -526,23 +526,21 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
           </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
-          <div className="space-y-2 md:space-y-1">
+          <div className="space-y-2 md:space-y-1.5">
             {sortedTimeLabels.map((label) => (
               <div
                 key={label.id}
-                className="flex items-center gap-2 md:gap-2.5 py-2 md:py-1.5"
+                className="group flex items-center gap-3 md:gap-4 py-2.5 md:py-2 px-3 md:px-2.5 rounded-lg bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 transition-all duration-200"
               >
                 {/* 時間表示 */}
-                <div className="w-14 md:w-14 flex-shrink-0">
-                  <div 
-                    onClick={() => handleEditLabel(label.id)}
-                    className="text-base md:text-base font-medium text-gray-700 select-none cursor-pointer hover:text-amber-600 transition-colors tabular-nums"
-                  >
-                    {label.time || '--:--'}
-                  </div>
+                <div 
+                  onClick={() => handleEditLabel(label.id)}
+                  className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 bg-white rounded-md text-sm md:text-base font-semibold text-gray-800 group-hover:text-amber-700 group-hover:bg-amber-100 cursor-pointer transition-colors tabular-nums shadow-sm"
+                >
+                  {label.time || '--:--'}
                 </div>
-
-                {/* 内容入力（下線付き） */}
+                
+                {/* 内容入力 */}
                 <div className="flex-1 min-w-0">
                   <input
                     type="text"
@@ -550,7 +548,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
                     onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
                     onCompositionStart={handleCompositionStart}
                     onCompositionEnd={handleCompositionEnd}
-                    className="w-full bg-transparent border-0 border-b-2 border-gray-300 px-0 py-1 md:py-1 text-base md:text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-0"
+                    className="w-full bg-transparent border-0 border-b border-transparent focus:border-amber-400 text-base md:text-base text-gray-900 focus:outline-none placeholder:text-gray-400 transition-colors"
                     placeholder="内容を入力"
                   />
                 </div>

@@ -271,54 +271,86 @@ export default function SchedulePage() {
             </Link>
           </div>
           <div className="flex-1 flex justify-center items-center">
-            <div className="flex flex-row items-center gap-2.5 sm:gap-3 md:gap-4 px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-white border border-gray-200 rounded-md sm:rounded-xl shadow-md">
+            {/* スマホレイアウト：1つのカード */}
+            <div className="sm:hidden w-full max-w-xs">
+              <div className="bg-white border-2 border-gray-300 rounded-2xl shadow-xl px-3 py-2.5">
+                {/* 日付ナビゲーション */}
+                <div className="flex items-center justify-center gap-1.5">
+                  <button
+                    onClick={moveToPreviousDay}
+                    className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
+                    aria-label="前日"
+                  >
+                    <HiChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setIsDatePickerOpen(true)}
+                    className="flex items-center cursor-pointer hover:bg-gray-50 rounded-md px-2 py-1 transition-colors flex-1 justify-center"
+                    aria-label="日付を選択"
+                  >
+                    <span className="text-base text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+                      {formatDateString(selectedDate)}
+                    </span>
+                  </button>
+                  <button
+                    onClick={moveToNextDay}
+                    disabled={isToday}
+                    className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors ${
+                      isToday
+                        ? 'text-gray-300 cursor-not-allowed'
+                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                    aria-label="翌日"
+                  >
+                    <HiChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            {/* タブレット・デスクトップレイアウト：横並び */}
+            <div className="hidden sm:flex flex-row items-center gap-3 md:gap-4 px-5 py-2 md:px-6 md:py-2.5 bg-white border-2 border-gray-300 rounded-2xl shadow-xl">
               {/* 日付ナビゲーション */}
-              <div className="flex items-center gap-1 sm:gap-2 md:gap-2.5">
+              <div className="flex items-center gap-2 md:gap-2.5">
                 <button
                   onClick={moveToPreviousDay}
-                  className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
+                  className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
                   aria-label="前日"
                 >
-                  <HiChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
+                  <HiChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
                 </button>
                 <button
                   onClick={() => setIsDatePickerOpen(true)}
-                  className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 cursor-pointer hover:bg-gray-50 rounded-md px-1.5 py-1 sm:px-2 sm:py-1.5 transition-colors"
+                  className="flex items-center gap-2 md:gap-2.5 cursor-pointer hover:bg-gray-50 rounded-md px-2 py-1.5 transition-colors"
                   aria-label="日付を選択"
                 >
-                  <HiCalendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
-                    <span className="sm:hidden">{formatDateStringShort(selectedDate)}</span>
-                    <span className="hidden sm:inline">{formatDateString(selectedDate)}</span>
+                  <HiCalendar className="h-5 w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0" />
+                  <span className="text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+                    {formatDateString(selectedDate)}
                   </span>
                 </button>
                 <button
                   onClick={moveToNextDay}
                   disabled={isToday}
-                  className={`flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-md transition-colors ${
+                  className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md transition-colors ${
                     isToday
                       ? 'text-gray-300 cursor-not-allowed'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                   aria-label="翌日"
                 >
-                  <HiChevronRight className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
+                  <HiChevronRight className="h-5 w-5 md:h-6 md:w-6" />
                 </button>
               </div>
               {/* 区切り線 */}
-              <div className="flex-shrink-0 h-6 sm:h-7 md:h-8 flex items-center">
+              <div className="flex-shrink-0 h-7 md:h-8 flex items-center">
                 <div className="w-px h-full bg-gray-200"></div>
               </div>
               {/* 時刻 */}
-              <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5">
-                <HiClock className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0" />
-                <span className="text-sm sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
+              <div className="flex items-center gap-2 md:gap-2.5">
+                <HiClock className="h-5 w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0" />
+                <span className="text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
                   {formatTime(currentTime)}
                 </span>
-              </div>
-              {/* 区切り線（デスクトップ版のみ） */}
-              <div className="hidden sm:flex flex-shrink-0 h-6 sm:h-7 md:h-8 items-center">
-                <div className="w-px h-full bg-gray-200"></div>
               </div>
             </div>
           </div>
@@ -326,20 +358,20 @@ export default function SchedulePage() {
             <div className="hidden sm:flex items-center gap-2">
               <button
                 onClick={() => setIsOCROpen(true)}
-                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                className="px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-600 text-white hover:bg-amber-700 rounded transition-colors flex items-center justify-center gap-2 min-h-[44px] shadow-lg ring-2 ring-amber-300 ring-offset-2"
                 title="画像から読み取り"
                 aria-label="画像から読み取り"
               >
                 <HiCamera className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
-                <span className="hidden md:inline text-sm font-medium">画像から読み取り</span>
+                <span className="text-sm sm:text-base font-medium">AIで読み取る</span>
               </button>
             </div>
           </div>
         </header>
 
-        {/* タブナビゲーション（モバイル版：ヘッダーの下に配置） */}
-        <div className="lg:hidden mb-4 flex-shrink-0">
-          <nav className="flex gap-1.5 sm:gap-2 bg-white border border-gray-200 rounded-lg shadow p-1.5 sm:p-2">
+        {/* タブナビゲーション（スマホ版：画面下部に固定） */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-20 px-4 pb-4">
+          <nav className="flex gap-1.5 sm:gap-2 bg-white border-2 border-gray-300 rounded-t-xl shadow-lg p-1.5 sm:p-2">
             <button
               onClick={() => setActiveTab('today')}
               className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-colors text-xs sm:text-sm min-h-[44px] ${
@@ -351,6 +383,14 @@ export default function SchedulePage() {
               本日のスケジュール
             </button>
             <button
+              onClick={() => setIsOCROpen(true)}
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-600 text-white hover:bg-amber-700 rounded transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center shadow-lg ring-2 ring-amber-300 ring-offset-2"
+              title="画像から読み取り"
+              aria-label="画像から読み取り"
+            >
+              <HiCamera className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
+            <button
               onClick={() => setActiveTab('roast')}
               className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-colors text-xs sm:text-sm min-h-[44px] ${
                 activeTab === 'roast'
@@ -360,19 +400,11 @@ export default function SchedulePage() {
             >
               ローストスケジュール
             </button>
-            <button
-              onClick={() => setIsOCROpen(true)}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 text-gray-700 hover:bg-gray-100 rounded transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center"
-              title="画像から読み取り"
-              aria-label="画像から読み取り"
-            >
-              <HiCamera className="h-5 w-5 sm:h-6 sm:w-6" />
-            </button>
           </nav>
         </div>
 
         {/* コンテンツ */}
-        <main className="flex-1 flex flex-col min-h-0">
+        <main className="flex-1 flex flex-col min-h-0 pb-20 lg:pb-0">
           {/* モバイル版：タブ切替 */}
           <div className="block lg:hidden flex-1 flex flex-col min-h-0">
             {activeTab === 'today' && (

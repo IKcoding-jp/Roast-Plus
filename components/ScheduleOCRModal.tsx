@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { CameraCapture } from './CameraCapture';
 import { Loading } from './Loading';
 import { OCRConfirmModal } from './OCRConfirmModal';
 import { extractScheduleFromImage } from '@/lib/scheduleOCR';
 import type { TimeLabel, RoastSchedule } from '@/types';
-import { HiX, HiPhotograph } from 'react-icons/hi';
+import { HiX, HiPhotograph, HiCamera } from 'react-icons/hi';
 import { useToastContext } from './Toast';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAppData } from '@/hooks/useAppData';
@@ -27,14 +27,6 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   const [ocrResult, setOcrResult] = useState<{ timeLabels: TimeLabel[]; roastSchedules: RoastSchedule[] } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // 開発者モードの状態に応じて初期表示を設定
-  useEffect(() => {
-    if (!isDeveloperMode) {
-      // 通常モードの場合はカメラを表示
-      setShowCamera(true);
-    }
-  }, [isDeveloperMode]);
 
   const handleImageFile = async (file: File) => {
     setIsProcessing(true);
@@ -93,7 +85,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
         : errorMessage;
       
       setError(finalErrorMessage);
-      setShowCamera(!isDeveloperMode);
+      setShowCamera(false);
       showToast(errorMessage, 'error');
     } finally {
       setIsProcessing(false);
@@ -146,18 +138,14 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
         onRetry={() => {
           setShowConfirm(false);
           setOcrResult(null);
-          if (isDeveloperMode) {
-            setShowCamera(false);
-          } else {
-            setShowCamera(true);
-          }
+          setShowCamera(false);
         }}
       />
     );
   }
 
-  // 開発者モードの場合は選択画面を表示
-  if (isDeveloperMode && !showCamera && !isProcessing && !error && !showConfirm) {
+  // 選択画面を表示
+  if (!showCamera && !isProcessing && !error && !showConfirm) {
     return (
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
@@ -172,17 +160,18 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
           </div>
           <div className="space-y-3">
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => setShowCamera(true)}
               className="w-full px-4 py-3 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+            >
+              <HiCamera className="h-5 w-5" />
+              <span>カメラで撮影</span>
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full px-4 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors min-h-[44px] flex items-center justify-center gap-2"
             >
               <HiPhotograph className="h-5 w-5" />
               <span>ファイルから選択</span>
-            </button>
-            <button
-              onClick={() => setShowCamera(true)}
-              className="w-full px-4 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors min-h-[44px] flex items-center justify-center gap-2"
-            >
-              <span>カメラで撮影</span>
             </button>
           </div>
           <input
@@ -202,11 +191,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
       <CameraCapture
         onCapture={handleCapture}
         onCancel={() => {
-          if (isDeveloperMode) {
-            setShowCamera(false);
-          } else {
-            onCancel();
-          }
+          setShowCamera(false);
         }}
       />
     );
@@ -240,7 +225,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
             <button
               onClick={() => {
                 setError(null);
-                setShowCamera(!isDeveloperMode);
+                setShowCamera(false);
               }}
               className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors min-h-[44px]"
             >

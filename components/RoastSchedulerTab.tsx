@@ -23,7 +23,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
 
   if (!data) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-md">
+      <div className="rounded-2xl bg-white p-6 shadow-xl border-2 border-gray-300">
         <p className="text-center text-gray-500">データがありません</p>
       </div>
     );
@@ -325,7 +325,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
   };
 
   return (
-    <div className="relative rounded-lg bg-white p-3 md:p-4 lg:p-6 shadow-md h-full flex flex-col">
+    <div className="relative rounded-2xl bg-white p-4 md:p-6 shadow-xl border-2 border-gray-300 h-full flex flex-col backdrop-blur-sm">
       {/* デスクトップ版：タイトルと追加ボタンを横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex items-center justify-between">
         <h2 className="text-base md:text-lg font-semibold text-gray-800">

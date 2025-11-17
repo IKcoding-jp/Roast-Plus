@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { HiHome, HiSearch, HiPlus, HiX, HiCheckCircle, HiXCircle, HiCollection, HiOutlineCollection } from 'react-icons/hi';
 import { RiBookFill } from 'react-icons/ri';
-import { MdCompareArrows } from 'react-icons/md';
+import { MdCompareArrows, MdSort, MdArrowUpward, MdArrowDownward } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import { useDefectBeans } from '@/hooks/useDefectBeans';
 import { useDefectBeanSettings } from '@/hooks/useDefectBeanSettings';
@@ -16,6 +16,7 @@ import { Loading } from '@/components/Loading';
 import type { DefectBean } from '@/types';
 
 type FilterOption = 'all' | 'shouldRemove' | 'shouldNotRemove';
+type SortOption = 'default' | 'createdAtDesc' | 'createdAtAsc' | 'nameAsc' | 'nameDesc';
 
 export default function DefectBeansPage() {
   const { user, loading: authLoading } = useAuth();
@@ -28,6 +29,9 @@ export default function DefectBeansPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
+  const [sortOption, setSortOption] = useState<SortOption>('default');
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
 
   // フィルタリングと検索（Hooksは早期リターンの前に呼び出す必要がある）
   const filteredDefectBeans = useMemo(() => {
@@ -56,18 +60,58 @@ export default function DefectBeansPage() {
       );
     }
 
-    // ソート（マスターを先に、その後ユーザー追加）
-    filtered.sort((a, b) => {
-      if (a.isMaster && !b.isMaster) return -1;
-      if (!a.isMaster && b.isMaster) return 1;
-      if (a.order !== undefined && b.order !== undefined) {
-        return a.order - b.order;
-      }
-      return a.name.localeCompare(b.name, 'ja');
-    });
+    // ソート
+    if (sortOption === 'default') {
+      // デフォルト（マスターを先に、その後ユーザー追加）
+      filtered.sort((a, b) => {
+        if (a.isMaster && !b.isMaster) return -1;
+        if (!a.isMaster && b.isMaster) return 1;
+        if (a.order !== undefined && b.order !== undefined) {
+          return a.order - b.order;
+        }
+        return a.name.localeCompare(b.name, 'ja');
+      });
+    } else if (sortOption === 'createdAtDesc') {
+      // 新しい順（作成日時降順）
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateB - dateA;
+      });
+    } else if (sortOption === 'createdAtAsc') {
+      // 古い順（作成日時昇順）
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateA - dateB;
+      });
+    } else if (sortOption === 'nameAsc') {
+      // 名前昇順
+      filtered.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+    } else if (sortOption === 'nameDesc') {
+      // 名前降順
+      filtered.sort((a, b) => b.name.localeCompare(a.name, 'ja'));
+    }
 
     return filtered;
-  }, [allDefectBeans, searchQuery, filterOption, settings]);
+  }, [allDefectBeans, searchQuery, filterOption, settings, sortOption]);
+
+  // メニュー外クリックで閉じる処理
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
+        setShowSortMenu(false);
+      }
+    };
+
+    if (showSortMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSortMenu]);
 
   // 早期リターン（すべてのHooksの後）
   if (authLoading || isLoading) {
@@ -195,6 +239,33 @@ export default function DefectBeansPage() {
     selectedIds.has(bean.id)
   );
 
+  // ソートアイコンの取得
+  const getSortIcon = () => {
+    if (sortOption === 'default') {
+      return <MdSort className="h-5 w-5" />;
+    } else if (sortOption === 'createdAtAsc' || sortOption === 'nameAsc') {
+      return <MdArrowUpward className="h-5 w-5" />;
+    } else {
+      return <MdArrowDownward className="h-5 w-5" />;
+    }
+  };
+
+  // ソートオプションのラベル
+  const getSortLabel = (option: SortOption) => {
+    switch (option) {
+      case 'default':
+        return 'デフォルト';
+      case 'createdAtDesc':
+        return '新しい順';
+      case 'createdAtAsc':
+        return '古い順';
+      case 'nameAsc':
+        return '名前昇順';
+      case 'nameDesc':
+        return '名前降順';
+    }
+  };
+
   return (
     <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-7xl mx-auto">
@@ -216,8 +287,8 @@ export default function DefectBeansPage() {
 
             {/* 中央: タイトル */}
             <div className="flex justify-center items-center gap-2 sm:gap-3 min-w-0">
-              <RiBookFill className="h-7 w-7 sm:h-8 sm:w-8 text-amber-600 flex-shrink-0" />
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 whitespace-nowrap">
+              <RiBookFill className="hidden sm:block h-7 w-7 sm:h-8 sm:w-8 text-amber-600 flex-shrink-0" />
+              <h1 className="hidden sm:block text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 whitespace-nowrap">
                 コーヒー豆図鑑
               </h1>
             </div>
@@ -226,6 +297,47 @@ export default function DefectBeansPage() {
             <div className="flex justify-end items-center gap-2 flex-shrink-0">
               {!(filteredDefectBeans.length === 0 && !searchQuery && filterOption === 'all') && (
                 <>
+                  {/* ソートボタン */}
+                  <div className="relative" ref={sortMenuRef}>
+                    <button
+                      onClick={() => setShowSortMenu(!showSortMenu)}
+                      className={`px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1.5 ${
+                        showSortMenu
+                          ? 'bg-amber-600 text-white hover:bg-amber-700'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                      }`}
+                      title="ソート"
+                    >
+                      {getSortIcon()}
+                      <span className="hidden sm:inline text-sm">ソート</span>
+                    </button>
+                    {/* ドロップダウンメニュー */}
+                    {showSortMenu && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <div className="py-1">
+                          {(['default', 'createdAtDesc', 'createdAtAsc', 'nameAsc', 'nameDesc'] as SortOption[]).map((option) => (
+                            <button
+                              key={option}
+                              onClick={() => {
+                                setSortOption(option);
+                                setShowSortMenu(false);
+                              }}
+                              className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${
+                                sortOption === option
+                                  ? 'bg-amber-50 text-amber-700 font-medium'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                              }`}
+                            >
+                              {sortOption === option && (
+                                <HiCheckCircle className="h-4 w-4 text-amber-600" />
+                              )}
+                              <span>{getSortLabel(option)}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={toggleCompareMode}
                     className={`px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1.5 ${

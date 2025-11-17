@@ -10,8 +10,10 @@ import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
+import { RoastTimerSettings } from './RoastTimerSettings';
 import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiHome, HiClock } from 'react-icons/hi';
 import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
+import { IoSettings } from 'react-icons/io5';
 import Link from 'next/link';
 
 const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
@@ -65,6 +67,7 @@ export function RoastTimer() {
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [showContinuousRoastDialog, setShowContinuousRoastDialog] = useState(false);
   const [showAfterPurgeDialog, setShowAfterPurgeDialog] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const prevStatusRef = useRef<string | undefined>(undefined);
   const hasInitializedRef = useRef(false);
 
@@ -507,14 +510,24 @@ export function RoastTimer() {
           >
             <HiHome className="h-6 w-6 flex-shrink-0" />
           </Link>
-          <Link
-            href="/roast-record"
-            className="absolute top-4 right-4 z-10 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
-            aria-label="ロースト履歴一覧"
-          >
-            <HiClock className="text-lg flex-shrink-0" />
-            <span className="whitespace-nowrap">ロースト履歴</span>
-          </Link>
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            <button
+              onClick={() => setShowSettings(true)}
+              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+              title="設定"
+              aria-label="設定"
+            >
+              <IoSettings className="h-6 w-6 flex-shrink-0" />
+            </button>
+            <Link
+              href="/roast-record"
+              className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+              aria-label="ロースト履歴一覧"
+            >
+              <HiClock className="text-lg flex-shrink-0" />
+              <span className="whitespace-nowrap">ロースト履歴</span>
+            </Link>
+          </div>
           
           <div className="flex flex-col items-center justify-center w-full">
             {/* タイトル */}
@@ -675,14 +688,24 @@ export function RoastTimer() {
             >
               <HiHome className="h-6 w-6 flex-shrink-0" />
             </Link>
-            <Link
-              href="/roast-record"
-              className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0 pointer-events-auto"
-              aria-label="ロースト履歴一覧"
-            >
-              <HiClock className="text-lg flex-shrink-0" />
-              <span className="whitespace-nowrap">ロースト履歴</span>
-            </Link>
+            <div className="flex items-center gap-2 pointer-events-auto">
+              <button
+                onClick={() => setShowSettings(true)}
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                title="設定"
+                aria-label="設定"
+              >
+                <IoSettings className="h-6 w-6 flex-shrink-0" />
+              </button>
+              <Link
+                href="/roast-record"
+                className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
+                aria-label="ロースト履歴一覧"
+              >
+                <HiClock className="text-lg flex-shrink-0" />
+                <span className="whitespace-nowrap">ロースト履歴</span>
+              </Link>
+            </div>
           </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）
@@ -1014,6 +1037,17 @@ export function RoastTimer() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* 設定モーダル */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-4 sm:p-6 my-4">
+            <RoastTimerSettings
+              onClose={() => setShowSettings(false)}
+            />
+          </div>
         </div>
       )}
     </div>

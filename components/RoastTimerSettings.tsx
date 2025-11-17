@@ -9,6 +9,7 @@ import {
   saveRoastTimerSettings,
   clearRoastTimerSettingsCache,
 } from '@/lib/roastTimerSettings';
+import { playTimerSound, stopTimerSound } from '@/lib/sounds';
 import type { RoastTimerSettings } from '@/types';
 
 interface RoastTimerSettingsProps {
@@ -21,6 +22,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
   const [settings, setSettings] = useState<RoastTimerSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTestingSound, setIsTestingSound] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -36,6 +38,13 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
     }
   }, [user]);
 
+  // コンポーネントがアンマウントされる時に音を停止
+  useEffect(() => {
+    return () => {
+      stopTimerSound();
+    };
+  }, []);
+
   const handleSave = async () => {
     if (!user || !settings) return;
 
@@ -49,6 +58,34 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
       alert('設定の保存に失敗しました');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleTestSound = async () => {
+    if (!settings) return;
+
+    // 既存の音を停止
+    stopTimerSound();
+
+    setIsTestingSound(true);
+    try {
+      const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
+      if (audio) {
+        // 音声の再生が完了したら状態をリセット
+        audio.addEventListener('ended', () => {
+          setIsTestingSound(false);
+        }, { once: true });
+        // エラーが発生した場合も状態をリセット
+        audio.addEventListener('error', () => {
+          setIsTestingSound(false);
+        }, { once: true });
+      } else {
+        setIsTestingSound(false);
+      }
+    } catch (error) {
+      console.error('Failed to play test sound:', error);
+      alert('サウンドの再生に失敗しました');
+      setIsTestingSound(false);
     }
   };
 
@@ -92,7 +129,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">タイマー音</h3>
 
           <div className="space-y-4">
-            <div>
+            <div className="flex items-center justify-between">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -107,114 +144,38 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
                 />
                 <span className="text-sm sm:text-base text-gray-700">タイマー音を有効にする</span>
               </label>
+              {settings.timerSoundEnabled && (
+                <button
+                  type="button"
+                  onClick={handleTestSound}
+                  disabled={isTestingSound}
+                  className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors text-sm sm:text-base min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  {isTestingSound ? '再生中...' : 'テスト'}
+                </button>
+              )}
             </div>
 
             {settings.timerSoundEnabled && (
-              <>
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                    タイマー音ファイル
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.timerSoundFile}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        timerSoundFile: e.target.value,
-                      })
-                    }
-                    placeholder="sounds/alarm/alarm01.mp3"
-                    className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                    音量: {Math.round(settings.timerSoundVolume * 100)}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={settings.timerSoundVolume}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        timerSoundVolume: parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* 通知音の設定 */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">通知音</h3>
-
-          <div className="space-y-4">
-            <div>
-              <label className="flex items-center gap-2">
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                  音量: {Math.round(settings.timerSoundVolume * 100)}%
+                </label>
                 <input
-                  type="checkbox"
-                  checked={settings.notificationSoundEnabled}
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={settings.timerSoundVolume}
                   onChange={(e) =>
                     setSettings({
                       ...settings,
-                      notificationSoundEnabled: e.target.checked,
+                      timerSoundVolume: parseFloat(e.target.value),
                     })
                   }
-                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
-                <span className="text-sm sm:text-base text-gray-700">通知音を有効にする</span>
-              </label>
-            </div>
-
-            {settings.notificationSoundEnabled && (
-              <>
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                    通知音ファイル
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.notificationSoundFile}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        notificationSoundFile: e.target.value,
-                      })
-                    }
-                    placeholder="sounds/alarm/alarm01.mp3"
-                    className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                    音量: {Math.round(settings.notificationSoundVolume * 100)}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={settings.notificationSoundVolume}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        notificationSoundVolume: parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
-              </>
+              </div>
             )}
           </div>
         </div>

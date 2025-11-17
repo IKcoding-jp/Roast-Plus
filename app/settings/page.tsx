@@ -7,6 +7,7 @@ import { useAppData } from '@/hooks/useAppData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
+import { RoastTimerSettings } from '@/components/RoastTimerSettings';
 import { HiHome } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
@@ -18,6 +19,7 @@ export default function SettingsPage() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [showRoastTimerSettings, setShowRoastTimerSettings] = useState(false);
 
   if (authLoading || devModeLoading || dataLoading) {
     return <Loading />;
@@ -111,6 +113,21 @@ export default function SettingsPage() {
               開発予定
             </p>
           </Link>
+
+          {/* ローストタイマー設定セクション */}
+          <div className="bg-white rounded-lg shadow-md p-6 transition-shadow hover:shadow-lg">
+            <button
+              onClick={() => setShowRoastTimerSettings(true)}
+              className="w-full text-left"
+            >
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                ローストタイマー設定
+              </h2>
+              <p className="text-sm text-gray-600">
+                タイマー音や通知音の設定を変更できます
+              </p>
+            </button>
+          </div>
 
           {/* 開発者モードセクション */}
           <div className="bg-white rounded-lg shadow-md p-6">
@@ -230,6 +247,17 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* ローストタイマー設定モーダル */}
+        {showRoastTimerSettings && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-4 sm:p-6 my-4">
+              <RoastTimerSettings
+                onClose={() => setShowRoastTimerSettings(false)}
+              />
             </div>
           </div>
         )}

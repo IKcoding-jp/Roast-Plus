@@ -9,7 +9,7 @@ import type { RoastTimerSettings, UserSettings } from '@/types';
 // デフォルト設定
 const DEFAULT_SETTINGS: RoastTimerSettings = {
   goToRoastRoomTimeSeconds: 60,
-  timerSoundEnabled: true,
+  timerSoundEnabled: false,
   timerSoundFile: '/sounds/alarm/alarm01.mp3',
   timerSoundVolume: 0.5,
   notificationSoundEnabled: true,

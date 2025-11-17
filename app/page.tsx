@@ -7,12 +7,10 @@ import { PiCoffeeBeanFill } from "react-icons/pi";
 import { RiCalendarScheduleLine, RiBookFill } from "react-icons/ri";
 import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
-import { IoSettings, IoInformationCircleOutline } from "react-icons/io5";
+import { IoSettings } from "react-icons/io5";
 import { MdTimer } from "react-icons/md";
 import { MdTimeline } from "react-icons/md";
-import { VersionUpdateModal } from '@/components/VersionUpdateModal';
 import { Loading } from '@/components/Loading';
-import { shouldShowVersionModal, setLastShownVersion } from '@/lib/versionManager';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
 // バージョン情報（package.jsonと同期）
@@ -23,7 +21,6 @@ const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間（3
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [showVersionModal, setShowVersionModal] = useState(false);
   const [showLoadingDebugModal, setShowLoadingDebugModal] = useState(false);
   const [splashVisible, setSplashVisible] = useState(true);
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
@@ -42,29 +39,6 @@ export default function HomePage() {
       router.push('/login');
     }
   }, [user, loading, router]);
-
-  // バージョンチェック（認証完了後、初回起動時またはバージョンアップ時）
-  useEffect(() => {
-    if (loading || !user) {
-      return;
-    }
-
-    // 初回起動時またはバージョンアップ時はモーダルを表示
-    if (shouldShowVersionModal(APP_VERSION)) {
-      setShowVersionModal(true);
-    }
-  }, [user, loading]);
-
-  // モーダルを閉じた際に、現在のバージョンを保存
-  const handleCloseVersionModal = () => {
-    setShowVersionModal(false);
-    setLastShownVersion(APP_VERSION);
-  };
-
-  // 開発用: モーダルを強制的に表示
-  const handleShowVersionModalForDev = () => {
-    setShowVersionModal(true);
-  };
 
   // 開発用: Lottieアニメーション確認モーダルを表示
   const handleShowLoadingDebugModal = () => {
@@ -91,13 +65,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F7F7F5' }}>
-      {/* バージョンアップ説明モーダル */}
-      <VersionUpdateModal
-        isOpen={showVersionModal}
-        onClose={handleCloseVersionModal}
-        currentVersion={APP_VERSION}
-      />
-
       {/* 開発用: Lottieアニメーション確認モーダル */}
       {showLoadingDebugModal && (
         <div
@@ -144,26 +111,16 @@ export default function HomePage() {
           <span className="text-sm font-normal text-gray-300">v{APP_VERSION}</span>
         </div>
         <div className="flex items-center gap-4">
-          {/* 開発者モード: バージョンアップモーダル表示ボタン */}
+          {/* 開発者モード: Lottieアニメーション確認ボタン */}
           {isDeveloperMode && (
-            <>
-              <button
-                onClick={handleShowVersionModalForDev}
-                className="p-2 text-white hover:text-gray-200 hover:bg-dark-light rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                aria-label="バージョンアップモーダルを表示"
-                title="開発用: バージョンアップモーダルを表示"
-              >
-                <IoInformationCircleOutline className="h-6 w-6" />
-              </button>
-              <button
-                onClick={handleShowLoadingDebugModal}
-                className="p-2 text-white hover:text-gray-200 hover:bg-dark-light rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                aria-label="Lottieアニメーション確認"
-                title="開発用: Lottieアニメーション確認"
-              >
-                <PiCoffeeBeanFill className="h-6 w-6" />
-              </button>
-            </>
+            <button
+              onClick={handleShowLoadingDebugModal}
+              className="p-2 text-white hover:text-gray-200 hover:bg-dark-light rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Lottieアニメーション確認"
+              title="開発用: Lottieアニメーション確認"
+            >
+              <PiCoffeeBeanFill className="h-6 w-6" />
+            </button>
           )}
           <button
             onClick={handleLogout}

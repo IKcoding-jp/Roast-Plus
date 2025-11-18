@@ -11,9 +11,8 @@ import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
 import { RoastTimerSettings } from './RoastTimerSettings';
-import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiClock, HiArrowLeft } from 'react-icons/hi';
+import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiArrowLeft } from 'react-icons/hi';
 import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
-import { IoSettings } from 'react-icons/io5';
 import Link from 'next/link';
 
 const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
@@ -697,26 +696,6 @@ export function RoastTimer() {
           >
             <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
           </Link>
-          {state?.status === 'completed' && (
-            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-              <button
-                onClick={() => setShowSettings(true)}
-                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                title="設定"
-                aria-label="設定"
-              >
-                <IoSettings className="h-6 w-6 flex-shrink-0" />
-              </button>
-              <Link
-                href="/roast-record"
-                className="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 flex-shrink-0"
-                aria-label="ロースト履歴一覧"
-              >
-                <HiClock className="text-lg flex-shrink-0" />
-                <span className="whitespace-nowrap">ロースト履歴</span>
-              </Link>
-            </div>
-          )}
           
           <div className="flex flex-col items-center justify-center w-full">
             {/* タイトル */}

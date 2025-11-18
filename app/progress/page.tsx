@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { Loading } from '@/components/Loading';
 import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress, archiveWorkProgress, unarchiveWorkProgress } from '@/lib/firestore';
-import { HiHome, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection, HiArchive } from 'react-icons/hi';
+import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection, HiArchive } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
@@ -748,15 +748,15 @@ export default function ProgressPage() {
         {/* ヘッダー */}
         <header className="mb-6 sm:mb-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 items-center mb-4">
-            {/* 左側: ホームに戻る */}
+            {/* 左側: 戻る */}
             <div className="flex justify-start">
               <Link
                 href="/"
                 className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                title="ホームに戻る"
-                aria-label="ホームに戻る"
+                title="戻る"
+                aria-label="戻る"
               >
-                <HiHome className="h-6 w-6 flex-shrink-0" />
+                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
               </Link>
             </div>
 

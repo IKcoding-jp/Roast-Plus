@@ -11,7 +11,7 @@ import { TastingRecordForm } from '@/components/TastingRecordForm';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import { Loading } from '@/components/Loading';
 import type { TastingSession, TastingRecord } from '@/types';
-import { HiHome, HiPlus, HiFilter, HiArrowLeft } from 'react-icons/hi';
+import { HiPlus, HiFilter, HiArrowLeft } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
 function TastingPageContent() {
@@ -297,10 +297,10 @@ function TastingPageContent() {
               <Link
                 href="/"
                 className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                title="ホームに戻る"
-                aria-label="ホームに戻る"
+                title="戻る"
+                aria-label="戻る"
               >
-                <HiHome className="h-6 w-6 flex-shrink-0" />
+                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
               </Link>
               <div id="filter-button-container-mobile" className="sm:hidden"></div>
             </div>

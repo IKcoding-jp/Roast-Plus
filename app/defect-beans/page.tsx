@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiHome, HiSearch, HiPlus, HiX, HiCheckCircle, HiXCircle, HiCollection, HiOutlineCollection } from 'react-icons/hi';
+import { HiArrowLeft, HiSearch, HiPlus, HiX, HiCheckCircle, HiXCircle, HiCollection, HiOutlineCollection } from 'react-icons/hi';
 import { RiBookFill } from 'react-icons/ri';
 import { MdCompareArrows, MdSort, MdArrowUpward, MdArrowDownward } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
@@ -280,15 +280,15 @@ export default function DefectBeansPage() {
         <header className="mb-4">
           {/* タイトルとナビゲーション（一番上、同じ行） */}
           <div className="grid grid-cols-3 items-center mb-3">
-            {/* 左側: ホームに戻る */}
+            {/* 左側: 戻る */}
             <div className="flex justify-start">
               <Link
                 href="/"
                 className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                title="ホームに戻る"
-                aria-label="ホームに戻る"
+                title="戻る"
+                aria-label="戻る"
               >
-                <HiHome className="h-6 w-6 flex-shrink-0" />
+                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
               </Link>
             </div>
 

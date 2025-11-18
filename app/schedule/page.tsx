@@ -8,7 +8,7 @@ import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
 import { Loading } from '@/components/Loading';
 import { useToastContext } from '@/components/Toast';
-import { HiHome, HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCamera } from 'react-icons/hi';
+import { HiArrowLeft, HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCamera } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
 import { ScheduleOCRModal } from '@/components/ScheduleOCRModal';
 import LoginPage from '@/app/login/page';
@@ -264,10 +264,10 @@ export default function SchedulePage() {
             <Link
               href="/"
               className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-              title="ホームに戻る"
-              aria-label="ホームに戻る"
+              title="戻る"
+              aria-label="戻る"
             >
-              <HiHome className="h-6 w-6 flex-shrink-0" />
+              <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
             </Link>
           </div>
           <div className="flex-1 flex justify-center items-center">

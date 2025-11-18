@@ -11,7 +11,7 @@ import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
 import { RoastTimerSettings } from './RoastTimerSettings';
-import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiHome, HiClock, HiArrowLeft } from 'react-icons/hi';
+import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiClock, HiArrowLeft } from 'react-icons/hi';
 import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
 import { IoSettings } from 'react-icons/io5';
 import Link from 'next/link';
@@ -538,10 +538,10 @@ export function RoastTimer() {
           <Link
             href="/"
             className="absolute top-4 left-4 z-10 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-            title="ホームに戻る"
-            aria-label="ホームに戻る"
+            title="戻る"
+            aria-label="戻る"
           >
-            <HiHome className="h-6 w-6 flex-shrink-0" />
+            <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
           </Link>
           {state?.status === 'completed' && (
             <div className="absolute top-4 right-4 z-10 flex items-center gap-2">

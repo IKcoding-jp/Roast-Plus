@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { useRoastTimer } from '@/hooks/useRoastTimer';
-import { formatTime, formatTimeAsMinutes, calculateRecommendedTime } from '@/lib/roastTimerUtils';
+import { formatTime, formatTimeAsMinutes, formatTimeAsMinutesAndSeconds, calculateRecommendedTime } from '@/lib/roastTimerUtils';
 import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
@@ -319,7 +319,7 @@ export function RoastTimer() {
           // 過去の記録モード：おすすめ時間の確認ダイアログ（豆と焙煎度合いが選択されている場合のみ）
           if (recommendedTimeInfo && beanName && roastLevel) {
             const confirmed = confirm(
-              `過去の記録から、平均焙煎時間は${formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}、おすすめタイマー時間は${formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}です。\nこの時間でタイマーを開始しますか？`
+              `過去の記録から、平均焙煎時間は${formatTimeAsMinutesAndSeconds(recommendedTimeInfo.averageDuration)}、おすすめタイマー時間は${formatTimeAsMinutesAndSeconds(recommendedTimeInfo.recommendedDuration)}です。\nこの時間でタイマーを開始しますか？`
             );
             if (!confirmed) {
               return;
@@ -1250,11 +1250,11 @@ export function RoastTimer() {
                           <p className="text-sm sm:text-base text-gray-700">
                             過去の記録から、平均焙煎時間は{' '}
                             <span className="font-bold text-amber-800">
-                              {formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}
+                              {formatTimeAsMinutesAndSeconds(recommendedTimeInfo.averageDuration)}
                             </span>
                             、おすすめタイマー時間は{' '}
                             <span className="font-bold text-amber-800">
-                              {formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}
+                              {formatTimeAsMinutesAndSeconds(recommendedTimeInfo.recommendedDuration)}
                             </span>{' '}
                             です
                           </p>

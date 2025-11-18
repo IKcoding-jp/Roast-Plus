@@ -76,3 +76,23 @@ export function formatTimeAsMinutes(seconds: number): string {
   return `${minutes}分`;
 }
 
+/**
+ * 秒数を分と秒を含む文字列に変換（例: "5分30秒"）
+ * 
+ * @param seconds 秒数
+ * @returns "X分Y秒"形式の文字列
+ */
+export function formatTimeAsMinutesAndSeconds(seconds: number): string {
+  const roundedSeconds = Math.floor(seconds);
+  const minutes = Math.floor(roundedSeconds / 60);
+  const remainingSeconds = roundedSeconds % 60;
+  
+  if (minutes === 0) {
+    return `${remainingSeconds}秒`;
+  }
+  if (remainingSeconds === 0) {
+    return `${minutes}分`;
+  }
+  return `${minutes}分${remainingSeconds}秒`;
+}
+

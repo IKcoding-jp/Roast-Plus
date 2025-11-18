@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
-import { useAppData } from '@/hooks/useAppData';
-import type { RoastTimerState } from '@/types';
+import type { AppData, RoastTimerState } from '@/types';
 import { setRoastTimerState as saveLocalState, getRoastTimerState as loadLocalState, getDeviceId } from '@/lib/localStorage';
 import { notifyRoastTimerComplete, scheduleNotification, cancelAllScheduledNotifications } from '@/lib/notifications';
 import { playTimerSound, stopTimerSound, stopAllSounds, stopAudio } from '@/lib/sounds';
@@ -39,9 +38,16 @@ function calculateElapsedTime(
   return pausedElapsed;
 }
 
-export function useRoastTimer() {
+type UpdateAppDataFn = (newDataOrUpdater: AppData | ((currentData: AppData) => AppData)) => Promise<void>;
+
+interface UseRoastTimerArgs {
+  data: AppData | null;
+  updateData: UpdateAppDataFn;
+  isLoading: boolean;
+}
+
+export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs) {
   const { user } = useAuth();
-  const { data, updateData } = useAppData();
   const [localState, setLocalState] = useState<RoastTimerState | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastUpdateRef = useRef<number>(Date.now());
@@ -161,6 +167,7 @@ export function useRoastTimer() {
             return;
           }
           
+          let stateToPersist: RoastTimerState = storedState;
           // ローカルストレージから読み込んだ場合、開始時刻から経過時間を再計算
           if (storedState.status === 'running' && storedState.startedAt) {
             const elapsed = calculateElapsedTime(
@@ -171,27 +178,30 @@ export function useRoastTimer() {
             );
             const remaining = Math.max(0, storedState.duration - elapsed);
             
-            const restoredState: RoastTimerState = {
+            stateToPersist = {
               ...storedState,
               elapsed,
               remaining,
               lastUpdatedAt: new Date().toISOString(),
             };
-            
-            setLocalState(restoredState);
-            // Firestoreにも保存（マイグレーション）
-            updateData({
-              ...data,
-              roastTimerState: restoredState,
-            });
-          } else {
-            setLocalState(storedState);
-            // Firestoreにも保存（マイグレーション）
-            updateData({
-              ...data,
-              roastTimerState: storedState,
-            });
           }
+          
+          setLocalState(stateToPersist);
+
+          // Firestoreにも保存（マイグレーション）。ただしAppDataの読み込み完了までは書き込みを遅延
+          if (isLoading) {
+            return;
+          }
+
+          updateData((currentData) => ({
+            ...currentData,
+            roastTimerState: stateToPersist,
+          })).catch((error) => {
+            console.error('Failed to migrate roast timer state from local storage:', error);
+          });
+
+          isInitialMountRef.current = false;
+          return;
         }
         isInitialMountRef.current = false;
       } else {
@@ -206,7 +216,7 @@ export function useRoastTimer() {
         }
       }
     }
-  }, [data.roastTimerState, user, data, updateData, currentDeviceId]);
+  }, [user, data, updateData, currentDeviceId, isLoading]);
 
   // タイマーの更新処理（開始時刻ベースで計算）
   const updateTimer = useCallback(async () => {
@@ -255,10 +265,10 @@ export function useRoastTimer() {
 
         // Firestoreに完了状態を保存
         try {
-          await updateData({
-            ...data,
+          await updateData((currentData) => ({
+            ...currentData,
             roastTimerState: updatedState,
-          });
+          }));
         } catch (error) {
           console.error('Failed to save roast timer state to Firestore:', error);
         }
@@ -268,7 +278,7 @@ export function useRoastTimer() {
       saveLocalState(updatedState);
       setLocalState(updatedState);
     }
-  }, [localState, user, data, updateData]);
+  }, [localState, user, updateData]);
 
   // タイマーの定期更新（UI表示用）
   useEffect(() => {
@@ -371,10 +381,10 @@ export function useRoastTimer() {
 
       // Firestoreに保存
       try {
-        await updateData({
-          ...data,
+        await updateData((currentData) => ({
+          ...currentData,
           roastTimerState: newState,
-        });
+        }));
       } catch (error) {
         console.error('Failed to save roast timer state to Firestore:', error);
       }
@@ -383,7 +393,7 @@ export function useRoastTimer() {
       const scheduledTime = Date.now() + duration * 1000;
       await scheduleNotification(notificationId, scheduledTime);
     },
-    [user, data, updateData, currentDeviceId]
+    [user, updateData, currentDeviceId]
   );
 
   // タイマーを一時停止
@@ -415,14 +425,14 @@ export function useRoastTimer() {
 
     // Firestoreに保存
     try {
-      await updateData({
-        ...data,
+      await updateData((currentData) => ({
+        ...currentData,
         roastTimerState: updatedState,
-      });
+      }));
     } catch (error) {
       console.error('Failed to save roast timer state to Firestore:', error);
     }
-  }, [localState, user, data, updateData, currentDeviceId]);
+  }, [localState, user, updateData, currentDeviceId]);
 
   // タイマーを再開
   const resumeTimer = useCallback(async () => {
@@ -452,10 +462,10 @@ export function useRoastTimer() {
 
     // Firestoreに保存
     try {
-      await updateData({
-        ...data,
+      await updateData((currentData) => ({
+        ...currentData,
         roastTimerState: updatedState,
-      });
+      }));
     } catch (error) {
       console.error('Failed to save roast timer state to Firestore:', error);
     }
@@ -466,7 +476,7 @@ export function useRoastTimer() {
       const scheduledTime = Date.now() + remainingTime;
       scheduleNotification(updatedState.notificationId, scheduledTime);
     }
-  }, [localState, user, data, updateData, currentDeviceId]);
+  }, [localState, user, updateData, currentDeviceId]);
 
   // タイマーをスキップ（残り時間を1秒に設定）
   const skipTimer = useCallback(async () => {
@@ -496,15 +506,15 @@ export function useRoastTimer() {
 
     // Firestoreに保存
     try {
-      await updateData({
-        ...data,
+      await updateData((currentData) => ({
+        ...currentData,
         roastTimerState: updatedState,
-      });
+      }));
     } catch (error) {
       console.error('Failed to save roast timer state to Firestore:', error);
     }
     // 次回のカウントダウンで完了処理が実行される
-  }, [localState, user, data, updateData, currentDeviceId]);
+  }, [localState, user, updateData, currentDeviceId]);
 
   // タイマーをリセット
   const resetTimer = useCallback(async () => {

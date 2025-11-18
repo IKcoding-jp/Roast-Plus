@@ -37,7 +37,7 @@ function removeNonNumeric(str: string): string {
 
 export function RoastTimer() {
   const { user } = useAuth();
-  const { data } = useAppData();
+  const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
   const {
     state,
@@ -47,7 +47,7 @@ export function RoastTimer() {
     resetTimer,
     skipTimer,
     stopSound,
-  } = useRoastTimer();
+  } = useRoastTimer({ data, updateData, isLoading });
 
   const [inputMode, setInputMode] = useState<'manual' | 'recommended' | null>(null);
   const [recommendedMode, setRecommendedMode] = useState<'weight' | 'history'>('weight');

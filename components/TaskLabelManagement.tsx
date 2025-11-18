@@ -21,6 +21,20 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
   const [localLabels, setLocalLabels] = useState<
     Array<{ id: string; leftLabel: string; rightLabel: string }>
   >([]);
+  const [headerTextLeft, setHeaderTextLeft] = useState(
+    data.userSettings?.taskLabelHeaderTextLeft || '作業ラベル'
+  );
+  const [headerTextRight, setHeaderTextRight] = useState(
+    data.userSettings?.taskLabelHeaderTextRight || '作業ラベル'
+  );
+
+  // userSettingsの変更を反映
+  useEffect(() => {
+    const newHeaderTextLeft = data.userSettings?.taskLabelHeaderTextLeft || '作業ラベル';
+    const newHeaderTextRight = data.userSettings?.taskLabelHeaderTextRight || '作業ラベル';
+    setHeaderTextLeft(newHeaderTextLeft);
+    setHeaderTextRight(newHeaderTextRight);
+  }, [data.userSettings?.taskLabelHeaderTextLeft, data.userSettings?.taskLabelHeaderTextRight]);
 
   useEffect(() => {
     if (localLabels.length === 0 && taskLabels.length > 0) {
@@ -76,6 +90,62 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
       <div className="mb-4">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800">作業ラベル管理</h2>
       </div>
+      <div className="mb-6 pb-6 border-b border-gray-200">
+        <div className="mb-4">
+          <label className="block text-sm sm:text-base font-medium text-gray-700 mb-3">
+            担当表のヘッダー表記
+          </label>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1">
+              <label className="block text-xs sm:text-sm text-gray-600 mb-1">
+                左側のヘッダー
+              </label>
+              <input
+                type="text"
+                value={headerTextLeft}
+                onChange={(e) => setHeaderTextLeft(e.target.value)}
+                onBlur={() => {
+                  const updatedData: AppData = {
+                    ...data,
+                    userSettings: {
+                      ...data.userSettings,
+                      taskLabelHeaderTextLeft: headerTextLeft.trim() || undefined,
+                    },
+                  };
+                  onUpdate(updatedData);
+                }}
+                placeholder="作業ラベル"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded text-gray-900 text-sm sm:text-base placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs sm:text-sm text-gray-600 mb-1">
+                右側のヘッダー
+              </label>
+              <input
+                type="text"
+                value={headerTextRight}
+                onChange={(e) => setHeaderTextRight(e.target.value)}
+                onBlur={() => {
+                  const updatedData: AppData = {
+                    ...data,
+                    userSettings: {
+                      ...data.userSettings,
+                      taskLabelHeaderTextRight: headerTextRight.trim() || undefined,
+                    },
+                  };
+                  onUpdate(updatedData);
+                }}
+                placeholder="作業ラベル"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded text-gray-900 text-sm sm:text-base placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+          </div>
+          <p className="mt-2 text-xs sm:text-sm text-gray-500">
+            担当表の「作業ラベル」という表記を左と右で個別に変更できます。空欄の場合は「作業ラベル」が表示されます。
+          </p>
+        </div>
+      </div>
       <div className="space-y-3 mb-4">
         {localLabels.length === 0 ? (
           <p className="text-gray-500 text-sm sm:text-base">
@@ -93,7 +163,7 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                 onChange={(e) => updateLabel(label.id, 'leftLabel', e.target.value)}
                 onBlur={() => saveLabel(label.id)}
                 placeholder="左ラベル（例：掃除機）"
-                className="flex-1 px-3 py-2 sm:py-3 border border-gray-300 rounded text-gray-900 text-sm sm:text-base placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded text-gray-900 text-sm sm:text-base placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
               <input
                 type="text"
@@ -101,7 +171,7 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                 onChange={(e) => updateLabel(label.id, 'rightLabel', e.target.value)}
                 onBlur={() => saveLabel(label.id)}
                 placeholder="右ラベル（任意、例：ロースト）"
-                className="flex-1 px-3 py-2 sm:py-3 border border-gray-300 rounded text-gray-900 text-sm sm:text-base placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded text-gray-900 text-sm sm:text-base placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
               <button
                 onClick={() => {

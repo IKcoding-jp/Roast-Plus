@@ -131,6 +131,8 @@ export interface UserSettings {
   selectedMemberId?: string; // 試飲感想記録用のメンバーID
   selectedManagerId?: string; // デバイス使用者設定用の管理者ID
   roastTimerSettings?: RoastTimerSettings; // ローストタイマー設定
+  taskLabelHeaderTextLeft?: string; // 担当表の左側作業ラベルヘッダー表記（デフォルト: 「作業ラベル」）
+  taskLabelHeaderTextRight?: string; // 担当表の右側作業ラベルヘッダー表記（デフォルト: 「作業ラベル」）
 }
 
 // シャッフルイベント（マルチデバイス同期用）

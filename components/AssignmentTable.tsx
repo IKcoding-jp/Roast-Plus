@@ -678,6 +678,10 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
     );
   }
 
+  // ヘッダー表記を取得（設定がない場合はデフォルトの「作業ラベル」）
+  const headerTextLeft = data.userSettings?.taskLabelHeaderTextLeft || '作業ラベル';
+  const headerTextRight = data.userSettings?.taskLabelHeaderTextRight || '作業ラベル';
+
   return (
     <div className="bg-white rounded-lg shadow p-4 sm:p-6">
       <div className="mb-4">
@@ -686,7 +690,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
             <thead>
               <tr>
                 <th className="border border-gray-300 p-2 sm:p-3 bg-gray-50 text-center text-gray-800 text-sm sm:text-base w-32 sm:w-40 whitespace-nowrap">
-                  <div className="flex items-center justify-center">作業ラベル</div>
+                  <div className="flex items-center justify-center">{headerTextLeft}</div>
                 </th>
                 {teams.map((team) => (
                   <th
@@ -697,7 +701,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                   </th>
                 ))}
                 <th className="border border-gray-300 p-2 sm:p-3 bg-gray-50 text-center text-gray-800 text-sm sm:text-base w-32 sm:w-40 whitespace-nowrap">
-                  <div className="flex items-center justify-center">作業ラベル</div>
+                  <div className="flex items-center justify-center">{headerTextRight}</div>
                 </th>
               </tr>
             </thead>

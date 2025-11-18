@@ -417,6 +417,15 @@ export function RoastTimer() {
   const handleContinuousRoastYes = async () => {
     // 音を確実に停止
     stopSound();
+
+    // 先にローカル状態をクリアして、画面遷移時のチラつきを防ぐ
+    setInputMode(null);
+    setRecommendedMode('weight');
+    setDurationMinutes('');
+    setDurationSeconds('');
+    setBeanName('');
+    setWeight('');
+    setRoastLevel('');
     
     // まず、すべてのダイアログを閉じる（resetTimer()が完了する前に再表示されるのを防ぐ）
     setShowCompletionDialog(false);
@@ -425,15 +434,6 @@ export function RoastTimer() {
     
     // タイマーをリセット（Firestoreから状態を削除）
     await resetTimer();
-    
-    // リセット完了後、ローカル状態をクリア
-    setInputMode(null);
-    setRecommendedMode('weight');
-    setDurationMinutes('');
-    setDurationSeconds('');
-    setBeanName('');
-    setWeight('');
-    setRoastLevel('');
     
     // 連続焙煎の場合は、ローストタイマー画面に戻る
     router.push('/roast-timer');
@@ -543,6 +543,15 @@ export function RoastTimer() {
   const handleAfterPurgeClose = async () => {
     // 音を確実に停止
     stopSound();
+
+    // 先にローカル状態をクリアして、画面遷移時のチラつきを防ぐ
+    setInputMode(null);
+    setRecommendedMode('weight');
+    setDurationMinutes('');
+    setDurationSeconds('');
+    setBeanName('');
+    setWeight('');
+    setRoastLevel('');
     
     // まず、すべてのダイアログを閉じる（resetTimer()が完了する前に再表示されるのを防ぐ）
     setShowCompletionDialog(false);
@@ -551,14 +560,6 @@ export function RoastTimer() {
 
     // タイマーをリセット（Firestoreから状態を削除）
     await resetTimer();
-
-    // リセット完了後、ローカル状態をクリア
-    setInputMode(null);
-    setRecommendedMode('weight');
-    setDurationMinutes('');
-    setBeanName('');
-    setWeight('');
-    setRoastLevel('');
   };
 
   // 入力値の正規化（全角数字を半角に変換、数字以外を除去）

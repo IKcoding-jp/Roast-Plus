@@ -106,7 +106,7 @@ export default function HomePage() {
         <div className="flex items-center gap-2">
           <PiCoffeeBeanFill className="h-6 w-6 text-gold" />
           <h1 className="text-xl font-bold text-white">
-            ローストプラス
+            ローストプラス β版
           </h1>
           <span className="text-sm font-normal text-gray-300">v{APP_VERSION}</span>
         </div>
@@ -174,7 +174,7 @@ export default function HomePage() {
           >
             <MdTimer className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
-              ローストタイマー β版
+              ローストタイマー
             </h2>
           </button>
 
@@ -185,7 +185,7 @@ export default function HomePage() {
           >
             <RiBookFill className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
-              コーヒー豆図鑑 β版
+              コーヒー豆図鑑
             </h2>
           </button>
 
@@ -196,7 +196,7 @@ export default function HomePage() {
           >
             <MdTimeline className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
-              作業進捗 β版
+              作業進捗
             </h2>
           </button>
 

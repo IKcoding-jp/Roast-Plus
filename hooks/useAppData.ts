@@ -139,7 +139,8 @@ export function useAppData() {
         // lockedKeysに含まれるキーは常にlatestLocalDataRef.currentに存在する
         const value = latestLocalDataRef.current[key];
         if (value !== undefined) {
-          mergedData[key] = value;
+          // TypeScriptの型推論を補助するための型アサーション
+          (mergedData as Record<keyof AppData, AppData[keyof AppData]>)[key] = value;
         }
       });
 

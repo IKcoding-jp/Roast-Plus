@@ -142,7 +142,7 @@ export function DefectBeanForm({
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* ヘッダー */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-20">
           <h2 className="text-xl font-semibold text-gray-800">
             {mode === 'edit' ? '欠点豆を編集' : '欠点豆を追加'}
           </h2>
@@ -154,19 +154,18 @@ export function DefectBeanForm({
           </button>
         </div>
 
-        {/* フォーム */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* 画像選択 */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              画像 {mode === 'add' && <span className="text-red-500">*</span>}
-            </label>
-            {imagePreview ? (
-              <div className="relative">
+        {/* 画像選択 */}
+        <div className="px-6 pt-6">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            画像 {mode === 'add' && <span className="text-red-500">*</span>}
+          </label>
+          {imagePreview ? (
+            <div className="flex justify-center">
+              <div className="relative w-full max-w-xs">
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full max-w-xs mx-auto aspect-square object-cover rounded-lg"
+                  className="w-full aspect-square object-cover rounded-lg"
                 />
                 <button
                   type="button"
@@ -187,29 +186,33 @@ export function DefectBeanForm({
                   <HiX className="h-5 w-5" />
                 </button>
               </div>
-            ) : (
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCamera(true)}
-                  className="w-full px-4 py-12 border-2 border-dashed border-gray-300 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-colors flex flex-col items-center justify-center gap-2 min-h-[200px]"
-                >
-                  <HiCamera className="h-12 w-12 text-gray-400" />
-                  <span className="text-gray-600 font-medium">カメラで撮影</span>
-                </button>
-                <div className="text-center text-sm text-gray-500">または</div>
-                <label className="block w-full px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center">
-                  <span className="text-gray-700 font-medium">ファイルを選択</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => setShowCamera(true)}
+                className="w-full px-4 py-12 border-2 border-dashed border-gray-300 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-colors flex flex-col items-center justify-center gap-2 min-h-[200px]"
+              >
+                <HiCamera className="h-12 w-12 text-gray-400" />
+                <span className="text-gray-600 font-medium">カメラで撮影</span>
+              </button>
+              <div className="text-center text-sm text-gray-500">または</div>
+              <label className="block w-full px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center">
+                <span className="text-gray-700 font-medium">ファイルを選択</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          )}
+        </div>
+
+        {/* フォーム */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
 
           {/* 名称 */}
           <div>

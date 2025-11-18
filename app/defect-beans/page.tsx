@@ -301,53 +301,55 @@ export default function DefectBeansPage() {
             </div>
 
             {/* 右側: アクションボタン */}
-            <div className="flex justify-end items-center gap-2 flex-shrink-0">
+            <div className="flex justify-end items-center gap-1.5 sm:gap-2 flex-shrink-0 flex-wrap">
               {!(filteredDefectBeans.length === 0 && !searchQuery && filterOption === 'all') && (
                 <>
                   {/* ソートボタン */}
-                  <div className="relative" ref={sortMenuRef}>
-                    <button
-                      onClick={() => setShowSortMenu(!showSortMenu)}
-                      className={`px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1.5 ${
-                        showSortMenu
-                          ? 'bg-amber-600 text-white hover:bg-amber-700'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                      }`}
-                      title="ソート"
-                    >
-                      {getSortIcon()}
-                      <span className="hidden sm:inline text-sm">ソート</span>
-                    </button>
-                    {/* ドロップダウンメニュー */}
-                    {showSortMenu && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                        <div className="py-1">
-                          {(['default', 'createdAtDesc', 'createdAtAsc', 'nameAsc', 'nameDesc'] as SortOption[]).map((option) => (
-                            <button
-                              key={option}
-                              onClick={() => {
-                                setSortOption(option);
-                                setShowSortMenu(false);
-                              }}
-                              className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${
-                                sortOption === option
-                                  ? 'bg-amber-50 text-amber-700 font-medium'
-                                  : 'text-gray-700 hover:bg-gray-50'
-                              }`}
-                            >
-                              {sortOption === option && (
-                                <HiCheckCircle className="h-4 w-4 text-amber-600" />
-                              )}
-                              <span>{getSortLabel(option)}</span>
-                            </button>
-                          ))}
+                  {!compareMode && (
+                    <div className="relative" ref={sortMenuRef}>
+                      <button
+                        onClick={() => setShowSortMenu(!showSortMenu)}
+                        className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${
+                          showSortMenu
+                            ? 'bg-amber-600 text-white hover:bg-amber-700'
+                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                        }`}
+                        title="ソート"
+                      >
+                        {getSortIcon()}
+                        <span className="hidden sm:inline text-sm">ソート</span>
+                      </button>
+                      {/* ドロップダウンメニュー */}
+                      {showSortMenu && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                          <div className="py-1">
+                            {(['default', 'createdAtDesc', 'createdAtAsc', 'nameAsc', 'nameDesc'] as SortOption[]).map((option) => (
+                              <button
+                                key={option}
+                                onClick={() => {
+                                  setSortOption(option);
+                                  setShowSortMenu(false);
+                                }}
+                                className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${
+                                  sortOption === option
+                                    ? 'bg-amber-50 text-amber-700 font-medium'
+                                    : 'text-gray-700 hover:bg-gray-50'
+                                }`}
+                              >
+                                {sortOption === option && (
+                                  <HiCheckCircle className="h-4 w-4 text-amber-600" />
+                                )}
+                                <span>{getSortLabel(option)}</span>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
                   <button
                     onClick={toggleCompareMode}
-                    className={`px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1.5 ${
+                    className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${
                       compareMode
                         ? 'bg-amber-600 text-white hover:bg-amber-700'
                         : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
@@ -359,23 +361,25 @@ export default function DefectBeansPage() {
                       {compareMode ? '選択モード' : '比較'}
                     </span>
                   </button>
-                  {compareMode && selectedIds.size > 0 && selectedIds.size < 2 && (
+                  {compareMode && selectedIds.size > 0 && (
                     <button
                       onClick={handleShowCompare}
-                      className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1.5 text-sm"
+                      className="px-2 sm:px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 text-sm"
                       title="比較を表示"
                     >
                       比較 ({selectedIds.size})
                     </button>
                   )}
-                  <button
-                    onClick={() => setShowAddForm(true)}
-                    className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1.5"
-                    title="欠点豆を追加"
-                  >
-                    <HiPlus className="h-5 w-5" />
-                    <span className="hidden sm:inline text-sm">追加</span>
-                  </button>
+                  {!compareMode && (
+                    <button
+                      onClick={() => setShowAddForm(true)}
+                      className="px-2 sm:px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5"
+                      title="欠点豆を追加"
+                    >
+                      <HiPlus className="h-5 w-5" />
+                      <span className="hidden sm:inline text-sm">追加</span>
+                    </button>
+                  )}
                 </>
               )}
             </div>

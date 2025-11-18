@@ -49,11 +49,12 @@ export function DefectBeanCompare({
             {defectBeans.map((defectBean) => (
               <div
                 key={defectBean.id}
-                className="bg-gray-50 rounded-lg p-4 border border-gray-200 max-h-[60vh] md:max-h-[70vh] overflow-y-auto overflow-x-hidden"
+                className="bg-gray-50 rounded-lg p-4 sm:p-5 border border-gray-200 max-h-[85vh] overflow-y-auto overflow-x-hidden flex flex-col"
               >
                 <DefectBeanDetail
                   defectBean={defectBean}
                   shouldRemove={settings[defectBean.id]?.shouldRemove}
+                  isCompareMode={true}
                 />
               </div>
             ))}

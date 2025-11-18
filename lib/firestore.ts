@@ -197,6 +197,18 @@ function normalizeAppData(data: any): AppData {
     if (data.userSettings.selectedManagerId !== undefined) {
       cleanedUserSettings.selectedManagerId = data.userSettings.selectedManagerId;
     }
+    if (typeof data.userSettings.taskLabelHeaderTextLeft === 'string') {
+      const trimmedLeft = data.userSettings.taskLabelHeaderTextLeft.trim();
+      if (trimmedLeft.length > 0) {
+        cleanedUserSettings.taskLabelHeaderTextLeft = trimmedLeft;
+      }
+    }
+    if (typeof data.userSettings.taskLabelHeaderTextRight === 'string') {
+      const trimmedRight = data.userSettings.taskLabelHeaderTextRight.trim();
+      if (trimmedRight.length > 0) {
+        cleanedUserSettings.taskLabelHeaderTextRight = trimmedRight;
+      }
+    }
     // roastTimerSettingsを正規化
     if (data.userSettings.roastTimerSettings && typeof data.userSettings.roastTimerSettings === 'object') {
       const settings = data.userSettings.roastTimerSettings;
@@ -294,10 +306,12 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
     if (data.userSettings) {
       // 元のdataオブジェクトからuserSettingsの状態を確認
       const userSettingsUpdate: any = {};
+      let hasAnyField = false;
       
       // selectedMemberIdが存在する場合は設定、undefinedの場合は削除
       if (data.userSettings.selectedMemberId !== undefined) {
         userSettingsUpdate.selectedMemberId = data.userSettings.selectedMemberId;
+        hasAnyField = true;
       } else {
         userSettingsUpdate.selectedMemberId = deleteField();
       }
@@ -305,17 +319,36 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       // selectedManagerIdが存在する場合は設定、undefinedの場合は削除
       if (data.userSettings.selectedManagerId !== undefined) {
         userSettingsUpdate.selectedManagerId = data.userSettings.selectedManagerId;
+        hasAnyField = true;
       } else {
         userSettingsUpdate.selectedManagerId = deleteField();
       }
       
-      // 両方とも削除される場合はuserSettings全体を削除
-      const deleteFieldValue = deleteField();
-      const hasMemberId = data.userSettings.selectedMemberId !== undefined;
-      const hasManagerId = data.userSettings.selectedManagerId !== undefined;
+      // taskLabelHeaderTextLeftが存在する場合は設定、undefinedの場合は削除
+      if (data.userSettings.taskLabelHeaderTextLeft !== undefined) {
+        userSettingsUpdate.taskLabelHeaderTextLeft = data.userSettings.taskLabelHeaderTextLeft;
+        hasAnyField = true;
+      } else {
+        userSettingsUpdate.taskLabelHeaderTextLeft = deleteField();
+      }
       
-      if (!hasMemberId && !hasManagerId) {
-        cleanedData.userSettings = deleteFieldValue as any;
+      // taskLabelHeaderTextRightが存在する場合は設定、undefinedの場合は削除
+      if (data.userSettings.taskLabelHeaderTextRight !== undefined) {
+        userSettingsUpdate.taskLabelHeaderTextRight = data.userSettings.taskLabelHeaderTextRight;
+        hasAnyField = true;
+      } else {
+        userSettingsUpdate.taskLabelHeaderTextRight = deleteField();
+      }
+      
+      // roastTimerSettingsが存在する場合は設定
+      if (data.userSettings.roastTimerSettings !== undefined) {
+        userSettingsUpdate.roastTimerSettings = data.userSettings.roastTimerSettings;
+        hasAnyField = true;
+      }
+      
+      // すべてのフィールドが削除される場合はuserSettings全体を削除
+      if (!hasAnyField) {
+        cleanedData.userSettings = deleteField() as any;
       } else {
         cleanedData.userSettings = userSettingsUpdate;
       }

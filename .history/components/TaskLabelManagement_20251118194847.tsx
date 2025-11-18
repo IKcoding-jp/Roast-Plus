@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { AppData, TaskLabel } from '@/types';
 
 interface TaskLabelManagementProps {

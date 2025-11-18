@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { AppData, TaskLabel } from '@/types';
 
 interface TaskLabelManagementProps {
@@ -28,55 +28,40 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
     data.userSettings?.taskLabelHeaderTextRight || '作業ラベル'
   );
 
-  // 入力中かどうかを追跡するフラグ
-  const [isEditingLeft, setIsEditingLeft] = useState(false);
-  const [isEditingRight, setIsEditingRight] = useState(false);
-
   // デバウンス用のタイマー
   const saveTimeoutLeftRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimeoutRightRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ヘッダーテキストを保存する関数（最新のdataを参照するため、useCallbackを使わない）
-  const saveHeaderTextLeft = (value: string) => {
-    // 最新のdataを参照するため、関数内でdataを参照
-    const currentData = data;
+  // ヘッダーテキストを保存する関数
+  const saveHeaderTextLeft = useCallback((value: string) => {
     const updatedData: AppData = {
-      ...currentData,
+      ...data,
       userSettings: {
-        ...currentData.userSettings,
+        ...data.userSettings,
         taskLabelHeaderTextLeft: value.trim() || undefined,
       },
     };
     onUpdate(updatedData);
-  };
+  }, [data, onUpdate]);
 
-  const saveHeaderTextRight = (value: string) => {
-    // 最新のdataを参照するため、関数内でdataを参照
-    const currentData = data;
+  const saveHeaderTextRight = useCallback((value: string) => {
     const updatedData: AppData = {
-      ...currentData,
+      ...data,
       userSettings: {
-        ...currentData.userSettings,
+        ...data.userSettings,
         taskLabelHeaderTextRight: value.trim() || undefined,
       },
     };
     onUpdate(updatedData);
-  };
+  }, [data, onUpdate]);
 
-  // userSettingsの変更を反映（入力中でない場合のみ）
+  // userSettingsの変更を反映
   useEffect(() => {
-    if (!isEditingLeft) {
-      const newHeaderTextLeft = data.userSettings?.taskLabelHeaderTextLeft || '作業ラベル';
-      setHeaderTextLeft(newHeaderTextLeft);
-    }
-  }, [data.userSettings?.taskLabelHeaderTextLeft, isEditingLeft]);
-
-  useEffect(() => {
-    if (!isEditingRight) {
-      const newHeaderTextRight = data.userSettings?.taskLabelHeaderTextRight || '作業ラベル';
-      setHeaderTextRight(newHeaderTextRight);
-    }
-  }, [data.userSettings?.taskLabelHeaderTextRight, isEditingRight]);
+    const newHeaderTextLeft = data.userSettings?.taskLabelHeaderTextLeft || '作業ラベル';
+    const newHeaderTextRight = data.userSettings?.taskLabelHeaderTextRight || '作業ラベル';
+    setHeaderTextLeft(newHeaderTextLeft);
+    setHeaderTextRight(newHeaderTextRight);
+  }, [data.userSettings?.taskLabelHeaderTextLeft, data.userSettings?.taskLabelHeaderTextRight]);
 
   // クリーンアップ
   useEffect(() => {
@@ -160,7 +145,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                 onChange={(e) => {
                   const newValue = e.target.value;
                   setHeaderTextLeft(newValue);
-                  setIsEditingLeft(true);
                   // 既存のタイマーをクリア
                   if (saveTimeoutLeftRef.current) {
                     clearTimeout(saveTimeoutLeftRef.current);
@@ -171,7 +155,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                   }, 500);
                 }}
                 onBlur={() => {
-                  setIsEditingLeft(false);
                   // 既存のタイマーをクリアして即座に保存
                   if (saveTimeoutLeftRef.current) {
                     clearTimeout(saveTimeoutLeftRef.current);
@@ -193,7 +176,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                 onChange={(e) => {
                   const newValue = e.target.value;
                   setHeaderTextRight(newValue);
-                  setIsEditingRight(true);
                   // 既存のタイマーをクリア
                   if (saveTimeoutRightRef.current) {
                     clearTimeout(saveTimeoutRightRef.current);
@@ -204,7 +186,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                   }, 500);
                 }}
                 onBlur={() => {
-                  setIsEditingRight(false);
                   // 既存のタイマーをクリアして即座に保存
                   if (saveTimeoutRightRef.current) {
                     clearTimeout(saveTimeoutRightRef.current);

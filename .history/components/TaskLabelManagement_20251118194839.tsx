@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { AppData, TaskLabel } from '@/types';
 
 interface TaskLabelManagementProps {
@@ -193,7 +193,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                 onChange={(e) => {
                   const newValue = e.target.value;
                   setHeaderTextRight(newValue);
-                  setIsEditingRight(true);
                   // 既存のタイマーをクリア
                   if (saveTimeoutRightRef.current) {
                     clearTimeout(saveTimeoutRightRef.current);
@@ -204,7 +203,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                   }, 500);
                 }}
                 onBlur={() => {
-                  setIsEditingRight(false);
                   // 既存のタイマーをクリアして即座に保存
                   if (saveTimeoutRightRef.current) {
                     clearTimeout(saveTimeoutRightRef.current);

@@ -11,6 +11,7 @@ interface DefectBeanDetailProps {
   onToggleSetting?: (id: string, shouldRemove: boolean) => void;
   onDelete?: (id: string, imageUrl: string) => void;
   onClose?: () => void;
+  isCompareMode?: boolean;
 }
 
 export function DefectBeanDetail({
@@ -19,6 +20,7 @@ export function DefectBeanDetail({
   onToggleSetting,
   onDelete,
   onClose,
+  isCompareMode = false,
 }: DefectBeanDetailProps) {
   const [showImageModal, setShowImageModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -41,10 +43,17 @@ export function DefectBeanDetail({
 
   return (
     <>
-      <div className="border-t border-gray-200 p-4 space-y-4">
+      <div className={`${isCompareMode ? 'p-0' : 'border-t border-gray-200 p-4'} ${isCompareMode ? 'space-y-3' : 'space-y-3 sm:space-y-4'}`}>
+        {/* 名前 */}
+        <h3 className="text-xl font-bold text-gray-800 text-center">
+          {defectBean.name}
+        </h3>
+
         {/* 画像（拡大表示可能） */}
         <div
-          className="relative w-full max-w-xs mx-auto aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
+          className={`relative w-full mx-auto aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer ${
+            isCompareMode ? 'max-w-[280px] sm:max-w-[320px]' : 'max-w-xs'
+          }`}
           onClick={() => setShowImageModal(true)}
         >
           <Image
@@ -52,30 +61,30 @@ export function DefectBeanDetail({
             alt={defectBean.name}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, 320px"
+            sizes={isCompareMode ? "(max-width: 768px) 280px, 320px" : "(max-width: 768px) 100vw, 320px"}
             unoptimized
           />
         </div>
 
         {/* 詳細情報 */}
-        <div className="space-y-3">
+        <div className={isCompareMode ? 'space-y-2.5' : 'space-y-3'}>
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-1">特徴</h4>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap">
+            <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
               {defectBean.characteristics}
             </p>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-1">味への影響</h4>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap">
+            <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
               {defectBean.tasteImpact}
             </p>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-1">省く理由</h4>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap">
+            <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
               {defectBean.removalReason}
             </p>
           </div>

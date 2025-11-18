@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { AppData, TaskLabel } from '@/types';
 
 interface TaskLabelManagementProps {
@@ -63,20 +63,13 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
     onUpdate(updatedData);
   };
 
-  // userSettingsの変更を反映（入力中でない場合のみ）
+  // userSettingsの変更を反映
   useEffect(() => {
-    if (!isEditingLeft) {
-      const newHeaderTextLeft = data.userSettings?.taskLabelHeaderTextLeft || '作業ラベル';
-      setHeaderTextLeft(newHeaderTextLeft);
-    }
-  }, [data.userSettings?.taskLabelHeaderTextLeft, isEditingLeft]);
-
-  useEffect(() => {
-    if (!isEditingRight) {
-      const newHeaderTextRight = data.userSettings?.taskLabelHeaderTextRight || '作業ラベル';
-      setHeaderTextRight(newHeaderTextRight);
-    }
-  }, [data.userSettings?.taskLabelHeaderTextRight, isEditingRight]);
+    const newHeaderTextLeft = data.userSettings?.taskLabelHeaderTextLeft || '作業ラベル';
+    const newHeaderTextRight = data.userSettings?.taskLabelHeaderTextRight || '作業ラベル';
+    setHeaderTextLeft(newHeaderTextLeft);
+    setHeaderTextRight(newHeaderTextRight);
+  }, [data.userSettings?.taskLabelHeaderTextLeft, data.userSettings?.taskLabelHeaderTextRight]);
 
   // クリーンアップ
   useEffect(() => {
@@ -160,7 +153,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                 onChange={(e) => {
                   const newValue = e.target.value;
                   setHeaderTextLeft(newValue);
-                  setIsEditingLeft(true);
                   // 既存のタイマーをクリア
                   if (saveTimeoutLeftRef.current) {
                     clearTimeout(saveTimeoutLeftRef.current);
@@ -171,7 +163,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                   }, 500);
                 }}
                 onBlur={() => {
-                  setIsEditingLeft(false);
                   // 既存のタイマーをクリアして即座に保存
                   if (saveTimeoutLeftRef.current) {
                     clearTimeout(saveTimeoutLeftRef.current);
@@ -193,7 +184,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                 onChange={(e) => {
                   const newValue = e.target.value;
                   setHeaderTextRight(newValue);
-                  setIsEditingRight(true);
                   // 既存のタイマーをクリア
                   if (saveTimeoutRightRef.current) {
                     clearTimeout(saveTimeoutRightRef.current);
@@ -204,7 +194,6 @@ export function TaskLabelManagement({ data, onUpdate }: TaskLabelManagementProps
                   }, 500);
                 }}
                 onBlur={() => {
-                  setIsEditingRight(false);
                   // 既存のタイマーをクリアして即座に保存
                   if (saveTimeoutRightRef.current) {
                     clearTimeout(saveTimeoutRightRef.current);

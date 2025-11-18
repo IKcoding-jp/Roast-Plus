@@ -335,85 +335,78 @@ export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
           <p className="text-gray-600">検索条件に一致する記録がありません</p>
         </div>
       ) : (
-        <div className="flex-1 min-h-0 overflow-y-auto space-y-3">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-3 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 md:items-start md:auto-rows-auto">
           {filteredAndSortedRecords.map((record) => (
-            <div
-              key={record.id}
-              className="bg-white rounded-lg shadow-md p-4 sm:p-6 cursor-pointer hover:shadow-lg transition-all border border-gray-100"
-              onClick={() => handleCardClick(record.id)}
-            >
-              <div className="flex items-start justify-between gap-4">
-                {/* 左側: メイン情報 */}
-                <div className="flex-1 min-w-0">
-                  {/* 豆名と焙煎度合い */}
-                  <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
-                    <div className="flex-shrink-0">
-                      <PiCoffeeBeanFill className="h-5 w-5 sm:h-6 sm:w-6 text-amber-700" />
-                    </div>
-                    <div className="flex-1 min-w-0 flex items-center gap-2.5 sm:gap-3 flex-wrap">
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
-                        {record.beanName}
-                      </h3>
-                      <span
-                        className="inline-block px-2.5 sm:px-3 py-1 text-white text-xs sm:text-sm font-semibold rounded-full flex-shrink-0"
-                        style={{ backgroundColor: getRoastLevelColor(record.roastLevel) }}
-                      >
-                        {record.roastLevel}
-                      </span>
-                    </div>
-                  </div>
+             <div
+               key={record.id}
+               className="bg-white rounded-lg shadow-md p-3 md:p-4 cursor-pointer hover:shadow-lg transition-all border border-gray-100 relative h-auto"
+               onClick={() => handleCardClick(record.id)}
+             >
+               {/* 削除ボタン（右上） */}
+               <button
+                 onClick={(e) => handleDelete(record.id, e)}
+                 className="absolute top-2 right-2 p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center z-10"
+                 aria-label="削除"
+               >
+                 <HiTrash className="h-4 w-4" />
+               </button>
 
-                  {/* 詳細情報（グリッドレイアウト） */}
-                  <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2">
-                    {/* 焙煎日 */}
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <HiCalendar className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-500 mb-0.5">焙煎日</span>
-                        <span className="text-sm sm:text-base font-medium text-gray-900">
-                          {formatDate(record.roastDate)}
-                        </span>
-                      </div>
-                    </div>
+               {/* 豆名と焙煎度合い */}
+               <div className="flex items-center gap-2 mb-3 pr-8">
+                 <div className="flex-shrink-0">
+                   <PiCoffeeBeanFill className="h-4 w-4 md:h-5 md:w-5 text-amber-700" />
+                 </div>
+                 <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
+                   <h3 className="text-base md:text-lg font-bold text-gray-900 truncate">
+                     {record.beanName}
+                   </h3>
+                   <span
+                     className="inline-block px-2 py-0.5 text-white text-xs font-semibold rounded-full flex-shrink-0"
+                     style={{ backgroundColor: getRoastLevelColor(record.roastLevel) }}
+                   >
+                     {record.roastLevel}
+                   </span>
+                 </div>
+               </div>
 
-                    {/* 重さ */}
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <div className="h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center flex-shrink-0">
-                        <span className="text-gray-400 text-base sm:text-lg">⚖</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-500 mb-0.5">重さ</span>
-                        <span className="text-sm sm:text-base font-medium text-gray-900">
-                          {record.weight}g
-                        </span>
-                      </div>
-                    </div>
+               {/* 詳細情報 */}
+               <div className="space-y-2">
+                 {/* 焙煎時間 */}
+                 <div className="flex items-center gap-2 text-gray-700">
+                   <MdTimer className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                   <div className="flex items-center gap-2">
+                     <span className="text-xs text-gray-500">焙煎時間</span>
+                     <span className="text-sm md:text-base font-medium text-gray-900 font-mono">
+                       {formatTime(record.duration)}
+                     </span>
+                   </div>
+                 </div>
 
-                    {/* 焙煎時間 */}
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <MdTimer className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-500 mb-0.5">焙煎時間</span>
-                        <span className="text-sm sm:text-base font-medium text-gray-900 font-mono">
-                          {formatTime(record.duration)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                 {/* 重さ */}
+                 <div className="flex items-center gap-2 text-gray-700">
+                   <div className="h-4 w-4 flex items-center justify-center flex-shrink-0">
+                     <span className="text-gray-400 text-base">⚖</span>
+                   </div>
+                   <div className="flex items-center gap-2">
+                     <span className="text-xs text-gray-500">重さ</span>
+                     <span className="text-sm md:text-base font-medium text-gray-900 font-mono">
+                       {record.weight}g
+                     </span>
+                   </div>
+                 </div>
 
-                {/* 右側: 削除ボタン */}
-                <div className="flex-shrink-0">
-                  <button
-                    onClick={(e) => handleDelete(record.id, e)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                    aria-label="削除"
-                  >
-                    <HiTrash className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
+                 {/* 焙煎日 */}
+                 <div className="flex items-center gap-2 text-gray-700">
+                   <HiCalendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                   <div className="flex items-center gap-2">
+                     <span className="text-xs text-gray-500">焙煎日</span>
+                     <span className="text-sm md:text-base font-medium text-gray-900 font-mono">
+                       {formatDate(record.roastDate)}
+                     </span>
+                   </div>
+                 </div>
+               </div>
+             </div>
           ))}
         </div>
       )}

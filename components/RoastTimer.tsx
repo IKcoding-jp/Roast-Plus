@@ -11,7 +11,7 @@ import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
 import { RoastTimerSettings } from './RoastTimerSettings';
-import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiArrowLeft } from 'react-icons/hi';
+import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiArrowLeft, HiClipboardList } from 'react-icons/hi';
 import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
 import Link from 'next/link';
 
@@ -814,6 +814,15 @@ export function RoastTimer() {
           >
             <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
           </Link>
+          <Link
+            href="/roast-record"
+            className="absolute top-4 right-4 z-10 px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
+            title="ロースト記録一覧"
+            aria-label="ロースト記録一覧"
+          >
+            <HiClipboardList className="h-5 w-5 flex-shrink-0" />
+            <span className="text-sm font-semibold hidden sm:inline">記録一覧</span>
+          </Link>
 
           <div className="flex flex-col items-center justify-center w-full">
             {/* タイトル */}
@@ -979,6 +988,15 @@ export function RoastTimer() {
             >
               <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
             </button>
+            <Link
+              href="/roast-record"
+              className="px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px] pointer-events-auto"
+              title="ロースト記録一覧"
+              aria-label="ロースト記録一覧"
+            >
+              <HiClipboardList className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-semibold hidden sm:inline">記録一覧</span>
+            </Link>
           </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）

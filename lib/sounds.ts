@@ -30,7 +30,7 @@ export async function playTimerSound(
     // パスが相対パスの場合は絶対パスに変換
     let audioPath = soundFile.startsWith('/') ? soundFile : `/${soundFile}`;
     // キャッシュ回避のため、バージョンクエリを追加
-    const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.4';
+    const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.8';
     audioPath = `${audioPath}?v=${version}`;
     const audio = new Audio(audioPath);
     
@@ -116,7 +116,7 @@ export async function playNotificationSound(
     // パスが相対パスの場合は絶対パスに変換
     let audioPath = soundFile.startsWith('/') ? soundFile : `/${soundFile}`;
     // キャッシュ回避のため、バージョンクエリを追加
-    const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.4';
+    const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.8';
     audioPath = `${audioPath}?v=${version}`;
     const audio = new Audio(audioPath);
     

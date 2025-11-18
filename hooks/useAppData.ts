@@ -136,7 +136,11 @@ export function useAppData() {
 
       const mergedData = { ...incomingData } as AppData;
       lockedKeys.forEach((key) => {
-        (mergedData as AppData)[key] = latestLocalDataRef.current[key];
+        // lockedKeysに含まれるキーは常にlatestLocalDataRef.currentに存在する
+        const value = latestLocalDataRef.current[key];
+        if (value !== undefined) {
+          (mergedData as any)[key] = value;
+        }
       });
 
       commitData(mergedData);

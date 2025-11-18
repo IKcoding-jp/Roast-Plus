@@ -62,6 +62,8 @@ export function RoastTimer() {
     recommendedDuration: number;
   } | null>(null);
   const [availableBeans, setAvailableBeans] = useState<BeanName[]>([]); // 記録がある豆のリスト
+  const [availableWeights, setAvailableWeights] = useState<Array<200 | 300 | 500>>([]); // 選択された豆の記録がある重さのリスト
+  const [availableRoastLevels, setAvailableRoastLevels] = useState<Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>>([]); // 選択された豆と重さの記録がある焙煎度合いのリスト
 
   // ダイアログの状態
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
@@ -154,6 +156,68 @@ export function RoastTimer() {
       setAvailableBeans([]);
     }
   }, [inputMode, recommendedMode, user, data]);
+
+  // 選択された豆の記録がある重さと焙煎度合いのリストを生成
+  useEffect(() => {
+    if (inputMode === 'recommended' && recommendedMode === 'history' && beanName && user) {
+      const loadAvailableOptions = async () => {
+        try {
+          const allRecords = await getAllRoastTimerRecords(user.uid, data);
+          
+          // 選択された豆の記録をフィルタリング
+          const beanRecords = allRecords.filter((record) => record.beanName === beanName);
+          
+          // 各重さについて、2件以上の記録がある組み合わせ（重さ + 焙煎度合い）があるか確認
+          const weightSet = new Set<200 | 300 | 500>();
+          for (const weight of WEIGHTS) {
+            for (const roastLevel of ROAST_LEVELS) {
+              const matchingRecords = beanRecords.filter(
+                (record) => record.weight === weight && record.roastLevel === roastLevel
+              );
+              
+              // 2件以上の記録がある場合、その重さをリストに追加
+              if (matchingRecords.length >= 2) {
+                weightSet.add(weight);
+                break; // この重さについては既に追加済みなので、次の重さへ
+              }
+            }
+          }
+          
+          // 各焙煎度合いについて、2件以上の記録がある組み合わせ（重さ + 焙煎度合い）があるか確認
+          const roastLevelSet = new Set<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>();
+          for (const roastLevel of ROAST_LEVELS) {
+            for (const weight of WEIGHTS) {
+              const matchingRecords = beanRecords.filter(
+                (record) => record.weight === weight && record.roastLevel === roastLevel
+              );
+              
+              // 2件以上の記録がある場合、その焙煎度合いをリストに追加
+              if (matchingRecords.length >= 2) {
+                roastLevelSet.add(roastLevel);
+                break; // この焙煎度合いについては既に追加済みなので、次の焙煎度合いへ
+              }
+            }
+          }
+          
+          setAvailableWeights(Array.from(weightSet).sort((a, b) => a - b));
+          setAvailableRoastLevels(Array.from(roastLevelSet));
+          
+          // 豆が変更された場合、重さと焙煎度合いをリセット
+          setWeight('');
+          setRoastLevel('');
+        } catch (error) {
+          console.error('Failed to load available options:', error);
+          setAvailableWeights([]);
+          setAvailableRoastLevels([]);
+        }
+      };
+      
+      loadAvailableOptions();
+    } else {
+      setAvailableWeights([]);
+      setAvailableRoastLevels([]);
+    }
+  }, [inputMode, recommendedMode, beanName, user, data]);
 
   // 完了状態を検出してダイアログを表示（runningからcompletedに変化した時のみ）
   useEffect(() => {
@@ -1177,7 +1241,12 @@ export function RoastTimer() {
                         </label>
                         <select
                           value={beanName}
-                          onChange={(e) => setBeanName(e.target.value as BeanName)}
+                          onChange={(e) => {
+                            setBeanName(e.target.value as BeanName);
+                            // 豆が変更された場合、重さと焙煎度合いをリセット
+                            setWeight('');
+                            setRoastLevel('');
+                          }}
                           className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
                         >
                           <option value="">選択してください</option>
@@ -1206,14 +1275,25 @@ export function RoastTimer() {
                               e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
                             )
                           }
-                          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
+                          disabled={!beanName}
+                          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
                         >
                           <option value="">選択してください</option>
-                          {ROAST_LEVELS.map((level) => (
-                            <option key={level} value={level}>
-                              {level}
+                          {availableRoastLevels.length > 0 ? (
+                            availableRoastLevels.map((level) => (
+                              <option key={level} value={level}>
+                                {level}
+                              </option>
+                            ))
+                          ) : beanName ? (
+                            <option value="" disabled>
+                              記録がありません（2件以上の記録が必要です）
                             </option>
-                          ))}
+                          ) : (
+                            <option value="" disabled>
+                              豆を選択してください
+                            </option>
+                          )}
                         </select>
                       </div>
 
@@ -1226,14 +1306,25 @@ export function RoastTimer() {
                           onChange={(e) =>
                             setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')
                           }
-                          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
+                          disabled={!beanName}
+                          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
                         >
                           <option value="">選択してください</option>
-                          {WEIGHTS.map((w) => (
-                            <option key={w} value={w}>
-                              {w}g
+                          {availableWeights.length > 0 ? (
+                            availableWeights.map((w) => (
+                              <option key={w} value={w}>
+                                {w}g
+                              </option>
+                            ))
+                          ) : beanName ? (
+                            <option value="" disabled>
+                              記録がありません（2件以上の記録が必要です）
                             </option>
-                          ))}
+                          ) : (
+                            <option value="" disabled>
+                              豆を選択してください
+                            </option>
+                          )}
                         </select>
                       </div>
 

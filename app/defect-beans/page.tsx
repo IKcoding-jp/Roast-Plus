@@ -370,10 +370,11 @@ export default function DefectBeansPage() {
                   )}
                   <button
                     onClick={() => setShowAddForm(true)}
-                    className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center justify-center"
+                    className="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1.5"
                     title="欠点豆を追加"
                   >
                     <HiPlus className="h-5 w-5" />
+                    <span className="hidden sm:inline text-sm">追加</span>
                   </button>
                 </>
               )}

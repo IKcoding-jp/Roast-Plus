@@ -7,6 +7,13 @@ import { setRoastTimerState as saveLocalState, getRoastTimerState as loadLocalSt
 import { notifyRoastTimerComplete, scheduleNotification, cancelAllScheduledNotifications } from '@/lib/notifications';
 import { playTimerSound, stopTimerSound, stopAllSounds, stopAudio } from '@/lib/sounds';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
+import {
+  ensureServerTimeSync,
+  getSyncedIsoString,
+  getSyncedTimestamp,
+  getSyncedTimestampSync,
+  setTimeSyncUser,
+} from '@/lib/timeSync';
 
 const UPDATE_INTERVAL = 100; // 100msごとに更新
 
@@ -16,26 +23,27 @@ const UPDATE_INTERVAL = 100; // 100msごとに更新
 function calculateElapsedTime(
   startedAt: string | undefined,
   pausedAt: string | undefined,
-  pausedElapsed: number,
+  pausedElapsed: number = 0,
   status: RoastTimerState['status']
 ): number {
   if (!startedAt) return 0;
+  const totalPaused = Math.max(0, pausedElapsed);
   
   if (status === 'paused' && pausedAt) {
     // 一時停止中は、一時停止時点までの経過時間を返す
     const pausedTime = new Date(pausedAt).getTime();
     const startTime = new Date(startedAt).getTime();
-    return (pausedTime - startTime) / 1000 - pausedElapsed;
+    return Math.max(0, (pausedTime - startTime) / 1000 - totalPaused);
   }
   
   if (status === 'running') {
-    // 実行中は、現在時刻から開始時刻を引いて、一時停止時間を差し引く
-    const now = Date.now();
+    // 実行中は、現在時刻から開始時刻を引いて、一時停止時間を差し引く（サーバー時刻ベース）
+    const now = getSyncedTimestampSync();
     const startTime = new Date(startedAt).getTime();
-    return (now - startTime) / 1000 - pausedElapsed;
+    return Math.max(0, (now - startTime) / 1000 - totalPaused);
   }
   
-  return pausedElapsed;
+  return Math.max(0, totalPaused);
 }
 
 type UpdateAppDataFn = (newDataOrUpdater: AppData | ((currentData: AppData) => AppData)) => Promise<void>;
@@ -57,6 +65,16 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   const pausedElapsedRef = useRef<number>(0); // 一時停止の累積時間（秒）
   const isUpdatingFromFirestoreRef = useRef(false); // Firestoreからの更新中かどうか
   const currentDeviceId = getDeviceId();
+  const userId = user?.uid ?? null;
+
+  useEffect(() => {
+    setTimeSyncUser(userId);
+    if (userId) {
+      ensureServerTimeSync().catch((error) => {
+        console.error('Failed to initialize roast timer time-sync:', error);
+      });
+    }
+  }, [userId]);
 
   // Firestoreの状態をローカル状態に反映
   useEffect(() => {
@@ -80,6 +98,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
           isInitialMountRef.current = false;
           saveLocalState(null);
           setLocalState(null);
+          pausedElapsedRef.current = 0;
           // 初回マウント時に完了状態が残っている場合は、Firestoreから削除
           // （リセットが完了していない可能性があるため）
           if (user) {
@@ -95,9 +114,14 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         // 既に初期化済みで、他のデバイスが完了を検出した場合は反映する
         // ただし、リセット直後は反映しない
         if (localState?.status !== 'completed' && !hasResetRef.current) {
+          const completedState: RoastTimerState = {
+            ...firestoreState,
+            pausedElapsed: typeof firestoreState.pausedElapsed === 'number' ? firestoreState.pausedElapsed : 0,
+          };
+          pausedElapsedRef.current = completedState.pausedElapsed ?? 0;
           isUpdatingFromFirestoreRef.current = true;
-          setLocalState(firestoreState);
-          saveLocalState(firestoreState);
+          setLocalState(completedState);
+          saveLocalState(completedState);
           setTimeout(() => {
             isUpdatingFromFirestoreRef.current = false;
           }, 100);
@@ -107,19 +131,23 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       
       // 開始時刻から経過時間を再計算
       if (firestoreState.startedAt) {
+        const firestorePausedElapsed =
+          typeof firestoreState.pausedElapsed === 'number' ? firestoreState.pausedElapsed : 0;
+        pausedElapsedRef.current = firestorePausedElapsed;
         const elapsed = calculateElapsedTime(
           firestoreState.startedAt,
           firestoreState.pausedAt,
-          pausedElapsedRef.current,
+          firestorePausedElapsed,
           firestoreState.status
         );
         const remaining = Math.max(0, firestoreState.duration - elapsed);
         
         const restoredState: RoastTimerState = {
           ...firestoreState,
+          pausedElapsed: firestorePausedElapsed,
           elapsed,
           remaining,
-          lastUpdatedAt: new Date().toISOString(),
+          lastUpdatedAt: getSyncedIsoString(),
         };
         
         // ローカル状態と異なる場合のみ更新（lastUpdatedAtとtriggeredByDeviceIdで比較）
@@ -139,6 +167,10 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         }
       } else {
         // 開始時刻がない場合はそのまま反映（lastUpdatedAtとtriggeredByDeviceIdで比較）
+        const normalizedState: RoastTimerState = {
+          ...firestoreState,
+          pausedElapsed: typeof firestoreState.pausedElapsed === 'number' ? firestoreState.pausedElapsed : 0,
+        };
         const shouldUpdate = !localState || 
           localState.status !== firestoreState.status ||
           localState.lastUpdatedAt !== firestoreState.lastUpdatedAt ||
@@ -146,8 +178,9 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         
         if (shouldUpdate) {
           isUpdatingFromFirestoreRef.current = true;
-          setLocalState(firestoreState);
-          saveLocalState(firestoreState);
+          pausedElapsedRef.current = normalizedState.pausedElapsed ?? 0;
+          setLocalState(normalizedState);
+          saveLocalState(normalizedState);
           setTimeout(() => {
             isUpdatingFromFirestoreRef.current = false;
           }, 100);
@@ -159,34 +192,42 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       if (isInitialMountRef.current) {
         const storedState = loadLocalState();
         if (storedState) {
+          const storedPausedElapsed =
+            typeof storedState.pausedElapsed === 'number' ? storedState.pausedElapsed : 0;
+          const normalizedStoredState: RoastTimerState = {
+            ...storedState,
+            pausedElapsed: storedPausedElapsed,
+          };
           // 完了状態の場合は読み込まない
           if (storedState.status === 'completed') {
             saveLocalState(null);
             setLocalState(null);
+            pausedElapsedRef.current = 0;
             isInitialMountRef.current = false;
             return;
           }
           
-          let stateToPersist: RoastTimerState = storedState;
+          let stateToPersist: RoastTimerState = normalizedStoredState;
           // ローカルストレージから読み込んだ場合、開始時刻から経過時間を再計算
           if (storedState.status === 'running' && storedState.startedAt) {
             const elapsed = calculateElapsedTime(
               storedState.startedAt,
               storedState.pausedAt,
-              pausedElapsedRef.current,
+              storedPausedElapsed,
               storedState.status
             );
             const remaining = Math.max(0, storedState.duration - elapsed);
             
-            stateToPersist = {
-              ...storedState,
-              elapsed,
-              remaining,
-              lastUpdatedAt: new Date().toISOString(),
-            };
+          stateToPersist = {
+            ...normalizedStoredState,
+            elapsed,
+            remaining,
+            lastUpdatedAt: getSyncedIsoString(),
+          };
           }
           
           setLocalState(stateToPersist);
+          pausedElapsedRef.current = stateToPersist.pausedElapsed ?? 0;
 
           // Firestoreにも保存（マイグレーション）。ただしAppDataの読み込み完了までは書き込みを遅延
           if (isLoading) {
@@ -209,6 +250,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         // リセット後は、Firestoreの状態がundefinedになるまで待つ
         if (localState !== null && !hasResetRef.current) {
           setLocalState(null);
+          pausedElapsedRef.current = 0;
         }
         // リセットフラグが設定されている場合、Firestoreの状態がundefinedになったらリセットフラグをクリア
         if (hasResetRef.current && !firestoreState) {
@@ -223,20 +265,23 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     if (!localState || !user) return;
 
     if (localState.status === 'running' && localState.startedAt) {
+      const pausedElapsed = localState.pausedElapsed ?? pausedElapsedRef.current ?? 0;
+      pausedElapsedRef.current = pausedElapsed;
       // 開始時刻から経過時間を計算
       const elapsed = calculateElapsedTime(
         localState.startedAt,
         localState.pausedAt,
-        pausedElapsedRef.current,
+        pausedElapsed,
         localState.status
       );
       const remaining = Math.max(0, localState.duration - elapsed);
 
       const updatedState: RoastTimerState = {
         ...localState,
+        pausedElapsed,
         elapsed,
         remaining,
-        lastUpdatedAt: new Date().toISOString(),
+        lastUpdatedAt: getSyncedIsoString(),
       };
 
       // タイマーが完了した場合
@@ -310,19 +355,22 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && localState?.status === 'running' && localState.startedAt) {
         // ページが表示された時、開始時刻から経過時間を再計算
+        const pausedElapsed = localState.pausedElapsed ?? pausedElapsedRef.current ?? 0;
+        pausedElapsedRef.current = pausedElapsed;
         const elapsed = calculateElapsedTime(
           localState.startedAt,
           localState.pausedAt,
-          pausedElapsedRef.current,
+          pausedElapsed,
           localState.status
         );
         const remaining = Math.max(0, localState.duration - elapsed);
 
         const updatedState: RoastTimerState = {
           ...localState,
+          pausedElapsed,
           elapsed,
           remaining,
-          lastUpdatedAt: new Date().toISOString(),
+          lastUpdatedAt: getSyncedIsoString(),
         };
 
         // タイマーが完了している場合
@@ -362,12 +410,14 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       // 一時停止の累積時間をリセット
       pausedElapsedRef.current = 0;
 
-      const startedAt = new Date().toISOString();
+      const startedAtMs = await getSyncedTimestamp();
+      const startedAt = new Date(startedAtMs).toISOString();
       const newState: RoastTimerState = {
         status: 'running',
         duration,
         elapsed: 0,
         remaining: duration,
+        pausedElapsed: 0,
         beanName,
         weight,
         roastLevel,
@@ -403,19 +453,22 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   const pauseTimer = useCallback(async () => {
     if (!localState || localState.status !== 'running' || !user) return;
 
+    const pausedElapsed = localState.pausedElapsed ?? pausedElapsedRef.current ?? 0;
+    pausedElapsedRef.current = pausedElapsed;
     // 現在の経過時間を計算
     const elapsed = calculateElapsedTime(
       localState.startedAt,
       localState.pausedAt,
-      pausedElapsedRef.current,
+      pausedElapsed,
       localState.status
     );
 
-    const pausedAt = new Date().toISOString();
+    const pausedAt = new Date(await getSyncedTimestamp()).toISOString();
     const updatedState: RoastTimerState = {
       ...localState,
       status: 'paused',
       pausedAt,
+      pausedElapsed,
       elapsed,
       remaining: Math.max(0, localState.duration - elapsed),
       lastUpdatedAt: pausedAt,
@@ -441,19 +494,23 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   const resumeTimer = useCallback(async () => {
     if (!localState || localState.status !== 'paused' || !user) return;
 
+    const basePausedElapsed = localState.pausedElapsed ?? pausedElapsedRef.current ?? 0;
+    let newPausedElapsed = basePausedElapsed;
     // 一時停止期間を累積時間に加算
     if (localState.pausedAt && localState.startedAt) {
       const pausedTime = new Date(localState.pausedAt).getTime();
-      const resumeTime = Date.now();
+      const resumeTime = getSyncedTimestampSync();
       const pauseDuration = (resumeTime - pausedTime) / 1000; // 秒単位
-      pausedElapsedRef.current += pauseDuration;
+      newPausedElapsed = basePausedElapsed + pauseDuration;
     }
+    pausedElapsedRef.current = newPausedElapsed;
 
-    const resumedAt = new Date().toISOString();
+    const resumedAt = new Date(await getSyncedTimestamp()).toISOString();
     const updatedState: RoastTimerState = {
       ...localState,
       status: 'running',
       pausedAt: undefined,
+      pausedElapsed: newPausedElapsed,
       lastUpdatedAt: resumedAt,
       triggeredByDeviceId: currentDeviceId,
     };
@@ -488,7 +545,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     // 残り時間を1秒にするため、開始時刻を調整
     // 経過時間を duration - 1 にするため、開始時刻を (duration - 1)秒前に設定
     const targetElapsed = localState.duration - 1;
-    const now = Date.now();
+    const now = getSyncedTimestampSync();
     const adjustedStartTime = new Date(now - targetElapsed * 1000).toISOString();
 
     const updatedState: RoastTimerState = {
@@ -496,7 +553,8 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       startedAt: adjustedStartTime,
       elapsed: targetElapsed,
       remaining: 1,
-      lastUpdatedAt: new Date().toISOString(),
+      pausedElapsed: 0,
+      lastUpdatedAt: getSyncedIsoString(),
       triggeredByDeviceId: currentDeviceId,
     };
 
@@ -542,6 +600,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     // ローカル状態をクリア
     saveLocalState(null);
     setLocalState(null);
+    pausedElapsedRef.current = 0;
 
     // Firestoreから削除（確実に削除するため、awaitで待機）
     try {

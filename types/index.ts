@@ -163,6 +163,7 @@ export interface RoastTimerState {
   duration: number; // 設定時間（秒）
   elapsed: number; // 経過時間（秒）
   remaining: number; // 残り時間（秒）
+  pausedElapsed?: number; // 累積一時停止時間（秒）
   beanName?: string; // 豆の名前
   weight?: 200 | 300 | 500; // 重さ（g）
   roastLevel?: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'; // 焙煎度合い
@@ -263,4 +264,3 @@ export interface WorkProgress {
   completedCount?: number; // 完成数（目標量がない場合も記録可能、累積）
   archivedAt?: string; // アーカイブ日時（ISO 8601形式、アーカイブしたときに記録）
 }
-

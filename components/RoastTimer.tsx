@@ -465,6 +465,9 @@ export function RoastTimer() {
     setShowContinuousRoastDialog(false);
     setShowAfterPurgeDialog(false);
 
+    // prevStatusRefをリセットして、resetTimer()後の状態変化でCompletionDialogが再表示されないようにする
+    prevStatusRef.current = undefined;
+
     // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
     if (state) {
       try {
@@ -481,19 +484,27 @@ export function RoastTimer() {
       }
     }
     
-    // タイマー状態から情報を取得してクエリパラメータとして渡す
-    if (state && state.beanName && state.weight && state.roastLevel && state.elapsed > 0) {
+    const stateSnapshot = state;
+    let targetUrl = '/roast-record';
+    if (stateSnapshot && stateSnapshot.beanName && stateSnapshot.weight && stateSnapshot.roastLevel && stateSnapshot.elapsed > 0) {
       const params = new URLSearchParams({
-        beanName: state.beanName,
-        weight: state.weight.toString(),
-        roastLevel: state.roastLevel,
-        duration: Math.round(state.elapsed).toString(),
+        beanName: stateSnapshot.beanName,
+        weight: stateSnapshot.weight.toString(),
+        roastLevel: stateSnapshot.roastLevel,
+        duration: Math.round(stateSnapshot.elapsed).toString(),
       });
-      router.push(`/roast-record?${params.toString()}`);
-    } else {
-      // タイマー情報がない場合は、空の状態で遷移
-      router.push('/roast-record');
+      targetUrl = `/roast-record?${params.toString()}`;
     }
+
+    // 記録画面へ遷移する前にタイマー状態を完全にリセットして他端末でもダイアログが再表示されないようにする
+    await resetTimer();
+    
+    // resetTimer()後の状態変化でダイアログが再表示されないように、念のため再度閉じる
+    setShowCompletionDialog(false);
+    setShowContinuousRoastDialog(false);
+    setShowAfterPurgeDialog(false);
+    
+    router.push(targetUrl);
   };
 
   // アフターパージダイアログの「閉じる」

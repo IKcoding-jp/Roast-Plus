@@ -277,10 +277,7 @@ export function RoastTimer() {
   }, [beanName, weight, roastLevel, inputMode, recommendedMode, user, data, durationMinutes]);
 
   const handleStart = async () => {
-    if (!user) {
-      alert('ログインが必要です');
-      return;
-    }
+    if (!user) return;
 
     let finalDuration: number;
 
@@ -978,10 +975,6 @@ export function RoastTimer() {
                       alert('有効な時間を入力してください');
                       return;
                     }
-                    if (!user) {
-                      alert('ログインが必要です');
-                      return;
-                    }
                     await startTimer(duration, 2); // 通知ID: 2=手動
                   }}
                   disabled={!durationMinutes || durationMinutes.trim() === ''}
@@ -1094,8 +1087,8 @@ export function RoastTimer() {
                         setRecommendedTimeInfo(null);
                       }}
                       className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${recommendedMode === 'weight'
-                        ? 'bg-white text-amber-700 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                          ? 'bg-white text-amber-700 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                       重さで設定
@@ -1105,8 +1098,8 @@ export function RoastTimer() {
                         setRecommendedMode('history');
                       }}
                       className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${recommendedMode === 'history'
-                        ? 'bg-white text-amber-700 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                          ? 'bg-white text-amber-700 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                       過去の記録から設定

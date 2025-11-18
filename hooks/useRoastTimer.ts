@@ -245,6 +245,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         updatedState.remaining = 0;
         updatedState.elapsed = localState.duration;
         updatedState.completedByDeviceId = currentDeviceId;
+        updatedState.dialogState = 'completion'; // 完了ダイアログを表示
 
         // すべてのスケジュール通知をキャンセル
         cancelAllScheduledNotifications();

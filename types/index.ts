@@ -156,6 +156,7 @@ export interface RoastTimerRecord {
 
 // ローストタイマー状態
 export type RoastTimerStatus = 'idle' | 'running' | 'paused' | 'completed';
+export type RoastTimerDialogState = 'completion' | 'continuousRoast' | 'afterPurge' | null;
 
 export interface RoastTimerState {
   status: RoastTimerStatus; // タイマーの状態
@@ -171,6 +172,7 @@ export interface RoastTimerState {
   notificationId?: number; // 通知ID（2=手動、3=おすすめ）
   triggeredByDeviceId?: string; // 操作を実行したデバイスID
   completedByDeviceId?: string; // 完了を検出したデバイスID
+  dialogState?: RoastTimerDialogState; // ダイアログの表示状態（マルチデバイス同期用）
 }
 
 // アプリ全体のデータ構造

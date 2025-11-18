@@ -175,6 +175,41 @@ export function RoastTimer() {
     prevStatusRef.current = currentStatus;
   }, [state?.status, showCompletionDialog, showContinuousRoastDialog, showAfterPurgeDialog]);
 
+  // FirestoreのdialogStateを監視してダイアログを同期表示
+  useEffect(() => {
+    if (!state) return;
+
+    const dialogState = state.dialogState;
+
+    // 完了ダイアログの表示
+    if (dialogState === 'completion' && state.status === 'completed') {
+      if (!showCompletionDialog && !showContinuousRoastDialog && !showAfterPurgeDialog) {
+        setShowCompletionDialog(true);
+      }
+    }
+    // 連続焙煎ダイアログの表示
+    else if (dialogState === 'continuousRoast' && state.status === 'completed') {
+      if (!showContinuousRoastDialog && !showAfterPurgeDialog) {
+        setShowCompletionDialog(false);
+        setShowContinuousRoastDialog(true);
+      }
+    }
+    // アフターパージダイアログの表示
+    else if (dialogState === 'afterPurge' && state.status === 'completed') {
+      if (!showAfterPurgeDialog) {
+        setShowCompletionDialog(false);
+        setShowContinuousRoastDialog(false);
+        setShowAfterPurgeDialog(true);
+      }
+    }
+    // ダイアログを閉じる
+    else if (dialogState === null) {
+      setShowCompletionDialog(false);
+      setShowContinuousRoastDialog(false);
+      setShowAfterPurgeDialog(false);
+    }
+  }, [state?.dialogState, state?.status, showCompletionDialog, showContinuousRoastDialog, showAfterPurgeDialog]);
+
   // 重さに応じてデフォルト時間を設定（200g→8分、300g→9分、500g→10分）
   // 重さモードの場合のみ適用
   const prevWeightRef = useRef<200 | 300 | 500 | ''>('');
@@ -341,18 +376,50 @@ export function RoastTimer() {
   };
 
   // 完了ダイアログのOKボタン
-  const handleCompletionOk = () => {
+  const handleCompletionOk = async () => {
     // 音を確実に停止
     stopSound();
     setShowCompletionDialog(false);
     setShowContinuousRoastDialog(true);
+
+    // Firestoreにダイアログ状態を保存（マルチデバイス同期）
+    if (state) {
+      try {
+        await updateData((currentData) => ({
+          ...currentData,
+          roastTimerState: {
+            ...state,
+            dialogState: 'continuousRoast',
+            lastUpdatedAt: new Date().toISOString(),
+          },
+        }));
+      } catch (error) {
+        console.error('Failed to update dialog state:', error);
+      }
+    }
   };
 
   // 連続焙煎ダイアログの「はい」
-  const handleContinuousRoastYes = () => {
+  const handleContinuousRoastYes = async () => {
     // 音を確実に停止
     stopSound();
     setShowContinuousRoastDialog(false);
+    
+    // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
+    if (state) {
+      try {
+        await updateData((currentData) => ({
+          ...currentData,
+          roastTimerState: {
+            ...state,
+            dialogState: null,
+            lastUpdatedAt: new Date().toISOString(),
+          },
+        }));
+      } catch (error) {
+        console.error('Failed to update dialog state:', error);
+      }
+    }
     
     // タイマーをリセット
     resetTimer();
@@ -369,16 +436,48 @@ export function RoastTimer() {
   };
 
   // 連続焙煎ダイアログの「いいえ」
-  const handleContinuousRoastNo = () => {
+  const handleContinuousRoastNo = async () => {
     setShowContinuousRoastDialog(false);
     setShowAfterPurgeDialog(true);
+
+    // Firestoreにダイアログ状態を保存（マルチデバイス同期）
+    if (state) {
+      try {
+        await updateData((currentData) => ({
+          ...currentData,
+          roastTimerState: {
+            ...state,
+            dialogState: 'afterPurge',
+            lastUpdatedAt: new Date().toISOString(),
+          },
+        }));
+      } catch (error) {
+        console.error('Failed to update dialog state:', error);
+      }
+    }
   };
 
   // アフターパージダイアログの「記録に進む」
-  const handleAfterPurgeRecord = () => {
+  const handleAfterPurgeRecord = async () => {
     // 音を確実に停止
     stopSound();
     setShowAfterPurgeDialog(false);
+
+    // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
+    if (state) {
+      try {
+        await updateData((currentData) => ({
+          ...currentData,
+          roastTimerState: {
+            ...state,
+            dialogState: null,
+            lastUpdatedAt: new Date().toISOString(),
+          },
+        }));
+      } catch (error) {
+        console.error('Failed to update dialog state:', error);
+      }
+    }
     
     // タイマー状態から情報を取得してクエリパラメータとして渡す
     if (state && state.beanName && state.weight && state.roastLevel && state.elapsed > 0) {
@@ -396,10 +495,27 @@ export function RoastTimer() {
   };
 
   // アフターパージダイアログの「閉じる」
-  const handleAfterPurgeClose = () => {
+  const handleAfterPurgeClose = async () => {
     // 音を確実に停止
     stopSound();
     setShowAfterPurgeDialog(false);
+
+    // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
+    if (state) {
+      try {
+        await updateData((currentData) => ({
+          ...currentData,
+          roastTimerState: {
+            ...state,
+            dialogState: null,
+            lastUpdatedAt: new Date().toISOString(),
+          },
+        }));
+      } catch (error) {
+        console.error('Failed to update dialog state:', error);
+      }
+    }
+
     resetTimer();
     setInputMode(null);
     setRecommendedMode('weight');
@@ -512,16 +628,50 @@ export function RoastTimer() {
       {/* ダイアログ */}
       <CompletionDialog
         isOpen={showCompletionDialog}
-        onClose={() => {
+        onClose={async () => {
           // ダイアログを閉じる時も音を停止
           stopSound();
           setShowCompletionDialog(false);
+
+          // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
+          if (state) {
+            try {
+              await updateData((currentData) => ({
+                ...currentData,
+                roastTimerState: {
+                  ...state,
+                  dialogState: null,
+                  lastUpdatedAt: new Date().toISOString(),
+                },
+              }));
+            } catch (error) {
+              console.error('Failed to update dialog state:', error);
+            }
+          }
         }}
         onContinue={handleCompletionOk}
       />
       <ContinuousRoastDialog
         isOpen={showContinuousRoastDialog}
-        onClose={() => setShowContinuousRoastDialog(false)}
+        onClose={async () => {
+          setShowContinuousRoastDialog(false);
+
+          // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
+          if (state) {
+            try {
+              await updateData((currentData) => ({
+                ...currentData,
+                roastTimerState: {
+                  ...state,
+                  dialogState: null,
+                  lastUpdatedAt: new Date().toISOString(),
+                },
+              }));
+            } catch (error) {
+              console.error('Failed to update dialog state:', error);
+            }
+          }
+        }}
         onYes={handleContinuousRoastYes}
         onNo={handleContinuousRoastNo}
       />

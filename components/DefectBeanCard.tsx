@@ -49,14 +49,14 @@ export function DefectBeanCard({
   return (
     <>
       <div
-        className={`bg-white rounded-lg shadow-md overflow-hidden transition-all ${
+        className={`bg-white rounded-lg shadow-md overflow-hidden transition-all flex flex-col ${
           isSelected ? 'ring-2 ring-amber-500' : ''
         } hover:shadow-lg ${!compareMode && onEdit ? 'cursor-pointer' : ''}`}
         onClick={handleCardClick}
       >
         {/* 画像 */}
         <div
-          className="relative w-full aspect-square bg-gray-100 cursor-pointer"
+          className="relative w-full aspect-square bg-gray-100 cursor-pointer flex-shrink-0"
           onClick={(e) => {
             e.stopPropagation(); // カードクリックを防ぐ
             setShowImageModal(true);
@@ -79,16 +79,16 @@ export function DefectBeanCard({
         </div>
 
         {/* 情報 */}
-        <div className="p-2 space-y-2">
+        <div className="p-2 flex flex-col flex-1 min-h-0">
           {/* 名称 */}
-          <div>
+          <div className="flex-shrink-0">
             <h3 className="text-sm font-semibold text-gray-800 mb-1">
               {defectBean.name}
             </h3>
           </div>
 
           {/* 詳細情報 */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 flex-1 min-h-0">
             <div>
               <h4 className="text-xs font-semibold text-gray-700 mb-0.5">特徴</h4>
               <p className="text-xs text-gray-600 whitespace-pre-wrap line-clamp-3 min-h-[2.5rem]">
@@ -113,7 +113,7 @@ export function DefectBeanCard({
 
           {/* 設定切り替え */}
           {onToggleSetting && (
-            <div className="flex gap-1.5 pt-1.5 border-t border-gray-200" onClick={(e) => e.stopPropagation()}>
+            <div className="flex gap-1.5 pt-1.5 border-t border-gray-200 mt-auto flex-shrink-0" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => handleToggleSetting(true)}
                 className={`flex-1 px-1.5 sm:px-2 py-1.5 rounded text-[10px] sm:text-xs font-semibold transition-colors min-h-[36px] flex items-center justify-center gap-0.5 sm:gap-1 whitespace-nowrap ${

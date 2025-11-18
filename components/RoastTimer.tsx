@@ -252,7 +252,7 @@ export function RoastTimer() {
     if (inputMode === 'recommended' && recommendedMode === 'history' && beanName && weight !== '' && roastLevel && user) {
       const calculateRecommended = async () => {
         try {
-          const settings = await loadRoastTimerSettings(user.uid);
+          const settings = await loadRoastTimerSettings();
           const allRecords = await getAllRoastTimerRecords(user.uid, data);
           const result = calculateRecommendedTime(
             allRecords,

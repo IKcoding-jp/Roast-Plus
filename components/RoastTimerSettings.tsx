@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/auth';
-import { useAppData } from '@/hooks/useAppData';
 import { Loading } from '@/components/Loading';
 import {
   loadRoastTimerSettings,
@@ -17,26 +15,22 @@ interface RoastTimerSettingsProps {
 }
 
 export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
-  const { user } = useAuth();
-  const { data } = useAppData();
   const [settings, setSettings] = useState<RoastTimerSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isTestingSound, setIsTestingSound] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      loadRoastTimerSettings(user.uid)
-        .then((loadedSettings) => {
-          setSettings(loadedSettings);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error('Failed to load settings:', error);
-          setIsLoading(false);
-        });
-    }
-  }, [user]);
+    loadRoastTimerSettings()
+      .then((loadedSettings) => {
+        setSettings(loadedSettings);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Failed to load settings:', error);
+        setIsLoading(false);
+      });
+  }, []);
 
   // コンポーネントがアンマウントされる時に音を停止
   useEffect(() => {
@@ -46,11 +40,11 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
   }, []);
 
   const handleSave = async () => {
-    if (!user || !settings) return;
+    if (!settings) return;
 
     setIsSaving(true);
     try {
-      await saveRoastTimerSettings(user.uid, settings, data);
+      await saveRoastTimerSettings(settings);
       clearRoastTimerSettingsCache();
       onClose();
     } catch (error) {

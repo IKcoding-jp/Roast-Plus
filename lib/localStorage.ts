@@ -2,6 +2,7 @@
 
 const SELECTED_MEMBER_ID_KEY = 'roastplus_selected_member_id';
 const ROAST_TIMER_STATE_KEY = 'roastplus_roast_timer_state';
+const ROAST_TIMER_SETTINGS_KEY = 'roastplus_roast_timer_settings';
 const DEVICE_ID_KEY = 'roastplus_device_id';
 
 /**
@@ -52,6 +53,36 @@ export function getRoastTimerState(): any | null {
     return JSON.parse(stored);
   } catch (error) {
     console.error('Failed to parse roast timer state from localStorage:', error);
+    return null;
+  }
+}
+
+/**
+ * ローストタイマー設定を保存
+ */
+export function setRoastTimerSettings(settings: unknown): void {
+  if (typeof window === 'undefined') return;
+  
+  if (settings === null || settings === undefined) {
+    localStorage.removeItem(ROAST_TIMER_SETTINGS_KEY);
+  } else {
+    localStorage.setItem(ROAST_TIMER_SETTINGS_KEY, JSON.stringify(settings));
+  }
+}
+
+/**
+ * ローストタイマー設定を取得
+ */
+export function getRoastTimerSettings(): unknown | null {
+  if (typeof window === 'undefined') return null;
+  
+  const stored = localStorage.getItem(ROAST_TIMER_SETTINGS_KEY);
+  if (!stored) return null;
+  
+  try {
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error('Failed to parse roast timer settings from localStorage:', error);
     return null;
   }
 }

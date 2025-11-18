@@ -297,7 +297,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
         // アラーム音を先に再生（通知より先に再生することで、iOS/iPadOSでの音声ブロックを回避）
         try {
-          const settings = await loadRoastTimerSettings(user.uid);
+          const settings = await loadRoastTimerSettings();
           if (settings.timerSoundEnabled) {
             const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
             soundAudioRef.current = audio;

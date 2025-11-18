@@ -1,10 +1,11 @@
 /**
  * ローストタイマー設定管理
- * Firestoreから設定を読み込み、メモリ上にキャッシュ
+ * LocalStorageから設定を読み込み、メモリ上にキャッシュ
+ * 端末ごとに独立した設定を保存
  */
 
-import { getUserData, saveUserData } from './firestore';
-import type { RoastTimerSettings, UserSettings } from '@/types';
+import { getRoastTimerSettings, setRoastTimerSettings } from './localStorage';
+import type { RoastTimerSettings } from '@/types';
 
 // デフォルト設定
 const DEFAULT_SETTINGS: RoastTimerSettings = {
@@ -24,8 +25,9 @@ let loadPromise: Promise<RoastTimerSettings> | null = null;
 
 /**
  * 設定を読み込む（キャッシュがあればそれを返す）
+ * userIdパラメータは互換性のため残しているが、使用しない
  */
-export async function loadRoastTimerSettings(userId: string): Promise<RoastTimerSettings> {
+export async function loadRoastTimerSettings(userId?: string): Promise<RoastTimerSettings> {
   // キャッシュがあればそれを返す
   if (settingsCache) {
     return settingsCache;
@@ -40,14 +42,13 @@ export async function loadRoastTimerSettings(userId: string): Promise<RoastTimer
   isLoading = true;
   loadPromise = (async () => {
     try {
-      const data = await getUserData(userId);
-      const settings = data.userSettings?.roastTimerSettings;
+      const storedSettings = getRoastTimerSettings();
       
-      if (settings) {
+      if (storedSettings && typeof storedSettings === 'object' && !Array.isArray(storedSettings)) {
         // 設定が存在する場合は、デフォルト値とマージ
         settingsCache = {
           ...DEFAULT_SETTINGS,
-          ...settings,
+          ...(storedSettings as Partial<RoastTimerSettings>),
         };
       } else {
         // 設定が存在しない場合はデフォルト値を使用
@@ -70,29 +71,19 @@ export async function loadRoastTimerSettings(userId: string): Promise<RoastTimer
 }
 
 /**
- * 設定を保存する
+ * 設定を保存する（LocalStorageに保存）
+ * updateAppDataパラメータは互換性のため残しているが、使用しない
  */
 export async function saveRoastTimerSettings(
-  userId: string,
   settings: RoastTimerSettings,
-  currentData: any
+  updateAppData?: unknown
 ): Promise<void> {
   try {
     // キャッシュを更新
     settingsCache = { ...settings };
 
-    // Firestoreに保存
-    const updatedUserSettings: UserSettings = {
-      ...currentData.userSettings,
-      roastTimerSettings: settings,
-    };
-
-    const updatedData = {
-      ...currentData,
-      userSettings: updatedUserSettings,
-    };
-
-    await saveUserData(userId, updatedData);
+    // LocalStorageに保存
+    setRoastTimerSettings(settings);
   } catch (error) {
     console.error('Failed to save roast timer settings:', error);
     throw error;

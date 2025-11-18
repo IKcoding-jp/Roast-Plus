@@ -70,6 +70,7 @@ export function RoastTimer() {
   const [showSettings, setShowSettings] = useState(false);
   const prevStatusRef = useRef<string | undefined>(undefined);
   const hasInitializedRef = useRef(false);
+  const dialogSyncLockRef = useRef(false);
 
   // ページを開いた時の初期化（完了状態の場合は自動リセット）
   useEffect(() => {
@@ -160,13 +161,15 @@ export function RoastTimer() {
     const prevStatus = prevStatusRef.current;
 
     // runningからcompletedに変化した時のみダイアログを表示
-    if (
+    const shouldOpenCompletionDialog =
+      !dialogSyncLockRef.current &&
       prevStatus === 'running' &&
       currentStatus === 'completed' &&
       !showCompletionDialog &&
       !showContinuousRoastDialog &&
-      !showAfterPurgeDialog
-    ) {
+      !showAfterPurgeDialog;
+
+    if (shouldOpenCompletionDialog) {
       setShowCompletionDialog(true);
     }
 
@@ -183,6 +186,10 @@ export function RoastTimer() {
         setShowContinuousRoastDialog(false);
         setShowAfterPurgeDialog(false);
       }
+      return;
+    }
+
+    if (dialogSyncLockRef.current) {
       return;
     }
 
@@ -456,6 +463,8 @@ export function RoastTimer() {
 
   // アフターパージダイアログの「記録に進む」
   const handleAfterPurgeRecord = async () => {
+    dialogSyncLockRef.current = true;
+
     // 音を確実に停止
     stopSound();
     
@@ -467,13 +476,16 @@ export function RoastTimer() {
     // prevStatusRefをリセットして、resetTimer()後の状態変化でCompletionDialogが再表示されないようにする
     prevStatusRef.current = undefined;
 
-    // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
-    if (state) {
+    const stateSnapshot = state;
+    let clearDialogStatePromise: Promise<void> | null = null;
+
+    // Firestoreにダイアログ状態をクリア（マルチデバイス同期用）
+    if (stateSnapshot) {
       try {
-        await updateData((currentData) => ({
+        clearDialogStatePromise = updateData((currentData) => ({
           ...currentData,
           roastTimerState: {
-            ...state,
+            ...stateSnapshot,
             dialogState: null,
             lastUpdatedAt: new Date().toISOString(),
           },
@@ -483,9 +495,14 @@ export function RoastTimer() {
       }
     }
     
-    const stateSnapshot = state;
     let targetUrl = '/roast-record';
-    if (stateSnapshot && stateSnapshot.beanName && stateSnapshot.weight && stateSnapshot.roastLevel && stateSnapshot.elapsed > 0) {
+    if (
+      stateSnapshot &&
+      stateSnapshot.beanName &&
+      stateSnapshot.weight &&
+      stateSnapshot.roastLevel &&
+      stateSnapshot.elapsed > 0
+    ) {
       const params = new URLSearchParams({
         beanName: stateSnapshot.beanName,
         weight: stateSnapshot.weight.toString(),
@@ -495,15 +512,31 @@ export function RoastTimer() {
       targetUrl = `/roast-record?${params.toString()}`;
     }
 
-    // 記録画面へ遷移する前にタイマー状態を完全にリセットして他端末でもダイアログが再表示されないようにする
-    await resetTimer();
-    
-    // resetTimer()後の状態変化でダイアログが再表示されないように、念のため再度閉じる
+    // すべてのダイアログを即座に閉じてチラつきを防止
     setShowCompletionDialog(false);
     setShowContinuousRoastDialog(false);
     setShowAfterPurgeDialog(false);
-    
+
+    // 記録画面への遷移を優先
     router.push(targetUrl);
+
+    if (clearDialogStatePromise) {
+      try {
+        await clearDialogStatePromise;
+      } catch (error) {
+        console.error('Failed to update dialog state:', error);
+      }
+    }
+
+    // リセットは非同期で継続し、副作用でダイアログが再表示されないようにもう一度閉じる
+    try {
+      await resetTimer();
+    } finally {
+      setShowCompletionDialog(false);
+      setShowContinuousRoastDialog(false);
+      setShowAfterPurgeDialog(false);
+      dialogSyncLockRef.current = false;
+    }
   };
 
   // アフターパージダイアログの「閉じる」

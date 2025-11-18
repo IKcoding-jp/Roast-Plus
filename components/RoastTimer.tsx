@@ -277,49 +277,67 @@ export function RoastTimer() {
   }, [beanName, weight, roastLevel, inputMode, recommendedMode, user, data, durationMinutes]);
 
   const handleStart = async () => {
-    if (!user) return;
-
-    let finalDuration: number;
-
-    // 手動入力モードの場合は分のみ必須
-    if (inputMode === 'manual') {
-      if (!durationMinutes) {
-        alert('分を入力してください');
+    try {
+      if (!user) {
+        alert('ログインが必要です');
         return;
       }
-      const minutes = parseInt(durationMinutes, 10) || 0;
-      const seconds = parseInt(durationSeconds, 10) || 0;
-      finalDuration = minutes * 60 + seconds;
-    } else {
-      // おすすめモードの場合は重さのみ必須
-      if (weight === '') {
-        alert('重さを選択してください');
+      if (isLoading) {
+        alert('データを読み込み中です。しばらくお待ちください。');
         return;
       }
 
-      if (recommendedMode === 'history') {
-        // 過去の記録モード：豆の名前と焙煎度合いも必須
-        if (!beanName) {
-          alert('豆の名前を選択してください');
+      let finalDuration: number;
+
+      // 手動入力モードの場合は分のみ必須
+      if (inputMode === 'manual') {
+        if (!durationMinutes) {
+          alert('分を入力してください');
           return;
         }
-        if (!roastLevel) {
-          alert('焙煎度合いを選択してください');
+        const minutes = parseInt(durationMinutes, 10) || 0;
+        const seconds = parseInt(durationSeconds, 10) || 0;
+        finalDuration = minutes * 60 + seconds;
+      } else {
+        // おすすめモードの場合は重さのみ必須
+        if (weight === '') {
+          alert('重さを選択してください');
           return;
         }
 
-        // 過去の記録モード：おすすめ時間の確認ダイアログ（豆と焙煎度合いが選択されている場合のみ）
-        if (recommendedTimeInfo && beanName && roastLevel) {
-          const confirmed = confirm(
-            `過去の記録から、平均焙煎時間は${formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}、おすすめタイマー時間は${formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}です。\nこの時間でタイマーを開始しますか？`
-          );
-          if (!confirmed) {
+        if (recommendedMode === 'history') {
+          // 過去の記録モード：豆の名前と焙煎度合いも必須
+          if (!beanName) {
+            alert('豆の名前を選択してください');
             return;
           }
-          // おすすめ時間を使用
-          finalDuration = recommendedTimeInfo.recommendedDuration;
+          if (!roastLevel) {
+            alert('焙煎度合いを選択してください');
+            return;
+          }
+
+          // 過去の記録モード：おすすめ時間の確認ダイアログ（豆と焙煎度合いが選択されている場合のみ）
+          if (recommendedTimeInfo && beanName && roastLevel) {
+            const confirmed = confirm(
+              `過去の記録から、平均焙煎時間は${formatTimeAsMinutes(recommendedTimeInfo.averageDuration)}、おすすめタイマー時間は${formatTimeAsMinutes(recommendedTimeInfo.recommendedDuration)}です。\nこの時間でタイマーを開始しますか？`
+            );
+            if (!confirmed) {
+              return;
+            }
+            // おすすめ時間を使用
+            finalDuration = recommendedTimeInfo.recommendedDuration;
+          } else {
+            // おすすめ時間が計算されていない場合は、重さに応じたデフォルト時間を使用
+            const defaultMinutes: Record<200 | 300 | 500, number> = {
+              200: 8,
+              300: 9,
+              500: 10,
+            };
+            const defaultMin = defaultMinutes[weight];
+            finalDuration = defaultMin * 60;
+          }
         } else {
-          // おすすめ時間が計算されていない場合は、重さに応じたデフォルト時間を使用
+          // 重さモード：重さに応じたデフォルト時間を使用
           const defaultMinutes: Record<200 | 300 | 500, number> = {
             200: 8,
             300: 9,
@@ -328,33 +346,27 @@ export function RoastTimer() {
           const defaultMin = defaultMinutes[weight];
           finalDuration = defaultMin * 60;
         }
-      } else {
-        // 重さモード：重さに応じたデフォルト時間を使用
-        const defaultMinutes: Record<200 | 300 | 500, number> = {
-          200: 8,
-          300: 9,
-          500: 10,
-        };
-        const defaultMin = defaultMinutes[weight];
-        finalDuration = defaultMin * 60;
       }
+
+      if (finalDuration <= 0) {
+        alert('有効な時間を入力してください');
+        return;
+      }
+
+      // 通知ID: 2=手動、3=おすすめ
+      const notificationId = inputMode === 'recommended' ? 3 : 2;
+
+      await startTimer(
+        finalDuration,
+        notificationId,
+        inputMode === 'recommended' && beanName !== '' ? beanName : undefined,
+        inputMode === 'recommended' && weight !== '' ? weight : undefined,
+        inputMode === 'recommended' && roastLevel !== '' ? roastLevel : undefined
+      );
+    } catch (error) {
+      console.error('Failed to start timer:', error);
+      alert('タイマーの開始に失敗しました。もう一度お試しください。');
     }
-
-    if (finalDuration <= 0) {
-      alert('有効な時間を入力してください');
-      return;
-    }
-
-    // 通知ID: 2=手動、3=おすすめ
-    const notificationId = inputMode === 'recommended' ? 3 : 2;
-
-    await startTimer(
-      finalDuration,
-      notificationId,
-      inputMode === 'recommended' && beanName !== '' ? beanName : undefined,
-      inputMode === 'recommended' && weight !== '' ? weight : undefined,
-      inputMode === 'recommended' && roastLevel !== '' ? roastLevel : undefined
-    );
   };
 
   const handlePause = () => {
@@ -964,20 +976,33 @@ export function RoastTimer() {
                 {/* 手動スタートボタン */}
                 <button
                   onClick={async () => {
-                    if (!durationMinutes) {
-                      alert('分を入力してください');
-                      return;
+                    try {
+                      if (!user) {
+                        alert('ログインが必要です');
+                        return;
+                      }
+                      if (isLoading) {
+                        alert('データを読み込み中です。しばらくお待ちください。');
+                        return;
+                      }
+                      if (!durationMinutes) {
+                        alert('分を入力してください');
+                        return;
+                      }
+                      const minutes = parseInt(durationMinutes, 10) || 0;
+                      const seconds = parseInt(durationSeconds, 10) || 0;
+                      const duration = minutes * 60 + seconds;
+                      if (duration <= 0) {
+                        alert('有効な時間を入力してください');
+                        return;
+                      }
+                      await startTimer(duration, 2); // 通知ID: 2=手動
+                    } catch (error) {
+                      console.error('Failed to start timer:', error);
+                      alert('タイマーの開始に失敗しました。もう一度お試しください。');
                     }
-                    const minutes = parseInt(durationMinutes, 10) || 0;
-                    const seconds = parseInt(durationSeconds, 10) || 0;
-                    const duration = minutes * 60 + seconds;
-                    if (duration <= 0) {
-                      alert('有効な時間を入力してください');
-                      return;
-                    }
-                    await startTimer(duration, 2); // 通知ID: 2=手動
                   }}
-                  disabled={!durationMinutes || durationMinutes.trim() === ''}
+                  disabled={!durationMinutes || durationMinutes.trim() === '' || !user || isLoading}
                   className="w-full flex items-center justify-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[60px] sm:min-h-[64px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
                 >
                   <HiPlay className="text-xl sm:text-2xl" />
@@ -1054,7 +1079,7 @@ export function RoastTimer() {
                 <div className="pt-2 flex-shrink-0">
                   <button
                     onClick={handleStart}
-                    disabled={!durationMinutes}
+                    disabled={!durationMinutes || !user || isLoading}
                     className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
                   >
                     <HiPlay className="text-2xl" />

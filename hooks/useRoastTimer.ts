@@ -405,12 +405,21 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       weight?: 200 | 300 | 500,
       roastLevel?: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
     ) => {
-      if (!user || isLoading) return;
+      if (!user || isLoading) {
+        throw new Error('User is not authenticated or data is loading');
+      }
 
       // 一時停止の累積時間をリセット
       pausedElapsedRef.current = 0;
 
-      const startedAtMs = await getSyncedTimestamp();
+      // サーバー時刻の取得を試みる（失敗した場合はローカル時刻を使用）
+      let startedAtMs: number;
+      try {
+        startedAtMs = await getSyncedTimestamp();
+      } catch (error) {
+        console.warn('Failed to get synced timestamp, using local time:', error);
+        startedAtMs = Date.now();
+      }
       const startedAt = new Date(startedAtMs).toISOString();
       const newState: RoastTimerState = {
         status: 'running',
@@ -440,11 +449,17 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         }));
       } catch (error) {
         console.error('Failed to save roast timer state to Firestore:', error);
+        throw error; // Firestoreへの保存に失敗した場合はエラーを投げる
       }
 
-      // 通知をスケジュール
-      const scheduledTime = Date.now() + duration * 1000;
-      await scheduleNotification(notificationId, scheduledTime);
+      // 通知をスケジュール（失敗してもタイマーは開始する）
+      try {
+        const scheduledTime = Date.now() + duration * 1000;
+        await scheduleNotification(notificationId, scheduledTime);
+      } catch (error) {
+        console.warn('Failed to schedule notification:', error);
+        // 通知のスケジュールに失敗してもタイマーは開始する
+      }
     },
     [user, updateData, currentDeviceId]
   );

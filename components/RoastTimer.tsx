@@ -177,7 +177,15 @@ export function RoastTimer() {
 
   // FirestoreのdialogStateを監視してダイアログを同期表示
   useEffect(() => {
-    if (!state) return;
+    if (!state) {
+      // stateがnullの場合は、すべてのダイアログを閉じる
+      if (showCompletionDialog || showContinuousRoastDialog || showAfterPurgeDialog) {
+        setShowCompletionDialog(false);
+        setShowContinuousRoastDialog(false);
+        setShowAfterPurgeDialog(false);
+      }
+      return;
+    }
 
     const dialogState = state.dialogState;
 
@@ -403,26 +411,16 @@ export function RoastTimer() {
   const handleContinuousRoastYes = async () => {
     // 音を確実に停止
     stopSound();
+    
+    // まず、すべてのダイアログを閉じる（resetTimer()が完了する前に再表示されるのを防ぐ）
+    setShowCompletionDialog(false);
     setShowContinuousRoastDialog(false);
+    setShowAfterPurgeDialog(false);
     
-    // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
-    if (state) {
-      try {
-        await updateData((currentData) => ({
-          ...currentData,
-          roastTimerState: {
-            ...state,
-            dialogState: null,
-            lastUpdatedAt: new Date().toISOString(),
-          },
-        }));
-      } catch (error) {
-        console.error('Failed to update dialog state:', error);
-      }
-    }
+    // タイマーをリセット（Firestoreから状態を削除）
+    await resetTimer();
     
-    // タイマーをリセット
-    resetTimer();
+    // リセット完了後、ローカル状態をクリア
     setInputMode(null);
     setRecommendedMode('weight');
     setDurationMinutes('');
@@ -461,6 +459,10 @@ export function RoastTimer() {
   const handleAfterPurgeRecord = async () => {
     // 音を確実に停止
     stopSound();
+    
+    // まず、すべてのダイアログを閉じる（ページ遷移前に再表示されるのを防ぐ）
+    setShowCompletionDialog(false);
+    setShowContinuousRoastDialog(false);
     setShowAfterPurgeDialog(false);
 
     // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
@@ -498,25 +500,16 @@ export function RoastTimer() {
   const handleAfterPurgeClose = async () => {
     // 音を確実に停止
     stopSound();
+    
+    // まず、すべてのダイアログを閉じる（resetTimer()が完了する前に再表示されるのを防ぐ）
+    setShowCompletionDialog(false);
+    setShowContinuousRoastDialog(false);
     setShowAfterPurgeDialog(false);
 
-    // Firestoreにダイアログ状態をクリア（マルチデバイス同期）
-    if (state) {
-      try {
-        await updateData((currentData) => ({
-          ...currentData,
-          roastTimerState: {
-            ...state,
-            dialogState: null,
-            lastUpdatedAt: new Date().toISOString(),
-          },
-        }));
-      } catch (error) {
-        console.error('Failed to update dialog state:', error);
-      }
-    }
+    // タイマーをリセット（Firestoreから状態を削除）
+    await resetTimer();
 
-    resetTimer();
+    // リセット完了後、ローカル状態をクリア
     setInputMode(null);
     setRecommendedMode('weight');
     setDurationMinutes('');

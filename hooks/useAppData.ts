@@ -188,9 +188,21 @@ export function useAppData() {
     };
   }, [user, authLoading, applyIncomingSnapshot, commitData]);
 
+  // isLoadingの参照を保持（コールバック内で最新の値を使用するため）
+  const isLoadingRef = useRef(true);
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
+
   const updateData = useCallback(
     async (newDataOrUpdater: AppData | ((currentData: AppData) => AppData)) => {
       if (!user) return;
+
+      // データ読み込み中は更新を許可しない（データ消失防止）
+      if (isLoadingRef.current) {
+        console.warn('Cannot update data while loading. This prevents overwriting data with initial empty state.');
+        return;
+      }
 
       const currentData = latestLocalDataRef.current;
       const newData =

@@ -326,7 +326,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       saveLocalState(updatedState);
       setLocalState(updatedState);
     }
-  }, [localState, user, updateData]);
+  }, [localState, user, updateData, isLoading, currentDeviceId]);
 
   // タイマーの定期更新（UI表示用）
   useEffect(() => {
@@ -461,7 +461,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         // 通知のスケジュールに失敗してもタイマーは開始する
       }
     },
-    [user, updateData, currentDeviceId]
+    [user, updateData, currentDeviceId, isLoading]
   );
 
   // タイマーを一時停止
@@ -503,7 +503,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     } catch (error) {
       console.error('Failed to save roast timer state to Firestore:', error);
     }
-  }, [localState, user, updateData, currentDeviceId]);
+  }, [localState, user, updateData, currentDeviceId, isLoading]);
 
   // タイマーを再開
   const resumeTimer = useCallback(async () => {
@@ -551,7 +551,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       const scheduledTime = Date.now() + remainingTime;
       scheduleNotification(updatedState.notificationId, scheduledTime);
     }
-  }, [localState, user, updateData, currentDeviceId]);
+  }, [localState, user, updateData, currentDeviceId, isLoading]);
 
   // タイマーをスキップ（残り時間を1秒に設定）
   const skipTimer = useCallback(async () => {
@@ -590,7 +590,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       console.error('Failed to save roast timer state to Firestore:', error);
     }
     // 次回のカウントダウンで完了処理が実行される
-  }, [localState, user, updateData, currentDeviceId]);
+  }, [localState, user, updateData, currentDeviceId, isLoading]);
 
   // タイマーをリセット
   const resetTimer = useCallback(async () => {
@@ -629,7 +629,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       console.error('Failed to delete roast timer state from Firestore:', error);
       // エラーが発生しても、リセットフラグは維持する
     }
-  }, [user, updateData]);
+  }, [user, updateData, isLoading]);
 
   // サウンドを停止（完了ダイアログのOKボタンで呼ばれる）
   const stopSound = useCallback(() => {

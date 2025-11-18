@@ -134,12 +134,12 @@ export function useAppData() {
         return;
       }
 
-      const mergedData = { ...incomingData } as AppData;
+      const mergedData: AppData = { ...incomingData };
       lockedKeys.forEach((key) => {
         // lockedKeysに含まれるキーは常にlatestLocalDataRef.currentに存在する
         const value = latestLocalDataRef.current[key];
         if (value !== undefined) {
-          (mergedData as any)[key] = value;
+          mergedData[key] = value;
         }
       });
 
@@ -211,15 +211,20 @@ export function useAppData() {
         tastingSessions: Array.isArray(newData.tastingSessions) ? newData.tastingSessions : currentData.tastingSessions,
         tastingRecords: Array.isArray(newData.tastingRecords) ? newData.tastingRecords : currentData.tastingRecords,
         notifications: Array.isArray(newData.notifications) ? newData.notifications : currentData.notifications,
-        manager: newData.manager !== undefined ? newData.manager : currentData.manager,
-        userSettings: newData.userSettings || currentData.userSettings,
-        shuffleEvent: newData.shuffleEvent !== undefined ? newData.shuffleEvent : currentData.shuffleEvent,
-        encouragementCount:
-          typeof newData.encouragementCount === 'number' ? newData.encouragementCount : currentData.encouragementCount ?? 0,
+        manager: hasOwn(newData, 'manager') ? newData.manager : currentData.manager,
+        userSettings: hasOwn(newData, 'userSettings') ? newData.userSettings : currentData.userSettings,
+        shuffleEvent: hasOwn(newData, 'shuffleEvent') ? newData.shuffleEvent : currentData.shuffleEvent,
+        encouragementCount: hasOwn(newData, 'encouragementCount')
+          ? typeof newData.encouragementCount === 'number'
+            ? newData.encouragementCount
+            : currentData.encouragementCount ?? 0
+          : currentData.encouragementCount ?? 0,
         roastTimerRecords: Array.isArray(newData.roastTimerRecords) ? newData.roastTimerRecords : currentData.roastTimerRecords,
         roastTimerState: hasRoastTimerStateOverride ? newData.roastTimerState : currentData.roastTimerState,
-        defectBeans: newData.defectBeans !== undefined ? newData.defectBeans : currentData.defectBeans,
-        defectBeanSettings: newData.defectBeanSettings !== undefined ? newData.defectBeanSettings : currentData.defectBeanSettings,
+        defectBeans: hasOwn(newData, 'defectBeans') ? newData.defectBeans : currentData.defectBeans,
+        defectBeanSettings: hasOwn(newData, 'defectBeanSettings')
+          ? newData.defectBeanSettings
+          : currentData.defectBeanSettings,
         workProgresses: Array.isArray(newData.workProgresses) ? newData.workProgresses : currentData.workProgresses,
       };
 

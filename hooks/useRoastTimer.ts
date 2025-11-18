@@ -249,19 +249,21 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         // すべてのスケジュール通知をキャンセル
         cancelAllScheduledNotifications();
 
-        // 通知とサウンド
-        await notifyRoastTimerComplete();
-        
-        // 設定を読み込んでサウンドを再生
+        // アラーム音を先に再生（通知より先に再生することで、iOS/iPadOSでの音声ブロックを回避）
         try {
           const settings = await loadRoastTimerSettings(user.uid);
           if (settings.timerSoundEnabled) {
             const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
             soundAudioRef.current = audio;
+            // アラーム音の再生を確実に開始するため、少し待ってから通知を表示
+            await new Promise(resolve => setTimeout(resolve, 100));
           }
         } catch (error) {
           console.error('Failed to play timer sound:', error);
         }
+
+        // 通知を表示（アラーム音の再生開始後に表示）
+        await notifyRoastTimerComplete();
 
         // Firestoreに完了状態を保存
         try {

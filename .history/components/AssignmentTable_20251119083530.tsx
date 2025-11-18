@@ -827,8 +827,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                                     : a
                                 );
 
-                                // 選択日（明日）を対象日付として使用
-                                const targetDate = selectedDate;
+                                // 今日の場合は16:45以降なら翌日、それ以外は今日の日付を使用
+                                const targetDate = isToday ? getShuffleTargetDate() : selectedDate;
 
                                 // 新しい割り当てが存在しない場合は追加
                                 if (

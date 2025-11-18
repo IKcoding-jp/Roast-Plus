@@ -452,25 +452,16 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
   const teams = data.teams;
   
-  // 今日と明日の判定
-  const today = getTodayString();
-  const tomorrow = getNextWeekday(today);
-  const isTomorrow = selectedDate === tomorrow; // 明日かどうか
-  
   // 選択日に応じて表示する割り当てを決定
   const displayAssignments = useMemo(() => {
     if (isToday) {
-      // 今日の場合は前日の平日の担当を表示
-      const previousWeekday = getPreviousWeekday(today);
-      return data.assignmentHistory.filter((a) => a.assignedDate === previousWeekday);
-    } else if (isTomorrow) {
-      // 明日の場合は該当日の担当を取得（なければ空欄）
-      return data.assignmentHistory.filter((a) => a.assignedDate === selectedDate);
+      // 今日の場合は現在の割り当てを表示
+      return data.assignments;
     } else {
       // 過去の場合は履歴から該当日の割り当てを取得
       return data.assignmentHistory.filter((a) => a.assignedDate === selectedDate);
     }
-  }, [data.assignmentHistory, selectedDate, isToday, isTomorrow, today, getPreviousWeekday, getNextWeekday]);
+  }, [data.assignments, data.assignmentHistory, selectedDate, isToday]);
   
   const assignments = displayAssignments;
 
@@ -497,9 +488,9 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   }, [selectedDate, data.taskLabelHistory, isToday]);
 
   const isAlreadyShuffled = useMemo(() => {
-    // 選択日（明日）に対して既にシャッフル済みかどうかを判定
-    return assignments.some((a) => a.assignedDate === selectedDate);
-  }, [assignments, selectedDate]);
+    const targetDate = getShuffleTargetDate();
+    return assignments.some((a) => a.assignedDate === targetDate);
+  }, [assignments, getShuffleTargetDate]);
 
   const isWeekend = useMemo(() => {
     const date = new Date(selectedDate + 'T00:00:00');
@@ -827,8 +818,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                                     : a
                                 );
 
-                                // 選択日（明日）を対象日付として使用
-                                const targetDate = selectedDate;
+                                // 今日の場合は16:45以降なら翌日、それ以外は今日の日付を使用
+                                const targetDate = isToday ? getShuffleTargetDate() : selectedDate;
 
                                 // 新しい割り当てが存在しない場合は追加
                                 if (
@@ -915,12 +906,12 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
           </table>
         </div>
       </div>
-      {/* シャッフルボタンは平日かつ明日の場合のみ表示 */}
-      {isTomorrow && !isWeekend && (
+      {/* シャッフルボタンは平日かつ今日の場合のみ表示 */}
+      {isToday && !isWeekend && (
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={() => {
-              const targetDate = selectedDate; // 選択日（明日）を対象日付として使用
+              const targetDate = getShuffleTargetDate();
               const shuffled = shuffleAssignments(data, targetDate);
               const shuffleEvent: ShuffleEvent = {
                 startTime: new Date().toISOString(),
@@ -954,7 +945,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
           {isDeveloperModeEnabled && (
             <button
               onClick={() => {
-                const targetDate = selectedDate; // 選択日（明日）を対象日付として使用
+                const targetDate = getShuffleTargetDate();
                 const shuffled = shuffleAssignments(data, targetDate);
                 const shuffleEvent: ShuffleEvent = {
                   startTime: new Date().toISOString(),

@@ -497,9 +497,9 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   }, [selectedDate, data.taskLabelHistory, isToday]);
 
   const isAlreadyShuffled = useMemo(() => {
-    // 選択日（明日）に対して既にシャッフル済みかどうかを判定
-    return assignments.some((a) => a.assignedDate === selectedDate);
-  }, [assignments, selectedDate]);
+    const targetDate = getShuffleTargetDate();
+    return assignments.some((a) => a.assignedDate === targetDate);
+  }, [assignments, getShuffleTargetDate]);
 
   const isWeekend = useMemo(() => {
     const date = new Date(selectedDate + 'T00:00:00');
@@ -827,8 +827,8 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
                                     : a
                                 );
 
-                                // 選択日（明日）を対象日付として使用
-                                const targetDate = selectedDate;
+                                // 今日の場合は16:45以降なら翌日、それ以外は今日の日付を使用
+                                const targetDate = isToday ? getShuffleTargetDate() : selectedDate;
 
                                 // 新しい割り当てが存在しない場合は追加
                                 if (
@@ -920,7 +920,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={() => {
-              const targetDate = selectedDate; // 選択日（明日）を対象日付として使用
+              const targetDate = getShuffleTargetDate();
               const shuffled = shuffleAssignments(data, targetDate);
               const shuffleEvent: ShuffleEvent = {
                 startTime: new Date().toISOString(),
@@ -954,7 +954,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
           {isDeveloperModeEnabled && (
             <button
               onClick={() => {
-                const targetDate = selectedDate; // 選択日（明日）を対象日付として使用
+                const targetDate = getShuffleTargetDate();
                 const shuffled = shuffleAssignments(data, targetDate);
                 const shuffleEvent: ShuffleEvent = {
                   startTime: new Date().toISOString(),

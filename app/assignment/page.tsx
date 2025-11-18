@@ -89,18 +89,19 @@ export default function AssignmentPage() {
     const today = getTodayString();
     const nextWeekday = getNextWeekday(selectedDate);
     
-    // 今日を超えないようにする（今日まで移動可能）
-    // 今日が土日の場合は、前の平日まで移動可能
-    const maxDate = isWeekend(today) ? getPreviousWeekday(today) : today;
-    if (nextWeekday <= maxDate) {
+    // 明日（1日先の平日）まで移動可能
+    const tomorrow = getNextWeekday(today);
+    if (nextWeekday <= tomorrow) {
       setSelectedDate(nextWeekday);
     }
-  }, [selectedDate, getNextWeekday, getPreviousWeekday, isWeekend]);
+  }, [selectedDate, getNextWeekday, getTodayString]);
 
   // 選択日が今日かどうか（実際の今日の日付と比較）
   const today = getTodayString();
   const effectiveToday = isWeekend(today) ? getPreviousWeekday(today) : today;
   const isToday = selectedDate === today; // 実際の今日の日付と比較
+  const tomorrow = getNextWeekday(today);
+  const isTomorrow = selectedDate === tomorrow; // 明日かどうか
 
   // 日付と時刻のフォーマット関数
   const formatDate = (date: Date): string => {
@@ -170,9 +171,9 @@ export default function AssignmentPage() {
                     </button>
                     <button
                       onClick={moveToNextDay}
-                      disabled={isToday}
+                      disabled={isTomorrow}
                       className={`flex items-center justify-center min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] rounded-md transition-colors ${
-                        isToday
+                        isTomorrow
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                       }`}

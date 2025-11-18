@@ -1006,7 +1006,7 @@ export function RoastTimer() {
                   className="w-full flex items-center justify-center gap-2 px-6 py-4 sm:py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 min-h-[60px] sm:min-h-[64px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
                 >
                   <HiPlay className="text-xl sm:text-2xl" />
-                  <span>手動で焙煎スタート</span>
+                  <span>手動でタイマースタート</span>
                 </button>
 
                 {/* おすすめ焙煎ボタン */}

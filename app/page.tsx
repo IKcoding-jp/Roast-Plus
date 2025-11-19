@@ -178,14 +178,14 @@ export default function HomePage() {
             </h2>
           </button>
 
-          {/* コーヒー豆図鑑カード */}
+          {/* 欠点豆図鑑カード */}
           <button
             onClick={() => router.push('/defect-beans')}
             className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
           >
             <RiBookFill className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
-              コーヒー豆図鑑
+              欠点豆図鑑
             </h2>
           </button>
 

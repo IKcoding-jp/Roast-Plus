@@ -296,7 +296,7 @@ export default function DefectBeansPage() {
             <div className="flex justify-center items-center gap-2 sm:gap-3 min-w-0">
               <RiBookFill className="hidden sm:block h-7 w-7 sm:h-8 sm:w-8 text-amber-600 flex-shrink-0" />
               <h1 className="hidden sm:block text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 whitespace-nowrap">
-                コーヒー豆図鑑
+                欠点豆図鑑
               </h1>
             </div>
 

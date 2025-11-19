@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { HiCheck, HiXCircle, HiX } from 'react-icons/hi';
+import { HiXCircle } from 'react-icons/hi';
 import type { DefectBean } from '@/types';
 
 interface DefectBeanCardProps {
@@ -129,7 +129,7 @@ export function DefectBeanCard({
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                <HiXCircle className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="text-base sm:text-lg leading-none">×</span>
                 <span>省く</span>
               </button>
               <button
@@ -140,7 +140,7 @@ export function DefectBeanCard({
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                <HiCheck className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="text-base sm:text-lg leading-none">○</span>
                 <span>省かない</span>
               </button>
             </div>

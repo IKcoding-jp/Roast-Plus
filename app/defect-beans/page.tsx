@@ -279,7 +279,7 @@ export default function DefectBeansPage() {
         {/* ヘッダー */}
         <header className="mb-4">
           {/* タイトルとナビゲーション（一番上、同じ行） */}
-          <div className="grid grid-cols-3 items-center mb-3">
+          <div className="flex sm:grid sm:grid-cols-3 items-center justify-between mb-3">
             {/* 左側: 戻る */}
             <div className="flex justify-start">
               <Link
@@ -309,15 +309,14 @@ export default function DefectBeansPage() {
                     <div className="relative" ref={sortMenuRef}>
                       <button
                         onClick={() => setShowSortMenu(!showSortMenu)}
-                        className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${
-                          showSortMenu
-                            ? 'bg-amber-600 text-white hover:bg-amber-700'
-                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                        }`}
+                        className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${showSortMenu
+                          ? 'bg-amber-600 text-white hover:bg-amber-700'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                          }`}
                         title="ソート"
                       >
                         {getSortIcon()}
-                        <span className="hidden sm:inline text-sm">ソート</span>
+                        <span className="text-xs sm:text-sm">ソート</span>
                       </button>
                       {/* ドロップダウンメニュー */}
                       {showSortMenu && (
@@ -330,11 +329,10 @@ export default function DefectBeansPage() {
                                   setSortOption(option);
                                   setShowSortMenu(false);
                                 }}
-                                className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${
-                                  sortOption === option
-                                    ? 'bg-amber-50 text-amber-700 font-medium'
-                                    : 'text-gray-700 hover:bg-gray-50'
-                                }`}
+                                className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${sortOption === option
+                                  ? 'bg-amber-50 text-amber-700 font-medium'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                                  }`}
                               >
                                 {sortOption === option && (
                                   <HiCheckCircle className="h-4 w-4 text-amber-600" />
@@ -349,15 +347,14 @@ export default function DefectBeansPage() {
                   )}
                   <button
                     onClick={toggleCompareMode}
-                    className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${
-                      compareMode
-                        ? 'bg-amber-600 text-white hover:bg-amber-700'
-                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                    }`}
+                    className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${compareMode
+                      ? 'bg-amber-600 text-white hover:bg-amber-700'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                      }`}
                     title={compareMode ? '選択モード' : '比較モード'}
                   >
                     <MdCompareArrows className="h-5 w-5" />
-                    <span className="hidden sm:inline text-sm">
+                    <span className="text-xs sm:text-sm">
                       {compareMode ? '選択モード' : '比較'}
                     </span>
                   </button>
@@ -377,7 +374,7 @@ export default function DefectBeansPage() {
                       title="欠点豆を追加"
                     >
                       <HiPlus className="h-5 w-5" />
-                      <span className="hidden sm:inline text-sm">追加</span>
+                      <span className="text-xs sm:text-sm">追加</span>
                     </button>
                   )}
                 </>
@@ -408,39 +405,36 @@ export default function DefectBeansPage() {
               <div className="flex gap-1.5">
                 <button
                   onClick={() => setFilterOption('all')}
-                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${
-                    filterOption === 'all'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${filterOption === 'all'
+                    ? 'bg-amber-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                   title="全て表示"
                 >
                   <HiCollection className="h-4 w-4" />
-                  <span className="hidden sm:inline">全て</span>
+                  <span className="text-xs sm:text-sm">全て</span>
                 </button>
                 <button
                   onClick={() => setFilterOption('shouldRemove')}
-                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${
-                    filterOption === 'shouldRemove'
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${filterOption === 'shouldRemove'
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                   title="省く設定のもの"
                 >
                   <HiXCircle className="h-4 w-4" />
-                  <span className="hidden sm:inline">省く</span>
+                  <span className="text-xs sm:text-sm">省く</span>
                 </button>
                 <button
                   onClick={() => setFilterOption('shouldNotRemove')}
-                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${
-                    filterOption === 'shouldNotRemove'
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${filterOption === 'shouldNotRemove'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                   title="省かない設定のもの"
                 >
                   <HiCheckCircle className="h-4 w-4" />
-                  <span className="hidden sm:inline">省かない</span>
+                  <span className="text-xs sm:text-sm">省かない</span>
                 </button>
               </div>
             </div>
@@ -462,7 +456,7 @@ export default function DefectBeansPage() {
                   )}
                 </div>
               </div>
-              
+
               {/* メッセージ */}
               <div className="space-y-2">
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
@@ -476,7 +470,7 @@ export default function DefectBeansPage() {
                     : '最初の欠点豆を追加して、図鑑を始めましょう。'}
                 </p>
               </div>
-              
+
               {/* アクションボタン（登録がない場合のみ表示） */}
               {!searchQuery && filterOption === 'all' && (
                 <button
@@ -524,7 +518,7 @@ export default function DefectBeansPage() {
         {editingDefectBeanId && (() => {
           const editingBean = allDefectBeans.find((db) => db.id === editingDefectBeanId);
           if (!editingBean) return null;
-          
+
           return (
             <DefectBeanForm
               mode="edit"

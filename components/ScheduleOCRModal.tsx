@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { CameraCapture } from './CameraCapture';
-import { Loading } from './Loading';
 import { OCRConfirmModal } from './OCRConfirmModal';
 import { extractScheduleFromImage } from '@/lib/scheduleOCR';
 import type { TimeLabel, RoastSchedule } from '@/types';
@@ -26,9 +25,25 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   const [error, setError] = useState<string | null>(null);
   const [ocrResult, setOcrResult] = useState<{ timeLabels: TimeLabel[]; roastSchedules: RoastSchedule[] } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 画像プレビューを生成
+  useEffect(() => {
+    if (currentFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(currentFile);
+    } else {
+      setImagePreview(null);
+    }
+  }, [currentFile]);
+
   const handleImageFile = async (file: File) => {
+    setCurrentFile(file);
     setIsProcessing(true);
     setError(null);
     setShowCamera(false);
@@ -87,6 +102,9 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
       setError(finalErrorMessage);
       setShowCamera(false);
       showToast(errorMessage, 'error');
+      // エラー時はプレビューをクリーンアップ
+      setCurrentFile(null);
+      setImagePreview(null);
     } finally {
       setIsProcessing(false);
     }
@@ -128,16 +146,22 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
         onSave={(mode, timeLabels, roastSchedules) => {
           setShowConfirm(false);
           setOcrResult(null);
+          setCurrentFile(null);
+          setImagePreview(null);
           onSuccess(mode, timeLabels, roastSchedules);
         }}
         onCancel={() => {
           setShowConfirm(false);
           setOcrResult(null);
+          setCurrentFile(null);
+          setImagePreview(null);
           onCancel();
         }}
         onRetry={() => {
           setShowConfirm(false);
           setOcrResult(null);
+          setCurrentFile(null);
+          setImagePreview(null);
           setShowCamera(false);
         }}
       />
@@ -147,12 +171,16 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   // 選択画面を表示
   if (!showCamera && !isProcessing && !error && !showConfirm) {
     return (
-      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
         <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">画像を選択</h2>
             <button
-              onClick={onCancel}
+              onClick={() => {
+                setCurrentFile(null);
+                setImagePreview(null);
+                onCancel();
+              }}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               <HiX className="h-5 w-5 text-gray-600" />
@@ -199,9 +227,35 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
 
   if (isProcessing) {
     return (
-      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-          <Loading message="画像を解析中..." />
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+          <div className="text-center">
+            {/* 画像プレビュー */}
+            {imagePreview && (
+              <div className="mb-6 rounded-lg overflow-hidden border-2 border-amber-200 bg-gray-50">
+                <img 
+                  src={imagePreview} 
+                  alt="解析中の画像" 
+                  className="w-full max-h-64 object-contain"
+                />
+              </div>
+            )}
+            
+            {/* スピナー */}
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="w-12 h-12 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin"></div>
+              </div>
+            </div>
+            
+            {/* メッセージ */}
+            <p className="text-lg font-medium text-gray-800 mb-1">
+              画像を解析中...
+            </p>
+            <p className="text-sm text-gray-500">
+              しばらくお待ちください
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -209,12 +263,16 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
 
   if (error) {
     return (
-      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
         <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">エラー</h2>
             <button
-              onClick={onCancel}
+              onClick={() => {
+                setCurrentFile(null);
+                setImagePreview(null);
+                onCancel();
+              }}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               <HiX className="h-5 w-5 text-gray-600" />
@@ -225,6 +283,8 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
             <button
               onClick={() => {
                 setError(null);
+                setCurrentFile(null);
+                setImagePreview(null);
                 setShowCamera(false);
               }}
               className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors min-h-[44px]"
@@ -232,7 +292,11 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
               再試行
             </button>
             <button
-              onClick={onCancel}
+              onClick={() => {
+                setCurrentFile(null);
+                setImagePreview(null);
+                onCancel();
+              }}
               className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors min-h-[44px]"
             >
               キャンセル

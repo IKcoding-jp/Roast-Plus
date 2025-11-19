@@ -16,7 +16,7 @@ export const ocrScheduleFromImage = onCall(
   {
     cors: true,
     maxInstances: 10,
-    secrets: ['OPENAI_API_KEY'], // Secrets Managerからシークレットを取得
+    secrets: ['OPENAI_API_KEY', 'GOOGLE_VISION_API_KEY'], // Secrets Managerからシークレットを取得
   },
   async (request) => {
     // 認証チェック
@@ -35,10 +35,11 @@ export const ocrScheduleFromImage = onCall(
       const base64Data = imageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
 
       // Google Vision APIでOCR実行
-      const apiKey = process.env.GOOGLE_VISION_API_KEY;
-      const visionClient = apiKey
-        ? new ImageAnnotatorClient({ apiKey })
-        : new ImageAnnotatorClient();
+      const apiKey = process.env.GOOGLE_VISION_API_KEY?.trim();
+      if (!apiKey) {
+        throw new HttpsError('failed-precondition', 'GOOGLE_VISION_API_KEYが設定されていません。firebase functions:secrets:set GOOGLE_VISION_API_KEY で設定してください。');
+      }
+      const visionClient = new ImageAnnotatorClient({ apiKey });
 
       const [result] = await visionClient.textDetection({
         image: { content: base64Data },

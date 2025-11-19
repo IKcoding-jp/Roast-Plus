@@ -2613,7 +2613,6 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
 
 
 
-                      const currentHistoryByDate =
 
 
 
@@ -2621,7 +2620,6 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
 
 
 
-                        data.assignmentHistoryByDate || groupAssignmentsByDate(data.assignmentHistory);
 
 
 
@@ -2629,7 +2627,6 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
 
 
 
-                      const filteredHistoryByDate = filterAssignmentHistoryByPredicate(
 
 
 
@@ -2637,7 +2634,6 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
 
 
 
-                        currentHistoryByDate,
 
 
 
@@ -2645,7 +2641,6 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
 
 
 
-                        (a) => a.teamId !== team.id
 
 
 
@@ -2653,7 +2648,6 @@ export function MemberTeamManagement({ data, onUpdate }: MemberTeamManagementPro
 
 
 
-                      );
 
 
 

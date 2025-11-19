@@ -8,8 +8,7 @@ import { AssignmentTable } from '@/components/AssignmentTable';
 import { MemberTeamManagement } from '@/components/MemberTeamManagement';
 import { TaskLabelManagement } from '@/components/TaskLabelManagement';
 import { Loading } from '@/components/Loading';
-import { HiArrowLeft, HiCalendar, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
-import { DatePickerModal } from '@/components/DatePickerModal';
+import { HiArrowLeft } from 'react-icons/hi';
 import LoginPage from '@/app/login/page';
 
 type TabType = 'assignment' | 'members' | 'labels';
@@ -76,48 +75,10 @@ export default function AssignmentPage() {
     return today;
   };
 
-  const [selectedDate, setSelectedDate] = useState<string>(getInitialDate());
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-
-  // 日付移動関数
-  const moveToPreviousDay = () => {
-    const previousWeekday = getPreviousWeekday(selectedDate);
-    setSelectedDate(previousWeekday);
-  };
-
-  const moveToNextDay = useCallback(() => {
-    const today = getTodayString();
-    const nextWeekday = getNextWeekday(selectedDate);
-    
-    // 明日（1日先の平日）まで移動可能
-    const tomorrow = getNextWeekday(today);
-    if (nextWeekday <= tomorrow) {
-      setSelectedDate(nextWeekday);
-    }
-  }, [selectedDate, getNextWeekday, getTodayString]);
-
-  // 選択日が今日かどうか（実際の今日の日付と比較）
+  // 常に今日の日付を使用
   const today = getTodayString();
-  const effectiveToday = isWeekend(today) ? getPreviousWeekday(today) : today;
-  const isToday = selectedDate === today; // 実際の今日の日付と比較
-  const tomorrow = getNextWeekday(today);
-  const isTomorrow = selectedDate === tomorrow; // 明日かどうか
-
-  // 日付と時刻のフォーマット関数
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-    const weekday = weekdays[date.getDay()];
-
-    return `${year}年${month}月${day}日（${weekday}）`;
-  };
-
-  const formatDateString = (dateString: string): string => {
-    const date = new Date(dateString + 'T00:00:00');
-    return formatDate(date);
-  };
+  const selectedDate = isWeekend(today) ? getPreviousWeekday(today) : today;
+  const isToday = selectedDate === today;
 
   if (authLoading) {
     return <Loading />;
@@ -146,45 +107,6 @@ export default function AssignmentPage() {
                 <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
               </Link>
             </div>
-            {/* 日付ナビゲーション（担当表タブの時のみ表示） */}
-            {activeTab === 'assignment' && (
-              <div className="flex justify-center w-full sm:flex-1">
-                <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 md:gap-4 px-2 py-0.5 sm:px-5 sm:py-1 md:px-6 md:py-1.5 bg-white border border-gray-200 rounded-md sm:rounded-xl shadow-md">
-                  {/* 日付ナビゲーション */}
-                  <div className="flex items-center gap-0.5 sm:gap-2.5 md:gap-3">
-                    <button
-                      onClick={moveToPreviousDay}
-                      className="flex items-center justify-center min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
-                      aria-label="前日"
-                    >
-                      <HiChevronLeft className="h-3.5 w-3.5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
-                    </button>
-                    <button
-                      onClick={() => setIsDatePickerOpen(true)}
-                      className="flex items-center gap-0.5 sm:gap-2.5 md:gap-3 cursor-pointer hover:bg-gray-50 rounded-md px-1 py-0.5 sm:px-2 sm:py-1 transition-colors"
-                      aria-label="日付を選択"
-                    >
-                      <HiCalendar className="h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-amber-600 flex-shrink-0 self-center" />
-                      <span className="text-lg sm:text-base md:text-lg text-gray-900 font-semibold font-sans whitespace-nowrap leading-tight">
-                        {formatDateString(selectedDate)}
-                      </span>
-                    </button>
-                    <button
-                      onClick={moveToNextDay}
-                      disabled={isTomorrow}
-                      className={`flex items-center justify-center min-w-[32px] min-h-[32px] sm:min-w-[44px] sm:min-h-[44px] rounded-md transition-colors ${
-                        isTomorrow
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                      }`}
-                      aria-label="翌日"
-                    >
-                      <HiChevronRight className="h-3.5 w-3.5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
           </div>
         </header>
@@ -240,19 +162,6 @@ export default function AssignmentPage() {
         </main>
       </div>
 
-      {/* カレンダーピッカーモーダル */}
-      {isDatePickerOpen && (
-        <DatePickerModal
-          selectedDate={selectedDate}
-          onSelect={(date) => {
-            setSelectedDate(date);
-            setIsDatePickerOpen(false);
-          }}
-          onCancel={() => setIsDatePickerOpen(false)}
-          isWeekend={isWeekend}
-          getTodayString={getTodayString}
-        />
-      )}
     </div>
   );
 }

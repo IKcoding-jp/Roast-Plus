@@ -51,19 +51,26 @@ export function DefectBeanDetail({
 
         {/* 画像（拡大表示可能） */}
         <div
-          className={`relative w-full mx-auto aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer ${
+          className={`relative w-full mx-auto aspect-square cursor-pointer p-2.5 bg-gradient-to-br from-stone-50 via-amber-50/30 to-stone-100 ${
             isCompareMode ? 'max-w-[280px] sm:max-w-[320px]' : 'max-w-xs'
           }`}
           onClick={() => setShowImageModal(true)}
         >
-          <Image
-            src={defectBean.imageUrl}
-            alt={defectBean.name}
-            fill
-            className="object-cover"
-            sizes={isCompareMode ? "(max-width: 768px) 280px, 320px" : "(max-width: 768px) 100vw, 320px"}
-            unoptimized
-          />
+          {/* 外側の太い枠（深いブラウン、強い影） */}
+          <div className="absolute inset-0 border-[6px] border-amber-950/50 rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.15),0_4px_8px_rgba(0,0,0,0.1)]"></div>
+          {/* 内側の細い枠（上品なゴールド、光沢感） */}
+          <div className="absolute inset-2 border-[1.5px] border-amber-500/70 rounded-lg shadow-[inset_0_1px_2px_rgba(255,255,255,0.3),inset_0_-1px_2px_rgba(0,0,0,0.1)]"></div>
+          {/* 画像コンテナ */}
+          <div className="absolute inset-[10px] bg-gray-100 rounded-lg overflow-hidden shadow-inner">
+            <Image
+              src={defectBean.imageUrl}
+              alt={defectBean.name}
+              fill
+              className="object-cover"
+              sizes={isCompareMode ? "(max-width: 768px) 280px, 320px" : "(max-width: 768px) 100vw, 320px"}
+              unoptimized
+            />
+          </div>
         </div>
 
         {/* 詳細情報 */}

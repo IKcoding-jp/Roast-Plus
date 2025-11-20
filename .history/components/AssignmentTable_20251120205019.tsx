@@ -258,10 +258,9 @@ function getRecentPairs(
   teamAId: string,
   teamBId: string,
   targetDate: string,
-  days: number = DEFAULT_CONSECUTIVE_DAYS,
-  currentAssignments?: Assignment[]
+  days: number = DEFAULT_CONSECUTIVE_DAYS
 ): Set<string> {
-  return getConsecutivePairs(assignmentHistory, targetDate, teamAId, teamBId, days, currentAssignments);
+  return getConsecutivePairs(assignmentHistory, targetDate, teamAId, teamBId, days);
 }
 
 
@@ -299,7 +298,7 @@ function shuffleAssignments(
 
   const recentPairs = isPairCheckEnabled && teamA && teamB
 
-    ? getConsecutivePairs(assignmentHistory, assignedDate, teamA.id, teamB.id, consecutiveDays, assignments)
+    ? getConsecutivePairs(assignmentHistory, assignedDate, teamA.id, teamB.id, consecutiveDays)
 
     : new Set<string>();
 

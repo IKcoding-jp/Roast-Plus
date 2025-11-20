@@ -177,8 +177,7 @@ function getConsecutivePairs(
   targetDate: string,
   teamAId: string,
   teamBId: string,
-  days: number = DEFAULT_CONSECUTIVE_DAYS,
-  currentAssignments?: Assignment[] // 現在の割り当て（昨日の割り当てなど）
+  days: number = DEFAULT_CONSECUTIVE_DAYS
 ): Set<string> {
   const previousDates = new Set(getPreviousWeekdays(targetDate, days));
 
@@ -211,33 +210,6 @@ function getConsecutivePairs(
     }
   }
 
-  // 現在の割り当てからもペアを抽出（昨日の割り当てなど）
-  if (currentAssignments && currentAssignments.length > 0) {
-    const currentByLabel = new Map<string, { teamA?: string; teamB?: string }>();
-    
-    for (const assignment of currentAssignments) {
-      if (
-        (assignment.teamId === teamAId || assignment.teamId === teamBId) &&
-        assignment.memberId
-      ) {
-        if (!currentByLabel.has(assignment.taskLabelId)) {
-          currentByLabel.set(assignment.taskLabelId, {});
-        }
-        
-        const labelHistory = currentByLabel.get(assignment.taskLabelId)!;
-        if (assignment.teamId === teamAId) {
-          labelHistory.teamA = assignment.memberId;
-        } else if (assignment.teamId === teamBId) {
-          labelHistory.teamB = assignment.memberId;
-        }
-      }
-    }
-    
-    // 現在の割り当てのペアをhistoryByDateAndLabelに追加（仮想的な日付として扱う）
-    const virtualDate = 'current';
-    historyByDateAndLabel.set(virtualDate, currentByLabel);
-  }
-
   const pairs = new Set<string>();
   for (const dayHistoryByLabel of historyByDateAndLabel.values()) {
     for (const dayHistory of dayHistoryByLabel.values()) {
@@ -258,10 +230,9 @@ function getRecentPairs(
   teamAId: string,
   teamBId: string,
   targetDate: string,
-  days: number = DEFAULT_CONSECUTIVE_DAYS,
-  currentAssignments?: Assignment[]
+  days: number = DEFAULT_CONSECUTIVE_DAYS
 ): Set<string> {
-  return getConsecutivePairs(assignmentHistory, targetDate, teamAId, teamBId, days, currentAssignments);
+  return getConsecutivePairs(assignmentHistory, targetDate, teamAId, teamBId, days);
 }
 
 
@@ -299,7 +270,7 @@ function shuffleAssignments(
 
   const recentPairs = isPairCheckEnabled && teamA && teamB
 
-    ? getConsecutivePairs(assignmentHistory, assignedDate, teamA.id, teamB.id, consecutiveDays, assignments)
+    ? getConsecutivePairs(assignmentHistory, assignedDate, teamA.id, teamB.id, consecutiveDays)
 
     : new Set<string>();
 
@@ -930,14 +901,30 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
       const targetDate = getShuffleTargetDate();
       
       // シャッフル結果はtargetDateに保存されるので、表示もtargetDateを使う
-      // targetDateに割り当てがあればtargetDate、なければtargetDateを返す（新規作成される）
+      const hasAssignmentsForTargetDate = data.assignmentHistory.some(
+
+        (a) => a.assignedDate === targetDate
+
+      );
+
+      // targetDateに割り当てがあればtargetDate、なければ今日の日付（targetDateが今日の場合）または前の平日
+      if (hasAssignmentsForTargetDate) {
+        return targetDate;
+      }
+      
+      // targetDateが今日の場合、今日に割り当てがなければ前の平日
+      if (targetDate === today) {
+        return getPreviousWeekday(today);
+      }
+      
+      // targetDateが翌日の場合、その日付を返す
       return targetDate;
 
     }
 
     return selectedDate;
 
-  }, [isToday, selectedDate, getShuffleTargetDate]);
+  }, [isToday, selectedDate, today, getPreviousWeekday, data.assignmentHistory, getShuffleTargetDate]);
 
   
 
@@ -945,17 +932,9 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
   const assignments = useMemo(() => {
 
-    const result = getAssignmentsForDate(data.assignmentHistory, assignmentDisplayDate);
-    
-    // assignmentDisplayDateに割り当てがない場合、前の平日の割り当てを参照（シャッフル時の現在の割り当てとして使用）
-    if (result.length === 0 && isToday) {
-      const previousWeekday = getPreviousWeekday(assignmentDisplayDate);
-      return getAssignmentsForDate(data.assignmentHistory, previousWeekday);
-    }
-    
-    return result;
+    return getAssignmentsForDate(data.assignmentHistory, assignmentDisplayDate);
 
-  }, [data.assignmentHistory, assignmentDisplayDate, isToday, getPreviousWeekday]);
+  }, [data.assignmentHistory, assignmentDisplayDate]);
 
   
 

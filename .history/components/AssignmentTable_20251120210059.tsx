@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
-import type { AppData, Assignment, Member, ShuffleEvent, TaskLabel } from '@/types';
+import type { AppData, Assignment, ShuffleEvent, TaskLabel } from '@/types';
 
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
@@ -144,150 +144,6 @@ function normalizePair(memberId1: string, memberId2: string): string {
 }
 
 
-const SHUFFLE_WEIGHTS = {
-  pairUsed: 4,
-  pairRecent: 9,
-  pairCurrentDay: 12,
-  recentMember: 3,
-  sameAsCurrent: 6,
-  participation: 1,
-};
-
-function pickMemberWithLowestScore(
-  candidates: Member[],
-  scoreFn: (member: Member) => number
-): Member | null {
-  let best: Member | null = null;
-  let bestScore = Infinity;
-
-  for (const candidate of candidates) {
-    const score = scoreFn(candidate);
-    // Slight randomness for ties to avoid deterministic loops
-    if (score < bestScore - 1e-9) {
-      best = candidate;
-      bestScore = score;
-    } else if (Math.abs(score - bestScore) < 1e-9 && Math.random() < 0.5) {
-      best = candidate;
-    }
-  }
-
-  return best;
-}
-
-function getAssignmentCountsByTeam(assignments: Assignment[], teamId: string): Map<string, number> {
-  const counts = new Map<string, number>();
-
-  for (const record of assignments) {
-    if (record.teamId === teamId && record.memberId) {
-      counts.set(record.memberId, (counts.get(record.memberId) || 0) + 1);
-    }
-  }
-
-  return counts;
-}
-
-function accumulatePairUsage(
-  source: Assignment[],
-  teamAId: string,
-  teamBId: string,
-  usage: Map<string, number>,
-  countedKeys: Set<string>
-) {
-  const pairsByDateAndLabel = new Map<string, { teamA?: string; teamB?: string }>();
-
-  for (const record of source) {
-    if (record.teamId !== teamAId && record.teamId !== teamBId) {
-      continue;
-    }
-    if (!record.memberId) {
-      continue;
-    }
-
-    const key = `${record.assignedDate}::${record.taskLabelId}`;
-    if (!pairsByDateAndLabel.has(key)) {
-      pairsByDateAndLabel.set(key, {});
-    }
-
-    const pair = pairsByDateAndLabel.get(key)!;
-    if (record.teamId === teamAId) {
-      pair.teamA = record.memberId;
-    } else {
-      pair.teamB = record.memberId;
-    }
-  }
-
-  for (const [key, pair] of pairsByDateAndLabel) {
-    if (pair.teamA && pair.teamB) {
-      const pairKey = normalizePair(pair.teamA, pair.teamB);
-      const countedKey = `${key}::${pairKey}`;
-      if (countedKeys.has(countedKey)) {
-        continue;
-      }
-      countedKeys.add(countedKey);
-      usage.set(pairKey, (usage.get(pairKey) || 0) + 1);
-    }
-  }
-}
-
-function getPairUsageCounts(
-  assignmentHistory: Assignment[],
-  teamAId: string,
-  teamBId: string,
-  additionalAssignments?: Assignment[]
-): Map<string, number> {
-  const usage = new Map<string, number>();
-  const countedKeys = new Set<string>();
-
-  accumulatePairUsage(assignmentHistory, teamAId, teamBId, usage, countedKeys);
-  if (additionalAssignments && additionalAssignments.length > 0) {
-    accumulatePairUsage(additionalAssignments, teamAId, teamBId, usage, countedKeys);
-  }
-
-  return usage;
-}
-
-function getPairsForDate(
-  assignments: Assignment[],
-  targetDate: string,
-  teamAId: string,
-  teamBId: string
-): Set<string> {
-  const pairsByLabel = new Map<string, { teamA?: string; teamB?: string }>();
-
-  for (const record of assignments) {
-    if (record.assignedDate !== targetDate) {
-      continue;
-    }
-    if (record.teamId !== teamAId && record.teamId !== teamBId) {
-      continue;
-    }
-    if (!record.memberId) {
-      continue;
-    }
-
-    if (!pairsByLabel.has(record.taskLabelId)) {
-      pairsByLabel.set(record.taskLabelId, {});
-    }
-
-    const labelPair = pairsByLabel.get(record.taskLabelId)!;
-    if (record.teamId === teamAId) {
-      labelPair.teamA = record.memberId;
-    } else {
-      labelPair.teamB = record.memberId;
-    }
-  }
-
-  const pairs = new Set<string>();
-  for (const pair of pairsByLabel.values()) {
-    if (pair.teamA && pair.teamB) {
-      pairs.add(normalizePair(pair.teamA, pair.teamB));
-    }
-  }
-
-  return pairs;
-}
-
-
 
 // ????????????????????/?????????
 
@@ -322,10 +178,9 @@ function getConsecutivePairs(
   teamAId: string,
   teamBId: string,
   days: number = DEFAULT_CONSECUTIVE_DAYS,
-  currentAssignments?: Assignment[],
-  options?: { includeTargetDate?: boolean }
+  currentAssignments?: Assignment[] // 現在の割り当て（昨日の割り当てなど）
 ): Set<string> {
-  const includeTargetDate = options?.includeTargetDate ?? false;
+  // daysが-1の場合は全履歴をチェック
   const checkAllHistory = days === -1;
   const previousDates = checkAllHistory ? null : new Set(getPreviousWeekdays(targetDate, days));
 
@@ -334,34 +189,18 @@ function getConsecutivePairs(
     Map<string, { teamA?: string; teamB?: string }>
   >();
 
-  const mergeIntoHistory = (records: Assignment[], treatAsCurrent = false) => {
-    for (const record of records) {
-      if (record.teamId !== teamAId && record.teamId !== teamBId) {
-        continue;
-      }
-      if (!record.memberId) {
-        continue;
-      }
-
-      if (!includeTargetDate && !treatAsCurrent && record.assignedDate === targetDate) {
-        continue;
+  for (const record of assignmentHistory) {
+    // 全履歴チェックの場合は日付チェックをスキップ、そうでない場合はpreviousDatesをチェック
+    if (
+      (record.teamId === teamAId || record.teamId === teamBId) &&
+      record.memberId &&
+      (checkAllHistory || previousDates!.has(record.assignedDate))
+    ) {
+      if (!historyByDateAndLabel.has(record.assignedDate)) {
+        historyByDateAndLabel.set(record.assignedDate, new Map());
       }
 
-      const isWithinWindow =
-        checkAllHistory ||
-        treatAsCurrent ||
-        (previousDates ? previousDates.has(record.assignedDate) : false);
-
-      if (!isWithinWindow) {
-        continue;
-      }
-
-      const dateKey = treatAsCurrent && !record.assignedDate ? 'current' : record.assignedDate;
-      if (!historyByDateAndLabel.has(dateKey)) {
-        historyByDateAndLabel.set(dateKey, new Map());
-      }
-
-      const dayHistoryByLabel = historyByDateAndLabel.get(dateKey)!;
+      const dayHistoryByLabel = historyByDateAndLabel.get(record.assignedDate)!;
       if (!dayHistoryByLabel.has(record.taskLabelId)) {
         dayHistoryByLabel.set(record.taskLabelId, {});
       }
@@ -373,12 +212,33 @@ function getConsecutivePairs(
         dayHistory.teamB = record.memberId;
       }
     }
-  };
+  }
 
-  mergeIntoHistory(assignmentHistory);
-
+  // 現在の割り当てからもペアを抽出（昨日の割り当てなど）
   if (currentAssignments && currentAssignments.length > 0) {
-    mergeIntoHistory(currentAssignments, true);
+    const currentByLabel = new Map<string, { teamA?: string; teamB?: string }>();
+    
+    for (const assignment of currentAssignments) {
+      if (
+        (assignment.teamId === teamAId || assignment.teamId === teamBId) &&
+        assignment.memberId
+      ) {
+        if (!currentByLabel.has(assignment.taskLabelId)) {
+          currentByLabel.set(assignment.taskLabelId, {});
+        }
+        
+        const labelHistory = currentByLabel.get(assignment.taskLabelId)!;
+        if (assignment.teamId === teamAId) {
+          labelHistory.teamA = assignment.memberId;
+        } else if (assignment.teamId === teamBId) {
+          labelHistory.teamB = assignment.memberId;
+        }
+      }
+    }
+    
+    // 現在の割り当てのペアをhistoryByDateAndLabelに追加（仮想的な日付として扱う）
+    const virtualDate = 'current';
+    historyByDateAndLabel.set(virtualDate, currentByLabel);
   }
 
   const pairs = new Set<string>();
@@ -392,6 +252,9 @@ function getConsecutivePairs(
 
   return pairs;
 }
+
+
+
 
 function getRecentPairs(
   assignmentHistory: Assignment[],
@@ -439,36 +302,18 @@ function shuffleAssignments(
   // days=-1で全履歴をチェック
 
   const recentPairs = isPairCheckEnabled && teamA && teamB
+
     ? getConsecutivePairs(
-        assignmentHistory,
-        assignedDate,
-        teamA.id,
-        teamB.id,
-        -1,
-        assignments,
-        { includeTargetDate: true }
+        assignmentHistory, 
+        assignedDate, 
+        teamA.id, 
+        teamB.id, 
+        -1, 
+        // シャッフル対象の日付の割り当てを除外（同じ日に複数回シャッフルした場合、直前の結果を除外）
+        assignments.filter(a => a.assignedDate !== assignedDate)
       )
+
     : new Set<string>();
-
-  const pairUsageCounts =
-    isPairCheckEnabled && teamA && teamB
-      ? getPairUsageCounts(assignmentHistory, teamA.id, teamB.id, assignments)
-      : new Map<string, number>();
-
-  const pairsOnTargetDate =
-    isPairCheckEnabled && teamA && teamB
-      ? getPairsForDate(assignments, assignedDate, teamA.id, teamB.id)
-      : new Set<string>();
-
-  const participationCountsA =
-    isPairCheckEnabled && teamA
-      ? getAssignmentCountsByTeam(assignmentHistory, teamA.id)
-      : new Map<string, number>();
-
-  const participationCountsB =
-    isPairCheckEnabled && teamB
-      ? getAssignmentCountsByTeam(assignmentHistory, teamB.id)
-      : new Map<string, number>();
 
 
 
@@ -583,13 +428,11 @@ function shuffleAssignments(
 
 
 
-
           let availableMembersA = shuffledTeamA.filter(
 
             (m) => !usedTeamA.has(m.id) && !(m.excludedTaskLabelIds || []).includes(label.id)
 
           );
-
 
 
 
@@ -601,13 +444,11 @@ function shuffleAssignments(
 
 
 
-
           if (filteredMembersA.length === 0) {
 
             filteredMembersA = availableMembersA.filter((m) => m.id !== currentMemberIdA);
 
           }
-
 
 
 
@@ -619,28 +460,13 @@ function shuffleAssignments(
 
 
 
+          teamAMemberId =
 
-          const candidateListA = filteredMembersA.length > 0 ? filteredMembersA : availableMembersA;
+            filteredMembersA.length > 0
 
-          const pickedA = pickMemberWithLowestScore(candidateListA, (member) => {
+              ? filteredMembersA[Math.floor(Math.random() * filteredMembersA.length)].id
 
-            const recentPenalty = recentMemberIdsA.includes(member.id) ? SHUFFLE_WEIGHTS.recentMember : 0;
-
-            const samePenalty = member.id === currentMemberIdA ? SHUFFLE_WEIGHTS.sameAsCurrent : 0;
-
-            const participationPenalty =
-
-              (participationCountsA.get(member.id) || 0) * SHUFFLE_WEIGHTS.participation;
-
-            return recentPenalty + samePenalty + participationPenalty;
-
-          });
-
-
-
-
-          teamAMemberId = pickedA?.id ?? null;
-
+              : null;
 
 
 
@@ -685,7 +511,6 @@ function shuffleAssignments(
 
 
 
-
           let availableMembersB = shuffledTeamB.filter(
 
             (m) => !usedTeamB.has(m.id) && !(m.excludedTaskLabelIds || []).includes(label.id)
@@ -694,8 +519,7 @@ function shuffleAssignments(
 
 
 
-
-          // �����̃t�B���^�����O�i�ŋߒS�����������o�[�ƌ��݂̃����o�[�����O�j
+          // 既存のフィルタリング（最近担当したメンバーと現在のメンバーを除外）
 
           let filteredMembersB = availableMembersB.filter(
 
@@ -705,8 +529,7 @@ function shuffleAssignments(
 
 
 
-
-          // �y�A�̘A����F�b�N��ǉ��iA��[���̃����o�[������ς݂̏ꍇ�j
+          // ペアの連続チェックを追加（Aチームのメンバーが決定済みの場合）
 
           if (teamAMemberId) {
 
@@ -722,12 +545,11 @@ function shuffleAssignments(
 
 
 
-
-          // �t�H�[���o�b�N�����i�i�K�I�Ɋɘa�j
+          // フォールバック処理（段階的に緩和）
 
           if (filteredMembersB.length === 0) {
 
-            // �y�A��F�b�N���ɘa
+            // ペアチェックを緩和
 
             if (teamAMemberId) {
 
@@ -747,13 +569,11 @@ function shuffleAssignments(
 
 
 
-
           if (filteredMembersB.length === 0) {
 
             filteredMembersB = availableMembersB.filter((m) => m.id !== currentMemberIdB);
 
           }
-
 
 
 
@@ -765,50 +585,13 @@ function shuffleAssignments(
 
 
 
+          teamBMemberId =
 
-          const candidateListB = filteredMembersB.length > 0 ? filteredMembersB : availableMembersB;
+            filteredMembersB.length > 0
 
-          const pickedB = pickMemberWithLowestScore(candidateListB, (member) => {
+              ? filteredMembersB[Math.floor(Math.random() * filteredMembersB.length)].id
 
-            const pairKey = teamAMemberId ? normalizePair(teamAMemberId, member.id) : '';
-
-            const pairUsedPenalty = pairKey ? (pairUsageCounts.get(pairKey) || 0) * SHUFFLE_WEIGHTS.pairUsed : 0;
-
-            const recentPairPenalty = pairKey && recentPairs.has(pairKey) ? SHUFFLE_WEIGHTS.pairRecent : 0;
-
-            const currentDayPairPenalty = pairKey && pairsOnTargetDate.has(pairKey) ? SHUFFLE_WEIGHTS.pairCurrentDay : 0;
-
-            const recentPenalty = recentMemberIdsB.includes(member.id) ? SHUFFLE_WEIGHTS.recentMember : 0;
-
-            const samePenalty = member.id === currentMemberIdB ? SHUFFLE_WEIGHTS.sameAsCurrent : 0;
-
-            const participationPenalty =
-
-              (participationCountsB.get(member.id) || 0) * SHUFFLE_WEIGHTS.participation;
-
-            return (
-
-              pairUsedPenalty +
-
-              recentPairPenalty +
-
-              currentDayPairPenalty +
-
-              recentPenalty +
-
-              samePenalty +
-
-              participationPenalty
-
-            );
-
-          });
-
-
-
-
-          teamBMemberId = pickedB?.id ?? null;
-
+              : null;
 
 
 
@@ -2108,7 +1891,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
             disabled={isShuffling || isAnimating}
 
-            className="px-6 py-3 sm:px-8 sm:py-4 bg-amber-600 text-white text-base sm:text-lg rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="px-6 py-3 sm:px-8 sm:py-4 bg-orange-500 text-white text-base sm:text-lg rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
 
           >
 

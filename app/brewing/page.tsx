@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { HiHome, HiArrowLeft } from 'react-icons/hi';
-import { RiCupLine } from 'react-icons/ri';
+import { MdCoffeeMaker } from 'react-icons/md';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
@@ -35,7 +35,7 @@ export default function BrewingPage() {
               <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
             </Link>
             <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-              <RiCupLine className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
+              <MdCoffeeMaker className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
               <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">ドリップガイド</h1>
             </div>
           </div>

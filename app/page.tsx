@@ -4,12 +4,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth, signOut } from '@/lib/auth';
 import { useEffect, useState } from 'react';
 import { PiCoffeeBeanFill } from "react-icons/pi";
-import { RiCalendarScheduleLine, RiBookFill, RiCupLine } from "react-icons/ri";
+import { RiCalendarScheduleFill, RiBookFill } from "react-icons/ri";
 import { FaCoffee } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
-import { IoSettings } from "react-icons/io5";
-import { MdTimer } from "react-icons/md";
-import { MdTimeline } from "react-icons/md";
+import { IoSettings, IoTimer } from "react-icons/io5";
+import { MdTimer, MdTimeline, MdCoffeeMaker, MdAddCircle } from "react-icons/md";
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
@@ -150,7 +149,7 @@ export default function HomePage() {
             onClick={() => router.push('/schedule')}
             className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
           >
-            <RiCalendarScheduleLine className="h-12 w-12 md:h-12 md:w-12 text-primary" />
+            <RiCalendarScheduleFill className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
               スケジュール
             </h2>
@@ -208,9 +207,37 @@ export default function HomePage() {
             <span className="absolute top-2 right-2 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
               開発予定
             </span>
-            <RiCupLine className="h-12 w-12 md:h-12 md:w-12 text-primary" />
+            <MdCoffeeMaker className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
               ドリップガイド
+            </h2>
+          </button>
+
+          {/* ハンドピックタイマーカード */}
+          <button
+            onClick={() => router.push('/handpick-timer')}
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+          >
+            <span className="absolute top-2 right-2 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
+              開発予定
+            </span>
+            <IoTimer className="h-12 w-12 md:h-12 md:w-12 text-primary" />
+            <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
+              ハンドピックタイマー
+            </h2>
+          </button>
+
+          {/* カウンターカード */}
+          <button
+            onClick={() => router.push('/counter')}
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+          >
+            <span className="absolute top-2 right-2 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
+              開発予定
+            </span>
+            <MdAddCircle className="h-12 w-12 md:h-12 md:w-12 text-primary" />
+            <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
+              カウンター
             </h2>
           </button>
 

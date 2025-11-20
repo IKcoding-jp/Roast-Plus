@@ -180,9 +180,7 @@ function getConsecutivePairs(
   days: number = DEFAULT_CONSECUTIVE_DAYS,
   currentAssignments?: Assignment[] // 現在の割り当て（昨日の割り当てなど）
 ): Set<string> {
-  // daysが-1の場合は全履歴をチェック
-  const checkAllHistory = days === -1;
-  const previousDates = checkAllHistory ? null : new Set(getPreviousWeekdays(targetDate, days));
+  const previousDates = new Set(getPreviousWeekdays(targetDate, days));
 
   const historyByDateAndLabel = new Map<
     string,
@@ -190,11 +188,10 @@ function getConsecutivePairs(
   >();
 
   for (const record of assignmentHistory) {
-    // 全履歴チェックの場合は日付チェックをスキップ、そうでない場合はpreviousDatesをチェック
     if (
       (record.teamId === teamAId || record.teamId === teamBId) &&
       record.memberId &&
-      (checkAllHistory || previousDates!.has(record.assignedDate))
+      previousDates.has(record.assignedDate)
     ) {
       if (!historyByDateAndLabel.has(record.assignedDate)) {
         historyByDateAndLabel.set(record.assignedDate, new Map());
@@ -299,19 +296,10 @@ function shuffleAssignments(
 
 
   // Avoid repeating the same A-B pair on the previous weekdays (label-agnostic)
-  // days=-1で全履歴をチェック
 
   const recentPairs = isPairCheckEnabled && teamA && teamB
 
-    ? getConsecutivePairs(
-        assignmentHistory, 
-        assignedDate, 
-        teamA.id, 
-        teamB.id, 
-        -1, 
-        // シャッフル対象の日付の割り当てを除外（同じ日に複数回シャッフルした場合、直前の結果を除外）
-        assignments.filter(a => a.assignedDate !== assignedDate)
-      )
+    ? getConsecutivePairs(assignmentHistory, assignedDate, teamA.id, teamB.id, consecutiveDays, assignments)
 
     : new Set<string>();
 

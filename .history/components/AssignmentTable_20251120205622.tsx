@@ -299,19 +299,10 @@ function shuffleAssignments(
 
 
   // Avoid repeating the same A-B pair on the previous weekdays (label-agnostic)
-  // days=-1で全履歴をチェック
 
   const recentPairs = isPairCheckEnabled && teamA && teamB
 
-    ? getConsecutivePairs(
-        assignmentHistory, 
-        assignedDate, 
-        teamA.id, 
-        teamB.id, 
-        -1, 
-        // シャッフル対象の日付の割り当てを除外（同じ日に複数回シャッフルした場合、直前の結果を除外）
-        assignments.filter(a => a.assignedDate !== assignedDate)
-      )
+    ? getConsecutivePairs(assignmentHistory, assignedDate, teamA.id, teamB.id, consecutiveDays, assignments)
 
     : new Set<string>();
 

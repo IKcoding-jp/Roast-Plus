@@ -201,12 +201,9 @@ export default function HomePage() {
 
           {/* ドリップガイドカード */}
           <button
-            onClick={() => router.push('/brewing')}
+            onClick={() => router.push('/drip-guide')}
             className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
           >
-            <span className="absolute top-2 right-2 new-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
-              開発予定
-            </span>
             <MdCoffeeMaker className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
               ドリップガイド

@@ -301,7 +301,7 @@ export default function DefectBeansPage() {
             </div>
 
             {/* 右側: アクションボタン */}
-            <div className="flex justify-end items-center gap-1.5 sm:gap-2 flex-shrink-0 flex-wrap">
+            <div className="flex justify-end items-center gap-2 sm:gap-3 flex-shrink-0 flex-wrap">
               {!(filteredDefectBeans.length === 0 && !searchQuery && filterOption === 'all') && (
                 <>
                   {/* ソートボタン */}
@@ -309,9 +309,9 @@ export default function DefectBeansPage() {
                     <div className="relative" ref={sortMenuRef}>
                       <button
                         onClick={() => setShowSortMenu(!showSortMenu)}
-                        className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${showSortMenu
-                          ? 'bg-amber-600 text-white hover:bg-amber-700'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                        className={`px-3 py-2 text-sm rounded-lg transition-colors min-h-[44px] flex items-center gap-1.5 ${showSortMenu
+                          ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-md'
+                          : 'bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50'
                           }`}
                         title="ソート"
                       >
@@ -347,9 +347,9 @@ export default function DefectBeansPage() {
                   )}
                   <button
                     onClick={toggleCompareMode}
-                    className={`px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 ${compareMode
-                      ? 'bg-amber-600 text-white hover:bg-amber-700'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                    className={`px-3 py-2 text-sm rounded-lg transition-colors min-h-[44px] flex items-center gap-1.5 ${compareMode
+                      ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-md'
+                      : 'bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50'
                       }`}
                     title={compareMode ? '選択モード' : '比較モード'}
                   >
@@ -361,7 +361,7 @@ export default function DefectBeansPage() {
                   {compareMode && selectedIds.size > 0 && (
                     <button
                       onClick={handleShowCompare}
-                      className="px-2 sm:px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5 text-sm"
+                      className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-1.5 shadow-md"
                       title="比較を表示"
                     >
                       比較 ({selectedIds.size})
@@ -370,7 +370,7 @@ export default function DefectBeansPage() {
                   {!compareMode && (
                     <button
                       onClick={() => setShowAddForm(true)}
-                      className="px-2 sm:px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] flex items-center gap-1 sm:gap-1.5"
+                      className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-1.5 shadow-md"
                       title="欠点豆を追加"
                     >
                       <HiPlus className="h-5 w-5" />
@@ -475,7 +475,7 @@ export default function DefectBeansPage() {
               {!searchQuery && filterOption === 'all' && (
                 <button
                   onClick={() => setShowAddForm(true)}
-                  className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+                  className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all min-h-[44px]"
                 >
                   <HiPlus className="w-5 h-5" />
                   <span className="font-medium">欠点豆を追加</span>

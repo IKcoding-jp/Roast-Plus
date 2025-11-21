@@ -20,27 +20,33 @@ export default function HandpickTimerPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F7F7F5' }}>
-      {/* ヘッダー */}
-      <header className="flex items-center justify-between bg-dark px-6 py-4 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="p-2 text-white hover:text-gray-200 hover:bg-dark-light rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-            aria-label="ホームに戻る"
-          >
-            <HiArrowLeft className="h-6 w-6" />
-          </Link>
-          <h1 className="text-xl font-bold text-white">ハンドピックタイマー</h1>
-        </div>
-      </header>
+    <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex justify-start w-full sm:w-auto sm:flex-1">
+              <Link
+                href="/"
+                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                title="戻る"
+                aria-label="戻る"
+              >
+                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
+              </Link>
+            </div>
+            <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center whitespace-nowrap">
+              ハンドピックタイマー
+            </h1>
+            <div className="hidden sm:block flex-1 flex-shrink-0"></div>
+          </div>
+        </header>
 
-      {/* メインコンテンツ */}
-      <main className="container mx-auto px-4 pt-6 pb-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <p className="text-gray-600 text-center">このページは準備中です。</p>
-        </div>
-      </main>
+        <main className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <p className="text-gray-600 text-center">このページは準備中です。</p>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

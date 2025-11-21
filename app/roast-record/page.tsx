@@ -247,7 +247,7 @@ function RoastRecordPageContent() {
             <div className="flex justify-end sm:flex-1">
               <Link
                 href="/roast-record?new=true"
-                className="px-3 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm md:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-1.5 sm:gap-2 flex-shrink-0 min-h-[44px] min-w-[44px] justify-center"
+                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 min-h-[44px] flex-shrink-0"
                 aria-label="新規記録作成"
               >
                 <HiPlus className="text-base sm:text-lg flex-shrink-0" />

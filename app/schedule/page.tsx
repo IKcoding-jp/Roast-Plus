@@ -355,15 +355,15 @@ export default function SchedulePage() {
             </div>
           </div>
           <div className="flex-1 flex justify-end items-center">
-            <div className="hidden sm:flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setIsOCROpen(true)}
-                className="px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-600 text-white hover:bg-amber-700 rounded transition-colors flex items-center justify-center gap-2 min-h-[44px] shadow-lg ring-2 ring-amber-300 ring-offset-2"
+                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition-colors flex items-center gap-2 min-h-[44px] shadow-md"
                 title="画像から読み取り"
                 aria-label="画像から読み取り"
               >
                 <HiCamera className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
-                <span className="text-sm sm:text-base font-medium">AIで読み取る</span>
+                <span className="font-medium">AIで読み取る</span>
               </button>
             </div>
           </div>
@@ -384,7 +384,7 @@ export default function SchedulePage() {
             </button>
             <button
               onClick={() => setIsOCROpen(true)}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-600 text-white hover:bg-amber-700 rounded transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center shadow-lg ring-2 ring-amber-300 ring-offset-2"
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center shadow-md"
               title="画像から読み取り"
               aria-label="画像から読み取り"
             >

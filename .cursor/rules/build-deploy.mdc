@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # ビルドとデプロイ
 
 ## 開発環境
@@ -63,4 +67,3 @@
 - 全てのリクエストが `/index.html` にリダイレクト（SPAルーティング）
 - Service Workerが有効化
 - 画像の最適化が無効化（`unoptimized: true`）
-

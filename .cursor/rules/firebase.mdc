@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # Firebase
 
 ## Firestore の原則
@@ -124,4 +128,3 @@ await runTransaction(db, async (transaction) => {
 ### 環境変数
 - Firebase設定は環境変数で管理（`.env.local`に配置）
 - `NEXT_PUBLIC_` プレフィックスはクライアント側で公開されるため注意
-

@@ -212,33 +212,33 @@ await updateFirestore(newState); // 後から Firestore を更新
 
 ## 詳細仕様ドキュメント
 
-以下の詳細仕様は、`.cursor/rules/` 配下のファイルを参照してください。
+以下の詳細仕様は、`.cursor/rules.d/` 配下のファイルを参照してください。
 
-- **アーキテクチャ**: `.cursor/rules/architecture.mdc`
+- **アーキテクチャ**: `.cursor/rules.d/architecture.md`
   - プロジェクト概要、技術スタック、ディレクトリ構造、アーキテクチャレベルの制約
 
-- **データモデル**: `.cursor/rules/data-model.mdc`
+- **データモデル**: `.cursor/rules.d/data-model.md`
   - `AppData` 型の概要、各型の役割、データ操作の原則
 
-- **Firebase**: `.cursor/rules/firebase.mdc`
+- **Firebase**: `.cursor/rules.d/firebase.md`
   - Firestore/Storage の原則、マルチデバイス同期、書き込み最適化、トランザクション
 
-- **機能**: `.cursor/rules/features.mdc`
+- **機能**: `.cursor/rules.d/features.md`
   - 各機能の概要、マルチデバイス整合性のポイント
 
-- **ビルド・デプロイ**: `.cursor/rules/build-deploy.mdc`
+- **ビルド・デプロイ**: `.cursor/rules.d/build-deploy.md`
   - 静的エクスポート、Firebase Hosting、キャッシュ戦略、PWA 挙動
 
-- **UI Overview**: `.cursor/rules/ui-overview.mdc`
+- **UI Overview**: `.cursor/rules.d/ui-overview.md`
   - UI ポリシー概要、モバイルファースト、タッチ操作前提、ページごとの一貫性ルール
 
-- **UI Theme**: `.cursor/rules/ui-theme.mdc`
+- **UI Theme**: `.cursor/rules.d/ui-theme.md`
   - カラーパレット、タイポグラフィ、スペーシング、影、角丸
 
-- **UI Components**: `.cursor/rules/ui-components.mdc`
+- **UI Components**: `.cursor/rules.d/ui-components.md`
   - 共通コンポーネント方針、Button/Card/Modal などのパターン、Tailwind 使い方ガイド
 
-- **UI Layout**: `.cursor/rules/ui-layout.mdc`
+- **UI Layout**: `.cursor/rules.d/ui-layout.md`
   - レイアウトパターン（一覧/詳細/設定画面）、ブレークポイント、レスポンシブデザイン
 
 ---

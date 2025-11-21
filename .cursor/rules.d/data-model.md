@@ -1,0 +1,121 @@
+# データモデル
+
+## AppData 型の概要
+
+`AppData` 型は、ユーザーごとの全データを定義する型です。`types/index.ts` で定義されており、Firestore の `/users/{userId}` パスに保存されます。
+
+## 主要な型
+
+### Team
+チーム情報
+
+### Member
+メンバー情報
+- `teamId`: 所属チームを参照
+- `excludedTaskLabelIds`: 除外ラベルを管理
+
+### Manager
+管理者情報
+
+### TaskLabel
+タスクラベル
+- `leftLabel` と `rightLabel` でペアを表現
+
+### TaskLabelSnapshot
+作業ラベルの日付別スナップショット
+
+### Assignment
+現在の割り当て
+- `memberId` が `null` の場合は未割り当て
+
+### TimeLabel
+時間ラベル（本日のスケジュール用）
+
+### TodaySchedule
+本日のスケジュール
+- 日次スケジュール、`TimeLabel` の配列を含む
+
+### RoastSchedule
+ローストスケジュール
+- 焙煎機予熱、ロースト、アフターパージ、チャフのお掃除など
+
+### TastingSession
+試飲セッション
+- 豆の名前、焙煎度合い、メモなど
+
+### TastingRecord
+試飲記録
+- 評価項目：苦味、酸味、ボディ、甘み、香り、総合評価など
+
+### Notification
+通知
+- タイプ: `update`、`announcement`、`improvement`、`request`、`bugfix`
+
+### DefectBean
+欠点豆
+- マスターデータとユーザー追加データの両方に対応
+- `isMaster` フラグで区別
+
+### DefectBeanSettings
+欠点豆設定
+- 省く/省かないの設定を欠点豆IDごとに管理
+
+### WorkProgress
+作業進捗
+- 進捗状態、目標量、現在の進捗量、完成数、進捗履歴など
+
+### ProgressEntry
+進捗記録エントリ
+- 日付、進捗量、メモ
+
+### RoastTimerSettings
+ローストタイマー設定
+- タイマー音、通知音の設定など
+
+### RoastTimerRecord
+ローストタイマー記録
+- 実際のロースト時間を記録
+
+### RoastTimerState
+ローストタイマー状態
+- 実行中、一時停止、完了など
+- マルチデバイス同期用の `triggeredByDeviceId`、`completedByDeviceId` を含む
+
+### UserSettings
+ユーザー設定
+- 選択中のメンバーID、管理者ID、ローストタイマー設定など
+
+### ShuffleEvent
+シャッフルイベント
+- マルチデバイス同期用
+
+## データ操作の原則
+
+### 不変性
+- データの追加・更新・削除は不変性を保つ（スプレッド演算子を使用）
+
+### 関連データの扱い
+- 削除時は関連データも適切に処理（例: チーム削除時はメンバーと割り当ても削除）
+
+### データ操作関数
+- データ操作関数は `lib/firestore.ts` に定義
+
+### 欠点豆データの扱い
+- 欠点豆マスターデータは `/defectBeans` コレクションに保存（全ユーザー共通）
+- ユーザー追加欠点豆は `AppData.defectBeans` に保存（ユーザーごと）
+- 欠点豆設定は `AppData.defectBeanSettings` に保存（ユーザーごと）
+
+## マルチデバイス整合性のポイント
+
+### 日付・時刻の扱い
+- 日付や状態の判定に、端末のローカル時計を使わない
+- Firestore に保存された日付・状態・値、もしくはサーバータイムスタンプを基準にする
+
+### 状態の同期
+- 複数デバイス間で「同じタイミングに同じデータ」が見えることを最優先する
+- Firestore の `onSnapshot` により、全デバイス間でデータがリアルタイムに同期
+
+### 競合の回避
+- 多端末からの同時更新がありうる箇所では、Firestore のトランザクション（`runTransaction`）を検討
+- サーバータイムスタンプを使用して、更新時刻の整合性を保つ
+

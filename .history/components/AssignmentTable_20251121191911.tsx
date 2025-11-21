@@ -1235,6 +1235,37 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
 
 
+  // 初回アクセス時に履歴が存在しない場合は自動的に作成
+
+  useEffect(() => {
+
+    if (!data.taskLabelHistory || !Array.isArray(data.taskLabelHistory)) {
+
+      return;
+
+    }
+
+    const snapshot = data.taskLabelHistory.find((s) => s.date === selectedDate);
+
+    if (!snapshot && !isToday) {
+
+      // 履歴が存在しない場合、直近の過去の履歴または現在のtaskLabelsを複製
+
+      const labelsToCopy = getTaskLabelsForDate(data, selectedDate);
+
+      if (labelsToCopy.length > 0) {
+
+        const updatedData = upsertTaskLabelSnapshot(data, selectedDate, labelsToCopy);
+
+        onUpdate(updatedData);
+
+      }
+
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  }, [selectedDate, data.taskLabelHistory, isToday]);
 
 
 

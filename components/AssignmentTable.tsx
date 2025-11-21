@@ -143,6 +143,39 @@ function normalizePair(memberId1: string, memberId2: string): string {
 
 }
 
+// Fisher-Yatesで均一シャッフル
+function fisherYates<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// 直前の並びと同一かどうか（teamId + taskLabelId 単位で比較）
+function areAssignmentsSame(a: Assignment[], b: Assignment[]): boolean {
+  if (a.length !== b.length) return false;
+  const toKey = (as: Assignment[]) => {
+    const map = new Map<string, string | null>();
+    as.forEach((item) => {
+      const key = `${item.teamId}::${item.taskLabelId}`;
+      map.set(key, item.memberId ?? null);
+    });
+    return map;
+  };
+
+  const mapB = toKey(b);
+
+  for (const item of a) {
+    const key = `${item.teamId}::${item.taskLabelId}`;
+    if (!mapB.has(key)) return false;
+    if (mapB.get(key) !== (item.memberId ?? null)) return false;
+  }
+
+  return true;
+}
+
 
 const SHUFFLE_WEIGHTS = {
   pairUsed: 4,
@@ -488,7 +521,7 @@ function shuffleAssignments(
 
     teamMembersMap.set(team.id, teamMembers);
 
-    shuffledMembersMap.set(team.id, [...teamMembers].sort(() => Math.random() - 0.5));
+    shuffledMembersMap.set(team.id, fisherYates(teamMembers));
 
     usedMembersMap.set(team.id, new Set<string>());
 
@@ -1154,19 +1187,20 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   const assignmentDisplayDate = useMemo(() => {
 
     if (isToday) {
+      // Firestore由来のtargetDateを最優先（端末時計のズレ対策）
+      if (data.shuffleEvent?.targetDate) {
+        return data.shuffleEvent.targetDate;
+      }
 
-      // シャッフル対象の日付を取得（16:45以降の場合は翌日）
-      const targetDate = getShuffleTargetDate();
-      
-      // シャッフル結果はtargetDateに保存されるので、表示もtargetDateを使う
-      // targetDateに割り当てがあればtargetDate、なければtargetDateを返す（新規作成される）
-      return targetDate;
-
+      // �V���b�t���Ώۂ̓��t���擾�i16:45�ȍ~�̏ꍇ�͗����j
+      return getShuffleTargetDate();
     }
 
     return selectedDate;
 
-  }, [isToday, selectedDate, getShuffleTargetDate]);
+  }, [isToday, data.shuffleEvent?.targetDate, selectedDate, getShuffleTargetDate]);
+
+
 
   
 
@@ -1391,7 +1425,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
       // 既にアニメーションが終了している場合、即座に結果を表示
 
-      const targetDate = getShuffleTargetDate(event.startTime);
+      const targetDate = event.targetDate || getShuffleTargetDate(event.startTime);
 
       const { nextHistory } = buildUpdatedAssignmentHistory(
 
@@ -1565,7 +1599,7 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
         const shuffleTime = data.shuffleEvent?.startTime;
 
-        const targetDate = getShuffleTargetDate(shuffleTime);
+        const targetDate = data.shuffleEvent?.targetDate || getShuffleTargetDate(shuffleTime);
 
         const { nextHistory } = buildUpdatedAssignmentHistory(
 
@@ -2061,37 +2095,38 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
             onClick={() => {
 
-              const targetDate = getShuffleTargetDate(); // シャッフル対象の日付を取得（16:45以降の場合は翌日）
+              const targetDate = getShuffleTargetDate(); // �V���b�t���Ώۂ̓��t���擾�i16:45�ȍ~�̏ꍇ�͗����j
 
-              // 現在表示されている割り当てを渡す
-              const shuffled = shuffleAssignments(data, targetDate, DEFAULT_CONSECUTIVE_DAYS, assignments);
+              // 1�񂾂����̂Ɠ����Ȃ�ꍇ�̓��[��
+              const first = shuffleAssignments(data, targetDate, DEFAULT_CONSECUTIVE_DAYS, assignments);
+              const shuffled =
+                areAssignmentsSame(first, assignments) && data.members.length > 1
+                  ? shuffleAssignments(data, targetDate, DEFAULT_CONSECUTIVE_DAYS, assignments)
+                  : first;
 
               const shuffleEvent: ShuffleEvent = {
 
                 startTime: new Date().toISOString(),
+                targetDate,
 
                 shuffledAssignments: shuffled,
 
               };
 
-              
-
-              // shuffleEventをFirestoreに書き込む
-
+              // ���ʂƗ����𑦎���Firestore�ɔ��f
+              const { nextHistory } = buildUpdatedAssignmentHistory(shuffled, targetDate);
               const updatedData: AppData = {
 
                 ...data,
-
+                assignments: shuffled,
+                assignmentHistory: nextHistory,
                 shuffleEvent,
 
               };
 
               onUpdate(updatedData);
 
-              
-
-              // ローカルでもアニメーションを開始
-
+              // ���[�J���ł��A�j���[�V�������J�n
               setIsShuffling(true);
 
               setIsAnimating(true);
@@ -2124,37 +2159,38 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
 
               onClick={() => {
 
-                const targetDate = getShuffleTargetDate(); // シャッフル対象の日付を取得（16:45以降の場合は翌日）
+                const targetDate = getShuffleTargetDate(); // �V���b�t���Ώۂ̓��t���擾�i16:45�ȍ~�̏ꍇ�͗����j
 
-                // 現在表示されている割り当てを渡す
-                const shuffled = shuffleAssignments(data, targetDate, DEFAULT_CONSECUTIVE_DAYS, assignments);
+                // 1�񂾂����̂Ɠ����Ȃ�ꍇ�̓��[��
+                const first = shuffleAssignments(data, targetDate, DEFAULT_CONSECUTIVE_DAYS, assignments);
+                const shuffled =
+                  areAssignmentsSame(first, assignments) && data.members.length > 1
+                    ? shuffleAssignments(data, targetDate, DEFAULT_CONSECUTIVE_DAYS, assignments)
+                    : first;
 
                 const shuffleEvent: ShuffleEvent = {
 
                   startTime: new Date().toISOString(),
+                  targetDate,
 
                   shuffledAssignments: shuffled,
 
                 };
 
-                
-
-                // shuffleEventをFirestoreに書き込む
-
+                // ���ʂƗ����𑦎���Firestore�ɔ��f
+                const { nextHistory } = buildUpdatedAssignmentHistory(shuffled, targetDate);
                 const updatedData: AppData = {
 
                   ...data,
-
+                  assignments: shuffled,
+                  assignmentHistory: nextHistory,
                   shuffleEvent,
 
                 };
 
                 onUpdate(updatedData);
 
-                
-
-                // ローカルでもアニメーションを開始
-
+                // ���[�J���ł��A�j���[�V�������J�n
                 setIsShuffling(true);
 
                 setIsAnimating(true);
@@ -2192,4 +2228,3 @@ export function AssignmentTable({ data, onUpdate, selectedDate, isToday }: Assig
   );
 
 }
-

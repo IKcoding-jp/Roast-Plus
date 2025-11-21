@@ -280,6 +280,7 @@ export interface UserSettings {
 export interface ShuffleEvent {
 
   startTime: string; // ISO 8601形式のタイムスタンプ
+  targetDate?: string; // target date for the shuffled result (source of truth from Firestore)
 
   shuffledAssignments: Assignment[]; // シャッフル結果
 

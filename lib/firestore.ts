@@ -235,6 +235,7 @@ function normalizeAppData(data: any): AppData {
     ) {
       normalized.shuffleEvent = {
         startTime: data.shuffleEvent.startTime,
+        targetDate: typeof data.shuffleEvent.targetDate === 'string' ? data.shuffleEvent.targetDate : undefined,
         shuffledAssignments: data.shuffleEvent.shuffledAssignments,
       };
     }

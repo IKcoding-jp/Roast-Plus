@@ -1,7 +1,7 @@
 import { DripRecipe } from './types';
 
 export const MOCK_RECIPES: DripRecipe[] = [
-    // BYSN Standard Drip (modified)
+    // BYSN Standard Drip (細く中心に注ぐスタイル)
     {
         id: 'recipe-001',
         name: 'BYSN Standard Drip',
@@ -10,7 +10,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
         totalWaterGram: 320,
         totalDurationSec: 180,
         purpose: '試飲会用スタンダード',
-        description: '基本のドリップレシピ。酸味と甘みのバランス重視。',
+        description: 'できるだけお湯を細く、中心に１円玉くらいの円を描きながら注ぐ淹れ方。丁寧な抽出で酸味と甘みのバランスを引き出します。',
         createdAt: '2023-10-27T10:00:00Z',
         updatedAt: '2023-10-27T10:00:00Z',
         isDefault: true,
@@ -19,36 +19,40 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 id: 'step-1',
                 startTimeSec: 0,
                 title: '蒸らし',
-                description: '全体にお湯を行き渡らせ、20秒待ちます。',
+                description: '中心に細くお湯を注ぎ、１円玉くらいの円を描きながら全体を湿らせます。20秒蒸らします。',
                 targetTotalWater: 20,
-                note: '粉が膨らむのを確認',
+                note: '粉全体が均一に膨らむのを確認',
             },
             {
                 id: 'step-2',
                 startTimeSec: 20,
                 title: '1投目',
-                description: '中心から円を描くように注ぎます。',
+                description: 'できるだけ細く、中心に１円玉くらいの円を描きながらゆっくり注ぎます。',
                 targetTotalWater: 200,
+                note: '注湯スピードは一定に保つ',
             },
             {
                 id: 'step-3',
-                startTimeSec: 50,
+                startTimeSec: 85,
                 title: '2投目',
-                description: '水位を保ちながら優しく注ぎ足します。',
+                description: '同様に細く、中心に１円玉くらいの円を描きながら注ぎ足します。',
                 targetTotalWater: 280,
+                note: '水位が下がりすぎないタイミングで',
             },
             {
                 id: 'step-4',
-                startTimeSec: 80,
+                startTimeSec: 115,
                 title: '3投目',
-                description: '残りの湯量を注ぎきります。',
+                description: '最後まで細く丁寧に、中心に１円玉くらいの円を描きながら注ぎきります。',
                 targetTotalWater: 320,
+                note: '最後まで一定のスピードで',
             },
             {
                 id: 'step-5',
-                startTimeSec: 140,
+                startTimeSec: 130,
                 title: '落ち切り待ち',
-                description: 'ドリッパーからお湯が落ち切るのを待ちます。',
+                description: 'ドリッパーからお湯が完全に落ち切るのを待ちます。',
+                note: '目標抽出時間: 3分30秒前後',
             },
         ],
     },

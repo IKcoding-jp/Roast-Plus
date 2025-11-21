@@ -25,10 +25,16 @@ export function useRecipes() {
 
         // デフォルトレシピを常に含める
         const defaultRecipes = MOCK_RECIPES.filter(r => r.isDefault);
-        const userRecipes = loadedRecipes.filter(r => !r.isDefault);
+
+        // ユーザーレシピのIDセットを作成
+        const userRecipeIds = new Set(loadedRecipes.map(r => r.id));
+
+        // デフォルトレシピから、ユーザーレシピと重複するIDを除外
+        // （ユーザーが編集したデフォルトレシピは、localStorageのバージョンを優先）
+        const defaultRecipesToInclude = defaultRecipes.filter(r => !userRecipeIds.has(r.id));
 
         // デフォルトレシピとユーザーレシピを結合
-        const allRecipes = [...defaultRecipes, ...userRecipes];
+        const allRecipes = [...defaultRecipesToInclude, ...loadedRecipes];
 
         setRecipes(allRecipes);
         setIsLoaded(true);
@@ -36,7 +42,9 @@ export function useRecipes() {
 
     const saveRecipes = (newRecipes: DripRecipe[]) => {
         setRecipes(newRecipes);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newRecipes));
+        // デフォルトレシピを除外し、ユーザーレシピのみを保存
+        const userRecipesOnly = newRecipes.filter(r => !r.isDefault);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(userRecipesOnly));
     };
 
     const addRecipe = (recipe: DripRecipe) => {
@@ -45,7 +53,9 @@ export function useRecipes() {
     };
 
     const updateRecipe = (recipe: DripRecipe) => {
-        const newRecipes = recipes.map((r) => (r.id === recipe.id ? recipe : r));
+        // デフォルトレシピが編集された場合、isDefaultを削除してユーザーレシピとして保存
+        const updatedRecipe = recipe.isDefault ? { ...recipe, isDefault: false } : recipe;
+        const newRecipes = recipes.map((r) => (r.id === recipe.id ? updatedRecipe : r));
         saveRecipes(newRecipes);
     };
 

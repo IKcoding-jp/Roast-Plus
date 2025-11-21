@@ -85,10 +85,10 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
         clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = null;
       }
-      
+
       lastSelectedDateRef.current = selectedDate;
       isInitializedRef.current = false;
-      
+
       // 選択日が変わった時は、即座に新しい日付のデータを読み込む
       const scheduleForSelectedDate = data.todaySchedules?.find((s) => s.date === selectedDate);
       const newTimeLabels = scheduleForSelectedDate?.timeLabels || [];
@@ -106,11 +106,11 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
     const scheduleForSelectedDate = data.todaySchedules?.find((s) => s.date === selectedDate);
     const newTimeLabels = scheduleForSelectedDate?.timeLabels || [];
     const newTimeLabelsStr = JSON.stringify(newTimeLabels);
-    
+
     // 初期化されていない場合、またはローカル状態とFirestoreの状態が不一致の場合は初期化
-    if (!isInitializedRef.current || 
-        (localTimeLabelsLengthRef.current === 0 && newTimeLabels.length > 0) ||
-        (localTimeLabelsLengthRef.current > 0 && newTimeLabels.length === 0)) {
+    if (!isInitializedRef.current ||
+      (localTimeLabelsLengthRef.current === 0 && newTimeLabels.length > 0) ||
+      (localTimeLabelsLengthRef.current > 0 && newTimeLabels.length === 0)) {
       setLocalTimeLabels(newTimeLabels);
       localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
       originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
@@ -121,24 +121,24 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
       localTimeLabelsLengthRef.current = newTimeLabels.length;
       return;
     }
-    
+
     // todaySchedules全体のJSON文字列を計算
     const todaySchedulesStr = JSON.stringify(data.todaySchedules || []);
-    
+
     // 前回のtodaySchedulesと同じで、かつ更新中でない場合は何もしない（不要な実行を防止）
     if (lastTodaySchedulesStrRef.current === todaySchedulesStr && lastDataRef.current !== '' && !isUpdatingRef.current) {
       return;
     }
-    
+
     lastTodaySchedulesStrRef.current = todaySchedulesStr;
-    
+
     // 外部からの更新の場合のみ同期
     if (!isUpdatingRef.current) {
       // 前回のデータと同じ場合は何もしない（無限ループ防止）
       if (lastDataRef.current === newTimeLabelsStr) {
         return;
       }
-      
+
       // originalTimeLabelsRefと比較して、異なる場合のみ更新
       const originalStr = JSON.stringify(originalTimeLabelsRef.current);
       if (originalStr !== newTimeLabelsStr) {
@@ -159,7 +159,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
         todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
         return;
       }
-      
+
       const originalStr = JSON.stringify(originalTimeLabelsRef.current);
       if (originalStr !== newTimeLabelsStr) {
         setLocalTimeLabels(newTimeLabels);
@@ -240,7 +240,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
         lastDataRef.current = newTimeLabelsStr;
 
         onUpdateRef.current(updatedData);
-        
+
         // 更新フラグをリセット（FirestoreのonSnapshotが発火する前に）
         // useAppData.tsとタイミングを整合させるため100msに設定
         setTimeout(() => {
@@ -266,7 +266,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
     localTimeLabelsRef.current = JSON.parse(JSON.stringify(localTimeLabels));
 
     const originalTimeLabels = originalTimeLabelsRef.current;
-    
+
     // 長さが異なる場合
     if (localTimeLabels.length !== originalTimeLabels.length) {
       debouncedSave(localTimeLabels, selectedDate);
@@ -298,18 +298,18 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
         clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = null;
       }
-      
+
       // 未保存の変更を即座に保存（変更がある場合のみ）
       if (!isUpdatingRef.current) {
         const currentTimeLabels = localTimeLabelsRef.current;
         const originalTimeLabels = originalTimeLabelsRef.current;
         const currentSelectedDate = lastSelectedDateRef.current;
-        
+
         // 選択日が変わっている場合は保存しない
         if (currentSelectedDate !== selectedDate) {
           return;
         }
-        
+
         const hasChanges = currentTimeLabels.length !== originalTimeLabels.length ||
           currentTimeLabels.some((label, index) => {
             const original = originalTimeLabels[index];
@@ -353,7 +353,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
-      
+
       if (errorTimeoutRef.current) {
         clearTimeout(errorTimeoutRef.current);
       }
@@ -363,32 +363,32 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
   const addTimeLabel = () => {
     if (!newHour) {
       setAddError('数字を入力してください');
-      
+
       // 既存のタイマーをクリア
       if (errorTimeoutRef.current) {
         clearTimeout(errorTimeoutRef.current);
       }
-      
+
       // 3秒後にエラーを自動的にクリア
       errorTimeoutRef.current = setTimeout(() => {
         setAddError('');
         errorTimeoutRef.current = null;
       }, 3000);
-      
+
       return;
     }
-    
+
     // エラーをクリア（タイマーもクリア）
     if (errorTimeoutRef.current) {
       clearTimeout(errorTimeoutRef.current);
       errorTimeoutRef.current = null;
     }
     setAddError('');
-    
+
     const hour = newHour.padStart(2, '0');
     const minute = newMinute ? newMinute.padStart(2, '0') : '00'; // 分が未入力の場合は00
     const time = `${hour}:${minute}`;
-    
+
     const newLabel: TimeLabel = {
       id: `time-${Date.now()}`,
       time: time,
@@ -415,11 +415,11 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
 
   const handleEditSave = (id: string, hour: string, minute: string) => {
     if (!hour) return; // 時が入力されていない場合は保存しない
-    
+
     const formattedHour = hour.padStart(2, '0');
     const formattedMinute = minute ? minute.padStart(2, '0') : '00';
     const newTime = `${formattedHour}:${formattedMinute}`;
-    
+
     updateTimeLabel(id, { time: newTime });
     setEditingLabelId(null);
   };
@@ -446,14 +446,62 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
     }, 300);
   };
 
-  // 時間順にソート
-  const sortedTimeLabels = useMemo(() => {
-    return [...localTimeLabels].sort((a, b) => {
+  // 時間順にソートしてグループ化
+  const groupedTimeLabels = useMemo(() => {
+    const groups: { time: string; labels: TimeLabel[] }[] = [];
+
+    // まず時間順にソート
+    const sorted = [...localTimeLabels].sort((a, b) => {
       const timeA = a.time || '00:00';
       const timeB = b.time || '00:00';
       return timeA.localeCompare(timeB);
     });
+
+    // グループ化
+    sorted.forEach((label) => {
+      const lastGroup = groups[groups.length - 1];
+      if (lastGroup && lastGroup.time === label.time) {
+        lastGroup.labels.push(label);
+      } else {
+        groups.push({
+          time: label.time,
+          labels: [label],
+        });
+      }
+    });
+
+    return groups;
   }, [localTimeLabels]);
+
+  // グループ単位での編集・削除用
+  const handleEditGroup = (time: string) => {
+    // その時間の最初のラベルのIDを使って編集ダイアログを開く（保存時にtimeを使って一括更新する）
+    const label = localTimeLabels.find(l => l.time === time);
+    if (label) {
+      setEditingLabelId(label.id); // IDはダイアログ表示のトリガーとしてのみ使用
+    }
+  };
+
+  const handleEditGroupSave = (oldTime: string, newHour: string, newMinute: string) => {
+    if (!newHour) return;
+
+    const formattedHour = newHour.padStart(2, '0');
+    const formattedMinute = newMinute ? newMinute.padStart(2, '0') : '00';
+    const newTime = `${formattedHour}:${formattedMinute}`;
+
+    // 同じ時間のラベルを全て更新
+    setLocalTimeLabels(
+      localTimeLabels.map((label) =>
+        label.time === oldTime ? { ...label, time: newTime } : label
+      )
+    );
+    setEditingLabelId(null);
+  };
+
+  const handleDeleteGroup = (time: string) => {
+    setLocalTimeLabels(localTimeLabels.filter((label) => label.time !== time));
+    setEditingLabelId(null);
+  };
 
   return (
     <div className="rounded-2xl bg-white p-4 md:p-6 shadow-xl border-2 border-gray-300 h-full flex flex-col backdrop-blur-sm">
@@ -481,11 +529,10 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
               }}
               min="0"
               max="23"
-              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-                addError 
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                  : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
-              }`}
+              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${addError
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
+                }`}
               placeholder="時"
             />
             <span className="text-gray-600 text-base md:text-base">:</span>
@@ -517,41 +564,45 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
 
       {localTimeLabels.length === 0 ? (
         <div className="flex-1 flex items-center justify-center text-center text-gray-500">
-            <div>
-              <div className="mb-3 md:mb-5 flex justify-center">
-                <HiClock className="h-12 w-12 md:h-20 md:w-20 text-gray-300" />
-              </div>
-              <p className="text-base md:text-lg font-medium">時間ラベルがありません</p>
-              <p className="mt-1.5 md:mt-3 text-base md:text-base text-gray-400">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
+          <div>
+            <div className="mb-3 md:mb-5 flex justify-center">
+              <HiClock className="h-12 w-12 md:h-20 md:w-20 text-gray-300" />
             </div>
+            <p className="text-base md:text-lg font-medium">時間ラベルがありません</p>
+            <p className="mt-1.5 md:mt-3 text-base md:text-base text-gray-400">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
           </div>
+        </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
           <div className="space-y-2 md:space-y-1.5">
-            {sortedTimeLabels.map((label) => (
+            {groupedTimeLabels.map((group) => (
               <div
-                key={label.id}
-                className="group flex items-center gap-3 md:gap-4 py-2.5 md:py-2 px-3 md:px-2.5 rounded-lg bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 transition-all duration-200"
+                key={group.time}
+                className="group flex items-baseline gap-3 md:gap-4 py-2.5 md:py-2 px-3 md:px-2.5 rounded-lg bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 transition-all duration-200"
               >
-                {/* 時間表示 */}
-                <div 
-                  onClick={() => handleEditLabel(label.id)}
+                {/* 時間表示（グループ共通） */}
+                <div
+                  onClick={() => handleEditGroup(group.time)}
                   className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 bg-white rounded-md text-sm md:text-base font-semibold text-gray-800 group-hover:text-amber-700 group-hover:bg-amber-100 cursor-pointer transition-colors tabular-nums shadow-sm"
                 >
-                  {label.time || '--:--'}
+                  {group.time || '--:--'}
                 </div>
-                
-                {/* 内容入力 */}
-                <div className="flex-1 min-w-0">
-                  <input
-                    type="text"
-                    value={label.content}
-                    onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
-                    onCompositionStart={handleCompositionStart}
-                    onCompositionEnd={handleCompositionEnd}
-                    className="w-full bg-transparent border-0 border-b border-transparent focus:border-amber-400 text-base md:text-base text-gray-900 focus:outline-none placeholder:text-gray-400 transition-colors"
-                    placeholder="内容を入力"
-                  />
+
+                {/* 内容入力（複数） */}
+                <div className="flex-1 min-w-0 flex flex-col gap-2">
+                  {group.labels.map((label) => (
+                    <div key={label.id} className="w-full">
+                      <input
+                        type="text"
+                        value={label.content}
+                        onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
+                        onCompositionStart={handleCompositionStart}
+                        onCompositionEnd={handleCompositionEnd}
+                        className="w-full bg-transparent border-0 border-b border-transparent focus:border-amber-400 text-base md:text-base text-gray-900 focus:outline-none placeholder:text-gray-400 transition-colors py-1"
+                        placeholder="内容を入力"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -577,11 +628,10 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
                   }}
                   min="0"
                   max="23"
-                  className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-                    addError 
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                      : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
-                  }`}
+                  className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${addError
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
+                    }`}
                   placeholder="時"
                 />
                 <span className="text-gray-600 text-base md:text-base">:</span>
@@ -636,11 +686,10 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
               }}
               min="0"
               max="23"
-              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-                addError 
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                  : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
-              }`}
+              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${addError
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
+                }`}
               placeholder="時"
             />
             <span className="text-gray-600 text-base md:text-base">:</span>
@@ -675,21 +724,21 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
       {editingLabelId && typeof window !== 'undefined' && (() => {
         const editingLabel = localTimeLabels.find((label) => label.id === editingLabelId);
         if (!editingLabel) return null;
-        
+
         const parseTime = (timeStr: string) => {
           if (!timeStr) return { hour: '', minute: '' };
           const [hour, minute] = timeStr.split(':');
           return { hour: hour || '', minute: minute || '' };
         };
-        
+
         const initialTime = parseTime(editingLabel.time);
-        
+
         return createPortal(
           <TimeEditDialog
             initialHour={initialTime.hour}
             initialMinute={initialTime.minute}
-            onSave={(hour, minute) => handleEditSave(editingLabelId, hour, minute)}
-            onDelete={() => deleteTimeLabel(editingLabelId)}
+            onSave={(hour, minute) => handleEditGroupSave(editingLabel.time, hour, minute)}
+            onDelete={() => handleDeleteGroup(editingLabel.time)}
             onCancel={handleEditCancel}
           />,
           document.body

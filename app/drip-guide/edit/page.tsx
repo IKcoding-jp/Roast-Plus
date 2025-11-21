@@ -1,13 +1,14 @@
 'use client';
 
-import React, { use } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { RecipeForm } from '@/components/drip-guide/RecipeForm';
 import { useRecipes } from '@/lib/drip-guide/useRecipes';
 import { DripRecipe } from '@/lib/drip-guide/types';
 
-export default function EditRecipePage({ params }: { params: Promise<{ recipeId: string }> }) {
-    const { recipeId } = use(params);
+function EditRecipeContent() {
+    const searchParams = useSearchParams();
+    const recipeId = searchParams.get('id');
     const router = useRouter();
     const { recipes, updateRecipe, isLoaded } = useRecipes();
 
@@ -30,5 +31,13 @@ export default function EditRecipePage({ params }: { params: Promise<{ recipeId:
         <div className="max-w-5xl mx-auto p-4 sm:p-6">
             <RecipeForm initialRecipe={recipe} onSubmit={handleSubmit} />
         </div>
+    );
+}
+
+export default function EditRecipePage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+            <EditRecipeContent />
+        </Suspense>
     );
 }

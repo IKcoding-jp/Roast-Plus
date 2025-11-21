@@ -1,13 +1,15 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { DripGuideRunner } from '@/components/drip-guide/DripGuideRunner';
 import { useRecipes } from '@/lib/drip-guide/useRecipes';
 import Link from 'next/link';
 import { ArrowLeft } from 'phosphor-react';
 
-export default function RunRecipePage({ params }: { params: Promise<{ recipeId: string }> }) {
-    const { recipeId } = use(params);
+function RunRecipeContent() {
+    const searchParams = useSearchParams();
+    const recipeId = searchParams.get('id');
     const { recipes, isLoaded } = useRecipes();
 
     if (!isLoaded) {
@@ -37,5 +39,13 @@ export default function RunRecipePage({ params }: { params: Promise<{ recipeId: 
             </div>
             <DripGuideRunner recipe={recipe} />
         </div>
+    );
+}
+
+export default function RunRecipePage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+            <RunRecipeContent />
+        </Suspense>
     );
 }

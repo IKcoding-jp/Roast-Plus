@@ -56,7 +56,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                             </h3>
                             <div className="flex gap-1">
                                 <Link
-                                    href={`/drip-guide/${recipe.id}/edit`}
+                                    href={`/drip-guide/edit?id=${recipe.id}`}
                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                                     title="編集"
                                 >
@@ -104,7 +104,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                         </div>
 
                         <Link
-                            href={`/drip-guide/${recipe.id}/run`}
+                            href={`/drip-guide/run?id=${recipe.id}`}
                             className={clsx(
                                 "mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-lg font-bold transition-all",
                                 "bg-amber-600 text-white hover:bg-amber-700 active:scale-[0.98]"

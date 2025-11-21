@@ -60,7 +60,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
     return (
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto pb-20">
             <div className="mb-6 flex items-center justify-between">
-                <Link href="/drip-guide" className="flex items-center text-gray-500 hover:text-gray-800 transition-colors">
+                <Link href="/drip-guide" className="flex items-center text-gray-500 hover:text-gray-800 transition-colors p-2 -ml-2 rounded-lg active:bg-gray-100">
                     <ArrowLeft size={20} className="mr-1" />
                     一覧に戻る
                 </Link>
@@ -80,7 +80,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 placeholder="例: BYSN Standard Drip"
                                 required
                             />
@@ -92,7 +92,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 type="text"
                                 value={beanName}
                                 onChange={(e) => setBeanName(e.target.value)}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 placeholder="例: Ethiopia Yirgacheffe"
                                 required
                             />
@@ -104,7 +104,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 type="text"
                                 value={purpose}
                                 onChange={(e) => setPurpose(e.target.value)}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 placeholder="例: 試飲会用"
                             />
                         </div>
@@ -115,7 +115,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 type="number"
                                 value={beanAmountGram}
                                 onChange={(e) => setBeanAmountGram(parseInt(e.target.value) || 0)}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 min={1}
                             />
                         </div>
@@ -126,7 +126,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 type="number"
                                 value={totalWaterGram}
                                 onChange={(e) => setTotalWaterGram(parseInt(e.target.value) || 0)}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 min={1}
                             />
                         </div>
@@ -144,7 +144,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                                 const seconds = totalDurationSec % 60;
                                                 setTotalDurationSec(minutes * 60 + seconds);
                                             }}
-                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                            className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                             min={0}
                                         />
                                         <span className="text-gray-600 text-sm whitespace-nowrap">分</span>
@@ -160,7 +160,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                                 const seconds = parseInt(e.target.value) || 0;
                                                 setTotalDurationSec(minutes * 60 + seconds);
                                             }}
-                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                            className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                             min={0}
                                             max={59}
                                         />
@@ -175,7 +175,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 rows={3}
                                 placeholder="レシピの特徴や注意点など"
                             />
@@ -193,7 +193,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-center z-10">
                 <button
                     type="submit"
-                    className="flex items-center gap-2 bg-amber-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg hover:bg-amber-700 transition-transform active:scale-95"
+                    className="flex items-center gap-2 bg-amber-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg hover:bg-amber-700 transition-transform active:scale-95 touch-manipulation"
                 >
                     <FloppyDisk size={24} />
                     レシピを保存

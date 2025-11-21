@@ -57,7 +57,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
                                     type="number"
                                     value={step.startTimeSec}
                                     onChange={(e) => updateStep(index, 'startTimeSec', parseInt(e.target.value) || 0)}
-                                    className="w-full p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none"
+                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                     min={0}
                                 />
                             </div>
@@ -70,7 +70,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
                                     value={step.title}
                                     onChange={(e) => updateStep(index, 'title', e.target.value)}
                                     placeholder="例: 蒸らし"
-                                    className="w-full p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none"
+                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 />
                             </div>
 
@@ -82,7 +82,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
                                     value={step.targetTotalWater || ''}
                                     onChange={(e) => updateStep(index, 'targetTotalWater', e.target.value ? parseInt(e.target.value) : undefined)}
                                     placeholder="任意"
-                                    className="w-full p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none"
+                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 />
                             </div>
 
@@ -90,7 +90,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
                             <div className="col-span-6 sm:col-span-3 flex items-end justify-end">
                                 <button
                                     onClick={() => removeStep(index)}
-                                    className="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                    className="text-gray-400 hover:text-red-500 p-3 sm:p-2 rounded-full hover:bg-red-50 transition-colors touch-manipulation"
                                     title="ステップを削除"
                                 >
                                     <Trash size={20} />
@@ -104,7 +104,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
                                     value={step.description}
                                     onChange={(e) => updateStep(index, 'description', e.target.value)}
                                     placeholder="例: 全体にお湯を行き渡らせます"
-                                    className="w-full p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-sm"
+                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                     rows={2}
                                 />
                             </div>

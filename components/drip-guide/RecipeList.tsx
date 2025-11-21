@@ -44,11 +44,11 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
 
     return (
         <>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recipes.map((recipe) => (
                     <div
                         key={recipe.id}
-                        className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow flex flex-col"
+                        className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 hover:shadow-md transition-shadow flex flex-col"
                     >
                         <div className="flex justify-between items-start mb-3">
                             <h3 className="font-bold text-lg text-gray-800 line-clamp-1" title={recipe.name}>
@@ -57,7 +57,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                             <div className="flex gap-1">
                                 <Link
                                     href={`/drip-guide/edit?id=${recipe.id}`}
-                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                    className="p-3 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                                     title="編集"
                                 >
                                     <Pencil size={18} />
@@ -70,7 +70,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                             e.stopPropagation();
                                             handleDeleteClick(recipe.id);
                                         }}
-                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                        className="p-3 sm:p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                                         title="削除"
                                     >
                                         <Trash size={18} />
@@ -106,8 +106,8 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                         <Link
                             href={`/drip-guide/run?id=${recipe.id}`}
                             className={clsx(
-                                "mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-lg font-bold transition-all",
-                                "bg-amber-600 text-white hover:bg-amber-700 active:scale-[0.98]"
+                                "mt-auto flex items-center justify-center gap-2 w-full py-3 sm:py-2.5 rounded-lg font-bold transition-all",
+                                "bg-amber-600 text-white hover:bg-amber-700 active:scale-[0.98] touch-manipulation"
                             )}
                         >
                             <Play size={20} weight="fill" />

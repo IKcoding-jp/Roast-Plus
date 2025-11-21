@@ -15,7 +15,7 @@ export default function DripGuidePage() {
     }
 
     return (
-        <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className="h-screen overflow-y-hidden flex flex-col px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
             <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
                 <header className="mb-4 sm:mb-6 flex-shrink-0">
                     <div className="flex items-center justify-between">

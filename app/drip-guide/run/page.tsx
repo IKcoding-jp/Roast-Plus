@@ -31,12 +31,6 @@ function RunRecipeContent() {
 
     return (
         <div className="min-h-screen bg-white">
-            <div className="p-4">
-                <Link href="/drip-guide" className="inline-flex items-center text-gray-400 hover:text-gray-600 transition-colors">
-                    <ArrowLeft size={20} className="mr-1" />
-                    戻る
-                </Link>
-            </div>
             <DripGuideRunner recipe={recipe} />
         </div>
     );

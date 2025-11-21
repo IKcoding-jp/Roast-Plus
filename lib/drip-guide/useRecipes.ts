@@ -12,16 +12,25 @@ export function useRecipes() {
 
     useEffect(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
+        let loadedRecipes: DripRecipe[] = [];
+
         if (stored) {
             try {
-                setRecipes(JSON.parse(stored));
+                loadedRecipes = JSON.parse(stored);
             } catch (e) {
                 console.error('Failed to parse recipes', e);
-                setRecipes(MOCK_RECIPES);
+                loadedRecipes = [];
             }
-        } else {
-            setRecipes(MOCK_RECIPES);
         }
+
+        // デフォルトレシピを常に含める
+        const defaultRecipes = MOCK_RECIPES.filter(r => r.isDefault);
+        const userRecipes = loadedRecipes.filter(r => !r.isDefault);
+
+        // デフォルトレシピとユーザーレシピを結合
+        const allRecipes = [...defaultRecipes, ...userRecipes];
+
+        setRecipes(allRecipes);
         setIsLoaded(true);
     }, []);
 

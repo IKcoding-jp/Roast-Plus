@@ -19,4 +19,5 @@ export interface DripRecipe {
     steps: DripStep[];
     createdAt?: string;
     updatedAt?: string;
+    isDefault?: boolean; // デフォルトレシピは削除不可
 }

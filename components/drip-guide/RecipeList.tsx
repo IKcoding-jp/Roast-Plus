@@ -62,18 +62,20 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                 >
                                     <Pencil size={18} />
                                 </Link>
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleDeleteClick(recipe.id);
-                                    }}
-                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                                    title="削除"
-                                >
-                                    <Trash size={18} />
-                                </button>
+                                {!recipe.isDefault && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleDeleteClick(recipe.id);
+                                        }}
+                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                        title="削除"
+                                    >
+                                        <Trash size={18} />
+                                    </button>
+                                )}
                             </div>
                         </div>
 

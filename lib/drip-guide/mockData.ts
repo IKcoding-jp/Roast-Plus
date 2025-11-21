@@ -13,6 +13,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
         description: '基本のドリップレシピ。酸味と甘みのバランス重視。',
         createdAt: '2023-10-27T10:00:00Z',
         updatedAt: '2023-10-27T10:00:00Z',
+        isDefault: true,
         steps: [
             {
                 id: 'step-1',
@@ -64,6 +65,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
         description: '井崎流のハンドドリップレシピ。4回注ぎで合計300gの抽出。',
         createdAt: '2023-11-01T10:00:00Z',
         updatedAt: '2023-11-01T10:00:00Z',
+        isDefault: true,
         steps: [
             {
                 id: 'step-1',
@@ -78,21 +80,21 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 60,
                 title: '2投目',
                 description: '太めの注湯で60g',
-                targetTotalWater: 180,
+                targetTotalWater: 120,
             },
             {
                 id: 'step-3',
                 startTimeSec: 90,
                 title: '3投目',
                 description: '同様に60g',
-                targetTotalWater: 300,
+                targetTotalWater: 180,
             },
             {
                 id: 'step-4',
                 startTimeSec: 120,
                 title: '4投目／仕上げ',
                 description: '残り120g注ぐ、その後撹拌 → 落ちきり',
-                targetTotalWater: 200,
+                targetTotalWater: 300,
                 note: '撹拌（ドリッパーを軽く回す）',
             },
         ],

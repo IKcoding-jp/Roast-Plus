@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
 import type { AppData, RoastTimerState } from '@/types';
 import { setRoastTimerState as saveLocalState, getRoastTimerState as loadLocalState, getDeviceId } from '@/lib/localStorage';
-import { notifyRoastTimerComplete, scheduleNotification, cancelAllScheduledNotifications } from '@/lib/notifications';
 import { playTimerSound, stopTimerSound, stopAllSounds, stopAudio } from '@/lib/sounds';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import {
@@ -292,24 +291,16 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         updatedState.completedByDeviceId = currentDeviceId;
         updatedState.dialogState = 'completion'; // 完了ダイアログを表示
 
-        // すべてのスケジュール通知をキャンセル
-        cancelAllScheduledNotifications();
-
-        // アラーム音を先に再生（通知より先に再生することで、iOS/iPadOSでの音声ブロックを回避）
+        // アラーム音を再生
         try {
           const settings = await loadRoastTimerSettings();
           if (settings.timerSoundEnabled) {
             const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
             soundAudioRef.current = audio;
-            // アラーム音の再生を確実に開始するため、少し待ってから通知を表示
-            await new Promise(resolve => setTimeout(resolve, 100));
           }
         } catch (error) {
           console.error('Failed to play timer sound:', error);
         }
-
-        // 通知を表示（アラーム音の再生開始後に表示）
-        await notifyRoastTimerComplete();
 
         // Firestoreに完了状態を保存
         try {
@@ -400,7 +391,6 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   const startTimer = useCallback(
     async (
       duration: number,
-      notificationId: number, // 2=手動、3=おすすめ
       beanName?: string,
       weight?: 200 | 300 | 500,
       roastLevel?: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
@@ -432,7 +422,6 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         roastLevel,
         startedAt,
         lastUpdatedAt: startedAt,
-        notificationId,
         triggeredByDeviceId: currentDeviceId,
       };
 
@@ -450,15 +439,6 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       } catch (error) {
         console.error('Failed to save roast timer state to Firestore:', error);
         throw error; // Firestoreへの保存に失敗した場合はエラーを投げる
-      }
-
-      // 通知をスケジュール（失敗してもタイマーは開始する）
-      try {
-        const scheduledTime = Date.now() + duration * 1000;
-        await scheduleNotification(notificationId, scheduledTime);
-      } catch (error) {
-        console.warn('Failed to schedule notification:', error);
-        // 通知のスケジュールに失敗してもタイマーは開始する
       }
     },
     [user, updateData, currentDeviceId, isLoading]
@@ -544,13 +524,6 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     } catch (error) {
       console.error('Failed to save roast timer state to Firestore:', error);
     }
-
-    // 通知を再スケジュール
-    if (updatedState.notificationId) {
-      const remainingTime = updatedState.remaining * 1000;
-      const scheduledTime = Date.now() + remainingTime;
-      scheduleNotification(updatedState.notificationId, scheduledTime);
-    }
   }, [localState, user, updateData, currentDeviceId, isLoading]);
 
   // タイマーをスキップ（残り時間を1秒に設定）
@@ -601,9 +574,6 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
     // 一時停止の累積時間をリセット
     pausedElapsedRef.current = 0;
-
-    // すべてのスケジュール通知をキャンセル
-    cancelAllScheduledNotifications();
 
     // サウンドを停止
     if (soundAudioRef.current) {

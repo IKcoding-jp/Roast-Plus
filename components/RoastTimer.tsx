@@ -417,12 +417,8 @@ export function RoastTimer() {
         return;
       }
 
-      // 通知ID: 2=手動、3=おすすめ
-      const notificationId = inputMode === 'recommended' ? 3 : 2;
-
       await startTimer(
         finalDuration,
-        notificationId,
         inputMode === 'recommended' && beanName !== '' ? beanName : undefined,
         inputMode === 'recommended' && weight !== '' ? weight : undefined,
         inputMode === 'recommended' && roastLevel !== '' ? roastLevel : undefined
@@ -1078,7 +1074,7 @@ export function RoastTimer() {
                         alert('有効な時間を入力してください');
                         return;
                       }
-                      await startTimer(duration, 2); // 通知ID: 2=手動
+                      await startTimer(duration);
                     } catch (error) {
                       console.error('Failed to start timer:', error);
                       alert('タイマーの開始に失敗しました。もう一度お試しください。');

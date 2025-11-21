@@ -16,8 +16,10 @@ export default function NewRecipePage() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-4 sm:p-6">
-            <RecipeForm onSubmit={handleSubmit} />
+        <div className="min-h-screen text-gray-900" style={{ backgroundColor: '#F7F7F5' }}>
+            <div className="max-w-5xl mx-auto p-4 sm:p-6">
+                <RecipeForm onSubmit={handleSubmit} />
+            </div>
         </div>
     );
 }

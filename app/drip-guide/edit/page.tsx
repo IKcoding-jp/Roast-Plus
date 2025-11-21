@@ -36,8 +36,10 @@ function EditRecipeContent() {
 
 export default function EditRecipePage() {
     return (
-        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
-            <EditRecipeContent />
-        </Suspense>
+        <div className="min-h-screen text-gray-900" style={{ backgroundColor: '#F7F7F5' }}>
+            <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+                <EditRecipeContent />
+            </Suspense>
+        </div>
     );
 }

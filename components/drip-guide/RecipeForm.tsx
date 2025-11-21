@@ -134,8 +134,8 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">総時間</label>
                             <div className="flex gap-2 items-center">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-1">
+                                <div>
+                                    <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={Math.floor(totalDurationSec / 60)}
@@ -144,14 +144,14 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                                 const seconds = totalDurationSec % 60;
                                                 setTotalDurationSec(minutes * 60 + seconds);
                                             }}
-                                            className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                            className="w-20 p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base text-right"
                                             min={0}
                                         />
-                                        <span className="text-gray-600 text-sm whitespace-nowrap">分</span>
+                                        <span className="text-gray-600 text-sm whitespace-nowrap font-medium">分</span>
                                     </div>
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-1">
+                                <div>
+                                    <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={totalDurationSec % 60}
@@ -160,11 +160,11 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                                 const seconds = parseInt(e.target.value) || 0;
                                                 setTotalDurationSec(minutes * 60 + seconds);
                                             }}
-                                            className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                            className="w-20 p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base text-right"
                                             min={0}
                                             max={59}
                                         />
-                                        <span className="text-gray-600 text-sm whitespace-nowrap">秒</span>
+                                        <span className="text-gray-600 text-sm whitespace-nowrap font-medium">秒</span>
                                     </div>
                                 </div>
                             </div>

@@ -163,10 +163,10 @@ export function RoastTimer() {
       const loadAvailableOptions = async () => {
         try {
           const allRecords = await getAllRoastTimerRecords(user.uid, data);
-          
+
           // 選択された豆の記録をフィルタリング
           const beanRecords = allRecords.filter((record) => record.beanName === beanName);
-          
+
           // 各重さについて、2件以上の記録がある組み合わせ（重さ + 焙煎度合い）があるか確認
           const weightSet = new Set<200 | 300 | 500>();
           for (const weight of WEIGHTS) {
@@ -174,7 +174,7 @@ export function RoastTimer() {
               const matchingRecords = beanRecords.filter(
                 (record) => record.weight === weight && record.roastLevel === roastLevel
               );
-              
+
               // 2件以上の記録がある場合、その重さをリストに追加
               if (matchingRecords.length >= 2) {
                 weightSet.add(weight);
@@ -182,7 +182,7 @@ export function RoastTimer() {
               }
             }
           }
-          
+
           // 各焙煎度合いについて、2件以上の記録がある組み合わせ（重さ + 焙煎度合い）があるか確認
           const roastLevelSet = new Set<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>();
           for (const roastLevel of ROAST_LEVELS) {
@@ -190,7 +190,7 @@ export function RoastTimer() {
               const matchingRecords = beanRecords.filter(
                 (record) => record.weight === weight && record.roastLevel === roastLevel
               );
-              
+
               // 2件以上の記録がある場合、その焙煎度合いをリストに追加
               if (matchingRecords.length >= 2) {
                 roastLevelSet.add(roastLevel);
@@ -198,10 +198,10 @@ export function RoastTimer() {
               }
             }
           }
-          
+
           setAvailableWeights(Array.from(weightSet).sort((a, b) => a - b));
           setAvailableRoastLevels(Array.from(roastLevelSet));
-          
+
           // 豆が変更された場合、重さと焙煎度合いをリセット
           setWeight('');
           setRoastLevel('');
@@ -211,7 +211,7 @@ export function RoastTimer() {
           setAvailableRoastLevels([]);
         }
       };
-      
+
       loadAvailableOptions();
     } else {
       setAvailableWeights([]);
@@ -438,27 +438,24 @@ export function RoastTimer() {
   };
 
   const handleReset = () => {
-    if (confirm('タイマーをリセットしますか？')) {
-      // 音を確実に停止
-      stopSound();
-      resetTimer();
-      setInputMode(null);
-      setRecommendedMode('weight');
-      setDurationMinutes('');
-      setDurationSeconds('');
-      setBeanName('');
-      setWeight('');
-      setRoastLevel('');
-      setShowCompletionDialog(false);
-      setShowContinuousRoastDialog(false);
-      setShowAfterPurgeDialog(false);
-    }
+    console.log('handleReset called');
+    // 音を確実に停止
+    stopSound();
+    resetTimer();
+    setInputMode(null);
+    setRecommendedMode('weight');
+    setDurationMinutes('');
+    setDurationSeconds('');
+    setBeanName('');
+    setWeight('');
+    setRoastLevel('');
+    setShowCompletionDialog(false);
+    setShowContinuousRoastDialog(false);
+    setShowAfterPurgeDialog(false);
   };
 
   const handleSkip = () => {
-    if (confirm('タイマーをスキップして完了にしますか？')) {
-      skipTimer();
-    }
+    skipTimer();
   };
 
   // 完了ダイアログのOKボタン
@@ -1190,8 +1187,8 @@ export function RoastTimer() {
                         setRecommendedTimeInfo(null);
                       }}
                       className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${recommendedMode === 'weight'
-                          ? 'bg-white text-amber-700 shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-white text-amber-700 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                       重さで設定
@@ -1201,8 +1198,8 @@ export function RoastTimer() {
                         setRecommendedMode('history');
                       }}
                       className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${recommendedMode === 'history'
-                          ? 'bg-white text-amber-700 shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-white text-amber-700 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                       過去の記録から設定

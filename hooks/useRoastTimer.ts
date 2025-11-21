@@ -79,14 +79,16 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   useEffect(() => {
     if (!user || !data) return;
 
-    // リセットが実行された場合は、状態を読み込まない
+    const firestoreState = data.roastTimerState;
+
+    // リセットが実行された場合は、Firestoreの状態が消えるまで無視する
     if (hasResetRef.current) {
+      if (firestoreState) {
+        return;
+      }
       hasResetRef.current = false;
       isInitialMountRef.current = false;
-      return;
     }
-
-    const firestoreState = data.roastTimerState;
 
     // Firestoreに状態がある場合
     if (firestoreState) {
@@ -259,6 +261,44 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     }
   }, [user, data, updateData, currentDeviceId, isLoading]);
 
+  // タイマー完了処理
+  const completeTimer = useCallback(async (currentState: RoastTimerState) => {
+    const updatedState: RoastTimerState = {
+      ...currentState,
+      status: 'completed',
+      remaining: 0,
+      elapsed: currentState.duration,
+      completedByDeviceId: currentDeviceId,
+      dialogState: 'completion', // 完了ダイアログを表示
+      lastUpdatedAt: getSyncedIsoString(),
+    };
+
+    // アラーム音を再生
+    try {
+      const settings = await loadRoastTimerSettings();
+      if (settings.timerSoundEnabled) {
+        const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
+        soundAudioRef.current = audio;
+      }
+    } catch (error) {
+      console.error('Failed to play timer sound:', error);
+    }
+
+    // ローカル状態を更新
+    saveLocalState(updatedState);
+    setLocalState(updatedState);
+
+    // Firestoreに完了状態を保存
+    try {
+      await updateData((currentData) => ({
+        ...currentData,
+        roastTimerState: updatedState,
+      }));
+    } catch (error) {
+      console.error('Failed to save roast timer state to Firestore:', error);
+    }
+  }, [currentDeviceId, updateData]);
+
   // タイマーの更新処理（開始時刻ベースで計算）
   const updateTimer = useCallback(async () => {
     if (!localState || !user || isLoading) return;
@@ -275,6 +315,12 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       );
       const remaining = Math.max(0, localState.duration - elapsed);
 
+      // タイマーが完了した場合
+      if (remaining <= 0) {
+        await completeTimer(localState);
+        return;
+      }
+
       const updatedState: RoastTimerState = {
         ...localState,
         pausedElapsed,
@@ -283,41 +329,11 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         lastUpdatedAt: getSyncedIsoString(),
       };
 
-      // タイマーが完了した場合
-      if (remaining <= 0) {
-        updatedState.status = 'completed';
-        updatedState.remaining = 0;
-        updatedState.elapsed = localState.duration;
-        updatedState.completedByDeviceId = currentDeviceId;
-        updatedState.dialogState = 'completion'; // 完了ダイアログを表示
-
-        // アラーム音を再生
-        try {
-          const settings = await loadRoastTimerSettings();
-          if (settings.timerSoundEnabled) {
-            const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
-            soundAudioRef.current = audio;
-          }
-        } catch (error) {
-          console.error('Failed to play timer sound:', error);
-        }
-
-        // Firestoreに完了状態を保存
-        try {
-          await updateData((currentData) => ({
-            ...currentData,
-            roastTimerState: updatedState,
-          }));
-        } catch (error) {
-          console.error('Failed to save roast timer state to Firestore:', error);
-        }
-      }
-
       // ローカル状態のみ更新（Firestoreには保存しない - 100msごとの更新はローカルのみ）
       saveLocalState(updatedState);
       setLocalState(updatedState);
     }
-  }, [localState, user, updateData, isLoading, currentDeviceId]);
+  }, [localState, user, isLoading, completeTimer]);
 
   // タイマーの定期更新（UI表示用）
   useEffect(() => {
@@ -356,6 +372,12 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         );
         const remaining = Math.max(0, localState.duration - elapsed);
 
+        // タイマーが完了している場合
+        if (remaining <= 0) {
+          completeTimer(localState);
+          return;
+        }
+
         const updatedState: RoastTimerState = {
           ...localState,
           pausedElapsed,
@@ -364,20 +386,8 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
           lastUpdatedAt: getSyncedIsoString(),
         };
 
-        // タイマーが完了している場合
-        if (remaining <= 0) {
-          updatedState.status = 'completed';
-          updatedState.remaining = 0;
-          updatedState.elapsed = localState.duration;
-        }
-
         saveLocalState(updatedState);
         setLocalState(updatedState);
-
-        // 完了している場合は完了処理を実行
-        if (updatedState.status === 'completed' && user) {
-          updateTimer();
-        }
       }
     };
 
@@ -385,7 +395,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [localState, user, updateTimer]);
+  }, [localState, user, completeTimer]);
 
   // タイマーを開始
   const startTimer = useCallback(
@@ -526,44 +536,15 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     }
   }, [localState, user, updateData, currentDeviceId, isLoading]);
 
-  // タイマーをスキップ（残り時間を1秒に設定）
+  // タイマーをスキップ（即座に完了）
   const skipTimer = useCallback(async () => {
-    if (!localState || !localState.startedAt || !user || isLoading) return;
+    if (!localState || !user || isLoading) return;
 
-    // 残り時間を1秒にするため、開始時刻を調整
-    // 経過時間を duration - 1 にするため、開始時刻を (duration - 1)秒前に設定
-    const targetElapsed = localState.duration - 1;
-    const now = getSyncedTimestampSync();
-    const adjustedStartTime = new Date(now - targetElapsed * 1000).toISOString();
-
-    const updatedState: RoastTimerState = {
-      ...localState,
-      startedAt: adjustedStartTime,
-      elapsed: targetElapsed,
-      remaining: 1,
-      pausedElapsed: 0,
-      lastUpdatedAt: getSyncedIsoString(),
-      triggeredByDeviceId: currentDeviceId,
-    };
-
-    // 一時停止の累積時間をリセット（スキップ時は経過時間を直接設定するため）
+    // 一時停止の累積時間をリセット
     pausedElapsedRef.current = 0;
 
-    // ローカル状態を更新
-    saveLocalState(updatedState);
-    setLocalState(updatedState);
-
-    // Firestoreに保存
-    try {
-      await updateData((currentData) => ({
-        ...currentData,
-        roastTimerState: updatedState,
-      }));
-    } catch (error) {
-      console.error('Failed to save roast timer state to Firestore:', error);
-    }
-    // 次回のカウントダウンで完了処理が実行される
-  }, [localState, user, updateData, currentDeviceId, isLoading]);
+    await completeTimer(localState);
+  }, [localState, user, isLoading, completeTimer]);
 
   // タイマーをリセット
   const resetTimer = useCallback(async () => {

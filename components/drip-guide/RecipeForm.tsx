@@ -18,6 +18,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
     const [beanName, setBeanName] = useState(initialRecipe?.beanName || '');
     const [beanAmountGram, setBeanAmountGram] = useState(initialRecipe?.beanAmountGram || 20);
     const [totalWaterGram, setTotalWaterGram] = useState(initialRecipe?.totalWaterGram || 300);
+    const [totalDurationSec, setTotalDurationSec] = useState(initialRecipe?.totalDurationSec || 180);
     const [purpose, setPurpose] = useState(initialRecipe?.purpose || '');
     const [description, setDescription] = useState(initialRecipe?.description || '');
     const [steps, setSteps] = useState<DripStep[]>(initialRecipe?.steps || []);
@@ -36,14 +37,8 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
             return;
         }
 
-        // Calculate total duration from last step
+        // Sort steps by start time
         const sortedSteps = [...steps].sort((a, b) => a.startTimeSec - b.startTimeSec);
-        // Rough estimate: last step start time + 30s (or user could specify, but let's auto-calc for now)
-        // Or just use the last step's start time if we don't have duration per step. 
-        // Let's assume the last step takes some time, say 30s default if not specified elsewhere.
-        // For now, let's just say totalDuration is last step start + 30s.
-        const lastStepStart = sortedSteps[sortedSteps.length - 1].startTimeSec;
-        const totalDurationSec = lastStepStart + 30;
 
         const recipe: DripRecipe = {
             id: initialRecipe?.id || crypto.randomUUID(),
@@ -134,6 +129,45 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
                                 min={1}
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">総時間</label>
+                            <div className="flex gap-2 items-center">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            value={Math.floor(totalDurationSec / 60)}
+                                            onChange={(e) => {
+                                                const minutes = parseInt(e.target.value) || 0;
+                                                const seconds = totalDurationSec % 60;
+                                                setTotalDurationSec(minutes * 60 + seconds);
+                                            }}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                            min={0}
+                                        />
+                                        <span className="text-gray-600 text-sm whitespace-nowrap">分</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            value={totalDurationSec % 60}
+                                            onChange={(e) => {
+                                                const minutes = Math.floor(totalDurationSec / 60);
+                                                const seconds = parseInt(e.target.value) || 0;
+                                                setTotalDurationSec(minutes * 60 + seconds);
+                                            }}
+                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                            min={0}
+                                            max={59}
+                                        />
+                                        <span className="text-gray-600 text-sm whitespace-nowrap">秒</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="col-span-2">

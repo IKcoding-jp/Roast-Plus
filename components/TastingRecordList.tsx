@@ -64,7 +64,7 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
         return (
           <div
             key={record.id}
-            className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow"
+            className="bg-[#fdfbf7] rounded-xl shadow-md p-6 cursor-pointer hover:shadow-xl transition-all border-4 border-double border-stone-200"
             onClick={() => handleCardClick(record.id)}
           >
             <div className="flex flex-col md:flex-row gap-4">
@@ -75,18 +75,18 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                     {record.beanName}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <span 
+                    <span
                       className="px-3 py-1 text-white text-sm rounded-full"
                       style={
-                        record.roastLevel === '深煎り' 
+                        record.roastLevel === '深煎り'
                           ? { backgroundColor: '#120C0A' }
                           : record.roastLevel === '中深煎り'
-                          ? { backgroundColor: '#4E3526' }
-                          : record.roastLevel === '中煎り'
-                          ? { backgroundColor: '#745138' }
-                          : record.roastLevel === '浅煎り'
-                          ? { backgroundColor: '#C78F5D' }
-                          : { backgroundColor: '#6B7280' }
+                            ? { backgroundColor: '#4E3526' }
+                            : record.roastLevel === '中煎り'
+                              ? { backgroundColor: '#745138' }
+                              : record.roastLevel === '浅煎り'
+                                ? { backgroundColor: '#C78F5D' }
+                                : { backgroundColor: '#6B7280' }
                       }
                     >
                       {record.roastLevel}

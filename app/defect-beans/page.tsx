@@ -9,6 +9,7 @@ import { MdCompareArrows, MdSort, MdArrowUpward, MdArrowDownward } from 'react-i
 import LoginPage from '@/app/login/page';
 import { useDefectBeans } from '@/hooks/useDefectBeans';
 import { useDefectBeanSettings } from '@/hooks/useDefectBeanSettings';
+import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { DefectBeanCard } from '@/components/DefectBeanCard';
 import { DefectBeanForm } from '@/components/DefectBeanForm';
 import { DefectBeanCompare } from '@/components/DefectBeanCompare';
@@ -22,6 +23,7 @@ export default function DefectBeansPage() {
   const { user, loading: authLoading } = useAuth();
   const { allDefectBeans, isLoading, addDefectBean, updateDefectBean, removeDefectBean } = useDefectBeans();
   const { settings, updateSetting } = useDefectBeanSettings();
+  const { isEnabled: isDeveloperModeEnabled } = useDeveloperMode();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOption, setFilterOption] = useState<FilterOption>('all');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -525,7 +527,7 @@ export default function DefectBeansPage() {
               defectBean={editingBean}
               onSubmit={handleAddDefectBean} // 使用されないが型のため必要
               onUpdate={handleUpdateDefectBean}
-              onDelete={handleDeleteDefectBeanFromEdit}
+              onDelete={isDeveloperModeEnabled ? handleDeleteDefectBeanFromEdit : undefined}
               onCancel={() => setEditingDefectBeanId(null)}
             />
           );

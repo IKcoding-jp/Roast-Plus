@@ -16,7 +16,6 @@ export interface HandpickTimerState {
     remainingSeconds: number;
     isRunning: boolean;
     cycleCount: number;
-    beanOrigin: string;
     soundEnabled: boolean;
     firstMinutes: number;  // 1回目の時間（分）
     secondMinutes: number; // 2回目の時間（分）
@@ -27,7 +26,6 @@ export function useHandpickTimer() {
     const [remainingSeconds, setRemainingSeconds] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [cycleCount, setCycleCount] = useState(0);
-    const [beanOrigin, setBeanOrigin] = useState('');
     const [soundEnabled, setSoundEnabled] = useState(true);
     const [firstMinutes, setFirstMinutes] = useState(5);
     const [secondMinutes, setSecondMinutes] = useState(5);
@@ -42,7 +40,6 @@ export function useHandpickTimer() {
             setPhase(stored.phase);
             setRemainingSeconds(stored.remainingSeconds);
             setCycleCount(stored.cycleCount);
-            setBeanOrigin(stored.beanOrigin);
             setSoundEnabled(stored.soundEnabled);
             setFirstMinutes(stored.firstMinutes || 5);
             setSecondMinutes(stored.secondMinutes || 5);
@@ -58,12 +55,11 @@ export function useHandpickTimer() {
             phase,
             remainingSeconds,
             cycleCount,
-            beanOrigin,
             firstMinutes,
             secondMinutes,
             soundEnabled,
         });
-    }, [phase, remainingSeconds, cycleCount, beanOrigin, firstMinutes, secondMinutes, soundEnabled]);
+    }, [phase, remainingSeconds, cycleCount, firstMinutes, secondMinutes, soundEnabled]);
 
     // タイマーのカウントダウン処理
     useEffect(() => {
@@ -179,7 +175,6 @@ export function useHandpickTimer() {
         remainingSeconds,
         isRunning,
         cycleCount,
-        beanOrigin,
         soundEnabled,
         firstMinutes,
         secondMinutes,
@@ -191,7 +186,6 @@ export function useHandpickTimer() {
         pause,
         resume,
         reset,
-        setBeanOrigin,
         setSoundEnabled,
         setFirstMinutes,
         setSecondMinutes,

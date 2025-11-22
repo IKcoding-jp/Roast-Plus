@@ -20,7 +20,6 @@
 
 import { useAuth } from '@/lib/auth';
 import { HiArrowLeft } from 'react-icons/hi';
-import { MdAddCircle } from 'react-icons/md';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
@@ -129,7 +128,7 @@ export default function CounterPage() {
 
   return (
     <div className="h-screen flex flex-col bg-[#F7F7F5] overflow-hidden">
-      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between relative bg-white/50 backdrop-blur-sm border-b border-gray-200/50 z-10">
+      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center bg-white/50 backdrop-blur-sm border-b border-gray-200/50 z-10">
         <Link
           href="/"
           className="p-2 -ml-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
@@ -138,10 +137,6 @@ export default function CounterPage() {
         >
           <HiArrowLeft className="h-6 w-6" />
         </Link>
-        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 text-lg font-bold text-gray-800">
-          <MdAddCircle className="h-6 w-6 text-primary" />
-          カウンター
-        </h1>
       </header>
 
       <main className="flex-1 min-h-0 container mx-auto p-4 lg:p-6 flex flex-col justify-center overflow-hidden">

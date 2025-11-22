@@ -10,11 +10,11 @@ export interface HandpickTimerStorageState {
     phase: TimerPhase;
     remainingSeconds: number;
     cycleCount: number;
-    beanOrigin: string;
     firstMinutes: number;
     secondMinutes: number;
     soundEnabled: boolean;
     lastUpdated: string;
+    beanOrigin?: string; // 後方互換性のため残す（使用しない）
 }
 
 /**
@@ -56,7 +56,6 @@ export function saveHandpickTimerState(state: Partial<HandpickTimerStorageState>
             phase: state.phase ?? existing?.phase ?? 'idle',
             remainingSeconds: state.remainingSeconds ?? existing?.remainingSeconds ?? 0,
             cycleCount: state.cycleCount ?? existing?.cycleCount ?? 0,
-            beanOrigin: state.beanOrigin ?? existing?.beanOrigin ?? '',
             firstMinutes: state.firstMinutes ?? existing?.firstMinutes ?? 5,
             secondMinutes: state.secondMinutes ?? existing?.secondMinutes ?? 5,
             soundEnabled: state.soundEnabled ?? existing?.soundEnabled ?? true,

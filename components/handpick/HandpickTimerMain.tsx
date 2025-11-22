@@ -9,13 +9,12 @@ import Link from 'next/link';
 import { useHandpickTimer } from '@/hooks/useHandpickTimer';
 import { TimerDisplay } from './TimerDisplay';
 import { getPhaseName, getPhaseMessage } from '@/lib/handpickTimerUtils';
-import { BeanOriginInput } from './BeanOriginInput';
 import { TimeSettingInput } from './TimeSettingInput';
 import { TimerControls } from './TimerControls';
 import { HiVolumeUp, HiVolumeOff, HiArrowLeft } from 'react-icons/hi';
 
 export function HandpickTimerMain() {
-    const { state, start, pause, resume, reset, setBeanOrigin, setSoundEnabled, setFirstMinutes, setSecondMinutes } =
+    const { state, start, pause, resume, reset, setSoundEnabled, setFirstMinutes, setSecondMinutes } =
         useHandpickTimer();
 
     // 現在のフェーズの合計時間を取得（秒単位）
@@ -41,12 +40,7 @@ export function HandpickTimerMain() {
                     >
                         <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
                     </Link>
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 items-stretch">
-                        <BeanOriginInput
-                            value={state.beanOrigin}
-                            onChange={setBeanOrigin}
-                            disabled={state.isRunning}
-                        />
+                    <div className="flex-1 flex justify-end">
                         <TimeSettingInput
                             firstMinutes={state.firstMinutes}
                             secondMinutes={state.secondMinutes}

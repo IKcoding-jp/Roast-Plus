@@ -30,15 +30,15 @@ export function TimeSettingInput({
     };
 
     return (
-        <div className="bg-white/80 rounded-lg border border-gray-100 px-3 py-2 sm:px-4 sm:py-2.5 shadow-sm">
+        <div className="h-full bg-white/80 rounded-lg border border-gray-100 px-3 py-2 sm:px-4 sm:py-2.5 shadow-sm flex flex-col">
             <div className="mb-1.5 sm:mb-2">
                 <span className="text-xs sm:text-sm font-bold text-gray-600">時間設定（分）</span>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 flex-1">
                 {/* 1回目 */}
-                <div>
+                <div className="flex flex-col justify-end">
                     <label className="block">
-                        <span className="text-xs text-gray-500 mb-1 block">1回目</span>
+                        <span className="text-xs text-gray-500 mb-0.5 block">1回目</span>
                         <input
                             type="number"
                             min="1"
@@ -46,14 +46,14 @@ export function TimeSettingInput({
                             value={firstMinutes}
                             onChange={(e) => handleInputChange(e.target.value, onFirstChange)}
                             disabled={disabled}
-                            className="w-full px-2 py-1.5 sm:px-3 sm:py-2 border border-gray-200 rounded-md text-center text-base sm:text-lg font-bold text-gray-800 focus:border-[#EF8A00] focus:outline-none transition-colors disabled:bg-gray-50 disabled:text-gray-400"
+                            className="w-full px-2 py-1.5 sm:px-3 sm:py-2 border border-gray-200 rounded-md text-center text-sm sm:text-base font-bold text-gray-800 focus:border-[#EF8A00] focus:outline-none transition-colors disabled:bg-gray-50 disabled:text-gray-400"
                         />
                     </label>
                 </div>
                 {/* 2回目 */}
-                <div>
+                <div className="flex flex-col justify-end">
                     <label className="block">
-                        <span className="text-xs text-gray-500 mb-1 block">2回目</span>
+                        <span className="text-xs text-gray-500 mb-0.5 block">2回目</span>
                         <input
                             type="number"
                             min="1"
@@ -61,7 +61,7 @@ export function TimeSettingInput({
                             value={secondMinutes}
                             onChange={(e) => handleInputChange(e.target.value, onSecondChange)}
                             disabled={disabled}
-                            className="w-full px-2 py-1.5 sm:px-3 sm:py-2 border border-gray-200 rounded-md text-center text-base sm:text-lg font-bold text-gray-800 focus:border-[#EF8A00] focus:outline-none transition-colors disabled:bg-gray-50 disabled:text-gray-400"
+                            className="w-full px-2 py-1.5 sm:px-3 sm:py-2 border border-gray-200 rounded-md text-center text-sm sm:text-base font-bold text-gray-800 focus:border-[#EF8A00] focus:outline-none transition-colors disabled:bg-gray-50 disabled:text-gray-400"
                         />
                     </label>
                 </div>

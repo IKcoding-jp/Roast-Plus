@@ -75,20 +75,6 @@ export function TimerControls({
                     </>
                 )}
             </div>
-
-            {/* サウンド切り替えボタン */}
-            <div className="flex justify-end">
-                <button
-                    onClick={onToggleSound}
-                    className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-sm border transition-all flex items-center justify-center gap-2 ${soundEnabled
-                            ? 'bg-[#EF8A00] text-white border-[#EF8A00]'
-                            : 'bg-gray-100 text-gray-500 border-gray-200'
-                        }`}
-                >
-                    {soundEnabled ? <HiVolumeUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <HiVolumeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
-                    <span className="hidden sm:inline">{soundEnabled ? '音あり' : '音なし'}</span>
-                </button>
-            </div>
         </div>
     );
 }

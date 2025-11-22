@@ -11,6 +11,7 @@ import { getPhaseName, getPhaseMessage } from '@/lib/handpickTimerUtils';
 import { BeanOriginInput } from './BeanOriginInput';
 import { TimeSettingInput } from './TimeSettingInput';
 import { TimerControls } from './TimerControls';
+import { HiVolumeUp, HiVolumeOff } from 'react-icons/hi';
 
 export function HandpickTimerMain() {
     const { state, start, pause, resume, reset, setBeanOrigin, setSoundEnabled, setFirstMinutes, setSecondMinutes } =
@@ -30,7 +31,7 @@ export function HandpickTimerMain() {
         <div className="h-screen flex flex-col bg-[#F7F7F5] overflow-hidden">
             {/* 上部エリア（コンパクト） */}
             <div className="flex-none px-3 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-3">
-                <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+                <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 items-stretch">
                     <BeanOriginInput
                         value={state.beanOrigin}
                         onChange={setBeanOrigin}
@@ -69,6 +70,20 @@ export function HandpickTimerMain() {
             {/* 下部エリア（情報と操作） */}
             <div className="flex-none px-3 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-4 bg-white/50 backdrop-blur-sm border-t border-gray-200/50">
                 <div className="max-w-5xl mx-auto space-y-2 sm:space-y-3">
+                    {/* サウンド切り替えボタン（作業メッセージの上） */}
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => setSoundEnabled(!state.soundEnabled)}
+                            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-sm border transition-all flex items-center justify-center gap-2 ${state.soundEnabled
+                                    ? 'bg-[#EF8A00] text-white border-[#EF8A00]'
+                                    : 'bg-gray-100 text-gray-500 border-gray-200'
+                                }`}
+                        >
+                            {state.soundEnabled ? <HiVolumeUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <HiVolumeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
+                            <span className="hidden sm:inline">{state.soundEnabled ? '音あり' : '音なし'}</span>
+                        </button>
+                    </div>
+
                     {/* サイクル数と作業メッセージを横並び */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {/* サイクル数（コンパクト版） */}

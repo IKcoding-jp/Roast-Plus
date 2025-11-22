@@ -26,7 +26,7 @@ export const RecordForm = ({ onSave, disabled }: Props) => {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="例: 1回目の計測"
+                    placeholder="A"
                     className="w-full px-3 h-[6dvh] min-h-[40px] rounded-lg bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#EF8A00] focus:ring-2 focus:ring-[#EF8A00]/20 outline-none transition-all text-[2dvh] text-gray-800 placeholder-gray-400 font-medium"
                 />
             </div>

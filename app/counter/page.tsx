@@ -85,6 +85,7 @@ export default function CounterPage() {
       value: count,
       createdAt: now.toISOString(),
       checked: false,
+      type: 'manual',
     };
 
     setRecords((prev) => [newRecord, ...prev]);
@@ -98,17 +99,28 @@ export default function CounterPage() {
     ));
   };
 
+  const handleClearRecords = () => {
+    if (window.confirm('すべての記録を削除しますか？')) {
+      setRecords([]);
+    }
+  };
+
   const handleSaveResult = (value: number, type: 'sum' | 'diff') => {
     const now = new Date();
     const namePrefix = type === 'sum' ? '合計' : '差分';
-    const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // 選択された記録を取得してソースとして保存
+    const selectedRecords = records.filter(r => r.checked);
+    const sources = selectedRecords.map(r => ({ name: r.name, value: r.value }));
 
     const newRecord: RecordItem = {
       id: crypto.randomUUID(),
-      name: `${namePrefix}-${timeStr}`,
+      name: namePrefix, // 時間のサフィックスを削除
       value: value,
       createdAt: now.toISOString(),
       checked: false,
+      type: type,
+      sources: sources,
     };
 
     setRecords((prev) => [newRecord, ...prev]);
@@ -136,8 +148,8 @@ export default function CounterPage() {
           <button
             onClick={() => setActiveTab('counter')}
             className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'counter'
-                ? 'bg-white text-gray-800 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-white text-gray-800 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
           >
             カウンター
@@ -145,8 +157,8 @@ export default function CounterPage() {
           <button
             onClick={() => setActiveTab('records')}
             className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'records'
-                ? 'bg-white text-gray-800 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-white text-gray-800 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
           >
             記録一覧
@@ -186,14 +198,25 @@ export default function CounterPage() {
           {/* Mobile Records View */}
           <div className={`absolute inset-0 flex flex-col bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden ${activeTab === 'records' ? 'block' : 'hidden'}`}>
             <div className="flex-none p-4 border-b border-gray-100 flex items-center justify-between bg-white">
-              <h2 className="font-bold text-gray-700 flex items-center gap-2">
-                <span className="w-1.5 h-5 bg-[#EF8A00] rounded-full"></span>
-                記録一覧
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-bold text-gray-700 flex items-center gap-2">
+                  <span className="w-1.5 h-5 bg-[#EF8A00] rounded-full"></span>
+                  記録一覧
+                </h2>
+                {records.length > 0 && (
+                  <span className="text-xs font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded-md">
+                    {records.length}
+                  </span>
+                )}
+              </div>
               {records.length > 0 && (
-                <span className="text-xs font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded-md">
-                  {records.length}
-                </span>
+                <button
+                  type="button"
+                  onClick={handleClearRecords}
+                  className="text-xs text-red-500 hover:text-red-600 font-bold px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                >
+                  クリア
+                </button>
               )}
             </div>
             <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-2 bg-gray-50/30">
@@ -226,14 +249,25 @@ export default function CounterPage() {
           {/* Right Side: Records List */}
           <div className="w-[320px] xl:w-[360px] flex flex-col bg-gray-50 border-l border-gray-100 min-h-0">
             <div className="flex-none p-4 border-b border-gray-200/50 flex items-center justify-between bg-white/50 backdrop-blur-sm">
-              <h2 className="font-bold text-gray-700 flex items-center gap-2 text-base">
-                <span className="w-1.5 h-5 bg-[#EF8A00] rounded-full"></span>
-                記録一覧
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-bold text-gray-700 flex items-center gap-2 text-base">
+                  <span className="w-1.5 h-5 bg-[#EF8A00] rounded-full"></span>
+                  記録一覧
+                </h2>
+                {records.length > 0 && (
+                  <span className="text-[10px] font-bold bg-white border border-gray-200 text-gray-600 px-2 py-0.5 rounded-full shadow-sm">
+                    {records.length}件
+                  </span>
+                )}
+              </div>
               {records.length > 0 && (
-                <span className="text-[10px] font-bold bg-white border border-gray-200 text-gray-600 px-2 py-0.5 rounded-full shadow-sm">
-                  {records.length}件
-                </span>
+                <button
+                  type="button"
+                  onClick={handleClearRecords}
+                  className="text-xs text-red-500 hover:text-red-600 font-bold px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                >
+                  クリア
+                </button>
               )}
             </div>
 

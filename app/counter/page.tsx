@@ -20,6 +20,7 @@
 
 import { useAuth } from '@/lib/auth';
 import { HiArrowLeft } from 'react-icons/hi';
+import { MdAddCircle } from 'react-icons/md';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
@@ -137,7 +138,8 @@ export default function CounterPage() {
         >
           <HiArrowLeft className="h-6 w-6" />
         </Link>
-        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-gray-800">
+        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 text-lg font-bold text-gray-800">
+          <MdAddCircle className="h-6 w-6 text-primary" />
           カウンター
         </h1>
       </header>

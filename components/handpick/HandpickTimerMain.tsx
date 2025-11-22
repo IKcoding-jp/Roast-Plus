@@ -5,13 +5,14 @@
 
 'use client';
 
+import Link from 'next/link';
 import { useHandpickTimer } from '@/hooks/useHandpickTimer';
 import { TimerDisplay } from './TimerDisplay';
 import { getPhaseName, getPhaseMessage } from '@/lib/handpickTimerUtils';
 import { BeanOriginInput } from './BeanOriginInput';
 import { TimeSettingInput } from './TimeSettingInput';
 import { TimerControls } from './TimerControls';
-import { HiVolumeUp, HiVolumeOff } from 'react-icons/hi';
+import { HiVolumeUp, HiVolumeOff, HiArrowLeft } from 'react-icons/hi';
 
 export function HandpickTimerMain() {
     const { state, start, pause, resume, reset, setBeanOrigin, setSoundEnabled, setFirstMinutes, setSecondMinutes } =
@@ -29,23 +30,33 @@ export function HandpickTimerMain() {
 
     return (
         <div className="h-screen flex flex-col bg-[#F7F7F5] overflow-hidden">
-            {/* 上部エリア（コンパクト） */}
-            <div className="flex-none px-3 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-3">
-                <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 items-stretch">
-                    <BeanOriginInput
-                        value={state.beanOrigin}
-                        onChange={setBeanOrigin}
-                        disabled={state.isRunning}
-                    />
-                    <TimeSettingInput
-                        firstMinutes={state.firstMinutes}
-                        secondMinutes={state.secondMinutes}
-                        onFirstChange={setFirstMinutes}
-                        onSecondChange={setSecondMinutes}
-                        disabled={state.isRunning}
-                    />
+            {/* ヘッダー */}
+            <header className="flex-none px-3 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-3">
+                <div className="max-w-5xl mx-auto flex items-center gap-2 sm:gap-3">
+                    <Link
+                        href="/"
+                        className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                        title="戻る"
+                        aria-label="戻る"
+                    >
+                        <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
+                    </Link>
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 items-stretch">
+                        <BeanOriginInput
+                            value={state.beanOrigin}
+                            onChange={setBeanOrigin}
+                            disabled={state.isRunning}
+                        />
+                        <TimeSettingInput
+                            firstMinutes={state.firstMinutes}
+                            secondMinutes={state.secondMinutes}
+                            onFirstChange={setFirstMinutes}
+                            onSecondChange={setSecondMinutes}
+                            disabled={state.isRunning}
+                        />
+                    </div>
                 </div>
-            </div>
+            </header>
 
             {/* 中央エリア（メイン表示、最も大きい） */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center px-3 py-2 sm:px-4 sm:py-3 lg:px-6">

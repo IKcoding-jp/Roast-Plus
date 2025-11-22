@@ -95,6 +95,12 @@ select option {
   animation: gradient-shift 3s ease infinite;
 }
 
+.completed-label-gradient {
+  background: linear-gradient(90deg, #B45309, #D97706, #F59E0B, #D97706, #B45309);
+  background-size: 200% 100%;
+  animation: gradient-shift 3s ease infinite;
+}
+
 /* Scrollbar Hiding Utilities */
 .scrollbar-hide {
   -ms-overflow-style: none;

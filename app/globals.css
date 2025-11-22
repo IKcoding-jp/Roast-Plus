@@ -53,15 +53,19 @@ body {
 
 /* select要素とoption要素のスタイル */
 select option {
-  color: #1f2937; /* text-gray-800 */
+  color: #1f2937;
+  /* text-gray-800 */
   background-color: white;
 }
 
 /* New!ラベルのアニメーション */
 @keyframes pulse-scale {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
@@ -71,9 +75,11 @@ select option {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -87,4 +93,17 @@ select option {
   background: linear-gradient(90deg, #dc2626, #ef4444, #f87171, #ef4444, #dc2626);
   background-size: 200% 100%;
   animation: gradient-shift 3s ease infinite;
+}
+
+/* Scrollbar Hiding Utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
 }

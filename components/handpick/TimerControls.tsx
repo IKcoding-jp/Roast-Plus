@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { HiPlay, HiPause, HiRefresh, HiVolumeUp, HiVolumeOff } from 'react-icons/hi';
 import { type TimerPhase } from '@/lib/handpickTimerUtils';
 
@@ -16,6 +17,7 @@ interface TimerControlsProps {
     onResume: () => void;
     onReset: () => void;
     onToggleSound: () => void;
+    isSecondPhaseStart?: boolean;
 }
 
 export function TimerControls({
@@ -27,10 +29,26 @@ export function TimerControls({
     onResume,
     onReset,
     onToggleSound,
+    isSecondPhaseStart = false,
 }: TimerControlsProps) {
+    const [isResetConfirm, setIsResetConfirm] = useState(false);
+
+    // 確認状態を3秒後に自動解除
+    useEffect(() => {
+        if (isResetConfirm) {
+            const timer = setTimeout(() => {
+                setIsResetConfirm(false);
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [isResetConfirm]);
+
     const handleReset = () => {
-        if (window.confirm('タイマーをリセットしますか？')) {
+        if (isResetConfirm) {
             onReset();
+            setIsResetConfirm(false);
+        } else {
+            setIsResetConfirm(true);
         }
     };
 
@@ -40,6 +58,7 @@ export function TimerControls({
             <div className="grid grid-cols-2 gap-2">
                 {phase === 'idle' ? (
                     <button
+                        type="button"
                         onClick={onStart}
                         className="col-span-2 bg-[#EF8A00] text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
                     >
@@ -50,6 +69,7 @@ export function TimerControls({
                     <>
                         {isRunning ? (
                             <button
+                                type="button"
                                 onClick={onPause}
                                 className="bg-amber-500 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
                             >
@@ -58,19 +78,24 @@ export function TimerControls({
                             </button>
                         ) : (
                             <button
+                                type="button"
                                 onClick={onResume}
                                 className="bg-[#EF8A00] text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
                             >
                                 <HiPlay className="w-5 h-5 sm:w-6 sm:h-6" />
-                                再開
+                                {isSecondPhaseStart ? '2回目スタート' : '再開'}
                             </button>
                         )}
                         <button
+                            type="button"
                             onClick={handleReset}
-                            className="bg-gray-100 text-gray-700 py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg border border-gray-200 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center gap-2"
+                            className={`py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg border transition-all flex items-center justify-center gap-2 ${isResetConfirm
+                                ? 'bg-red-500 text-white border-red-600 hover:bg-red-600'
+                                : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                                }`}
                         >
-                            <HiRefresh className="w-5 h-5 sm:w-6 sm:h-6" />
-                            リセット
+                            <HiRefresh className={`w-5 h-5 sm:w-6 sm:h-6 ${isResetConfirm ? 'animate-spin' : ''}`} />
+                            {isResetConfirm ? '本当にリセット？' : 'リセット'}
                         </button>
                     </>
                 )}

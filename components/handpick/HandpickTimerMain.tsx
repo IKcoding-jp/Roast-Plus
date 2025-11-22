@@ -14,7 +14,7 @@ import { TimerControls } from './TimerControls';
 import { HiVolumeUp, HiVolumeOff, HiArrowLeft } from 'react-icons/hi';
 
 export function HandpickTimerMain() {
-    const { state, start, pause, resume, reset, setSoundEnabled, setFirstMinutes, setSecondMinutes } =
+    const { state, start, pause, resume, reset, setSoundEnabled, setFirstMinutes, setSecondMinutes, skip } =
         useHandpickTimer();
 
     // 現在のフェーズの合計時間を取得（秒単位）
@@ -68,6 +68,7 @@ export function HandpickTimerMain() {
                         phase={state.phase}
                         isRunning={state.isRunning}
                         totalSeconds={getTotalSeconds()}
+                        onSkip={skip}
                     />
                 </div>
             </div>
@@ -80,8 +81,8 @@ export function HandpickTimerMain() {
                         <button
                             onClick={() => setSoundEnabled(!state.soundEnabled)}
                             className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-sm border transition-all flex items-center justify-center gap-2 ${state.soundEnabled
-                                    ? 'bg-[#EF8A00] text-white border-[#EF8A00]'
-                                    : 'bg-gray-100 text-gray-500 border-gray-200'
+                                ? 'bg-[#EF8A00] text-white border-[#EF8A00]'
+                                : 'bg-gray-100 text-gray-500 border-gray-200'
                                 }`}
                         >
                             {state.soundEnabled ? <HiVolumeUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <HiVolumeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -105,9 +106,18 @@ export function HandpickTimerMain() {
                             state.phase === 'second' ? 'bg-orange-50/80 border-orange-200' :
                                 'bg-gray-50/80 border-gray-200'
                             }`}>
-                            <p className="text-xs sm:text-sm lg:text-base font-bold text-gray-800 text-center leading-tight">
-                                {message}
-                            </p>
+                            {state.phase === 'idle' ? (
+                                <div className="text-center leading-tight">
+                                    <p className="text-[10px] sm:text-xs text-gray-500 font-bold mb-0.5">準備</p>
+                                    <p className="text-xs sm:text-sm lg:text-base font-bold text-gray-800">
+                                        {state.cycleCount === 0 ? 'ピシャット・欠点豆入れ・豆' : '新しい豆を用意してください'}
+                                    </p>
+                                </div>
+                            ) : (
+                                <p className="text-xs sm:text-sm lg:text-base font-bold text-gray-800 text-center leading-tight">
+                                    {message}
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -121,6 +131,7 @@ export function HandpickTimerMain() {
                         onResume={resume}
                         onReset={reset}
                         onToggleSound={() => setSoundEnabled(!state.soundEnabled)}
+                        isSecondPhaseStart={state.phase === 'second' && state.remainingSeconds === state.secondMinutes * 60}
                     />
                 </div>
             </div>

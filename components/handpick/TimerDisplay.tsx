@@ -13,9 +13,10 @@ interface TimerDisplayProps {
     phase: TimerPhase;
     isRunning: boolean;
     totalSeconds: number; // フェーズごとの合計時間
+    onSkip?: () => void;
 }
 
-export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds }: TimerDisplayProps) {
+export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds, onSkip }: TimerDisplayProps) {
     const [circleSize, setCircleSize] = useState(340);
     const strokeWidth = 16;
 
@@ -113,7 +114,7 @@ export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds 
                         strokeDasharray={circumference}
                         strokeDashoffset={offset}
                         strokeLinecap="round"
-                        className="transition-all duration-1000 ease-linear"
+                        style={{ transition: 'stroke-dashoffset 1s linear' }}
                     />
                 </svg>
 
@@ -128,9 +129,22 @@ export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds 
                         {formatTime(remainingSeconds)}
                     </div>
                     {phase !== 'idle' && (
-                        <div className="text-gray-400 text-base sm:text-lg mt-2 font-medium">
-                            {Math.round(progress)}% 完了
-                        </div>
+                        <>
+                            <div className="text-gray-400 text-base sm:text-lg mt-2 font-medium">
+                                {Math.round(progress)}% 完了
+                            </div>
+                            {onSkip && (
+                                <button
+                                    onClick={onSkip}
+                                    className="mt-2 px-3 py-1 text-xs sm:text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors flex items-center gap-1"
+                                >
+                                    スキップ
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 sm:w-4 sm:h-4">
+                                        <path d="M4.5 3.25a.75.75 0 00-1.125.65v12.2a.75.75 0 001.125.65l9.75-6.1a.75.75 0 000-1.3l-9.75-6.1zM15.25 3.25a.75.75 0 00-.75.75v12a.75.75 0 001.5 0v-12a.75.75 0 00-.75-.75z" />
+                                    </svg>
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

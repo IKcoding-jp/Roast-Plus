@@ -31,6 +31,7 @@ import { RecordForm } from './components/RecordForm';
 import { RecordList } from './components/RecordList';
 import { StatsPanel } from './components/StatsPanel';
 import { RecordItem } from './types';
+import { ConfirmDialog } from '@/components/drip-guide/ConfirmDialog';
 
 export default function CounterPage() {
   const { user, loading: authLoading } = useAuth();
@@ -40,6 +41,7 @@ export default function CounterPage() {
   const [history, setHistory] = useState<number[]>([]);
   const [records, setRecords] = useState<RecordItem[]>([]);
   const [activeTab, setActiveTab] = useState<'counter' | 'records'>('counter');
+  const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 
   if (authLoading) {
     return <Loading />;
@@ -100,9 +102,12 @@ export default function CounterPage() {
   };
 
   const handleClearRecords = () => {
-    if (window.confirm('すべての記録を削除しますか？')) {
-      setRecords([]);
-    }
+    setIsClearDialogOpen(true);
+  };
+
+  const performClearRecords = () => {
+    setRecords([]);
+    setIsClearDialogOpen(false);
   };
 
   const handleSaveResult = (value: number, type: 'sum' | 'diff') => {
@@ -279,6 +284,15 @@ export default function CounterPage() {
 
         </div>
       </main>
+
+      <ConfirmDialog
+        isOpen={isClearDialogOpen}
+        title="記録の削除"
+        message="すべての記録を削除しますか？この操作は取り消せません。"
+        confirmText="削除"
+        onConfirm={performClearRecords}
+        onCancel={() => setIsClearDialogOpen(false)}
+      />
     </div>
   );
 }

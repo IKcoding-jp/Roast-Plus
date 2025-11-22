@@ -68,6 +68,7 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSerifJP.variable} ${playfairDisplay.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Script
           src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js"

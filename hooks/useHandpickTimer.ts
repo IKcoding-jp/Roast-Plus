@@ -128,13 +128,9 @@ export function useHandpickTimer() {
         setIsRunning(false);
 
         if (phase === 'first') {
-            // 1回目終了 → 2回目へ自動移行
+            // 1回目終了 → 2回目へ移行（手動開始待ち）
             setPhase('second');
             setRemainingSeconds(secondMinutes * 60);
-            // 少し待ってから2回目を自動開始
-            setTimeout(() => {
-                setIsRunning(true);
-            }, 100);
         } else if (phase === 'second') {
             // 2回目終了 → サイクル数+1、停止状態へ
             setCycleCount((prev) => prev + 1);
@@ -189,5 +185,6 @@ export function useHandpickTimer() {
         setSoundEnabled,
         setFirstMinutes,
         setSecondMinutes,
+        skip: handlePhaseComplete,
     };
 }

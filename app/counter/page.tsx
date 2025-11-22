@@ -173,9 +173,9 @@ export default function CounterPage() {
         {/* Mobile Content (< lg) */}
         <div className="lg:hidden flex-1 min-h-0 relative">
           {/* Mobile Counter View */}
-          <div className={`absolute inset-0 flex flex-col overflow-hidden pb-[5dvh] ${activeTab === 'counter' ? 'block' : 'hidden'}`}>
-            <div className="h-full bg-white rounded-3xl shadow-sm border border-gray-100 p-[3dvh] flex flex-col justify-between">
-              <div className="flex-1 flex flex-col justify-center">
+          <div className={`absolute inset-0 flex flex-col overflow-hidden ${activeTab === 'counter' ? 'block' : 'hidden'}`}>
+            <div className="h-full bg-white rounded-3xl shadow-sm border border-gray-100 p-[3dvh] pb-[5dvh] flex flex-col justify-between overflow-y-auto">
+              <div className="flex-1 flex flex-col justify-center min-h-0">
                 <CounterDisplay count={count} />
               </div>
 

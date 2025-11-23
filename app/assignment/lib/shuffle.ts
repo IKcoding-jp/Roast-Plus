@@ -64,6 +64,47 @@ export const calculateAssignment = (
         return asg?.memberId || null;
     };
 
+    // ペア重複チェック用の履歴マップ構築
+    // memberId -> { daysAgo1: Set<partnerId>, daysAgo2: Set<partnerId> }
+    const pairHistory: Record<string, { daysAgo1: Set<string>, daysAgo2: Set<string> }> = {};
+    eligibleMembers.forEach(m => {
+        pairHistory[m.id] = { daysAgo1: new Set(), daysAgo2: new Set() };
+    });
+
+    [1, 2].forEach(daysAgo => {
+        const dayRecord = history[daysAgo - 1];
+        if (!dayRecord) return;
+
+        // タスクラベルごとにメンバーをグループ化
+        const tasks: Record<string, string[]> = {};
+        dayRecord.assignments.forEach(a => {
+            if (a.memberId && a.taskLabelId) {
+                if (!tasks[a.taskLabelId]) tasks[a.taskLabelId] = [];
+                tasks[a.taskLabelId].push(a.memberId);
+            }
+        });
+
+        // 同じタスクラベルにいたメンバー同士をペアとして登録
+        Object.values(tasks).forEach(membersInTask => {
+            if (membersInTask.length < 2) return;
+            for (let i = 0; i < membersInTask.length; i++) {
+                for (let j = i + 1; j < membersInTask.length; j++) {
+                    const m1 = membersInTask[i];
+                    const m2 = membersInTask[j];
+                    
+                    if (pairHistory[m1]) {
+                        if (daysAgo === 1) pairHistory[m1].daysAgo1.add(m2);
+                        else pairHistory[m1].daysAgo2.add(m2);
+                    }
+                    if (pairHistory[m2]) {
+                        if (daysAgo === 1) pairHistory[m2].daysAgo1.add(m1);
+                        else pairHistory[m2].daysAgo2.add(m1);
+                    }
+                }
+            }
+        });
+    });
+
     // 4. 割り当て実行
     const assignedMemberIds = new Set<string>();
 
@@ -74,10 +115,33 @@ export const calculateAssignment = (
     // ここでは、シャッフル対象のスロットに対してメンバーを割り当てていく。
 
     // スロットをシャッフル
-    const shuffledSlots = [...slots].sort(() => Math.random() - 0.5);
+    // 改善: 除外設定などにより「割り当て可能なメンバーが少ないスロット」を優先的に処理するため、
+    // 候補者数を計算してソートする
+    const slotsWithCount = slots.map(slot => {
+        // このスロットに割り当て可能なメンバー数（チーム一致かつ除外設定なし）
+        const count = eligibleMembers.filter(m => 
+            m.teamId === slot.teamId && 
+            !m.excludedTaskLabelIds.includes(slot.taskLabelId)
+        ).length;
+        return { ...slot, candidateCount: count };
+    });
+
+    // 候補者が少ない順（昇順）にソート。同じ場合はランダム。
+    const shuffledSlots = slotsWithCount.sort((a, b) => {
+        if (a.candidateCount !== b.candidateCount) {
+            return a.candidateCount - b.candidateCount;
+        }
+        return Math.random() - 0.5;
+    });
 
     for (const slot of shuffledSlots) {
         const candidates: Score[] = [];
+
+        // 現在処理中のスロットと同じ行（タスクラベル）に既にアサインされているメンバーを取得
+        // (assignments配列には、固定枠(null)と、このループですでに決定した割り当てが含まれている)
+        const currentRowPartners = assignments
+            .filter(a => a.taskLabelId === slot.taskLabelId && a.memberId)
+            .map(a => a.memberId!);
 
         for (const member of eligibleMembers) {
             // 割り当て済みメンバーはスキップ
@@ -89,15 +153,28 @@ export const calculateAssignment = (
 
             let score = recentCounts[member.id] || 0;
 
-            // ペナルティ計算
+            // 場所の重複ペナルティ計算
             const yesterdayMemberId = getHistoryAssignment(1, slot.taskLabelId);
-            if (yesterdayMemberId === member.id) score += 5;
+            if (yesterdayMemberId === member.id) score += 10000; // 昨日と同じなら超高ペナルティ（絶対避ける）
 
             const twoDaysAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
-            if (twoDaysAgoMemberId === member.id) score += 3;
+            if (twoDaysAgoMemberId === member.id) score += 5000; // 一昨日と同じなら高ペナルティ（できるだけ避ける）
 
             if (yesterdayMemberId === member.id && twoDaysAgoMemberId === member.id) {
-                score += 1000;
+                score += 50000; // 2日連続同じなら最大ペナルティ（何が何でも避ける）
+            }
+
+            // ペアの重複ペナルティ計算
+            // 同じ行になる予定のメンバーとの過去のペア関係をチェック
+            for (const partnerId of currentRowPartners) {
+                // 昨日ペアだった
+                if (pairHistory[member.id]?.daysAgo1.has(partnerId)) {
+                    score += 50;
+                }
+                // 一昨日ペアだった
+                if (pairHistory[member.id]?.daysAgo2.has(partnerId)) {
+                    score += 20;
+                }
             }
 
             score += Math.random();
@@ -107,7 +184,9 @@ export const calculateAssignment = (
         candidates.sort((a, b) => a.score - b.score);
         const bestCandidate = candidates[0];
 
-        if (bestCandidate && bestCandidate.score < 500) {
+        // 閾値を上げて、ペナルティが高くても他に候補がいなければ割り当てるようにする
+        // (最大ペナルティは約65000点なので、それより大きく設定)
+        if (bestCandidate && bestCandidate.score < 100000) {
             assignments.push({
                 teamId: slot.teamId,
                 taskLabelId: slot.taskLabelId,
@@ -123,5 +202,24 @@ export const calculateAssignment = (
         }
     }
 
-    return assignments;
+    // 安全装置：万が一の重複割り当てを防ぐための最終チェック
+    // (IDレベルでの重複があれば、ここで確実に未割り当てに戻します)
+    const validatedAssignments: Assignment[] = [];
+    const uniqueCheck = new Set<string>();
+
+    for (const asg of assignments) {
+        if (asg.memberId) {
+            if (uniqueCheck.has(asg.memberId)) {
+                // 既に割り当て済みのメンバーIDが再度登場した場合、未割り当て(null)に戻す
+                validatedAssignments.push({ ...asg, memberId: null });
+            } else {
+                uniqueCheck.add(asg.memberId);
+                validatedAssignments.push(asg);
+            }
+        } else {
+            validatedAssignments.push(asg);
+        }
+    }
+
+    return validatedAssignments;
 };

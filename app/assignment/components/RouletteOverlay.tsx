@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
+import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { Member } from '@/types';
 
 type Props = {
@@ -7,49 +8,81 @@ type Props = {
     members: Member[];
 };
 
-export const RouletteOverlay: React.FC<Props> = ({ isVisible, members }) => {
-    const [displayNames, setDisplayNames] = useState<string[]>([]);
-
-    useEffect(() => {
-        if (!isVisible) return;
-
-        const interval = setInterval(() => {
-            // ランダムに3人の名前を表示する演出
-            const randomMembers = [];
-            for (let i = 0; i < 3; i++) {
-                const r = Math.floor(Math.random() * members.length);
-                randomMembers.push(members[r]?.name || '...');
-            }
-            setDisplayNames(randomMembers);
-        }, 80);
-
-        return () => clearInterval(interval);
-    }, [isVisible, members]);
-
+export const RouletteOverlay: React.FC<Props> = ({ isVisible }) => {
     if (!isVisible) return null;
+
+    // 5つの豆を円形に配置して回転させる
+    const beans = Array.from({ length: 5 });
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm"
+            // コーヒー感のあるダークブラウンの背景
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a100c]/95 backdrop-blur-sm"
         >
-            <div className="text-center">
-                <h2 className="text-white text-2xl mb-8 font-bold tracking-widest">SHUFFLING...</h2>
-                <div className="flex flex-col gap-4">
-                    {displayNames.map((name, i) => (
+            <div className="flex flex-col items-center justify-center">
+                {/* アニメーションコンテナ */}
+                <div className="relative w-40 h-40 mb-8">
+                    {/* 中央の大きな豆 */}
+                    <motion.div
+                        className="absolute inset-0 flex items-center justify-center"
+                        animate={{ 
+                            scale: [1, 1.1, 1],
+                            rotate: [0, 10, -10, 0]
+                        }}
+                        transition={{ 
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                    >
+                        <PiCoffeeBeanFill size={64} className="text-gold drop-shadow-lg" />
+                    </motion.div>
+
+                    {/* 周囲を回る豆たち */}
+                    {beans.map((_, i) => (
                         <motion.div
                             key={i}
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1.5, opacity: 1 }}
-                            transition={{ duration: 0.1 }}
-                            className="text-4xl md:text-6xl font-black text-gold text-shadow-lg"
+                            className="absolute inset-0"
+                            initial={{ rotate: i * (360 / beans.length) }}
+                            animate={{ rotate: i * (360 / beans.length) + 360 }}
+                            transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "linear"
+                            }}
                         >
-                            {name}
+                            <motion.div
+                                className="absolute top-0 left-1/2 -translate-x-1/2 -mt-2"
+                                animate={{ 
+                                    rotate: -360, // 自身の回転を相殺して向きを保つ
+                                    scale: [1, 1.2, 1] 
+                                }}
+                                transition={{
+                                    rotate: { duration: 3, repeat: Infinity, ease: "linear" },
+                                    scale: { duration: 1.5, repeat: Infinity, delay: i * 0.2 }
+                                }}
+                            >
+                                <PiCoffeeBeanFill 
+                                    size={24} 
+                                    className="text-amber-500/80" 
+                                />
+                            </motion.div>
                         </motion.div>
                     ))}
                 </div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <h2 className="text-gold text-2xl md:text-3xl font-bold tracking-[0.2em] text-shadow-lg">
+                        BLENDING...
+                    </h2>
+                </motion.div>
             </div>
         </motion.div>
     );

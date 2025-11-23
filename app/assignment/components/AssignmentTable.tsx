@@ -427,22 +427,31 @@ export const AssignmentTable: React.FC<Props> = ({
                 >
                     <div className="relative">
                         {isAddingTeam ? (
-                            <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32">
-                                <input
-                                    className="w-full px-1 text-sm outline-none"
-                                    placeholder="班名"
-                                    value={newTeamName}
-                                    onChange={e => setNewTeamName(e.target.value)}
-                                    autoFocus
-                                    onKeyDown={e => {
-                                        if (e.key === 'Enter') handleAddTeam();
-                                        if (e.key === 'Escape') setIsAddingTeam(false);
-                                    }}
+                            <>
+                                <div 
+                                    className="fixed inset-0 z-10" 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsAddingTeam(false);
+                                    }} 
                                 />
-                                <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1">
-                                    <MdAdd />
-                                </button>
-                            </div>
+                                <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32">
+                                    <input
+                                        className="w-full px-1 text-sm outline-none text-gray-900"
+                                        placeholder="班名"
+                                        value={newTeamName}
+                                        onChange={e => setNewTeamName(e.target.value)}
+                                        autoFocus
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') handleAddTeam();
+                                            if (e.key === 'Escape') setIsAddingTeam(false);
+                                        }}
+                                    />
+                                    <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1">
+                                        <MdAdd />
+                                    </button>
+                                </div>
+                            </>
                         ) : (
                             <button
                                 onClick={() => setIsAddingTeam(true)}
@@ -529,7 +538,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                 {isEditing ? (
                                     <div className="flex gap-1 w-full min-w-0 items-center justify-end">
                                         <input
-                                            className="w-full min-w-0 p-2 border rounded bg-white text-right text-sm"
+                                            className="w-full min-w-0 p-2 border rounded bg-white text-right text-sm text-gray-900"
                                             value={editRightLabel}
                                             onChange={e => setEditRightLabel(e.target.value)}
                                             onKeyDown={e => {
@@ -643,7 +652,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                         <label className="text-xs font-bold text-gray-500">メンバー名</label>
                                         <div className="flex gap-2">
                                             <input
-                                                className="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                className="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900"
                                                 value={editingMemberName}
                                                 onChange={(e) => setEditingMemberName(e.target.value)}
                                             />
@@ -770,22 +779,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                         </div>
                                     )}
 
-                                    {/* 行の設定変更 */}
-                                    <button
-                                        onClick={() => {
-                                            setHeightConfig({
-                                                taskLabelId: contextMenu.taskLabelId,
-                                                currentHeight: tableSettings?.rowHeights?.[contextMenu.taskLabelId] ?? 80,
-                                                label: '行の設定',
-                                                currentName: taskLabels.find(l => l.id === contextMenu.taskLabelId)?.leftLabel || ''
-                                            });
-                                            setContextMenu(null);
-                                        }}
-                                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors text-left"
-                                    >
-                                        <MdHeight size={20} className="text-gray-500" />
-                                        <div className="text-sm font-bold">行の設定（高さ・名前）</div>
-                                    </button>
+                                    {/* 行の設定変更 - メンバー編集時には不要なので削除 */}
                                 </div>
                             </div>
                         </motion.div>
@@ -820,7 +814,7 @@ export const AssignmentTable: React.FC<Props> = ({
                             {/* 新規追加 */}
                             <div className="flex gap-2 mb-4 pb-4 border-b border-gray-100">
                                 <input
-                                    className="flex-1 border rounded px-3 py-2 text-sm"
+                                    className="flex-1 border rounded px-3 py-2 text-sm text-gray-900"
                                     placeholder="新規メンバー名"
                                     value={newMemberName}
                                     onChange={e => setNewMemberName(e.target.value)}

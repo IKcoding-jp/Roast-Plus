@@ -21,9 +21,11 @@ import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
+import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
 export default function AssignmentPage() {
     const router = useRouter();
+    const { isEnabled: isDeveloperMode } = useDeveloperMode();
 
     // マスタデータ
     const [teams, setTeams] = useState<Team[]>([]);
@@ -36,6 +38,29 @@ export default function AssignmentPage() {
     const [assignmentDay, setAssignmentDay] = useState<AssignmentDay | null>(null);
     const [shuffleEvent, setShuffleEvent] = useState<ShuffleEvent | null>(null);
     const [isRouletteVisible, setIsRouletteVisible] = useState(false);
+
+    // シャッフルボタンの有効/無効判定
+    const isShuffleDisabled = useMemo(() => {
+        // 開発者モードなら常に有効
+        if (isDeveloperMode) return false;
+
+        // 日付が取得できていない場合は無効
+        if (!todayDate) return true;
+
+        // 土日判定 (0=日曜, 6=土曜)
+        const date = new Date();
+        const day = date.getDay();
+        const isWeekend = day === 0 || day === 6;
+        if (isWeekend) return true;
+
+        // 既に割り当てがあるか判定
+        // assignmentDay.assignments の中に memberId が null でないものがあるか
+        if (assignmentDay?.assignments?.some(a => a.memberId !== null)) {
+            return true;
+        }
+
+        return false;
+    }, [isDeveloperMode, todayDate, assignmentDay]);
 
     // 初期化: 日付とマスタデータ
     useEffect(() => {
@@ -261,7 +286,12 @@ export default function AssignmentPage() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={handleShuffle}
-                            className="flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors z-50 relative bg-primary text-white hover:bg-primary-dark active:scale-95"
+                            disabled={isShuffleDisabled}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors z-50 relative ${
+                                isShuffleDisabled
+                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                    : 'bg-primary text-white hover:bg-primary-dark active:scale-95'
+                            }`}
                         >
                             <PiShuffleBold />
                             <span className="hidden md:inline">シャッフル</span>

@@ -107,22 +107,12 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                 <div className="w-10" /> {/* Spacer for centering */}
             </div>
 
-            {/* Progress Bar */}
-            <div className="flex-none h-1 bg-gray-100 w-full">
-                <motion.div
-                    className="h-full bg-amber-500"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressPercent}%` }}
-                    transition={{ duration: 1, ease: "linear" }}
-                />
-            </div>
-
             {/* Main Content - No Scroll */}
-            <div className="flex-grow flex flex-col items-center justify-center py-2 px-4 overflow-hidden">
-                {/* Steps Mini Map */}
-                <div className="w-full max-w-2xl mb-3 sm:mb-2 px-2 flex-shrink-0">
+            <div className="flex-grow flex flex-col items-center py-2 px-4 overflow-hidden">
+                {/* Steps Mini Map - Fixed at top */}
+                <div className="w-full max-w-2xl mb-2 sm:mb-3 px-2 flex-shrink-0">
                     <div className="overflow-x-auto pb-1 -mx-2 px-2">
-                        <div className="flex gap-3 sm:gap-2 min-w-max">
+                        <div className="flex gap-2 sm:gap-2 min-w-max">
                             {steps.map((step, index) => {
                                 const stepEndTime = index < steps.length - 1 
                                     ? steps[index + 1].startTimeSec 
@@ -137,7 +127,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         className={clsx(
-                                            "flex-shrink-0 rounded-lg px-4 py-3 sm:px-3 sm:py-2 min-w-[140px] sm:min-w-[120px] border-2 transition-all",
+                                            "flex-shrink-0 rounded-lg px-3 py-2 sm:px-3 sm:py-2 min-w-[120px] sm:min-w-[120px] border-2 transition-all",
                                             isCurrent
                                                 ? "bg-amber-50 border-amber-400 shadow-md"
                                                 : isCompleted
@@ -146,7 +136,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                         )}
                                     >
                                         <div className={clsx(
-                                            "text-sm sm:text-xs font-semibold mb-1.5 sm:mb-1",
+                                            "text-xs sm:text-xs font-semibold mb-1 sm:mb-1",
                                             isCurrent
                                                 ? "text-amber-700"
                                                 : isCompleted
@@ -156,7 +146,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                             {formatTime(step.startTimeSec)} - {formatTime(stepEndTime)}
                                         </div>
                                         <div className={clsx(
-                                            "text-base sm:text-sm font-bold truncate",
+                                            "text-sm sm:text-sm font-bold truncate",
                                             isCurrent
                                                 ? "text-amber-800"
                                                 : isCompleted
@@ -174,7 +164,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                                         100
                                                     )}%` 
                                                 }}
-                                                className="h-1.5 sm:h-1 bg-amber-500 rounded-full mt-2 sm:mt-1.5"
+                                                className="h-1 sm:h-1 bg-amber-500 rounded-full mt-1.5 sm:mt-1.5"
                                                 transition={{ duration: 1, ease: "linear" }}
                                             />
                                         )}
@@ -185,15 +175,17 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                     </div>
                 </div>
 
-                {/* Timer */}
-                <div className="text-center mb-4 sm:mb-6 flex-shrink-0 mt-2 sm:mt-4">
-                    <div className="text-8xl sm:text-7xl md:text-8xl lg:text-9xl tabular-nums font-bold text-gray-800 tracking-tighter leading-none" style={{ fontFamily: 'var(--font-nunito), sans-serif' }}>
-                        {formatTime(currentTime)}
+                {/* Timer and Step Info - Centered */}
+                <div className="flex-grow flex flex-col items-center justify-center w-full">
+                    {/* Timer */}
+                    <div className="text-center mb-4 sm:mb-6 flex-shrink-0 -mt-4 sm:mt-0">
+                        <div className="text-8xl sm:text-7xl md:text-8xl lg:text-9xl tabular-nums font-bold text-gray-800 tracking-tighter leading-none" style={{ fontFamily: 'var(--font-nunito), sans-serif' }}>
+                            {formatTime(currentTime)}
+                        </div>
                     </div>
-                </div>
 
-                {/* Current Step Info */}
-                <div className="w-full max-w-md text-center flex-grow flex flex-col justify-start min-h-0">
+                    {/* Current Step Info */}
+                    <div className="w-full max-w-md text-center flex-shrink-0 flex flex-col justify-center">
                     <AnimatePresence mode="wait">
                         {currentStep ? (
                             <motion.div
@@ -236,7 +228,18 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                             </motion.div>
                         )}
                     </AnimatePresence>
+                    </div>
                 </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="flex-none h-1 bg-gray-100 w-full">
+                <motion.div
+                    className="h-full bg-amber-500"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    transition={{ duration: 1, ease: "linear" }}
+                />
             </div>
 
             {/* Footer Controls - Fixed */}

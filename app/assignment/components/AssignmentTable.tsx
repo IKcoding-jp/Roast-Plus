@@ -158,16 +158,22 @@ export const AssignmentTable: React.FC<Props> = ({
     const isLongPress = useRef(false);
     const touchStartPos = useRef<{ x: number, y: number } | null>(null);
 
-    // コンテキストメニューが開いたときに名前をセット、アコーディオンをリセット
+    // コンテキストメニューが開いたときにアコーディオンをリセット
+    useEffect(() => {
+        if (contextMenu?.memberId) {
+            setIsExclusionSettingsOpen(false); // メニューを開くたびに閉じた状態に戻す
+        } else {
+            setEditingMemberName('');
+        }
+    }, [contextMenu]);
+
+    // メンバー情報が更新されたら編集用ステートも更新
     useEffect(() => {
         if (contextMenu?.memberId) {
             const member = members.find(m => m.id === contextMenu.memberId);
             if (member) {
                 setEditingMemberName(member.name);
             }
-            setIsExclusionSettingsOpen(false); // メニューを開くたびに閉じた状態に戻す
-        } else {
-            setEditingMemberName('');
         }
     }, [contextMenu, members]);
 

@@ -69,9 +69,22 @@ export function useRecipes() {
 
     const saveRecipes = (newRecipes: DripRecipe[]) => {
         setRecipes(newRecipes);
-        // デフォルトレシピを除外し、ユーザーレシピのみを保存
-        const userRecipesOnly = newRecipes.filter(r => !r.isDefault);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(userRecipesOnly));
+        // デフォルトレシピのIDリストを取得
+        const defaultRecipeIds = new Set(MOCK_RECIPES.filter(r => r.isDefault).map(r => r.id));
+        
+        // デフォルトレシピ（編集済み）とユーザーレシピを保存
+        // デフォルトレシピのIDの場合は、isDefault: trueのまま保存
+        // 通常のユーザーレシピはそのまま保存
+        const recipesToSave = newRecipes.filter(r => {
+            // デフォルトレシピのIDの場合は保存（編集済みデフォルトレシピ）
+            if (defaultRecipeIds.has(r.id)) {
+                return true;
+            }
+            // 通常のユーザーレシピも保存
+            return !r.isDefault;
+        });
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(recipesToSave));
     };
 
     const addRecipe = (recipe: DripRecipe) => {
@@ -80,13 +93,25 @@ export function useRecipes() {
     };
 
     const updateRecipe = (recipe: DripRecipe) => {
-        // デフォルトレシピが編集された場合、isDefaultを削除してユーザーレシピとして保存
-        const updatedRecipe = recipe.isDefault ? { ...recipe, isDefault: false } : recipe;
+        // デフォルトレシピのIDリストを取得
+        const defaultRecipeIds = new Set(MOCK_RECIPES.filter(r => r.isDefault).map(r => r.id));
+        
+        // デフォルトレシピのIDの場合は、isDefaultを保持する
+        const updatedRecipe = defaultRecipeIds.has(recipe.id)
+            ? { ...recipe, isDefault: true }
+            : recipe;
+        
         const newRecipes = recipes.map((r) => (r.id === recipe.id ? updatedRecipe : r));
         saveRecipes(newRecipes);
     };
 
     const deleteRecipe = (id: string) => {
+        // デフォルトレシピは削除できない
+        const recipeToDelete = recipes.find((r) => r.id === id);
+        if (recipeToDelete?.isDefault) {
+            console.warn('Cannot delete default recipe:', id);
+            return;
+        }
         const newRecipes = recipes.filter((r) => r.id !== id);
         saveRecipes(newRecipes);
     };

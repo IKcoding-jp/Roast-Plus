@@ -28,7 +28,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 20,
                 title: '1投目',
                 description: 'できるだけ細く、中心に１円玉くらいの円を描きながらゆっくり注ぎます。',
-                targetTotalWater: 100,
+                targetTotalWater: 90,
                 note: '注湯スピードは一定に保つ',
             },
             {
@@ -36,7 +36,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 85,
                 title: '2投目',
                 description: '同様に細く、中心に１円玉くらいの円を描きながら注ぎ足します。',
-                targetTotalWater: 140,
+                targetTotalWater: 40,
                 note: '水位が下がりすぎないタイミングで',
             },
             {
@@ -44,7 +44,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 115,
                 title: '3投目',
                 description: '最後まで細く丁寧に、中心に１円玉くらいの円を描きながら注ぎきります。',
-                targetTotalWater: 160,
+                targetTotalWater: 20,
                 note: '最後まで一定のスピードで',
             },
             {

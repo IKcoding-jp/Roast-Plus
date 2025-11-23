@@ -356,7 +356,15 @@ export interface RoastTimerState {
 
 }
 
-
+// 割り当て表の表示設定（幅・高さ）
+export interface TableSettings {
+  colWidths: {
+    taskLabel: number; // 左端列
+    note: number;      // 右端列
+    teams: Record<string, number>; // チームID -> 幅
+  };
+  rowHeights: Record<string, number>; // 作業ラベルID -> 高さ
+}
 
 // アプリ全体のデータ構造
 

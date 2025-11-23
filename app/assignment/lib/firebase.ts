@@ -20,8 +20,9 @@ import {
     TaskLabel,
     AssignmentDay,
     ShuffleEvent,
-    Assignment
-} from '../types';
+    Assignment,
+    TableSettings
+} from '@/types';
 
 // コレクション参照
 const teamsCol = collection(db, 'teams');
@@ -101,15 +102,55 @@ export const updateMemberExclusions = async (memberId: string, excludedTaskLabel
     await updateDoc(docRef, { excludedTaskLabelIds });
 };
 
+// チーム管理
+export const addTeam = async (team: Team) => {
+    const docRef = doc(teamsCol, team.id);
+    await setDoc(docRef, team);
+};
+
+export const deleteTeam = async (teamId: string) => {
+    const docRef = doc(teamsCol, teamId);
+    await deleteDoc(docRef);
+};
+
+export const updateTeam = async (team: Team) => {
+    const docRef = doc(teamsCol, team.id);
+    await updateDoc(docRef, { ...team });
+};
+
 // メンバー管理
 export const addMember = async (member: Member) => {
     const docRef = doc(membersCol, member.id);
     await setDoc(docRef, member);
 };
 
-export const deleteMember = async (memberId: string) => {
+export const deleteMember = async (memberId: string, dateStr?: string) => {
     const docRef = doc(membersCol, memberId);
     await deleteDoc(docRef);
+
+    // 指定された日付（今日）の割り当てからも削除する
+    if (dateStr) {
+        const assignmentDocRef = doc(assignmentDaysCol, dateStr);
+        const snapshot = await import('firebase/firestore').then(m => m.getDoc(assignmentDocRef));
+        
+        if (snapshot.exists()) {
+            const data = snapshot.data() as AssignmentDay;
+            const assignments = data.assignments || [];
+            
+            // 該当メンバーの割り当てを探す
+            const updatedAssignments = assignments.map(a => {
+                if (a.memberId === memberId) {
+                    return { ...a, memberId: null };
+                }
+                return a;
+            });
+
+            // 変更があった場合のみ更新
+            if (JSON.stringify(assignments) !== JSON.stringify(updatedAssignments)) {
+                await updateDoc(assignmentDocRef, { assignments: updatedAssignments });
+            }
+        }
+    }
 };
 
 export const updateMember = async (member: Member) => {
@@ -162,4 +203,31 @@ export const fetchRecentAssignments = async (endDate: string, days: number): Pro
     });
 
     return results;
+};
+
+// テーブル設定管理
+const settingsCol = collection(db, 'assignmentSettings');
+
+export const subscribeTableSettings = (callback: (settings: TableSettings | null) => void) => {
+    const docRef = doc(settingsCol, 'table');
+    return onSnapshot(docRef, (snap) => {
+        if (snap.exists()) {
+            callback(snap.data() as TableSettings);
+        } else {
+            // デフォルト値を返す
+            callback({
+                colWidths: {
+                    taskLabel: 120,
+                    note: 120,
+                    teams: {}
+                },
+                rowHeights: {}
+            });
+        }
+    });
+};
+
+export const updateTableSettings = async (settings: TableSettings) => {
+    const docRef = doc(settingsCol, 'table');
+    await setDoc(docRef, settings, { merge: true });
 };

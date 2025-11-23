@@ -3,17 +3,19 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent
-} from './types';
+    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings
+} from '@/types';
 import {
     fetchTeams, fetchMembers, fetchTaskLabels,
-    subscribeAssignmentDay, subscribeShuffleEvent,
+    subscribeAssignmentDay, subscribeShuffleEvent, subscribeTableSettings,
     updateAssignmentDay, createShuffleEvent, updateShuffleEventState,
-    updateMemberExclusions, fetchRecentAssignments
+    updateMemberExclusions, fetchRecentAssignments,
+    addMember, deleteMember, updateMember,
+    addTaskLabel, deleteTaskLabel, updateTaskLabel,
+    addTeam, deleteTeam, updateTeam, updateTableSettings
 } from './lib/firebase';
 import { calculateAssignment } from './lib/shuffle';
 import { AssignmentTable } from './components/AssignmentTable';
-import { MemberSettingsDialog } from './components/MemberSettingsDialog';
 import { RouletteOverlay } from './components/RouletteOverlay';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
@@ -27,15 +29,13 @@ export default function AssignmentPage() {
     const [teams, setTeams] = useState<Team[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
     const [taskLabels, setTaskLabels] = useState<TaskLabel[]>([]);
+    const [tableSettings, setTableSettings] = useState<TableSettings | null>(null);
 
     // 状態
     const [todayDate, setTodayDate] = useState<string>("");
     const [assignmentDay, setAssignmentDay] = useState<AssignmentDay | null>(null);
     const [shuffleEvent, setShuffleEvent] = useState<ShuffleEvent | null>(null);
     const [isRouletteVisible, setIsRouletteVisible] = useState(false);
-
-    // ダイアログ
-    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
     // 初期化: 日付とマスタデータ
     useEffect(() => {
@@ -71,6 +71,10 @@ export default function AssignmentPage() {
                 // 演出開始判定
                 // 現在時刻と開始時刻を比較して、まだ演出期間内なら表示
                 const now = Date.now();
+                
+                // startedAtがnullの場合（書き込み直後のレイテンシなど）は演出しない、または少し待つ
+                if (!event.startedAt) return;
+
                 const startTime = event.startedAt.toMillis();
                 const endTime = startTime + event.durationMs;
 
@@ -87,9 +91,14 @@ export default function AssignmentPage() {
             }
         });
 
+        const unsubSettings = subscribeTableSettings((settings) => {
+            setTableSettings(settings);
+        });
+
         return () => {
             unsubAssignment();
             unsubShuffle();
+            unsubSettings();
         };
     }, [todayDate]);
 
@@ -101,11 +110,11 @@ export default function AssignmentPage() {
         const initial: Assignment[] = [];
         teams.forEach(team => {
             taskLabels.forEach(task => {
-                initial.push({ teamId: team.id, taskLabelId: task.id, memberId: null });
+                initial.push({ teamId: team.id, taskLabelId: task.id, memberId: null, assignedDate: todayDate || '' });
             });
         });
         return initial;
-    }, [assignmentDay, teams, taskLabels]);
+    }, [assignmentDay, teams, taskLabels, todayDate]);
 
     // 土日チェック
     const isWeekend = useMemo(() => {
@@ -118,11 +127,6 @@ export default function AssignmentPage() {
     const handleShuffle = async () => {
         if (!todayDate) return;
 
-        if (isWeekend) {
-            alert("土日はシャッフルできません（手動で調整してください）");
-            return;
-        }
-
         if (!confirm("担当をシャッフルしますか？\n現在の配置は上書きされます。")) return;
 
         try {
@@ -130,7 +134,7 @@ export default function AssignmentPage() {
             const history = await fetchRecentAssignments(todayDate, 7);
 
             // 2. 計算
-            const result = calculateAssignment(teams, taskLabels, members, history, todayDate);
+            const result = calculateAssignment(teams, taskLabels, members, history, todayDate, displayAssignments);
 
             // 3. イベント発行
             const eventId = uuidv4();
@@ -159,26 +163,6 @@ export default function AssignmentPage() {
         }
     };
 
-    // 手動編集: スワップ
-    const handleSwap = async (asg1: Assignment, asg2: Assignment) => {
-        if (!todayDate) return;
-
-        const newAssignments = [...displayAssignments];
-
-        // 配列内のインデックスを探す
-        const idx1 = newAssignments.findIndex(a => a.teamId === asg1.teamId && a.taskLabelId === asg1.taskLabelId);
-        const idx2 = newAssignments.findIndex(a => a.teamId === asg2.teamId && a.taskLabelId === asg2.taskLabelId);
-
-        if (idx1 === -1 || idx2 === -1) return; // ありえないはずだが
-
-        // memberIdを入れ替え
-        const temp = newAssignments[idx1].memberId;
-        newAssignments[idx1] = { ...newAssignments[idx1], memberId: newAssignments[idx2].memberId };
-        newAssignments[idx2] = { ...newAssignments[idx2], memberId: temp };
-
-        await updateAssignmentDay(todayDate, newAssignments);
-    };
-
     // 手動編集: メンバー変更
     const handleUpdateMember = async (targetAsg: Assignment, memberId: string | null) => {
         if (!todayDate) return;
@@ -188,7 +172,7 @@ export default function AssignmentPage() {
 
         if (idx === -1) {
             // まだ存在しない場合（初期状態など）は追加
-            newAssignments.push({ ...targetAsg, memberId });
+            newAssignments.push({ ...targetAsg, memberId, assignedDate: todayDate });
         } else {
             newAssignments[idx] = { ...newAssignments[idx], memberId };
         }
@@ -196,18 +180,74 @@ export default function AssignmentPage() {
         await updateAssignmentDay(todayDate, newAssignments);
     };
 
-    // 除外設定更新
-    const handleUpdateExclusions = async (memberId: string, excludedIds: string[]) => {
-        await updateMemberExclusions(memberId, excludedIds);
-        // ローカルのmembersステートも更新しておくと即時反映される
-        setMembers(prev => prev.map(m => m.id === memberId ? { ...m, excludedTaskLabelIds: excludedIds } : m));
+    // メンバー名変更
+    const handleUpdateMemberName = async (memberId: string, name: string) => {
+        const member = members.find(m => m.id === memberId);
+        if (member) {
+            const updated = { ...member, name };
+            await updateMember(updated);
+            setMembers(prev => prev.map(m => m.id === memberId ? updated : m));
+        }
+    };
+
+    // 除外設定変更
+    const handleUpdateMemberExclusion = async (memberId: string, taskLabelId: string, isExcluded: boolean) => {
+        const member = members.find(m => m.id === memberId);
+        if (member) {
+            let newExclusions = [...member.excludedTaskLabelIds];
+            if (isExcluded) {
+                if (!newExclusions.includes(taskLabelId)) newExclusions.push(taskLabelId);
+            } else {
+                newExclusions = newExclusions.filter(id => id !== taskLabelId);
+            }
+            await updateMemberExclusions(memberId, newExclusions);
+            // ローカル更新
+            setMembers(prev => prev.map(m => m.id === memberId ? { ...m, excludedTaskLabelIds: newExclusions } : m));
+        }
+    };
+
+    // 割り当てスワップ
+    const handleSwapAssignments = async (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => {
+        if (!todayDate) return;
+
+        const updatedAssignments = [...displayAssignments];
+        
+        const findIndex = (tId: string, lId: string) => updatedAssignments.findIndex(a => a.teamId === tId && a.taskLabelId === lId);
+        
+        let index1 = findIndex(asg1.teamId, asg1.taskLabelId);
+        let index2 = findIndex(asg2.teamId, asg2.taskLabelId);
+        
+        const mem1 = index1 !== -1 ? updatedAssignments[index1].memberId : null;
+        const mem2 = index2 !== -1 ? updatedAssignments[index2].memberId : null;
+
+        // swap logic
+        
+        // 1. Update asg1 position with mem2
+        if (index1 !== -1) {
+            updatedAssignments[index1] = { ...updatedAssignments[index1], memberId: mem2 };
+        } else {
+            updatedAssignments.push({ teamId: asg1.teamId, taskLabelId: asg1.taskLabelId, memberId: mem2, assignedDate: todayDate });
+            // index2 might be invalidated if it was -1, but if it was -1, we use findIndex again or push logic handles it.
+        }
+
+        // 2. Update asg2 position with mem1
+        // Re-find index2 in case it was -1 and we want to be safe, or if array changed significantly (though push is at end)
+        index2 = findIndex(asg2.teamId, asg2.taskLabelId);
+        
+        if (index2 !== -1) {
+            updatedAssignments[index2] = { ...updatedAssignments[index2], memberId: mem1 };
+        } else {
+            updatedAssignments.push({ teamId: asg2.teamId, taskLabelId: asg2.taskLabelId, memberId: mem1, assignedDate: todayDate });
+        }
+        
+        await updateAssignmentDay(todayDate, updatedAssignments);
     };
 
     return (
-        <div className="min-h-screen bg-[#F7F7F5] pb-10">
+        <div className="min-h-screen bg-[#F7F7F5] flex flex-col">
             {/* ヘッダー */}
-            <header className="bg-white shadow-sm sticky top-0 z-30">
-                <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <header className="bg-white shadow-sm sticky top-0 z-30 flex-shrink-0">
+                <div className="w-full px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900">
                             <IoArrowBack size={24} />
@@ -218,44 +258,64 @@ export default function AssignmentPage() {
                         </h1>
                     </div>
 
-                    <button
-                        onClick={handleShuffle}
-                        disabled={isWeekend}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors ${isWeekend
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                : 'bg-primary text-white hover:bg-primary-dark active:scale-95'
-                            }`}
-                    >
-                        <PiShuffleBold />
-                        <span className="hidden md:inline">シャッフル</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleShuffle}
+                            className="flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors z-50 relative bg-primary text-white hover:bg-primary-dark active:scale-95"
+                        >
+                            <PiShuffleBold />
+                            <span className="hidden md:inline">シャッフル</span>
+                        </button>
+                    </div>
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto px-2 md:px-4 py-6">
-                <div className="bg-white rounded-xl shadow-sm p-2 md:p-6 overflow-hidden">
-                    <AssignmentTable
-                        teams={teams}
-                        taskLabels={taskLabels}
-                        assignments={displayAssignments}
-                        members={members}
-                        onSwap={handleSwap}
-                        onUpdateMember={handleUpdateMember}
-                        onMemberClick={setSelectedMember}
-                    />
-                </div>
-            </main>
-
-            {/* モーダル類 */}
-            {selectedMember && (
-                <MemberSettingsDialog
-                    member={selectedMember}
+            <main className="flex-1 w-full px-2 md:px-4 py-4 flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
+                <AssignmentTable
+                    teams={teams}
                     taskLabels={taskLabels}
-                    isOpen={!!selectedMember}
-                    onClose={() => setSelectedMember(null)}
-                    onUpdateExclusions={handleUpdateExclusions}
+                    assignments={displayAssignments}
+                    members={members}
+                    tableSettings={tableSettings}
+                    onUpdateTableSettings={updateTableSettings}
+                    onUpdateMember={handleUpdateMember}
+                    onUpdateMemberName={handleUpdateMemberName}
+                    onUpdateMemberExclusion={handleUpdateMemberExclusion}
+                    onSwapAssignments={handleSwapAssignments}
+                    onAddMember={async (member) => {
+                        await addMember(member);
+                        setMembers(prev => [...prev, member]);
+                    }}
+                    onDeleteMember={async (memberId) => {
+                        await deleteMember(memberId, todayDate);
+                        setMembers(prev => prev.filter(m => m.id !== memberId));
+                    }}
+                    onUpdateTaskLabel={async (label) => {
+                        await updateTaskLabel(label);
+                        setTaskLabels(prev => prev.map(l => l.id === label.id ? label : l));
+                    }}
+                    onAddTaskLabel={async (label) => {
+                        await addTaskLabel(label);
+                        setTaskLabels(prev => [...prev, label]);
+                    }}
+                    onDeleteTaskLabel={async (labelId) => {
+                        await deleteTaskLabel(labelId);
+                        setTaskLabels(prev => prev.filter(l => l.id !== labelId));
+                    }}
+                    onAddTeam={async (team) => {
+                        await addTeam(team);
+                        setTeams(prev => [...prev, team]);
+                    }}
+                    onDeleteTeam={async (teamId) => {
+                        await deleteTeam(teamId);
+                        setTeams(prev => prev.filter(t => t.id !== teamId));
+                    }}
+                    onUpdateTeam={async (team) => {
+                        await updateTeam(team);
+                        setTeams(prev => prev.map(t => t.id === team.id ? team : t));
+                    }}
                 />
-            )}
+            </main>
 
             <RouletteOverlay
                 isVisible={isRouletteVisible}

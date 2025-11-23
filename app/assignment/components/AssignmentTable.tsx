@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
-import { Team, TaskLabel, Assignment, Member } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MdAdd, MdDelete, MdEdit, MdSwapHoriz, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown, MdLinearScale, MdHeight } from 'react-icons/md';
+import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
     teams: Team[];
     taskLabels: TaskLabel[];
     assignments: Assignment[];
     members: Member[];
-    onSwap: (assignment1: Assignment, assignment2: Assignment) => void;
-    onUpdateMember: (assignment: Assignment, memberId: string | null) => void;
-    onMemberClick: (member: Member) => void; // 設定ダイアログ用
+    tableSettings: TableSettings | null;
+    onUpdateTableSettings: (settings: TableSettings) => Promise<void>;
+    onUpdateMember: (assignment: Assignment, memberId: string | null) => Promise<void>;
+    onAddMember: (member: Member) => Promise<void>;
+    onDeleteMember: (memberId: string) => Promise<void>;
+    onUpdateTaskLabel: (taskLabel: TaskLabel) => Promise<void>;
+    onAddTaskLabel: (taskLabel: TaskLabel) => Promise<void>;
+    onDeleteTaskLabel: (taskLabelId: string) => Promise<void>;
+    onAddTeam: (team: Team) => Promise<void>;
+    onDeleteTeam: (teamId: string) => Promise<void>;
+    onUpdateTeam: (team: Team) => Promise<void>;
+    onUpdateMemberName: (memberId: string, name: string) => Promise<void>;
+    onUpdateMemberExclusion: (memberId: string, taskLabelId: string, isExcluded: boolean) => Promise<void>;
+    onSwapAssignments: (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => Promise<void>;
 };
 
 export const AssignmentTable: React.FC<Props> = ({
@@ -17,151 +30,998 @@ export const AssignmentTable: React.FC<Props> = ({
     taskLabels,
     assignments,
     members,
-    onSwap,
     onUpdateMember,
-    onMemberClick,
+    onAddMember,
+    onDeleteMember,
+    onUpdateTaskLabel,
+    onAddTaskLabel,
+    onDeleteTaskLabel,
+    onAddTeam,
+    onDeleteTeam,
+    onUpdateTeam,
+    onUpdateMemberName,
+    onUpdateMemberExclusion,
+    onSwapAssignments,
+    tableSettings,
+    onUpdateTableSettings,
 }) => {
-    const [selectedCell, setSelectedCell] = useState<{ teamId: string; taskLabelId: string } | null>(null);
-    const [showMenu, setShowMenu] = useState<{ teamId: string; taskLabelId: string } | null>(null);
+    // 新規ラベル入力用
+    const [newLeftLabel, setNewLeftLabel] = useState('');
+    const [newRightLabel, setNewRightLabel] = useState('');
 
-    const getAssignment = (teamId: string, taskLabelId: string) => {
-        return assignments.find(a => a.teamId === teamId && a.taskLabelId === taskLabelId);
+    // 新規チーム入力用
+    const [newTeamName, setNewTeamName] = useState('');
+    const [isAddingTeam, setIsAddingTeam] = useState(false);
+
+    // 編集中のセル状態
+    const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
+    const [editLeftLabel, setEditLeftLabel] = useState('');
+    const [editRightLabel, setEditRightLabel] = useState('');
+
+    // チーム編集モード（インライン編集用）
+    const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
+    const [editTeamName, setEditTeamName] = useState('');
+
+    // チームアクションモーダル (編集・削除用)
+    const [activeTeamActionId, setActiveTeamActionId] = useState<string | null>(null);
+    const [activeTeamName, setActiveTeamName] = useState('');
+
+    // メンバー選択メニュー (既存)
+    const [showMemberMenu, setShowMemberMenu] = useState<{ taskLabelId: string, teamId: string } | null>(null);
+    const [newMemberName, setNewMemberName] = useState('');
+
+    // 新しいUI状態
+    const [selectedCell, setSelectedCell] = useState<{ teamId: string, taskLabelId: string } | null>(null);
+    const [contextMenu, setContextMenu] = useState<{ teamId: string, taskLabelId: string, memberId: string | null } | null>(null);
+    const [editingMemberName, setEditingMemberName] = useState('');
+    
+    // 除外設定アコーディオンの開閉状態
+    const [isExclusionSettingsOpen, setIsExclusionSettingsOpen] = useState(false);
+
+    // 幅設定モーダル用
+    const [widthConfig, setWidthConfig] = useState<{
+        type: 'taskLabel' | 'note' | 'team';
+        id?: string;
+        currentWidth: number;
+        label: string;
+    } | null>(null);
+
+    // 高さ設定モーダル用
+    const [heightConfig, setHeightConfig] = useState<{
+        taskLabelId: string;
+        currentHeight: number;
+        label: string;
+        currentName: string; // 名前変更用
+    } | null>(null);
+
+    // 幅変更保存
+    const handleSaveWidth = async (width: number) => {
+        if (!widthConfig) return;
+        
+        const currentSettings: TableSettings = tableSettings || {
+            colWidths: { taskLabel: 120, note: 120, teams: {} },
+            rowHeights: {}
+        };
+
+        const newSettings = { 
+            ...currentSettings,
+            colWidths: {
+                ...currentSettings.colWidths,
+                teams: { ...currentSettings.colWidths.teams }
+            }
+        };
+        
+        if (widthConfig.type === 'taskLabel') {
+            newSettings.colWidths.taskLabel = width;
+        } else if (widthConfig.type === 'note') {
+            newSettings.colWidths.note = width;
+        } else if (widthConfig.type === 'team' && widthConfig.id) {
+            newSettings.colWidths.teams[widthConfig.id] = width;
+        }
+        
+        await onUpdateTableSettings(newSettings);
+        setWidthConfig(null);
     };
 
-    const getMember = (memberId: string | null) => {
-        return members.find(m => m.id === memberId);
+    // 行設定（高さ・名前）保存
+    const handleSaveRowConfig = async (height: number, name: string) => {
+        if (!heightConfig) return;
+
+        // 高さの保存
+        const currentSettings: TableSettings = tableSettings || {
+            colWidths: { taskLabel: 120, note: 120, teams: {} },
+            rowHeights: {}
+        };
+
+        const newSettings = { 
+            ...currentSettings,
+            rowHeights: { ...currentSettings.rowHeights }
+        };
+
+        newSettings.rowHeights[heightConfig.taskLabelId] = height;
+        await onUpdateTableSettings(newSettings);
+
+        // 名前の保存（変更がある場合のみ）
+        const label = taskLabels.find(l => l.id === heightConfig.taskLabelId);
+        if (label && name.trim() && name !== label.leftLabel) {
+            await onUpdateTaskLabel({
+                ...label,
+                leftLabel: name
+            });
+        }
+
+        setHeightConfig(null);
+    };
+
+    // 長押し検知用
+    const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+    const isLongPress = useRef(false);
+    const touchStartPos = useRef<{ x: number, y: number } | null>(null);
+
+    // コンテキストメニューが開いたときに名前をセット、アコーディオンをリセット
+    useEffect(() => {
+        if (contextMenu?.memberId) {
+            const member = members.find(m => m.id === contextMenu.memberId);
+            if (member) {
+                setEditingMemberName(member.name);
+            }
+            setIsExclusionSettingsOpen(false); // メニューを開くたびに閉じた状態に戻す
+        } else {
+            setEditingMemberName('');
+        }
+    }, [contextMenu, members]);
+
+    // ラベル編集開始
+    const startEditLabel = (label: TaskLabel) => {
+        setEditingLabelId(label.id);
+        setEditLeftLabel(label.leftLabel);
+        setEditRightLabel(label.rightLabel || '');
+    };
+
+    // ラベル保存
+    const saveLabel = async (labelId: string) => {
+        const label = taskLabels.find(l => l.id === labelId);
+        if (label) {
+            await onUpdateTaskLabel({
+                ...label,
+                leftLabel: editLeftLabel,
+                rightLabel: editRightLabel || null
+            });
+        }
+        setEditingLabelId(null);
+    };
+
+    // 新規ラベル追加
+    const handleAddTaskLabel = async () => {
+        if (!newLeftLabel.trim()) return;
+
+        const maxOrder = taskLabels.length > 0 ? Math.max(...taskLabels.map(t => t.order || 0)) : 0;
+        
+        await onAddTaskLabel({
+            id: uuidv4(),
+            leftLabel: newLeftLabel,
+            rightLabel: newRightLabel || null,
+            order: maxOrder + 1
+        });
+
+        setNewLeftLabel('');
+        setNewRightLabel('');
+    };
+
+    // 新規メンバー追加 & 割り当て
+    const handleAddMember = async (taskLabelId: string, teamId: string) => {
+        if (!newMemberName.trim()) return;
+
+        const newMember: Member = {
+            id: uuidv4(),
+            name: newMemberName,
+            teamId: teamId, 
+            excludedTaskLabelIds: [],
+            isManager: false,
+        };
+
+        await onAddMember(newMember);
+        await onUpdateMember({ 
+            teamId: teamId, 
+            taskLabelId: taskLabelId, 
+            memberId: null,
+            assignedDate: '' // This will be ignored or overwritten by update logic
+        }, newMember.id);
+
+        setNewMemberName('');
+        setShowMemberMenu(null);
+    };
+
+    // チーム追加
+    const handleAddTeam = async () => {
+        if (!newTeamName.trim()) return;
+        
+        const maxOrder = teams.length > 0 ? Math.max(...teams.map(t => t.order || 0)) : 0;
+        const newTeam: Team = {
+            id: uuidv4(),
+            name: newTeamName,
+            order: maxOrder + 1
+        };
+
+        await onAddTeam(newTeam);
+        setNewTeamName('');
+        setIsAddingTeam(false);
+    };
+
+    // チーム更新 (インライン)
+    const handleUpdateTeam = async (teamId: string) => {
+        const team = teams.find(t => t.id === teamId);
+        if (team && editTeamName.trim()) {
+            await onUpdateTeam({ ...team, name: editTeamName });
+        }
+        setEditingTeamId(null);
+    };
+
+    // チーム更新 (モーダル経由)
+    const handleUpdateTeamFromModal = async () => {
+        if (!activeTeamActionId || !activeTeamName.trim()) return;
+        
+        const team = teams.find(t => t.id === activeTeamActionId);
+        if (team) {
+            await onUpdateTeam({ ...team, name: activeTeamName });
+        }
+        setActiveTeamActionId(null);
+    };
+
+    // チーム削除 (モーダル経由)
+    const handleDeleteTeamFromModal = async () => {
+        if (!activeTeamActionId) return;
+        
+        if (confirm('本当に削除しますか？\n所属するメンバーも削除されます。')) {
+            await onDeleteTeam(activeTeamActionId);
+            setActiveTeamActionId(null);
+        }
+    };
+
+    // 削除確認
+    const handleDeleteTaskLabel = async (id: string) => {
+        if (confirm('この作業ラベルを削除しますか？\n（全てのチームから削除されます）')) {
+            await onDeleteTaskLabel(id);
+        }
+    };
+
+    // イベントハンドラ: 長押し判定
+    const handleCellTouchStart = (teamId: string, taskLabelId: string, memberId: string | null, e: React.TouchEvent | React.MouseEvent) => {
+        isLongPress.current = false;
+        if ('touches' in e) {
+            touchStartPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        } else {
+            touchStartPos.current = { x: e.clientX, y: e.clientY };
+        }
+
+        longPressTimer.current = setTimeout(() => {
+            isLongPress.current = true;
+            setContextMenu({ teamId, taskLabelId, memberId });
+            setSelectedCell(null); // 選択は解除
+            if (navigator.vibrate) navigator.vibrate(50);
+        }, 500);
+    };
+
+    const handleCellTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
+        if (!touchStartPos.current || !longPressTimer.current) return;
+        
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+        
+        const diffX = Math.abs(clientX - touchStartPos.current.x);
+        const diffY = Math.abs(clientY - touchStartPos.current.y);
+
+        // 10px以上動いたら長押しキャンセル
+        if (diffX > 10 || diffY > 10) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+    };
+
+    const handleCellTouchEnd = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
     };
 
     const handleCellClick = (teamId: string, taskLabelId: string) => {
-        if (showMenu) {
-            setShowMenu(null);
+        if (isLongPress.current) {
+            isLongPress.current = false;
             return;
         }
+        
+        // コンテキストメニューが開いていたら何もしない（オーバーレイクリックで閉じるため）
+        if (contextMenu) return;
 
-        if (!selectedCell) {
-            setSelectedCell({ teamId, taskLabelId });
-        } else {
-            // 同じセルをタップ -> 選択解除
+        if (selectedCell) {
             if (selectedCell.teamId === teamId && selectedCell.taskLabelId === taskLabelId) {
-                setSelectedCell(null);
-                // ここでメニューを開くロジックにしてもいいが、要件では「長押し」推奨
-                // 今回はシンプルに「選択中に再度タップでメニュー」にするか、長押し実装するか。
-                // 要件: "セルを長押し or メニューアイコンから"
-                // 実装簡易化のため、選択状態で再度タップ -> メニュー表示 にする
-                setShowMenu({ teamId, taskLabelId });
-            } else if (selectedCell.teamId === teamId) {
-                // 同じチームの別セル -> スワップ
-                const asg1 = getAssignment(selectedCell.teamId, selectedCell.taskLabelId);
-                const asg2 = getAssignment(teamId, taskLabelId);
-
-                // Assignmentが存在しない場合は仮想的に作成して渡す
-                const safeAsg1 = asg1 || { teamId: selectedCell.teamId, taskLabelId: selectedCell.taskLabelId, memberId: null };
-                const safeAsg2 = asg2 || { teamId, taskLabelId, memberId: null };
-
-                onSwap(safeAsg1, safeAsg2);
+                // 選択解除
                 setSelectedCell(null);
             } else {
-                // 違うチーム -> 選択解除
+                // スワップ実行
+                onSwapAssignments(selectedCell, { teamId, taskLabelId });
                 setSelectedCell(null);
             }
+        } else {
+            // 選択
+            setSelectedCell({ teamId, taskLabelId });
         }
     };
 
+    // Grid style definition
+    const generateGridTemplateColumns = () => {
+        const defaultWidth = 100;
+        const labelWidth = tableSettings?.colWidths?.taskLabel ?? 120;
+        const noteWidth = tableSettings?.colWidths?.note ?? 120;
+        
+        const teamColumns = teams.map(team => {
+            const w = tableSettings?.colWidths?.teams?.[team.id] ?? defaultWidth;
+            return `${w}px`;
+        }).join(' ');
+        
+        return `${labelWidth}px ${teamColumns} ${noteWidth}px`;
+    };
+
+    const gridTemplateColumns = generateGridTemplateColumns();
+
     return (
-        <div className="overflow-x-auto pb-20">
-            <table className="w-full border-collapse text-sm md:text-base">
-                <thead>
-                    <tr>
-                        <th className="p-2 border-b-2 border-gray-200 bg-gray-50 text-left text-gray-500 font-semibold">
-                            {/* 左上空欄 */}
-                        </th>
-                        {teams.map(team => (
-                            <th key={team.id} className="p-2 border-b-2 border-gray-200 bg-gray-50 text-center text-gray-700 font-bold min-w-[100px]">
+        <div className="w-fit mx-auto max-w-full overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100 relative">
+            {/* ヘッダー */}
+            <div 
+                className="grid bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-600 sticky top-0 z-20"
+                style={{ gridTemplateColumns, minWidth: 'max-content' }}
+            >
+                <div 
+                    className="p-2 sm:p-3 border-r border-gray-200 flex items-center justify-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => setWidthConfig({
+                        type: 'taskLabel',
+                        currentWidth: tableSettings?.colWidths?.taskLabel ?? 120,
+                        label: '作業ラベル列の幅'
+                    })}
+                    title="クリックして幅を変更"
+                >
+                    作業ラベル
+                </div>
+                
+                {teams.map(team => (
+                    <div 
+                        key={team.id} 
+                        className="p-2 border-r border-gray-200 text-center relative group bg-gray-50 flex items-center justify-center"
+                    >
+                        {editingTeamId === team.id ? (
+                            <input
+                                className="w-full px-1 py-1 text-center border rounded bg-white text-sm"
+                                value={editTeamName}
+                                onChange={e => setEditTeamName(e.target.value)}
+                                autoFocus
+                                onKeyDown={e => e.key === 'Enter' && handleUpdateTeam(team.id)}
+                                onBlur={() => handleUpdateTeam(team.id)}
+                            />
+                        ) : (
+                            <div 
+                                className="cursor-pointer hover:bg-gray-100 rounded px-2 py-1 truncate w-full select-none active:bg-gray-200"
+                                onClick={() => {
+                                    setActiveTeamActionId(team.id);
+                                    setActiveTeamName(team.name);
+                                }}
+                            >
                                 {team.name}班
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {taskLabels.map(task => (
-                        <tr key={task.id} className="border-b border-gray-100">
-                            <th className="p-3 text-left text-gray-700 font-medium bg-gray-50 sticky left-0 z-10 shadow-sm md:shadow-none">
-                                {task.name}
-                            </th>
+                            </div>
+                        )}
+                    </div>
+                ))}
+
+                {/* チーム追加 & 補足ヘッダー */}
+                <div 
+                    className="p-2 text-center flex items-center justify-between bg-gray-50 relative px-2 sm:px-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={(e) => {
+                        if ((e.target as HTMLElement).closest('button, input')) return;
+                        setWidthConfig({
+                            type: 'note',
+                            currentWidth: tableSettings?.colWidths?.note ?? 120,
+                            label: '補足列の幅'
+                        });
+                    }}
+                    title="クリックして幅を変更"
+                >
+                    <div className="relative">
+                        {isAddingTeam ? (
+                            <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32">
+                                <input
+                                    className="w-full px-1 text-sm outline-none"
+                                    placeholder="班名"
+                                    value={newTeamName}
+                                    onChange={e => setNewTeamName(e.target.value)}
+                                    autoFocus
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter') handleAddTeam();
+                                        if (e.key === 'Escape') setIsAddingTeam(false);
+                                    }}
+                                />
+                                <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1">
+                                    <MdAdd />
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsAddingTeam(true)}
+                                className="p-1 rounded-full bg-gray-200 text-gray-600 hover:bg-primary hover:text-white transition-colors shadow-sm"
+                                title="班を追加"
+                            >
+                                <MdAdd size={16} />
+                            </button>
+                        )}
+                    </div>
+                    <span>補足</span>
+                    <span className="w-4"></span> {/* スペーサー */}
+                </div>
+            </div>
+
+            {/* ボディ */}
+            <div className="divide-y divide-gray-100 bg-white" style={{ minWidth: 'max-content' }}>
+                {taskLabels.map(label => {
+                    const isEditing = editingLabelId === label.id;
+
+                    return (
+                        <div 
+                            key={label.id} 
+                            className="grid items-center hover:bg-orange-50/30 transition-colors group"
+                            style={{ 
+                                gridTemplateColumns,
+                                minHeight: `${tableSettings?.rowHeights?.[label.id] ?? 80}px`
+                            }}
+                        >
+                            {/* 左ラベル列 */}
+                            <div className="p-3 py-4 border-r border-gray-100 h-full flex items-center">
+                                <div 
+                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm break-words whitespace-pre-wrap hover:bg-gray-100 rounded transition-colors"
+                                    onClick={() => {
+                                        setHeightConfig({
+                                            taskLabelId: label.id,
+                                            currentHeight: tableSettings?.rowHeights?.[label.id] ?? 80,
+                                            label: '行の設定',
+                                            currentName: label.leftLabel
+                                        });
+                                    }}
+                                >
+                                    {label.leftLabel}
+                                </div>
+                            </div>
+
+                            {/* 各チームの担当者列 */}
                             {teams.map(team => {
-                                const assignment = getAssignment(team.id, task.id);
-                                const member = getMember(assignment?.memberId || null);
-                                const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === task.id;
-                                const isMenuOpen = showMenu?.teamId === team.id && showMenu?.taskLabelId === task.id;
+                                const assignment = assignments.find(a => a.teamId === team.id && a.taskLabelId === label.id);
+                                const member = members.find(m => m.id === assignment?.memberId);
+                                
+                                const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === label.id;
 
                                 return (
-                                    <td key={team.id} className="p-1 relative">
-                                        <motion.div
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={() => handleCellClick(team.id, task.id)}
+                                    <div key={team.id} className="p-2 py-4 border-r border-gray-100 h-full flex items-center justify-center relative">
+                                        <button
+                                            onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
+                                            onMouseUp={handleCellTouchEnd}
+                                            onMouseMove={handleCellTouchMove}
+                                            onMouseLeave={handleCellTouchEnd}
+                                            onTouchStart={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
+                                            onTouchEnd={handleCellTouchEnd}
+                                            onTouchMove={handleCellTouchMove}
+                                            onClick={(e) => handleCellClick(team.id, label.id)}
                                             className={`
-                        relative h-14 md:h-16 rounded-lg flex items-center justify-center cursor-pointer transition-colors border-2
-                        ${isSelected ? 'border-primary bg-orange-50' : 'border-transparent bg-white hover:bg-gray-50'}
-                        ${!member ? 'text-gray-300' : 'text-gray-800 font-bold'}
-                        shadow-sm
-                      `}
+                                                w-full py-2 px-1 rounded-lg text-sm font-bold text-center transition-all truncate select-none
+                                                ${member 
+                                                    ? isSelected
+                                                        ? 'bg-primary text-white shadow-md scale-105'
+                                                        : 'text-gray-800 bg-white border border-gray-200 shadow-sm hover:shadow' 
+                                                    : isSelected
+                                                        ? 'bg-primary/20 text-primary border border-primary'
+                                                        : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100'}
+                                            `}
                                         >
                                             {member ? member.name : '未割当'}
-
-                                            {/* メンバー設定ボタン (名前の横に小さく、あるいは長押し代わりのUI) */}
-                                            {member && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        onMemberClick(member);
-                                                    }}
-                                                    className="absolute top-1 right-1 text-xs text-gray-400 hover:text-primary p-1"
-                                                >
-                                                    ⚙️
-                                                </button>
-                                            )}
-                                        </motion.div>
-
-                                        {/* 簡易メニュー (メンバー変更用) */}
-                                        <AnimatePresence>
-                                            {isMenuOpen && (
-                                                <div className="absolute top-full left-0 z-20 bg-white shadow-xl rounded-lg p-2 w-48 border border-gray-100">
-                                                    <div className="text-xs text-gray-500 mb-2">メンバー変更</div>
-                                                    <div className="max-h-40 overflow-y-auto">
-                                                        <button
-                                                            onClick={() => {
-                                                                onUpdateMember({ teamId: team.id, taskLabelId: task.id, memberId: null } as Assignment, null);
-                                                                setShowMenu(null);
-                                                                setSelectedCell(null);
-                                                            }}
-                                                            className="w-full text-left px-2 py-1 hover:bg-gray-100 text-red-500 text-sm"
-                                                        >
-                                                            未割り当てにする
-                                                        </button>
-                                                        {members.filter(m => !m.isManager).map(m => (
-                                                            <button
-                                                                key={m.id}
-                                                                onClick={() => {
-                                                                    onUpdateMember({ teamId: team.id, taskLabelId: task.id, memberId: null } as Assignment, m.id);
-                                                                    setShowMenu(null);
-                                                                    setSelectedCell(null);
-                                                                }}
-                                                                className="w-full text-left px-2 py-1 hover:bg-gray-100 text-gray-700 text-sm"
-                                                            >
-                                                                {m.name}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </AnimatePresence>
-                                    </td>
+                                        </button>
+                                    </div>
                                 );
                             })}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+
+                            {/* 右ラベル列 */}
+                            <div className="p-3 py-4 h-full flex items-center relative pr-8">
+                                {isEditing ? (
+                                    <div className="flex gap-1 w-full min-w-0 items-center justify-end">
+                                        <input
+                                            className="w-full min-w-0 p-2 border rounded bg-white text-right text-sm"
+                                            value={editRightLabel}
+                                            onChange={e => setEditRightLabel(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') saveLabel(label.id);
+                                            }}
+                                        />
+                                        <button 
+                                            onClick={() => saveLabel(label.id)} 
+                                            className="absolute right-1 top-1/2 -translate-y-1/2 text-green-600 p-1.5 rounded hover:bg-green-50 transition-colors"
+                                            title="保存"
+                                        >
+                                            <MdCheck size={18} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div 
+                                        className="w-full p-1 cursor-pointer break-words whitespace-pre-wrap text-right text-gray-600 text-sm"
+                                        onClick={() => startEditLabel(label)}
+                                    >
+                                        {label.rightLabel}
+                                    </div>
+                                )}
+                                
+                                {/* 削除ボタン（ホバー時のみ表示、編集中は非表示） */}
+                                {!isEditing && (
+                                    <button 
+                                        onClick={() => handleDeleteTaskLabel(label.id)}
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <MdDelete size={18} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+
+                {/* 新規ラベル追加行 */}
+                <div 
+                    className="grid items-center bg-gray-50 p-2 py-4 border-t border-gray-200 min-h-[80px]"
+                    style={{ gridTemplateColumns }}
+                >
+                    <div className="pr-2">
+                        <input
+                            className="w-full p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-sm text-gray-800 placeholder-gray-500"
+                            placeholder="作業を追加"
+                            value={newLeftLabel}
+                            onChange={e => setNewLeftLabel(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') handleAddTaskLabel();
+                            }}
+                        />
+                    </div>
+                    
+                    {/* チーム列の空白（結合） */}
+                    <div className="col-span-full px-2 text-center text-gray-600 text-xs font-bold flex items-center justify-center" style={{ gridColumn: `2 / span ${teams.length}` }}>
+                        <span className="hidden md:inline">左と右を入力して追加</span>
+                    </div>
+
+                    <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
+                        <input
+                            className="w-full min-w-0 p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-right text-sm text-gray-800 placeholder-gray-500"
+                            placeholder="補足(任意)"
+                            value={newRightLabel}
+                            onChange={e => setNewRightLabel(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') handleAddTaskLabel();
+                            }}
+                        />
+                        <button
+                            onClick={handleAddTaskLabel}
+                            disabled={!newLeftLabel.trim()}
+                            className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-dark shadow-sm disabled:opacity-50 disabled:shadow-none transition-all flex-shrink-0 flex items-center justify-center h-full max-h-[38px]"
+                        >
+                            <MdAdd size={20} />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* コンテキストメニューモーダル */}
+            <AnimatePresence>
+                {contextMenu && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40"
+                            onClick={() => setContextMenu(null)}
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+                            animate={{ opacity: 1, scale: 1, y: 0 }} 
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="bg-white rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden"
+                        >
+                            <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                                <h3 className="font-bold text-gray-800">
+                                    {teams.find(t => t.id === contextMenu.teamId)?.name}班 - {taskLabels.find(l => l.id === contextMenu.taskLabelId)?.leftLabel}
+                                </h3>
+                                <button onClick={() => setContextMenu(null)} className="text-gray-400 hover:text-gray-600">
+                                    <MdClose size={20} />
+                                </button>
+                            </div>
+                            
+                            <div className="p-4 space-y-4">
+                                {/* メンバー名変更エリア */}
+                                {contextMenu.memberId ? (
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-500">メンバー名</label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                className="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                                                value={editingMemberName}
+                                                onChange={(e) => setEditingMemberName(e.target.value)}
+                                            />
+                                            <button 
+                                                onClick={async () => {
+                                                    if (contextMenu.memberId && editingMemberName.trim()) {
+                                                        await onUpdateMemberName(contextMenu.memberId, editingMemberName);
+                                                        setContextMenu(null);
+                                                    }
+                                                }}
+                                                className="bg-primary text-white px-3 py-2 rounded hover:bg-primary-dark flex items-center justify-center"
+                                                disabled={!editingMemberName.trim()}
+                                            >
+                                                <MdCheck size={20} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-2 text-gray-500">
+                                        メンバーが割り当てられていません
+                                    </div>
+                                )}
+
+                                <div className="border-t border-gray-100 pt-4 grid gap-2">
+                                    
+                                    {/* メンバー変更 (既存メニュー呼び出し) */}
+                                    <button
+                                        onClick={() => {
+                                            setShowMemberMenu({ taskLabelId: contextMenu.taskLabelId, teamId: contextMenu.teamId });
+                                            setContextMenu(null);
+                                        }}
+                                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                                    >
+                                        <MdPerson size={20} />
+                                        <div className="text-sm font-bold">メンバーを変更・追加</div>
+                                    </button>
+
+                                    {/* 未割り当てにする */}
+                                    {contextMenu.memberId && (
+                                        <button
+                                            onClick={async () => {
+                                                await onUpdateMember({ teamId: contextMenu.teamId, taskLabelId: contextMenu.taskLabelId, memberId: null, assignedDate: '' }, null);
+                                                setContextMenu(null);
+                                            }}
+                                            className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 text-red-600 hover:bg-red-50 transition-colors text-left"
+                                        >
+                                            <MdPersonOff size={20} />
+                                            <div className="text-sm font-bold">未割り当てにする</div>
+                                        </button>
+                                    )}
+
+                                    {/* 除外ラベル設定（アコーディオン形式） */}
+                                    {contextMenu.memberId && (
+                                        <div className="border border-gray-200 rounded-lg overflow-hidden mt-2">
+                                            <button
+                                                onClick={() => setIsExclusionSettingsOpen(!isExclusionSettingsOpen)}
+                                                className="w-full flex items-center justify-between gap-3 p-3 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <MdBlock size={20} className="text-gray-500" />
+                                                    <div className="text-sm font-bold">除外ラベル設定</div>
+                                                </div>
+                                                {isExclusionSettingsOpen ? <MdKeyboardArrowDown size={20} /> : <MdKeyboardArrowRight size={20} />}
+                                            </button>
+                                            
+                                            <AnimatePresence>
+                                                {isExclusionSettingsOpen && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        className="overflow-hidden bg-white"
+                                                    >
+                                                        <div className="p-2 border-t border-gray-200">
+                                                            <div className="text-xs text-gray-500 mb-2 px-1">
+                                                                チェックした作業には割り当てられません
+                                                            </div>
+                                                            <div className="max-h-40 overflow-y-auto space-y-1">
+                                                                {taskLabels.map(label => {
+                                                                    const member = members.find(m => m.id === contextMenu.memberId);
+                                                                    const isExcluded = member?.excludedTaskLabelIds.includes(label.id) || false;
+                                                                    
+                                                                    return (
+                                                                        <label 
+                                                                            key={label.id} 
+                                                                            className={`
+                                                                                flex items-center gap-3 p-2 rounded cursor-pointer transition-colors
+                                                                                ${isExcluded ? 'bg-red-50' : 'hover:bg-gray-50'}
+                                                                            `}
+                                                                        >
+                                                                            <div className="relative flex items-center justify-center w-5 h-5">
+                                                                                <input 
+                                                                                    type="checkbox" 
+                                                                                    checked={isExcluded} 
+                                                                                    onChange={async (e) => {
+                                                                                        if (contextMenu.memberId) {
+                                                                                            await onUpdateMemberExclusion(contextMenu.memberId, label.id, e.target.checked);
+                                                                                        }
+                                                                                    }}
+                                                                                    className="appearance-none w-5 h-5 border border-gray-300 rounded checked:bg-red-500 checked:border-red-500 focus:ring-2 focus:ring-red-200 transition-colors cursor-pointer"
+                                                                                />
+                                                                                {isExcluded && (
+                                                                                    <MdClose className="absolute text-white pointer-events-none" size={14} />
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="text-sm flex-1 truncate">
+                                                                                <span className={isExcluded ? 'text-red-700 font-medium' : 'text-gray-700'}>
+                                                                                    {label.leftLabel}
+                                                                                </span>
+                                                                                {label.rightLabel && (
+                                                                                    <span className={`ml-1 text-xs ${isExcluded ? 'text-red-500' : 'text-gray-400'}`}>
+                                                                                        ({label.rightLabel})
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </label>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    )}
+
+                                    {/* 行の設定変更 */}
+                                    <button
+                                        onClick={() => {
+                                            setHeightConfig({
+                                                taskLabelId: contextMenu.taskLabelId,
+                                                currentHeight: tableSettings?.rowHeights?.[contextMenu.taskLabelId] ?? 80,
+                                                label: '行の設定',
+                                                currentName: taskLabels.find(l => l.id === contextMenu.taskLabelId)?.leftLabel || ''
+                                            });
+                                            setContextMenu(null);
+                                        }}
+                                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                                    >
+                                        <MdHeight size={20} className="text-gray-500" />
+                                        <div className="text-sm font-bold">行の設定（高さ・名前）</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* 既存のメンバー選択メニュー */}
+            <AnimatePresence>
+                {showMemberMenu && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                         <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40"
+                            onClick={() => setShowMemberMenu(null)}
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }} 
+                            animate={{ opacity: 1, scale: 1 }} 
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10"
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <div className="text-sm text-gray-500 font-bold">
+                                    {teams.find(t => t.id === showMemberMenu.teamId)?.name}班 - {taskLabels.find(l => l.id === showMemberMenu.taskLabelId)?.leftLabel}
+                                </div>
+                                <button onClick={() => setShowMemberMenu(null)}><MdClose /></button>
+                            </div>
+                            
+                            {/* 新規追加 */}
+                            <div className="flex gap-2 mb-4 pb-4 border-b border-gray-100">
+                                <input
+                                    className="flex-1 border rounded px-3 py-2 text-sm"
+                                    placeholder="新規メンバー名"
+                                    value={newMemberName}
+                                    onChange={e => setNewMemberName(e.target.value)}
+                                />
+                                <button
+                                    onClick={() => handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId)}
+                                    disabled={!newMemberName.trim()}
+                                    className="bg-primary text-white px-3 py-2 rounded hover:bg-primary-dark disabled:opacity-50"
+                                >
+                                    <MdAdd size={20} />
+                                </button>
+                            </div>
+
+                            <div className="max-h-60 overflow-y-auto space-y-2">
+                                {members.filter(m => !m.isManager).map(m => (
+                                    <div key={m.id} className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => {
+                                                onUpdateMember({ teamId: showMemberMenu.teamId, taskLabelId: showMemberMenu.taskLabelId, memberId: null, assignedDate: '' }, m.id);
+                                                setShowMemberMenu(null);
+                                            }}
+                                            className={`
+                                                flex-1 text-left px-3 py-2 hover:bg-gray-100 rounded
+                                                ${assignments.find(a => a.teamId === showMemberMenu.teamId && a.taskLabelId === showMemberMenu.taskLabelId)?.memberId === m.id 
+                                                    ? 'bg-primary/10 text-primary font-bold' 
+                                                    : 'text-gray-700'}
+                                            `}
+                                        >
+                                            {m.name}
+                                        </button>
+                                        <button
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                if (confirm(`${m.name}を削除しますか？\n割り当てからも解除されます。`)) {
+                                                    await onDeleteMember(m.id);
+                                                }
+                                            }}
+                                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
+                                            title="メンバーを削除"
+                                        >
+                                            <MdDelete size={20} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* チーム編集/削除モーダル */}
+            <AnimatePresence>
+                {activeTeamActionId && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40"
+                            onClick={() => setActiveTeamActionId(null)}
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }} 
+                            animate={{ opacity: 1, scale: 1 }} 
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10"
+                        >
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">班の編集</h3>
+                            
+                            <div className="mb-6">
+                                <label className="block text-sm text-gray-500 mb-1">班名</label>
+                                <input 
+                                    className="w-full p-2 border border-gray-300 rounded text-lg text-gray-800"
+                                    value={activeTeamName}
+                                    onChange={e => setActiveTeamName(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="mb-6">
+                                <label className="block text-sm text-gray-500 mb-1">幅(px)</label>
+                                <input 
+                                    type="number"
+                                    className="w-full p-2 border border-gray-300 rounded text-lg text-gray-800"
+                                    value={tableSettings?.colWidths?.teams?.[activeTeamActionId] ?? 100}
+                                    onChange={async (e) => {
+                                        if (!activeTeamActionId || !tableSettings) return;
+                                        const val = parseInt(e.target.value) || 100;
+                                        const newSettings = { ...tableSettings };
+                                        if (!newSettings.colWidths.teams) newSettings.colWidths.teams = {};
+                                        newSettings.colWidths.teams[activeTeamActionId] = val;
+                                        await onUpdateTableSettings(newSettings);
+                                    }}
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <button 
+                                    onClick={handleUpdateTeamFromModal}
+                                    className="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark"
+                                >
+                                    更新する
+                                </button>
+                                <button 
+                                    onClick={handleDeleteTeamFromModal}
+                                    className="w-full py-3 bg-gray-100 text-red-500 rounded-lg font-bold hover:bg-red-50 flex items-center justify-center gap-2"
+                                >
+                                    <MdDelete size={20} />
+                                    この班を削除
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTeamActionId(null)}
+                                    className="w-full py-2 text-gray-500 hover:bg-gray-50 rounded-lg"
+                                >
+                                    キャンセル
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* 幅設定モーダル */}
+            <AnimatePresence>
+                {widthConfig && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40"
+                            onClick={() => setWidthConfig(null)}
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10"
+                        >
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">{widthConfig.label}</h3>
+                            <div className="flex items-center gap-2 mb-6">
+                                <input
+                                    type="number"
+                                    className="flex-1 p-2 border border-gray-300 rounded text-lg text-center text-gray-800"
+                                    value={widthConfig.currentWidth}
+                                    onChange={e => setWidthConfig({ ...widthConfig, currentWidth: parseInt(e.target.value) || 0 })}
+                                    autoFocus
+                                    onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth)}
+                                />
+                                <span className="text-gray-500 font-bold">px</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <button onClick={() => setWidthConfig(null)} className="flex-1 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">キャンセル</button>
+                                <button onClick={() => handleSaveWidth(widthConfig.currentWidth)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* 高さ設定モーダル */}
+            <AnimatePresence>
+                {heightConfig && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40"
+                            onClick={() => setHeightConfig(null)}
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10"
+                        >
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">{heightConfig.label}</h3>
+                            
+                            <div className="mb-4">
+                                <label className="block text-sm text-gray-500 mb-1">ラベル名</label>
+                                <input
+                                    className="w-full p-2 border border-gray-300 rounded text-lg text-gray-900"
+                                    value={heightConfig.currentName}
+                                    onChange={e => setHeightConfig({ ...heightConfig, currentName: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="mb-6">
+                                <label className="block text-sm text-gray-500 mb-1">高さ(px)</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="number"
+                                        className="flex-1 p-2 border border-gray-300 rounded text-lg text-center text-gray-900"
+                                        value={heightConfig.currentHeight}
+                                        onChange={e => setHeightConfig({ ...heightConfig, currentHeight: parseInt(e.target.value) || 0 })}
+                                        onKeyDown={e => e.key === 'Enter' && handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
+                                    />
+                                    <span className="text-gray-500 font-bold">px</span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <button onClick={() => setHeightConfig(null)} className="flex-1 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">キャンセル</button>
+                                <button onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

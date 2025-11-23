@@ -5,7 +5,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
     {
         id: 'recipe-001',
         name: 'BYSN Standard Drip',
-        beanName: 'G2B8',
+        beanName: 'BYSNドリップパック',
         beanAmountGram: 10,
         totalWaterGram: 160,
         totalDurationSec: 180,
@@ -61,7 +61,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
     {
         id: 'recipe-003',
         name: '井崎流ハンドドリップ術',
-        beanName: 'G2B8',
+        beanName: 'お好みの豆',
         beanAmountGram: 10,
         totalWaterGram: 150,
         totalDurationSec: 180,

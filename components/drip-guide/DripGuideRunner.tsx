@@ -130,7 +130,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
             <div className="flex-grow overflow-y-auto flex flex-col items-center py-6 px-4">
                 {/* Timer */}
                 <div className="text-center mb-8 mt-4">
-                    <div className="text-7xl sm:text-8xl font-mono font-bold text-gray-800 tracking-tighter leading-none">
+                    <div className="text-7xl sm:text-8xl tabular-nums font-bold text-gray-800 tracking-tighter leading-none">
                         {formatTime(currentTime)}
                     </div>
                     <div className="text-sm text-gray-400 mt-2 font-medium">

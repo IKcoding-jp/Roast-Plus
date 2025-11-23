@@ -65,7 +65,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
 
     if (isCompleted) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
+            <div className="flex flex-col items-center justify-center h-[100dvh] text-center p-6">
                 <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -75,15 +75,6 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                 </motion.div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">抽出完了！</h2>
                 <p className="text-gray-600 mb-8">お疲れ様でした。美味しいコーヒーを楽しみましょう。</p>
-
-                <div className="w-full max-w-md mb-8">
-                    <label className="block text-left text-sm font-medium text-gray-700 mb-2">ひとことメモ</label>
-                    <textarea
-                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
-                        placeholder="味の感想や抽出の様子など..."
-                        rows={3}
-                    />
-                </div>
 
                 <div className="flex gap-4">
                     <button
@@ -126,20 +117,83 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                 />
             </div>
 
-            {/* Main Content - Scrollable */}
-            <div className="flex-grow overflow-y-auto flex flex-col items-center py-6 px-4">
-                {/* Timer */}
-                <div className="text-center mb-8 mt-4">
-                    <div className="text-7xl sm:text-8xl tabular-nums font-bold text-gray-800 tracking-tighter leading-none">
-                        {formatTime(currentTime)}
+            {/* Main Content - No Scroll */}
+            <div className="flex-grow flex flex-col items-center justify-center py-2 px-4 overflow-hidden">
+                {/* Steps Mini Map */}
+                <div className="w-full max-w-2xl mb-3 sm:mb-2 px-2 flex-shrink-0">
+                    <div className="overflow-x-auto pb-1 -mx-2 px-2">
+                        <div className="flex gap-3 sm:gap-2 min-w-max">
+                            {steps.map((step, index) => {
+                                const stepEndTime = index < steps.length - 1 
+                                    ? steps[index + 1].startTimeSec 
+                                    : recipe.totalDurationSec;
+                                const isCompleted = currentTime > stepEndTime;
+                                const isCurrent = currentStep?.id === step.id;
+                                const isUpcoming = step.startTimeSec > currentTime;
+
+                                return (
+                                    <motion.div
+                                        key={step.id}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className={clsx(
+                                            "flex-shrink-0 rounded-lg px-4 py-3 sm:px-3 sm:py-2 min-w-[140px] sm:min-w-[120px] border-2 transition-all",
+                                            isCurrent
+                                                ? "bg-amber-50 border-amber-400 shadow-md"
+                                                : isCompleted
+                                                ? "bg-gray-50 border-gray-200"
+                                                : "bg-gray-100 border-gray-200 opacity-60"
+                                        )}
+                                    >
+                                        <div className={clsx(
+                                            "text-sm sm:text-xs font-semibold mb-1.5 sm:mb-1",
+                                            isCurrent
+                                                ? "text-amber-700"
+                                                : isCompleted
+                                                ? "text-gray-600"
+                                                : "text-gray-400"
+                                        )}>
+                                            {formatTime(step.startTimeSec)} - {formatTime(stepEndTime)}
+                                        </div>
+                                        <div className={clsx(
+                                            "text-base sm:text-sm font-bold truncate",
+                                            isCurrent
+                                                ? "text-amber-800"
+                                                : isCompleted
+                                                ? "text-gray-700"
+                                                : "text-gray-500"
+                                        )}>
+                                            {step.title}
+                                        </div>
+                                        {isCurrent && (
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ 
+                                                    width: `${Math.min(
+                                                        ((currentTime - step.startTimeSec) / (stepEndTime - step.startTimeSec)) * 100,
+                                                        100
+                                                    )}%` 
+                                                }}
+                                                className="h-1.5 sm:h-1 bg-amber-500 rounded-full mt-2 sm:mt-1.5"
+                                                transition={{ duration: 1, ease: "linear" }}
+                                            />
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
                     </div>
-                    <div className="text-sm text-gray-400 mt-2 font-medium">
-                        TOTAL TIME / {formatTime(recipe.totalDurationSec)}
+                </div>
+
+                {/* Timer */}
+                <div className="text-center mb-4 sm:mb-6 flex-shrink-0 mt-2 sm:mt-4">
+                    <div className="text-8xl sm:text-7xl md:text-8xl lg:text-9xl tabular-nums font-bold text-gray-800 tracking-tighter leading-none" style={{ fontFamily: 'var(--font-nunito), sans-serif' }}>
+                        {formatTime(currentTime)}
                     </div>
                 </div>
 
                 {/* Current Step Info */}
-                <div className="w-full max-w-md text-center">
+                <div className="w-full max-w-md text-center flex-grow flex flex-col justify-start min-h-0">
                     <AnimatePresence mode="wait">
                         {currentStep ? (
                             <motion.div
@@ -150,23 +204,23 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                 transition={{ duration: 0.3 }}
                                 className="flex flex-col items-center"
                             >
-                                <h3 className="text-3xl font-bold text-amber-700 mb-4">{currentStep.title}</h3>
+                                <h3 className="text-3xl sm:text-2xl md:text-3xl font-bold text-amber-700 mb-4 sm:mb-3">{currentStep.title}</h3>
 
                                 {currentStep.targetTotalWater && (
-                                    <div className="mb-6">
-                                        <span className="inline-block bg-blue-50 text-blue-600 px-6 py-2 rounded-full font-bold text-xl shadow-sm border border-blue-100">
-                                            {currentStep.targetTotalWater}g <span className="text-sm font-normal text-blue-400">まで注ぐ</span>
+                                    <div className="mb-4 sm:mb-3">
+                                        <span className="inline-block bg-blue-50 text-blue-600 px-6 py-3 sm:px-5 sm:py-2 rounded-full font-bold text-xl sm:text-lg shadow-sm border border-blue-100">
+                                            {currentStep.targetTotalWater}g <span className="text-base sm:text-sm font-normal text-blue-400">まで注ぐ</span>
                                         </span>
                                     </div>
                                 )}
 
-                                <p className="text-lg text-gray-600 leading-relaxed mb-6 max-w-xs mx-auto">
+                                <p className="text-lg sm:text-base md:text-lg text-gray-600 leading-relaxed mb-4 sm:mb-3 max-w-xs mx-auto">
                                     {currentStep.description}
                                 </p>
 
                                 {currentStep.note && (
-                                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 text-amber-800 text-sm max-w-xs mx-auto flex items-start gap-2">
-                                        <Lightbulb size={18} className="text-amber-600 flex-shrink-0 mt-0.5" weight="fill" />
+                                    <div className="bg-amber-50 p-4 sm:p-3 rounded-xl border border-amber-100 text-amber-800 text-base sm:text-sm max-w-xs mx-auto flex items-start gap-2">
+                                        <Lightbulb size={20} className="sm:w-4 sm:h-4 text-amber-600 flex-shrink-0 mt-0.5" weight="fill" />
                                         <span>{currentStep.note}</span>
                                     </div>
                                 )}
@@ -176,7 +230,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                 key="start"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="text-gray-400 text-lg py-10"
+                                className="text-gray-400 text-base py-4"
                             >
                                 準備ができたら<br />スタートボタンを押してください
                             </motion.div>

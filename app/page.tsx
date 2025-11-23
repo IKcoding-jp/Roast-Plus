@@ -144,11 +144,11 @@ export default function HomePage() {
       {/* ヘッダー */}
       <header className="flex items-center justify-between bg-dark px-6 py-4 shadow-sm">
         <div className="flex items-center gap-2">
-          <PiCoffeeBeanFill className="h-6 w-6 text-gold" />
-          <h1 className="text-xl font-bold text-white">
-            ローストプラス β版
-          </h1>
-          <span className="text-sm font-normal text-gray-300">v{APP_VERSION}</span>
+          <img 
+            src="/logo.png" 
+            alt="RoastPlus" 
+            className="h-8 w-auto"
+          />
         </div>
         <div className="flex items-center gap-4">
           {/* 開発者モード: Lottieアニメーション確認ボタン */}

@@ -172,7 +172,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
             <div className="flex-grow flex flex-col items-center py-2 px-4 overflow-hidden">
                 {/* Steps Mini Map - Fixed at top */}
                 <div className="w-full max-w-2xl mb-2 sm:mb-3 px-2 flex-shrink-0">
-                    <div className="overflow-x-auto pb-1 -mx-2 px-2" ref={scrollContainerRef}>
+                    <div className="overflow-x-auto scrollbar-hide pb-1 -mx-2 px-2" ref={scrollContainerRef}>
                         <div className="flex gap-2 sm:gap-2 min-w-max">
                             {steps.map((step, index) => {
                                 const stepEndTime = index < steps.length - 1 

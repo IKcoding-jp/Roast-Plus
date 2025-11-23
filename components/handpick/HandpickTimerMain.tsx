@@ -30,7 +30,7 @@ export function HandpickTimerMain() {
     return (
         <div className="h-screen flex flex-col bg-[#F7F7F5] overflow-hidden">
             {/* ヘッダー */}
-            <header className="flex-none px-3 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-3">
+            <header className="flex-none px-4 py-3 sm:px-4 sm:py-3 lg:px-6 lg:py-3">
                 <div className="max-w-5xl mx-auto flex items-center gap-2 sm:gap-3">
                     <Link
                         href="/"
@@ -57,7 +57,7 @@ export function HandpickTimerMain() {
                 <div className="w-full max-w-4xl flex flex-col items-center justify-center space-y-2 sm:space-y-3 lg:space-y-4">
                     {/* フェーズ名 */}
                     <div className="text-center">
-                        <h2 className="text-sm sm:text-base lg:text-lg font-bold text-gray-500 uppercase tracking-wider">
+                        <h2 className="text-base sm:text-base lg:text-lg font-bold text-gray-500 uppercase tracking-wider">
                             {phaseName}
                         </h2>
                     </div>
@@ -74,18 +74,18 @@ export function HandpickTimerMain() {
             </div>
 
             {/* 下部エリア（情報と操作） */}
-            <div className="flex-none px-3 py-2 sm:px-4 sm:py-3 lg:px-6 lg:py-4 bg-white/50 backdrop-blur-sm border-t border-gray-200/50">
+            <div className="flex-none px-4 py-3 sm:px-4 sm:py-3 lg:px-6 lg:py-4 bg-white/50 backdrop-blur-sm border-t border-gray-200/50">
                 <div className="max-w-5xl mx-auto space-y-2 sm:space-y-3">
                     {/* サウンド切り替えボタン（作業メッセージの上） */}
                     <div className="flex justify-end">
                         <button
                             onClick={() => setSoundEnabled(!state.soundEnabled)}
-                            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-sm border transition-all flex items-center justify-center gap-2 ${state.soundEnabled
+                            className={`px-5 sm:px-5 py-3 sm:py-2.5 rounded-lg font-bold text-base sm:text-sm border transition-all flex items-center justify-center gap-2 min-h-[44px] ${state.soundEnabled
                                 ? 'bg-[#EF8A00] text-white border-[#EF8A00]'
                                 : 'bg-gray-100 text-gray-500 border-gray-200'
                                 }`}
                         >
-                            {state.soundEnabled ? <HiVolumeUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <HiVolumeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
+                            {state.soundEnabled ? <HiVolumeUp className="w-5 h-5 sm:w-5 sm:h-5" /> : <HiVolumeOff className="w-5 h-5 sm:w-5 sm:h-5" />}
                             <span className="hidden sm:inline">{state.soundEnabled ? '音あり' : '音なし'}</span>
                         </button>
                     </div>
@@ -93,28 +93,28 @@ export function HandpickTimerMain() {
                     {/* サイクル数と作業メッセージを横並び */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {/* サイクル数（コンパクト版） */}
-                        <div className="bg-white/80 rounded-lg border border-gray-100 px-3 py-2 sm:px-4 sm:py-2.5 shadow-sm flex items-center justify-between">
-                            <span className="text-xs sm:text-sm font-bold text-gray-600">今日のサイクル数</span>
+                        <div className="bg-white/80 rounded-lg border border-gray-100 px-4 py-3 sm:px-4 sm:py-2.5 shadow-sm flex items-center justify-between">
+                            <span className="text-sm sm:text-sm font-bold text-gray-600">今日のサイクル数</span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-2xl sm:text-3xl font-black text-[#EF8A00] tabular-nums">{state.cycleCount}</span>
-                                <span className="text-xs sm:text-sm font-bold text-gray-400">セット</span>
+                                <span className="text-3xl sm:text-3xl font-black text-[#EF8A00] tabular-nums">{state.cycleCount}</span>
+                                <span className="text-sm sm:text-sm font-bold text-gray-400">セット</span>
                             </div>
                         </div>
 
                         {/* 作業メッセージ（コンパクト版） */}
-                        <div className={`rounded-lg border px-3 py-2 sm:px-4 sm:py-2.5 transition-colors duration-300 flex items-center justify-center ${state.phase === 'first' ? 'bg-amber-50/80 border-amber-200' :
+                        <div className={`rounded-lg border px-4 py-3 sm:px-4 sm:py-2.5 transition-colors duration-300 flex items-center justify-center ${state.phase === 'first' ? 'bg-amber-50/80 border-amber-200' :
                             state.phase === 'second' ? 'bg-orange-50/80 border-orange-200' :
                                 'bg-gray-50/80 border-gray-200'
                             }`}>
                             {state.phase === 'idle' ? (
                                 <div className="text-center leading-tight">
-                                    <p className="text-[10px] sm:text-xs text-gray-500 font-bold mb-0.5">準備</p>
-                                    <p className="text-xs sm:text-sm lg:text-base font-bold text-gray-800">
+                                    <p className="text-xs sm:text-xs text-gray-500 font-bold mb-0.5">準備</p>
+                                    <p className="text-sm sm:text-sm lg:text-base font-bold text-gray-800">
                                         {state.cycleCount === 0 ? 'ピシャット・欠点豆入れ・豆' : '新しい豆を用意してください'}
                                     </p>
                                 </div>
                             ) : (
-                                <p className="text-xs sm:text-sm lg:text-base font-bold text-gray-800 text-center leading-tight">
+                                <p className="text-sm sm:text-sm lg:text-base font-bold text-gray-800 text-center leading-tight">
                                     {message}
                                 </p>
                             )}

@@ -55,11 +55,11 @@ export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds,
             } else {
                 // スマホ縦向き
                 if (viewportHeight >= 700) {
-                    setCircleSize(260);
+                    setCircleSize(320);
                 } else if (viewportHeight >= 600) {
-                    setCircleSize(220);
+                    setCircleSize(280);
                 } else {
-                    setCircleSize(200);
+                    setCircleSize(260);
                 }
             }
         };
@@ -123,23 +123,23 @@ export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds,
                     <div
                         className="font-black tabular-nums tracking-tight leading-none text-gray-800"
                         style={{
-                            fontSize: circleSize >= 340 ? '5.5rem' : circleSize >= 280 ? '4.5rem' : circleSize >= 220 ? '3.5rem' : '3rem',
+                            fontSize: circleSize >= 340 ? '5.5rem' : circleSize >= 280 ? '4.5rem' : circleSize >= 260 ? '4rem' : '3.5rem',
                         }}
                     >
                         {formatTime(remainingSeconds)}
                     </div>
                     {phase !== 'idle' && (
                         <>
-                            <div className="text-gray-400 text-base sm:text-lg mt-2 font-medium">
+                            <div className="text-gray-400 text-lg sm:text-lg mt-2 font-medium">
                                 {Math.round(progress)}% 完了
                             </div>
                             {onSkip && (
                                 <button
                                     onClick={onSkip}
-                                    className="mt-2 px-3 py-1 text-xs sm:text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors flex items-center gap-1"
+                                    className="mt-2 px-4 py-1.5 text-sm sm:text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors flex items-center gap-1 min-h-[44px]"
                                 >
                                     スキップ
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 sm:w-4 sm:h-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 sm:w-4 sm:h-4">
                                         <path d="M4.5 3.25a.75.75 0 00-1.125.65v12.2a.75.75 0 001.125.65l9.75-6.1a.75.75 0 000-1.3l-9.75-6.1zM15.25 3.25a.75.75 0 00-.75.75v12a.75.75 0 001.5 0v-12a.75.75 0 00-.75-.75z" />
                                     </svg>
                                 </button>

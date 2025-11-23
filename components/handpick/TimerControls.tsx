@@ -60,9 +60,9 @@ export function TimerControls({
                     <button
                         type="button"
                         onClick={onStart}
-                        className="col-span-2 bg-[#EF8A00] text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        className="col-span-2 bg-[#EF8A00] text-white py-3.5 sm:py-3 rounded-lg font-bold text-base sm:text-base lg:text-lg shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[44px]"
                     >
-                        <HiPlay className="w-5 h-5 sm:w-6 sm:h-6" />
+                        <HiPlay className="w-6 h-6 sm:w-6 sm:h-6" />
                         スタート
                     </button>
                 ) : (
@@ -71,30 +71,30 @@ export function TimerControls({
                             <button
                                 type="button"
                                 onClick={onPause}
-                                className="bg-amber-500 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                className="bg-amber-500 text-white py-3.5 sm:py-3 rounded-lg font-bold text-base sm:text-base lg:text-lg shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[44px]"
                             >
-                                <HiPause className="w-5 h-5 sm:w-6 sm:h-6" />
+                                <HiPause className="w-6 h-6 sm:w-6 sm:h-6" />
                                 一時停止
                             </button>
                         ) : (
                             <button
                                 type="button"
                                 onClick={onResume}
-                                className="bg-[#EF8A00] text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                className="bg-[#EF8A00] text-white py-3.5 sm:py-3 rounded-lg font-bold text-base sm:text-base lg:text-lg shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[44px]"
                             >
-                                <HiPlay className="w-5 h-5 sm:w-6 sm:h-6" />
+                                <HiPlay className="w-6 h-6 sm:w-6 sm:h-6" />
                                 {isSecondPhaseStart ? '2回目スタート' : '再開'}
                             </button>
                         )}
                         <button
                             type="button"
                             onClick={handleReset}
-                            className={`py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base lg:text-lg border transition-all flex items-center justify-center gap-2 ${isResetConfirm
+                            className={`py-3.5 sm:py-3 rounded-lg font-bold text-base sm:text-base lg:text-lg border transition-all flex items-center justify-center gap-2 min-h-[44px] ${isResetConfirm
                                 ? 'bg-red-500 text-white border-red-600 hover:bg-red-600'
                                 : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
                                 }`}
                         >
-                            <HiRefresh className={`w-5 h-5 sm:w-6 sm:h-6 ${isResetConfirm ? 'animate-spin' : ''}`} />
+                            <HiRefresh className={`w-6 h-6 sm:w-6 sm:h-6 ${isResetConfirm ? 'animate-spin' : ''}`} />
                             {isResetConfirm ? '本当にリセット？' : 'リセット'}
                         </button>
                     </>

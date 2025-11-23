@@ -406,11 +406,11 @@ export const AssignmentTable: React.FC<Props> = ({
             <div className="hidden md:block w-fit mx-auto max-w-full overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100 relative">
                 {/* ヘッダー */}
                 <div 
-                    className="grid bg-gray-50 border-b border-gray-200 md:text-base font-semibold text-gray-600 sticky top-0 z-20"
+                    className="grid bg-dark border-b border-gray-700 md:text-base font-semibold text-white sticky top-0 z-20"
                     style={{ gridTemplateColumns, minWidth: 'max-content' }}
                 >
                 <div 
-                    className="p-2 sm:p-3 md:p-4 border-r border-gray-200 flex items-center justify-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-2 px-2 sm:px-3 border-r border-gray-700 flex items-center justify-center bg-dark cursor-pointer hover:bg-gray-800 transition-colors"
                     onClick={() => setWidthConfig({
                         type: 'taskLabel',
                         currentWidth: tableSettings?.colWidths?.taskLabel ?? 160,
@@ -423,7 +423,7 @@ export const AssignmentTable: React.FC<Props> = ({
                 
                 {/* チーム列（チームがない場合も表示） */}
                 {teams.length === 0 ? (
-                    <div className="p-2 md:p-4 border-r border-gray-200 text-center bg-orange-50/50 flex flex-col items-center justify-center h-full min-h-[44px]">
+                    <div className="py-2 px-2 border-r border-gray-700 text-center bg-dark flex flex-col items-center justify-center h-full min-h-[44px]">
                         {isAddingTeam ? (
                             <div className="relative z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32 md:w-40">
                                 <input
@@ -444,7 +444,7 @@ export const AssignmentTable: React.FC<Props> = ({
                         ) : (
                             <button
                                 onClick={() => setIsAddingTeam(true)}
-                                className="text-primary text-sm md:text-base font-bold flex items-center gap-1 hover:underline py-1 px-3 md:py-2 md:px-4 rounded hover:bg-primary/10 border border-primary/20 bg-white shadow-sm"
+                                className="text-primary text-sm md:text-base font-bold flex items-center gap-1 hover:underline py-1 px-3 rounded hover:bg-white/10 border border-primary/20 bg-transparent shadow-sm"
                             >
                                 <MdAdd className="md:w-5 md:h-5" /> 最初の班を追加
                             </button>
@@ -454,11 +454,11 @@ export const AssignmentTable: React.FC<Props> = ({
                     teams.map(team => (
                         <div 
                             key={team.id} 
-                            className="p-2 md:p-4 border-r border-gray-200 text-center relative group bg-gray-50 flex items-center justify-center"
+                            className="py-2 px-2 border-r border-gray-700 text-center relative group bg-dark flex items-center justify-center"
                         >
                             {editingTeamId === team.id ? (
                                 <input
-                                    className="w-full px-1 py-1 md:p-2 text-center border rounded bg-white text-sm md:text-base"
+                                    className="w-full px-1 py-1 text-center border rounded bg-white text-gray-900 text-sm md:text-base"
                                     value={editTeamName}
                                     onChange={e => setEditTeamName(e.target.value)}
                                     autoFocus
@@ -467,7 +467,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                 />
                             ) : (
                                 <div 
-                                    className="cursor-pointer hover:bg-gray-100 rounded px-2 py-1 md:py-2 truncate w-full select-none active:bg-gray-200"
+                                    className="cursor-pointer hover:bg-gray-800 rounded px-2 py-1 truncate w-full select-none active:bg-gray-700"
                                     onClick={() => {
                                         setActiveTeamActionId(team.id);
                                         setActiveTeamName(team.name);
@@ -482,7 +482,7 @@ export const AssignmentTable: React.FC<Props> = ({
 
                 {/* チーム追加 & 補足ヘッダー */}
                 <div 
-                    className="p-2 text-center flex items-center justify-between bg-gray-50 relative px-2 sm:px-3 md:px-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-2 px-2 sm:px-3 text-center flex items-center justify-between bg-dark relative cursor-pointer hover:bg-gray-800 transition-colors"
                     onClick={(e) => {
                         if ((e.target as HTMLElement).closest('button, input')) return;
                         setWidthConfig({
@@ -524,7 +524,7 @@ export const AssignmentTable: React.FC<Props> = ({
                             ) : (
                                 <button
                                     onClick={() => setIsAddingTeam(true)}
-                                    className="p-1 md:p-2 rounded-full bg-gray-200 text-gray-600 hover:bg-primary hover:text-white transition-colors shadow-sm"
+                                    className="p-1 rounded-full bg-gray-700 text-gray-300 hover:bg-primary hover:text-white transition-colors shadow-sm"
                                     title="班を追加"
                                 >
                                     <MdAdd size={16} className="md:w-5 md:h-5" />
@@ -548,17 +548,17 @@ export const AssignmentTable: React.FC<Props> = ({
                             className="grid items-center hover:bg-orange-50/30 transition-colors group"
                             style={{ 
                                 gridTemplateColumns,
-                                minHeight: `${tableSettings?.rowHeights?.[label.id] ?? 100}px`
+                                minHeight: `${tableSettings?.rowHeights?.[label.id] ?? 60}px`
                             }}
                         >
                             {/* 左ラベル列 */}
-                            <div className="p-3 md:p-4 py-4 border-r border-gray-100 h-full flex items-center">
+                            <div className="p-3 md:p-4 py-2 border-r border-gray-100 h-full flex items-center">
                                 <div 
                                     className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap hover:bg-gray-100 rounded transition-colors"
                                     onClick={() => {
                                         setHeightConfig({
                                             taskLabelId: label.id,
-                                            currentHeight: tableSettings?.rowHeights?.[label.id] ?? 100,
+                                            currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
                                             label: '行の設定',
                                             currentName: label.leftLabel
                                         });
@@ -581,7 +581,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                     const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === label.id;
 
                                     return (
-                                        <div key={team.id} className="p-2 md:p-4 py-4 border-r border-gray-100 h-full flex items-center justify-center relative">
+                                        <div key={team.id} className="p-2 md:p-4 py-2 border-r border-gray-100 h-full flex items-center justify-center relative">
                                             <button
                                                 onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                                 onMouseUp={handleCellTouchEnd}
@@ -610,7 +610,7 @@ export const AssignmentTable: React.FC<Props> = ({
                             )}
 
                             {/* 右ラベル列 */}
-                            <div className="p-3 md:p-4 py-4 h-full flex items-center relative pr-8 md:pr-10">
+                            <div className="p-3 md:p-4 py-2 h-full flex items-center relative pr-8 md:pr-10">
                                 {isEditing ? (
                                     <div className="flex gap-1 w-full min-w-0 items-center justify-end">
                                         <input
@@ -654,7 +654,7 @@ export const AssignmentTable: React.FC<Props> = ({
 
                 {/* 新規ラベル追加行 */}
                 <div 
-                    className="grid items-center bg-gray-50 p-2 py-4 border-t border-gray-200 min-h-[80px]"
+                    className="grid items-center bg-gray-50 p-2 py-2 border-t border-gray-200 min-h-[60px]"
                     style={{ gridTemplateColumns }}
                 >
                     <div className="pr-2">

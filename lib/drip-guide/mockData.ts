@@ -19,7 +19,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 id: 'step-1',
                 startTimeSec: 0,
                 title: '蒸らし',
-                description: '中心に細くお湯を注ぎ、１円玉くらいの円を描きながら全体を湿らせます。20秒蒸らします。',
+                description: '粉全体にまんべんなくお湯を注いで均一に湿らせます。20秒蒸らします。',
                 targetTotalWater: 20,
                 note: '粉全体が均一に膨らむのを確認',
             },

@@ -17,6 +17,7 @@ import {
 import { calculateAssignment } from './lib/shuffle';
 import { AssignmentTable } from './components/AssignmentTable';
 import { RouletteOverlay } from './components/RouletteOverlay';
+import { Loading } from '@/components/Loading';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
@@ -33,6 +34,10 @@ export default function AssignmentPage() {
     const [members, setMembers] = useState<Member[]>([]);
     const [taskLabels, setTaskLabels] = useState<TaskLabel[]>([]);
     const [tableSettings, setTableSettings] = useState<TableSettings | null>(null);
+
+    // ロード状態
+    const [isMasterLoaded, setIsMasterLoaded] = useState(false);
+    const [isAssignmentLoaded, setIsAssignmentLoaded] = useState(false);
 
     // 状態
     const [todayDate, setTodayDate] = useState<string>("");
@@ -78,6 +83,7 @@ export default function AssignmentPage() {
             setTeams(t);
             setMembers(m);
             setTaskLabels(l);
+            setIsMasterLoaded(true);
         };
         loadMasterData();
     }, []);
@@ -88,6 +94,7 @@ export default function AssignmentPage() {
 
         const unsubAssignment = subscribeAssignmentDay(todayDate, (data) => {
             setAssignmentDay(data);
+            setIsAssignmentLoaded(true);
         });
 
         const unsubShuffle = subscribeShuffleEvent(todayDate, (event) => {
@@ -268,6 +275,12 @@ export default function AssignmentPage() {
         
         await updateAssignmentDay(todayDate, updatedAssignments);
     };
+
+    const isLoading = !isMasterLoaded || !isAssignmentLoaded;
+
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <div className="min-h-screen bg-[#F7F7F5] flex flex-col">

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DripRecipe, DripStep } from '@/lib/drip-guide/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowCounterClockwise, CheckCircle, X, ArrowLeft } from 'phosphor-react';
+import { Play, Pause, ArrowCounterClockwise, CheckCircle, X, ArrowLeft, Lightbulb } from 'phosphor-react';
 import { clsx } from 'clsx';
 import Link from 'next/link';
 
@@ -165,8 +165,9 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                 </p>
 
                                 {currentStep.note && (
-                                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 text-amber-800 text-sm max-w-xs mx-auto">
-                                        <span className="font-bold mr-1">Point:</span> {currentStep.note}
+                                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 text-amber-800 text-sm max-w-xs mx-auto flex items-start gap-2">
+                                        <Lightbulb size={18} className="text-amber-600 flex-shrink-0 mt-0.5" weight="fill" />
+                                        <span>{currentStep.note}</span>
                                     </div>
                                 )}
                             </motion.div>

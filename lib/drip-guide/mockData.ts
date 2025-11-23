@@ -1,13 +1,13 @@
 import { DripRecipe } from './types';
 
 export const MOCK_RECIPES: DripRecipe[] = [
-    // BYSN Standard Drip (細く中心に注ぐスタイル)
+    // BYSN Standard Drip (細く中心に注ぐスタイル) - 1人前基準
     {
         id: 'recipe-001',
         name: 'BYSN Standard Drip',
         beanName: 'G2B8',
-        beanAmountGram: 20,
-        totalWaterGram: 320,
+        beanAmountGram: 10,
+        totalWaterGram: 160,
         totalDurationSec: 180,
         purpose: '試飲会用スタンダード',
         description: 'できるだけお湯を細く、中心に１円玉くらいの円を描きながら注ぐ淹れ方。丁寧な抽出で酸味と甘みのバランスを引き出します。',
@@ -20,7 +20,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 0,
                 title: '蒸らし',
                 description: '中心に細くお湯を注ぎ、１円玉くらいの円を描きながら全体を湿らせます。20秒蒸らします。',
-                targetTotalWater: 20,
+                targetTotalWater: 10,
                 note: '粉全体が均一に膨らむのを確認',
             },
             {
@@ -28,7 +28,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 20,
                 title: '1投目',
                 description: 'できるだけ細く、中心に１円玉くらいの円を描きながらゆっくり注ぎます。',
-                targetTotalWater: 200,
+                targetTotalWater: 100,
                 note: '注湯スピードは一定に保つ',
             },
             {
@@ -36,7 +36,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 85,
                 title: '2投目',
                 description: '同様に細く、中心に１円玉くらいの円を描きながら注ぎ足します。',
-                targetTotalWater: 280,
+                targetTotalWater: 140,
                 note: '水位が下がりすぎないタイミングで',
             },
             {
@@ -44,7 +44,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 startTimeSec: 115,
                 title: '3投目',
                 description: '最後まで細く丁寧に、中心に１円玉くらいの円を描きながら注ぎきります。',
-                targetTotalWater: 320,
+                targetTotalWater: 160,
                 note: '最後まで一定のスピードで',
             },
             {
@@ -57,16 +57,16 @@ export const MOCK_RECIPES: DripRecipe[] = [
         ],
     },
 
-    // 井崎流ハンドドリップ術 (new)
+    // 井崎流ハンドドリップ術 - 1人前基準
     {
         id: 'recipe-003',
         name: '井崎流ハンドドリップ術',
         beanName: 'G2B8',
-        beanAmountGram: 20,
-        totalWaterGram: 300,
+        beanAmountGram: 10,
+        totalWaterGram: 150,
         totalDurationSec: 180,
         purpose: 'アジア人初の世界チャンピオンの淹れ方',
-        description: '井崎流のハンドドリップレシピ。4回注ぎで合計300gの抽出。',
+        description: '井崎流のハンドドリップレシピ。4回注ぎで抽出します。',
         createdAt: '2023-11-01T10:00:00Z',
         updatedAt: '2023-11-01T10:00:00Z',
         isDefault: true,
@@ -75,30 +75,30 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 id: 'step-1',
                 startTimeSec: 0,
                 title: '蒸らし（1投目）',
-                description: '細く注いで60g、その後撹拌',
-                targetTotalWater: 60,
+                description: '細く注いで、その後撹拌',
+                targetTotalWater: 30,
                 note: '撹拌（ドリッパーを軽く回す）',
             },
             {
                 id: 'step-2',
                 startTimeSec: 60,
                 title: '2投目',
-                description: '太めの注湯で60g',
-                targetTotalWater: 120,
+                description: '太めの注湯で注ぐ',
+                targetTotalWater: 60,
             },
             {
                 id: 'step-3',
                 startTimeSec: 90,
                 title: '3投目',
-                description: '同様に60g',
-                targetTotalWater: 180,
+                description: '同様に注ぐ',
+                targetTotalWater: 90,
             },
             {
                 id: 'step-4',
                 startTimeSec: 120,
                 title: '4投目／仕上げ',
-                description: '残り120g注ぐ、その後撹拌 → 落ちきり',
-                targetTotalWater: 300,
+                description: '残りを注ぐ、その後撹拌 → 落ちきり',
+                targetTotalWater: 150,
                 note: '撹拌（ドリッパーを軽く回す）',
             },
         ],

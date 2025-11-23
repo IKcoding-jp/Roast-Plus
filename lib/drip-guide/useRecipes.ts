@@ -5,6 +5,22 @@ import { DripRecipe } from './types';
 import { MOCK_RECIPES } from './mockData';
 
 const STORAGE_KEY = 'roastplus_drip_recipes';
+const MIGRATION_FLAG_KEY = 'roastplus_drip_recipes_migrated_to_1serving';
+
+/**
+ * 2人前基準のレシピを1人前基準に変換する
+ */
+function migrateRecipeTo1Serving(recipe: DripRecipe): DripRecipe {
+    return {
+        ...recipe,
+        beanAmountGram: Math.round(recipe.beanAmountGram / 2),
+        totalWaterGram: Math.round(recipe.totalWaterGram / 2),
+        steps: recipe.steps.map((step) => ({
+            ...step,
+            targetTotalWater: step.targetTotalWater ? Math.round(step.targetTotalWater / 2) : undefined,
+        })),
+    };
+}
 
 export function useRecipes() {
     const [recipes, setRecipes] = useState<DripRecipe[]>([]);
@@ -12,6 +28,7 @@ export function useRecipes() {
 
     useEffect(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
+        const migrationFlag = localStorage.getItem(MIGRATION_FLAG_KEY);
         let loadedRecipes: DripRecipe[] = [];
 
         if (stored) {
@@ -21,6 +38,16 @@ export function useRecipes() {
                 console.error('Failed to parse recipes', e);
                 loadedRecipes = [];
             }
+        }
+
+        // マイグレーション: 2人前基準から1人前基準への変換（1回だけ実行）
+        if (loadedRecipes.length > 0 && migrationFlag !== 'true') {
+            console.log('Migrating recipes from 2 servings to 1 serving...');
+            loadedRecipes = loadedRecipes.map(migrateRecipeTo1Serving);
+            // 変換後のレシピを保存
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(loadedRecipes));
+            // マイグレーションフラグを設定
+            localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
         }
 
         // デフォルトレシピを常に含める

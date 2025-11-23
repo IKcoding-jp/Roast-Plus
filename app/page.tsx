@@ -22,6 +22,7 @@ export default function HomePage() {
   const router = useRouter();
   const [showLoadingDebugModal, setShowLoadingDebugModal] = useState(false);
   const [splashVisible, setSplashVisible] = useState(true);
+  const [cardHeight, setCardHeight] = useState<number | null>(null);
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
 
   // スプラッシュ画面の表示時間を管理
@@ -38,6 +39,46 @@ export default function HomePage() {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  // スマホレイアウト: 画面高さに応じてカードの高さを動的に調整
+  useEffect(() => {
+    const calculateCardHeight = () => {
+      // スマホのみで適用（md未満 = 768px未満）
+      if (typeof window === 'undefined' || window.innerWidth >= 768) {
+        setCardHeight(null);
+        return;
+      }
+
+      // 利用可能な高さを計算
+      const viewportHeight = window.innerHeight;
+      const headerHeight = 64; // py-4 (16px × 2) + ロゴ高さ (32px) = 約64px
+      const paddingTop = 8; // pt-2 = 8px
+      const paddingBottom = 24; // pb-6 = 24px
+      const gridGap = 60; // 5行 × gap-3 (12px) = 60px
+      
+      const availableHeight = viewportHeight - headerHeight - paddingTop - paddingBottom;
+      const cardHeightPerRow = (availableHeight - gridGap) / 5; // 10個のカードを5行に配置
+      
+      // 最小高さを確保（100px以上）
+      const minCardHeight = 100;
+      const calculatedHeight = Math.max(cardHeightPerRow, minCardHeight);
+      
+      setCardHeight(calculatedHeight);
+    };
+
+    // 初回計算
+    calculateCardHeight();
+
+    // リサイズイベントリスナーを追加
+    window.addEventListener('resize', calculateCardHeight);
+    window.addEventListener('orientationchange', calculateCardHeight);
+
+    // クリーンアップ
+    return () => {
+      window.removeEventListener('resize', calculateCardHeight);
+      window.removeEventListener('orientationchange', calculateCardHeight);
+    };
+  }, []);
 
   // 開発用: Lottieアニメーション確認モーダルを表示
   const handleShowLoadingDebugModal = () => {
@@ -132,13 +173,17 @@ export default function HomePage() {
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 pt-2 sm:pt-3 pb-6 sm:pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-3 auto-rows-fr">
+        <div 
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-3"
+          style={cardHeight ? { gridAutoRows: `${cardHeight}px` } : { gridAutoRows: '1fr' }}
+        >
 
 
           {/* 担当表カード */}
           <button
             onClick={() => router.push('/assignment')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <FaUsers className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
@@ -149,7 +194,8 @@ export default function HomePage() {
           {/* スケジュールカード */}
           <button
             onClick={() => router.push('/schedule')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <RiCalendarScheduleFill className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
@@ -160,7 +206,8 @@ export default function HomePage() {
           {/* 試飲感想記録カード */}
           <button
             onClick={() => router.push('/tasting')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <FaCoffee className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
@@ -171,10 +218,11 @@ export default function HomePage() {
           {/* ローストタイマーカード */}
           <button
             onClick={() => router.push('/roast-timer')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <MdTimer className="h-12 w-12 md:h-12 md:w-12 text-primary" />
-            <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
+            <h2 className="text-sm md:text-base font-semibold text-gray-800 text-center">
               ローストタイマー
             </h2>
           </button>
@@ -182,7 +230,8 @@ export default function HomePage() {
           {/* コーヒー豆図鑑カード */}
           <button
             onClick={() => router.push('/defect-beans')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <RiBookFill className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
@@ -193,7 +242,8 @@ export default function HomePage() {
           {/* 作業進捗カード */}
           <button
             onClick={() => router.push('/progress')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <MdTimeline className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
@@ -204,7 +254,8 @@ export default function HomePage() {
           {/* ドリップガイドカード */}
           <button
             onClick={() => router.push('/drip-guide')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <span className="absolute top-2 right-2 completed-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
               完成
@@ -218,13 +269,14 @@ export default function HomePage() {
           {/* ハンドピックタイマーカード */}
           <button
             onClick={() => router.push('/handpick-timer')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <span className="absolute top-2 right-2 completed-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
               完成
             </span>
             <IoTimer className="h-12 w-12 md:h-12 md:w-12 text-primary" />
-            <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
+            <h2 className="text-xs md:text-base font-semibold text-gray-800 text-center">
               ハンドピックタイマー
             </h2>
           </button>
@@ -232,7 +284,8 @@ export default function HomePage() {
           {/* カウンターカード */}
           <button
             onClick={() => router.push('/counter')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <span className="absolute top-2 right-2 completed-label-gradient text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-pulse-scale">
               完成
@@ -246,7 +299,8 @@ export default function HomePage() {
           {/* 設定カード */}
           <button
             onClick={() => router.push('/settings')}
-            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
+            className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg md:h-full"
+            style={cardHeight ? { height: `${cardHeight}px` } : undefined}
           >
             <IoSettings className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-right md:text-center">

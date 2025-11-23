@@ -22,7 +22,7 @@ import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
-import { MdAssignment } from "react-icons/md";
+import { FaUsers } from "react-icons/fa";
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
 export default function AssignmentPage() {
@@ -297,7 +297,7 @@ export default function AssignmentPage() {
                     {/* 中央: 見出し */}
                     <div className="flex items-center justify-center z-0">
                         <div className="flex items-center gap-2">
-                            <MdAssignment className="text-primary w-6 h-6 md:w-7 md:h-7" />
+                            <FaUsers className="text-primary w-6 h-6 md:w-7 md:h-7" />
                             <h1 className="text-xl md:text-2xl font-bold text-gray-800">
                                 担当表
                             </h1>

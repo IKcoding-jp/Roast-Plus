@@ -5,10 +5,10 @@ import { useAuth, signOut } from '@/lib/auth';
 import { useEffect, useState } from 'react';
 import { PiCoffeeBeanFill } from "react-icons/pi";
 import { RiCalendarScheduleFill, RiBookFill } from "react-icons/ri";
-import { FaCoffee } from "react-icons/fa";
+import { FaCoffee, FaUsers } from "react-icons/fa";
 
 import { IoSettings, IoTimer } from "react-icons/io5";
-import { MdTimer, MdTimeline, MdCoffeeMaker, MdAddCircle, MdAssignment } from "react-icons/md";
+import { MdTimer, MdTimeline, MdCoffeeMaker, MdAddCircle } from "react-icons/md";
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
@@ -140,7 +140,7 @@ export default function HomePage() {
             onClick={() => router.push('/assignment')}
             className="relative flex flex-col items-center justify-center gap-3 rounded-lg bg-white p-5 md:p-6 shadow-md transition-shadow hover:shadow-lg h-full"
           >
-            <MdAssignment className="h-12 w-12 md:h-12 md:w-12 text-primary" />
+            <FaUsers className="h-12 w-12 md:h-12 md:w-12 text-primary" />
             <h2 className="text-base md:text-base font-semibold text-gray-800 text-center">
               担当表
             </h2>

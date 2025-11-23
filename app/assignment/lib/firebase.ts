@@ -1,6 +1,7 @@
 import {
     collection,
     doc,
+    getDoc,
     getDocs,
     onSnapshot,
     query,
@@ -75,16 +76,18 @@ export const subscribeShuffleEvent = (date: string, callback: (data: ShuffleEven
 // 更新系
 export const updateAssignmentDay = async (date: string, assignments: Assignment[]) => {
     const docRef = doc(assignmentDaysCol, date);
+    
+    // 既存のドキュメントを読み込んで createdAt を保持
+    const existingDoc = await getDoc(docRef);
+    const existingData = existingDoc.exists() ? existingDoc.data() : null;
+    
+    // assignments 配列を完全に置き換える（merge: true を削除）
     await setDoc(docRef, {
         assignments,
         updatedAt: serverTimestamp(),
-        // createdAtは既存なら更新しない、新規なら設定したいが、setDoc(merge: true)だとcreatedAtが消えるリスクはないが
-        // ここでは簡易的に updatedAt だけ更新し、createdAtがない場合は serverTimestamp() を入れるロジックにする
-    }, { merge: true });
-
-    // createdAt がない場合（新規作成時）の補完は別途考えるか、初期化時に行う
-    // 今回は setDoc with merge なので、初回は createdAt が入らない可能性があるが、
-    // 読み込み側で必須としていないので許容、あるいは初回作成ロジックを分ける
+        // createdAt が既に存在する場合は保持、存在しない場合は新規作成として設定
+        createdAt: existingData?.createdAt || serverTimestamp(),
+    });
 };
 
 export const createShuffleEvent = async (event: ShuffleEvent) => {

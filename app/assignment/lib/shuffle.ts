@@ -13,8 +13,8 @@ export const calculateAssignment = (
     targetDate: string,
     currentAssignments?: Assignment[] // 現在の割り当て（固定チェック用）
 ): Assignment[] => {
-    // 1. 対象メンバーの抽出 (管理者以外)
-    const eligibleMembers = members.filter(m => !m.isManager);
+    // 1. 対象メンバーの抽出 (アクティブなメンバー)
+    const eligibleMembers = members.filter(m => m.active !== false);
 
     // 2. 割り当て枠の作成
     // 現在の割り当てで memberId が null の枠はシャッフル対象外（固定）とする
@@ -35,7 +35,8 @@ export const calculateAssignment = (
                 assignments.push({
                     teamId: team.id,
                     taskLabelId: task.id,
-                    memberId: null
+                    memberId: null,
+                    assignedDate: targetDate
                 });
                 lockedSlots.add(`${team.id}-${task.id}`);
             } else {
@@ -190,14 +191,16 @@ export const calculateAssignment = (
             assignments.push({
                 teamId: slot.teamId,
                 taskLabelId: slot.taskLabelId,
-                memberId: bestCandidate.memberId
+                memberId: bestCandidate.memberId,
+                assignedDate: targetDate
             });
             assignedMemberIds.add(bestCandidate.memberId);
         } else {
             assignments.push({
                 teamId: slot.teamId,
                 taskLabelId: slot.taskLabelId,
-                memberId: null
+                memberId: null,
+                assignedDate: targetDate
             });
         }
     }

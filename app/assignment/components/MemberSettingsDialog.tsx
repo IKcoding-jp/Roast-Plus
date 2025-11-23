@@ -1,5 +1,5 @@
 import React from 'react';
-import { Member, TaskLabel } from '../types';
+import { Member, TaskLabel } from '../../../types';
 
 type Props = {
     member: Member;
@@ -52,7 +52,7 @@ export const MemberSettingsDialog: React.FC<Props> = ({
                                         className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
                                     />
                                     <span className={`ml-3 font-medium ${isExcluded ? 'text-red-500' : 'text-gray-700'}`}>
-                                        {task.name}
+                                        {task.leftLabel} {task.rightLabel || ''}
                                     </span>
                                     {isExcluded && <span className="ml-auto text-xs text-red-500 font-bold">除外中</span>}
                                 </label>

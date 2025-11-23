@@ -86,6 +86,13 @@ export interface Assignment {
 
 }
 
+// 割り当ての日次スナップショット
+export interface AssignmentDay {
+  date: string; // YYYY-MM-DD形式
+  assignments: Assignment[];
+  updatedAt?: any;
+}
+
 
 
 
@@ -279,10 +286,19 @@ export interface UserSettings {
 
 export interface ShuffleEvent {
 
-  startTime: string; // ISO 8601形式のタイムスタンプ
-  targetDate?: string; // target date for the shuffled result (source of truth from Firestore)
+  date?: string; // Document ID (YYYY-MM-DD)
 
-  shuffledAssignments: Assignment[]; // シャッフル結果
+  // 既存定義
+  startTime?: string; // ISO 8601形式のタイムスタンプ
+  targetDate?: string; // target date for the shuffled result (source of truth from Firestore)
+  shuffledAssignments?: Assignment[]; // シャッフル結果
+
+  // 追加定義 (Assignment機能で使用)
+  eventId?: string;
+  state?: 'running' | 'done';
+  startedAt?: any; // Timestamp or ISO string
+  durationMs?: number;
+  resultAssignments?: Assignment[];
 
 }
 

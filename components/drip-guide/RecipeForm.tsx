@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DripRecipe, DripStep } from '@/lib/drip-guide/types';
 import { StepEditor } from './StepEditor';
-import { FloppyDisk, ArrowLeft } from 'phosphor-react';
+import { FloppyDisk, ArrowLeft, ArrowClockwise } from 'phosphor-react';
 import Link from 'next/link';
+import { MOCK_RECIPES } from '@/lib/drip-guide/mockData';
 
 interface RecipeFormProps {
     initialRecipe?: DripRecipe;
@@ -55,6 +56,33 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
         };
 
         onSubmit(recipe);
+    };
+
+    const handleResetToDefault = () => {
+        if (!initialRecipe?.isDefault || !initialRecipe?.id) {
+            return;
+        }
+
+        // MOCK_RECIPESから元のデフォルト値を取得
+        const defaultRecipe = MOCK_RECIPES.find((r) => r.id === initialRecipe.id);
+        if (!defaultRecipe) {
+            return;
+        }
+
+        // 確認ダイアログ
+        if (!confirm('デフォルト値に戻しますか？現在の編集内容は失われます。')) {
+            return;
+        }
+
+        // フォームの状態をデフォルト値にリセット
+        setName(defaultRecipe.name);
+        setBeanName(defaultRecipe.beanName);
+        setBeanAmountGram(defaultRecipe.beanAmountGram);
+        setTotalWaterGram(defaultRecipe.totalWaterGram);
+        setTotalDurationSec(defaultRecipe.totalDurationSec);
+        setPurpose(defaultRecipe.purpose || '');
+        setDescription(defaultRecipe.description || '');
+        setSteps(defaultRecipe.steps.map(step => ({ ...step }))); // ディープコピー
     };
 
     return (
@@ -190,14 +218,26 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
             </div>
 
             {/* Submit Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-center z-10">
-                <button
-                    type="submit"
-                    className="flex items-center gap-2 bg-amber-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg hover:bg-amber-700 transition-transform active:scale-95 touch-manipulation"
-                >
-                    <FloppyDisk size={24} />
-                    レシピを保存
-                </button>
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10">
+                <div className="max-w-3xl mx-auto flex flex-row gap-3 justify-center">
+                    {initialRecipe?.isDefault && (
+                        <button
+                            type="button"
+                            onClick={handleResetToDefault}
+                            className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg font-medium text-base hover:bg-gray-200 transition-colors active:scale-95 touch-manipulation"
+                        >
+                            <ArrowClockwise size={20} />
+                            デフォルトに戻す
+                        </button>
+                    )}
+                    <button
+                        type="submit"
+                        className="flex items-center justify-center gap-2 bg-amber-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg hover:bg-amber-700 transition-transform active:scale-95 touch-manipulation"
+                    >
+                        <FloppyDisk size={24} />
+                        レシピを保存
+                    </button>
+                </div>
             </div>
         </form>
     );

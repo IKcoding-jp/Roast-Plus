@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, ArrowCounterClockwise, CheckCircle, X, ArrowLeft, Lightbulb } from 'phosphor-react';
 import { clsx } from 'clsx';
 import Link from 'next/link';
+import Lottie, { LottieRefCurrentProps } from 'lottie-react';
 
 interface DripGuideRunnerProps {
     recipe: DripRecipe;
@@ -15,7 +16,10 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
+    const [animationData, setAnimationData] = useState<any>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const lottieRef = useRef<LottieRefCurrentProps>(null);
 
     // Sort steps just in case
     const steps = [...recipe.steps].sort((a, b) => a.startTimeSec - b.startTimeSec);
@@ -33,6 +37,27 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
         }
     }, [currentTime, recipe.totalDurationSec, isCompleted]);
 
+    // Load Lottie animation when completed
+    useEffect(() => {
+        const loadAnimation = async () => {
+            try {
+                const response = await fetch('/animations/Break Time.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    setAnimationData(data);
+                } else {
+                    console.error('Failed to load Lottie animation');
+                }
+            } catch (error) {
+                console.error('Error loading Lottie animation:', error);
+            }
+        };
+
+        if (isCompleted) {
+            loadAnimation();
+        }
+    }, [isCompleted]);
+
     // Timer logic
     useEffect(() => {
         if (isRunning) {
@@ -46,6 +71,27 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
     }, [isRunning]);
+
+    // Auto scroll to current step in mini map
+    useEffect(() => {
+        if (currentStep && scrollContainerRef.current) {
+            const activeStepElement = document.getElementById(`step-card-${currentStep.id}`);
+            if (activeStepElement) {
+                activeStepElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'center'
+                });
+            }
+        }
+    }, [currentStep?.id]);
+
+    // Set animation speed
+    useEffect(() => {
+        if (lottieRef.current) {
+            lottieRef.current.setSpeed(0.5);
+        }
+    }, [animationData]);
 
     const toggleTimer = () => setIsRunning(!isRunning);
 
@@ -69,9 +115,24 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                 <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="bg-green-100 p-6 rounded-full mb-6"
+                    className={clsx(
+                        "rounded-full mb-6 flex items-center justify-center",
+                        animationData ? "" : "bg-green-100 p-6"
+                    )}
                 >
-                    <CheckCircle size={64} className="text-green-600" weight="fill" />
+                    {animationData ? (
+                        <Lottie
+                            lottieRef={lottieRef}
+                            animationData={animationData}
+                            loop={false}
+                            style={{ width: 160, height: 160 }}
+                            onDOMLoaded={() => {
+                                lottieRef.current?.setSpeed(0.5);
+                            }}
+                        />
+                    ) : (
+                        <CheckCircle size={64} className="text-green-600" weight="fill" />
+                    )}
                 </motion.div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">抽出完了！</h2>
                 <p className="text-gray-600 mb-8">お疲れ様でした。美味しいコーヒーを楽しみましょう。</p>
@@ -111,7 +172,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
             <div className="flex-grow flex flex-col items-center py-2 px-4 overflow-hidden">
                 {/* Steps Mini Map - Fixed at top */}
                 <div className="w-full max-w-2xl mb-2 sm:mb-3 px-2 flex-shrink-0">
-                    <div className="overflow-x-auto pb-1 -mx-2 px-2">
+                    <div className="overflow-x-auto pb-1 -mx-2 px-2" ref={scrollContainerRef}>
                         <div className="flex gap-2 sm:gap-2 min-w-max">
                             {steps.map((step, index) => {
                                 const stepEndTime = index < steps.length - 1 
@@ -124,6 +185,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                 return (
                                     <motion.div
                                         key={step.id}
+                                        id={`step-card-${step.id}`}
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         className={clsx(

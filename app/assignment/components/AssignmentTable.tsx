@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MdAdd, MdDelete, MdEdit, MdSwapHoriz, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown, MdLinearScale, MdHeight } from 'react-icons/md';
+import { MdAdd, MdDelete, MdEdit, MdSwapHoriz, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown, MdLinearScale, MdHeight, MdInfoOutline } from 'react-icons/md';
 import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
@@ -355,6 +355,11 @@ export const AssignmentTable: React.FC<Props> = ({
         const labelWidth = tableSettings?.colWidths?.taskLabel ?? 120;
         const noteWidth = tableSettings?.colWidths?.note ?? 120;
         
+        // チームがない場合は、プレースホルダー用の幅（160px）を確保
+        if (teams.length === 0) {
+            return `${labelWidth}px 160px ${noteWidth}px`;
+        }
+        
         const teamColumns = teams.map(team => {
             const w = tableSettings?.colWidths?.teams?.[team.id] ?? defaultWidth;
             return `${w}px`;
@@ -366,51 +371,115 @@ export const AssignmentTable: React.FC<Props> = ({
     const gridTemplateColumns = generateGridTemplateColumns();
 
     return (
-        <div className="w-fit mx-auto max-w-full overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100 relative">
-            {/* ヘッダー */}
-            <div 
-                className="grid bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-600 sticky top-0 z-20"
-                style={{ gridTemplateColumns, minWidth: 'max-content' }}
-            >
+        <div className="w-full max-w-full flex flex-col items-center gap-6">
+            {/* データがない場合の初期ガイドメッセージ */}
+            {teams.length === 0 && taskLabels.length === 0 && (
+                <div className="w-full max-w-md bg-white rounded-xl shadow-sm border border-orange-100 p-6 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="p-3 bg-orange-50 rounded-full text-primary">
+                            <MdInfoOutline size={32} />
+                        </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">担当表をはじめましょう</h3>
+                    <p className="text-gray-600 text-sm mb-6">
+                        まずは「班」と「作業」を追加して、<br />
+                        日々の役割分担を管理する表を作成しましょう。
+                    </p>
+                    
+                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-500">
+                        <div className="flex flex-col items-center gap-2 p-2 bg-gray-50 rounded border border-primary/20">
+                            <span className="font-bold text-primary">STEP 1</span>
+                            <span>班を追加</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2 p-2 bg-gray-50 rounded">
+                            <span className="font-bold">STEP 2</span>
+                            <span>作業を追加</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2 p-2 bg-gray-50 rounded">
+                            <span className="font-bold">STEP 3</span>
+                            <span>割当開始</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block w-fit mx-auto max-w-full overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100 relative">
+                {/* ヘッダー */}
+                <div 
+                    className="grid bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-600 sticky top-0 z-20"
+                    style={{ gridTemplateColumns, minWidth: 'max-content' }}
+                >
                 <div 
                     className="p-2 sm:p-3 border-r border-gray-200 flex items-center justify-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={() => setWidthConfig({
                         type: 'taskLabel',
                         currentWidth: tableSettings?.colWidths?.taskLabel ?? 120,
-                        label: '作業ラベル列の幅'
+                        label: '左ラベル列の幅'
                     })}
                     title="クリックして幅を変更"
                 >
-                    作業ラベル
+                    左ラベル
                 </div>
                 
-                {teams.map(team => (
-                    <div 
-                        key={team.id} 
-                        className="p-2 border-r border-gray-200 text-center relative group bg-gray-50 flex items-center justify-center"
-                    >
-                        {editingTeamId === team.id ? (
-                            <input
-                                className="w-full px-1 py-1 text-center border rounded bg-white text-sm"
-                                value={editTeamName}
-                                onChange={e => setEditTeamName(e.target.value)}
-                                autoFocus
-                                onKeyDown={e => e.key === 'Enter' && handleUpdateTeam(team.id)}
-                                onBlur={() => handleUpdateTeam(team.id)}
-                            />
-                        ) : (
-                            <div 
-                                className="cursor-pointer hover:bg-gray-100 rounded px-2 py-1 truncate w-full select-none active:bg-gray-200"
-                                onClick={() => {
-                                    setActiveTeamActionId(team.id);
-                                    setActiveTeamName(team.name);
-                                }}
-                            >
-                                {team.name}班
+                {/* チーム列（チームがない場合も表示） */}
+                {teams.length === 0 ? (
+                    <div className="p-2 border-r border-gray-200 text-center bg-orange-50/50 flex flex-col items-center justify-center h-full min-h-[44px]">
+                        {isAddingTeam ? (
+                            <div className="relative z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32">
+                                <input
+                                    className="w-full px-1 text-sm outline-none text-gray-900"
+                                    placeholder="班名"
+                                    value={newTeamName}
+                                    onChange={e => setNewTeamName(e.target.value)}
+                                    autoFocus
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter') handleAddTeam();
+                                        if (e.key === 'Escape') setIsAddingTeam(false);
+                                    }}
+                                />
+                                <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1">
+                                    <MdAdd />
+                                </button>
                             </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsAddingTeam(true)}
+                                className="text-primary text-sm font-bold flex items-center gap-1 hover:underline py-1 px-3 rounded hover:bg-primary/10 border border-primary/20 bg-white shadow-sm"
+                            >
+                                <MdAdd /> 最初の班を追加
+                            </button>
                         )}
                     </div>
-                ))}
+                ) : (
+                    teams.map(team => (
+                        <div 
+                            key={team.id} 
+                            className="p-2 border-r border-gray-200 text-center relative group bg-gray-50 flex items-center justify-center"
+                        >
+                            {editingTeamId === team.id ? (
+                                <input
+                                    className="w-full px-1 py-1 text-center border rounded bg-white text-sm"
+                                    value={editTeamName}
+                                    onChange={e => setEditTeamName(e.target.value)}
+                                    autoFocus
+                                    onKeyDown={e => e.key === 'Enter' && handleUpdateTeam(team.id)}
+                                    onBlur={() => handleUpdateTeam(team.id)}
+                                />
+                            ) : (
+                                <div 
+                                    className="cursor-pointer hover:bg-gray-100 rounded px-2 py-1 truncate w-full select-none active:bg-gray-200"
+                                    onClick={() => {
+                                        setActiveTeamActionId(team.id);
+                                        setActiveTeamName(team.name);
+                                    }}
+                                >
+                                    {team.name}班
+                                </div>
+                            )}
+                        </div>
+                    ))
+                )}
 
                 {/* チーム追加 & 補足ヘッダー */}
                 <div 
@@ -420,49 +489,51 @@ export const AssignmentTable: React.FC<Props> = ({
                         setWidthConfig({
                             type: 'note',
                             currentWidth: tableSettings?.colWidths?.note ?? 120,
-                            label: '補足列の幅'
+                            label: '右ラベル列の幅'
                         });
                     }}
                     title="クリックして幅を変更"
                 >
                     <div className="relative">
-                        {isAddingTeam ? (
-                            <>
-                                <div 
-                                    className="fixed inset-0 z-10" 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsAddingTeam(false);
-                                    }} 
-                                />
-                                <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32">
-                                    <input
-                                        className="w-full px-1 text-sm outline-none text-gray-900"
-                                        placeholder="班名"
-                                        value={newTeamName}
-                                        onChange={e => setNewTeamName(e.target.value)}
-                                        autoFocus
-                                        onKeyDown={e => {
-                                            if (e.key === 'Enter') handleAddTeam();
-                                            if (e.key === 'Escape') setIsAddingTeam(false);
-                                        }}
+                        {teams.length > 0 && (
+                            isAddingTeam ? (
+                                <>
+                                    <div 
+                                        className="fixed inset-0 z-10" 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsAddingTeam(false);
+                                        }} 
                                     />
-                                    <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1">
-                                        <MdAdd />
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <button
-                                onClick={() => setIsAddingTeam(true)}
-                                className="p-1 rounded-full bg-gray-200 text-gray-600 hover:bg-primary hover:text-white transition-colors shadow-sm"
-                                title="班を追加"
-                            >
-                                <MdAdd size={16} />
-                            </button>
+                                    <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32">
+                                        <input
+                                            className="w-full px-1 text-sm outline-none text-gray-900"
+                                            placeholder="班名"
+                                            value={newTeamName}
+                                            onChange={e => setNewTeamName(e.target.value)}
+                                            autoFocus
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') handleAddTeam();
+                                                if (e.key === 'Escape') setIsAddingTeam(false);
+                                            }}
+                                        />
+                                        <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1">
+                                            <MdAdd />
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => setIsAddingTeam(true)}
+                                    className="p-1 rounded-full bg-gray-200 text-gray-600 hover:bg-primary hover:text-white transition-colors shadow-sm"
+                                    title="班を追加"
+                                >
+                                    <MdAdd size={16} />
+                                </button>
+                            )
                         )}
                     </div>
-                    <span>補足</span>
+                    <span>右ラベル</span>
                     <span className="w-4"></span> {/* スペーサー */}
                 </div>
             </div>
@@ -499,39 +570,45 @@ export const AssignmentTable: React.FC<Props> = ({
                             </div>
 
                             {/* 各チームの担当者列 */}
-                            {teams.map(team => {
-                                const assignment = assignments.find(a => a.teamId === team.id && a.taskLabelId === label.id);
-                                const member = members.find(m => m.id === assignment?.memberId);
-                                
-                                const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === label.id;
+                            {teams.length === 0 ? (
+                                <div className="p-2 border-r border-gray-100 h-full bg-gray-50/30 flex items-center justify-center">
+                                    <span className="text-xs text-gray-300">班を作成してください</span>
+                                </div>
+                            ) : (
+                                teams.map(team => {
+                                    const assignment = assignments.find(a => a.teamId === team.id && a.taskLabelId === label.id);
+                                    const member = members.find(m => m.id === assignment?.memberId);
+                                    
+                                    const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === label.id;
 
-                                return (
-                                    <div key={team.id} className="p-2 py-4 border-r border-gray-100 h-full flex items-center justify-center relative">
-                                        <button
-                                            onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
-                                            onMouseUp={handleCellTouchEnd}
-                                            onMouseMove={handleCellTouchMove}
-                                            onMouseLeave={handleCellTouchEnd}
-                                            onTouchStart={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
-                                            onTouchEnd={handleCellTouchEnd}
-                                            onTouchMove={handleCellTouchMove}
-                                            onClick={(e) => handleCellClick(team.id, label.id)}
-                                            className={`
-                                                w-full py-2 px-1 rounded-lg text-sm font-bold text-center transition-all truncate select-none
-                                                ${member 
-                                                    ? isSelected
-                                                        ? 'bg-primary text-white shadow-md scale-105'
-                                                        : 'text-gray-800 bg-white border border-gray-200 shadow-sm hover:shadow' 
-                                                    : isSelected
-                                                        ? 'bg-primary/20 text-primary border border-primary'
-                                                        : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100'}
-                                            `}
-                                        >
-                                            {member ? member.name : '未割当'}
-                                        </button>
-                                    </div>
-                                );
-                            })}
+                                    return (
+                                        <div key={team.id} className="p-2 py-4 border-r border-gray-100 h-full flex items-center justify-center relative">
+                                            <button
+                                                onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
+                                                onMouseUp={handleCellTouchEnd}
+                                                onMouseMove={handleCellTouchMove}
+                                                onMouseLeave={handleCellTouchEnd}
+                                                onTouchStart={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
+                                                onTouchEnd={handleCellTouchEnd}
+                                                onTouchMove={handleCellTouchMove}
+                                                onClick={(e) => handleCellClick(team.id, label.id)}
+                                                className={`
+                                                    w-full py-2 px-1 rounded-lg text-sm font-bold text-center transition-all truncate select-none
+                                                    ${member 
+                                                        ? isSelected
+                                                            ? 'bg-primary text-white shadow-md scale-105'
+                                                            : 'text-gray-800 bg-white border border-gray-200 shadow-sm hover:shadow' 
+                                                        : isSelected
+                                                            ? 'bg-primary/20 text-primary border border-primary'
+                                                            : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100'}
+                                                `}
+                                            >
+                                                {member ? member.name : '未割当'}
+                                            </button>
+                                        </div>
+                                    );
+                                })
+                            )}
 
                             {/* 右ラベル列 */}
                             <div className="p-3 py-4 h-full flex items-center relative pr-8">
@@ -555,7 +632,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                     </div>
                                 ) : (
                                     <div 
-                                        className="w-full p-1 cursor-pointer break-words whitespace-pre-wrap text-right text-gray-600 text-sm"
+                                        className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm break-words whitespace-pre-wrap text-right hover:bg-gray-100 rounded transition-colors"
                                         onClick={() => startEditLabel(label)}
                                     >
                                         {label.rightLabel}
@@ -584,7 +661,7 @@ export const AssignmentTable: React.FC<Props> = ({
                     <div className="pr-2">
                         <input
                             className="w-full p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-sm text-gray-800 placeholder-gray-500"
-                            placeholder="作業を追加"
+                            placeholder="左ラベル"
                             value={newLeftLabel}
                             onChange={e => setNewLeftLabel(e.target.value)}
                             onKeyDown={e => {
@@ -594,14 +671,14 @@ export const AssignmentTable: React.FC<Props> = ({
                     </div>
                     
                     {/* チーム列の空白（結合） */}
-                    <div className="col-span-full px-2 text-center text-gray-600 text-xs font-bold flex items-center justify-center" style={{ gridColumn: `2 / span ${teams.length}` }}>
+                    <div className="col-span-full px-2 text-center text-gray-600 text-xs font-bold flex items-center justify-center" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
                         <span className="hidden md:inline">左と右を入力して追加</span>
                     </div>
 
                     <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
                         <input
                             className="w-full min-w-0 p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-right text-sm text-gray-800 placeholder-gray-500"
-                            placeholder="補足(任意)"
+                            placeholder="右ラベル(任意)"
                             value={newRightLabel}
                             onChange={e => setNewRightLabel(e.target.value)}
                             onKeyDown={e => {
@@ -617,6 +694,112 @@ export const AssignmentTable: React.FC<Props> = ({
                         </button>
                     </div>
                 </div>
+            </div>
+            </div>
+
+            {/* Mobile List View */}
+            <div className="md:hidden w-full space-y-4 px-2">
+                {taskLabels.map(label => {
+                    const isEditing = editingLabelId === label.id;
+                    
+                    return (
+                        <div key={label.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-3">
+                            {/* Header: Label Names */}
+                            <div className="flex justify-between items-start border-b border-gray-50 pb-2 min-h-[40px]">
+                                {isEditing ? (
+                                    <div className="flex flex-col gap-2 w-full">
+                                        <input
+                                            className="w-full p-2 border rounded bg-white text-lg font-bold text-gray-800"
+                                            value={editLeftLabel}
+                                            onChange={e => setEditLeftLabel(e.target.value)}
+                                            placeholder="左ラベル"
+                                        />
+                                        <div className="flex gap-2">
+                                            <input
+                                                className="flex-1 p-2 border rounded bg-white text-sm text-gray-600"
+                                                value={editRightLabel}
+                                                onChange={e => setEditRightLabel(e.target.value)}
+                                                placeholder="右ラベル"
+                                            />
+                                            <button 
+                                                onClick={() => saveLabel(label.id)} 
+                                                className="bg-green-500 text-white p-2 rounded hover:bg-green-600 shrink-0"
+                                            >
+                                                <MdCheck size={20} />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDeleteTaskLabel(label.id)} 
+                                                className="bg-red-50 text-red-500 p-2 rounded hover:bg-red-100 border border-red-200 shrink-0"
+                                            >
+                                                <MdDelete size={20} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 w-full flex-wrap">
+                                        <div 
+                                            className="text-sm text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 cursor-pointer font-bold"
+                                            onClick={() => startEditLabel(label)}
+                                        >
+                                            {label.leftLabel}
+                                        </div>
+                                        {label.rightLabel && (
+                                            <div 
+                                                className="text-sm text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 cursor-pointer font-bold"
+                                                onClick={() => startEditLabel(label)}
+                                            >
+                                                {label.rightLabel}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Teams Grid */}
+                            {teams.length === 0 ? (
+                                <div className="text-center py-4 bg-gray-50 rounded-lg text-sm text-gray-400">
+                                    班を作成してください
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-2">
+                                    {teams.map(team => {
+                                        const assignment = assignments.find(a => a.teamId === team.id && a.taskLabelId === label.id);
+                                        const member = members.find(m => m.id === assignment?.memberId);
+                                        const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === label.id;
+
+                                        return (
+                                            <div key={team.id} className="flex flex-col gap-1">
+                                                <div className="text-[10px] text-gray-400 font-bold px-1">{team.name}班</div>
+                                                <button
+                                                    onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
+                                                    onMouseUp={handleCellTouchEnd}
+                                                    onMouseMove={handleCellTouchMove}
+                                                    onMouseLeave={handleCellTouchEnd}
+                                                    onTouchStart={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
+                                                    onTouchEnd={handleCellTouchEnd}
+                                                    onTouchMove={handleCellTouchMove}
+                                                    onClick={(e) => handleCellClick(team.id, label.id)}
+                                                    className={`
+                                                        w-full py-3 px-2 rounded-lg text-sm font-bold text-center transition-all truncate select-none
+                                                        ${member 
+                                                            ? isSelected
+                                                                ? 'bg-primary text-white shadow-md scale-105'
+                                                                : 'text-gray-800 bg-gray-50 border border-gray-200 shadow-sm' 
+                                                            : isSelected
+                                                                ? 'bg-primary/20 text-primary border border-primary'
+                                                                : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300'}
+                                                    `}
+                                                >
+                                                    {member ? member.name : '未割当'}
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* コンテキストメニューモーダル */}

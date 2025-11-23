@@ -21,6 +21,7 @@ import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
+import { MdAssignment } from "react-icons/md";
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
 export default function AssignmentPage() {
@@ -272,22 +273,30 @@ export default function AssignmentPage() {
         <div className="min-h-screen bg-[#F7F7F5] flex flex-col">
             {/* ヘッダー */}
             <header className="bg-white shadow-sm sticky top-0 z-30 flex-shrink-0">
-                <div className="w-full px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900">
+                <div className="w-full px-4 h-16 relative flex items-center justify-center">
+                    {/* 左側: 戻るボタン */}
+                    <div className="absolute left-4 flex items-center z-10">
+                        <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900 p-2 -ml-2">
                             <IoArrowBack size={24} />
                         </button>
-                        <h1 className="text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
-                            <span>{todayDate}</span>
-                            <span className="text-sm font-normal text-gray-500">の担当表</span>
-                        </h1>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* 中央: 見出し */}
+                    <div className="flex items-center justify-center z-0">
+                        <div className="flex items-center gap-2">
+                            <MdAssignment className="text-primary w-6 h-6 md:w-7 md:h-7" />
+                            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+                                担当表
+                            </h1>
+                        </div>
+                    </div>
+
+                    {/* 右側: シャッフルボタン */}
+                    <div className="absolute right-4 flex items-center z-10">
                         <button
                             onClick={handleShuffle}
                             disabled={isShuffleDisabled}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors z-50 relative ${
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors ${
                                 isShuffleDisabled
                                     ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                                     : 'bg-primary text-white hover:bg-primary-dark active:scale-95'

@@ -541,10 +541,10 @@ export const AssignmentTable: React.FC<Props> = ({
                     <span>右ラベル</span>
                     <span className="w-4"></span> {/* スペーサー */}
                 </div>
-            </div>
+                </div>
 
-            {/* ボディ */}
-            <div className="divide-y divide-gray-100 bg-white" style={{ minWidth: 'max-content' }}>
+                {/* ボディ */}
+                <div className="divide-y divide-gray-100 bg-white" style={{ minWidth: 'max-content' }}>
                 {taskLabels.map(label => {
                     const isEditing = editingLabelId === label.id;
 
@@ -558,9 +558,9 @@ export const AssignmentTable: React.FC<Props> = ({
                             }}
                         >
                             {/* 左ラベル列 */}
-                            <div className="p-3 md:p-4 py-2 border-r border-gray-100 h-full flex items-center">
+                            <div className="p-3 md:p-4 py-2 border-r border-gray-100 h-full flex items-center justify-center">
                                 <div 
-                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap hover:bg-gray-100 rounded transition-colors"
+                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap text-center hover:bg-gray-100 rounded transition-colors"
                                     onClick={() => {
                                         setHeightConfig({
                                             taskLabelId: label.id,
@@ -699,7 +699,7 @@ export const AssignmentTable: React.FC<Props> = ({
                         </button>
                     </div>
                 </div>
-            </div>
+                </div>
             </div>
 
             {/* Mobile List View */}
@@ -1017,36 +1017,58 @@ export const AssignmentTable: React.FC<Props> = ({
                             </div>
 
                             <div className="max-h-60 overflow-y-auto space-y-2">
-                                {members.map(m => (
-                                    <div key={m.id} className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => {
-                                                onUpdateMember({ teamId: showMemberMenu.teamId, taskLabelId: showMemberMenu.taskLabelId, memberId: null, assignedDate: '' }, m.id);
-                                                setShowMemberMenu(null);
-                                            }}
-                                            className={`
-                                                flex-1 text-left px-3 py-2 hover:bg-gray-100 rounded
-                                                ${assignments.find(a => a.teamId === showMemberMenu.teamId && a.taskLabelId === showMemberMenu.taskLabelId)?.memberId === m.id 
-                                                    ? 'bg-primary/10 text-primary font-bold' 
-                                                    : 'text-gray-700'}
-                                            `}
-                                        >
-                                            {m.name}
-                                        </button>
-                                        <button
-                                            onClick={async (e) => {
-                                                e.stopPropagation();
-                                                if (confirm(`${m.name}を削除しますか？\n割り当てからも解除されます。`)) {
-                                                    await onDeleteMember(m.id);
-                                                }
-                                            }}
-                                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
-                                            title="メンバーを削除"
-                                        >
-                                            <MdDelete size={20} />
-                                        </button>
-                                    </div>
-                                ))}
+                                {members.map(m => {
+                                    // すでに他のタスクに割り当てられているかどうかを確認
+                                    // ※現在のセルに割り当てられているメンバーもリストから除外するならここで判定
+                                    // ただし、現在のセルに割り当てられているメンバーを表示するかどうかは要件次第ですが
+                                    // 「追加済み」＝「どこかのセルに割り当てられている」という意味であれば以下のようにフィルタリング
+                                    
+                                    // もし「このチームのこのタスクに既に割り当てられている人は表示しない」という意味であれば
+                                    // assignments.find(a => a.teamId === showMemberMenu.teamId && a.taskLabelId === showMemberMenu.taskLabelId)?.memberId === m.id
+                                    // で判定できますが、通常メンバーリストには全員表示して選択状態を変えることが多いです。
+
+                                    // リクエスト「すでに追加ずみのメンバーであれば非表示」の解釈：
+                                    // 1. 全ての割り当て状況を見て、どこかに割り当てられているメンバーは表示しない？
+                                    // 2. または、このセルに割り当てられているメンバーは表示しない？（これは通常入れ替え用途で使うので違うかも）
+                                    // 3. メンバーリスト（members）自体は全員分あるが、画面上のリストには「未割り当てのメンバー」だけ出したい？
+
+                                    // 文脈から「メンバー選択メニュー」は「割り当てる人を選ぶ」場所なので、
+                                    // 「すでに他の場所に割り当てられている人」を表示するかどうかがポイント。
+                                    // RoastPlusの仕様上、一人のメンバーは一つのタスクしか担当できない（重複不可）制約があるかどうかによりますが、
+                                    // 通常は重複不可なら「割り当て済み」としてグレーアウトするか非表示にします。
+                                    
+                                    // ここでは「すでに追加ずみのメンバー」＝「assignments テーブルに memberId が存在するメンバー」と解釈し、
+                                    // そのメンバーをリストから除外（非表示）にする実装を行います。
+                                    
+                                    const isAssigned = assignments.some(a => a.memberId === m.id);
+                                    if (isAssigned) return null;
+
+                                    return (
+                                        <div key={m.id} className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    onUpdateMember({ teamId: showMemberMenu.teamId, taskLabelId: showMemberMenu.taskLabelId, memberId: null, assignedDate: '' }, m.id);
+                                                    setShowMemberMenu(null);
+                                                }}
+                                                className="flex-1 text-left px-3 py-2 hover:bg-gray-100 rounded text-gray-700"
+                                            >
+                                                {m.name}
+                                            </button>
+                                            <button
+                                                onClick={async (e) => {
+                                                    e.stopPropagation();
+                                                    if (confirm(`${m.name}を削除しますか？\n割り当てからも解除されます。`)) {
+                                                        await onDeleteMember(m.id);
+                                                    }
+                                                }}
+                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
+                                                title="メンバーを削除"
+                                            >
+                                                <MdDelete size={20} />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </motion.div>
                     </div>

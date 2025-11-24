@@ -47,10 +47,26 @@ export const calculateAssignment = (
     });
 
     // 3. 履歴データの整理
+    // 同じ日の前回のシャッフル結果を履歴に含める（0日前として扱う）
+    const historyWithToday: AssignmentDay[] = [];
+    if (currentAssignments && currentAssignments.length > 0) {
+        // 現在の割り当てに memberId が null でないものが含まれている場合、
+        // それは「同じ日の前回のシャッフル結果」として履歴に追加
+        const hasAssignedMembers = currentAssignments.some(a => a.memberId !== null);
+        if (hasAssignedMembers) {
+            historyWithToday.push({
+                date: targetDate,
+                assignments: currentAssignments.filter(a => a.memberId !== null) // null は除外
+            });
+        }
+    }
+    // 過去の履歴を追加（昨日、一昨日...）
+    historyWithToday.push(...history);
+
     const recentCounts: Record<string, number> = {};
     eligibleMembers.forEach(m => recentCounts[m.id] = 0);
 
-    history.forEach(day => {
+    historyWithToday.forEach(day => {
         day.assignments.forEach(asg => {
             if (asg.memberId && recentCounts[asg.memberId] !== undefined) {
                 recentCounts[asg.memberId]++;
@@ -59,7 +75,7 @@ export const calculateAssignment = (
     });
 
     const getHistoryAssignment = (daysAgo: number, taskLabelId: string): string | null => {
-        const dayRecord = history[daysAgo - 1];
+        const dayRecord = historyWithToday[daysAgo - 1];
         if (!dayRecord) return null;
         const asg = dayRecord.assignments.find(a => a.taskLabelId === taskLabelId);
         return asg?.memberId || null;
@@ -73,7 +89,7 @@ export const calculateAssignment = (
     });
 
     [1, 2].forEach(daysAgo => {
-        const dayRecord = history[daysAgo - 1];
+        const dayRecord = historyWithToday[daysAgo - 1];
         if (!dayRecord) return;
 
         // タスクラベルごとにメンバーをグループ化

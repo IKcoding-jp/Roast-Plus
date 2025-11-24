@@ -617,42 +617,29 @@ export const AssignmentTable: React.FC<Props> = ({
 
                             {/* 右ラベル列 */}
                             <div className="p-3 md:p-4 py-2 h-full flex items-center relative pr-8 md:pr-10">
-                                {isEditing ? (
-                                    <div className="flex gap-1 w-full min-w-0 items-center justify-end">
-                                        <input
-                                            className="w-full min-w-0 p-2 md:p-3 border rounded bg-white text-right text-sm md:text-base text-gray-900"
-                                            value={editRightLabel}
-                                            onChange={e => setEditRightLabel(e.target.value)}
-                                            onKeyDown={e => {
-                                                if (e.key === 'Enter') saveLabel(label.id);
-                                            }}
-                                        />
-                                        <button 
-                                            onClick={() => saveLabel(label.id)} 
-                                            className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 text-green-600 p-1.5 md:p-2 rounded hover:bg-green-50 transition-colors"
-                                            title="保存"
-                                        >
-                                            <MdCheck size={18} className="md:w-6 md:h-6" />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div 
-                                        className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap text-right hover:bg-gray-100 rounded transition-colors"
-                                        onClick={() => startEditLabel(label)}
-                                    >
-                                        {label.rightLabel}
-                                    </div>
-                                )}
-                                
-                                {/* 削除ボタン（ホバー時のみ表示、編集中は非表示） */}
-                                {!isEditing && (
-                                    <button 
-                                        onClick={() => handleDeleteTaskLabel(label.id)}
-                                        className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 p-1.5 md:p-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        <MdDelete size={18} className="md:w-6 md:h-6" />
-                                    </button>
-                                )}
+                                <div 
+                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap text-right hover:bg-gray-100 rounded transition-colors"
+                                    onClick={() => {
+                                        setEditingLabelId(label.id);
+                                        setEditLeftLabel(label.leftLabel); // 名前変更用に左ラベルもセット
+                                        setEditRightLabel(label.rightLabel || '');
+                                        
+                                        // 既存の編集モーダルを流用するか、ラベル設定用モーダルを開く
+                                        // ここでは「左ラベル列」と同様に heightConfig を使って編集モーダルを開く実装に変更
+                                        // ただし右ラベル専用のモードが必要かもしれません
+                                        // 今回は「ダイアログで編集・削除ができるように」とのことなので
+                                        // setHeightConfig を使って「行の設定」として開く形にします（左ラベルと同じ挙動）
+                                        
+                                        setHeightConfig({
+                                            taskLabelId: label.id,
+                                            currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
+                                            label: '行の設定',
+                                            currentName: label.leftLabel
+                                        });
+                                    }}
+                                >
+                                    {label.rightLabel}
+                                </div>
                             </div>
                         </div>
                     );
@@ -1219,9 +1206,19 @@ export const AssignmentTable: React.FC<Props> = ({
                             </div>
 
                             <div className="flex gap-2">
-                                <button onClick={() => setHeightConfig(null)} className="flex-1 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">キャンセル</button>
-                                <button onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
-                            </div>
+                                    <button onClick={() => {
+                                        // 右ラベルの削除
+                                        if (confirm('この作業ラベルを削除しますか？\n（全てのチームから削除されます）')) {
+                                            onDeleteTaskLabel(heightConfig.taskLabelId);
+                                            setHeightConfig(null);
+                                        }
+                                    }} className="flex-1 py-2 bg-gray-100 text-red-500 rounded-lg font-bold hover:bg-red-50 flex items-center justify-center gap-2">
+                                        <MdDelete size={20} />
+                                        削除
+                                    </button>
+                                    <button onClick={() => setHeightConfig(null)} className="flex-1 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">キャンセル</button>
+                                    <button onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
+                                </div>
                         </motion.div>
                     </div>
                 )}

@@ -17,14 +17,15 @@ export const calculateAssignment = (
     const eligibleMembers = members.filter(m => m.active !== false);
 
     // 2. 割り当て枠の作成
-    // 現在の割り当てで memberId が null の枠はシャッフル対象外（固定）とする
-    // または、既に memberId が設定されている枠も固定する？
-    // 要件：「未割り当てはシャッフルの考慮にいれず、位置を固定するべきです」
-    // 解釈：memberId === null のスロットは、新しい結果でも memberId: null のままにする。
+    // memberId === null（未割り当て）の枠は固定する
+    // 割り当て済みの枠のみをシャッフル対象として再抽選する
     
     const slots: { teamId: string; taskLabelId: string }[] = [];
     const lockedSlots = new Set<string>(); // "teamId-taskLabelId"
     const assignments: Assignment[] = [];
+
+    // 割り当て済みメンバーを追跡するセット (重複割り当て防止用)
+    const assignedMemberIds = new Set<string>();
 
     teams.forEach(team => {
         taskLabels.forEach(task => {
@@ -32,6 +33,7 @@ export const calculateAssignment = (
             
             if (current && current.memberId === null) {
                 // 未割り当ての場合は固定（結果にそのまま含める）
+                // メンバーがいないので assignedMemberIds への追加は不要
                 assignments.push({
                     teamId: team.id,
                     taskLabelId: task.id,
@@ -40,7 +42,8 @@ export const calculateAssignment = (
                 });
                 lockedSlots.add(`${team.id}-${task.id}`);
             } else {
-                // 割り当て対象のスロット
+                // 割り当て済み（またはデータなし）のスロットをシャッフル対象にする
+                // ここにいたメンバーはプールに戻され、再配置される
                 slots.push({ teamId: team.id, taskLabelId: task.id });
             }
         });
@@ -123,12 +126,9 @@ export const calculateAssignment = (
     });
 
     // 4. 割り当て実行
-    const assignedMemberIds = new Set<string>();
+    // assignedMemberIds は上で初期化済み
 
-    // 固定されたスロットに既に割り当てられているメンバーを除外リストに追加
-    // currentAssignments で memberId が null でないスロットも固定する場合はここに追加ロジックが必要だが、
-    // 今回の要件は「未割り当て(null)は固定」なので、null以外のスロットは再シャッフル対象となる。
-    // ただし、currentAssignments で null になっているスロットは上で assignments に追加済み。
+    // 固定されたスロットに既に割り当てられているメンバーを除外リストに追加済み
     // ここでは、シャッフル対象のスロットに対してメンバーを割り当てていく。
 
     // スロットをシャッフル

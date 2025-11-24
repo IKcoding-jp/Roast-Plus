@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DripRecipe, DripStep } from '@/lib/drip-guide/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowCounterClockwise, CheckCircle, X, ArrowLeft, Lightbulb } from 'phosphor-react';
+import { Play, Pause, ArrowCounterClockwise, X, ArrowLeft, Lightbulb } from 'phosphor-react';
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
@@ -112,14 +112,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
     if (isCompleted) {
         return (
             <div className="flex flex-col items-center justify-center h-[100dvh] text-center p-6">
-                <motion.div
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className={clsx(
-                        "rounded-full mb-6 flex items-center justify-center",
-                        animationData ? "" : "bg-green-100 p-6"
-                    )}
-                >
+                <div className="mb-6 flex items-center justify-center">
                     {animationData ? (
                         <Lottie
                             lottieRef={lottieRef}
@@ -131,9 +124,11 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                             }}
                         />
                     ) : (
-                        <CheckCircle size={64} className="text-green-600" weight="fill" />
+                        <div className="w-40 h-40 flex items-center justify-center">
+                            <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
                     )}
-                </motion.div>
+                </div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">抽出完了！</h2>
                 <p className="text-gray-600 mb-8">お疲れ様でした。美味しいコーヒーを楽しみましょう。</p>
 

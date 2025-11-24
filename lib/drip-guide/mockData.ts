@@ -33,7 +33,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
             },
             {
                 id: 'step-3',
-                startTimeSec: 85,
+                startTimeSec: 95,
                 title: '2投目',
                 description: '同様に細く、中心に１円玉くらいの円を描きながら注ぎ足します。',
                 targetTotalWater: 140,
@@ -41,7 +41,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
             },
             {
                 id: 'step-4',
-                startTimeSec: 110,
+                startTimeSec: 120,
                 title: '3投目',
                 description: '最後まで細く丁寧に、中心に１円玉くらいの円を描きながら注ぎきります。',
                 targetTotalWater: 160,
@@ -49,7 +49,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
             },
             {
                 id: 'step-5',
-                startTimeSec: 130,
+                startTimeSec: 145,
                 title: '落ち切り待ち',
                 description: 'ドリッパーからお湯が完全に落ち切るのを待ちます。',
                 note: '目標抽出時間: 3分秒前後',

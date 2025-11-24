@@ -88,6 +88,36 @@ export default function AssignmentPage() {
         loadMasterData();
     }, []);
 
+    // 日付変更時の割り当て継承
+    useEffect(() => {
+        const initializeTodayAssignment = async () => {
+            // 読み込み完了後、今日のデータが存在しない場合のみ実行
+            if (isAssignmentLoaded && !assignmentDay && todayDate) {
+                try {
+                    // 直近7日間の履歴を取得
+                    const recent = await fetchRecentAssignments(todayDate, 7);
+
+                    // 最も新しいものを選択
+                    const latest = recent.length > 0 ? recent[0] : null;
+
+                    if (latest && latest.assignments) {
+                        // 過去の割り当てをコピーして今日の日付で保存
+                        const newAssignments = latest.assignments.map(a => ({
+                            ...a,
+                            assignedDate: todayDate
+                        }));
+                        await updateAssignmentDay(todayDate, newAssignments);
+                    } else {
+                        // No previous assignment found within 7 days.
+                    }
+                } catch (error) {
+                    console.error("Failed to inherit previous assignment:", error);
+                }
+            }
+        };
+        initializeTodayAssignment();
+    }, [isAssignmentLoaded, assignmentDay, todayDate]);
+
     // リアルタイム監視
     useEffect(() => {
         if (!todayDate) return;

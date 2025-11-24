@@ -76,11 +76,11 @@ export const subscribeShuffleEvent = (date: string, callback: (data: ShuffleEven
 // 更新系
 export const updateAssignmentDay = async (date: string, assignments: Assignment[]) => {
     const docRef = doc(assignmentDaysCol, date);
-    
+
     // 既存のドキュメントを読み込んで createdAt を保持
     const existingDoc = await getDoc(docRef);
     const existingData = existingDoc.exists() ? existingDoc.data() : null;
-    
+
     // assignments 配列を完全に置き換える（merge: true を削除）
     await setDoc(docRef, {
         assignments,
@@ -135,11 +135,11 @@ export const deleteMember = async (memberId: string, dateStr?: string) => {
     if (dateStr) {
         const assignmentDocRef = doc(assignmentDaysCol, dateStr);
         const snapshot = await import('firebase/firestore').then(m => m.getDoc(assignmentDocRef));
-        
+
         if (snapshot.exists()) {
             const data = snapshot.data() as AssignmentDay;
             const assignments = data.assignments || [];
-            
+
             // 該当メンバーの割り当てを探す
             const updatedAssignments = assignments.map(a => {
                 if (a.memberId === memberId) {

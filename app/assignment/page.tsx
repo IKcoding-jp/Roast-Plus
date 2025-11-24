@@ -14,7 +14,7 @@ import {
     addTaskLabel, deleteTaskLabel, updateTaskLabel,
     addTeam, deleteTeam, updateTeam, updateTableSettings
 } from './lib/firebase';
-import { calculateAssignment } from './lib/shuffle';
+import { calculateAssignment } from '@/app/assignment/lib/shuffle';
 import { AssignmentTable } from './components/AssignmentTable';
 import { RouletteOverlay } from './components/RouletteOverlay';
 import { Loading } from '@/components/Loading';
@@ -104,7 +104,7 @@ export default function AssignmentPage() {
                 // 演出開始判定
                 // 現在時刻と開始時刻を比較して、まだ演出期間内なら表示
                 const now = Date.now();
-                
+
                 // startedAtがnullの場合（書き込み直後のレイテンシなど）は演出しない、または少し待つ
                 if (!event.startedAt) return;
 
@@ -160,7 +160,7 @@ export default function AssignmentPage() {
     const handleShuffle = async () => {
         if (!todayDate) return;
 
-        if (!confirm("担当をシャッフルしますか？\n現在の配置は上書きされます。")) return;
+
 
         try {
             // 1. 履歴取得 (過去7日分)
@@ -244,17 +244,17 @@ export default function AssignmentPage() {
         if (!todayDate) return;
 
         const updatedAssignments = [...displayAssignments];
-        
+
         const findIndex = (tId: string, lId: string) => updatedAssignments.findIndex(a => a.teamId === tId && a.taskLabelId === lId);
-        
+
         let index1 = findIndex(asg1.teamId, asg1.taskLabelId);
         let index2 = findIndex(asg2.teamId, asg2.taskLabelId);
-        
+
         const mem1 = index1 !== -1 ? updatedAssignments[index1].memberId : null;
         const mem2 = index2 !== -1 ? updatedAssignments[index2].memberId : null;
 
         // swap logic
-        
+
         // 1. Update asg1 position with mem2
         if (index1 !== -1) {
             updatedAssignments[index1] = { ...updatedAssignments[index1], memberId: mem2 };
@@ -266,13 +266,13 @@ export default function AssignmentPage() {
         // 2. Update asg2 position with mem1
         // Re-find index2 in case it was -1 and we want to be safe, or if array changed significantly (though push is at end)
         index2 = findIndex(asg2.teamId, asg2.taskLabelId);
-        
+
         if (index2 !== -1) {
             updatedAssignments[index2] = { ...updatedAssignments[index2], memberId: mem1 };
         } else {
             updatedAssignments.push({ teamId: asg2.teamId, taskLabelId: asg2.taskLabelId, memberId: mem1, assignedDate: todayDate });
         }
-        
+
         await updateAssignmentDay(todayDate, updatedAssignments);
     };
 
@@ -309,11 +309,10 @@ export default function AssignmentPage() {
                         <button
                             onClick={handleShuffle}
                             disabled={isShuffleDisabled}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors ${
-                                isShuffleDisabled
-                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                    : 'bg-primary text-white hover:bg-primary-dark active:scale-95'
-                            }`}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors ${isShuffleDisabled
+                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                : 'bg-primary text-white hover:bg-primary-dark active:scale-95'
+                                }`}
                         >
                             <PiShuffleBold />
                             <span className="hidden md:inline">シャッフル</span>

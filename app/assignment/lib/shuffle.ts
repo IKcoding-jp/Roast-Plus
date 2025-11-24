@@ -19,7 +19,7 @@ export const calculateAssignment = (
     // 2. 割り当て枠の作成
     // memberId === null（未割り当て）の枠は固定する
     // 割り当て済みの枠のみをシャッフル対象として再抽選する
-    
+
     const slots: { teamId: string; taskLabelId: string }[] = [];
     const lockedSlots = new Set<string>(); // "teamId-taskLabelId"
     const assignments: Assignment[] = [];
@@ -30,7 +30,7 @@ export const calculateAssignment = (
     teams.forEach(team => {
         taskLabels.forEach(task => {
             const current = currentAssignments?.find(a => a.teamId === team.id && a.taskLabelId === task.id);
-            
+
             if (current && current.memberId === null) {
                 // 未割り当ての場合は固定（結果にそのまま含める）
                 // メンバーがいないので assignedMemberIds への追加は不要
@@ -111,7 +111,7 @@ export const calculateAssignment = (
                 for (let j = i + 1; j < membersInTask.length; j++) {
                     const m1 = membersInTask[i];
                     const m2 = membersInTask[j];
-                    
+
                     if (pairHistory[m1]) {
                         if (daysAgo === 1) pairHistory[m1].daysAgo1.add(m2);
                         else pairHistory[m1].daysAgo2.add(m2);
@@ -125,99 +125,134 @@ export const calculateAssignment = (
         });
     });
 
-    // 4. 割り当て実行
-    // assignedMemberIds は上で初期化済み
+    // 4. 割り当て実行 (リトライロジック)
+    // assignedMemberIds は上で初期化済み -> リトライごとにリセットする必要があるため、ループ内で定義する
 
-    // 固定されたスロットに既に割り当てられているメンバーを除外リストに追加済み
-    // ここでは、シャッフル対象のスロットに対してメンバーを割り当てていく。
+    let bestAssignments: Assignment[] = [];
+    let minTotalScore = Infinity;
 
-    // スロットをシャッフル
-    // 改善: 除外設定などにより「割り当て可能なメンバーが少ないスロット」を優先的に処理するため、
-    // 候補者数を計算してソートする
-    const slotsWithCount = slots.map(slot => {
-        // このスロットに割り当て可能なメンバー数（チーム一致かつ除外設定なし）
-        const count = eligibleMembers.filter(m => 
-            m.teamId === slot.teamId && 
-            !m.excludedTaskLabelIds.includes(slot.taskLabelId)
-        ).length;
-        return { ...slot, candidateCount: count };
-    });
+    // 500回試行して、最もスコア（ペナルティ）が低い結果を採用する
+    const MAX_RETRIES = 500;
 
-    // 候補者が少ない順（昇順）にソート。同じ場合はランダム。
-    const shuffledSlots = slotsWithCount.sort((a, b) => {
-        if (a.candidateCount !== b.candidateCount) {
-            return a.candidateCount - b.candidateCount;
-        }
-        return Math.random() - 0.5;
-    });
+    for (let i = 0; i < MAX_RETRIES; i++) {
+        const currentLoopAssignments: Assignment[] = [];
+        const currentLoopAssignedMemberIds = new Set<string>();
+        let currentLoopTotalScore = 0;
 
-    for (const slot of shuffledSlots) {
-        const candidates: Score[] = [];
+        // 固定枠を最初に追加
+        assignments.forEach(a => {
+            currentLoopAssignments.push(a);
+            // 固定枠は memberId: null なので assignedMemberIds への追加は不要
+        });
 
-        // 現在処理中のスロットと同じ行（タスクラベル）に既にアサインされているメンバーを取得
-        // (assignments配列には、固定枠(null)と、このループですでに決定した割り当てが含まれている)
-        const currentRowPartners = assignments
-            .filter(a => a.taskLabelId === slot.taskLabelId && a.memberId)
-            .map(a => a.memberId!);
+        // スロットをシャッフル
+        // 改善: 除外設定などにより「割り当て可能なメンバーが少ないスロット」を優先的に処理するため、
+        // 候補者数を計算してソートする
+        const slotsWithCount = slots.map(slot => {
+            // このスロットに割り当て可能なメンバー数（チーム一致かつ除外設定なし）
+            const count = eligibleMembers.filter(m =>
+                m.teamId === slot.teamId &&
+                !m.excludedTaskLabelIds.includes(slot.taskLabelId)
+            ).length;
+            return { ...slot, candidateCount: count };
+        });
 
-        for (const member of eligibleMembers) {
-            // 割り当て済みメンバーはスキップ
-            if (assignedMemberIds.has(member.id)) continue;
-            // チームが異なるメンバーはスキップ
-            if (member.teamId !== slot.teamId) continue;
-            // 除外ラベルに含まれる場合はスキップ
-            if (member.excludedTaskLabelIds.includes(slot.taskLabelId)) continue;
+        // 候補者が少ない順（昇順）にソート。同じ場合はランダム。
+        const shuffledSlots = slotsWithCount.sort((a, b) => {
+            if (a.candidateCount !== b.candidateCount) {
+                return a.candidateCount - b.candidateCount;
+            }
+            return Math.random() - 0.5;
+        });
 
-            let score = recentCounts[member.id] || 0;
+        for (const slot of shuffledSlots) {
+            const candidates: Score[] = [];
 
-            // 場所の重複ペナルティ計算
-            const yesterdayMemberId = getHistoryAssignment(1, slot.taskLabelId);
-            if (yesterdayMemberId === member.id) score += 10000; // 昨日と同じなら超高ペナルティ（絶対避ける）
+            // 現在処理中のスロットと同じ行（タスクラベル）に既にアサインされているメンバーを取得
+            // (currentLoopAssignments配列には、固定枠(null)と、このループですでに決定した割り当てが含まれている)
+            const currentRowPartners = currentLoopAssignments
+                .filter(a => a.taskLabelId === slot.taskLabelId && a.memberId)
+                .map(a => a.memberId!);
 
-            const twoDaysAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
-            if (twoDaysAgoMemberId === member.id) score += 5000; // 一昨日と同じなら高ペナルティ（できるだけ避ける）
+            for (const member of eligibleMembers) {
+                // 割り当て済みメンバーはスキップ
+                if (currentLoopAssignedMemberIds.has(member.id)) continue;
+                // チームが異なるメンバーはスキップ
+                if (member.teamId !== slot.teamId) continue;
+                // 除外ラベルに含まれる場合はスキップ
+                if (member.excludedTaskLabelIds.includes(slot.taskLabelId)) continue;
 
-            if (yesterdayMemberId === member.id && twoDaysAgoMemberId === member.id) {
-                score += 50000; // 2日連続同じなら最大ペナルティ（何が何でも避ける）
+                let score = recentCounts[member.id] || 0;
+
+                // 場所の重複ペナルティ計算
+                const yesterdayMemberId = getHistoryAssignment(1, slot.taskLabelId);
+                if (yesterdayMemberId === member.id) score += 10000; // 昨日と同じなら超高ペナルティ（絶対避ける）
+
+                const twoDaysAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
+                if (twoDaysAgoMemberId === member.id) score += 5000; // 一昨日と同じなら高ペナルティ（できるだけ避ける）
+
+                if (yesterdayMemberId === member.id && twoDaysAgoMemberId === member.id) {
+                    score += 50000; // 2日連続同じなら最大ペナルティ（何が何でも避ける）
+                }
+
+                // ペアの重複ペナルティ計算
+                // 同じ行になる予定のメンバーとの過去のペア関係をチェック
+                for (const partnerId of currentRowPartners) {
+                    // 昨日ペアだった
+                    if (pairHistory[member.id]?.daysAgo1.has(partnerId)) {
+                        score += 50;
+                    }
+                    // 一昨日ペアだった
+                    if (pairHistory[member.id]?.daysAgo2.has(partnerId)) {
+                        score += 20;
+                    }
+                }
+
+                // ランダム要素（同じスコア内でのばらつき）
+                score += Math.random();
+                candidates.push({ memberId: member.id, score });
             }
 
-            // ペアの重複ペナルティ計算
-            // 同じ行になる予定のメンバーとの過去のペア関係をチェック
-            for (const partnerId of currentRowPartners) {
-                // 昨日ペアだった
-                if (pairHistory[member.id]?.daysAgo1.has(partnerId)) {
-                    score += 50;
-                }
-                // 一昨日ペアだった
-                if (pairHistory[member.id]?.daysAgo2.has(partnerId)) {
-                    score += 20;
-                }
-            }
+            candidates.sort((a, b) => a.score - b.score);
+            const bestCandidate = candidates[0];
 
-            score += Math.random();
-            candidates.push({ memberId: member.id, score });
+            // 閾値を上げて、ペナルティが高くても他に候補がいなければ割り当てるようにする
+            // (最大ペナルティは約65000点なので、それより大きく設定)
+            if (bestCandidate && bestCandidate.score < 100000) {
+                currentLoopAssignments.push({
+                    teamId: slot.teamId,
+                    taskLabelId: slot.taskLabelId,
+                    memberId: bestCandidate.memberId,
+                    assignedDate: targetDate
+                });
+                currentLoopAssignedMemberIds.add(bestCandidate.memberId);
+
+                // ループ全体のスコアに加算（ランダム要素は除くために整数化してもいいが、比較用なのでそのままでも可）
+                // ただし、ランダム要素が結果の優劣に影響しすぎないよう、ペナルティ部分だけを重視したい
+                // ここでは単純に加算する
+                currentLoopTotalScore += bestCandidate.score;
+            } else {
+                currentLoopAssignments.push({
+                    teamId: slot.teamId,
+                    taskLabelId: slot.taskLabelId,
+                    memberId: null,
+                    assignedDate: targetDate
+                });
+                // 割り当て失敗（候補なし）は大きなペナルティとみなす
+                currentLoopTotalScore += 1000000;
+            }
         }
 
-        candidates.sort((a, b) => a.score - b.score);
-        const bestCandidate = candidates[0];
+        // 最良の結果を更新
+        if (currentLoopTotalScore < minTotalScore) {
+            minTotalScore = currentLoopTotalScore;
+            bestAssignments = currentLoopAssignments;
+        }
 
-        // 閾値を上げて、ペナルティが高くても他に候補がいなければ割り当てるようにする
-        // (最大ペナルティは約65000点なので、それより大きく設定)
-        if (bestCandidate && bestCandidate.score < 100000) {
-            assignments.push({
-                teamId: slot.teamId,
-                taskLabelId: slot.taskLabelId,
-                memberId: bestCandidate.memberId,
-                assignedDate: targetDate
-            });
-            assignedMemberIds.add(bestCandidate.memberId);
-        } else {
-            assignments.push({
-                teamId: slot.teamId,
-                taskLabelId: slot.taskLabelId,
-                memberId: null,
-                assignedDate: targetDate
-            });
+        // 完璧な結果（ペナルティなし、ランダムノイズのみ）なら即終了
+        // メンバー数 * 1 (ランダム最大値) 程度以下ならペナルティなしとみなせる
+        if (currentLoopTotalScore < eligibleMembers.length * 2) {
+            break;
         }
     }
 
@@ -226,7 +261,7 @@ export const calculateAssignment = (
     const validatedAssignments: Assignment[] = [];
     const uniqueCheck = new Set<string>();
 
-    for (const asg of assignments) {
+    for (const asg of bestAssignments) {
         if (asg.memberId) {
             if (uniqueCheck.has(asg.memberId)) {
                 // 既に割り当て済みのメンバーIDが再度登場した場合、未割り当て(null)に戻す

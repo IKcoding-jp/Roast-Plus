@@ -189,7 +189,7 @@ export const calculateAssignment = (
                 if (yesterdayMemberId === member.id) score += 10000; // 昨日と同じなら超高ペナルティ（絶対避ける）
 
                 const twoDaysAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
-                if (twoDaysAgoMemberId === member.id) score += 5000; // 一昨日と同じなら高ペナルティ（できるだけ避ける）
+                if (twoDaysAgoMemberId === member.id) score += 20000; // 一昨日と同じなら高ペナルティ（できるだけ避ける）
 
                 if (yesterdayMemberId === member.id && twoDaysAgoMemberId === member.id) {
                     score += 50000; // 2日連続同じなら最大ペナルティ（何が何でも避ける）
@@ -200,11 +200,11 @@ export const calculateAssignment = (
                 for (const partnerId of currentRowPartners) {
                     // 昨日ペアだった
                     if (pairHistory[member.id]?.daysAgo1.has(partnerId)) {
-                        score += 50;
+                        score += 5000;
                     }
                     // 一昨日ペアだった
                     if (pairHistory[member.id]?.daysAgo2.has(partnerId)) {
-                        score += 20;
+                        score += 2000;
                     }
                 }
 

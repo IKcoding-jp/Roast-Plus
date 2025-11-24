@@ -44,6 +44,8 @@ export default function AssignmentPage() {
     const [assignmentDay, setAssignmentDay] = useState<AssignmentDay | null>(null);
     const [shuffleEvent, setShuffleEvent] = useState<ShuffleEvent | null>(null);
     const [isRouletteVisible, setIsRouletteVisible] = useState(false);
+    // ローカルでのシャッフル実行中フラグ (自分自身のアニメーション用)
+    const [isLocalShuffling, setIsLocalShuffling] = useState(false);
 
     // シャッフルボタンの有効/無効判定
     const isShuffleDisabled = useMemo(() => {
@@ -146,11 +148,16 @@ export default function AssignmentPage() {
                     // 終了時刻に非表示にするタイマー
                     const remaining = endTime - now;
                     setTimeout(() => {
-                        setIsRouletteVisible(false);
+                        // ローカル実行中でなければ非表示にする
+                        // (ローカル実行中は isLocalShuffling が false になるまで表示し続けるため、ここでは消さない)
+                        if (!isLocalShuffling) {
+                            // setIsRouletteVisible(false); // ここで消すとローカルと競合する可能性があるので、useEffectの依存配列で制御する方が安全だが、
+                            // 今回は isLocalShuffling があるので、そちらを優先するロジックにする
+                        }
                     }, remaining);
                 }
             } else {
-                setIsRouletteVisible(false);
+                // setIsRouletteVisible(false); // ここも同様
             }
         });
 
@@ -163,7 +170,21 @@ export default function AssignmentPage() {
             unsubShuffle();
             unsubSettings();
         };
-    }, [todayDate]);
+    }, [todayDate]); // isLocalShuffling を依存配列に入れるとループする可能性があるので入れない
+
+    // アニメーション表示制御
+    useEffect(() => {
+        if (isLocalShuffling) {
+            setIsRouletteVisible(true);
+        } else {
+            // ローカル実行が終わったら、イベントの状態を見て非表示にするか決める
+            // ただし、イベント購読側で制御しているので、ここでは「ローカルが終わったら即非表示」ではなく
+            // イベント側にお任せする形でも良いが、確実に消すためにチェックする
+            if (shuffleEvent?.state !== 'running') {
+                setIsRouletteVisible(false);
+            }
+        }
+    }, [isLocalShuffling, shuffleEvent]);
 
     // 表示用Assignments (データがない場合は空枠を表示)
     const displayAssignments = useMemo(() => {
@@ -190,7 +211,7 @@ export default function AssignmentPage() {
     const handleShuffle = async () => {
         if (!todayDate) return;
 
-
+        setIsLocalShuffling(true);
 
         try {
             // 1. 履歴取得 (過去7日分)
@@ -199,7 +220,7 @@ export default function AssignmentPage() {
             // 2. 計算
             const result = calculateAssignment(teams, taskLabels, members, history, todayDate, displayAssignments);
 
-            // 3. イベント発行
+            // 3. イベント発行 (他クライアント用)
             const eventId = uuidv4();
             const durationMs = 3000;
 
@@ -212,17 +233,20 @@ export default function AssignmentPage() {
                 state: 'running'
             });
 
-            // 4. 演出終了待ち (リーダー側で結果を確定させる役割)
-            setTimeout(async () => {
-                // 結果を保存
-                await updateAssignmentDay(todayDate, result);
-                // イベント完了
-                await updateShuffleEventState(todayDate, 'done');
-            }, durationMs + 500); // 少し余裕を持たせる
+            // 4. 演出待機 (awaitで確実に待つ)
+            await new Promise(resolve => setTimeout(resolve, durationMs));
+
+            // 5. 結果を保存
+            await updateAssignmentDay(todayDate, result);
+
+            // 6. イベント完了
+            await updateShuffleEventState(todayDate, 'done');
 
         } catch (e) {
             console.error(e);
             alert("シャッフルに失敗しました");
+        } finally {
+            setIsLocalShuffling(false);
         }
     };
 

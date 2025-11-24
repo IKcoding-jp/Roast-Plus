@@ -302,6 +302,20 @@ export interface ShuffleEvent {
 
 }
 
+// シャッフル履歴（シャッフルごとの記録）
+
+export interface ShuffleHistory {
+
+  id: string; // 一意のID（UUID）
+
+  createdAt: any; // 作成日時（サーバータイムスタンプ）
+
+  assignments: Assignment[]; // シャッフル結果
+
+  targetDate: string; // 対象日付（YYYY-MM-DD）
+
+}
+
 
 
 // ローストタイマー記録

@@ -10,6 +10,7 @@ import {
     subscribeAssignmentDay, subscribeShuffleEvent, subscribeTableSettings,
     updateAssignmentDay, createShuffleEvent, updateShuffleEventState,
     updateMemberExclusions, fetchRecentAssignments,
+    createShuffleHistory, fetchRecentShuffleHistory,
     addMember, deleteMember, updateMember,
     addTaskLabel, deleteTaskLabel, updateTaskLabel,
     addTeam, deleteTeam, updateTeam, updateTableSettings
@@ -23,11 +24,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
 import { FaUsers } from "react-icons/fa";
-import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 
 export default function AssignmentPage() {
     const router = useRouter();
-    const { isEnabled: isDeveloperMode } = useDeveloperMode();
 
     // マスタデータ
     const [teams, setTeams] = useState<Team[]>([]);
@@ -48,27 +47,14 @@ export default function AssignmentPage() {
     const [isLocalShuffling, setIsLocalShuffling] = useState(false);
 
     // シャッフルボタンの有効/無効判定
+    // 開発者モードに関わらず、1日何回でもシャッフル可能
     const isShuffleDisabled = useMemo(() => {
-        // 開発者モードなら常に有効
-        if (isDeveloperMode) return false;
-
         // 日付が取得できていない場合は無効
         if (!todayDate) return true;
 
-        // 土日判定 (0=日曜, 6=土曜)
-        const date = new Date();
-        const day = date.getDay();
-        const isWeekend = day === 0 || day === 6;
-        if (isWeekend) return true;
-
-        // 既に割り当てがあるか判定
-        // assignmentDay.assignments の中に memberId が null でないものがあるか
-        if (assignmentDay?.assignments?.some(a => a.memberId !== null)) {
-            return true;
-        }
-
+        // 常に有効
         return false;
-    }, [isDeveloperMode, todayDate, assignmentDay]);
+    }, [todayDate]);
 
     // 初期化: 日付とマスタデータ
     useEffect(() => {
@@ -214,8 +200,11 @@ export default function AssignmentPage() {
         setIsLocalShuffling(true);
 
         try {
-            // 1. 履歴取得 (過去7日分)
-            const history = await fetchRecentAssignments(todayDate, 7);
+            // 1. シャッフル履歴取得 (最新2件)
+            const shuffleHistoryList = await fetchRecentShuffleHistory(2);
+            
+            // 履歴をAssignment[][]形式に変換
+            const history: Assignment[][] = shuffleHistoryList.map(h => h.assignments);
 
             // 2. 計算
             const result = calculateAssignment(teams, taskLabels, members, history, todayDate, displayAssignments);
@@ -239,7 +228,15 @@ export default function AssignmentPage() {
             // 5. 結果を保存
             await updateAssignmentDay(todayDate, result);
 
-            // 6. イベント完了
+            // 6. シャッフル履歴を保存
+            const historyId = uuidv4();
+            await createShuffleHistory({
+                id: historyId,
+                assignments: result,
+                targetDate: todayDate,
+            });
+
+            // 7. イベント完了
             await updateShuffleEventState(todayDate, 'done');
 
         } catch (e) {

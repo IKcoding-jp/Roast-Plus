@@ -21,6 +21,7 @@ import {
     TaskLabel,
     AssignmentDay,
     ShuffleEvent,
+    ShuffleHistory,
     Assignment,
     TableSettings
 } from '@/types';
@@ -31,6 +32,7 @@ const membersCol = collection(db, 'members');
 const taskLabelsCol = collection(db, 'taskLabels');
 const assignmentDaysCol = collection(db, 'assignmentDays');
 const shuffleEventsCol = collection(db, 'shuffleEvents');
+const shuffleHistoryCol = collection(db, 'shuffleHistory');
 
 // マスタデータ取得
 export const fetchTeams = async (): Promise<Team[]> => {
@@ -233,4 +235,34 @@ export const subscribeTableSettings = (callback: (settings: TableSettings | null
 export const updateTableSettings = async (settings: TableSettings) => {
     const docRef = doc(settingsCol, 'table');
     await setDoc(docRef, settings, { merge: true });
+};
+
+// シャッフル履歴管理
+export const createShuffleHistory = async (history: Omit<ShuffleHistory, 'createdAt'>) => {
+    const docRef = doc(shuffleHistoryCol, history.id);
+    await setDoc(docRef, {
+        ...history,
+        createdAt: serverTimestamp(),
+    });
+};
+
+export const fetchRecentShuffleHistory = async (limitCount: number = 2): Promise<ShuffleHistory[]> => {
+    try {
+        const q = query(shuffleHistoryCol, orderBy('createdAt', 'desc'), limit(limitCount));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ShuffleHistory));
+    } catch (error) {
+        // インデックスが作成されていない場合や、createdAtフィールドが存在しない場合のフォールバック
+        // 全件取得してソート（データ量が少ない場合のみ有効）
+        console.warn('Failed to fetch shuffle history with orderBy, falling back to full fetch:', error);
+        const snapshot = await getDocs(shuffleHistoryCol);
+        const allHistory = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ShuffleHistory));
+        // createdAtでソート（存在しない場合は最後に）
+        allHistory.sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() || 0;
+            const bTime = b.createdAt?.toMillis?.() || 0;
+            return bTime - aTime; // 降順
+        });
+        return allHistory.slice(0, limitCount);
+    }
 };

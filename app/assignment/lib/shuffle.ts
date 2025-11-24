@@ -1,4 +1,4 @@
-import { Team, Member, TaskLabel, Assignment, AssignmentDay } from '@/types';
+import { Team, Member, TaskLabel, Assignment } from '@/types';
 
 type Score = {
     memberId: string;
@@ -9,7 +9,7 @@ export const calculateAssignment = (
     teams: Team[],
     taskLabels: TaskLabel[],
     members: Member[],
-    history: AssignmentDay[], // 直近の履歴 (昨日、一昨日...)
+    history: Assignment[][], // シャッフル履歴の配列（history[0] = 1回前、history[1] = 2回前）
     targetDate: string,
     currentAssignments?: Assignment[] // 現在の割り当て（固定チェック用）
 ): Assignment[] => {
@@ -50,54 +50,53 @@ export const calculateAssignment = (
     });
 
     // 3. 履歴データの整理
-    // 同じ日の前回のシャッフル結果を履歴に含める（0日前として扱う）
-    const historyWithToday: AssignmentDay[] = [];
+    // シャッフル履歴ベースで参照（history[0] = 1回前、history[1] = 2回前）
+    const historyWithToday: Assignment[][] = [];
+    // 現在の割り当てを1回前として扱う（memberIdがnullでないもののみ）
     if (currentAssignments && currentAssignments.length > 0) {
-        // 現在の割り当てに memberId が null でないものが含まれている場合、
-        // それは「同じ日の前回のシャッフル結果」として履歴に追加
         const hasAssignedMembers = currentAssignments.some(a => a.memberId !== null);
         if (hasAssignedMembers) {
-            historyWithToday.push({
-                date: targetDate,
-                assignments: currentAssignments.filter(a => a.memberId !== null) // null は除外
-            });
+            historyWithToday.push(currentAssignments.filter(a => a.memberId !== null));
         }
     }
-    // 過去の履歴を追加（昨日、一昨日...）
+    // 過去のシャッフル履歴を追加
     historyWithToday.push(...history);
 
     const recentCounts: Record<string, number> = {};
     eligibleMembers.forEach(m => recentCounts[m.id] = 0);
 
-    historyWithToday.forEach(day => {
-        day.assignments.forEach(asg => {
+    // シャッフル履歴からカウントを計算
+    historyWithToday.forEach(shuffleResult => {
+        shuffleResult.forEach(asg => {
             if (asg.memberId && recentCounts[asg.memberId] !== undefined) {
                 recentCounts[asg.memberId]++;
             }
         });
     });
 
-    const getHistoryAssignment = (daysAgo: number, taskLabelId: string): string | null => {
-        const dayRecord = historyWithToday[daysAgo - 1];
-        if (!dayRecord) return null;
-        const asg = dayRecord.assignments.find(a => a.taskLabelId === taskLabelId);
+    const getHistoryAssignment = (shuffleAgo: number, taskLabelId: string): string | null => {
+        // shuffleAgo: 1 = 1回前、2 = 2回前
+        const shuffleResult = historyWithToday[shuffleAgo - 1];
+        if (!shuffleResult) return null;
+        const asg = shuffleResult.find(a => a.taskLabelId === taskLabelId);
         return asg?.memberId || null;
     };
 
     // ペア重複チェック用の履歴マップ構築
-    // memberId -> { daysAgo1: Set<partnerId>, daysAgo2: Set<partnerId> }
-    const pairHistory: Record<string, { daysAgo1: Set<string>, daysAgo2: Set<string> }> = {};
+    // memberId -> { shuffleAgo1: Set<partnerId>, shuffleAgo2: Set<partnerId> }
+    const pairHistory: Record<string, { shuffleAgo1: Set<string>, shuffleAgo2: Set<string> }> = {};
     eligibleMembers.forEach(m => {
-        pairHistory[m.id] = { daysAgo1: new Set(), daysAgo2: new Set() };
+        pairHistory[m.id] = { shuffleAgo1: new Set(), shuffleAgo2: new Set() };
     });
 
-    [1, 2].forEach(daysAgo => {
-        const dayRecord = historyWithToday[daysAgo - 1];
-        if (!dayRecord) return;
+    [1, 2].forEach(shuffleAgo => {
+        // shuffleAgo: 1 = 1回前、2 = 2回前
+        const shuffleResult = historyWithToday[shuffleAgo - 1];
+        if (!shuffleResult) return;
 
         // タスクラベルごとにメンバーをグループ化
         const tasks: Record<string, string[]> = {};
-        dayRecord.assignments.forEach(a => {
+        shuffleResult.forEach(a => {
             if (a.memberId && a.taskLabelId) {
                 if (!tasks[a.taskLabelId]) tasks[a.taskLabelId] = [];
                 tasks[a.taskLabelId].push(a.memberId);
@@ -113,12 +112,12 @@ export const calculateAssignment = (
                     const m2 = membersInTask[j];
 
                     if (pairHistory[m1]) {
-                        if (daysAgo === 1) pairHistory[m1].daysAgo1.add(m2);
-                        else pairHistory[m1].daysAgo2.add(m2);
+                        if (shuffleAgo === 1) pairHistory[m1].shuffleAgo1.add(m2);
+                        else pairHistory[m1].shuffleAgo2.add(m2);
                     }
                     if (pairHistory[m2]) {
-                        if (daysAgo === 1) pairHistory[m2].daysAgo1.add(m1);
-                        else pairHistory[m2].daysAgo2.add(m1);
+                        if (shuffleAgo === 1) pairHistory[m2].shuffleAgo1.add(m1);
+                        else pairHistory[m2].shuffleAgo2.add(m1);
                     }
                 }
             }
@@ -185,25 +184,25 @@ export const calculateAssignment = (
                 let score = recentCounts[member.id] || 0;
 
                 // 場所の重複ペナルティ計算
-                const yesterdayMemberId = getHistoryAssignment(1, slot.taskLabelId);
-                if (yesterdayMemberId === member.id) score += 10000; // 昨日と同じなら超高ペナルティ（絶対避ける）
+                const oneShuffleAgoMemberId = getHistoryAssignment(1, slot.taskLabelId);
+                if (oneShuffleAgoMemberId === member.id) score += 10000; // 1回前と同じなら超高ペナルティ（絶対避ける）
 
-                const twoDaysAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
-                if (twoDaysAgoMemberId === member.id) score += 20000; // 一昨日と同じなら高ペナルティ（できるだけ避ける）
+                const twoShufflesAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
+                if (twoShufflesAgoMemberId === member.id) score += 20000; // 2回前と同じなら高ペナルティ（できるだけ避ける）
 
-                if (yesterdayMemberId === member.id && twoDaysAgoMemberId === member.id) {
-                    score += 50000; // 2日連続同じなら最大ペナルティ（何が何でも避ける）
+                if (oneShuffleAgoMemberId === member.id && twoShufflesAgoMemberId === member.id) {
+                    score += 50000; // 2回連続同じなら最大ペナルティ（何が何でも避ける）
                 }
 
                 // ペアの重複ペナルティ計算
                 // 同じ行になる予定のメンバーとの過去のペア関係をチェック
                 for (const partnerId of currentRowPartners) {
-                    // 昨日ペアだった
-                    if (pairHistory[member.id]?.daysAgo1.has(partnerId)) {
+                    // 1回前のシャッフルでペアだった
+                    if (pairHistory[member.id]?.shuffleAgo1.has(partnerId)) {
                         score += 5000;
                     }
-                    // 一昨日ペアだった
-                    if (pairHistory[member.id]?.daysAgo2.has(partnerId)) {
+                    // 2回前のシャッフルでペアだった
+                    if (pairHistory[member.id]?.shuffleAgo2.has(partnerId)) {
                         score += 2000;
                     }
                 }

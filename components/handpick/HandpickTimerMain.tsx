@@ -11,10 +11,10 @@ import { TimerDisplay } from './TimerDisplay';
 import { getPhaseName, getPhaseMessage } from '@/lib/handpickTimerUtils';
 import { TimeSettingInput } from './TimeSettingInput';
 import { TimerControls } from './TimerControls';
-import { HiVolumeUp, HiVolumeOff, HiArrowLeft } from 'react-icons/hi';
+import { HiVolumeUp, HiVolumeOff, HiArrowLeft, HiSpeakerphone } from 'react-icons/hi';
 
 export function HandpickTimerMain() {
-    const { state, start, pause, resume, reset, setSoundEnabled, setFirstMinutes, setSecondMinutes, skip } =
+    const { state, start, pause, resume, reset, setSoundEnabled, setFirstMinutes, setSecondMinutes, skip, testSound } =
         useHandpickTimer();
 
     // 現在のフェーズの合計時間を取得（秒単位）
@@ -77,7 +77,18 @@ export function HandpickTimerMain() {
             <div className="flex-none px-4 py-3 sm:px-4 sm:py-3 lg:px-6 lg:py-4 bg-white/50 backdrop-blur-sm border-t border-gray-200/50">
                 <div className="max-w-5xl mx-auto space-y-2 sm:space-y-3">
                     {/* サウンド切り替えボタン（作業メッセージの上） */}
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
+                        {/* サウンドテストボタン */}
+                        <button
+                            onClick={testSound}
+                            className="px-5 sm:px-5 py-3 sm:py-2.5 rounded-lg font-bold text-base sm:text-sm border border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all flex items-center justify-center gap-2 min-h-[44px]"
+                            title="サウンドテスト"
+                            aria-label="サウンドテスト"
+                        >
+                            <HiSpeakerphone className="w-5 h-5 sm:w-5 sm:h-5" />
+                            <span className="hidden sm:inline">テスト</span>
+                        </button>
+                        {/* 音あり/音なし切り替えボタン */}
                         <button
                             onClick={() => setSoundEnabled(!state.soundEnabled)}
                             className={`px-5 sm:px-5 py-3 sm:py-2.5 rounded-lg font-bold text-base sm:text-sm border transition-all flex items-center justify-center gap-2 min-h-[44px] ${state.soundEnabled

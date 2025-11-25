@@ -122,6 +122,36 @@ export function useHandpickTimer() {
         }
     }, [soundEnabled]);
 
+    // サウンドテスト（soundEnabledのチェックをスキップ）
+    const testSound = useCallback(() => {
+        try {
+            // ブラウザのデフォルトbeep音を使用
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+
+            // Web Audio APIを使用してビープ音を生成
+            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800; // 周波数
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (error) {
+            console.error('Failed to play test sound:', error);
+        }
+    }, []);
+
     // フェーズ完了時の処理
     const handlePhaseComplete = useCallback(() => {
         playSound();
@@ -186,5 +216,6 @@ export function useHandpickTimer() {
         setFirstMinutes,
         setSecondMinutes,
         skip: handlePhaseComplete,
+        testSound,
     };
 }

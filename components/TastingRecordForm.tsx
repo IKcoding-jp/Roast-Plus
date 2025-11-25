@@ -247,7 +247,7 @@ export function TastingRecordForm({
         step={STEP}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
+        className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
         disabled={readOnly}
       />
       <div className="flex justify-between text-xs text-gray-500 mt-1">

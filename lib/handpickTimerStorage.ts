@@ -12,9 +12,9 @@ export interface HandpickTimerStorageState {
     cycleCount: number;
     firstMinutes: number;
     secondMinutes: number;
-    soundEnabled: boolean;
     lastUpdated: string;
     beanOrigin?: string; // 後方互換性のため残す（使用しない）
+    soundEnabled?: boolean; // 後方互換性のため残す（使用しない）
 }
 
 /**
@@ -58,7 +58,6 @@ export function saveHandpickTimerState(state: Partial<HandpickTimerStorageState>
             cycleCount: state.cycleCount ?? existing?.cycleCount ?? 0,
             firstMinutes: state.firstMinutes ?? existing?.firstMinutes ?? 5,
             secondMinutes: state.secondMinutes ?? existing?.secondMinutes ?? 5,
-            soundEnabled: state.soundEnabled ?? existing?.soundEnabled ?? true,
             lastUpdated: new Date().toISOString(),
         };
 

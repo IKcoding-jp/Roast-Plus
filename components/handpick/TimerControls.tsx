@@ -5,30 +5,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HiPlay, HiPause, HiRefresh, HiVolumeUp, HiVolumeOff } from 'react-icons/hi';
+import { HiPlay, HiPause, HiRefresh } from 'react-icons/hi';
 import { type TimerPhase } from '@/lib/handpickTimerUtils';
 
 interface TimerControlsProps {
     phase: TimerPhase;
     isRunning: boolean;
-    soundEnabled: boolean;
-    onStart: () => void;
+    onStart: () => void | Promise<void>;
     onPause: () => void;
-    onResume: () => void;
+    onResume: () => void | Promise<void>;
     onReset: () => void;
-    onToggleSound: () => void;
     isSecondPhaseStart?: boolean;
 }
 
 export function TimerControls({
     phase,
     isRunning,
-    soundEnabled,
     onStart,
     onPause,
     onResume,
     onReset,
-    onToggleSound,
     isSecondPhaseStart = false,
 }: TimerControlsProps) {
     const [isResetConfirm, setIsResetConfirm] = useState(false);

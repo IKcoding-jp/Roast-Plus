@@ -6,15 +6,18 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useHandpickTimer } from '@/hooks/useHandpickTimer';
 import { TimerDisplay } from './TimerDisplay';
 import { getPhaseName, getPhaseMessage } from '@/lib/handpickTimerUtils';
 import { TimeSettingInput } from './TimeSettingInput';
 import { TimerControls } from './TimerControls';
-import { HiVolumeUp, HiVolumeOff, HiArrowLeft, HiSpeakerphone } from 'react-icons/hi';
+import { HandpickTimerSettings } from './HandpickTimerSettings';
+import { HiArrowLeft, HiCog } from 'react-icons/hi';
 
 export function HandpickTimerMain() {
-    const { state, start, pause, resume, reset, setSoundEnabled, setFirstMinutes, setSecondMinutes, skip, testSound } =
+    const [showSettings, setShowSettings] = useState(false);
+    const { state, start, pause, resume, reset, setFirstMinutes, setSecondMinutes, skip } =
         useHandpickTimer();
 
     // 現在のフェーズの合計時間を取得（秒単位）
@@ -76,28 +79,16 @@ export function HandpickTimerMain() {
             {/* 下部エリア（情報と操作） */}
             <div className="flex-none px-4 py-3 sm:px-4 sm:py-3 lg:px-6 lg:py-4 bg-white/50 backdrop-blur-sm border-t border-gray-200/50">
                 <div className="max-w-5xl mx-auto space-y-2 sm:space-y-3">
-                    {/* サウンド切り替えボタン（作業メッセージの上） */}
+                    {/* 設定ボタン（作業メッセージの上） */}
                     <div className="flex justify-end gap-2">
-                        {/* サウンドテストボタン */}
                         <button
-                            onClick={testSound}
+                            onClick={() => setShowSettings(true)}
                             className="px-5 sm:px-5 py-3 sm:py-2.5 rounded-lg font-bold text-base sm:text-sm border border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all flex items-center justify-center gap-2 min-h-[44px]"
-                            title="サウンドテスト"
-                            aria-label="サウンドテスト"
+                            title="設定"
+                            aria-label="設定"
                         >
-                            <HiSpeakerphone className="w-5 h-5 sm:w-5 sm:h-5" />
-                            <span className="hidden sm:inline">テスト</span>
-                        </button>
-                        {/* 音あり/音なし切り替えボタン */}
-                        <button
-                            onClick={() => setSoundEnabled(!state.soundEnabled)}
-                            className={`px-5 sm:px-5 py-3 sm:py-2.5 rounded-lg font-bold text-base sm:text-sm border transition-all flex items-center justify-center gap-2 min-h-[44px] ${state.soundEnabled
-                                ? 'bg-[#EF8A00] text-white border-[#EF8A00]'
-                                : 'bg-gray-100 text-gray-500 border-gray-200'
-                                }`}
-                        >
-                            {state.soundEnabled ? <HiVolumeUp className="w-5 h-5 sm:w-5 sm:h-5" /> : <HiVolumeOff className="w-5 h-5 sm:w-5 sm:h-5" />}
-                            <span className="hidden sm:inline">{state.soundEnabled ? '音あり' : '音なし'}</span>
+                            <HiCog className="w-5 h-5 sm:w-5 sm:h-5" />
+                            <span className="hidden sm:inline">設定</span>
                         </button>
                     </div>
 
@@ -136,16 +127,23 @@ export function HandpickTimerMain() {
                     <TimerControls
                         phase={state.phase}
                         isRunning={state.isRunning}
-                        soundEnabled={state.soundEnabled}
                         onStart={start}
                         onPause={pause}
                         onResume={resume}
                         onReset={reset}
-                        onToggleSound={() => setSoundEnabled(!state.soundEnabled)}
                         isSecondPhaseStart={state.phase === 'second' && state.remainingSeconds === state.secondMinutes * 60}
                     />
                 </div>
             </div>
+
+            {/* 設定モーダル */}
+            {showSettings && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-4 sm:p-6 my-4 max-h-[90vh] overflow-y-auto">
+                        <HandpickTimerSettings onClose={() => setShowSettings(false)} />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

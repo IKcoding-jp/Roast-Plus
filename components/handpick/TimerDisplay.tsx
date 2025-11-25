@@ -39,11 +39,11 @@ export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds,
             } else if (viewportWidth >= 768) {
                 // iPad縦向き・中型タブレット
                 if (viewportHeight >= 900) {
-                    setCircleSize(340);
+                    setCircleSize(480); // iPad用に大きく
                 } else if (viewportHeight >= 700) {
-                    setCircleSize(300);
+                    setCircleSize(440); // iPad用に大きく
                 } else {
-                    setCircleSize(260);
+                    setCircleSize(400); // iPad用に大きく
                 }
             } else if (viewportWidth >= 640) {
                 // 大きめスマホ横向き
@@ -123,7 +123,7 @@ export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds,
                     <div
                         className="font-black tabular-nums tracking-tight leading-none text-gray-800"
                         style={{
-                            fontSize: circleSize >= 340 ? '5.5rem' : circleSize >= 280 ? '4.5rem' : circleSize >= 260 ? '4rem' : '3.5rem',
+                            fontSize: circleSize >= 440 ? '7rem' : circleSize >= 400 ? '6.5rem' : circleSize >= 340 ? '5.5rem' : circleSize >= 280 ? '4.5rem' : circleSize >= 260 ? '4rem' : '3.5rem',
                         }}
                     >
                         {formatTime(remainingSeconds)}

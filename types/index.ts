@@ -262,6 +262,26 @@ export interface RoastTimerSettings {
 
 }
 
+// ハンドピックタイマー設定
+
+export interface HandpickTimerSettings {
+
+  soundEnabled: boolean; // サウンドの有効/無効
+
+  soundFile?: string; // サウンドファイルパス（後方互換性のため残す、デフォルト: sounds/alarm/alarm01.mp3）
+
+  soundVolume?: number; // サウンド音量（後方互換性のため残す、0.0～1.0、デフォルト0.5）
+
+  startSoundFile: string; // 開始音ファイルパス（デフォルト: sounds/alarm/alarm01.mp3）
+
+  startSoundVolume: number; // 開始音量（0.0～1.0、デフォルト0.5）
+
+  completeSoundFile: string; // 完了音ファイルパス（デフォルト: sounds/alarm/alarm01.mp3）
+
+  completeSoundVolume: number; // 完了音量（0.0～1.0、デフォルト0.5）
+
+}
+
 
 
 // ユーザー設定

@@ -92,6 +92,8 @@ export const AssignmentTable: React.FC<Props> = ({
         currentHeight: number;
         label: string;
         currentName: string; // 名前変更用
+        editMode: 'left' | 'right'; // 編集モード（左/右）
+        currentRightLabel?: string; // 右ラベル編集用（参照用）
     } | null>(null);
 
     // 幅変更保存
@@ -141,13 +143,27 @@ export const AssignmentTable: React.FC<Props> = ({
         newSettings.rowHeights[heightConfig.taskLabelId] = height;
         await onUpdateTableSettings(newSettings);
 
-        // 名前の保存（変更がある場合のみ）
+        // ラベルの保存（編集モードに応じて左右を個別に保存）
         const label = taskLabels.find(l => l.id === heightConfig.taskLabelId);
-        if (label && name.trim() && name !== label.leftLabel) {
-            await onUpdateTaskLabel({
-                ...label,
-                leftLabel: name
-            });
+        if (label) {
+            if (heightConfig.editMode === 'left') {
+                // 左ラベルを更新（変更がある場合のみ）
+                if (name.trim() && name !== label.leftLabel) {
+                    await onUpdateTaskLabel({
+                        ...label,
+                        leftLabel: name
+                    });
+                }
+            } else {
+                // 右ラベルを更新（空欄の場合はnullに設定）
+                const newRightLabel = name.trim() || null;
+                if (newRightLabel !== label.rightLabel) {
+                    await onUpdateTaskLabel({
+                        ...label,
+                        rightLabel: newRightLabel
+                    });
+                }
+            }
         }
 
         setHeightConfig(null);
@@ -565,8 +581,10 @@ export const AssignmentTable: React.FC<Props> = ({
                                         setHeightConfig({
                                             taskLabelId: label.id,
                                             currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
-                                            label: '行の設定',
-                                            currentName: label.leftLabel
+                                            label: '左ラベルの設定',
+                                            currentName: label.leftLabel,
+                                            editMode: 'left',
+                                            currentRightLabel: label.rightLabel || ''
                                         });
                                     }}
                                 >
@@ -620,21 +638,13 @@ export const AssignmentTable: React.FC<Props> = ({
                                 <div 
                                     className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap text-right hover:bg-gray-100 rounded transition-colors"
                                     onClick={() => {
-                                        setEditingLabelId(label.id);
-                                        setEditLeftLabel(label.leftLabel); // 名前変更用に左ラベルもセット
-                                        setEditRightLabel(label.rightLabel || '');
-                                        
-                                        // 既存の編集モーダルを流用するか、ラベル設定用モーダルを開く
-                                        // ここでは「左ラベル列」と同様に heightConfig を使って編集モーダルを開く実装に変更
-                                        // ただし右ラベル専用のモードが必要かもしれません
-                                        // 今回は「ダイアログで編集・削除ができるように」とのことなので
-                                        // setHeightConfig を使って「行の設定」として開く形にします（左ラベルと同じ挙動）
-                                        
                                         setHeightConfig({
                                             taskLabelId: label.id,
                                             currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
-                                            label: '行の設定',
-                                            currentName: label.leftLabel
+                                            label: '右ラベルの設定',
+                                            currentName: label.rightLabel || '',
+                                            editMode: 'right',
+                                            currentRightLabel: label.leftLabel // 左ラベルは参照用に保持
                                         });
                                     }}
                                 >
@@ -1183,12 +1193,18 @@ export const AssignmentTable: React.FC<Props> = ({
                             <h3 className="text-lg font-bold text-gray-800 mb-4">{heightConfig.label}</h3>
                             
                             <div className="mb-4">
-                                <label className="block text-sm text-gray-500 mb-1">ラベル名</label>
+                                <label className="block text-sm text-gray-500 mb-1">
+                                    {heightConfig.editMode === 'left' ? '左ラベル名' : '右ラベル名'}
+                                </label>
                                 <input
                                     className="w-full p-2 border border-gray-300 rounded text-lg text-gray-900"
                                     value={heightConfig.currentName}
                                     onChange={e => setHeightConfig({ ...heightConfig, currentName: e.target.value })}
+                                    placeholder={heightConfig.editMode === 'left' ? '左ラベルを入力' : '右ラベルを入力（任意）'}
                                 />
+                                {heightConfig.editMode === 'right' && (
+                                    <p className="text-xs text-gray-500 mt-1">右ラベルは任意です。空欄にすると削除されます。</p>
+                                )}
                             </div>
 
                             <div className="mb-6">

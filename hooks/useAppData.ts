@@ -78,6 +78,7 @@ const INITIAL_APP_DATA: AppData = {
   encouragementCount: 0,
   roastTimerRecords: [],
   workProgresses: [],
+  counterRecords: [],
 };
 
 const FIRESTORE_ACK_TIMEOUT_MS = SAVE_USER_DATA_DEBOUNCE_MS + 800;
@@ -239,6 +240,7 @@ export function useAppData() {
           ? newData.defectBeanSettings
           : currentData.defectBeanSettings,
         workProgresses: Array.isArray(newData.workProgresses) ? newData.workProgresses : currentData.workProgresses,
+        counterRecords: Array.isArray(newData.counterRecords) ? newData.counterRecords : currentData.counterRecords,
       };
 
       const mutatedKeys: (keyof AppData)[] = [];

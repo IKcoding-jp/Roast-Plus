@@ -1,9 +1,2 @@
-export type RecordItem = {
-    id: string;
-    name: string;
-    value: number;
-    createdAt: string; // ISO形式
-    checked: boolean;
-    type?: 'manual' | 'sum' | 'diff';
-    sources?: { name: string; value: number }[];
-};
+// CounterRecord型を再エクスポート（後方互換性のため）
+export type { CounterRecord as RecordItem } from '@/types';

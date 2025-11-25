@@ -73,6 +73,7 @@ const defaultData: AppData = {
   encouragementCount: 0,
   roastTimerRecords: [],
   workProgresses: [],
+  counterRecords: [],
 };
 
 function getUserDocRef(userId: string) {
@@ -186,6 +187,7 @@ function normalizeAppData(data: any): AppData {
           completedCount: typeof wp.completedCount === 'number' ? wp.completedCount : undefined,
         }))
       : [],
+    counterRecords: Array.isArray(data?.counterRecords) ? data.counterRecords : [],
   };
   
   // userSettingsは存在する場合のみ追加（selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除）

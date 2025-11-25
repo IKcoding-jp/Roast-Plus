@@ -32,18 +32,23 @@ import { RecordList } from './components/RecordList';
 import { StatsPanel } from './components/StatsPanel';
 import { RecordItem } from './types';
 import { ConfirmDialog } from '@/components/drip-guide/ConfirmDialog';
+import { useAppData } from '@/hooks/useAppData';
+import type { CounterRecord } from '@/types';
 
 export default function CounterPage() {
   const { user, loading: authLoading } = useAuth();
+  const { data, updateData, isLoading: dataLoading } = useAppData();
   useAppLifecycle();
 
   const [count, setCount] = useState(0);
   const [history, setHistory] = useState<number[]>([]);
-  const [records, setRecords] = useState<RecordItem[]>([]);
   const [activeTab, setActiveTab] = useState<'counter' | 'records'>('counter');
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 
-  if (authLoading) {
+  // Firestoreから記録を取得
+  const records: RecordItem[] = data.counterRecords || [];
+
+  if (authLoading || dataLoading) {
     return <Loading />;
   }
 
@@ -81,7 +86,7 @@ export default function CounterPage() {
 
     const recordName = name.trim() || defaultName;
 
-    const newRecord: RecordItem = {
+    const newRecord: CounterRecord = {
       id: crypto.randomUUID(),
       name: recordName,
       value: count,
@@ -90,15 +95,22 @@ export default function CounterPage() {
       type: 'manual',
     };
 
-    setRecords((prev) => [newRecord, ...prev]);
+    updateData((currentData) => ({
+      ...currentData,
+      counterRecords: [newRecord, ...(currentData.counterRecords || [])],
+    }));
+
     setCount(0);
     setHistory([]);
   };
 
   const handleToggleCheck = (id: string) => {
-    setRecords((prev) => prev.map(r =>
-      r.id === id ? { ...r, checked: !r.checked } : r
-    ));
+    updateData((currentData) => ({
+      ...currentData,
+      counterRecords: (currentData.counterRecords || []).map(r =>
+        r.id === id ? { ...r, checked: !r.checked } : r
+      ),
+    }));
   };
 
   const handleClearRecords = () => {
@@ -106,7 +118,10 @@ export default function CounterPage() {
   };
 
   const performClearRecords = () => {
-    setRecords([]);
+    updateData((currentData) => ({
+      ...currentData,
+      counterRecords: [],
+    }));
     setIsClearDialogOpen(false);
   };
 
@@ -118,7 +133,7 @@ export default function CounterPage() {
     const selectedRecords = records.filter(r => r.checked);
     const sources = selectedRecords.map(r => ({ name: r.name, value: r.value }));
 
-    const newRecord: RecordItem = {
+    const newRecord: CounterRecord = {
       id: crypto.randomUUID(),
       name: namePrefix, // 時間のサフィックスを削除
       value: value,
@@ -128,7 +143,10 @@ export default function CounterPage() {
       sources: sources,
     };
 
-    setRecords((prev) => [newRecord, ...prev]);
+    updateData((currentData) => ({
+      ...currentData,
+      counterRecords: [newRecord, ...(currentData.counterRecords || [])],
+    }));
   };
 
   return (

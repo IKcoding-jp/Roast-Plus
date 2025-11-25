@@ -461,6 +461,8 @@ export interface AppData {
 
   workProgresses: WorkProgress[]; // 作業進捗
 
+  counterRecords: CounterRecord[]; // カウンター記録
+
 }
 
 
@@ -590,6 +592,26 @@ export interface WorkProgress {
   completedCount?: number; // 完成数（目標量がない場合も記録可能、累積）
 
   archivedAt?: string; // アーカイブ日時（ISO 8601形式、アーカイブしたときに記録）
+
+}
+
+// カウンター記録
+
+export interface CounterRecord {
+
+  id: string;
+
+  name: string;
+
+  value: number;
+
+  createdAt: string; // ISO形式
+
+  checked: boolean;
+
+  type?: 'manual' | 'sum' | 'diff';
+
+  sources?: { name: string; value: number }[];
 
 }
 

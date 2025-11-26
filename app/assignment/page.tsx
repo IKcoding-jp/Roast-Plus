@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings
@@ -13,7 +13,8 @@ import {
     createShuffleHistory, fetchRecentShuffleHistory,
     addMember, deleteMember, updateMember,
     addTaskLabel, deleteTaskLabel, updateTaskLabel,
-    addTeam, deleteTeam, updateTeam, updateTableSettings
+    addTeam, deleteTeam, updateTeam, updateTableSettings,
+    mutateAssignmentDay, getServerTodayDate
 } from './lib/firebase';
 import { calculateAssignment } from '@/app/assignment/lib/shuffle';
 import { AssignmentTable } from './components/AssignmentTable';
@@ -46,67 +47,77 @@ export default function AssignmentPage() {
     // ローカルでのシャッフル実行中フラグ (自分自身のアニメーション用)
     const [isLocalShuffling, setIsLocalShuffling] = useState(false);
 
-    // シャッフルボタンの有効/無効判定
-    // 開発者モードに関わらず、1日何回でもシャッフル可能
+    // ???????????/????
+    // ???????????1????????????
     const isShuffleDisabled = useMemo(() => {
-        // 日付が取得できていない場合は無効
         if (!todayDate) return true;
-
-        // 常に有効
         return false;
     }, [todayDate]);
 
-    // 初期化: 日付とマスタデータ
+    // ??? ?????????
     useEffect(() => {
-        // JSTで今日の日付を取得
-        const date = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Tokyo" });
-        setTodayDate(date);
+        let cancelled = false;
 
-        const loadMasterData = async () => {
+        const bootstrap = async () => {
+            const date = await getServerTodayDate();
+            if (!cancelled) {
+                setTodayDate(date);
+            }
+
             const [t, m, l] = await Promise.all([
                 fetchTeams(),
                 fetchMembers(),
                 fetchTaskLabels()
             ]);
+
+            if (cancelled) return;
+
             setTeams(t);
             setMembers(m);
             setTaskLabels(l);
             setIsMasterLoaded(true);
         };
-        loadMasterData();
+
+        bootstrap();
+
+        return () => { cancelled = true; };
     }, []);
 
-    // 日付変更時の割り当て継承
+    // ??????????????????????????????
     useEffect(() => {
         const initializeTodayAssignment = async () => {
-            // 読み込み完了後、今日のデータが存在しない場合のみ実行
-            if (isAssignmentLoaded && !assignmentDay && todayDate) {
-                try {
-                    // 直近7日間の履歴を取得
-                    const recent = await fetchRecentAssignments(todayDate, 7);
+            if (!isAssignmentLoaded || assignmentDay || !todayDate || !isMasterLoaded) return;
 
-                    // 最も新しいものを選択
-                    const latest = recent.length > 0 ? recent[0] : null;
+            try {
+                const recent = await fetchRecentAssignments(todayDate, 7);
+                const latest = recent.sort((a, b) => b.date.localeCompare(a.date))[0];
 
-                    if (latest && latest.assignments) {
-                        // 過去の割り当てをコピーして今日の日付で保存
-                        const newAssignments = latest.assignments.map(a => ({
-                            ...a,
-                            assignedDate: todayDate
-                        }));
-                        await updateAssignmentDay(todayDate, newAssignments);
-                    } else {
-                        // No previous assignment found within 7 days.
-                    }
-                } catch (error) {
-                    console.error("Failed to inherit previous assignment:", error);
-                }
+                const defaultAssignments = teams.flatMap(team =>
+                    taskLabels.map(task => ({
+                        teamId: team.id,
+                        taskLabelId: task.id,
+                        memberId: null,
+                        assignedDate: todayDate,
+                    }))
+                );
+
+                const fallbackAssignments = latest?.assignments?.map(a => ({
+                    ...a,
+                    assignedDate: todayDate,
+                })) ?? defaultAssignments;
+
+                await mutateAssignmentDay(todayDate, (current) => {
+                    if (current && current.length > 0) return current;
+                    return fallbackAssignments;
+                });
+            } catch (error) {
+                console.error("Failed to inherit previous assignment:", error);
             }
         };
         initializeTodayAssignment();
-    }, [isAssignmentLoaded, assignmentDay, todayDate]);
+    }, [isAssignmentLoaded, assignmentDay, todayDate, isMasterLoaded, teams, taskLabels]);
 
-    // リアルタイム監視
+    // ?????????Firestore????????????
     useEffect(() => {
         if (!todayDate) return;
 
@@ -119,11 +130,7 @@ export default function AssignmentPage() {
             setShuffleEvent(event);
 
             if (event && event.state === 'running') {
-                // 演出開始判定
-                // 現在時刻と開始時刻を比較して、まだ演出期間内なら表示
                 const now = Date.now();
-
-                // startedAtがnullの場合（書き込み直後のレイテンシなど）は演出しない、または少し待つ
                 if (!event.startedAt) return;
 
                 const startTime = event.startedAt.toMillis();
@@ -131,19 +138,15 @@ export default function AssignmentPage() {
 
                 if (now < endTime) {
                     setIsRouletteVisible(true);
-                    // 終了時刻に非表示にするタイマー
                     const remaining = endTime - now;
                     setTimeout(() => {
-                        // ローカル実行中でなければ非表示にする
-                        // (ローカル実行中は isLocalShuffling が false になるまで表示し続けるため、ここでは消さない)
                         if (!isLocalShuffling) {
-                            // setIsRouletteVisible(false); // ここで消すとローカルと競合する可能性があるので、useEffectの依存配列で制御する方が安全だが、
-                            // 今回は isLocalShuffling があるので、そちらを優先するロジックにする
+                            // overlay is controlled by event + local flag
                         }
                     }, remaining);
                 }
             } else {
-                // setIsRouletteVisible(false); // ここも同様
+                // setIsRouletteVisible(false);
             }
         });
 
@@ -156,7 +159,10 @@ export default function AssignmentPage() {
             unsubShuffle();
             unsubSettings();
         };
-    }, [todayDate]); // isLocalShuffling を依存配列に入れるとループする可能性があるので入れない
+        // isLocalShuffling ??????????????? todayDate ??
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [todayDate]);
+
 
     // アニメーション表示制御
     useEffect(() => {
@@ -187,11 +193,6 @@ export default function AssignmentPage() {
     }, [assignmentDay, teams, taskLabels, todayDate]);
 
     // 土日チェック
-    const isWeekend = useMemo(() => {
-        if (!todayDate) return false;
-        const day = new Date(todayDate).getDay();
-        return day === 0 || day === 6;
-    }, [todayDate]);
 
     // シャッフル実行 (リーダー機能)
     const handleShuffle = async () => {
@@ -247,21 +248,25 @@ export default function AssignmentPage() {
         }
     };
 
-    // 手動編集: メンバー変更
+    // ????: ???????????????????????
     const handleUpdateMember = async (targetAsg: Assignment, memberId: string | null) => {
         if (!todayDate) return;
 
-        const newAssignments = [...displayAssignments];
-        const idx = newAssignments.findIndex(a => a.teamId === targetAsg.teamId && a.taskLabelId === targetAsg.taskLabelId);
+        await mutateAssignmentDay(todayDate, (current) => {
+            const map = new Map<string, Assignment>();
+            current.forEach(a => {
+                map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: todayDate });
+            });
 
-        if (idx === -1) {
-            // まだ存在しない場合（初期状態など）は追加
-            newAssignments.push({ ...targetAsg, memberId, assignedDate: todayDate });
-        } else {
-            newAssignments[idx] = { ...newAssignments[idx], memberId };
-        }
+            map.set(`${targetAsg.teamId}__${targetAsg.taskLabelId}`, {
+                teamId: targetAsg.teamId,
+                taskLabelId: targetAsg.taskLabelId,
+                memberId,
+                assignedDate: todayDate,
+            });
 
-        await updateAssignmentDay(todayDate, newAssignments);
+            return Array.from(map.values());
+        });
     };
 
     // メンバー名変更
@@ -290,41 +295,35 @@ export default function AssignmentPage() {
         }
     };
 
-    // 割り当てスワップ
+    // ???????????????????????
     const handleSwapAssignments = async (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => {
         if (!todayDate) return;
 
-        const updatedAssignments = [...displayAssignments];
+        await mutateAssignmentDay(todayDate, (current) => {
+            const map = new Map<string, Assignment>();
+            current.forEach(a => {
+                map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: todayDate });
+            });
 
-        const findIndex = (tId: string, lId: string) => updatedAssignments.findIndex(a => a.teamId === tId && a.taskLabelId === lId);
+            const mem1 = map.get(`${asg1.teamId}__${asg1.taskLabelId}`)?.memberId ?? null;
+            const mem2 = map.get(`${asg2.teamId}__${asg2.taskLabelId}`)?.memberId ?? null;
 
-        let index1 = findIndex(asg1.teamId, asg1.taskLabelId);
-        let index2 = findIndex(asg2.teamId, asg2.taskLabelId);
+            map.set(`${asg1.teamId}__${asg1.taskLabelId}`, {
+                teamId: asg1.teamId,
+                taskLabelId: asg1.taskLabelId,
+                memberId: mem2,
+                assignedDate: todayDate,
+            });
 
-        const mem1 = index1 !== -1 ? updatedAssignments[index1].memberId : null;
-        const mem2 = index2 !== -1 ? updatedAssignments[index2].memberId : null;
+            map.set(`${asg2.teamId}__${asg2.taskLabelId}`, {
+                teamId: asg2.teamId,
+                taskLabelId: asg2.taskLabelId,
+                memberId: mem1,
+                assignedDate: todayDate,
+            });
 
-        // swap logic
-
-        // 1. Update asg1 position with mem2
-        if (index1 !== -1) {
-            updatedAssignments[index1] = { ...updatedAssignments[index1], memberId: mem2 };
-        } else {
-            updatedAssignments.push({ teamId: asg1.teamId, taskLabelId: asg1.taskLabelId, memberId: mem2, assignedDate: todayDate });
-            // index2 might be invalidated if it was -1, but if it was -1, we use findIndex again or push logic handles it.
-        }
-
-        // 2. Update asg2 position with mem1
-        // Re-find index2 in case it was -1 and we want to be safe, or if array changed significantly (though push is at end)
-        index2 = findIndex(asg2.teamId, asg2.taskLabelId);
-
-        if (index2 !== -1) {
-            updatedAssignments[index2] = { ...updatedAssignments[index2], memberId: mem1 };
-        } else {
-            updatedAssignments.push({ teamId: asg2.teamId, taskLabelId: asg2.taskLabelId, memberId: mem1, assignedDate: todayDate });
-        }
-
-        await updateAssignmentDay(todayDate, updatedAssignments);
+            return Array.from(map.values());
+        });
     };
 
     const isLoading = !isMasterLoaded || !isAssignmentLoaded;

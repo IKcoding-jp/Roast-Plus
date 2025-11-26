@@ -12,7 +12,8 @@ import {
     Timestamp,
     where,
     limit,
-    deleteDoc
+    deleteDoc,
+    runTransaction
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
@@ -33,6 +34,85 @@ const taskLabelsCol = collection(db, 'taskLabels');
 const assignmentDaysCol = collection(db, 'assignmentDays');
 const shuffleEventsCol = collection(db, 'shuffleEvents');
 const shuffleHistoryCol = collection(db, 'shuffleHistory');
+
+const assignmentKey = (teamId: string, taskLabelId: string) => `${teamId}__${taskLabelId}`;
+
+const normalizeAssignmentsForDate = (assignments: Assignment[], date: string): Assignment[] => {
+    const map = new Map<string, Assignment>();
+    assignments.forEach((a) => {
+        map.set(
+            assignmentKey(a.teamId, a.taskLabelId),
+            { ...a, assignedDate: date, memberId: a.memberId ?? null }
+        );
+    });
+    return Array.from(map.values());
+};
+
+const sortAssignmentsStable = (assignments: Assignment[]) =>
+    [...assignments].sort((a, b) => {
+        const teamDiff = a.teamId.localeCompare(b.teamId);
+        if (teamDiff !== 0) return teamDiff;
+        return a.taskLabelId.localeCompare(b.taskLabelId);
+    });
+
+const areAssignmentsEqual = (a: Assignment[], b: Assignment[]) => {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+        const aItem = a[i];
+        const bItem = b[i];
+        if (
+            aItem.teamId !== bItem.teamId ||
+            aItem.taskLabelId !== bItem.taskLabelId ||
+            aItem.memberId !== bItem.memberId
+        ) {
+            return false;
+        }
+    }
+    return true;
+};
+
+export const getServerTodayDate = async (timeZone: string = "Asia/Tokyo"): Promise<string> => {
+    // Use a dedicated meta document to fetch server-resolved timestamp
+    const metaRef = doc(db, '_meta', 'serverTime');
+    await setDoc(metaRef, { now: serverTimestamp() }, { merge: true });
+    const snap = await getDoc(metaRef);
+    const ts = snap.data()?.now as Timestamp | undefined;
+    const date = ts?.toDate() ?? new Date();
+    return new Intl.DateTimeFormat('en-CA', { timeZone }).format(date);
+};
+
+export const mutateAssignmentDay = async (
+    date: string,
+    updater: (current: Assignment[]) => Assignment[]
+): Promise<{ assignments: Assignment[]; changed: boolean }> => {
+    const docRef = doc(assignmentDaysCol, date);
+
+    return runTransaction(db, async (tx) => {
+        const snap = await tx.get(docRef);
+        const existingData = snap.exists() ? (snap.data() as AssignmentDay) : undefined;
+        const currentRaw = existingData?.assignments ?? [];
+        const normalizedCurrent = sortAssignmentsStable(normalizeAssignmentsForDate(currentRaw, date));
+
+        const proposed = sortAssignmentsStable(
+            normalizeAssignmentsForDate(updater(currentRaw), date)
+        );
+
+        const shouldCreateDoc = !snap.exists();
+        const hasDifference = shouldCreateDoc || !areAssignmentsEqual(normalizedCurrent, proposed);
+
+        if (!hasDifference) {
+            return { assignments: normalizedCurrent, changed: false };
+        }
+
+        tx.set(docRef, {
+            assignments: proposed,
+            updatedAt: serverTimestamp(),
+            createdAt: existingData?.createdAt ?? serverTimestamp(),
+        });
+
+        return { assignments: proposed, changed: true };
+    });
+};
 
 // マスタデータ取得
 export const fetchTeams = async (): Promise<Team[]> => {
@@ -77,19 +157,7 @@ export const subscribeShuffleEvent = (date: string, callback: (data: ShuffleEven
 
 // 更新系
 export const updateAssignmentDay = async (date: string, assignments: Assignment[]) => {
-    const docRef = doc(assignmentDaysCol, date);
-
-    // 既存のドキュメントを読み込んで createdAt を保持
-    const existingDoc = await getDoc(docRef);
-    const existingData = existingDoc.exists() ? existingDoc.data() : null;
-
-    // assignments 配列を完全に置き換える（merge: true を削除）
-    await setDoc(docRef, {
-        assignments,
-        updatedAt: serverTimestamp(),
-        // createdAt が既に存在する場合は保持、存在しない場合は新規作成として設定
-        createdAt: existingData?.createdAt || serverTimestamp(),
-    });
+    await mutateAssignmentDay(date, () => assignments);
 };
 
 export const createShuffleEvent = async (event: ShuffleEvent) => {

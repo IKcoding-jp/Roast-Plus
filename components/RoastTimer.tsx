@@ -1014,15 +1014,12 @@ export function RoastTimer() {
                 </label>
                 <div className="flex gap-3 sm:gap-4">
                   <div className="flex-1">
-                    <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
-                      分 <span className="text-red-500">*</span>
-                    </label>
                     <input
                       type="text"
                       inputMode="numeric"
                       value={durationMinutes}
                       onChange={(e) => handleDurationMinutesChange(e.target.value)}
-                      placeholder=""
+                      placeholder="分"
                       className="w-full rounded-lg border-2 border-gray-200 px-4 py-3.5 sm:py-4 text-lg sm:text-xl text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[56px] shadow-sm hover:border-gray-300"
                     />
                   </div>
@@ -1030,15 +1027,12 @@ export function RoastTimer() {
                     <span className="text-3xl font-bold text-gray-400">:</span>
                   </div>
                   <div className="flex-1">
-                    <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
-                      秒
-                    </label>
                     <input
                       type="text"
                       inputMode="numeric"
                       value={durationSeconds}
                       onChange={(e) => handleDurationSecondsChange(e.target.value)}
-                      placeholder=""
+                      placeholder="秒"
                       maxLength={2}
                       className="w-full rounded-lg border-2 border-gray-200 px-4 py-3.5 sm:py-4 text-lg sm:text-xl text-gray-900 bg-white focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[56px] shadow-sm hover:border-gray-300"
                     />
@@ -1119,15 +1113,12 @@ export function RoastTimer() {
                   </label>
                   <div className="flex gap-4">
                     <div className="flex-1">
-                      <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
-                        分 <span className="text-red-500">*</span>
-                      </label>
                       <input
                         type="text"
                         inputMode="numeric"
                         value={durationMinutes}
                         onChange={(e) => handleDurationMinutesChange(e.target.value)}
-                        placeholder=""
+                        placeholder="分"
                         className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
                       />
                     </div>
@@ -1135,15 +1126,12 @@ export function RoastTimer() {
                       <span className="text-2xl font-bold text-gray-400">:</span>
                     </div>
                     <div className="flex-1">
-                      <label className="block text-xs sm:text-sm font-medium text-gray-600 mb-2">
-                        秒
-                      </label>
                       <input
                         type="text"
                         inputMode="numeric"
                         value={durationSeconds}
                         onChange={(e) => handleDurationSecondsChange(e.target.value)}
-                        placeholder=""
+                        placeholder="秒"
                         maxLength={2}
                         className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
                       />

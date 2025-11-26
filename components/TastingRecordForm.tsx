@@ -30,6 +30,48 @@ const MIN_VALUE = 1.0;
 const MAX_VALUE = 5.0;
 const STEP = 0.125;
 
+interface SliderInputProps {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  description?: string;
+  readOnly?: boolean;
+}
+
+const SliderInput = ({
+  label,
+  value,
+  onChange,
+  description,
+  readOnly = false,
+}: SliderInputProps) => (
+  <div className="mb-6">
+    <div className="flex justify-between items-center mb-2">
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-700">{label}</label>
+        {description && (
+          <span className="text-xs text-gray-500">{description}</span>
+        )}
+      </div>
+      <span className="text-sm font-semibold text-amber-600">{value.toFixed(1)}</span>
+    </div>
+    <input
+      type="range"
+      min={MIN_VALUE}
+      max={MAX_VALUE}
+      step={STEP}
+      value={value}
+      onChange={(e) => onChange(parseFloat(e.target.value))}
+      className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
+      disabled={readOnly}
+    />
+    <div className="flex justify-between text-xs text-gray-500 mt-1">
+      <span>1.0</span>
+      <span>5.0</span>
+    </div>
+  </div>
+);
+
 export function TastingRecordForm({
   record,
   data,
@@ -219,44 +261,6 @@ export function TastingRecordForm({
 
   const formatValue = (value: number) => value.toFixed(3);
 
-  const SliderInput = ({
-    label,
-    value,
-    onChange,
-    description,
-  }: {
-    label: string;
-    value: number;
-    onChange: (value: number) => void;
-    description?: string;
-  }) => (
-    <div className="mb-6">
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
-          {description && (
-            <span className="text-xs text-gray-500">{description}</span>
-          )}
-        </div>
-        <span className="text-sm font-semibold text-amber-600">{value.toFixed(1)}</span>
-      </div>
-      <input
-        type="range"
-        min={MIN_VALUE}
-        max={MAX_VALUE}
-        step={STEP}
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
-        disabled={readOnly}
-      />
-      <div className="flex justify-between text-xs text-gray-500 mt-1">
-        <span>1.0</span>
-        <span>5.0</span>
-      </div>
-    </div>
-  );
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 豆の名前（セッションモードでは非表示） */}
@@ -349,30 +353,35 @@ export function TastingRecordForm({
           value={bitterness} 
           onChange={setBitterness}
           description="コーヒーの苦みの強さ"
+          readOnly={readOnly}
         />
         <SliderInput 
           label="酸味" 
           value={acidity} 
           onChange={setAcidity}
           description="コーヒーの酸っぱさや爽やかさ"
+          readOnly={readOnly}
         />
         <SliderInput 
           label="ボディ" 
           value={body} 
           onChange={setBody}
           description="コーヒーの口当たりや重厚感"
+          readOnly={readOnly}
         />
         <SliderInput 
           label="甘み" 
           value={sweetness} 
           onChange={setSweetness}
           description="コーヒーに感じられる甘さ"
+          readOnly={readOnly}
         />
         <SliderInput 
           label="香り" 
           value={aroma} 
           onChange={setAroma}
           description="コーヒーの香りの強さや豊かさ"
+          readOnly={readOnly}
         />
       </div>
 

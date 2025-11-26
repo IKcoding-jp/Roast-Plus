@@ -91,6 +91,7 @@ export interface AssignmentDay {
   date: string; // YYYY-MM-DD形式
   assignments: Assignment[];
   updatedAt?: any;
+  createdAt?: any;
 }
 
 

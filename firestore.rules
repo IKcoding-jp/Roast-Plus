@@ -37,6 +37,10 @@ service cloud.firestore {
     match /assignmentSettings/{document=**} {
       allow read, write: if request.auth != null;
     }
+
+    // メタ情報（サーバー時刻取得など）
+    match /_meta/{document=**} {
+      allow read, write: if request.auth != null;
+    }
   }
 }
-

@@ -36,6 +36,8 @@ export function useHandpickTimer() {
     const [settings, setSettings] = useState<HandpickTimerSettings | null>(null);
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    // 完了音用のAudioオブジェクトを保持するRef
+    const completeAudioRef = useRef<HTMLAudioElement | null>(null);
 
     // 初期化時にLocalStorageから復元
     useEffect(() => {
@@ -88,34 +90,74 @@ export function useHandpickTimer() {
         });
     }, [phase, remainingSeconds, cycleCount, firstMinutes, secondMinutes]);
 
-    // タイマーのカウントダウン処理
-    useEffect(() => {
-        if (!isRunning) {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
+    // 音声ファイルのパスを解決するヘルパー
+    const resolveAudioPath = (path: string) => {
+        let audioPath = path.startsWith('/') ? path : `/${path}`;
+        const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.8';
+        return `${audioPath}?v=${version}`;
+    };
+
+    // 完了音の準備（アンロック）を行う
+    const prepareCompleteSound = useCallback(async () => {
+        if (!settings || !settings.soundEnabled) return;
+
+        try {
+            // 既存のAudioがあれば破棄
+            if (completeAudioRef.current) {
+                completeAudioRef.current.pause();
+                completeAudioRef.current = null;
+            }
+
+            const audioPath = resolveAudioPath(settings.completeSoundFile);
+            const audio = new Audio(audioPath);
+
+            // エラーハンドリング
+            audio.addEventListener('error', (e) => {
+                const error = audio.error;
+                console.error('[HandpickTimer] Audio loading error:', {
+                    code: error?.code,
+                    message: error?.message,
+                    path: audioPath
+                });
+            });
+
+            // 音量を0にして一瞬再生することで、iOS等の自動再生制限を解除（アンロック）する
+            audio.volume = 0;
+            await audio.play();
+            audio.pause();
+            audio.currentTime = 0;
+
+            // 本番再生用に音量を設定
+            audio.volume = Math.max(0, Math.min(1, settings.completeSoundVolume));
+
+            // Refに保存
+            completeAudioRef.current = audio;
+            console.log('[HandpickTimer] Complete sound prepared and unlocked');
+        } catch (error) {
+            console.error('[HandpickTimer] Failed to prepare complete sound:', error);
+        }
+    }, [settings]);
+
+    // 完了音を再生（Refから）
+    const playCompleteSoundFromRef = useCallback(async () => {
+        if (!completeAudioRef.current) {
+            console.warn('[HandpickTimer] Complete sound not prepared, trying fallback');
+            // フォールバック: 通常の再生を試みる（ユーザー操作起因でないと鳴らない可能性あり）
+            if (settings && settings.soundEnabled) {
+                await playNotificationSound(settings.completeSoundFile, settings.completeSoundVolume);
             }
             return;
         }
 
-        intervalRef.current = setInterval(() => {
-            setRemainingSeconds((prev) => {
-                if (prev <= 1) {
-                    // フェーズ終了
-                    handlePhaseComplete();
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-            }
-        };
-    }, [isRunning, phase]);
+        try {
+            const audio = completeAudioRef.current;
+            audio.currentTime = 0;
+            await audio.play();
+            console.log('[HandpickTimer] Complete sound played from ref');
+        } catch (error) {
+            console.error('[HandpickTimer] Failed to play complete sound from ref:', error);
+        }
+    }, [settings]);
 
     // 開始音を再生
     const playStartSound = useCallback(async () => {
@@ -128,21 +170,13 @@ export function useHandpickTimer() {
         }
     }, [settings]);
 
-    // 完了音を再生
-    const playCompleteSound = useCallback(async () => {
-        if (!settings || !settings.soundEnabled) return;
-
-        try {
-            await playNotificationSound(settings.completeSoundFile, settings.completeSoundVolume);
-        } catch (error) {
-            console.error('Failed to play complete sound:', error);
-        }
-    }, [settings]);
-
     // フェーズ完了時の処理
     const handlePhaseComplete = useCallback(() => {
-        // setIntervalのコールバック内から呼ばれるため、awaitは使わずに呼び出す
-        void playCompleteSound();
+        console.log('[HandpickTimer] Phase complete triggered');
+
+        // 音声を再生
+        void playCompleteSoundFromRef();
+
         setIsRunning(false);
 
         if (phase === 'first') {
@@ -155,17 +189,57 @@ export function useHandpickTimer() {
             setPhase('idle');
             setRemainingSeconds(0);
         }
-    }, [phase, firstMinutes, secondMinutes, playCompleteSound]);
+    }, [phase, firstMinutes, secondMinutes, playCompleteSoundFromRef]);
+
+    // タイマーのカウントダウン処理
+    useEffect(() => {
+        if (!isRunning) {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+            return;
+        }
+
+        intervalRef.current = setInterval(() => {
+            setRemainingSeconds((prev) => {
+                // ここでは状態更新のみを行い、完了判定は別のuseEffectで行う
+                // ただし、0未満にならないようにする
+                return Math.max(0, prev - 1);
+            });
+        }, 1000);
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, [isRunning]);
+
+    // 残り時間0の監視
+    useEffect(() => {
+        // タイマー動作中で、残り時間が0になったら完了処理を実行
+        if (isRunning && remainingSeconds === 0) {
+            handlePhaseComplete();
+        }
+    }, [isRunning, remainingSeconds, handlePhaseComplete]);
 
     // タイマー開始
     const start = useCallback(async () => {
+        console.log('[HandpickTimer] Start clicked');
+
+        // 完了音の準備（アンロック）
+        // ユーザーインタラクション内で実行する必要がある
+        await prepareCompleteSound();
+
         setPhase('first');
         setRemainingSeconds(firstMinutes * 60);
         setIsRunning(true);
-        
+
         // スタート音を再生
         await playStartSound();
-    }, [firstMinutes, playStartSound]);
+    }, [firstMinutes, playStartSound, prepareCompleteSound]);
 
     // 一時停止
     const pause = useCallback(() => {
@@ -175,23 +249,29 @@ export function useHandpickTimer() {
     // 再開
     const resume = useCallback(async () => {
         if (phase !== 'idle' && remainingSeconds > 0) {
+            console.log('[HandpickTimer] Resume clicked');
+
+            // 再開時も念のため完了音を準備（アンロック）し直す
+            await prepareCompleteSound();
+
             // 2回目スタート時（phase === 'second' かつ remainingSeconds === secondMinutes * 60）に音を鳴らす
             const isSecondPhaseStart = phase === 'second' && remainingSeconds === secondMinutes * 60;
-            
+
             if (isSecondPhaseStart) {
                 // 2回目スタート音を再生（開始音を使用）
                 await playStartSound();
             }
-            
+
             setIsRunning(true);
         }
-    }, [phase, remainingSeconds, secondMinutes, playStartSound]);
+    }, [phase, remainingSeconds, secondMinutes, playStartSound, prepareCompleteSound]);
 
     // リセット（確認ダイアログは呼び出し側で実装）
     const reset = useCallback(() => {
         setIsRunning(false);
         setPhase('idle');
         setRemainingSeconds(0);
+        // AudioRefのクリーンアップは次のstart/resume時に行われるか、コンポーネントアンマウント時にGCされる
     }, []);
 
     const state: HandpickTimerState = {

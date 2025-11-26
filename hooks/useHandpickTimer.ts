@@ -271,6 +271,7 @@ export function useHandpickTimer() {
         setIsRunning(false);
         setPhase('idle');
         setRemainingSeconds(0);
+        setCycleCount(0); // 今日のサイクル数もリセット
         // AudioRefのクリーンアップは次のstart/resume時に行われるか、コンポーネントアンマウント時にGCされる
     }, []);
 

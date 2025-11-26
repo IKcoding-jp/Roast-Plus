@@ -11,7 +11,7 @@ import {
     updateAssignmentDay, createShuffleEvent, updateShuffleEventState,
     updateMemberExclusions, fetchRecentAssignments,
     createShuffleHistory, fetchRecentShuffleHistory,
-    addMember, deleteMember, updateMember,
+    addMember, deleteMember, updateMember, updateMemberTeam,
     addTaskLabel, deleteTaskLabel, updateTaskLabel,
     addTeam, deleteTeam, updateTeam, updateTableSettings,
     mutateAssignmentDay, getServerTodayDate
@@ -299,14 +299,17 @@ export default function AssignmentPage() {
     const handleSwapAssignments = async (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => {
         if (!todayDate) return;
 
-        await mutateAssignmentDay(todayDate, (current) => {
+        let mem1: string | null = null;
+        let mem2: string | null = null;
+
+        const { changed } = await mutateAssignmentDay(todayDate, (current) => {
             const map = new Map<string, Assignment>();
             current.forEach(a => {
                 map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: todayDate });
             });
 
-            const mem1 = map.get(`${asg1.teamId}__${asg1.taskLabelId}`)?.memberId ?? null;
-            const mem2 = map.get(`${asg2.teamId}__${asg2.taskLabelId}`)?.memberId ?? null;
+            mem1 = map.get(`${asg1.teamId}__${asg1.taskLabelId}`)?.memberId ?? null;
+            mem2 = map.get(`${asg2.teamId}__${asg2.taskLabelId}`)?.memberId ?? null;
 
             map.set(`${asg1.teamId}__${asg1.taskLabelId}`, {
                 teamId: asg1.teamId,
@@ -324,6 +327,38 @@ export default function AssignmentPage() {
 
             return Array.from(map.values());
         });
+
+        const isCrossTeamSwap = asg1.teamId !== asg2.teamId;
+        if (!changed || !isCrossTeamSwap) return;
+
+        const updates: Promise<void>[] = [];
+        const memberUpdates: { id: string, teamId: string }[] = [];
+
+        if (mem1) {
+            const currentTeam = members.find(m => m.id === mem1)?.teamId;
+            if (currentTeam !== asg2.teamId) {
+                updates.push(updateMemberTeam(mem1, asg2.teamId));
+                memberUpdates.push({ id: mem1, teamId: asg2.teamId });
+            }
+        }
+
+        if (mem2) {
+            const currentTeam = members.find(m => m.id === mem2)?.teamId;
+            if (currentTeam !== asg1.teamId) {
+                updates.push(updateMemberTeam(mem2, asg1.teamId));
+                memberUpdates.push({ id: mem2, teamId: asg1.teamId });
+            }
+        }
+
+        if (updates.length > 0) {
+            await Promise.all(updates);
+            if (memberUpdates.length > 0) {
+                setMembers(prev => prev.map(m => {
+                    const update = memberUpdates.find(u => u.id === m.id);
+                    return update ? { ...m, teamId: update.teamId } : m;
+                }));
+            }
+        }
     };
 
     const isLoading = !isMasterLoaded || !isAssignmentLoaded;

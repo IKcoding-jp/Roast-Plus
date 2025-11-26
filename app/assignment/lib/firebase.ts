@@ -175,6 +175,11 @@ export const updateMemberExclusions = async (memberId: string, excludedTaskLabel
     await updateDoc(docRef, { excludedTaskLabelIds });
 };
 
+export const updateMemberTeam = async (memberId: string, newTeamId: string) => {
+    const docRef = doc(membersCol, memberId);
+    await updateDoc(docRef, { teamId: newTeamId });
+};
+
 // チーム管理
 export const addTeam = async (team: Team) => {
     const docRef = doc(teamsCol, team.id);

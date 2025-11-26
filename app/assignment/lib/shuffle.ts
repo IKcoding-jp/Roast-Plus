@@ -23,13 +23,18 @@ export const calculateAssignment = (
     const slots: { teamId: string; taskLabelId: string }[] = [];
     const lockedSlots = new Set<string>(); // "teamId-taskLabelId"
     const assignments: Assignment[] = [];
+    const currentAssignmentMap = new Map<string, Assignment>();
+
+    currentAssignments?.forEach(asg => {
+        currentAssignmentMap.set(`${asg.teamId}-${asg.taskLabelId}`, asg);
+    });
 
     // 割り当て済みメンバーを追跡するセット (重複割り当て防止用)
     const assignedMemberIds = new Set<string>();
 
     teams.forEach(team => {
         taskLabels.forEach(task => {
-            const current = currentAssignments?.find(a => a.teamId === team.id && a.taskLabelId === task.id);
+            const current = currentAssignmentMap.get(`${team.id}-${task.id}`);
 
             if (current && current.memberId === null) {
                 // 未割り当ての場合は固定（結果にそのまま含める）
@@ -49,24 +54,29 @@ export const calculateAssignment = (
         });
     });
 
-    // 3. 履歴データの整理
-    // シャッフル履歴ベースで参照（history[0] = 1回前、history[1] = 2回前）
-    const historyWithToday: Assignment[][] = [];
-    // 現在の割り当てを1回前として扱う（memberIdがnullでないもののみ）
-    if (currentAssignments && currentAssignments.length > 0) {
-        const hasAssignedMembers = currentAssignments.some(a => a.memberId !== null);
-        if (hasAssignedMembers) {
-            historyWithToday.push(currentAssignments.filter(a => a.memberId !== null));
-        }
-    }
-    // 過去のシャッフル履歴を追加
-    historyWithToday.push(...history);
-
+    // 3. 履歴データの整備
+    // recentCounts は「最近よく担当しているメンバーへの軽いハンデ」にのみ使用する。
     const recentCounts: Record<string, number> = {};
     eligibleMembers.forEach(m => recentCounts[m.id] = 0);
 
-    // シャッフル履歴からカウントを計算
-    historyWithToday.forEach(shuffleResult => {
+    // currentAssignments（今日の確定分・null除外）と history（過去分のみ）をソースに集約
+    const forCountSources: Assignment[][] = [];
+
+    if (currentAssignments && currentAssignments.length > 0) {
+        const todayAssigned = currentAssignments.filter(a => a.memberId !== null);
+        if (todayAssigned.length > 0) {
+            forCountSources.push(todayAssigned);
+        }
+    }
+
+    history.forEach(shuffleResult => {
+        if (shuffleResult && shuffleResult.length > 0) {
+            forCountSources.push(shuffleResult);
+        }
+    });
+
+    // 上記ソースから担当回数をカウント
+    forCountSources.forEach(shuffleResult => {
         shuffleResult.forEach(asg => {
             if (asg.memberId && recentCounts[asg.memberId] !== undefined) {
                 recentCounts[asg.memberId]++;
@@ -76,14 +86,12 @@ export const calculateAssignment = (
 
     const getHistoryAssignment = (shuffleAgo: number, taskLabelId: string): string | null => {
         // shuffleAgo: 1 = 1回前、2 = 2回前
-        const shuffleResult = historyWithToday[shuffleAgo - 1];
+        const shuffleResult = history[shuffleAgo - 1];
         if (!shuffleResult) return null;
         const asg = shuffleResult.find(a => a.taskLabelId === taskLabelId);
         return asg?.memberId || null;
     };
 
-    // ペア重複チェック用の履歴マップ構築
-    // memberId -> { shuffleAgo1: Set<partnerId>, shuffleAgo2: Set<partnerId> }
     const pairHistory: Record<string, { shuffleAgo1: Set<string>, shuffleAgo2: Set<string> }> = {};
     eligibleMembers.forEach(m => {
         pairHistory[m.id] = { shuffleAgo1: new Set(), shuffleAgo2: new Set() };
@@ -91,7 +99,7 @@ export const calculateAssignment = (
 
     [1, 2].forEach(shuffleAgo => {
         // shuffleAgo: 1 = 1回前、2 = 2回前
-        const shuffleResult = historyWithToday[shuffleAgo - 1];
+        const shuffleResult = history[shuffleAgo - 1];
         if (!shuffleResult) return;
 
         // タスクラベルごとにメンバーをグループ化
@@ -173,21 +181,37 @@ export const calculateAssignment = (
                 .filter(a => a.taskLabelId === slot.taskLabelId && a.memberId)
                 .map(a => a.memberId!);
 
-            for (const member of eligibleMembers) {
+            const oneShuffleAgoMemberId = getHistoryAssignment(1, slot.taskLabelId);
+            const twoShufflesAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
+            const lastAssignedToday = currentAssignmentMap.get(`${slot.teamId}-${slot.taskLabelId}`)?.memberId ?? null;
+            const baseCandidates = eligibleMembers.filter(member => {
+                if (currentLoopAssignedMemberIds.has(member.id)) return false;
+                if (member.teamId !== slot.teamId) return false;
+                if (member.excludedTaskLabelIds.includes(slot.taskLabelId)) return false;
+                return true;
+            });
+            const hasAlternativeToLastAssigned =
+                lastAssignedToday !== null &&
+                baseCandidates.some(m => m.id !== lastAssignedToday);
+            const shouldExcludeLastAssigned =
+                lastAssignedToday !== null &&
+                baseCandidates.length > 1 &&
+                hasAlternativeToLastAssigned;
+            for (const member of baseCandidates) {
                 // 割り当て済みメンバーはスキップ
                 if (currentLoopAssignedMemberIds.has(member.id)) continue;
                 // チームが異なるメンバーはスキップ
                 if (member.teamId !== slot.teamId) continue;
                 // 除外ラベルに含まれる場合はスキップ
                 if (member.excludedTaskLabelIds.includes(slot.taskLabelId)) continue;
+                // currentAssignmentsの直近担当者は候補が複数いる場合のみ除外
+                if (shouldExcludeLastAssigned && member.id === lastAssignedToday) continue;
 
                 let score = recentCounts[member.id] || 0;
 
                 // 場所の重複ペナルティ計算
-                const oneShuffleAgoMemberId = getHistoryAssignment(1, slot.taskLabelId);
                 if (oneShuffleAgoMemberId === member.id) score += 10000; // 1回前と同じなら超高ペナルティ（絶対避ける）
 
-                const twoShufflesAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
                 if (twoShufflesAgoMemberId === member.id) score += 20000; // 2回前と同じなら高ペナルティ（できるだけ避ける）
 
                 if (oneShuffleAgoMemberId === member.id && twoShufflesAgoMemberId === member.id) {

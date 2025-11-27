@@ -28,7 +28,7 @@ export function HandpickTimerMain() {
     };
 
     const phaseName = getPhaseName(state.phase);
-    const message = getPhaseMessage(state.phase, state.isRunning);
+    const message = getPhaseMessage(state.phase, state.isRunning, state.remainingSeconds, state.secondMinutes);
 
     return (
         <div className="h-screen flex flex-col bg-[#F7F7F5] overflow-hidden">

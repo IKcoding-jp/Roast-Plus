@@ -40,15 +40,34 @@ export function formatTime(seconds: number): string {
 /**
  * フェーズごとのメッセージを取得
  */
-export function getPhaseMessage(phase: TimerPhase, isRunning: boolean): string {
+export function getPhaseMessage(
+    phase: TimerPhase,
+    isRunning: boolean,
+    remainingSeconds?: number,
+    secondMinutes?: number
+): string {
     if (phase === 'idle') {
         return 'スタートボタンを押して作業を開始';
     }
     if (phase === 'first') {
-        return isRunning ? '1回目：集中してチェック中' : '1回目終了：全員隣へ回す';
+        return isRunning ? '1回目：すべて取り切る気持ちで' : '1回目終了：全員隣へ回す';
     }
     if (phase === 'second') {
-        return isRunning ? '2回目：最終チェック＋袋詰め' : '2回目終了：袋詰めして新しい豆を準備';
+        // 開始時（残り時間が最大で、タイマーが停止中）
+        if (remainingSeconds !== undefined && secondMinutes !== undefined && 
+            remainingSeconds === secondMinutes * 60 && !isRunning) {
+            return '2回目開始：交換して2回目の準備をしてください';
+        }
+        // 動作中
+        if (isRunning) {
+            return '2回目：最終チェックです。取りこぼしをなくしましょう';
+        }
+        // 終了時（残り時間が0で、タイマーが停止中）
+        if (remainingSeconds !== undefined && remainingSeconds === 0 && !isRunning) {
+            return '2回目終了：豆をジップロックにいれて、新しい豆を用意してください';
+        }
+        // フォールバック（既存の動作）
+        return '2回目終了：交換して2回目の準備をしてください';
     }
     return '';
 }
@@ -61,7 +80,7 @@ export function getPhaseName(phase: TimerPhase): string {
         case 'first':
             return '1回目チェック';
         case 'second':
-            return '2回目チェック＋袋詰め';
+            return '2回目チェック';
         default:
             return '待機中';
     }

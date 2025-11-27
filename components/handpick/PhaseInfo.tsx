@@ -9,11 +9,13 @@ import { getPhaseName, getPhaseMessage, type TimerPhase } from '@/lib/handpickTi
 interface PhaseInfoProps {
     phase: TimerPhase;
     isRunning: boolean;
+    remainingSeconds?: number;
+    secondMinutes?: number;
 }
 
-export function PhaseInfo({ phase, isRunning }: PhaseInfoProps) {
+export function PhaseInfo({ phase, isRunning, remainingSeconds, secondMinutes }: PhaseInfoProps) {
     const phaseName = getPhaseName(phase);
-    const message = getPhaseMessage(phase, isRunning);
+    const message = getPhaseMessage(phase, isRunning, remainingSeconds, secondMinutes);
 
     // フェーズごとの背景色
     const getPhaseColor = () => {

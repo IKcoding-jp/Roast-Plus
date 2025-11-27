@@ -11,9 +11,9 @@ import { TastingRadarChart } from './TastingRadarChart';
 import { TastingSessionCarousel } from './TastingSessionCarousel';
 import {
   calculateAverageScores,
-  getActiveParticipantCount,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
+import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 
 interface TastingSessionListProps {
   data: AppData;
@@ -33,6 +33,9 @@ const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎�
 
 export function TastingSessionList({ data, onUpdate, filterButtonContainerId, filterButtonContainerIdMobile }: TastingSessionListProps) {
   const router = useRouter();
+  
+  // 担当表の /members コレクションからメンバーと管理者を取得
+  const { members: allMembers, manager } = useMembers();
 
   const tastingSessions = Array.isArray(data.tastingSessions)
     ? data.tastingSessions
@@ -40,7 +43,8 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
   const tastingRecords = Array.isArray(data.tastingRecords)
     ? data.tastingRecords
     : [];
-  const activeMemberCount = getActiveParticipantCount(data);
+  // アクティブメンバー数 + 管理者（存在する場合）
+  const activeMemberCount = getActiveMembers(allMembers).length + (manager ? 1 : 0);
 
   // 状態管理
   const [searchQuery, setSearchQuery] = useState('');

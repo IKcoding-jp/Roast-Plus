@@ -59,12 +59,8 @@ const MIN_WRITE_INTERVAL = 200;
 let lastWriteTime = 0;
 
 const defaultData: AppData = {
-  teams: [],
-  members: [],
-  taskLabels: [],
-  taskLabelHistory: [],
-  assignments: [],
-  assignmentHistory: [],
+  // 注意: teams, members, manager, taskLabels, assignments は
+  // 担当表機能で独立したコレクション（/teams, /members, /taskLabels, /assignmentDays）で管理されています
   todaySchedules: [],
   roastSchedules: [],
   tastingSessions: [],
@@ -148,18 +144,8 @@ function removeUndefinedFields(obj: any): any {
 // データを正規化する関数（不足しているフィールドをデフォルト値で補完）
 function normalizeAppData(data: any): AppData {
   const normalized: AppData = {
-    teams: Array.isArray(data?.teams) ? data.teams : [],
-    members: Array.isArray(data?.members) ? data.members : [],
-    manager: data?.manager && typeof data.manager === 'object' ? data.manager : undefined,
-    taskLabels: Array.isArray(data?.taskLabels) ? data.taskLabels : [],
-    taskLabelHistory: Array.isArray(data?.taskLabelHistory)
-      ? data.taskLabelHistory.map((snapshot: any) => ({
-          date: typeof snapshot.date === 'string' ? snapshot.date : '',
-          labels: Array.isArray(snapshot.labels) ? snapshot.labels : [],
-        }))
-      : [],
-    assignments: Array.isArray(data?.assignments) ? data.assignments : [],
-    assignmentHistory: Array.isArray(data?.assignmentHistory) ? data.assignmentHistory : [],
+    // 注意: teams, members, manager, taskLabels, assignments は
+    // 担当表機能で独立したコレクション（/teams, /members, /taskLabels, /assignmentDays）で管理されています
     todaySchedules: Array.isArray(data?.todaySchedules) ? data.todaySchedules : [],
     roastSchedules: Array.isArray(data?.roastSchedules)
       ? data.roastSchedules.map((schedule: any) => ({

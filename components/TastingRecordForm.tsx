@@ -7,6 +7,7 @@ import {
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
 import { useToastContext } from '@/components/Toast';
+import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
@@ -84,6 +85,9 @@ export function TastingRecordForm({
 }: TastingRecordFormProps) {
   const { showToast } = useToastContext();
   
+  // 担当表の /members コレクションからメンバーと管理者を取得
+  const { members: allMembers, manager } = useMembers();
+  
   // セッションIDの決定: 編集時はrecordから、新規作成時はpropsから
   const currentSessionId = record?.sessionId || sessionId || '';
   
@@ -103,13 +107,10 @@ export function TastingRecordForm({
     ? getRecordsBySessionId(data.tastingRecords, currentSessionId)
     : [];
 
-  // 全メンバーを取得（アクティブなメンバーのみ）
-  const activeMembers = data.members.filter((m) => m.active !== false);
-  
-  // 管理者も選択可能にする（管理者が存在する場合）
+  // 全メンバーを取得（アクティブなメンバーのみ）+ 管理者
   const selectableMembers = [
-    ...activeMembers,
-    ...(data.manager ? [{ id: data.manager.id, name: data.manager.name }] : [])
+    ...getActiveMembers(allMembers),
+    ...(manager ? [{ id: manager.id, name: manager.name, teamId: '', excludedTaskLabelIds: [] }] : [])
   ];
 
   // メンバー選択用のstate（新規作成時は空、編集時は既存のmemberIdを初期値）

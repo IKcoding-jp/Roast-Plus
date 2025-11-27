@@ -9,7 +9,6 @@ import type { AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import {
   calculateAverageScores,
-  getActiveMemberCount,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
 

@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings
+    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings, Manager
 } from '@/types';
 import {
     fetchTeams, fetchMembers, fetchTaskLabels,
@@ -14,17 +14,20 @@ import {
     addMember, deleteMember, updateMember, updateMemberTeam,
     addTaskLabel, deleteTaskLabel, updateTaskLabel,
     addTeam, deleteTeam, updateTeam, updateTableSettings,
-    mutateAssignmentDay, getServerTodayDate
+    mutateAssignmentDay, getServerTodayDate,
+    subscribeManager, setManager, deleteManager
 } from './lib/firebase';
 import { calculateAssignment } from '@/app/assignment/lib/shuffle';
 import { AssignmentTable } from './components/AssignmentTable';
 import { RouletteOverlay } from './components/RouletteOverlay';
+import { ManagerDialog } from './components/ManagerDialog';
 import { Loading } from '@/components/Loading';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaUserTie } from "react-icons/fa";
+import { HiPlus } from "react-icons/hi";
 
 export default function AssignmentPage() {
     const router = useRouter();
@@ -34,10 +37,14 @@ export default function AssignmentPage() {
     const [members, setMembers] = useState<Member[]>([]);
     const [taskLabels, setTaskLabels] = useState<TaskLabel[]>([]);
     const [tableSettings, setTableSettings] = useState<TableSettings | null>(null);
+    const [manager, setManagerState] = useState<Manager | null>(null);
 
     // ロード状態
     const [isMasterLoaded, setIsMasterLoaded] = useState(false);
     const [isAssignmentLoaded, setIsAssignmentLoaded] = useState(false);
+
+    // 管理者ダイアログ
+    const [isManagerDialogOpen, setIsManagerDialogOpen] = useState(false);
 
     // 状態
     const [todayDate, setTodayDate] = useState<string>("");
@@ -118,7 +125,7 @@ export default function AssignmentPage() {
         initializeTodayAssignment();
     }, [isAssignmentLoaded, assignmentDay, todayDate, isMasterLoaded, teams, taskLabels]);
 
-    // Firestore購読: 最新スナップショット + テーブル設定
+    // Firestore購読: 最新スナップショット + テーブル設定 + 管理者
     useEffect(() => {
         const unsubAssignment = subscribeLatestAssignmentDay((data) => {
             setAssignmentDay(data);
@@ -130,9 +137,14 @@ export default function AssignmentPage() {
             setTableSettings(settings);
         });
 
+        const unsubManager = subscribeManager((managerData) => {
+            setManagerState(managerData);
+        });
+
         return () => {
             unsubAssignment();
             unsubSettings();
+            unsubManager();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -470,6 +482,42 @@ export default function AssignmentPage() {
             <RouletteOverlay
                 isVisible={isRouletteVisible}
                 members={members}
+            />
+
+            {/* 管理者バッジ（右下固定） */}
+            <div className="fixed bottom-6 right-6 z-20">
+                <button
+                    onClick={() => setIsManagerDialogOpen(true)}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-all ${
+                        manager
+                            ? 'bg-white hover:bg-gray-50 border border-gray-200'
+                            : 'bg-primary text-white hover:bg-primary-dark'
+                    }`}
+                >
+                    {manager ? (
+                        <>
+                            <FaUserTie className="w-5 h-5 text-primary" />
+                            <div className="text-left">
+                                <div className="text-sm font-semibold text-gray-800">{manager.name}</div>
+                                <div className="text-xs text-gray-500">管理者</div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <HiPlus className="w-5 h-5" />
+                            <span className="font-medium">管理者</span>
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {/* 管理者編集ダイアログ */}
+            <ManagerDialog
+                isOpen={isManagerDialogOpen}
+                manager={manager}
+                onClose={() => setIsManagerDialogOpen(false)}
+                onSave={setManager}
+                onDelete={deleteManager}
             />
         </div>
     );

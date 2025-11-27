@@ -101,10 +101,37 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     // ビデオのフレームを一時キャンバスに描画
     tempContext.drawImage(video, 0, 0, videoWidth, videoHeight);
 
-    // 中央から正方形を切り取り、1024x1024にリサイズ
-    const cropSize = Math.min(videoWidth, videoHeight);
-    const cropX = (videoWidth - cropSize) / 2;
-    const cropY = (videoHeight - cropSize) / 2;
+    // ガイド枠の表示座標をビデオの元座標に変換
+    // object-coverのスケール率とオフセットを計算
+    const containerWidth = guideSize.containerWidth;
+    const containerHeight = guideSize.containerHeight;
+    const containerAspect = containerWidth / containerHeight;
+    const videoAspect = videoWidth / videoHeight;
+
+    let scale: number, offsetX: number, offsetY: number;
+
+    if (videoAspect > containerAspect) {
+      // ビデオが横長: 縦にフィット、左右がクリップ
+      scale = containerHeight / videoHeight;
+      offsetX = (videoWidth * scale - containerWidth) / 2;
+      offsetY = 0;
+    } else {
+      // ビデオが縦長: 横にフィット、上下がクリップ
+      scale = containerWidth / videoWidth;
+      offsetX = 0;
+      offsetY = (videoHeight * scale - containerHeight) / 2;
+    }
+
+    // ガイド枠の表示座標をビデオ座標に変換
+    const rawCropX = (guideSize.left + offsetX) / scale;
+    const rawCropY = (guideSize.top + offsetY) / scale;
+    const rawCropSize = guideSize.width / scale;
+
+    // 境界チェック（クランプ処理）
+    const cropSize = Math.min(rawCropSize, videoWidth, videoHeight);
+    const cropX = Math.max(0, Math.min(rawCropX, videoWidth - cropSize));
+    const cropY = Math.max(0, Math.min(rawCropY, videoHeight - cropSize));
+
     const targetSize = 1024;
 
     // リサイズ用の新しいキャンバスを作成

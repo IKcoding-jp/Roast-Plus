@@ -420,21 +420,8 @@ export interface TableSettings {
 // アプリ全体のデータ構造
 
 export interface AppData {
-
-  teams: Team[];
-
-  members: Member[];
-
-  manager?: Manager; // 管理者（全体で1人のみ）
-
-  taskLabels: TaskLabel[]; // 現在の作業ラベル（今日の基準）
-
-  taskLabelHistory: TaskLabelSnapshot[]; // 作業ラベルの日付別履歴
-
-  assignments: Assignment[]; // 現在の担当表（配列形式）
-
-  assignmentHistory: Assignment[]; // 過去の履歴
-
+  // 注意: teams, members, manager, taskLabels, assignments は
+  // 担当表機能で独立したコレクション（/teams, /members, /taskLabels, /assignmentDays）で管理されています
 
   todaySchedules: TodaySchedule[]; // 本日のスケジュール
 

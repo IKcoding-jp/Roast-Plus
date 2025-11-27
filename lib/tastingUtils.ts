@@ -1,4 +1,4 @@
-import type { TastingRecord, TastingSession, AppData, Member } from '@/types';
+import type { TastingRecord, TastingSession } from '@/types';
 
 // 平均スコアの型定義
 export interface AverageScores {
@@ -55,26 +55,6 @@ export function calculateAverageScores(records: TastingRecord[]): AverageScores 
     aroma: sum.aroma / count,
     overallRating: sum.overallRating / count,
   };
-}
-
-/**
- * アクティブメンバー数を取得する
- * @param members メンバー配列
- * @returns アクティブメンバー数
- */
-export function getActiveMemberCount(members: Member[]): number {
-  return members.filter((m) => m.active !== false).length;
-}
-
-/**
- * アクティブな参加者数（メンバー+管理者）を取得する
- * @param data アプリデータ
- * @returns アクティブな参加者数（メンバー数+管理者（存在する場合））
- */
-export function getActiveParticipantCount(data: AppData): number {
-  const activeMemberCount = getActiveMemberCount(data.members);
-  // 管理者が存在する場合は+1
-  return activeMemberCount + (data.manager ? 1 : 0);
 }
 
 /**

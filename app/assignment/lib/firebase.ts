@@ -25,7 +25,8 @@ import {
     ShuffleEvent,
     ShuffleHistory,
     Assignment,
-    TableSettings
+    TableSettings,
+    Manager
 } from '@/types';
 
 // コレクション参照
@@ -369,4 +370,42 @@ export const fetchRecentShuffleHistory = async (limitCount: number = 2): Promise
         });
         return allHistory.slice(0, limitCount);
     }
+};
+
+// ===== 管理者管理 =====
+const MANAGER_DOC_ID = 'default'; // 1人のみなので固定ID
+const managersCol = collection(db, 'managers');
+
+/**
+ * 管理者をリアルタイム購読
+ */
+export const subscribeManager = (callback: (manager: Manager | null) => void) => {
+    const docRef = doc(managersCol, MANAGER_DOC_ID);
+    return onSnapshot(docRef, (snap) => {
+        if (snap.exists()) {
+            callback({ id: snap.id, ...snap.data() } as Manager);
+        } else {
+            callback(null);
+        }
+    });
+};
+
+/**
+ * 管理者を設定（追加/更新）
+ */
+export const setManager = async (name: string): Promise<void> => {
+    const docRef = doc(managersCol, MANAGER_DOC_ID);
+    await setDoc(docRef, {
+        id: MANAGER_DOC_ID,
+        name,
+        updatedAt: serverTimestamp(),
+    });
+};
+
+/**
+ * 管理者を削除
+ */
+export const deleteManager = async (): Promise<void> => {
+    const docRef = doc(managersCol, MANAGER_DOC_ID);
+    await deleteDoc(docRef);
 };

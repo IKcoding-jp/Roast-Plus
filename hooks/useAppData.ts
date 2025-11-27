@@ -64,12 +64,8 @@ function areDeeplyEqual(a: unknown, b: unknown): boolean {
 }
 
 const INITIAL_APP_DATA: AppData = {
-  teams: [],
-  members: [],
-  taskLabels: [],
-  taskLabelHistory: [],
-  assignments: [],
-  assignmentHistory: [],
+  // 注意: teams, members, manager, taskLabels, assignments は
+  // 担当表機能で独立したコレクション（/teams, /members, /taskLabels, /assignmentDays）で管理されています
   todaySchedules: [],
   roastSchedules: [],
   tastingSessions: [],
@@ -214,18 +210,13 @@ export function useAppData() {
       const hasRoastTimerStateOverride = hasOwn(newData, 'roastTimerState');
 
       const normalizedData: AppData = {
-        teams: Array.isArray(newData.teams) ? newData.teams : currentData.teams,
-        members: Array.isArray(newData.members) ? newData.members : currentData.members,
-        taskLabels: Array.isArray(newData.taskLabels) ? newData.taskLabels : currentData.taskLabels,
-        taskLabelHistory: Array.isArray(newData.taskLabelHistory) ? newData.taskLabelHistory : currentData.taskLabelHistory,
-        assignments: Array.isArray(newData.assignments) ? newData.assignments : currentData.assignments,
-        assignmentHistory: Array.isArray(newData.assignmentHistory) ? newData.assignmentHistory : currentData.assignmentHistory,
+        // 注意: teams, members, manager, taskLabels, assignments は
+        // 担当表機能で独立したコレクション（/teams, /members, /taskLabels, /assignmentDays）で管理されています
         todaySchedules: Array.isArray(newData.todaySchedules) ? newData.todaySchedules : currentData.todaySchedules,
         roastSchedules: Array.isArray(newData.roastSchedules) ? newData.roastSchedules : currentData.roastSchedules,
         tastingSessions: Array.isArray(newData.tastingSessions) ? newData.tastingSessions : currentData.tastingSessions,
         tastingRecords: Array.isArray(newData.tastingRecords) ? newData.tastingRecords : currentData.tastingRecords,
         notifications: Array.isArray(newData.notifications) ? newData.notifications : currentData.notifications,
-        manager: hasOwn(newData, 'manager') ? newData.manager : currentData.manager,
         userSettings: hasOwn(newData, 'userSettings') ? newData.userSettings : currentData.userSettings,
         shuffleEvent: hasOwn(newData, 'shuffleEvent') ? newData.shuffleEvent : currentData.shuffleEvent,
         encouragementCount: hasOwn(newData, 'encouragementCount')

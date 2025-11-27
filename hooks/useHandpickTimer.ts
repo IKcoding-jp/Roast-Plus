@@ -149,6 +149,9 @@ export function useHandpickTimer() {
     const prepareCompleteSound = useCallback(async () => {
         if (!settings || !settings.soundEnabled || !settings.completeSoundEnabled) return;
 
+        // フォールバック用のデフォルトファイルパス
+        const DEFAULT_SOUND_FILE = '/sounds/alarm/アラーム1.mp3';
+
         try {
             // 既存のAudioがあれば破棄
             if (completeAudioRef.current) {
@@ -156,34 +159,137 @@ export function useHandpickTimer() {
                 completeAudioRef.current = null;
             }
 
-            const audioPath = resolveAudioPath(settings.completeSoundFile);
-            const audio = new Audio(audioPath);
+            let audioPath = resolveAudioPath(settings.completeSoundFile);
+            let audio = new Audio(audioPath);
+
+            // エラーフラグを設定
+            let hasError = false;
+            let usedFallback = false;
+            let errorDetails: {
+                code?: number;
+                message?: string;
+                path: string;
+                MEDIA_ERR_ABORTED?: number;
+                MEDIA_ERR_NETWORK?: number;
+                MEDIA_ERR_DECODE?: number;
+                MEDIA_ERR_SRC_NOT_SUPPORTED?: number;
+                readyState?: number;
+                networkState?: number;
+            } | null = null;
 
             // エラーハンドリング
-            audio.addEventListener('error', (e) => {
+            let errorHandler: ((e: Event) => void) | null = null;
+            let fallbackErrorHandler: ((e: Event) => void) | null = null;
+
+            errorHandler = (e: Event) => {
+                hasError = true;
                 const error = audio.error;
-                console.error('[HandpickTimer] Audio loading error:', {
-                    code: error?.code,
-                    message: error?.message,
-                    path: audioPath
-                });
-            });
+                if (error) {
+                    errorDetails = {
+                        code: error.code,
+                        message: error.message,
+                        path: audioPath,
+                        MEDIA_ERR_ABORTED: error.MEDIA_ERR_ABORTED,
+                        MEDIA_ERR_NETWORK: error.MEDIA_ERR_NETWORK,
+                        MEDIA_ERR_DECODE: error.MEDIA_ERR_DECODE,
+                        MEDIA_ERR_SRC_NOT_SUPPORTED: error.MEDIA_ERR_SRC_NOT_SUPPORTED,
+                    };
+                    console.error('[HandpickTimer] Audio loading error:', errorDetails);
+                    console.error('[HandpickTimer] Failed to load audio file:', audioPath);
+                } else {
+                    errorDetails = {
+                        path: audioPath,
+                        readyState: audio.readyState,
+                        networkState: audio.networkState,
+                    };
+                    console.error('[HandpickTimer] Audio error event fired but no error details available', errorDetails);
+                }
+            };
+            audio.addEventListener('error', errorHandler);
+
+            // エラーが発生した場合は、play()を試みない
+            // ただし、エラーイベントは非同期で発火する可能性があるため、
+            // 短い待機時間を設けてからエラーチェックを行う
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            // エラーが発生した場合、デフォルトファイルにフォールバック
+            if (hasError) {
+                console.warn('[HandpickTimer] Audio loading failed, trying fallback file. Error:', errorDetails);
+                audio.removeEventListener('error', errorHandler);
+                
+                // デフォルトファイルが元のファイルと同じ場合は、フォールバックしない
+                if (settings.completeSoundFile === DEFAULT_SOUND_FILE) {
+                    console.error('[HandpickTimer] Default sound file also failed, skipping unlock');
+                    return;
+                }
+
+                // デフォルトファイルで再試行
+                audioPath = resolveAudioPath(DEFAULT_SOUND_FILE);
+                audio = new Audio(audioPath);
+                hasError = false;
+                errorDetails = null;
+                usedFallback = true;
+
+                fallbackErrorHandler = (e: Event) => {
+                    hasError = true;
+                    const error = audio.error;
+                    if (error) {
+                        errorDetails = {
+                            code: error.code,
+                            message: error.message,
+                            path: audioPath,
+                            MEDIA_ERR_ABORTED: error.MEDIA_ERR_ABORTED,
+                            MEDIA_ERR_NETWORK: error.MEDIA_ERR_NETWORK,
+                            MEDIA_ERR_DECODE: error.MEDIA_ERR_DECODE,
+                            MEDIA_ERR_SRC_NOT_SUPPORTED: error.MEDIA_ERR_SRC_NOT_SUPPORTED,
+                        };
+                        console.error('[HandpickTimer] Fallback audio loading error:', errorDetails);
+                    } else {
+                        errorDetails = {
+                            path: audioPath,
+                            readyState: audio.readyState,
+                            networkState: audio.networkState,
+                        };
+                        console.error('[HandpickTimer] Fallback audio error event fired but no error details available', errorDetails);
+                    }
+                };
+                audio.addEventListener('error', fallbackErrorHandler);
+
+                await new Promise((resolve) => setTimeout(resolve, 100));
+
+                if (hasError) {
+                    console.error('[HandpickTimer] Fallback audio also failed, skipping unlock. Error:', errorDetails);
+                    audio.removeEventListener('error', fallbackErrorHandler);
+                    return;
+                }
+            }
 
             // 音量を0にし、さらにミュートも設定して確実に無音にする
             // 一瞬再生することで、iOS等の自動再生制限を解除（アンロック）する
             audio.volume = 0;
             audio.muted = true;  // 確実に無音にする
-            await audio.play();
-            audio.pause();
-            audio.currentTime = 0;
+            
+            try {
+                await audio.play();
+                audio.pause();
+                audio.currentTime = 0;
 
-            // 本番再生用に音量を設定し、ミュートを解除
-            audio.muted = false;
-            audio.volume = Math.max(0, Math.min(1, settings.completeSoundVolume));
+                // 本番再生用に音量を設定し、ミュートを解除
+                audio.muted = false;
+                audio.volume = Math.max(0, Math.min(1, settings.completeSoundVolume));
 
-            // Refに保存
-            completeAudioRef.current = audio;
-            console.log('[HandpickTimer] Complete sound prepared and unlocked');
+                // Refに保存
+                completeAudioRef.current = audio;
+                console.log('[HandpickTimer] Complete sound prepared and unlocked', usedFallback ? '(using fallback)' : '');
+            } catch (playError) {
+                console.error('[HandpickTimer] Failed to play audio for unlock:', playError);
+                // エラーイベントリスナーを削除
+                if (usedFallback && fallbackErrorHandler) {
+                    audio.removeEventListener('error', fallbackErrorHandler);
+                } else if (errorHandler) {
+                    audio.removeEventListener('error', errorHandler);
+                }
+            }
         } catch (error) {
             console.error('[HandpickTimer] Failed to prepare complete sound:', error);
         }

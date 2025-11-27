@@ -9,7 +9,6 @@ import { Loading } from '@/components/Loading';
 import {
   loadHandpickTimerSettings,
   saveHandpickTimerSettings,
-  clearHandpickTimerSettingsCache,
 } from '@/lib/handpickTimerSettings';
 import { playNotificationSound, stopNotificationSound } from '@/lib/sounds';
 import type { HandpickTimerSettings } from '@/types';
@@ -81,7 +80,8 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
     setIsSaving(true);
     try {
       await saveHandpickTimerSettings(settings);
-      clearHandpickTimerSettingsCache();
+      // clearHandpickTimerSettingsCache() は削除
+      // saveHandpickTimerSettings 内で既にキャッシュを更新しているため不要
       onClose();
     } catch (error) {
       console.error('Failed to save settings:', error);

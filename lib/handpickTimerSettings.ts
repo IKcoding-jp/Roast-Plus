@@ -11,10 +11,10 @@ import type { HandpickTimerSettings } from '@/types';
 const DEFAULT_SETTINGS: HandpickTimerSettings = {
   soundEnabled: true,
   startSoundEnabled: true,
-  startSoundFile: '/sounds/alarm/alarm01.mp3',
+  startSoundFile: '/sounds/alarm/アラーム1.mp3',
   startSoundVolume: 0.5,
   completeSoundEnabled: true,
-  completeSoundFile: '/sounds/alarm/alarm01.mp3',
+  completeSoundFile: '/sounds/alarm/アラーム1.mp3',
   completeSoundVolume: 0.5,
 };
 

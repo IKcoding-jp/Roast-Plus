@@ -13,7 +13,8 @@ import {
     where,
     limit,
     deleteDoc,
-    runTransaction
+    runTransaction,
+    documentId
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
@@ -105,6 +106,7 @@ export const mutateAssignmentDay = async (
         }
 
         tx.set(docRef, {
+            date,
             assignments: proposed,
             updatedAt: serverTimestamp(),
             createdAt: existingData?.createdAt ?? serverTimestamp(),
@@ -140,6 +142,35 @@ export const subscribeAssignmentDay = (date: string, callback: (data: Assignment
             callback({ ...snap.data(), date: snap.id } as AssignmentDay);
         } else {
             callback(null);
+        }
+    });
+};
+
+export const subscribeLatestAssignmentDay = (
+    callback: (data: AssignmentDay | null) => void,
+    options?: { onEmpty?: () => Promise<void> }
+) => {
+    const latestQuery = query(assignmentDaysCol, orderBy('updatedAt', 'desc'), limit(1));
+    let initializing = false;
+
+    return onSnapshot(latestQuery, async (snap) => {
+        if (!snap.empty) {
+            const docSnap = snap.docs[0];
+            callback({ ...docSnap.data(), date: docSnap.id } as AssignmentDay);
+            return;
+        }
+
+        callback(null);
+
+        if (options?.onEmpty && !initializing) {
+            initializing = true;
+            try {
+                await options.onEmpty();
+            } catch (error) {
+                console.error('Failed to initialize first assignment day:', error);
+            } finally {
+                initializing = false;
+            }
         }
     });
 };

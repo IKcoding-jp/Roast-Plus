@@ -7,7 +7,7 @@ import {
 } from '@/types';
 import {
     fetchTeams, fetchMembers, fetchTaskLabels,
-    subscribeAssignmentDay, subscribeShuffleEvent, subscribeTableSettings,
+    subscribeLatestAssignmentDay, subscribeShuffleEvent, subscribeTableSettings,
     updateAssignmentDay, createShuffleEvent, updateShuffleEventState,
     updateMemberExclusions, fetchRecentAssignments,
     createShuffleHistory, fetchRecentShuffleHistory,
@@ -41,18 +41,19 @@ export default function AssignmentPage() {
 
     // 状態
     const [todayDate, setTodayDate] = useState<string>("");
+    const [activeDate, setActiveDate] = useState<string>("");
     const [assignmentDay, setAssignmentDay] = useState<AssignmentDay | null>(null);
     const [shuffleEvent, setShuffleEvent] = useState<ShuffleEvent | null>(null);
     const [isRouletteVisible, setIsRouletteVisible] = useState(false);
     // ローカルでのシャッフル実行中フラグ (自分自身のアニメーション用)
     const [isLocalShuffling, setIsLocalShuffling] = useState(false);
 
-    // ???????????/????
-    // ???????????1????????????
+    // シャッフル許可判定
     const isShuffleDisabled = useMemo(() => {
-        if (!todayDate) return true;
+        if (!isMasterLoaded || !isAssignmentLoaded) return true;
+        if (!activeDate && !todayDate) return true;
         return false;
-    }, [todayDate]);
+    }, [isMasterLoaded, isAssignmentLoaded, activeDate, todayDate]);
 
     // ??? ?????????
     useEffect(() => {
@@ -117,16 +118,30 @@ export default function AssignmentPage() {
         initializeTodayAssignment();
     }, [isAssignmentLoaded, assignmentDay, todayDate, isMasterLoaded, teams, taskLabels]);
 
-    // ?????????Firestore????????????
+    // Firestore購読: 最新スナップショット + テーブル設定
     useEffect(() => {
-        if (!todayDate) return;
-
-        const unsubAssignment = subscribeAssignmentDay(todayDate, (data) => {
+        const unsubAssignment = subscribeLatestAssignmentDay((data) => {
             setAssignmentDay(data);
+            setActiveDate(data?.date ?? "");
             setIsAssignmentLoaded(true);
         });
 
-        const unsubShuffle = subscribeShuffleEvent(todayDate, (event) => {
+        const unsubSettings = subscribeTableSettings((settings) => {
+            setTableSettings(settings);
+        });
+
+        return () => {
+            unsubAssignment();
+            unsubSettings();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Firestore購読: シャッフルイベント（現在のアクティブ日付）
+    useEffect(() => {
+        if (!activeDate) return;
+
+        const unsubShuffle = subscribeShuffleEvent(activeDate, (event) => {
             setShuffleEvent(event);
 
             if (event && event.state === 'running') {
@@ -150,18 +165,10 @@ export default function AssignmentPage() {
             }
         });
 
-        const unsubSettings = subscribeTableSettings((settings) => {
-            setTableSettings(settings);
-        });
-
         return () => {
-            unsubAssignment();
             unsubShuffle();
-            unsubSettings();
         };
-        // isLocalShuffling ??????????????? todayDate ??
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [todayDate]);
+    }, [activeDate, isLocalShuffling]);
 
 
     // アニメーション表示制御
@@ -186,36 +193,43 @@ export default function AssignmentPage() {
         const initial: Assignment[] = [];
         teams.forEach(team => {
             taskLabels.forEach(task => {
-                initial.push({ teamId: team.id, taskLabelId: task.id, memberId: null, assignedDate: todayDate || '' });
+                initial.push({
+                    teamId: team.id,
+                    taskLabelId: task.id,
+                    memberId: null,
+                    assignedDate: activeDate || todayDate || ''
+                });
             });
         });
         return initial;
-    }, [assignmentDay, teams, taskLabels, todayDate]);
+    }, [assignmentDay, teams, taskLabels, todayDate, activeDate]);
 
     // 土日チェック
 
     // シャッフル実行 (リーダー機能)
     const handleShuffle = async () => {
-        if (!todayDate) return;
-
         setIsLocalShuffling(true);
 
         try {
-            // 1. シャッフル履歴取得 (最新2件)
+            const serverToday = await getServerTodayDate();
+            setTodayDate(serverToday);
+
+            const targetDate = activeDate && activeDate === serverToday ? activeDate : serverToday;
+            setActiveDate(targetDate);
+
+            // 1. Load recent shuffle history (latest 2)
             const shuffleHistoryList = await fetchRecentShuffleHistory(2);
-            
-            // 履歴をAssignment[][]形式に変換
             const history: Assignment[][] = shuffleHistoryList.map(h => h.assignments);
 
-            // 2. 計算
-            const result = calculateAssignment(teams, taskLabels, members, history, todayDate, displayAssignments);
+            // 2. Run calculation
+            const result = calculateAssignment(teams, taskLabels, members, history, targetDate, displayAssignments);
 
-            // 3. イベント発行 (他クライアント用)
+            // 3. Broadcast event to other clients
             const eventId = uuidv4();
             const durationMs = 3000;
 
             await createShuffleEvent({
-                date: todayDate,
+                date: targetDate,
                 eventId,
                 startedAt: serverTimestamp() as Timestamp,
                 durationMs,
@@ -223,26 +237,26 @@ export default function AssignmentPage() {
                 state: 'running'
             });
 
-            // 4. 演出待機 (awaitで確実に待つ)
+            // 4. Wait for animation
             await new Promise(resolve => setTimeout(resolve, durationMs));
 
-            // 5. 結果を保存
-            await updateAssignmentDay(todayDate, result);
+            // 5. Persist result
+            await updateAssignmentDay(targetDate, result);
 
-            // 6. シャッフル履歴を保存
+            // 6. Persist shuffle history
             const historyId = uuidv4();
             await createShuffleHistory({
                 id: historyId,
                 assignments: result,
-                targetDate: todayDate,
+                targetDate: targetDate,
             });
 
-            // 7. イベント完了
-            await updateShuffleEventState(todayDate, 'done');
+            // 7. Mark event done
+            await updateShuffleEventState(targetDate, 'done');
 
         } catch (e) {
             console.error(e);
-            alert("シャッフルに失敗しました");
+            alert('Shuffle failed');
         } finally {
             setIsLocalShuffling(false);
         }
@@ -250,19 +264,19 @@ export default function AssignmentPage() {
 
     // ????: ???????????????????????
     const handleUpdateMember = async (targetAsg: Assignment, memberId: string | null) => {
-        if (!todayDate) return;
+        if (!activeDate) return;
 
-        await mutateAssignmentDay(todayDate, (current) => {
+        await mutateAssignmentDay(activeDate, (current) => {
             const map = new Map<string, Assignment>();
             current.forEach(a => {
-                map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: todayDate });
+                map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: activeDate });
             });
 
             map.set(`${targetAsg.teamId}__${targetAsg.taskLabelId}`, {
                 teamId: targetAsg.teamId,
                 taskLabelId: targetAsg.taskLabelId,
                 memberId,
-                assignedDate: todayDate,
+                assignedDate: activeDate,
             });
 
             return Array.from(map.values());
@@ -297,15 +311,15 @@ export default function AssignmentPage() {
 
     // ???????????????????????
     const handleSwapAssignments = async (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => {
-        if (!todayDate) return;
+        if (!activeDate) return;
 
         let mem1: string | null = null;
         let mem2: string | null = null;
 
-        const { changed } = await mutateAssignmentDay(todayDate, (current) => {
+        const { changed } = await mutateAssignmentDay(activeDate, (current) => {
             const map = new Map<string, Assignment>();
             current.forEach(a => {
-                map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: todayDate });
+                map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: activeDate });
             });
 
             mem1 = map.get(`${asg1.teamId}__${asg1.taskLabelId}`)?.memberId ?? null;
@@ -315,14 +329,14 @@ export default function AssignmentPage() {
                 teamId: asg1.teamId,
                 taskLabelId: asg1.taskLabelId,
                 memberId: mem2,
-                assignedDate: todayDate,
+                assignedDate: activeDate,
             });
 
             map.set(`${asg2.teamId}__${asg2.taskLabelId}`, {
                 teamId: asg2.teamId,
                 taskLabelId: asg2.taskLabelId,
                 memberId: mem1,
-                assignedDate: todayDate,
+                assignedDate: activeDate,
             });
 
             return Array.from(map.values());
@@ -423,7 +437,7 @@ export default function AssignmentPage() {
                         setMembers(prev => [...prev, member]);
                     }}
                     onDeleteMember={async (memberId) => {
-                        await deleteMember(memberId, todayDate);
+                        await deleteMember(memberId, activeDate || todayDate);
                         setMembers(prev => prev.filter(m => m.id !== memberId));
                     }}
                     onUpdateTaskLabel={async (label) => {

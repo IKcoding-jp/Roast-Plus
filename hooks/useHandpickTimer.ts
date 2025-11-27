@@ -31,8 +31,25 @@ export function useHandpickTimer() {
     const [remainingSeconds, setRemainingSeconds] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [cycleCount, setCycleCount] = useState(0);
-    const [firstMinutes, setFirstMinutesState] = useState(5);
-    const [secondMinutes, setSecondMinutesState] = useState(5);
+    // LocalStorageから初期値を読み込む（SSR対策含む）
+    const [firstMinutes, setFirstMinutesState] = useState(() => {
+        if (typeof window === 'undefined') return 5;
+        try {
+            const stored = loadHandpickTimerState();
+            return stored?.firstMinutes ?? 5;
+        } catch {
+            return 5;
+        }
+    });
+    const [secondMinutes, setSecondMinutesState] = useState(() => {
+        if (typeof window === 'undefined') return 5;
+        try {
+            const stored = loadHandpickTimerState();
+            return stored?.secondMinutes ?? 5;
+        } catch {
+            return 5;
+        }
+    });
     const [settings, setSettings] = useState<HandpickTimerSettings | null>(null);
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -40,17 +57,15 @@ export function useHandpickTimer() {
     const completeAudioRef = useRef<HTMLAudioElement | null>(null);
     const hasHydratedRef = useRef(false);
 
-    // 初期化時にLocalStorageから復元
+    // 初期化時にLocalStorageからタイマーの進行状態を復元
+    // firstMinutes/secondMinutesはuseStateの初期値で既に反映されているため、ここでは触らない
     useEffect(() => {
         const stored = loadHandpickTimerState();
         if (stored) {
             setPhase(stored.phase);
             setRemainingSeconds(stored.remainingSeconds);
             setCycleCount(stored.cycleCount);
-            setFirstMinutesState(stored.firstMinutes || 5);
-            setSecondMinutesState(stored.secondMinutes || 5);
-
-            // 復元時は停止状態
+            // 復元時は停止状態にする
             setIsRunning(false);
         }
         hasHydratedRef.current = true;

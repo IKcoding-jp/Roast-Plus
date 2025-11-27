@@ -41,7 +41,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
             },
             {
                 id: 'step-4',
-                startTimeSec: 120,
+                startTimeSec: 110,
                 title: '3投目',
                 description: '最後まで細く丁寧に、中心に１円玉くらいの円を描きながら注ぎきります。',
                 targetTotalWater: 160,

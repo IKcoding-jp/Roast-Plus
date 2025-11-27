@@ -29,13 +29,42 @@ import {
     Manager
 } from '@/types';
 
-// コレクション参照
-const teamsCol = collection(db, 'teams');
-const membersCol = collection(db, 'members');
-const taskLabelsCol = collection(db, 'taskLabels');
-const assignmentDaysCol = collection(db, 'assignmentDays');
-const shuffleEventsCol = collection(db, 'shuffleEvents');
-const shuffleHistoryCol = collection(db, 'shuffleHistory');
+// ===== ヘルパー関数: ユーザー配下のコレクション参照 =====
+function getUserAssignmentRoot(userId: string) {
+    return doc(db, 'users', userId);
+}
+
+function getTeamsCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'teams');
+}
+
+function getMembersCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'members');
+}
+
+function getTaskLabelsCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'taskLabels');
+}
+
+function getAssignmentDaysCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'assignmentDays');
+}
+
+function getShuffleEventsCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'shuffleEvents');
+}
+
+function getShuffleHistoryCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'shuffleHistory');
+}
+
+function getAssignmentSettingsCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'assignmentSettings');
+}
+
+function getManagersCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'managers');
+}
 
 const assignmentKey = (teamId: string, taskLabelId: string) => `${teamId}__${taskLabelId}`;
 
@@ -84,9 +113,11 @@ export const getServerTodayDate = async (timeZone: string = "Asia/Tokyo"): Promi
 };
 
 export const mutateAssignmentDay = async (
+    userId: string,
     date: string,
     updater: (current: Assignment[]) => Assignment[]
 ): Promise<{ assignments: Assignment[]; changed: boolean }> => {
+    const assignmentDaysCol = getAssignmentDaysCollection(userId);
     const docRef = doc(assignmentDaysCol, date);
 
     return runTransaction(db, async (tx) => {
@@ -118,25 +149,29 @@ export const mutateAssignmentDay = async (
 };
 
 // マスタデータ取得
-export const fetchTeams = async (): Promise<Team[]> => {
+export const fetchTeams = async (userId: string): Promise<Team[]> => {
+    const teamsCol = getTeamsCollection(userId);
     const q = query(teamsCol, orderBy('order'));
     const snapshot = await getDocs(q);
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Team));
 };
 
-export const fetchMembers = async (): Promise<Member[]> => {
+export const fetchMembers = async (userId: string): Promise<Member[]> => {
+    const membersCol = getMembersCollection(userId);
     const snapshot = await getDocs(membersCol);
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Member));
 };
 
-export const fetchTaskLabels = async (): Promise<TaskLabel[]> => {
+export const fetchTaskLabels = async (userId: string): Promise<TaskLabel[]> => {
+    const taskLabelsCol = getTaskLabelsCollection(userId);
     const q = query(taskLabelsCol, orderBy('order'));
     const snapshot = await getDocs(q);
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as TaskLabel));
 };
 
 // リアルタイム監視
-export const subscribeAssignmentDay = (date: string, callback: (data: AssignmentDay | null) => void) => {
+export const subscribeAssignmentDay = (userId: string, date: string, callback: (data: AssignmentDay | null) => void) => {
+    const assignmentDaysCol = getAssignmentDaysCollection(userId);
     const docRef = doc(assignmentDaysCol, date);
     return onSnapshot(docRef, (snap) => {
         if (snap.exists()) {
@@ -148,9 +183,11 @@ export const subscribeAssignmentDay = (date: string, callback: (data: Assignment
 };
 
 export const subscribeLatestAssignmentDay = (
+    userId: string,
     callback: (data: AssignmentDay | null) => void,
     options?: { onEmpty?: () => Promise<void> }
 ) => {
+    const assignmentDaysCol = getAssignmentDaysCollection(userId);
     const latestQuery = query(assignmentDaysCol, orderBy('updatedAt', 'desc'), limit(1));
     let initializing = false;
 
@@ -176,7 +213,8 @@ export const subscribeLatestAssignmentDay = (
     });
 };
 
-export const subscribeShuffleEvent = (date: string, callback: (data: ShuffleEvent | null) => void) => {
+export const subscribeShuffleEvent = (userId: string, date: string, callback: (data: ShuffleEvent | null) => void) => {
+    const shuffleEventsCol = getShuffleEventsCollection(userId);
     const docRef = doc(shuffleEventsCol, date);
     return onSnapshot(docRef, (snap) => {
         if (snap.exists()) {
@@ -188,58 +226,68 @@ export const subscribeShuffleEvent = (date: string, callback: (data: ShuffleEven
 };
 
 // 更新系
-export const updateAssignmentDay = async (date: string, assignments: Assignment[]) => {
-    await mutateAssignmentDay(date, () => assignments);
+export const updateAssignmentDay = async (userId: string, date: string, assignments: Assignment[]) => {
+    await mutateAssignmentDay(userId, date, () => assignments);
 };
 
-export const createShuffleEvent = async (event: ShuffleEvent) => {
+export const createShuffleEvent = async (userId: string, event: ShuffleEvent) => {
+    const shuffleEventsCol = getShuffleEventsCollection(userId);
     const docRef = doc(shuffleEventsCol, event.date);
     await setDoc(docRef, event);
 };
 
-export const updateShuffleEventState = async (date: string, state: 'running' | 'done') => {
+export const updateShuffleEventState = async (userId: string, date: string, state: 'running' | 'done') => {
+    const shuffleEventsCol = getShuffleEventsCollection(userId);
     const docRef = doc(shuffleEventsCol, date);
     await updateDoc(docRef, { state });
 };
 
-export const updateMemberExclusions = async (memberId: string, excludedTaskLabelIds: string[]) => {
+export const updateMemberExclusions = async (userId: string, memberId: string, excludedTaskLabelIds: string[]) => {
+    const membersCol = getMembersCollection(userId);
     const docRef = doc(membersCol, memberId);
     await updateDoc(docRef, { excludedTaskLabelIds });
 };
 
-export const updateMemberTeam = async (memberId: string, newTeamId: string) => {
+export const updateMemberTeam = async (userId: string, memberId: string, newTeamId: string) => {
+    const membersCol = getMembersCollection(userId);
     const docRef = doc(membersCol, memberId);
     await updateDoc(docRef, { teamId: newTeamId });
 };
 
 // チーム管理
-export const addTeam = async (team: Team) => {
+export const addTeam = async (userId: string, team: Team) => {
+    const teamsCol = getTeamsCollection(userId);
     const docRef = doc(teamsCol, team.id);
     await setDoc(docRef, team);
 };
 
-export const deleteTeam = async (teamId: string) => {
+export const deleteTeam = async (userId: string, teamId: string) => {
+    const teamsCol = getTeamsCollection(userId);
     const docRef = doc(teamsCol, teamId);
     await deleteDoc(docRef);
 };
 
-export const updateTeam = async (team: Team) => {
+export const updateTeam = async (userId: string, team: Team) => {
+    const teamsCol = getTeamsCollection(userId);
     const docRef = doc(teamsCol, team.id);
     await updateDoc(docRef, { ...team });
 };
 
 // メンバー管理
-export const addMember = async (member: Member) => {
+export const addMember = async (userId: string, member: Member) => {
+    const membersCol = getMembersCollection(userId);
     const docRef = doc(membersCol, member.id);
     await setDoc(docRef, member);
 };
 
-export const deleteMember = async (memberId: string, dateStr?: string) => {
+export const deleteMember = async (userId: string, memberId: string, dateStr?: string) => {
+    const membersCol = getMembersCollection(userId);
     const docRef = doc(membersCol, memberId);
     await deleteDoc(docRef);
 
     // 指定された日付（今日）の割り当てからも削除する
     if (dateStr) {
+        const assignmentDaysCol = getAssignmentDaysCollection(userId);
         const assignmentDocRef = doc(assignmentDaysCol, dateStr);
         const snapshot = await import('firebase/firestore').then(m => m.getDoc(assignmentDocRef));
 
@@ -263,29 +311,33 @@ export const deleteMember = async (memberId: string, dateStr?: string) => {
     }
 };
 
-export const updateMember = async (member: Member) => {
+export const updateMember = async (userId: string, member: Member) => {
+    const membersCol = getMembersCollection(userId);
     const docRef = doc(membersCol, member.id);
     await updateDoc(docRef, { ...member });
 };
 
 // 作業ラベル管理
-export const addTaskLabel = async (taskLabel: TaskLabel) => {
+export const addTaskLabel = async (userId: string, taskLabel: TaskLabel) => {
+    const taskLabelsCol = getTaskLabelsCollection(userId);
     const docRef = doc(taskLabelsCol, taskLabel.id);
     await setDoc(docRef, taskLabel);
 };
 
-export const deleteTaskLabel = async (taskLabelId: string) => {
+export const deleteTaskLabel = async (userId: string, taskLabelId: string) => {
+    const taskLabelsCol = getTaskLabelsCollection(userId);
     const docRef = doc(taskLabelsCol, taskLabelId);
     await deleteDoc(docRef);
 };
 
-export const updateTaskLabel = async (taskLabel: TaskLabel) => {
+export const updateTaskLabel = async (userId: string, taskLabel: TaskLabel) => {
+    const taskLabelsCol = getTaskLabelsCollection(userId);
     const docRef = doc(taskLabelsCol, taskLabel.id);
     await updateDoc(docRef, { ...taskLabel });
 };
 
 // 過去の履歴を取得（公平性ロジック用）
-export const fetchRecentAssignments = async (endDate: string, days: number): Promise<AssignmentDay[]> => {
+export const fetchRecentAssignments = async (userId: string, endDate: string, days: number): Promise<AssignmentDay[]> => {
     // endDate より前の直近 n 日分を取得
     // date 文字列比較で簡易的にフィルタリング
     // 実際は where('date', '<', endDate) 等を使うが、dateがドキュメントIDなので where(documentId(), ...) が必要
@@ -293,6 +345,7 @@ export const fetchRecentAssignments = async (endDate: string, days: number): Pro
     // 日付文字列生成して個別にgetするか。
     // daysが少ない(7日)ので、個別にgetDocsする方が確実かつ低コストかも。
 
+    const assignmentDaysCol = getAssignmentDaysCollection(userId);
     const promises = [];
     const targetDate = new Date(endDate);
 
@@ -316,9 +369,8 @@ export const fetchRecentAssignments = async (endDate: string, days: number): Pro
 };
 
 // テーブル設定管理
-const settingsCol = collection(db, 'assignmentSettings');
-
-export const subscribeTableSettings = (callback: (settings: TableSettings | null) => void) => {
+export const subscribeTableSettings = (userId: string, callback: (settings: TableSettings | null) => void) => {
+    const settingsCol = getAssignmentSettingsCollection(userId);
     const docRef = doc(settingsCol, 'table');
     return onSnapshot(docRef, (snap) => {
         if (snap.exists()) {
@@ -337,13 +389,15 @@ export const subscribeTableSettings = (callback: (settings: TableSettings | null
     });
 };
 
-export const updateTableSettings = async (settings: TableSettings) => {
+export const updateTableSettings = async (userId: string, settings: TableSettings) => {
+    const settingsCol = getAssignmentSettingsCollection(userId);
     const docRef = doc(settingsCol, 'table');
     await setDoc(docRef, settings, { merge: true });
 };
 
 // シャッフル履歴管理
-export const createShuffleHistory = async (history: Omit<ShuffleHistory, 'createdAt'>) => {
+export const createShuffleHistory = async (userId: string, history: Omit<ShuffleHistory, 'createdAt'>) => {
+    const shuffleHistoryCol = getShuffleHistoryCollection(userId);
     const docRef = doc(shuffleHistoryCol, history.id);
     await setDoc(docRef, {
         ...history,
@@ -351,7 +405,8 @@ export const createShuffleHistory = async (history: Omit<ShuffleHistory, 'create
     });
 };
 
-export const fetchRecentShuffleHistory = async (limitCount: number = 2): Promise<ShuffleHistory[]> => {
+export const fetchRecentShuffleHistory = async (userId: string, limitCount: number = 2): Promise<ShuffleHistory[]> => {
+    const shuffleHistoryCol = getShuffleHistoryCollection(userId);
     try {
         const q = query(shuffleHistoryCol, orderBy('createdAt', 'desc'), limit(limitCount));
         const snapshot = await getDocs(q);
@@ -374,12 +429,12 @@ export const fetchRecentShuffleHistory = async (limitCount: number = 2): Promise
 
 // ===== 管理者管理 =====
 const MANAGER_DOC_ID = 'default'; // 1人のみなので固定ID
-const managersCol = collection(db, 'managers');
 
 /**
  * 管理者をリアルタイム購読
  */
-export const subscribeManager = (callback: (manager: Manager | null) => void) => {
+export const subscribeManager = (userId: string, callback: (manager: Manager | null) => void) => {
+    const managersCol = getManagersCollection(userId);
     const docRef = doc(managersCol, MANAGER_DOC_ID);
     return onSnapshot(docRef, (snap) => {
         if (snap.exists()) {
@@ -393,7 +448,8 @@ export const subscribeManager = (callback: (manager: Manager | null) => void) =>
 /**
  * 管理者を設定（追加/更新）
  */
-export const setManager = async (name: string): Promise<void> => {
+export const setManager = async (userId: string, name: string): Promise<void> => {
+    const managersCol = getManagersCollection(userId);
     const docRef = doc(managersCol, MANAGER_DOC_ID);
     await setDoc(docRef, {
         id: MANAGER_DOC_ID,
@@ -405,7 +461,8 @@ export const setManager = async (name: string): Promise<void> => {
 /**
  * 管理者を削除
  */
-export const deleteManager = async (): Promise<void> => {
+export const deleteManager = async (userId: string): Promise<void> => {
+    const managersCol = getManagersCollection(userId);
     const docRef = doc(managersCol, MANAGER_DOC_ID);
     await deleteDoc(docRef);
 };

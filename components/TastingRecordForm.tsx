@@ -8,6 +8,7 @@ import {
 } from '@/lib/tastingUtils';
 import { useToastContext } from '@/components/Toast';
 import { useMembers, getActiveMembers } from '@/hooks/useMembers';
+import { useAuth } from '@/lib/auth';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
@@ -84,9 +85,11 @@ export function TastingRecordForm({
   readOnly = false,
 }: TastingRecordFormProps) {
   const { showToast } = useToastContext();
+  const { user } = useAuth();
+  const userId = user?.uid ?? null;
   
-  // 担当表の /members コレクションからメンバーと管理者を取得
-  const { members: allMembers, manager } = useMembers();
+  // 担当表の /users/{userId}/members コレクションからメンバーと管理者を取得
+  const { members: allMembers, manager } = useMembers(userId);
   
   // セッションIDの決定: 編集時はrecordから、新規作成時はpropsから
   const currentSessionId = record?.sessionId || sessionId || '';

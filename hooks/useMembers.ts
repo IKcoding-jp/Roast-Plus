@@ -6,10 +6,11 @@ import { db } from '@/lib/firebase';
 import type { Member, Manager } from '@/types';
 
 /**
- * 担当表の /members コレクションからメンバーと /managers/default から管理者をリアルタイム取得するフック
+ * 担当表の /users/{userId}/members コレクションからメンバーと /users/{userId}/managers/default から管理者をリアルタイム取得するフック
+ * @param userId ユーザーID
  * @returns { members, manager, loading } メンバー配列、管理者、ローディング状態
  */
-export function useMembers() {
+export function useMembers(userId: string | null) {
   const [members, setMembers] = useState<Member[]>([]);
   const [manager, setManager] = useState<Manager | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,8 +18,17 @@ export function useMembers() {
   const [managerLoaded, setManagerLoaded] = useState(false);
 
   useEffect(() => {
+    if (!userId) {
+      setMembers([]);
+      setManager(null);
+      setMembersLoaded(true);
+      setManagerLoaded(true);
+      setLoading(false);
+      return;
+    }
+
     // メンバーの購読
-    const membersCol = collection(db, 'members');
+    const membersCol = collection(db, 'users', userId, 'members');
     const unsubMembers = onSnapshot(membersCol, (snapshot) => {
       const membersData = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -32,7 +42,7 @@ export function useMembers() {
     });
 
     // 管理者の購読
-    const managerDoc = doc(db, 'managers', 'default');
+    const managerDoc = doc(db, 'users', userId, 'managers', 'default');
     const unsubManager = onSnapshot(managerDoc, (snapshot) => {
       if (snapshot.exists()) {
         setManager({ id: snapshot.id, ...snapshot.data() } as Manager);
@@ -49,7 +59,7 @@ export function useMembers() {
       unsubMembers();
       unsubManager();
     };
-  }, []);
+  }, [userId]);
 
   // 両方のデータが読み込まれたらローディング完了
   useEffect(() => {

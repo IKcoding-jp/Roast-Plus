@@ -22,6 +22,7 @@ import { AssignmentTable } from './components/AssignmentTable';
 import { RouletteOverlay } from './components/RouletteOverlay';
 import { ManagerDialog } from './components/ManagerDialog';
 import { Loading } from '@/components/Loading';
+import { useAuth } from '@/lib/auth';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
@@ -31,6 +32,8 @@ import { HiPlus } from "react-icons/hi";
 
 export default function AssignmentPage() {
     const router = useRouter();
+    const { user, loading: authLoading } = useAuth();
+    const userId = user?.uid ?? null;
 
     // マスタデータ
     const [teams, setTeams] = useState<Team[]>([]);
@@ -62,8 +65,10 @@ export default function AssignmentPage() {
         return false;
     }, [isMasterLoaded, isAssignmentLoaded, activeDate, todayDate]);
 
-    // ??? ?????????
+    // マスタデータの取得
     useEffect(() => {
+        if (!userId || authLoading) return;
+
         let cancelled = false;
 
         const bootstrap = async () => {
@@ -73,9 +78,9 @@ export default function AssignmentPage() {
             }
 
             const [t, m, l] = await Promise.all([
-                fetchTeams(),
-                fetchMembers(),
-                fetchTaskLabels()
+                fetchTeams(userId),
+                fetchMembers(userId),
+                fetchTaskLabels(userId)
             ]);
 
             if (cancelled) return;
@@ -89,15 +94,17 @@ export default function AssignmentPage() {
         bootstrap();
 
         return () => { cancelled = true; };
-    }, []);
+    }, [userId, authLoading]);
 
-    // ??????????????????????????????
+    // 今日の担当表の初期化
     useEffect(() => {
+        if (!userId || authLoading) return;
+
         const initializeTodayAssignment = async () => {
             if (!isAssignmentLoaded || assignmentDay || !todayDate || !isMasterLoaded) return;
 
             try {
-                const recent = await fetchRecentAssignments(todayDate, 7);
+                const recent = await fetchRecentAssignments(userId, todayDate, 7);
                 const latest = recent.sort((a, b) => b.date.localeCompare(a.date))[0];
 
                 const defaultAssignments = teams.flatMap(team =>
@@ -114,7 +121,7 @@ export default function AssignmentPage() {
                     assignedDate: todayDate,
                 })) ?? defaultAssignments;
 
-                await mutateAssignmentDay(todayDate, (current) => {
+                await mutateAssignmentDay(userId, todayDate, (current) => {
                     if (current && current.length > 0) return current;
                     return fallbackAssignments;
                 });
@@ -123,21 +130,23 @@ export default function AssignmentPage() {
             }
         };
         initializeTodayAssignment();
-    }, [isAssignmentLoaded, assignmentDay, todayDate, isMasterLoaded, teams, taskLabels]);
+    }, [userId, authLoading, isAssignmentLoaded, assignmentDay, todayDate, isMasterLoaded, teams, taskLabels]);
 
     // Firestore購読: 最新スナップショット + テーブル設定 + 管理者
     useEffect(() => {
-        const unsubAssignment = subscribeLatestAssignmentDay((data) => {
+        if (!userId || authLoading) return;
+
+        const unsubAssignment = subscribeLatestAssignmentDay(userId, (data) => {
             setAssignmentDay(data);
             setActiveDate(data?.date ?? "");
             setIsAssignmentLoaded(true);
         });
 
-        const unsubSettings = subscribeTableSettings((settings) => {
+        const unsubSettings = subscribeTableSettings(userId, (settings) => {
             setTableSettings(settings);
         });
 
-        const unsubManager = subscribeManager((managerData) => {
+        const unsubManager = subscribeManager(userId, (managerData) => {
             setManagerState(managerData);
         });
 
@@ -146,14 +155,13 @@ export default function AssignmentPage() {
             unsubSettings();
             unsubManager();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [userId, authLoading]);
 
     // Firestore購読: シャッフルイベント（現在のアクティブ日付）
     useEffect(() => {
-        if (!activeDate) return;
+        if (!userId || authLoading || !activeDate) return;
 
-        const unsubShuffle = subscribeShuffleEvent(activeDate, (event) => {
+        const unsubShuffle = subscribeShuffleEvent(userId, activeDate, (event) => {
             setShuffleEvent(event);
 
             if (event && event.state === 'running') {
@@ -180,7 +188,7 @@ export default function AssignmentPage() {
         return () => {
             unsubShuffle();
         };
-    }, [activeDate, isLocalShuffling]);
+    }, [userId, authLoading, activeDate, isLocalShuffling]);
 
 
     // アニメーション表示制御
@@ -220,6 +228,8 @@ export default function AssignmentPage() {
 
     // シャッフル実行 (リーダー機能)
     const handleShuffle = async () => {
+        if (!userId) return;
+
         setIsLocalShuffling(true);
 
         try {
@@ -230,7 +240,7 @@ export default function AssignmentPage() {
             setActiveDate(targetDate);
 
             // 1. Load recent shuffle history (latest 2)
-            const shuffleHistoryList = await fetchRecentShuffleHistory(2);
+            const shuffleHistoryList = await fetchRecentShuffleHistory(userId, 2);
             const history: Assignment[][] = shuffleHistoryList.map(h => h.assignments);
 
             // 2. Run calculation
@@ -240,7 +250,7 @@ export default function AssignmentPage() {
             const eventId = uuidv4();
             const durationMs = 3000;
 
-            await createShuffleEvent({
+            await createShuffleEvent(userId, {
                 date: targetDate,
                 eventId,
                 startedAt: serverTimestamp() as Timestamp,
@@ -253,18 +263,18 @@ export default function AssignmentPage() {
             await new Promise(resolve => setTimeout(resolve, durationMs));
 
             // 5. Persist result
-            await updateAssignmentDay(targetDate, result);
+            await updateAssignmentDay(userId, targetDate, result);
 
             // 6. Persist shuffle history
             const historyId = uuidv4();
-            await createShuffleHistory({
+            await createShuffleHistory(userId, {
                 id: historyId,
                 assignments: result,
                 targetDate: targetDate,
             });
 
             // 7. Mark event done
-            await updateShuffleEventState(targetDate, 'done');
+            await updateShuffleEventState(userId, targetDate, 'done');
 
         } catch (e) {
             console.error(e);
@@ -274,11 +284,11 @@ export default function AssignmentPage() {
         }
     };
 
-    // ????: ???????????????????????
+    // 割り当ての更新
     const handleUpdateMember = async (targetAsg: Assignment, memberId: string | null) => {
-        if (!activeDate) return;
+        if (!userId || !activeDate) return;
 
-        await mutateAssignmentDay(activeDate, (current) => {
+        await mutateAssignmentDay(userId, activeDate, (current) => {
             const map = new Map<string, Assignment>();
             current.forEach(a => {
                 map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: activeDate });
@@ -297,16 +307,20 @@ export default function AssignmentPage() {
 
     // メンバー名変更
     const handleUpdateMemberName = async (memberId: string, name: string) => {
+        if (!userId) return;
+
         const member = members.find(m => m.id === memberId);
         if (member) {
             const updated = { ...member, name };
-            await updateMember(updated);
+            await updateMember(userId, updated);
             setMembers(prev => prev.map(m => m.id === memberId ? updated : m));
         }
     };
 
     // 除外設定変更
     const handleUpdateMemberExclusion = async (memberId: string, taskLabelId: string, isExcluded: boolean) => {
+        if (!userId) return;
+
         const member = members.find(m => m.id === memberId);
         if (member) {
             let newExclusions = [...member.excludedTaskLabelIds];
@@ -315,20 +329,20 @@ export default function AssignmentPage() {
             } else {
                 newExclusions = newExclusions.filter(id => id !== taskLabelId);
             }
-            await updateMemberExclusions(memberId, newExclusions);
+            await updateMemberExclusions(userId, memberId, newExclusions);
             // ローカル更新
             setMembers(prev => prev.map(m => m.id === memberId ? { ...m, excludedTaskLabelIds: newExclusions } : m));
         }
     };
 
-    // ???????????????????????
+    // 割り当ての入れ替え
     const handleSwapAssignments = async (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => {
-        if (!activeDate) return;
+        if (!userId || !activeDate) return;
 
         let mem1: string | null = null;
         let mem2: string | null = null;
 
-        const { changed } = await mutateAssignmentDay(activeDate, (current) => {
+        const { changed } = await mutateAssignmentDay(userId, activeDate, (current) => {
             const map = new Map<string, Assignment>();
             current.forEach(a => {
                 map.set(`${a.teamId}__${a.taskLabelId}`, { ...a, assignedDate: activeDate });
@@ -363,7 +377,7 @@ export default function AssignmentPage() {
         if (mem1) {
             const currentTeam = members.find(m => m.id === mem1)?.teamId;
             if (currentTeam !== asg2.teamId) {
-                updates.push(updateMemberTeam(mem1, asg2.teamId));
+                updates.push(updateMemberTeam(userId, mem1, asg2.teamId));
                 memberUpdates.push({ id: mem1, teamId: asg2.teamId });
             }
         }
@@ -371,7 +385,7 @@ export default function AssignmentPage() {
         if (mem2) {
             const currentTeam = members.find(m => m.id === mem2)?.teamId;
             if (currentTeam !== asg1.teamId) {
-                updates.push(updateMemberTeam(mem2, asg1.teamId));
+                updates.push(updateMemberTeam(userId, mem2, asg1.teamId));
                 memberUpdates.push({ id: mem2, teamId: asg1.teamId });
             }
         }
@@ -387,7 +401,7 @@ export default function AssignmentPage() {
         }
     };
 
-    const isLoading = !isMasterLoaded || !isAssignmentLoaded;
+    const isLoading = authLoading || !userId || !isMasterLoaded || !isAssignmentLoaded;
 
     if (isLoading) {
         return <Loading />;
@@ -439,41 +453,52 @@ export default function AssignmentPage() {
                     assignments={displayAssignments}
                     members={members}
                     tableSettings={tableSettings}
-                    onUpdateTableSettings={updateTableSettings}
+                    onUpdateTableSettings={async (settings) => {
+                        if (!userId) return;
+                        await updateTableSettings(userId, settings);
+                    }}
                     onUpdateMember={handleUpdateMember}
                     onUpdateMemberName={handleUpdateMemberName}
                     onUpdateMemberExclusion={handleUpdateMemberExclusion}
                     onSwapAssignments={handleSwapAssignments}
                     onAddMember={async (member) => {
-                        await addMember(member);
+                        if (!userId) return;
+                        await addMember(userId, member);
                         setMembers(prev => [...prev, member]);
                     }}
                     onDeleteMember={async (memberId) => {
-                        await deleteMember(memberId, activeDate || todayDate);
+                        if (!userId) return;
+                        await deleteMember(userId, memberId, activeDate || todayDate);
                         setMembers(prev => prev.filter(m => m.id !== memberId));
                     }}
                     onUpdateTaskLabel={async (label) => {
-                        await updateTaskLabel(label);
+                        if (!userId) return;
+                        await updateTaskLabel(userId, label);
                         setTaskLabels(prev => prev.map(l => l.id === label.id ? label : l));
                     }}
                     onAddTaskLabel={async (label) => {
-                        await addTaskLabel(label);
+                        if (!userId) return;
+                        await addTaskLabel(userId, label);
                         setTaskLabels(prev => [...prev, label]);
                     }}
                     onDeleteTaskLabel={async (labelId) => {
-                        await deleteTaskLabel(labelId);
+                        if (!userId) return;
+                        await deleteTaskLabel(userId, labelId);
                         setTaskLabels(prev => prev.filter(l => l.id !== labelId));
                     }}
                     onAddTeam={async (team) => {
-                        await addTeam(team);
+                        if (!userId) return;
+                        await addTeam(userId, team);
                         setTeams(prev => [...prev, team]);
                     }}
                     onDeleteTeam={async (teamId) => {
-                        await deleteTeam(teamId);
+                        if (!userId) return;
+                        await deleteTeam(userId, teamId);
                         setTeams(prev => prev.filter(t => t.id !== teamId));
                     }}
                     onUpdateTeam={async (team) => {
-                        await updateTeam(team);
+                        if (!userId) return;
+                        await updateTeam(userId, team);
                         setTeams(prev => prev.map(t => t.id === team.id ? team : t));
                     }}
                 />
@@ -516,8 +541,16 @@ export default function AssignmentPage() {
                 isOpen={isManagerDialogOpen}
                 manager={manager}
                 onClose={() => setIsManagerDialogOpen(false)}
-                onSave={setManager}
-                onDelete={deleteManager}
+                onSave={async (name: string) => {
+                    if (!userId) return;
+                    await setManager(userId, name);
+                    setManagerState({ id: 'default', name, updatedAt: null });
+                }}
+                onDelete={async () => {
+                    if (!userId) return;
+                    await deleteManager(userId);
+                    setManagerState(null);
+                }}
             />
         </div>
     );

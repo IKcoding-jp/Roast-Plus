@@ -14,6 +14,7 @@ import {
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
 import { useMembers, getActiveMembers } from '@/hooks/useMembers';
+import { useAuth } from '@/lib/auth';
 
 interface TastingSessionListProps {
   data: AppData;
@@ -33,9 +34,11 @@ const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎�
 
 export function TastingSessionList({ data, onUpdate, filterButtonContainerId, filterButtonContainerIdMobile }: TastingSessionListProps) {
   const router = useRouter();
+  const { user } = useAuth();
+  const userId = user?.uid ?? null;
   
-  // 担当表の /members コレクションからメンバーと管理者を取得
-  const { members: allMembers, manager } = useMembers();
+  // 担当表の /users/{userId}/members コレクションからメンバーと管理者を取得
+  const { members: allMembers, manager } = useMembers(userId);
 
   const tastingSessions = Array.isArray(data.tastingSessions)
     ? data.tastingSessions

@@ -14,6 +14,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
         createdAt: '2023-10-27T10:00:00Z',
         updatedAt: '2023-10-27T10:00:00Z',
         isDefault: true,
+        isManualMode: true,
         steps: [
             {
                 id: 'step-1',

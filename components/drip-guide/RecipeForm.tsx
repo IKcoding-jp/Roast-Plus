@@ -23,6 +23,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
     const [purpose, setPurpose] = useState(initialRecipe?.purpose || '');
     const [description, setDescription] = useState(initialRecipe?.description || '');
     const [steps, setSteps] = useState<DripStep[]>(initialRecipe?.steps || []);
+    const [isManualMode, setIsManualMode] = useState(initialRecipe?.isManualMode ?? false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -51,6 +52,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
             purpose,
             description,
             steps: sortedSteps,
+            isManualMode,
             createdAt: initialRecipe?.createdAt || new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
@@ -83,6 +85,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
         setPurpose(defaultRecipe.purpose || '');
         setDescription(defaultRecipe.description || '');
         setSteps(defaultRecipe.steps.map(step => ({ ...step }))); // ディープコピー
+        setIsManualMode(defaultRecipe.isManualMode ?? false);
     };
 
     return (
@@ -207,6 +210,43 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 rows={3}
                                 placeholder="レシピの特徴や注意点など"
                             />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Guide Mode Settings Section */}
+                <div>
+                    <h2 className="text-lg font-bold text-gray-700 mb-4 border-b pb-2">ガイドモード設定</h2>
+                    <div className="space-y-4">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="guideMode"
+                                        checked={!isManualMode}
+                                        onChange={() => setIsManualMode(false)}
+                                        className="w-5 h-5 text-amber-600 focus:ring-2 focus:ring-amber-500"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="font-semibold text-gray-800">自動モード</div>
+                                        <div className="text-sm text-gray-600">タイマーに基づいて自動的にステップが進行します。時間が確定しているレシピに適しています。</div>
+                                    </div>
+                                </label>
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="guideMode"
+                                        checked={isManualMode}
+                                        onChange={() => setIsManualMode(true)}
+                                        className="w-5 h-5 text-amber-600 focus:ring-2 focus:ring-amber-500"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="font-semibold text-gray-800">手動モード</div>
+                                        <div className="text-sm text-gray-600">手動でステップを進めます。タイマーは参考として表示されます。時間が不確定なレシピ（BYSN Standard Dripなど）に適しています。</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>

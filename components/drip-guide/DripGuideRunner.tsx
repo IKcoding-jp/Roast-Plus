@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DripRecipe, DripStep } from '@/lib/drip-guide/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ArrowCounterClockwise, X, ArrowLeft, Lightbulb } from 'phosphor-react';
+import { Play, Pause, ArrowCounterClockwise, X, ArrowLeft, Lightbulb, ArrowRight, CheckCircle } from 'phosphor-react';
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
@@ -20,22 +20,28 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lottieRef = useRef<LottieRefCurrentProps>(null);
+    
+    // Manual mode state
+    const isManualMode = recipe.isManualMode ?? false;
+    const [manualStepIndex, setManualStepIndex] = useState(0);
 
     // Sort steps just in case
     const steps = [...recipe.steps].sort((a, b) => a.startTimeSec - b.startTimeSec);
 
-    // Determine current step
-    const currentStepIndex = steps.findLastIndex((step) => step.startTimeSec <= currentTime);
-    const currentStep = currentStepIndex !== -1 ? steps[currentStepIndex] : null;
-    const nextStep = steps[currentStepIndex + 1] || null;
+    // Determine current step based on mode
+    const autoModeStepIndex = steps.findLastIndex((step) => step.startTimeSec <= currentTime);
+    const currentStepIndex = isManualMode ? manualStepIndex : autoModeStepIndex;
+    const currentStep = currentStepIndex !== -1 && currentStepIndex < steps.length ? steps[currentStepIndex] : null;
+    const nextStep = currentStepIndex < steps.length - 1 ? steps[currentStepIndex + 1] : null;
+    const prevStep = currentStepIndex > 0 ? steps[currentStepIndex - 1] : null;
 
-    // Check for completion
+    // Check for completion (auto mode only)
     useEffect(() => {
-        if (currentTime >= recipe.totalDurationSec && !isCompleted) {
+        if (!isManualMode && currentTime >= recipe.totalDurationSec && !isCompleted) {
             setIsRunning(false);
             setIsCompleted(true);
         }
-    }, [currentTime, recipe.totalDurationSec, isCompleted]);
+    }, [currentTime, recipe.totalDurationSec, isCompleted, isManualMode]);
 
     // Load Lottie animation when completed
     useEffect(() => {
@@ -84,7 +90,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                 });
             }
         }
-    }, [currentStep?.id]);
+    }, [currentStep?.id, isManualMode ? manualStepIndex : currentTime]);
 
     // Set animation speed
     useEffect(() => {
@@ -99,6 +105,28 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
         setIsRunning(false);
         setCurrentTime(0);
         setIsCompleted(false);
+        if (isManualMode) {
+            setManualStepIndex(0);
+        }
+    };
+
+    // Manual mode navigation
+    const goToNextStep = () => {
+        if (isManualMode && manualStepIndex < steps.length - 1) {
+            setManualStepIndex(manualStepIndex + 1);
+        }
+    };
+
+    const goToPrevStep = () => {
+        if (isManualMode && manualStepIndex > 0) {
+            setManualStepIndex(manualStepIndex - 1);
+        }
+    };
+
+    const handleComplete = () => {
+        if (isManualMode) {
+            setIsCompleted(true);
+        }
     };
 
     const formatTime = (seconds: number) => {
@@ -173,9 +201,13 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                 const stepEndTime = index < steps.length - 1 
                                     ? steps[index + 1].startTimeSec 
                                     : recipe.totalDurationSec;
-                                const isCompleted = currentTime > stepEndTime;
+                                const isStepCompleted = isManualMode 
+                                    ? index < currentStepIndex
+                                    : currentTime > stepEndTime;
                                 const isCurrent = currentStep?.id === step.id;
-                                const isUpcoming = step.startTimeSec > currentTime;
+                                const isUpcoming = isManualMode
+                                    ? index > currentStepIndex
+                                    : step.startTimeSec > currentTime;
 
                                 return (
                                     <motion.div
@@ -187,7 +219,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                             "flex-shrink-0 rounded-lg px-3 py-2 sm:px-3 sm:py-2 min-w-[120px] sm:min-w-[120px] border-2 transition-all",
                                             isCurrent
                                                 ? "bg-amber-50 border-amber-400 shadow-md"
-                                                : isCompleted
+                                                : isStepCompleted
                                                 ? "bg-gray-50 border-gray-200"
                                                 : "bg-gray-100 border-gray-200 opacity-60"
                                         )}
@@ -196,7 +228,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                             "text-xs sm:text-xs font-semibold mb-1 sm:mb-1",
                                             isCurrent
                                                 ? "text-amber-700"
-                                                : isCompleted
+                                                : isStepCompleted
                                                 ? "text-gray-600"
                                                 : "text-gray-400"
                                         )}>
@@ -206,13 +238,13 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                             "text-sm sm:text-sm font-bold truncate",
                                             isCurrent
                                                 ? "text-amber-800"
-                                                : isCompleted
+                                                : isStepCompleted
                                                 ? "text-gray-700"
                                                 : "text-gray-500"
                                         )}>
                                             {step.title}
                                         </div>
-                                        {isCurrent && (
+                                        {isCurrent && !isManualMode && (
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ 
@@ -302,55 +334,140 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
             {/* Footer Controls - Fixed */}
             <div className="flex-none bg-white border-t border-gray-100 pb-8 pt-4 px-6 safe-area-bottom">
                 {/* Next Step Preview */}
-                <div className="h-8 mb-4 flex justify-center items-center">
-                    {nextStep && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-gray-400 text-xs font-medium bg-gray-50 px-3 py-1 rounded-full"
+                {!isManualMode && (
+                    <div className="h-8 mb-4 flex justify-center items-center">
+                        {nextStep && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-gray-400 text-xs font-medium bg-gray-50 px-3 py-1 rounded-full"
+                            >
+                                Next: {formatTime(nextStep.startTimeSec)} - {nextStep.title}
+                            </motion.div>
+                        )}
+                    </div>
+                )}
+
+                {isManualMode ? (
+                    // Manual mode controls
+                    <div className="flex items-center justify-center gap-4 sm:gap-6">
+                        <button
+                            onClick={resetTimer}
+                            className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
                         >
-                            Next: {formatTime(nextStep.startTimeSec)} - {nextStep.title}
-                        </motion.div>
-                    )}
-                </div>
+                            <div className="p-3 rounded-full bg-gray-50">
+                                <ArrowCounterClockwise size={24} />
+                            </div>
+                            <span className="text-xs font-medium">リセット</span>
+                        </button>
 
-                <div className="flex items-center justify-center gap-10">
-                    <button
-                        onClick={resetTimer}
-                        className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors p-2 active:scale-95"
-                    >
-                        <div className="p-3 rounded-full bg-gray-50">
-                            <ArrowCounterClockwise size={24} />
-                        </div>
-                        <span className="text-xs font-medium">リセット</span>
-                    </button>
+                        <button
+                            onClick={goToPrevStep}
+                            disabled={manualStepIndex === 0}
+                            className={clsx(
+                                "flex flex-col items-center gap-1 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]",
+                                manualStepIndex === 0
+                                    ? "text-gray-300 cursor-not-allowed"
+                                    : "text-gray-400 hover:text-gray-600"
+                            )}
+                        >
+                            <div className={clsx(
+                                "p-3 rounded-full",
+                                manualStepIndex === 0 ? "bg-gray-50" : "bg-gray-50"
+                            )}>
+                                <ArrowLeft size={24} />
+                            </div>
+                            <span className="text-xs font-medium">前へ</span>
+                        </button>
 
-                    <button
-                        onClick={toggleTimer}
-                        className={clsx(
-                            "w-20 h-20 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation",
-                            isRunning
-                                ? "bg-white border-2 border-amber-100 text-amber-500"
-                                : "bg-amber-500 text-white shadow-amber-200"
-                        )}
-                    >
-                        {isRunning ? (
-                            <Pause size={36} weight="fill" />
+                        <button
+                            onClick={toggleTimer}
+                            className={clsx(
+                                "w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation",
+                                isRunning
+                                    ? "bg-white border-2 border-amber-100 text-amber-500"
+                                    : "bg-amber-500 text-white shadow-amber-200"
+                            )}
+                        >
+                            {isRunning ? (
+                                <Pause size={28} weight="fill" className="sm:w-9 sm:h-9" />
+                            ) : (
+                                <Play size={28} weight="fill" className="ml-1 sm:w-9 sm:h-9" />
+                            )}
+                        </button>
+
+                        {currentStepIndex === steps.length - 1 ? (
+                            <button
+                                onClick={handleComplete}
+                                className="flex flex-col items-center gap-1 text-green-600 hover:text-green-700 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
+                            >
+                                <div className="p-3 rounded-full bg-green-50">
+                                    <CheckCircle size={24} weight="fill" />
+                                </div>
+                                <span className="text-xs font-medium">完了</span>
+                            </button>
                         ) : (
-                            <Play size={36} weight="fill" className="ml-1" />
+                            <button
+                                onClick={goToNextStep}
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
+                            >
+                                <div className="p-3 rounded-full bg-gray-50">
+                                    <ArrowRight size={24} />
+                                </div>
+                                <span className="text-xs font-medium">次へ</span>
+                            </button>
                         )}
-                    </button>
 
-                    <Link
-                        href="/drip-guide"
-                        className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors p-2 active:scale-95"
-                    >
-                        <div className="p-3 rounded-full bg-gray-50">
-                            <X size={24} />
-                        </div>
-                        <span className="text-xs font-medium">終了</span>
-                    </Link>
-                </div>
+                        <Link
+                            href="/drip-guide"
+                            className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
+                        >
+                            <div className="p-3 rounded-full bg-gray-50">
+                                <X size={24} />
+                            </div>
+                            <span className="text-xs font-medium">終了</span>
+                        </Link>
+                    </div>
+                ) : (
+                    // Auto mode controls (existing)
+                    <div className="flex items-center justify-center gap-10">
+                        <button
+                            onClick={resetTimer}
+                            className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors p-2 active:scale-95"
+                        >
+                            <div className="p-3 rounded-full bg-gray-50">
+                                <ArrowCounterClockwise size={24} />
+                            </div>
+                            <span className="text-xs font-medium">リセット</span>
+                        </button>
+
+                        <button
+                            onClick={toggleTimer}
+                            className={clsx(
+                                "w-20 h-20 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation",
+                                isRunning
+                                    ? "bg-white border-2 border-amber-100 text-amber-500"
+                                    : "bg-amber-500 text-white shadow-amber-200"
+                            )}
+                        >
+                            {isRunning ? (
+                                <Pause size={36} weight="fill" />
+                            ) : (
+                                <Play size={36} weight="fill" className="ml-1" />
+                            )}
+                        </button>
+
+                        <Link
+                            href="/drip-guide"
+                            className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors p-2 active:scale-95"
+                        >
+                            <div className="p-3 rounded-full bg-gray-50">
+                                <X size={24} />
+                            </div>
+                            <span className="text-xs font-medium">終了</span>
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     );

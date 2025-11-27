@@ -20,4 +20,5 @@ export interface DripRecipe {
     createdAt?: string;
     updatedAt?: string;
     isDefault?: boolean; // デフォルトレシピは削除不可
+    isManualMode?: boolean; // 手動モード（時間が不確定なレシピ用）
 }

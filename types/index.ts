@@ -267,15 +267,19 @@ export interface RoastTimerSettings {
 
 export interface HandpickTimerSettings {
 
-  soundEnabled: boolean; // サウンドの有効/無効
+  soundEnabled: boolean; // サウンドの有効/無効（グローバル設定）
 
   soundFile?: string; // サウンドファイルパス（後方互換性のため残す、デフォルト: sounds/alarm/alarm01.mp3）
 
   soundVolume?: number; // サウンド音量（後方互換性のため残す、0.0～1.0、デフォルト0.5）
 
+  startSoundEnabled: boolean; // 開始音の有効/無効
+
   startSoundFile: string; // 開始音ファイルパス（デフォルト: sounds/alarm/alarm01.mp3）
 
   startSoundVolume: number; // 開始音量（0.0～1.0、デフォルト0.5）
+
+  completeSoundEnabled: boolean; // 完了音の有効/無効
 
   completeSoundFile: string; // 完了音ファイルパス（デフォルト: sounds/alarm/alarm01.mp3）
 

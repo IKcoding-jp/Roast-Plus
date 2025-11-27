@@ -165,121 +165,155 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
                 {/* 開始音設定 */}
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-base font-semibold text-gray-800">開始音</h4>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={settings.startSoundEnabled}
+                          onChange={(e) =>
+                            setSettings({
+                              ...settings,
+                              startSoundEnabled: e.target.checked,
+                            })
+                          }
+                          className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
+                        />
+                        <h4 className="text-base font-semibold text-gray-800">開始音</h4>
+                      </label>
+                    </div>
                     <button
                       type="button"
                       onClick={handleTestStartSound}
-                      disabled={isTestingStartSound}
+                      disabled={isTestingStartSound || !settings.startSoundEnabled}
                       className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors text-sm sm:text-base min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
                       {isTestingStartSound ? '再生中...' : 'テスト'}
                     </button>
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                        音量: {Math.round(settings.startSoundVolume * 100)}%
-                      </label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={settings.startSoundVolume}
-                        onChange={(e) =>
-                          setSettings({
-                            ...settings,
-                            startSoundVolume: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                      />
+                  {settings.startSoundEnabled && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                          音量: {Math.round(settings.startSoundVolume * 100)}%
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={settings.startSoundVolume}
+                          onChange={(e) =>
+                            setSettings({
+                              ...settings,
+                              startSoundVolume: parseFloat(e.target.value),
+                            })
+                          }
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                          サウンドファイル
+                        </label>
+                        <select
+                          value={settings.startSoundFile}
+                          onChange={(e) =>
+                            setSettings({
+                              ...settings,
+                              startSoundFile: e.target.value,
+                            })
+                          }
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+                        >
+                          {AVAILABLE_SOUND_FILES.map((file) => (
+                            <option key={file.value} value={file.value}>
+                              {file.label}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs sm:text-sm text-gray-500">
+                          /sounds/alarm/フォルダ内のファイルから選択できます
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                        サウンドファイル
-                      </label>
-                      <select
-                        value={settings.startSoundFile}
-                        onChange={(e) =>
-                          setSettings({
-                            ...settings,
-                            startSoundFile: e.target.value,
-                          })
-                        }
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
-                      >
-                        {AVAILABLE_SOUND_FILES.map((file) => (
-                          <option key={file.value} value={file.value}>
-                            {file.label}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="mt-1 text-xs sm:text-sm text-gray-500">
-                        /sounds/alarm/フォルダ内のファイルから選択できます
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* 完了音設定 */}
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-base font-semibold text-gray-800">完了音</h4>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={settings.completeSoundEnabled}
+                          onChange={(e) =>
+                            setSettings({
+                              ...settings,
+                              completeSoundEnabled: e.target.checked,
+                            })
+                          }
+                          className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
+                        />
+                        <h4 className="text-base font-semibold text-gray-800">完了音</h4>
+                      </label>
+                    </div>
                     <button
                       type="button"
                       onClick={handleTestCompleteSound}
-                      disabled={isTestingCompleteSound}
+                      disabled={isTestingCompleteSound || !settings.completeSoundEnabled}
                       className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors text-sm sm:text-base min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
                       {isTestingCompleteSound ? '再生中...' : 'テスト'}
                     </button>
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                        音量: {Math.round(settings.completeSoundVolume * 100)}%
-                      </label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={settings.completeSoundVolume}
-                        onChange={(e) =>
-                          setSettings({
-                            ...settings,
-                            completeSoundVolume: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                      />
+                  {settings.completeSoundEnabled && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                          音量: {Math.round(settings.completeSoundVolume * 100)}%
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={settings.completeSoundVolume}
+                          onChange={(e) =>
+                            setSettings({
+                              ...settings,
+                              completeSoundVolume: parseFloat(e.target.value),
+                            })
+                          }
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                          サウンドファイル
+                        </label>
+                        <select
+                          value={settings.completeSoundFile}
+                          onChange={(e) =>
+                            setSettings({
+                              ...settings,
+                              completeSoundFile: e.target.value,
+                            })
+                          }
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+                        >
+                          {AVAILABLE_SOUND_FILES.map((file) => (
+                            <option key={file.value} value={file.value}>
+                              {file.label}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs sm:text-sm text-gray-500">
+                          /sounds/alarm/フォルダ内のファイルから選択できます
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                        サウンドファイル
-                      </label>
-                      <select
-                        value={settings.completeSoundFile}
-                        onChange={(e) =>
-                          setSettings({
-                            ...settings,
-                            completeSoundFile: e.target.value,
-                          })
-                        }
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
-                      >
-                        {AVAILABLE_SOUND_FILES.map((file) => (
-                          <option key={file.value} value={file.value}>
-                            {file.label}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="mt-1 text-xs sm:text-sm text-gray-500">
-                        /sounds/alarm/フォルダ内のファイルから選択できます
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}

@@ -10,8 +10,10 @@ import type { HandpickTimerSettings } from '@/types';
 // デフォルト設定
 const DEFAULT_SETTINGS: HandpickTimerSettings = {
   soundEnabled: true,
+  startSoundEnabled: true,
   startSoundFile: '/sounds/alarm/alarm01.mp3',
   startSoundVolume: 0.5,
+  completeSoundEnabled: true,
   completeSoundFile: '/sounds/alarm/alarm01.mp3',
   completeSoundVolume: 0.5,
 };
@@ -61,6 +63,13 @@ export async function loadHandpickTimerSettings(): Promise<HandpickTimerSettings
         }
         if (stored.soundVolume !== undefined && stored.completeSoundVolume === undefined) {
           mergedSettings.completeSoundVolume = stored.soundVolume;
+        }
+        // 個別の有効/無効設定がない場合は、グローバル設定から引き継ぐ
+        if (stored.startSoundEnabled === undefined) {
+          mergedSettings.startSoundEnabled = stored.soundEnabled ?? true;
+        }
+        if (stored.completeSoundEnabled === undefined) {
+          mergedSettings.completeSoundEnabled = stored.soundEnabled ?? true;
         }
         
         settingsCache = mergedSettings;

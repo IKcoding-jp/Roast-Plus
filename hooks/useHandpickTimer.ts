@@ -99,7 +99,7 @@ export function useHandpickTimer() {
 
     // 完了音の準備（アンロック）を行う
     const prepareCompleteSound = useCallback(async () => {
-        if (!settings || !settings.soundEnabled) return;
+        if (!settings || !settings.soundEnabled || !settings.completeSoundEnabled) return;
 
         try {
             // 既存のAudioがあれば破棄
@@ -121,13 +121,16 @@ export function useHandpickTimer() {
                 });
             });
 
-            // 音量を0にして一瞬再生することで、iOS等の自動再生制限を解除（アンロック）する
+            // 音量を0にし、さらにミュートも設定して確実に無音にする
+            // 一瞬再生することで、iOS等の自動再生制限を解除（アンロック）する
             audio.volume = 0;
+            audio.muted = true;  // 確実に無音にする
             await audio.play();
             audio.pause();
             audio.currentTime = 0;
 
-            // 本番再生用に音量を設定
+            // 本番再生用に音量を設定し、ミュートを解除
+            audio.muted = false;
             audio.volume = Math.max(0, Math.min(1, settings.completeSoundVolume));
 
             // Refに保存
@@ -140,12 +143,13 @@ export function useHandpickTimer() {
 
     // 完了音を再生（Refから）
     const playCompleteSoundFromRef = useCallback(async () => {
+        // 完了音が無効の場合はスキップ
+        if (!settings || !settings.soundEnabled || !settings.completeSoundEnabled) return;
+
         if (!completeAudioRef.current) {
             console.warn('[HandpickTimer] Complete sound not prepared, trying fallback');
             // フォールバック: 通常の再生を試みる（ユーザー操作起因でないと鳴らない可能性あり）
-            if (settings && settings.soundEnabled) {
-                await playNotificationSound(settings.completeSoundFile, settings.completeSoundVolume);
-            }
+            await playNotificationSound(settings.completeSoundFile, settings.completeSoundVolume);
             return;
         }
 
@@ -161,7 +165,7 @@ export function useHandpickTimer() {
 
     // 開始音を再生
     const playStartSound = useCallback(async () => {
-        if (!settings || !settings.soundEnabled) return;
+        if (!settings || !settings.soundEnabled || !settings.startSoundEnabled) return;
 
         try {
             await playNotificationSound(settings.startSoundFile, settings.startSoundVolume);

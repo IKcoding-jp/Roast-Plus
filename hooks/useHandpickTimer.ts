@@ -31,13 +31,14 @@ export function useHandpickTimer() {
     const [remainingSeconds, setRemainingSeconds] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [cycleCount, setCycleCount] = useState(0);
-    const [firstMinutes, setFirstMinutes] = useState(5);
-    const [secondMinutes, setSecondMinutes] = useState(5);
+    const [firstMinutes, setFirstMinutesState] = useState(5);
+    const [secondMinutes, setSecondMinutesState] = useState(5);
     const [settings, setSettings] = useState<HandpickTimerSettings | null>(null);
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     // 完了音用のAudioオブジェクトを保持するRef
     const completeAudioRef = useRef<HTMLAudioElement | null>(null);
+    const hasHydratedRef = useRef(false);
 
     // 初期化時にLocalStorageから復元
     useEffect(() => {
@@ -46,12 +47,13 @@ export function useHandpickTimer() {
             setPhase(stored.phase);
             setRemainingSeconds(stored.remainingSeconds);
             setCycleCount(stored.cycleCount);
-            setFirstMinutes(stored.firstMinutes || 5);
-            setSecondMinutes(stored.secondMinutes || 5);
+            setFirstMinutesState(stored.firstMinutes || 5);
+            setSecondMinutesState(stored.secondMinutes || 5);
 
             // 復元時は停止状態
             setIsRunning(false);
         }
+        hasHydratedRef.current = true;
     }, []);
 
     // 設定を読み込む
@@ -81,6 +83,8 @@ export function useHandpickTimer() {
 
     // 状態変更時にLocalStorageに保存
     useEffect(() => {
+        if (!hasHydratedRef.current) return;
+
         saveHandpickTimerState({
             phase,
             remainingSeconds,
@@ -89,6 +93,35 @@ export function useHandpickTimer() {
             secondMinutes,
         });
     }, [phase, remainingSeconds, cycleCount, firstMinutes, secondMinutes]);
+
+    // 分設定変更時の共通バリデーション
+    const clampMinutes = useCallback((minutes: number) => {
+        if (!Number.isFinite(minutes)) return 5;
+        return Math.max(1, Math.min(60, Math.floor(minutes)));
+    }, []);
+
+    // 分設定変更時に即座に永続化するラッパ�E
+    const setFirstMinutes = useCallback((minutes: number) => {
+        const sanitized = clampMinutes(minutes);
+        setFirstMinutesState(sanitized);
+
+        try {
+            saveHandpickTimerState({ firstMinutes: sanitized });
+        } catch (error) {
+            console.error('[HandpickTimer] Failed to persist first minutes:', error);
+        }
+    }, [clampMinutes]);
+
+    const setSecondMinutes = useCallback((minutes: number) => {
+        const sanitized = clampMinutes(minutes);
+        setSecondMinutesState(sanitized);
+
+        try {
+            saveHandpickTimerState({ secondMinutes: sanitized });
+        } catch (error) {
+            console.error('[HandpickTimer] Failed to persist second minutes:', error);
+        }
+    }, [clampMinutes]);
 
     // 音声ファイルのパスを解決するヘルパー
     const resolveAudioPath = (path: string) => {

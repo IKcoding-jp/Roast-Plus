@@ -15,7 +15,7 @@ export const CounterControls = ({ onUpdate, onUndo, onReset, canUndo, canReset }
             <div className="grid grid-cols-2 gap-[1.5dvh]">
                 {/* Decrement Group */}
                 <div className="flex flex-col gap-[1.5dvh]">
-                    {[-10, -5, -1].map((val) => (
+                    {[-1, -5, -10].map((val) => (
                         <button
                             key={val}
                             onClick={() => onUpdate(val)}
@@ -28,7 +28,7 @@ export const CounterControls = ({ onUpdate, onUndo, onReset, canUndo, canReset }
 
                 {/* Increment Group */}
                 <div className="flex flex-col gap-[1.5dvh]">
-                    {[10, 5, 1].map((val) => (
+                    {[1, 5, 10].map((val) => (
                         <button
                             key={val}
                             onClick={() => onUpdate(val)}

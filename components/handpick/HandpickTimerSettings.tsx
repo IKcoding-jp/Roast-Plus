@@ -14,14 +14,10 @@ import {
 import { playNotificationSound, stopNotificationSound } from '@/lib/sounds';
 import type { HandpickTimerSettings } from '@/types';
 
-// 利用可能なサウンドファイル一覧
-const AVAILABLE_SOUND_FILES = [
-  { value: '/sounds/alarm/alarm01.mp3', label: 'alarm01.mp3' },
-  { value: '/sounds/alarm/alarm02.mp3', label: 'alarm02.mp3' },
-  { value: '/sounds/alarm/alarm03.mp3', label: 'alarm03.mp3' },
-  { value: '/sounds/alarm/alarm04.mp3', label: 'alarm04.mp3' },
-  { value: '/sounds/alarm/alarm05.mp3', label: 'alarm05.mp3' },
-];
+interface SoundFile {
+  value: string;
+  label: string;
+}
 
 interface HandpickTimerSettingsProps {
   onClose: () => void;
@@ -33,6 +29,32 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isTestingStartSound, setIsTestingStartSound] = useState(false);
   const [isTestingCompleteSound, setIsTestingCompleteSound] = useState(false);
+  const [availableSoundFiles, setAvailableSoundFiles] = useState<SoundFile[]>([]);
+  const [isLoadingSoundFiles, setIsLoadingSoundFiles] = useState(true);
+
+  // 音声ファイル一覧を読み込む
+  useEffect(() => {
+    const loadSoundFiles = async () => {
+      try {
+        const response = await fetch('/sounds/alarm/list.json');
+        if (!response.ok) {
+          throw new Error('Failed to load sound files list');
+        }
+        const files: SoundFile[] = await response.json();
+        setAvailableSoundFiles(files);
+      } catch (error) {
+        console.error('Failed to load sound files list:', error);
+        // フォールバック: デフォルトファイルを設定
+        setAvailableSoundFiles([
+          { value: '/sounds/alarm/アラーム1.mp3', label: 'アラーム1.mp3' },
+        ]);
+      } finally {
+        setIsLoadingSoundFiles(false);
+      }
+    };
+
+    loadSoundFiles();
+  }, []);
 
   useEffect(() => {
     loadHandpickTimerSettings()
@@ -125,7 +147,7 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
     }
   };
 
-  if (isLoading || !settings) {
+  if (isLoading || !settings || isLoadingSoundFiles) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <Loading fullScreen={false} />
@@ -213,7 +235,7 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
                       </div>
                       <div>
                         <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                          サウンドファイル
+                          サウンド
                         </label>
                         <select
                           value={settings.startSoundFile}
@@ -225,15 +247,12 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
                           }
                           className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
                         >
-                          {AVAILABLE_SOUND_FILES.map((file) => (
+                          {availableSoundFiles.map((file) => (
                             <option key={file.value} value={file.value}>
                               {file.label}
                             </option>
                           ))}
                         </select>
-                        <p className="mt-1 text-xs sm:text-sm text-gray-500">
-                          /sounds/alarm/フォルダ内のファイルから選択できます
-                        </p>
                       </div>
                     </div>
                   )}
@@ -290,7 +309,7 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
                       </div>
                       <div>
                         <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                          サウンドファイル
+                          サウンド
                         </label>
                         <select
                           value={settings.completeSoundFile}
@@ -302,15 +321,12 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
                           }
                           className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
                         >
-                          {AVAILABLE_SOUND_FILES.map((file) => (
+                          {availableSoundFiles.map((file) => (
                             <option key={file.value} value={file.value}>
                               {file.label}
                             </option>
                           ))}
                         </select>
-                        <p className="mt-1 text-xs sm:text-sm text-gray-500">
-                          /sounds/alarm/フォルダ内のファイルから選択できます
-                        </p>
                       </div>
                     </div>
                   )}

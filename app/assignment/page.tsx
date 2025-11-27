@@ -544,7 +544,7 @@ export default function AssignmentPage() {
                 onSave={async (name: string) => {
                     if (!userId) return;
                     await setManager(userId, name);
-                    setManagerState({ id: 'default', name, updatedAt: null });
+                    setManagerState({ id: 'default', name });
                 }}
                 onDelete={async () => {
                     if (!userId) return;

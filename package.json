@@ -1,12 +1,13 @@
 {
   "name": "roastplus",
-  "version": "0.3.12",
+  "version": "0.3.13",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "npm run generate:sound-list && next dev",
+    "build": "npm run generate:sound-list && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:sound-list": "tsx scripts/generate-sound-list.ts"
   },
   "dependencies": {
     "@types/uuid": "^10.0.0",
@@ -30,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",
+    "tsx": "^4.7.0",
     "typescript": "^5"
   }
 }

@@ -120,23 +120,33 @@ export function useHandpickTimer() {
         const sanitized = clampMinutes(minutes);
         setFirstMinutesState(sanitized);
 
+        // 1回目のフェーズで、タイマーが動作していない場合は残り時間を更新
+        if (phase === 'first' && !isRunning) {
+            setRemainingSeconds(sanitized * 60);
+        }
+
         try {
             saveHandpickTimerState({ firstMinutes: sanitized });
         } catch (error) {
             console.error('[HandpickTimer] Failed to persist first minutes:', error);
         }
-    }, [clampMinutes]);
+    }, [clampMinutes, phase, isRunning]);
 
     const setSecondMinutes = useCallback((minutes: number) => {
         const sanitized = clampMinutes(minutes);
         setSecondMinutesState(sanitized);
+
+        // 2回目のフェーズで、タイマーが動作していない場合は残り時間を更新
+        if (phase === 'second' && !isRunning) {
+            setRemainingSeconds(sanitized * 60);
+        }
 
         try {
             saveHandpickTimerState({ secondMinutes: sanitized });
         } catch (error) {
             console.error('[HandpickTimer] Failed to persist second minutes:', error);
         }
-    }, [clampMinutes]);
+    }, [clampMinutes, phase, isRunning]);
 
     // 音声ファイルのパスを解決するヘルパー
     const resolveAudioPath = (path: string) => {

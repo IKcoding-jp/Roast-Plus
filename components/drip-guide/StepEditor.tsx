@@ -8,9 +8,10 @@ import { clsx } from 'clsx';
 interface StepEditorProps {
     steps: DripStep[];
     onChange: (steps: DripStep[]) => void;
+    isManualMode?: boolean;
 }
 
-export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
+export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManualMode = false }) => {
     const addStep = () => {
         const lastStep = steps[steps.length - 1];
         const newStartTime = lastStep ? lastStep.startTimeSec + 30 : 0;
@@ -51,19 +52,21 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
                     <div key={step.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200 relative group">
                         <div className="grid grid-cols-12 gap-3">
                             {/* Time Input */}
-                            <div className="col-span-3 sm:col-span-2">
-                                <label className="block text-xs font-medium text-gray-500 mb-1">開始(秒)</label>
-                                <input
-                                    type="number"
-                                    value={step.startTimeSec}
-                                    onChange={(e) => updateStep(index, 'startTimeSec', parseInt(e.target.value) || 0)}
-                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
-                                    min={0}
-                                />
-                            </div>
+                            {!isManualMode && (
+                                <div className="col-span-3 sm:col-span-2">
+                                    <label className="block text-xs font-medium text-gray-500 mb-1">開始(秒)</label>
+                                    <input
+                                        type="number"
+                                        value={step.startTimeSec}
+                                        onChange={(e) => updateStep(index, 'startTimeSec', parseInt(e.target.value) || 0)}
+                                        className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                        min={0}
+                                    />
+                                </div>
+                            )}
 
                             {/* Title Input */}
-                            <div className="col-span-9 sm:col-span-4">
+                            <div className={isManualMode ? "col-span-6 sm:col-span-5" : "col-span-9 sm:col-span-4"}>
                                 <label className="block text-xs font-medium text-gray-500 mb-1">タイトル</label>
                                 <input
                                     type="text"
@@ -87,7 +90,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange }) => {
                             </div>
 
                             {/* Delete Button (Desktop: right aligned, Mobile: absolute top-right) */}
-                            <div className="col-span-6 sm:col-span-3 flex items-end justify-end">
+                            <div className={isManualMode ? "col-span-6 sm:col-span-4 flex items-end justify-end" : "col-span-6 sm:col-span-3 flex items-end justify-end"}>
                                 <button
                                     onClick={() => removeStep(index)}
                                     className="text-gray-400 hover:text-red-500 p-3 sm:p-2 rounded-full hover:bg-red-50 transition-colors touch-manipulation"

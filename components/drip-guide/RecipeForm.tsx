@@ -253,7 +253,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
 
                 {/* Steps Section */}
                 <div>
-                    <StepEditor steps={steps} onChange={setSteps} />
+                    <StepEditor steps={steps} onChange={setSteps} isManualMode={isManualMode} />
                 </div>
             </div>
 

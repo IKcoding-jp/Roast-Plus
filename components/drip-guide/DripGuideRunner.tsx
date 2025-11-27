@@ -225,16 +225,6 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                         )}
                                     >
                                         <div className={clsx(
-                                            "text-xs sm:text-xs font-semibold mb-1 sm:mb-1",
-                                            isCurrent
-                                                ? "text-amber-700"
-                                                : isStepCompleted
-                                                ? "text-gray-600"
-                                                : "text-gray-400"
-                                        )}>
-                                            {formatTime(step.startTimeSec)} - {formatTime(stepEndTime)}
-                                        </div>
-                                        <div className={clsx(
                                             "text-sm sm:text-sm font-bold truncate",
                                             isCurrent
                                                 ? "text-amber-800"
@@ -244,6 +234,30 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                         )}>
                                             {step.title}
                                         </div>
+                                        {!isManualMode && (
+                                            <div className={clsx(
+                                                "text-xs sm:text-xs font-semibold mt-0.5 sm:mt-0.5",
+                                                isCurrent
+                                                    ? "text-amber-700"
+                                                    : isStepCompleted
+                                                    ? "text-gray-600"
+                                                    : "text-gray-400"
+                                            )}>
+                                                {formatTime(step.startTimeSec)} - {formatTime(stepEndTime)}
+                                            </div>
+                                        )}
+                                        {step.targetTotalWater && (
+                                            <div className={clsx(
+                                                "text-xs sm:text-xs mt-0.5 sm:mt-0.5",
+                                                isCurrent
+                                                    ? "text-amber-600"
+                                                    : isStepCompleted
+                                                    ? "text-gray-500"
+                                                    : "text-gray-400"
+                                            )}>
+                                                {step.targetTotalWater}gまで注ぐ
+                                            </div>
+                                        )}
                                         {isCurrent && !isManualMode && (
                                             <motion.div
                                                 initial={{ width: 0 }}

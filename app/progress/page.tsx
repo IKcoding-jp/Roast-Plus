@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { Loading } from '@/components/Loading';
-import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress, archiveWorkProgress, unarchiveWorkProgress, updateProgressHistoryEntry, deleteProgressHistoryEntry } from '@/lib/firestore';
+import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress, archiveWorkProgress, unarchiveWorkProgress, updateProgressHistoryEntry, deleteProgressHistoryEntry, extractTargetAmount, extractUnitFromWeight } from '@/lib/firestore';
 import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection, HiArchive } from 'react-icons/hi';
 import { MdTimeline, MdSort } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
@@ -879,10 +879,19 @@ function WorkProgressFormDialog({
   isEditing: boolean;
   defaultGroupName?: string | null;
 }) {
+  // 既存データから数字と単位を分離
+  const initialWeight = initialData?.weight || '';
+  const initialAmount = initialWeight ? extractTargetAmount(initialWeight) : undefined;
+  const initialUnit = initialWeight ? extractUnitFromWeight(initialWeight) : '';
+  // 単位が6つ（kg, g, 個, 枚, 袋, 箱）に該当しない場合は空欄にする
+  const validUnits = ['kg', 'g', '個', '枚', '袋', '箱'];
+  const initialUnitValid = validUnits.includes(initialUnit) ? initialUnit : '';
+
   const [formData, setFormData] = useState({
     groupName: defaultGroupName || initialData?.groupName || '',
     taskName: initialData?.taskName || '',
-    weight: initialData?.weight || '',
+    targetAmount: initialAmount !== undefined ? initialAmount.toString() : '',
+    targetUnit: initialUnitValid,
     memo: initialData?.memo || '',
     status: initialData?.status || 'pending',
   });
@@ -894,7 +903,18 @@ function WorkProgressFormDialog({
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await onSubmit(formData);
+      // targetAmountとtargetUnitを結合してweightフィールドを作成
+      let weight = '';
+      if (formData.targetAmount.trim()) {
+        const amount = formData.targetAmount.trim();
+        const unit = formData.targetUnit.trim();
+        weight = unit ? `${amount}${unit}` : amount;
+      }
+      
+      await onSubmit({
+        ...formData,
+        weight,
+      });
       onClose();
     } catch (error) {
       console.error(error);
@@ -941,14 +961,31 @@ function WorkProgressFormDialog({
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">目標量 / 数量 (任意)</label>
-              <input
-                type="text"
-                value={formData.weight}
-                onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
-                placeholder="例: 10kg, 5個, 3枚"
-              />
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">目標量 (任意)</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  value={formData.targetAmount}
+                  onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
+                  placeholder="数値"
+                  step="0.1"
+                  min="0"
+                />
+                <select
+                  value={formData.targetUnit}
+                  onChange={(e) => setFormData({ ...formData, targetUnit: e.target.value })}
+                  className="px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
+                >
+                  <option value="">単位なし</option>
+                  <option value="kg">kg</option>
+                  <option value="g">g</option>
+                  <option value="個">個</option>
+                  <option value="枚">枚</option>
+                  <option value="袋">袋</option>
+                  <option value="箱">箱</option>
+                </select>
+              </div>
               <p className="text-xs text-gray-500 mt-1.5">
                 ※ 数値と単位を入力すると進捗バーが表示されます（例: 10kg）。<br />
                 ※ 空欄の場合は完成数のみをカウントするモードになります。

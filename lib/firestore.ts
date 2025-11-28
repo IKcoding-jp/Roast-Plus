@@ -712,7 +712,7 @@ export async function updateDefectBeanSetting(
  * @param weight 数量文字列（例：「10kg」「5個」「3枚」「10.5kg」）
  * @returns 目標量（数値）。抽出できない場合はundefined
  */
-function extractTargetAmount(weight?: string): number | undefined {
+export function extractTargetAmount(weight?: string): number | undefined {
   if (!weight) return undefined;
   
   // 正規表現で数値を抽出（小数点を含む、単位はkg、g、個、枚などに対応）
@@ -730,7 +730,7 @@ function extractTargetAmount(weight?: string): number | undefined {
  * @param weight 数量文字列（例：「10kg」「5個」「3枚」）
  * @returns 単位（例：「kg」「個」「枚」）。単位がない場合は空文字列
  */
-function extractUnit(weight?: string): string {
+export function extractUnitFromWeight(weight?: string): string {
   if (!weight) return '';
   
   // 正規表現で単位を抽出

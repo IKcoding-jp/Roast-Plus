@@ -125,14 +125,13 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                         const over = Math.abs(remaining);
                                         return over > 0 ? (
                                             <span className="text-green-600 font-medium">目標達成 (+{formatAmount(over, unit)}{unit})</span>
-                                        ) : (
-                                            <span className="text-green-600 font-medium">完了</span>
-                                        );
+                                        ) : null;
                                     }
                                     return <span>残り <span className="font-medium text-gray-700">{formatAmount(remaining, unit)}{unit}</span></span>;
                                 })()}
                             </div>
-                            <div className="text-xl font-bold text-gray-900 leading-none">
+                            <div className="text-xl font-bold text-gray-900 leading-none flex items-baseline gap-1">
+                                <span className="text-xs font-normal text-gray-500">完成数</span>
                                 {formatAmount(wp.currentAmount || 0, unit)}
                                 <span className="text-sm font-normal text-gray-500 ml-1">/ {formatAmount(wp.targetAmount, unit)}{unit}</span>
                             </div>

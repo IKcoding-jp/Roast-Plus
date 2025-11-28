@@ -1240,3 +1240,234 @@ export async function unarchiveWorkProgress(
   
   await saveUserData(userId, updatedData);
 }
+
+/**
+ * 進捗履歴エントリを更新
+ * @param userId ユーザーID
+ * @param workProgressId 作業進捗ID
+ * @param historyEntryId 更新する履歴エントリID
+ * @param updates 更新するフィールド（amount, memo）
+ * @param appData 現在のAppData
+ */
+export async function updateProgressHistoryEntry(
+  userId: string,
+  workProgressId: string,
+  historyEntryId: string,
+  updates: { amount?: number; memo?: string },
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
+  
+  if (existingIndex < 0) {
+    throw new Error(`WorkProgress with id ${workProgressId} not found`);
+  }
+  
+  const existing = workProgresses[existingIndex];
+  const progressHistory = existing.progressHistory || [];
+  const historyEntryIndex = progressHistory.findIndex((entry) => entry.id === historyEntryId);
+  
+  if (historyEntryIndex < 0) {
+    throw new Error(`Progress history entry with id ${historyEntryId} not found`);
+  }
+  
+  const now = new Date().toISOString();
+  
+  // 履歴エントリを更新
+  const updatedHistory = [...progressHistory];
+  updatedHistory[historyEntryIndex] = {
+    ...updatedHistory[historyEntryIndex],
+    ...(updates.amount !== undefined && { amount: updates.amount }),
+    ...(updates.memo !== undefined && { memo: updates.memo?.trim() || undefined }),
+  };
+  
+  // progressHistory全体からcurrentAmountまたはcompletedCountを再計算
+  let currentAmount: number | undefined;
+  let completedCount: number | undefined;
+  
+  if (existing.targetAmount !== undefined) {
+    // 進捗量モード：progressHistoryのamountの合計を計算
+    currentAmount = updatedHistory.reduce((sum, entry) => sum + entry.amount, 0);
+    // 負の値にならないように保護
+    currentAmount = Math.max(0, currentAmount);
+  } else {
+    // 完成数モード：progressHistoryのamountの合計を計算（完成数として扱う）
+    completedCount = updatedHistory.reduce((sum, entry) => sum + entry.amount, 0);
+    // 負の値にならないように保護
+    completedCount = Math.max(0, completedCount);
+  }
+  
+  // 進捗状態の自動変更
+  let status = existing.status;
+  let completedAt = existing.completedAt;
+  let startedAt = existing.startedAt;
+  
+  if (existing.targetAmount !== undefined) {
+    // 進捗量モード
+    if (currentAmount === 0 && status !== 'pending') {
+      status = 'pending';
+      startedAt = undefined;
+      completedAt = undefined;
+    } else if (currentAmount > 0 && status === 'pending') {
+      status = 'in_progress';
+      if (!startedAt) {
+        startedAt = now;
+      }
+    }
+    
+    if (currentAmount >= existing.targetAmount && status !== 'completed') {
+      status = 'completed';
+      completedAt = now;
+      if (!startedAt) {
+        startedAt = now;
+      }
+    } else if (currentAmount < existing.targetAmount && status === 'completed') {
+      status = 'in_progress';
+      completedAt = undefined;
+    }
+  } else {
+    // 完成数モード
+    if (completedCount === 0 && status !== 'pending') {
+      status = 'pending';
+      startedAt = undefined;
+    } else if (completedCount > 0 && status === 'pending') {
+      status = 'in_progress';
+      if (!startedAt) {
+        startedAt = now;
+      }
+    }
+  }
+  
+  const updatedWorkProgress: WorkProgress = {
+    ...existing,
+    currentAmount,
+    completedCount,
+    progressHistory: updatedHistory,
+    status,
+    startedAt,
+    completedAt,
+    updatedAt: now,
+  };
+  
+  const updatedWorkProgresses = [...workProgresses];
+  updatedWorkProgresses[existingIndex] = updatedWorkProgress;
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}
+
+/**
+ * 進捗履歴エントリを削除
+ * @param userId ユーザーID
+ * @param workProgressId 作業進捗ID
+ * @param historyEntryId 削除する履歴エントリID
+ * @param appData 現在のAppData
+ */
+export async function deleteProgressHistoryEntry(
+  userId: string,
+  workProgressId: string,
+  historyEntryId: string,
+  appData: AppData
+): Promise<void> {
+  const workProgresses = appData.workProgresses || [];
+  const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
+  
+  if (existingIndex < 0) {
+    throw new Error(`WorkProgress with id ${workProgressId} not found`);
+  }
+  
+  const existing = workProgresses[existingIndex];
+  const progressHistory = existing.progressHistory || [];
+  const historyEntryIndex = progressHistory.findIndex((entry) => entry.id === historyEntryId);
+  
+  if (historyEntryIndex < 0) {
+    throw new Error(`Progress history entry with id ${historyEntryId} not found`);
+  }
+  
+  const now = new Date().toISOString();
+  
+  // 履歴エントリを削除
+  const updatedHistory = progressHistory.filter((entry) => entry.id !== historyEntryId);
+  
+  // progressHistory全体からcurrentAmountまたはcompletedCountを再計算
+  let currentAmount: number | undefined;
+  let completedCount: number | undefined;
+  
+  if (existing.targetAmount !== undefined) {
+    // 進捗量モード：progressHistoryのamountの合計を計算
+    currentAmount = updatedHistory.reduce((sum, entry) => sum + entry.amount, 0);
+    // 負の値にならないように保護
+    currentAmount = Math.max(0, currentAmount);
+  } else {
+    // 完成数モード：progressHistoryのamountの合計を計算（完成数として扱う）
+    completedCount = updatedHistory.reduce((sum, entry) => sum + entry.amount, 0);
+    // 負の値にならないように保護
+    completedCount = Math.max(0, completedCount);
+  }
+  
+  // 進捗状態の自動変更
+  let status = existing.status;
+  let completedAt = existing.completedAt;
+  let startedAt = existing.startedAt;
+  
+  if (existing.targetAmount !== undefined) {
+    // 進捗量モード
+    if (currentAmount === 0 && status !== 'pending') {
+      status = 'pending';
+      startedAt = undefined;
+      completedAt = undefined;
+    } else if (currentAmount > 0 && status === 'pending') {
+      status = 'in_progress';
+      if (!startedAt) {
+        startedAt = now;
+      }
+    }
+    
+    if (currentAmount >= existing.targetAmount && status !== 'completed') {
+      status = 'completed';
+      completedAt = now;
+      if (!startedAt) {
+        startedAt = now;
+      }
+    } else if (currentAmount < existing.targetAmount && status === 'completed') {
+      status = 'in_progress';
+      completedAt = undefined;
+    }
+  } else {
+    // 完成数モード
+    if (completedCount === 0 && status !== 'pending') {
+      status = 'pending';
+      startedAt = undefined;
+    } else if (completedCount > 0 && status === 'pending') {
+      status = 'in_progress';
+      if (!startedAt) {
+        startedAt = now;
+      }
+    }
+  }
+  
+  const updatedWorkProgress: WorkProgress = {
+    ...existing,
+    currentAmount,
+    completedCount,
+    progressHistory: updatedHistory.length > 0 ? updatedHistory : undefined,
+    status,
+    startedAt,
+    completedAt,
+    updatedAt: now,
+  };
+  
+  const updatedWorkProgresses = [...workProgresses];
+  updatedWorkProgresses[existingIndex] = updatedWorkProgress;
+  
+  const updatedData: AppData = {
+    ...appData,
+    workProgresses: updatedWorkProgresses,
+  };
+  
+  await saveUserData(userId, updatedData);
+}

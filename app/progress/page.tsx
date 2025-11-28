@@ -1,8 +1,8 @@
 ﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { HiFilter, HiPlus, HiOutlineCollection, HiArchive } from 'react-icons/hi';
-import { MdTimeline } from 'react-icons/md';
+import { useRouter } from 'next/navigation';
+import { HiFilter, HiPlus, HiOutlineCollection, HiArchive, HiArrowLeft } from 'react-icons/hi';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { Loading } from '@/components/Loading';
@@ -32,6 +32,7 @@ type Grouped = {
 };
 
 export default function ProgressPage() {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
   const [showAddForm, setShowAddForm] = useState(false);
@@ -193,10 +194,14 @@ export default function ProgressPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <MdTimeline className="h-7 w-7 text-amber-600" />
-            <h1 className="text-2xl font-bold text-gray-900">作業進捗</h1>
-          </div>
+          <button
+            onClick={() => router.push('/')}
+            className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+            title="ホームに戻る"
+            aria-label="ホームに戻る"
+          >
+            <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
+          </button>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode(viewMode === 'normal' ? 'archived' : 'normal')}

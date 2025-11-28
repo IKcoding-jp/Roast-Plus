@@ -11,11 +11,11 @@ import type { RoastTimerSettings } from '@/types';
 const DEFAULT_SETTINGS: RoastTimerSettings = {
   goToRoastRoomTimeSeconds: 60,
   timerSoundEnabled: false,
-  timerSoundFile: '/sounds/alarm/alarm01.mp3',
-  timerSoundVolume: 0.5,
+  timerSoundFile: '/sounds/alarm/alarm02.mp3',
+  timerSoundVolume: 1,
   notificationSoundEnabled: true,
-  notificationSoundFile: '/sounds/alarm/alarm01.mp3',
-  notificationSoundVolume: 0.5,
+  notificationSoundFile: '/sounds/alarm/alarm03.mp3',
+  notificationSoundVolume: 1,
 };
 
 // メモリ上のキャッシュ

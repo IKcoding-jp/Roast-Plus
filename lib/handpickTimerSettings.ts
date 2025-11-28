@@ -1,13 +1,6 @@
-/**
- * ハンドピックタイマー設定管理
- * LocalStorageから設定を読み込み、メモリ上にキャッシュ
- * 端末ごとに独立した設定を保存
- */
-
 import { getHandpickTimerSettings, setHandpickTimerSettings } from './localStorage';
 import type { HandpickTimerSettings } from '@/types';
 
-// デフォルト設定
 const DEFAULT_SETTINGS: HandpickTimerSettings = {
   soundEnabled: true,
   startSoundEnabled: true,
@@ -18,93 +11,96 @@ const DEFAULT_SETTINGS: HandpickTimerSettings = {
   completeSoundVolume: 0.5,
 };
 
-// メモリ上のキャッシュ
+type StoredHandpickTimerSettings = Partial<HandpickTimerSettings> & {
+  soundFile?: string;
+  soundVolume?: number;
+};
+
 let settingsCache: HandpickTimerSettings | null = null;
-let isLoading = false;
 let loadPromise: Promise<HandpickTimerSettings> | null = null;
 
+const clampVolume = (value: unknown, fallback: number) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return fallback;
+  return Math.min(1, Math.max(0, value));
+};
+
+const toBoolean = (value: unknown, fallback: boolean) =>
+  typeof value === 'boolean' ? value : fallback;
+
+const normalizeSettings = (raw: unknown): HandpickTimerSettings => {
+  const stored: StoredHandpickTimerSettings =
+    raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as StoredHandpickTimerSettings) : {};
+
+  const merged: HandpickTimerSettings = {
+    ...DEFAULT_SETTINGS,
+    ...stored,
+  };
+
+  // Backward compatibility: migrate legacy soundFile / soundVolume
+  if (stored.soundFile && !stored.startSoundFile) {
+    merged.startSoundFile = stored.soundFile;
+  }
+  if (stored.soundFile && !stored.completeSoundFile) {
+    merged.completeSoundFile = stored.soundFile;
+  }
+
+  merged.startSoundVolume = clampVolume(
+    stored.startSoundVolume ?? stored.soundVolume ?? merged.startSoundVolume,
+    DEFAULT_SETTINGS.startSoundVolume,
+  );
+  merged.completeSoundVolume = clampVolume(
+    stored.completeSoundVolume ?? stored.soundVolume ?? merged.completeSoundVolume,
+    DEFAULT_SETTINGS.completeSoundVolume,
+  );
+
+  merged.soundEnabled = toBoolean(stored.soundEnabled, DEFAULT_SETTINGS.soundEnabled);
+  merged.startSoundEnabled = toBoolean(
+    stored.startSoundEnabled ?? merged.soundEnabled,
+    DEFAULT_SETTINGS.startSoundEnabled,
+  );
+  merged.completeSoundEnabled = toBoolean(
+    stored.completeSoundEnabled ?? merged.soundEnabled,
+    DEFAULT_SETTINGS.completeSoundEnabled,
+  );
+
+  return { ...merged };
+};
+
 /**
- * 設定を読み込む（キャッシュがあればそれを返す）
+ * LocalStorageから設定を読み込み、メモリキャッシュに保持する。
  */
 export async function loadHandpickTimerSettings(): Promise<HandpickTimerSettings> {
-  // キャッシュがあればそれを返す
   if (settingsCache) {
     return settingsCache;
   }
 
-  // 既に読み込み中の場合は、そのPromiseを返す
-  if (isLoading && loadPromise) {
-    return loadPromise;
-  }
-
-  // 読み込み開始
-  isLoading = true;
-  loadPromise = (async () => {
-    try {
-      const storedSettings = getHandpickTimerSettings();
-      
-      if (storedSettings && typeof storedSettings === 'object' && !Array.isArray(storedSettings)) {
-        const stored = storedSettings as Partial<HandpickTimerSettings>;
-        // 後方互換性: 古い設定（soundFile/soundVolume）がある場合は、開始音と完了音の両方に適用
-        const mergedSettings: HandpickTimerSettings = {
-          ...DEFAULT_SETTINGS,
-          ...stored,
-        };
-        
-        // 後方互換性の処理
-        if (stored.soundFile && !stored.startSoundFile) {
-          mergedSettings.startSoundFile = stored.soundFile;
-        }
-        if (stored.soundFile && !stored.completeSoundFile) {
-          mergedSettings.completeSoundFile = stored.soundFile;
-        }
-        if (stored.soundVolume !== undefined && stored.startSoundVolume === undefined) {
-          mergedSettings.startSoundVolume = stored.soundVolume;
-        }
-        if (stored.soundVolume !== undefined && stored.completeSoundVolume === undefined) {
-          mergedSettings.completeSoundVolume = stored.soundVolume;
-        }
-        // 個別の有効/無効設定がない場合は、グローバル設定から引き継ぐ
-        if (stored.startSoundEnabled === undefined) {
-          mergedSettings.startSoundEnabled = stored.soundEnabled ?? true;
-        }
-        if (stored.completeSoundEnabled === undefined) {
-          mergedSettings.completeSoundEnabled = stored.soundEnabled ?? true;
-        }
-        
-        settingsCache = mergedSettings;
-      } else {
-        // 設定が存在しない場合はデフォルト値を使用
+  if (!loadPromise) {
+    loadPromise = (async () => {
+      try {
+        const storedSettings = getHandpickTimerSettings();
+        settingsCache = normalizeSettings(storedSettings);
+        return settingsCache;
+      } catch (error) {
+        console.error('Failed to load handpick timer settings:', error);
         settingsCache = { ...DEFAULT_SETTINGS };
+        return settingsCache;
+      } finally {
+        loadPromise = null;
       }
-      
-      return settingsCache;
-    } catch (error) {
-      console.error('Failed to load handpick timer settings:', error);
-      // エラー時はデフォルト値を使用
-      settingsCache = { ...DEFAULT_SETTINGS };
-      return settingsCache;
-    } finally {
-      isLoading = false;
-      loadPromise = null;
-    }
-  })();
+    })();
+  }
 
   return loadPromise;
 }
 
 /**
- * 設定を保存する（LocalStorageに保存）
+ * 設定を保存し、キャッシュを最新化する。
  */
-export async function saveHandpickTimerSettings(
-  settings: HandpickTimerSettings
-): Promise<void> {
+export async function saveHandpickTimerSettings(settings: HandpickTimerSettings): Promise<void> {
   try {
-    // キャッシュを更新
-    settingsCache = { ...settings };
-
-    // LocalStorageに保存
-    setHandpickTimerSettings(settings);
+    const normalized = normalizeSettings(settings);
+    settingsCache = { ...normalized };
+    setHandpickTimerSettings(normalized);
   } catch (error) {
     console.error('Failed to save handpick timer settings:', error);
     throw error;
@@ -112,14 +108,15 @@ export async function saveHandpickTimerSettings(
 }
 
 /**
- * キャッシュをクリア（設定画面から戻った時に再読み込みするため）
+ * キャッシュをクリアする（次回呼び出し時に再読込させるため）。
  */
 export function clearHandpickTimerSettingsCache(): void {
   settingsCache = null;
+  loadPromise = null;
 }
 
 /**
- * 現在のキャッシュされた設定を取得（読み込み済みの場合のみ）
+ * 現在キャッシュされている設定を取得（未読込の場合は null）。
  */
 export function getCachedHandpickTimerSettings(): HandpickTimerSettings | null {
   return settingsCache;

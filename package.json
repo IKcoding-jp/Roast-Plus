@@ -1,6 +1,6 @@
 {
   "name": "roastplus",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "private": true,
   "scripts": {
     "dev": "npm run generate:sound-list && next dev",

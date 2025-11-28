@@ -254,43 +254,37 @@ export type DefectBeanSettings = {
   };
 };
 
+// 作業進捗状態
+
 export type WorkProgressStatus = 'pending' | 'in_progress' | 'completed';
+
+// 進捗記録エントリ
 
 export interface ProgressEntry {
   id: string;
-  date: string; // ISO 8601
-  amount: number;
-  memo?: string;
+  date: string; // 日付（ISO 8601形式）
+  amount: number; // 進捗量（数値、単位はweightフィールドから取得）
+  memo?: string; // メモ（任意）
 }
 
-export type WorkProgressMode = 'target' | 'count' | 'unset';
-
-export interface WorkProgressGoal {
-  mode: WorkProgressMode;
-  targetAmount?: number; // used when mode = target
-  unit?: string; // e.g. kg, 回
-}
-
-export interface WorkProgressProgress {
-  currentAmount?: number; // for mode = target
-  completedCount?: number; // for mode = count
-  history?: ProgressEntry[];
-}
+// 作業進捗
 
 export interface WorkProgress {
   id: string;
-  groupName?: string;
-  taskName?: string;
-  weight?: string;
-  status: WorkProgressStatus;
-  memo?: string;
-  startedAt?: string;
-  completedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  goal: WorkProgressGoal;
-  progress: WorkProgressProgress;
-  archivedAt?: string;
+  groupName?: string; // 作業グループ名（任意、グループ化に使用）
+  weight?: string; // 数量（文字列、例：「10kg」「5個」「3枚」）（任意）
+  taskName?: string; // 作業名（任意）
+  status: WorkProgressStatus; // 進捗状態
+  memo?: string; // メモ・備考（任意）
+  startedAt?: string; // 開始日時（ISO 8601形式、進捗状態が「途中」になったときに記録）
+  completedAt?: string; // 完了日時（ISO 8601形式、進捗状態が「済」になったときに記録）
+  createdAt: string; // 作成日時（ISO 8601形式）
+  updatedAt: string; // 更新日時（ISO 8601形式）
+  targetAmount?: number; // 目標量（数値、単位はweightフィールドから取得）
+  currentAmount?: number; // 現在の進捗量（累積、数値、単位はweightフィールドから取得）
+  progressHistory?: ProgressEntry[]; // 進捗記録の履歴
+  completedCount?: number; // 完成数（目標量がない場合も記録可能、累積）
+  archivedAt?: string; // アーカイブ日時（ISO 8601形式、アーカイブしたときに記録）
 }
 
 export interface CounterRecord {

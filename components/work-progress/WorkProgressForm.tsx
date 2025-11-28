@@ -103,21 +103,21 @@ export default function WorkProgressForm({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto my-4">
         <div className="border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
             {workProgress ? '作業を編集' : '作業を追加'}
           </h2>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
             aria-label="閉じる"
           >
             <HiX className="h-6 w-6 text-gray-600" />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-x-hidden">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">グループ名（任意）</label>
             <input
@@ -188,20 +188,20 @@ export default function WorkProgressForm({
           {progressType === 'target' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">数量（目標量）</label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 min-w-0">
                 <input
                   type="number"
                   value={weightAmount}
                   onChange={(e) => setWeightAmount(e.target.value)}
                   step="0.1"
                   min="0"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900 min-w-0"
                   placeholder="例: 200"
                 />
                 <select
                   value={weightUnit}
                   onChange={(e) => setWeightUnit(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900 flex-shrink-0"
                 >
                   {AVAILABLE_UNITS.map((u) => (
                     <option key={u} value={u}>
@@ -216,19 +216,19 @@ export default function WorkProgressForm({
           {progressType === 'count' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">完了数（初期値）</label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 min-w-0">
                 <input
                   type="number"
                   value={completedCount}
                   onChange={(e) => setCompletedCount(e.target.value)}
                   min="0"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900 min-w-0"
                   placeholder="例: 0"
                 />
                 <select
                   value={completedUnit}
                   onChange={(e) => setCompletedUnit(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px] text-gray-900 flex-shrink-0"
                 >
                   {AVAILABLE_UNITS.map((u) => (
                     <option key={u} value={u}>
@@ -264,17 +264,17 @@ export default function WorkProgressForm({
             />
           </div>
 
-          <div className="flex justify-between items-center gap-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-between items-center gap-3 pt-4 border-t border-gray-200 flex-wrap">
             {workProgress && onDelete && (
               <button
                 type="button"
                 onClick={onDelete}
-                className="px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition-colors min-h-[44px] min-w-[44px]"
+                className="px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 transition-colors min-h-[44px] min-w-[44px] flex-shrink-0"
               >
                 削除
               </button>
             )}
-            <div className="flex gap-3 ml-auto">
+            <div className="flex gap-3 ml-auto flex-shrink-0">
               <button
                 type="button"
                 onClick={onCancel}

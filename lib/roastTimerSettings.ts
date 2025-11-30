@@ -67,7 +67,7 @@ export async function loadRoastTimerSettings(userId?: string): Promise<RoastTime
         // 移行が発生した場合は設定を保存
         if (settingsCache.timerSoundFile !== (storedSettings as Partial<RoastTimerSettings>).timerSoundFile ||
             settingsCache.notificationSoundFile !== (storedSettings as Partial<RoastTimerSettings>).notificationSoundFile) {
-          setRoastTimerSettings(settingsCache).catch((error) => {
+          saveRoastTimerSettings(settingsCache).catch((error) => {
             console.error('Failed to save migrated settings:', error);
           });
         }

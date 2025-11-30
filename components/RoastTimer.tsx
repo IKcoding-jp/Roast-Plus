@@ -13,6 +13,7 @@ import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './Roa
 import { RoastTimerSettings } from './RoastTimerSettings';
 import { HiPlay, HiPause, HiRefresh, HiFastForward, HiCheckCircle, HiArrowLeft, HiClipboardList } from 'react-icons/hi';
 import { MdTimer, MdLightbulb, MdLocalFireDepartment } from 'react-icons/md';
+import { IoSettings } from 'react-icons/io5';
 import Link from 'next/link';
 
 const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
@@ -809,15 +810,26 @@ export function RoastTimer() {
           >
             <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
           </Link>
-          <Link
-            href="/roast-record"
-            className="absolute top-4 right-4 z-10 px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
-            title="ロースト記録一覧"
-            aria-label="ロースト記録一覧"
-          >
-            <HiClipboardList className="h-5 w-5 flex-shrink-0" />
-            <span className="text-sm font-semibold hidden sm:inline">記録一覧</span>
-          </Link>
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            <button
+              onClick={() => setShowSettings(true)}
+              className="px-4 py-2.5 bg-white text-gray-800 rounded-lg shadow-md hover:bg-gray-50 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px] border border-gray-200"
+              title="ローストタイマー設定"
+              aria-label="ローストタイマー設定"
+            >
+              <IoSettings className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-semibold hidden sm:inline">タイマー設定</span>
+            </button>
+            <Link
+              href="/roast-record"
+              className="px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
+              title="ロースト記録一覧"
+              aria-label="ロースト記録一覧"
+            >
+              <HiClipboardList className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-semibold hidden sm:inline">記録一覧</span>
+            </Link>
+          </div>
 
           <div className="flex flex-col items-center justify-center w-full">
             {/* タイトル */}
@@ -983,15 +995,26 @@ export function RoastTimer() {
             >
               <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
             </button>
-            <Link
-              href="/roast-record"
-              className="px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px] pointer-events-auto"
-              title="ロースト記録一覧"
-              aria-label="ロースト記録一覧"
-            >
-              <HiClipboardList className="h-5 w-5 flex-shrink-0" />
-              <span className="text-sm font-semibold hidden sm:inline">記録一覧</span>
-            </Link>
+            <div className="flex items-center gap-2 pointer-events-auto">
+              <button
+                onClick={() => setShowSettings(true)}
+                className="px-4 py-2.5 bg-white text-gray-800 rounded-lg shadow-md hover:bg-gray-50 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px] border border-gray-200"
+                title="ローストタイマー設定"
+                aria-label="ローストタイマー設定"
+              >
+                <IoSettings className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-semibold hidden sm:inline">タイマー設定</span>
+              </button>
+              <Link
+                href="/roast-record"
+                className="px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
+                title="ロースト記録一覧"
+                aria-label="ロースト記録一覧"
+              >
+                <HiClipboardList className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-semibold hidden sm:inline">記録一覧</span>
+              </Link>
+            </div>
           </div>
           {inputMode === null ? (
             // モード選択画面（手動入力も可能）

@@ -1302,7 +1302,7 @@ export async function updateProgressHistoryEntry(
   let completedAt = existing.completedAt;
   let startedAt = existing.startedAt;
   
-  if (existing.targetAmount !== undefined) {
+  if (existing.targetAmount !== undefined && currentAmount !== undefined) {
     // 進捗量モード
     if (currentAmount === 0 && status !== 'pending') {
       status = 'pending';
@@ -1327,13 +1327,15 @@ export async function updateProgressHistoryEntry(
     }
   } else {
     // 完成数モード
-    if (completedCount === 0 && status !== 'pending') {
-      status = 'pending';
-      startedAt = undefined;
-    } else if (completedCount > 0 && status === 'pending') {
-      status = 'in_progress';
-      if (!startedAt) {
-        startedAt = now;
+    if (completedCount !== undefined) {
+      if (completedCount === 0 && status !== 'pending') {
+        status = 'pending';
+        startedAt = undefined;
+      } else if (completedCount > 0 && status === 'pending') {
+        status = 'in_progress';
+        if (!startedAt) {
+          startedAt = now;
+        }
       }
     }
   }
@@ -1414,7 +1416,7 @@ export async function deleteProgressHistoryEntry(
   let completedAt = existing.completedAt;
   let startedAt = existing.startedAt;
   
-  if (existing.targetAmount !== undefined) {
+  if (existing.targetAmount !== undefined && currentAmount !== undefined) {
     // 進捗量モード
     if (currentAmount === 0 && status !== 'pending') {
       status = 'pending';
@@ -1439,13 +1441,15 @@ export async function deleteProgressHistoryEntry(
     }
   } else {
     // 完成数モード
-    if (completedCount === 0 && status !== 'pending') {
-      status = 'pending';
-      startedAt = undefined;
-    } else if (completedCount > 0 && status === 'pending') {
-      status = 'in_progress';
-      if (!startedAt) {
-        startedAt = now;
+    if (completedCount !== undefined) {
+      if (completedCount === 0 && status !== 'pending') {
+        status = 'pending';
+        startedAt = undefined;
+      } else if (completedCount > 0 && status === 'pending') {
+        status = 'in_progress';
+        if (!startedAt) {
+          startedAt = now;
+        }
       }
     }
   }

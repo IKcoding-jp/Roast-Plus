@@ -11,12 +11,12 @@ import {
   saveHandpickTimerSettings,
 } from '@/lib/handpickTimerSettings';
 import { playNotificationSound, stopNotificationSound } from '@/lib/sounds';
+import {
+  handpickStartSoundFiles,
+  handpickCompleteSoundFiles,
+  type SoundFile,
+} from '@/lib/soundFiles';
 import type { HandpickTimerSettings } from '@/types';
-
-interface SoundFile {
-  value: string;
-  label: string;
-}
 
 interface HandpickTimerSettingsProps {
   onClose: () => void;
@@ -28,37 +28,44 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isTestingStartSound, setIsTestingStartSound] = useState(false);
   const [isTestingCompleteSound, setIsTestingCompleteSound] = useState(false);
-  const [availableSoundFiles, setAvailableSoundFiles] = useState<SoundFile[]>([]);
-  const [isLoadingSoundFiles, setIsLoadingSoundFiles] = useState(true);
-
-  // 音声ファイル一覧を読み込む
-  useEffect(() => {
-    const loadSoundFiles = async () => {
-      try {
-        const response = await fetch('/sounds/alarm/list.json');
-        if (!response.ok) {
-          throw new Error('Failed to load sound files list');
-        }
-        const files: SoundFile[] = await response.json();
-        setAvailableSoundFiles(files);
-      } catch (error) {
-        console.error('Failed to load sound files list:', error);
-        // フォールバック: デフォルトファイルを設定
-        setAvailableSoundFiles([
-          { value: '/sounds/alarm/アラーム1.mp3', label: 'アラーム1.mp3' },
-        ]);
-      } finally {
-        setIsLoadingSoundFiles(false);
-      }
-    };
-
-    loadSoundFiles();
-  }, []);
+  
+  // 音声ファイル一覧はビルド時に生成された定数から直接取得
+  const availableStartSoundFiles = handpickStartSoundFiles;
+  const availableCompleteSoundFiles = handpickCompleteSoundFiles;
 
   useEffect(() => {
     loadHandpickTimerSettings()
       .then((loadedSettings) => {
-        setSettings(loadedSettings);
+        // 後方互換性: 古いパスが選択されている場合は新しいパスに移行
+        const migratedSettings = { ...loadedSettings };
+        if (loadedSettings.startSoundFile.startsWith('/sounds/alarm/')) {
+          // 開始音の古いパス（/sounds/alarm/）を新しいパスに移行
+          const fileName = loadedSettings.startSoundFile.replace('/sounds/alarm/', '');
+          migratedSettings.startSoundFile = `/sounds/handpicktimer/start/${fileName}`;
+        } else if (loadedSettings.startSoundFile.startsWith('/sounds/handpick/start/')) {
+          // 開始音の旧パス（/sounds/handpick/start/）を新しいパスに移行
+          const fileName = loadedSettings.startSoundFile.replace('/sounds/handpick/start/', '');
+          migratedSettings.startSoundFile = `/sounds/handpicktimer/start/${fileName}`;
+        }
+        if (loadedSettings.completeSoundFile.startsWith('/sounds/alarm/')) {
+          // 完了音の古いパス（/sounds/alarm/）を新しいパスに移行
+          const fileName = loadedSettings.completeSoundFile.replace('/sounds/alarm/', '');
+          migratedSettings.completeSoundFile = `/sounds/handpicktimer/complete/${fileName}`;
+        } else if (loadedSettings.completeSoundFile.startsWith('/sounds/handpick/complete/')) {
+          // 完了音の旧パス（/sounds/handpick/complete/）を新しいパスに移行
+          const fileName = loadedSettings.completeSoundFile.replace('/sounds/handpick/complete/', '');
+          migratedSettings.completeSoundFile = `/sounds/handpicktimer/complete/${fileName}`;
+        }
+        
+        // 移行が発生した場合は設定を保存
+        if (migratedSettings.startSoundFile !== loadedSettings.startSoundFile ||
+            migratedSettings.completeSoundFile !== loadedSettings.completeSoundFile) {
+          saveHandpickTimerSettings(migratedSettings).catch((error) => {
+            console.error('Failed to save migrated settings:', error);
+          });
+        }
+        
+        setSettings(migratedSettings);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -147,7 +154,7 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
     }
   };
 
-  if (isLoading || !settings || isLoadingSoundFiles) {
+  if (isLoading || !settings) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <Loading fullScreen={false} />
@@ -247,7 +254,7 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
                           }
                           className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
                         >
-                          {availableSoundFiles.map((file) => (
+                          {availableStartSoundFiles.map((file) => (
                             <option key={file.value} value={file.value}>
                               {file.label}
                             </option>
@@ -321,7 +328,7 @@ export function HandpickTimerSettings({ onClose }: HandpickTimerSettingsProps) {
                           }
                           className="w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
                         >
-                          {availableSoundFiles.map((file) => (
+                          {availableCompleteSoundFiles.map((file) => (
                             <option key={file.value} value={file.value}>
                               {file.label}
                             </option>

@@ -235,6 +235,7 @@ export function RoastTimer() {
 
     if (shouldOpenCompletionDialog) {
       setShowCompletionDialog(true);
+      // 通知音は completeTimer で再生されるため、ここでは再生しない
     }
 
     // 状態を更新
@@ -263,6 +264,7 @@ export function RoastTimer() {
     if (dialogState === 'completion' && state.status === 'completed') {
       if (!showCompletionDialog && !showContinuousRoastDialog && !showAfterPurgeDialog) {
         setShowCompletionDialog(true);
+        // 通知音は completeTimer で再生されるため、ここでは再生しない
       }
     }
     // 連続焙煎ダイアログの表示

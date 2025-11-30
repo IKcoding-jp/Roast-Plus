@@ -159,8 +159,8 @@ export function useHandpickTimer() {
     const prepareCompleteSound = useCallback(async () => {
         if (!settings || !settings.soundEnabled || !settings.completeSoundEnabled) return;
 
-        // フォールバック用のデフォルトファイルパス
-        const DEFAULT_SOUND_FILE = '/sounds/alarm/アラーム1.mp3';
+        // フォールバック用のデフォルトファイルパス（実際に存在する最初のファイル）
+        const DEFAULT_SOUND_FILE = settings.completeSoundFile || '/sounds/handpicktimer/complete/complete1.mp3';
 
         try {
             // 既存のAudioがあれば破棄

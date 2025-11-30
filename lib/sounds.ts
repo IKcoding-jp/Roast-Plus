@@ -131,10 +131,24 @@ export async function playNotificationSound(
           MEDIA_ERR_NETWORK: error.MEDIA_ERR_NETWORK,
           MEDIA_ERR_DECODE: error.MEDIA_ERR_DECODE,
           MEDIA_ERR_SRC_NOT_SUPPORTED: error.MEDIA_ERR_SRC_NOT_SUPPORTED,
+          readyState: audio.readyState,
+          networkState: audio.networkState,
         });
         console.error('Failed to load audio file:', audioPath);
+        console.error('Audio element:', {
+          src: audio.src,
+          currentSrc: audio.currentSrc,
+          readyState: audio.readyState,
+          networkState: audio.networkState,
+        });
       } else {
-        console.error('Audio error event fired but no error details available');
+        console.error('Audio error event fired but no error details available', {
+          audioPath,
+          src: audio.src,
+          currentSrc: audio.currentSrc,
+          readyState: audio.readyState,
+          networkState: audio.networkState,
+        });
       }
     };
     audio.addEventListener('error', notificationErrorHandler);

@@ -5,16 +5,17 @@
  */
 
 import { getRoastTimerSettings, setRoastTimerSettings } from './localStorage';
+import { roastTimerSoundFiles } from './soundFiles';
 import type { RoastTimerSettings } from '@/types';
 
-// デフォルト設定
+// デフォルト設定: 実際に存在する最初のファイルを使用
 const DEFAULT_SETTINGS: RoastTimerSettings = {
   goToRoastRoomTimeSeconds: 60,
   timerSoundEnabled: false,
-  timerSoundFile: '/sounds/alarm/alarm02.mp3',
+  timerSoundFile: roastTimerSoundFiles[0]?.value || '/sounds/roasttimer/alarm.mp3',
   timerSoundVolume: 1,
   notificationSoundEnabled: true,
-  notificationSoundFile: '/sounds/alarm/alarm03.mp3',
+  notificationSoundFile: roastTimerSoundFiles[0]?.value || '/sounds/roasttimer/alarm.mp3',
   notificationSoundVolume: 1,
 };
 
@@ -46,10 +47,30 @@ export async function loadRoastTimerSettings(userId?: string): Promise<RoastTime
       
       if (storedSettings && typeof storedSettings === 'object' && !Array.isArray(storedSettings)) {
         // 設定が存在する場合は、デフォルト値とマージ
-        settingsCache = {
+        const merged = {
           ...DEFAULT_SETTINGS,
           ...(storedSettings as Partial<RoastTimerSettings>),
         };
+        
+        // 後方互換性: 古いパス（/sounds/alarm/）が選択されている場合は新しいパスに移行
+        if (merged.timerSoundFile.startsWith('/sounds/alarm/')) {
+          const fileName = merged.timerSoundFile.replace('/sounds/alarm/', '');
+          merged.timerSoundFile = `/sounds/roasttimer/${fileName}`;
+        }
+        if (merged.notificationSoundFile.startsWith('/sounds/alarm/')) {
+          const fileName = merged.notificationSoundFile.replace('/sounds/alarm/', '');
+          merged.notificationSoundFile = `/sounds/roasttimer/${fileName}`;
+        }
+        
+        settingsCache = merged;
+        
+        // 移行が発生した場合は設定を保存
+        if (settingsCache.timerSoundFile !== (storedSettings as Partial<RoastTimerSettings>).timerSoundFile ||
+            settingsCache.notificationSoundFile !== (storedSettings as Partial<RoastTimerSettings>).notificationSoundFile) {
+          setRoastTimerSettings(settingsCache).catch((error) => {
+            console.error('Failed to save migrated settings:', error);
+          });
+        }
       } else {
         // 設定が存在しない場合はデフォルト値を使用
         settingsCache = { ...DEFAULT_SETTINGS };

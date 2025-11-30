@@ -18,7 +18,9 @@ export function CompletionDialog({ isOpen, onClose, onContinue }: CompletionDial
         }
       };
       window.addEventListener('keydown', handleEscape);
-      return () => window.removeEventListener('keydown', handleEscape);
+      return () => {
+        window.removeEventListener('keydown', handleEscape);
+      };
     }
   }, [isOpen, onClose]);
 

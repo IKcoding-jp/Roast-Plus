@@ -1,13 +1,18 @@
 import { getHandpickTimerSettings, setHandpickTimerSettings } from './localStorage';
+import {
+  handpickStartSoundFiles,
+  handpickCompleteSoundFiles,
+} from './soundFiles';
 import type { HandpickTimerSettings } from '@/types';
 
+// デフォルト設定: 実際に存在する最初のファイルを使用
 const DEFAULT_SETTINGS: HandpickTimerSettings = {
   soundEnabled: true,
   startSoundEnabled: true,
-  startSoundFile: '/sounds/alarm/アラーム1.mp3',
+  startSoundFile: handpickStartSoundFiles[0]?.value || '/sounds/handpicktimer/start/start1.mp3',
   startSoundVolume: 0.5,
   completeSoundEnabled: true,
-  completeSoundFile: '/sounds/alarm/アラーム1.mp3',
+  completeSoundFile: handpickCompleteSoundFiles[0]?.value || '/sounds/handpicktimer/complete/complete1.mp3',
   completeSoundVolume: 0.5,
 };
 

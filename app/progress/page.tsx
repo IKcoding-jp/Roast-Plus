@@ -67,7 +67,7 @@ export default function ProgressPage() {
     const workProgresses = data?.workProgresses || [];
 
     // フィルタリング（アーカイブ済み作業は除外）
-    let filtered = workProgresses.filter((wp) => {
+    const filtered = workProgresses.filter((wp) => {
       // アーカイブ済み作業は除外
       if (wp.archivedAt) {
         return false;

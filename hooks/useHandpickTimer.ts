@@ -17,20 +17,51 @@ import {
 import { playNotificationSound } from '@/lib/sounds';
 import type { HandpickTimerSettings } from '@/types';
 
+// 無音1秒のMP3データ（iOSのオーディオアンロック用）
+const SILENT_AUDIO_DATA_URL =
+    'data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA' +
+    'AQACABAAZGF0YcAAAAA=';
+
 export interface HandpickTimerState {
     phase: TimerPhase;
     remainingSeconds: number;
     isRunning: boolean;
     cycleCount: number;
-    firstMinutes: number;  // 1回目の時間（分）
+    firstMinutes: number; // 1回目の時間（分）
     secondMinutes: number; // 2回目の時間（分）
 }
 
 export function useHandpickTimer() {
-    const [phase, setPhase] = useState<TimerPhase>('idle');
-    const [remainingSeconds, setRemainingSeconds] = useState(0);
+    const getInitialState = () => {
+        if (typeof window === 'undefined') {
+            return {
+                phase: 'idle' as TimerPhase,
+                remainingSeconds: 0,
+                cycleCount: 0,
+            };
+        }
+        try {
+            const stored = loadHandpickTimerState();
+            return {
+                phase: stored?.phase ?? 'idle',
+                remainingSeconds: stored?.remainingSeconds ?? 0,
+                cycleCount: stored?.cycleCount ?? 0,
+            };
+        } catch {
+            return {
+                phase: 'idle' as TimerPhase,
+                remainingSeconds: 0,
+                cycleCount: 0,
+            };
+        }
+    };
+
+    const initial = getInitialState();
+
+    const [phase, setPhase] = useState<TimerPhase>(initial.phase);
+    const [remainingSeconds, setRemainingSeconds] = useState(initial.remainingSeconds);
     const [isRunning, setIsRunning] = useState(false);
-    const [cycleCount, setCycleCount] = useState(0);
+    const [cycleCount, setCycleCount] = useState(initial.cycleCount);
     // LocalStorageから初期値を読み込む（SSR対策含む）
     const [firstMinutes, setFirstMinutesState] = useState(() => {
         if (typeof window === 'undefined') return 5;
@@ -55,21 +86,8 @@ export function useHandpickTimer() {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     // 完了音用のAudioオブジェクトを保持するRef
     const completeAudioRef = useRef<HTMLAudioElement | null>(null);
-    const hasHydratedRef = useRef(false);
-
-    // 初期化時にLocalStorageからタイマーの進行状態を復元
-    // firstMinutes/secondMinutesはuseStateの初期値で既に反映されているため、ここでは触らない
-    useEffect(() => {
-        const stored = loadHandpickTimerState();
-        if (stored) {
-            setPhase(stored.phase);
-            setRemainingSeconds(stored.remainingSeconds);
-            setCycleCount(stored.cycleCount);
-            // 復元時は停止状態にする
-            setIsRunning(false);
-        }
-        hasHydratedRef.current = true;
-    }, []);
+    // 初期読み込みは完了扱いにして永続化を有効化
+    const hasHydratedRef = useRef(true);
 
     // 設定を読み込む
     useEffect(() => {
@@ -91,7 +109,7 @@ export function useHandpickTimer() {
             }
         };
 
-        // 定期的に設定をチェック（設定画面から戻った時に反映）
+        // 定期的に設定をチェックし、設定画面から戻った時に反映
         const interval = setInterval(checkSettings, 1000);
         return () => clearInterval(interval);
     }, []);
@@ -109,48 +127,56 @@ export function useHandpickTimer() {
         });
     }, [phase, remainingSeconds, cycleCount, firstMinutes, secondMinutes]);
 
-    // 分設定変更時の共通バリデーション
+    // 共通バリデーション
     const clampMinutes = useCallback((minutes: number) => {
         if (!Number.isFinite(minutes)) return 5;
         return Math.max(1, Math.min(60, Math.floor(minutes)));
     }, []);
 
-    // 分設定変更時に即座に永続化するラッパ�E
-    const setFirstMinutes = useCallback((minutes: number) => {
-        const sanitized = clampMinutes(minutes);
-        setFirstMinutesState(sanitized);
+    // 1回目の時間を設定して即座に永続化
+    const setFirstMinutes = useCallback(
+        (minutes: number) => {
+            const sanitized = clampMinutes(minutes);
+            setFirstMinutesState(sanitized);
 
-        // 1回目のフェーズで、タイマーが動作していない場合は残り時間を更新
-        if (phase === 'first' && !isRunning) {
-            setRemainingSeconds(sanitized * 60);
-        }
+            // 1回目のフェーズで、タイマーが停止中の場合は残り時間を更新
+            if (phase === 'first' && !isRunning) {
+                setRemainingSeconds(sanitized * 60);
+            }
 
-        try {
-            saveHandpickTimerState({ firstMinutes: sanitized });
-        } catch (error) {
-            console.error('[HandpickTimer] Failed to persist first minutes:', error);
-        }
-    }, [clampMinutes, phase, isRunning]);
+            try {
+                saveHandpickTimerState({ firstMinutes: sanitized });
+            } catch (error) {
+                console.error('[HandpickTimer] Failed to persist first minutes:', error);
+            }
+        },
+        [clampMinutes, phase, isRunning],
+    );
 
-    const setSecondMinutes = useCallback((minutes: number) => {
-        const sanitized = clampMinutes(minutes);
-        setSecondMinutesState(sanitized);
+    // 2回目の時間を設定して即座に永続化
+    const setSecondMinutes = useCallback(
+        (minutes: number) => {
+            const sanitized = clampMinutes(minutes);
+            setSecondMinutesState(sanitized);
 
-        // 2回目のフェーズで、タイマーが動作していない場合は残り時間を更新
-        if (phase === 'second' && !isRunning) {
-            setRemainingSeconds(sanitized * 60);
-        }
+            // 2回目のフェーズで、タイマーが停止中の場合は残り時間を更新
+            if (phase === 'second' && !isRunning) {
+                setRemainingSeconds(sanitized * 60);
+            }
 
-        try {
-            saveHandpickTimerState({ secondMinutes: sanitized });
-        } catch (error) {
-            console.error('[HandpickTimer] Failed to persist second minutes:', error);
-        }
-    }, [clampMinutes, phase, isRunning]);
+            try {
+                saveHandpickTimerState({ secondMinutes: sanitized });
+            } catch (error) {
+                console.error('[HandpickTimer] Failed to persist second minutes:', error);
+            }
+        },
+        [clampMinutes, phase, isRunning],
+    );
 
     // 音声ファイルのパスを解決するヘルパー
     const resolveAudioPath = (path: string) => {
-        let audioPath = path.startsWith('/') ? path : `/${path}`;
+        const safePath = path && path.length > 0 ? path : '/sounds/handpicktimer/complete/complete1.mp3';
+        const audioPath = safePath.startsWith('/') ? safePath : `/${safePath}`;
         const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.8';
         return `${audioPath}?v=${version}`;
     };
@@ -159,8 +185,8 @@ export function useHandpickTimer() {
     const prepareCompleteSound = useCallback(async () => {
         if (!settings || !settings.soundEnabled || !settings.completeSoundEnabled) return;
 
-        // フォールバック用のデフォルトファイルパス（実際に存在する最初のファイル）
-        const DEFAULT_SOUND_FILE = settings.completeSoundFile || '/sounds/handpicktimer/complete/complete1.mp3';
+        // フォールバック用のデフォルトファイルパス。実際に存在する最初のファイルを使用。
+        const DEFAULT_SOUND_FILE = '/sounds/handpicktimer/complete/complete1.mp3';
 
         try {
             // 既存のAudioがあれば破棄
@@ -169,8 +195,21 @@ export function useHandpickTimer() {
                 completeAudioRef.current = null;
             }
 
-            let audioPath = resolveAudioPath(settings.completeSoundFile);
+            // iOS等の自動再生制限を解除するため、無音クリップでアンロック
+            try {
+                const silent = new Audio(SILENT_AUDIO_DATA_URL);
+                silent.volume = 0;
+                silent.muted = true;
+                await silent.play();
+                silent.pause();
+                silent.currentTime = 0;
+            } catch (unlockError) {
+                console.warn('[HandpickTimer] Silent unlock failed', unlockError);
+            }
+
+            let audioPath = resolveAudioPath(settings.completeSoundFile || DEFAULT_SOUND_FILE);
             let audio = new Audio(audioPath);
+            audio.preload = 'auto';
 
             // エラーフラグを設定
             let hasError = false;
@@ -191,7 +230,7 @@ export function useHandpickTimer() {
             let errorHandler: ((e: Event) => void) | null = null;
             let fallbackErrorHandler: ((e: Event) => void) | null = null;
 
-            errorHandler = (e: Event) => {
+            errorHandler = () => {
                 hasError = true;
                 const error = audio.error;
                 if (error) {
@@ -205,7 +244,6 @@ export function useHandpickTimer() {
                         MEDIA_ERR_SRC_NOT_SUPPORTED: error.MEDIA_ERR_SRC_NOT_SUPPORTED,
                     };
                     console.error('[HandpickTimer] Audio loading error:', errorDetails);
-                    console.error('[HandpickTimer] Failed to load audio file:', audioPath);
                 } else {
                     errorDetails = {
                         path: audioPath,
@@ -217,30 +255,23 @@ export function useHandpickTimer() {
             };
             audio.addEventListener('error', errorHandler);
 
-            // エラーが発生した場合は、play()を試みない
-            // ただし、エラーイベントは非同期で発火する可能性があるため、
-            // 短い待機時間を設けてからエラーチェックを行う
+            // エラーイベントが非同期で発火する可能性があるため、短めの待機時間を設けてから判定
             await new Promise((resolve) => setTimeout(resolve, 100));
 
             // エラーが発生した場合、デフォルトファイルにフォールバック
             if (hasError) {
                 console.warn('[HandpickTimer] Audio loading failed, trying fallback file. Error:', errorDetails);
                 audio.removeEventListener('error', errorHandler);
-                
-                // デフォルトファイルが元のファイルと同じ場合は、フォールバックしない
-                if (settings.completeSoundFile === DEFAULT_SOUND_FILE) {
-                    console.error('[HandpickTimer] Default sound file also failed, skipping unlock');
-                    return;
-                }
 
                 // デフォルトファイルで再試行
                 audioPath = resolveAudioPath(DEFAULT_SOUND_FILE);
                 audio = new Audio(audioPath);
+                audio.preload = 'auto';
                 hasError = false;
                 errorDetails = null;
                 usedFallback = true;
 
-                fallbackErrorHandler = (e: Event) => {
+                fallbackErrorHandler = () => {
                     hasError = true;
                     const error = audio.error;
                     if (error) {
@@ -268,52 +299,31 @@ export function useHandpickTimer() {
                 await new Promise((resolve) => setTimeout(resolve, 100));
 
                 if (hasError) {
-                    console.error('[HandpickTimer] Fallback audio also failed, skipping unlock. Error:', errorDetails);
+                    console.error('[HandpickTimer] Fallback audio also failed, skipping prepare. Error:', errorDetails);
                     audio.removeEventListener('error', fallbackErrorHandler);
                     return;
                 }
             }
 
-            // 音量を0にし、さらにミュートも設定して確実に無音にする
-            // 一瞬再生することで、iOS等の自動再生制限を解除（アンロック）する
-            audio.volume = 0;
-            audio.muted = true;  // 確実に無音にする
-            
-            try {
-                await audio.play();
-                audio.pause();
-                audio.currentTime = 0;
+            // 本番再生用に音量を設定（アンロックは無音クリップで完了済み）
+            audio.muted = false;
+            audio.volume = Math.max(0, Math.min(1, settings.completeSoundVolume));
 
-                // 本番再生用に音量を設定し、ミュートを解除
-                audio.muted = false;
-                audio.volume = Math.max(0, Math.min(1, settings.completeSoundVolume));
-
-                // Refに保存
-                completeAudioRef.current = audio;
-                console.log('[HandpickTimer] Complete sound prepared and unlocked', usedFallback ? '(using fallback)' : '');
-            } catch (playError) {
-                console.error('[HandpickTimer] Failed to play audio for unlock:', playError);
-                // エラーイベントリスナーを削除
-                if (usedFallback && fallbackErrorHandler) {
-                    audio.removeEventListener('error', fallbackErrorHandler);
-                } else if (errorHandler) {
-                    audio.removeEventListener('error', errorHandler);
-                }
-            }
+            // Refに保存
+            completeAudioRef.current = audio;
+            console.log('[HandpickTimer] Complete sound prepared', usedFallback ? '(using fallback)' : '');
         } catch (error) {
             console.error('[HandpickTimer] Failed to prepare complete sound:', error);
         }
     }, [settings]);
 
-    // 完了音を再生（Refから）
+    // 完了音を再生。refから再生を試み、なければフォールバック。
     const playCompleteSoundFromRef = useCallback(async () => {
-        // 完了音が無効の場合はスキップ
         if (!settings || !settings.soundEnabled || !settings.completeSoundEnabled) return;
 
         if (!completeAudioRef.current) {
             console.warn('[HandpickTimer] Complete sound not prepared, trying fallback');
-            // フォールバック: 通常の再生を試みる（ユーザー操作起因でないと鳴らない可能性あり）
-            await playNotificationSound(settings.completeSoundFile, settings.completeSoundVolume);
+            await playNotificationSound(settings.completeSoundFile || '/sounds/handpicktimer/complete/complete1.mp3', settings.completeSoundVolume);
             return;
         }
 
@@ -338,7 +348,7 @@ export function useHandpickTimer() {
         }
     }, [settings]);
 
-    // フェーズ完了時の処理
+    // フェーズ完了の処理
     const handlePhaseComplete = useCallback(() => {
         console.log('[HandpickTimer] Phase complete triggered');
 
@@ -348,16 +358,16 @@ export function useHandpickTimer() {
         setIsRunning(false);
 
         if (phase === 'first') {
-            // 1回目終了 → 2回目へ移行（手動開始待ち）
+            // 1回目終了→2回目へ移行（手動開始前提）
             setPhase('second');
             setRemainingSeconds(secondMinutes * 60);
         } else if (phase === 'second') {
-            // 2回目終了 → サイクル数+1、停止状態へ
+            // 2回目終了→サイクル数+1、停止状態へ
             setCycleCount((prev) => prev + 1);
             setPhase('idle');
             setRemainingSeconds(0);
         }
-    }, [phase, firstMinutes, secondMinutes, playCompleteSoundFromRef]);
+    }, [phase, secondMinutes, playCompleteSoundFromRef]);
 
     // タイマーのカウントダウン処理
     useEffect(() => {
@@ -371,9 +381,11 @@ export function useHandpickTimer() {
 
         intervalRef.current = setInterval(() => {
             setRemainingSeconds((prev) => {
-                // ここでは状態更新のみを行い、完了判定は別のuseEffectで行う
-                // ただし、0未満にならないようにする
-                return Math.max(0, prev - 1);
+                const next = Math.max(0, prev - 1);
+                if (prev !== 0 && next === 0) {
+                    handlePhaseComplete();
+                }
+                return next;
             });
         }, 1000);
 
@@ -383,22 +395,13 @@ export function useHandpickTimer() {
                 intervalRef.current = null;
             }
         };
-    }, [isRunning]);
-
-    // 残り時間0の監視
-    useEffect(() => {
-        // タイマー動作中で、残り時間が0になったら完了処理を実行
-        if (isRunning && remainingSeconds === 0) {
-            handlePhaseComplete();
-        }
-    }, [isRunning, remainingSeconds, handlePhaseComplete]);
+    }, [isRunning, handlePhaseComplete]);
 
     // タイマー開始
     const start = useCallback(async () => {
         console.log('[HandpickTimer] Start clicked');
 
-        // 完了音の準備（アンロック）
-        // ユーザーインタラクション内で実行する必要がある
+        // 完了音の準備（アンロックも含む）
         await prepareCompleteSound();
 
         setPhase('first');
@@ -419,7 +422,7 @@ export function useHandpickTimer() {
         if (phase !== 'idle' && remainingSeconds > 0) {
             console.log('[HandpickTimer] Resume clicked');
 
-            // 再開時も念のため完了音を準備（アンロック）し直す
+            // 再開時も念のため完了音を準備（アンロックし直し）
             await prepareCompleteSound();
 
             // 2回目スタート時（phase === 'second' かつ remainingSeconds === secondMinutes * 60）に音を鳴らす
@@ -434,7 +437,7 @@ export function useHandpickTimer() {
         }
     }, [phase, remainingSeconds, secondMinutes, playStartSound, prepareCompleteSound]);
 
-    // リセット（確認ダイアログは呼び出し側で実装）
+    // リセット
     const reset = useCallback(() => {
         setIsRunning(false);
         setPhase('idle');

@@ -1,7 +1,6 @@
 /**
  * 時間設定入力コンポーネント
- * 1回目と2回目の時間を分けて入力
- * +/- ステッパーボタンと直接入力のハイブリッド方式
+ * 1回目と2回目の時間を分単位で設定する
  */
 
 'use client';
@@ -31,13 +30,6 @@ function StepperInput({ value, onChange, disabled, label }: StepperInputProps) {
     const [localValue, setLocalValue] = useState(String(value));
     const [isEditing, setIsEditing] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-
-    // 親の値変更時にローカル状態を同期（編集中でない場合のみ）
-    useEffect(() => {
-        if (!isEditing) {
-            setLocalValue(String(value));
-        }
-    }, [value, isEditing]);
 
     // 編集モードに入った時にinputにフォーカス
     useEffect(() => {
@@ -79,6 +71,8 @@ function StepperInput({ value, onChange, disabled, label }: StepperInputProps) {
 
     const handleValueClick = () => {
         if (!disabled) {
+            // 編集開始時に最新の外部値を反映してから編集モードへ
+            setLocalValue(String(value));
             setIsEditing(true);
         }
     };
@@ -143,7 +137,7 @@ export function TimeSettingInput({
     secondMinutes,
     onFirstChange,
     onSecondChange,
-    disabled = false
+    disabled = false,
 }: TimeSettingInputProps) {
     return (
         <div className="h-full bg-white/80 rounded-lg border border-gray-100 px-4 py-3 sm:px-4 sm:py-2.5 shadow-sm flex flex-col">
@@ -152,19 +146,9 @@ export function TimeSettingInput({
             </div>
             <div className="grid grid-cols-2 gap-2 flex-1">
                 {/* 1回目 */}
-                <StepperInput
-                    value={firstMinutes}
-                    onChange={onFirstChange}
-                    disabled={disabled}
-                    label="1回目"
-                />
+                <StepperInput value={firstMinutes} onChange={onFirstChange} disabled={disabled} label="1回目" />
                 {/* 2回目 */}
-                <StepperInput
-                    value={secondMinutes}
-                    onChange={onSecondChange}
-                    disabled={disabled}
-                    label="2回目"
-                />
+                <StepperInput value={secondMinutes} onChange={onSecondChange} disabled={disabled} label="2回目" />
             </div>
         </div>
     );

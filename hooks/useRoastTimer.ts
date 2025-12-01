@@ -264,7 +264,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
   // 音声ファイルのパスを解決するヘルパー
   const resolveAudioPath = useCallback((path: string) => {
-    let audioPath = path.startsWith('/') ? path : `/${path}`;
+    const audioPath = path.startsWith('/') ? path : `/${path}`;
     const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.8';
     return `${audioPath}?v=${version}`;
   }, []);

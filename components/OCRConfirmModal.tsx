@@ -51,7 +51,7 @@ export function OCRConfirmModal({
 
     // ローストスケジュールのソート：アフターパージは前のローストの後に配置
     // まず、orderプロパティでソート（サーバー側で設定された順序を尊重）
-    let sortedRoastSchedules = [...roastSchedules];
+    const sortedRoastSchedules = [...roastSchedules];
     
     // orderプロパティがある場合はそれでソート
     sortedRoastSchedules.sort((a, b) => {
@@ -144,7 +144,7 @@ export function OCRConfirmModal({
     });
 
     // ローストスケジュールのソート：アフターパージは前のローストの後に配置
-    let sortedRoastSchedules = [...roastSchedules];
+    const sortedRoastSchedules = [...roastSchedules];
 
     // アフターパージで時間が空の場合、前のローストの時間を参照
     const finalSorted: RoastSchedule[] = [];

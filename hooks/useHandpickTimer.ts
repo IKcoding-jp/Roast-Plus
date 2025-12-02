@@ -404,17 +404,21 @@ export function useHandpickTimer() {
         // 音声を再生
         void playCompleteSoundFromRef();
 
-        if (status === 'first-running' || status === 'first-paused') {
-            // 1回目終了→2回目待機状態へ
-            setStatus('second-waiting');
-            setRemainingSeconds(secondMinutes * 60);
-        } else if (status === 'second-running' || status === 'second-paused') {
-            // 2回目終了→サイクル数+1、待機状態へ
-            setCycleCount((prev) => prev + 1);
-            setStatus('idle');
-            setRemainingSeconds(0);
-        }
-    }, [status, secondMinutes, playCompleteSoundFromRef]);
+        // 関数型更新を使用して最新のstatusを取得
+        setStatus((prevStatus) => {
+            if (prevStatus === 'first-running' || prevStatus === 'first-paused') {
+                // 1回目終了→2回目待機状態へ
+                setRemainingSeconds(secondMinutes * 60);
+                return 'second-waiting';
+            } else if (prevStatus === 'second-running' || prevStatus === 'second-paused') {
+                // 2回目終了→サイクル数+1、待機状態へ
+                setCycleCount((prev) => prev + 1);
+                setRemainingSeconds(0);
+                return 'idle';
+            }
+            return prevStatus; // 変更不要な場合はそのまま返す
+        });
+    }, [secondMinutes, playCompleteSoundFromRef]);
 
     // タイマーのカウントダウン処理
     useEffect(() => {
@@ -474,18 +478,30 @@ export function useHandpickTimer() {
         // 再開時も念のため完了音を準備（アンロックし直し）
         await prepareCompleteSound();
 
-        if (status === 'first-paused') {
-            setStatus('first-running');
-        } else if (status === 'second-waiting' || status === 'second-paused') {
-            // 2回目待機中または一時停止中から再開
-            const isSecondPhaseStart = status === 'second-waiting';
-            if (isSecondPhaseStart) {
-                // 2回目スタート音を再生（開始音を使用）
-                await playStartSound();
+        // 関数型更新を使用して最新のstatusを取得
+        let shouldPlayStartSound = false;
+        setStatus((prevStatus) => {
+            if (prevStatus === 'first-paused') {
+                return 'first-running';
+            } else if (prevStatus === 'second-waiting') {
+                // 2回目スタート音を再生する必要があることを記録
+                shouldPlayStartSound = true;
+                return 'second-running';
+            } else if (prevStatus === 'second-paused') {
+                return 'second-running';
             }
-            setStatus('second-running');
+            return prevStatus; // 変更不要な場合はそのまま返す
+        });
+
+        // 状態更新後に音声を再生（2回目スタートの場合のみ）
+        if (shouldPlayStartSound) {
+            try {
+                await playStartSound();
+            } catch (error) {
+                console.error('[HandpickTimer] Failed to play start sound:', error);
+            }
         }
-    }, [status, playStartSound, prepareCompleteSound]);
+    }, [playStartSound, prepareCompleteSound]);
 
     // リセット
     const reset = useCallback(() => {

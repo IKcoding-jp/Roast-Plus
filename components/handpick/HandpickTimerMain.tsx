@@ -125,13 +125,11 @@ export function HandpickTimerMain() {
 
                     {/* 操作ボタン */}
                     <TimerControls
-                        phase={state.phase}
-                        isRunning={state.isRunning}
+                        status={state.status}
                         onStart={start}
                         onPause={pause}
                         onResume={resume}
                         onReset={reset}
-                        isSecondPhaseStart={state.phase === 'second' && state.remainingSeconds === state.secondMinutes * 60}
                     />
                 </div>
             </div>

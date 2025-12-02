@@ -22,34 +22,78 @@ const SILENT_AUDIO_DATA_URL =
     'data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA' +
     'AQACABAAZGF0YcAAAAA=';
 
+// タイマーの状態を一元管理
+export type TimerStatus =
+    | 'idle'                    // 待機中（スタート前、または完了後）
+    | 'first-running'           // 1回目実行中
+    | 'first-paused'            // 1回目一時停止中
+    | 'second-waiting'          // 2回目待機中（1回目終了後、2回目開始前）
+    | 'second-running'          // 2回目実行中
+    | 'second-paused';          // 2回目一時停止中
+
 export interface HandpickTimerState {
-    phase: TimerPhase;
+    status: TimerStatus;        // 状態を一元管理
     remainingSeconds: number;
-    isRunning: boolean;
     cycleCount: number;
     firstMinutes: number; // 1回目の時間（分）
     secondMinutes: number; // 2回目の時間（分）
+    // 既存コードとの互換性のため、phaseとisRunningも含める
+    phase: TimerPhase;
+    isRunning: boolean;
 }
 
 export function useHandpickTimer() {
+    // 既存のLocalStorageデータからstatusを導出するマイグレーション処理
     const getInitialState = () => {
         if (typeof window === 'undefined') {
             return {
-                phase: 'idle' as TimerPhase,
+                status: 'idle' as TimerStatus,
                 remainingSeconds: 0,
                 cycleCount: 0,
             };
         }
         try {
             const stored = loadHandpickTimerState();
+            if (stored) {
+                // 既存データからstatusを導出
+                let status: TimerStatus = 'idle';
+                if (stored.phase === 'first') {
+                    // 既存データにisRunningが保存されていないため、リロード後は常に停止状態とみなす
+                    // remainingSecondsで判定
+                    const expectedSeconds = (stored.firstMinutes ?? 5) * 60;
+                    if (stored.remainingSeconds > 0 && stored.remainingSeconds <= expectedSeconds) {
+                        status = 'first-paused'; // 途中で停止したとみなす（リロード後は常に停止状態）
+                    } else {
+                        status = 'idle'; // 0または異常値の場合はidle
+                    }
+                } else if (stored.phase === 'second') {
+                    const expectedSeconds = (stored.secondMinutes ?? 5) * 60;
+                    if (stored.remainingSeconds === expectedSeconds) {
+                        status = 'second-waiting'; // 2回目待機中
+                    } else if (stored.remainingSeconds === 0) {
+                        status = 'idle'; // 完了
+                    } else if (stored.remainingSeconds > 0) {
+                        status = 'second-paused'; // 途中で停止したとみなす
+                    } else {
+                        status = 'idle';
+                    }
+                } else {
+                    status = 'idle';
+                }
+                return {
+                    status,
+                    remainingSeconds: stored.remainingSeconds ?? 0,
+                    cycleCount: stored.cycleCount ?? 0,
+                };
+            }
             return {
-                phase: stored?.phase ?? 'idle',
-                remainingSeconds: stored?.remainingSeconds ?? 0,
-                cycleCount: stored?.cycleCount ?? 0,
+                status: 'idle' as TimerStatus,
+                remainingSeconds: 0,
+                cycleCount: 0,
             };
         } catch {
             return {
-                phase: 'idle' as TimerPhase,
+                status: 'idle' as TimerStatus,
                 remainingSeconds: 0,
                 cycleCount: 0,
             };
@@ -58,9 +102,8 @@ export function useHandpickTimer() {
 
     const initial = getInitialState();
 
-    const [phase, setPhase] = useState<TimerPhase>(initial.phase);
+    const [status, setStatus] = useState<TimerStatus>(initial.status);
     const [remainingSeconds, setRemainingSeconds] = useState(initial.remainingSeconds);
-    const [isRunning, setIsRunning] = useState(false);
     const [cycleCount, setCycleCount] = useState(initial.cycleCount);
     // LocalStorageから初期値を読み込む（SSR対策含む）
     const [firstMinutes, setFirstMinutesState] = useState(() => {
@@ -114,7 +157,13 @@ export function useHandpickTimer() {
         return () => clearInterval(interval);
     }, []);
 
-    // 状態変更時にLocalStorageに保存
+    // statusからphaseとisRunningを導出（既存コードとの互換性のため）
+    const phase: TimerPhase =
+        status === 'idle' ? 'idle' :
+        status === 'first-running' || status === 'first-paused' ? 'first' : 'second';
+    const isRunning = status === 'first-running' || status === 'second-running';
+
+    // 状態変更時にLocalStorageに保存（既存形式を維持）
     useEffect(() => {
         if (!hasHydratedRef.current) return;
 
@@ -125,7 +174,7 @@ export function useHandpickTimer() {
             firstMinutes,
             secondMinutes,
         });
-    }, [phase, remainingSeconds, cycleCount, firstMinutes, secondMinutes]);
+    }, [status, remainingSeconds, cycleCount, firstMinutes, secondMinutes, phase]);
 
     // 共通バリデーション
     const clampMinutes = useCallback((minutes: number) => {
@@ -140,7 +189,7 @@ export function useHandpickTimer() {
             setFirstMinutesState(sanitized);
 
             // 1回目のフェーズで、タイマーが停止中の場合は残り時間を更新
-            if (phase === 'first' && !isRunning) {
+            if (status === 'first-paused') {
                 setRemainingSeconds(sanitized * 60);
             }
 
@@ -150,7 +199,7 @@ export function useHandpickTimer() {
                 console.error('[HandpickTimer] Failed to persist first minutes:', error);
             }
         },
-        [clampMinutes, phase, isRunning],
+        [clampMinutes, status],
     );
 
     // 2回目の時間を設定して即座に永続化
@@ -160,7 +209,7 @@ export function useHandpickTimer() {
             setSecondMinutesState(sanitized);
 
             // 2回目のフェーズで、タイマーが停止中の場合は残り時間を更新
-            if (phase === 'second' && !isRunning) {
+            if (status === 'second-waiting' || status === 'second-paused') {
                 setRemainingSeconds(sanitized * 60);
             }
 
@@ -170,7 +219,7 @@ export function useHandpickTimer() {
                 console.error('[HandpickTimer] Failed to persist second minutes:', error);
             }
         },
-        [clampMinutes, phase, isRunning],
+        [clampMinutes, status],
     );
 
     // 音声ファイルのパスを解決するヘルパー
@@ -355,23 +404,21 @@ export function useHandpickTimer() {
         // 音声を再生
         void playCompleteSoundFromRef();
 
-        setIsRunning(false);
-
-        if (phase === 'first') {
-            // 1回目終了→2回目へ移行（手動開始前提）
-            setPhase('second');
+        if (status === 'first-running' || status === 'first-paused') {
+            // 1回目終了→2回目待機状態へ
+            setStatus('second-waiting');
             setRemainingSeconds(secondMinutes * 60);
-        } else if (phase === 'second') {
-            // 2回目終了→サイクル数+1、停止状態へ
+        } else if (status === 'second-running' || status === 'second-paused') {
+            // 2回目終了→サイクル数+1、待機状態へ
             setCycleCount((prev) => prev + 1);
-            setPhase('idle');
+            setStatus('idle');
             setRemainingSeconds(0);
         }
-    }, [phase, secondMinutes, playCompleteSoundFromRef]);
+    }, [status, secondMinutes, playCompleteSoundFromRef]);
 
     // タイマーのカウントダウン処理
     useEffect(() => {
-        if (!isRunning) {
+        if (status !== 'first-running' && status !== 'second-running') {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
                 intervalRef.current = null;
@@ -395,7 +442,7 @@ export function useHandpickTimer() {
                 intervalRef.current = null;
             }
         };
-    }, [isRunning, handlePhaseComplete]);
+    }, [status, handlePhaseComplete]);
 
     // タイマー開始
     const start = useCallback(async () => {
@@ -404,9 +451,8 @@ export function useHandpickTimer() {
         // 完了音の準備（アンロックも含む）
         await prepareCompleteSound();
 
-        setPhase('first');
+        setStatus('first-running');
         setRemainingSeconds(firstMinutes * 60);
-        setIsRunning(true);
 
         // スタート音を再生
         await playStartSound();
@@ -414,45 +460,50 @@ export function useHandpickTimer() {
 
     // 一時停止
     const pause = useCallback(() => {
-        setIsRunning(false);
-    }, []);
+        if (status === 'first-running') {
+            setStatus('first-paused');
+        } else if (status === 'second-running') {
+            setStatus('second-paused');
+        }
+    }, [status]);
 
     // 再開
     const resume = useCallback(async () => {
-        if (phase !== 'idle' && remainingSeconds > 0) {
-            console.log('[HandpickTimer] Resume clicked');
+        console.log('[HandpickTimer] Resume clicked');
 
-            // 再開時も念のため完了音を準備（アンロックし直し）
-            await prepareCompleteSound();
+        // 再開時も念のため完了音を準備（アンロックし直し）
+        await prepareCompleteSound();
 
-            // 2回目スタート時（phase === 'second' かつ remainingSeconds === secondMinutes * 60）に音を鳴らす
-            const isSecondPhaseStart = phase === 'second' && remainingSeconds === secondMinutes * 60;
-
+        if (status === 'first-paused') {
+            setStatus('first-running');
+        } else if (status === 'second-waiting' || status === 'second-paused') {
+            // 2回目待機中または一時停止中から再開
+            const isSecondPhaseStart = status === 'second-waiting';
             if (isSecondPhaseStart) {
                 // 2回目スタート音を再生（開始音を使用）
                 await playStartSound();
             }
-
-            setIsRunning(true);
+            setStatus('second-running');
         }
-    }, [phase, remainingSeconds, secondMinutes, playStartSound, prepareCompleteSound]);
+    }, [status, playStartSound, prepareCompleteSound]);
 
     // リセット
     const reset = useCallback(() => {
-        setIsRunning(false);
-        setPhase('idle');
+        setStatus('idle');
         setRemainingSeconds(0);
         setCycleCount(0); // 今日のサイクル数もリセット
         // AudioRefのクリーンアップは次のstart/resume時に行われるか、コンポーネントアンマウント時にGCされる
     }, []);
 
     const state: HandpickTimerState = {
-        phase,
+        status,
         remainingSeconds,
-        isRunning,
         cycleCount,
         firstMinutes,
         secondMinutes,
+        // 既存コードとの互換性のため
+        phase,
+        isRunning,
     };
 
     return {

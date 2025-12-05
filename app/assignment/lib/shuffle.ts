@@ -1,8 +1,22 @@
-import { Team, Member, TaskLabel, Assignment } from '@/types';
+import { Team, Member, TaskLabel, Assignment, PairExclusion } from '@/types';
 
 type Score = {
     memberId: string;
     score: number;
+};
+
+// ペア除外設定に該当するかチェックするヘルパー関数
+const isPairExcluded = (
+    memberId1: string,
+    memberId2: string,
+    pairExclusions?: PairExclusion[]
+): boolean => {
+    if (!pairExclusions || pairExclusions.length === 0) return false;
+
+    return pairExclusions.some(exclusion =>
+        (exclusion.memberId1 === memberId1 && exclusion.memberId2 === memberId2) ||
+        (exclusion.memberId1 === memberId2 && exclusion.memberId2 === memberId1)
+    );
 };
 
 export const calculateAssignment = (
@@ -11,7 +25,8 @@ export const calculateAssignment = (
     members: Member[],
     history: Assignment[][], // シャッフル履歴の配列（history[0] = 1回前、history[1] = 2回前）
     targetDate: string,
-    currentAssignments?: Assignment[] // 現在の割り当て（固定チェック用）
+    currentAssignments?: Assignment[], // 現在の割り当て（固定チェック用）
+    pairExclusions?: PairExclusion[] // ペア除外設定
 ): Assignment[] => {
     // 1. 対象メンバーの抽出 (アクティブなメンバー)
     const eligibleMembers = members.filter(m => m.active !== false);
@@ -209,30 +224,41 @@ export const calculateAssignment = (
 
                 let score = recentCounts[member.id] || 0;
 
-                // 場所の重複ペナルティ計算
-                if (oneShuffleAgoMemberId === member.id) score += 10000; // 1回前と同じなら超高ペナルティ（絶対避ける）
-
-                if (twoShufflesAgoMemberId === member.id) score += 20000; // 2回前と同じなら高ペナルティ（できるだけ避ける）
-
-                if (oneShuffleAgoMemberId === member.id && twoShufflesAgoMemberId === member.id) {
-                    score += 50000; // 2回連続同じなら最大ペナルティ（何が何でも避ける）
-                }
-
-                // ペアの重複ペナルティ計算
-                // 同じ行になる予定のメンバーとの過去のペア関係をチェック
+                // ペア除外設定チェック（最優先）
                 for (const partnerId of currentRowPartners) {
-                    // 1回前のシャッフルでペアだった
-                    if (pairHistory[member.id]?.shuffleAgo1.has(partnerId)) {
-                        score += 5000;
-                    }
-                    // 2回前のシャッフルでペアだった
-                    if (pairHistory[member.id]?.shuffleAgo2.has(partnerId)) {
-                        score += 2000;
+                    if (isPairExcluded(member.id, partnerId, pairExclusions)) {
+                        score = Infinity; // 絶対に選択されない
+                        break;
                     }
                 }
 
-                // ランダム要素（同じスコア内でのばらつき）
-                score += Math.random();
+                // スコアがInfinityでなければ他のペナルティも計算
+                if (score !== Infinity) {
+                    // 場所の重複ペナルティ計算
+                    if (oneShuffleAgoMemberId === member.id) score += 10000; // 1回前と同じなら超高ペナルティ（絶対避ける）
+
+                    if (twoShufflesAgoMemberId === member.id) score += 20000; // 2回前と同じなら高ペナルティ（できるだけ避ける）
+
+                    if (oneShuffleAgoMemberId === member.id && twoShufflesAgoMemberId === member.id) {
+                        score += 50000; // 2回連続同じなら最大ペナルティ（何が何でも避ける）
+                    }
+
+                    // ペアの重複ペナルティ計算
+                    // 同じ行になる予定のメンバーとの過去のペア関係をチェック
+                    for (const partnerId of currentRowPartners) {
+                        // 1回前のシャッフルでペアだった
+                        if (pairHistory[member.id]?.shuffleAgo1.has(partnerId)) {
+                            score += 5000;
+                        }
+                        // 2回前のシャッフルでペアだった
+                        if (pairHistory[member.id]?.shuffleAgo2.has(partnerId)) {
+                            score += 2000;
+                        }
+                    }
+
+                    // ランダム要素（同じスコア内でのばらつき）
+                    score += Math.random();
+                }
                 candidates.push({ memberId: member.id, score });
             }
 
@@ -241,6 +267,7 @@ export const calculateAssignment = (
 
             // 閾値を上げて、ペナルティが高くても他に候補がいなければ割り当てるようにする
             // (最大ペナルティは約65000点なので、それより大きく設定)
+            // ただしInfinityは除外
             if (bestCandidate && bestCandidate.score < 100000) {
                 currentLoopAssignments.push({
                     teamId: slot.teamId,

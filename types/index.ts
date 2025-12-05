@@ -163,6 +163,19 @@ export interface ShuffleHistory {
   targetDate: string; // YYYY-MM-DD
 }
 
+// ペア除外設定（シャッフル時に同じ行に配置しない組み合わせ）
+export interface PairExclusion {
+  id: string;
+  memberId1: string; // 正規化: memberId1 < memberId2
+  memberId2: string;
+  createdAt: any; // Firestore Timestamp
+}
+
+// ペアのメンバーIDを正規化するヘルパー関数
+export const normalizePairIds = (id1: string, id2: string): [string, string] => {
+  return id1 < id2 ? [id1, id2] : [id2, id1];
+};
+
 export interface RoastTimerRecord {
   id: string;
   beanName: string;

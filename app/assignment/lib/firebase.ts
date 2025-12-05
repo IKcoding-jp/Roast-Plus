@@ -26,7 +26,9 @@ import {
     ShuffleHistory,
     Assignment,
     TableSettings,
-    Manager
+    Manager,
+    PairExclusion,
+    normalizePairIds
 } from '@/types';
 
 // ===== ヘルパー関数: ユーザー配下のコレクション参照 =====
@@ -464,5 +466,94 @@ export const setManager = async (userId: string, name: string): Promise<void> =>
 export const deleteManager = async (userId: string): Promise<void> => {
     const managersCol = getManagersCollection(userId);
     const docRef = doc(managersCol, MANAGER_DOC_ID);
+    await deleteDoc(docRef);
+};
+
+// ===== ペア除外設定管理 =====
+
+function getPairExclusionsCollection(userId: string) {
+    return collection(getUserAssignmentRoot(userId), 'pairExclusions');
+}
+
+/**
+ * ペア除外設定を取得
+ */
+export const fetchPairExclusions = async (userId: string): Promise<PairExclusion[]> => {
+    const pairExclusionsCol = getPairExclusionsCollection(userId);
+    const q = query(pairExclusionsCol, orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as PairExclusion));
+};
+
+/**
+ * ペア除外設定をリアルタイム購読
+ */
+export const subscribePairExclusions = (
+    userId: string,
+    callback: (exclusions: PairExclusion[]) => void
+) => {
+    const pairExclusionsCol = getPairExclusionsCollection(userId);
+    // インデックスが存在しない場合を考慮し、orderByなしでクエリ
+    return onSnapshot(
+        pairExclusionsCol,
+        (snapshot) => {
+            const exclusions = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as PairExclusion));
+            // クライアント側でソート
+            exclusions.sort((a, b) => {
+                const aTime = a.createdAt?.toMillis?.() || 0;
+                const bTime = b.createdAt?.toMillis?.() || 0;
+                return bTime - aTime; // 降順
+            });
+            callback(exclusions);
+        },
+        (error) => {
+            console.error('Failed to subscribe to pair exclusions:', error);
+            // エラー時は空配列を返す
+            callback([]);
+        }
+    );
+};
+
+/**
+ * ペア除外設定を追加（重複チェック付き）
+ */
+export const addPairExclusion = async (
+    userId: string,
+    memberId1: string,
+    memberId2: string
+): Promise<void> => {
+    // IDを正規化（小さいIDを先に）
+    const [normalizedId1, normalizedId2] = normalizePairIds(memberId1, memberId2);
+
+    // 重複チェック
+    const pairExclusionsCol = getPairExclusionsCollection(userId);
+    const existingQuery = query(
+        pairExclusionsCol,
+        where('memberId1', '==', normalizedId1),
+        where('memberId2', '==', normalizedId2)
+    );
+    const existingSnapshot = await getDocs(existingQuery);
+
+    if (!existingSnapshot.empty) {
+        throw new Error('この組み合わせは既に登録されています');
+    }
+
+    // 新規追加
+    const id = crypto.randomUUID();
+    const docRef = doc(pairExclusionsCol, id);
+    await setDoc(docRef, {
+        id,
+        memberId1: normalizedId1,
+        memberId2: normalizedId2,
+        createdAt: serverTimestamp(),
+    });
+};
+
+/**
+ * ペア除外設定を削除
+ */
+export const deletePairExclusion = async (userId: string, exclusionId: string): Promise<void> => {
+    const pairExclusionsCol = getPairExclusionsCollection(userId);
+    const docRef = doc(pairExclusionsCol, exclusionId);
     await deleteDoc(docRef);
 };

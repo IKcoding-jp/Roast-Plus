@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings, Manager
+    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings, Manager, PairExclusion
 } from '@/types';
 import {
     fetchTeams, fetchMembers, fetchTaskLabels,
@@ -15,25 +15,29 @@ import {
     addTaskLabel, deleteTaskLabel, updateTaskLabel,
     addTeam, deleteTeam, updateTeam, updateTableSettings,
     mutateAssignmentDay, getServerTodayDate,
-    subscribeManager, setManager, deleteManager
+    subscribeManager, setManager, deleteManager,
+    subscribePairExclusions, addPairExclusion, deletePairExclusion, fetchPairExclusions
 } from './lib/firebase';
 import { calculateAssignment } from '@/app/assignment/lib/shuffle';
 import { AssignmentTable } from './components/AssignmentTable';
 import { RouletteOverlay } from './components/RouletteOverlay';
 import { ManagerDialog } from './components/ManagerDialog';
+import { PairExclusionSettingsModal } from './components/PairExclusionSettingsModal';
 import { Loading } from '@/components/Loading';
+import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAuth } from '@/lib/auth';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
 import { FaUsers, FaUserTie } from "react-icons/fa";
-import { HiPlus } from "react-icons/hi";
+import { HiPlus, HiCog } from "react-icons/hi";
 
 export default function AssignmentPage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const userId = user?.uid ?? null;
+    const { isEnabled: isDeveloperMode } = useDeveloperMode();
 
     // マスタデータ
     const [teams, setTeams] = useState<Team[]>([]);
@@ -48,6 +52,10 @@ export default function AssignmentPage() {
 
     // 管理者ダイアログ
     const [isManagerDialogOpen, setIsManagerDialogOpen] = useState(false);
+
+    // ペア除外設定
+    const [pairExclusions, setPairExclusions] = useState<PairExclusion[]>([]);
+    const [isPairExclusionModalOpen, setIsPairExclusionModalOpen] = useState(false);
 
     // 状態
     const [todayDate, setTodayDate] = useState<string>("");
@@ -150,10 +158,15 @@ export default function AssignmentPage() {
             setManagerState(managerData);
         });
 
+        const unsubPairExclusions = subscribePairExclusions(userId, (exclusions) => {
+            setPairExclusions(exclusions);
+        });
+
         return () => {
             unsubAssignment();
             unsubSettings();
             unsubManager();
+            unsubPairExclusions();
         };
     }, [userId, authLoading]);
 
@@ -244,7 +257,7 @@ export default function AssignmentPage() {
             const history: Assignment[][] = shuffleHistoryList.map(h => h.assignments);
 
             // 2. Run calculation
-            const result = calculateAssignment(teams, taskLabels, members, history, targetDate, displayAssignments);
+            const result = calculateAssignment(teams, taskLabels, members, history, targetDate, displayAssignments, pairExclusions);
 
             // 3. Broadcast event to other clients
             const eventId = uuidv4();
@@ -429,8 +442,17 @@ export default function AssignmentPage() {
                         </div>
                     </div>
 
-                    {/* 右側: シャッフルボタン */}
-                    <div className="absolute right-4 flex items-center z-10">
+                    {/* 右側: 設定ボタン + シャッフルボタン */}
+                    <div className="absolute right-4 flex items-center gap-2 z-10">
+                        {isDeveloperMode && (
+                            <button
+                                onClick={() => setIsPairExclusionModalOpen(true)}
+                                className="flex items-center gap-1 px-3 py-2 rounded-full font-bold shadow-md transition-colors bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                                title="ペア除外設定"
+                            >
+                                <HiCog className="w-5 h-5" />
+                            </button>
+                        )}
                         <button
                             onClick={handleShuffle}
                             disabled={isShuffleDisabled}
@@ -513,11 +535,10 @@ export default function AssignmentPage() {
             <div className="fixed bottom-6 right-6 z-20">
                 <button
                     onClick={() => setIsManagerDialogOpen(true)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-all ${
-                        manager
-                            ? 'bg-white hover:bg-gray-50 border border-gray-200'
-                            : 'bg-primary text-white hover:bg-primary-dark'
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-all ${manager
+                        ? 'bg-white hover:bg-gray-50 border border-gray-200'
+                        : 'bg-primary text-white hover:bg-primary-dark'
+                        }`}
                 >
                     {manager ? (
                         <>
@@ -550,6 +571,22 @@ export default function AssignmentPage() {
                     if (!userId) return;
                     await deleteManager(userId);
                     setManagerState(null);
+                }}
+            />
+
+            {/* ペア除外設定モーダル */}
+            <PairExclusionSettingsModal
+                isOpen={isPairExclusionModalOpen}
+                members={members}
+                pairExclusions={pairExclusions}
+                onClose={() => setIsPairExclusionModalOpen(false)}
+                onAdd={async (memberId1: string, memberId2: string) => {
+                    if (!userId) return;
+                    await addPairExclusion(userId, memberId1, memberId2);
+                }}
+                onDelete={async (exclusionId: string) => {
+                    if (!userId) return;
+                    await deletePairExclusion(userId, exclusionId);
                 }}
             />
         </div>

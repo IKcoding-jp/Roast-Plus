@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { DripRecipe } from '@/lib/drip-guide/types';
 import { Timer, Coffee, Drop, Trash, Pencil, Play } from 'phosphor-react';
 import { clsx } from 'clsx';
 import { ConfirmDialog } from './ConfirmDialog';
+import { StartHintDialog } from './StartHintDialog';
 import { calculateRecipeForServings } from '@/lib/drip-guide/recipeCalculator';
 
 interface RecipeListProps {
@@ -17,6 +19,8 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
     // 各レシピごとの人前選択状態を管理（レシピID -> 人前数）
     const [servingsMap, setServingsMap] = useState<Record<string, number>>({});
+    const [startTargetId, setStartTargetId] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleDeleteClick = (recipeId: string) => {
         console.log('Delete button clicked for recipe:', recipeId);
@@ -45,6 +49,30 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
 
     const getServingsForRecipe = (recipeId: string): number => {
         return servingsMap[recipeId] || 1;
+    };
+
+    const startTargetRecipe = useMemo(
+        () => recipes.find((recipe) => recipe.id === startTargetId) ?? null,
+        [recipes, startTargetId]
+    );
+
+    const startTargetCalculated = startTargetRecipe
+        ? calculateRecipeForServings(startTargetRecipe, getServingsForRecipe(startTargetRecipe.id))
+        : null;
+
+    const handleOpenStart = (recipeId: string) => {
+        setStartTargetId(recipeId);
+    };
+
+    const handleStartGuide = () => {
+        if (!startTargetRecipe) return;
+        const servings = getServingsForRecipe(startTargetRecipe.id);
+        router.push(`/drip-guide/run?id=${startTargetRecipe.id}&servings=${servings}`);
+        setStartTargetId(null);
+    };
+
+    const handleCloseStart = () => {
+        setStartTargetId(null);
     };
 
     if (recipes.length === 0) {
@@ -142,8 +170,9 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                 </div>
                             </div>
 
-                            <Link
-                                href={`/drip-guide/run?id=${recipe.id}&servings=${servings}`}
+                            <button
+                                type="button"
+                                onClick={() => handleOpenStart(recipe.id)}
                                 className={clsx(
                                     "mt-auto flex items-center justify-center gap-2 w-full py-3 sm:py-2.5 rounded-lg font-bold transition-all",
                                     "bg-amber-600 text-white hover:bg-amber-700 active:scale-[0.98] touch-manipulation"
@@ -151,7 +180,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                             >
                                 <Play size={20} weight="fill" />
                                 ガイド開始
-                            </Link>
+                            </button>
                         </div>
                     );
                 })}
@@ -165,6 +194,15 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                 cancelText="キャンセル"
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
+            />
+
+            <StartHintDialog
+                isOpen={startTargetId !== null}
+                onClose={handleCloseStart}
+                onStart={handleStartGuide}
+                totalWaterGram={startTargetCalculated?.totalWaterGram}
+                servings={startTargetRecipe ? getServingsForRecipe(startTargetRecipe.id) : undefined}
+                recipeName={startTargetRecipe?.name}
             />
         </>
     );

@@ -11,7 +11,11 @@ export const RecordForm = ({ onSave, disabled }: Props) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(name);
+        const trimmedName = name.trim();
+        if (!trimmedName) {
+            return;
+        }
+        onSave(trimmedName);
         setName('');
     };
 
@@ -19,7 +23,7 @@ export const RecordForm = ({ onSave, disabled }: Props) => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-[1.5dvh] pt-[2dvh] border-t border-gray-100">
             <div>
                 <label htmlFor="recordName" className="block text-[1.5dvh] font-bold text-gray-400 mb-[0.5dvh]">
-                    記録名 (任意)
+                    記録名 <span className="text-red-500">*</span>
                 </label>
                 <input
                     id="recordName"
@@ -27,6 +31,7 @@ export const RecordForm = ({ onSave, disabled }: Props) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="A"
+                    required
                     className="w-full px-3 h-[6dvh] min-h-[40px] rounded-lg bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#EF8A00] focus:ring-2 focus:ring-[#EF8A00]/20 outline-none transition-all text-[2dvh] text-gray-800 placeholder-gray-400 font-medium"
                 />
             </div>

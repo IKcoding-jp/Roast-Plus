@@ -400,11 +400,12 @@ export default function ProgressPage() {
               <>
                 <button
                   onClick={() => setShowFilterDialog(true)}
-                  className="px-3 py-2 text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                  className="px-3 py-2 text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 min-h-[44px] min-w-[44px]"
                   aria-label="フィルタと並び替え"
                   title="フィルタと並び替え"
                 >
                   <HiFilter className="h-4 w-4" />
+                  <span className="hidden md:inline text-sm font-medium whitespace-nowrap">フィルター</span>
                 </button>
                 {archivedWorkProgressesByDate.length > 0 && (
                   <button

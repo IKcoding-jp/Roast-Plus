@@ -147,7 +147,7 @@ export default function HomePage() {
           <img 
             src="/logo.png" 
             alt="RoastPlus" 
-            className="h-8 w-auto"
+            className="h-10 w-auto md:h-12"
           />
         </div>
         <div className="flex items-center gap-4">

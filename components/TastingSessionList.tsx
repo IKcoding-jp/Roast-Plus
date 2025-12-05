@@ -284,13 +284,14 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
   const filterButton = (
     <button
       onClick={handleOpenFilterModal}
-      className={`px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] relative ${
-        activeFilterCount > 0 ? 'text-amber-600' : ''
+      className={`px-3 py-2 md:px-3 md:py-2 rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg flex items-center justify-center gap-2 min-h-[44px] min-w-[44px] md:min-w-auto relative ${
+        activeFilterCount > 0 ? 'text-amber-600' : 'text-gray-600'
       }`}
       title="フィルター"
       aria-label="フィルター"
     >
-      <HiFilter className="h-6 w-6 flex-shrink-0" />
+      <HiFilter className="h-5 w-5 flex-shrink-0" />
+      <span className="hidden md:block text-sm font-medium whitespace-nowrap">フィルター</span>
       {activeFilterCount > 0 && (
         <span className="absolute -top-1 -right-1 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold">
           {activeFilterCount}

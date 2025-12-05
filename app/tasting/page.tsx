@@ -312,10 +312,10 @@ function TastingPageContent() {
               {!isEmpty && (
                 <Link
                   href="/tasting/sessions/new"
-                  className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 min-h-[44px] flex-shrink-0"
+                  className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 min-h-[44px] flex-shrink-0"
                   aria-label="新規セッション作成"
                 >
-                  <HiPlus className="text-lg flex-shrink-0" />
+                  <HiPlus className="h-5 w-5 flex-shrink-0" />
                   <span className="whitespace-nowrap">セッションを作成</span>
                 </Link>
               )}

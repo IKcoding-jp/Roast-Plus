@@ -358,11 +358,11 @@ export default function SchedulePage() {
             <div className="hidden sm:flex items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setIsOCROpen(true)}
-                className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition-colors flex items-center gap-2 min-h-[44px] shadow-md"
+                className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition-colors flex items-center gap-2 min-h-[44px] shadow-md"
                 title="画像から読み取り"
                 aria-label="画像から読み取り"
               >
-                <HiCamera className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
+                <HiCamera className="h-5 w-5 flex-shrink-0" />
                 <span className="font-medium">AIで読み取る</span>
               </button>
             </div>

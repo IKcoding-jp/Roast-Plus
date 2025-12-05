@@ -1,0 +1,25 @@
+---
+description: ドメイン型・共有型の定義ルール
+globs: types/**/*.ts
+alwaysApply: false
+---
+
+# 役割
+- ドメインデータとUI/Firestore間の共有型を単一ソースとして提供。  
+- クライアント・Functions 双方で参照可能な形で定義し、重複定義を避ける。
+
+# 実装規則
+- 追加/変更は必ず`types/index.ts`に集約し、`any`禁止。  
+- 文字列日付/ISOを明示し、`Date`オブジェクトを型に含めない。  
+- Enumの代わりにリテラルユニオンを優先し、`RoastLevel`等の既存パターンに揃える。  
+- 破壊的変更は互換性と既存データへの影響を確認してから実施。
+
+# アンチパターン
+- UIローカル用に型をコピーして分岐させること。  
+- Firestore 実データと乖離したフィールドを追加すること。  
+- Nullableを明示せずに利用すること。
+
+# 実装例
+- 中核型・AppData: [`types/index.ts`](../../../types/index.ts)  
+- ID正規化ヘルパー: [`normalizePairIds`](../../../types/index.ts)
+

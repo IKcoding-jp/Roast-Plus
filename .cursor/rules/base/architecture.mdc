@@ -1,0 +1,50 @@
+---
+description: RoastPlusのアーキテクチャと依存方向の全体指針
+alwaysApply: true
+---
+
+# アーキテクチャ概要
+- Next.js 16 (App Router) + React 19 + TypeScript 5、静的エクスポート運用（`next.config.ts`で本番のみ`output: 'export'`、画像は`unoptimized: true`）。  
+- Firebase (Auth/Firestore/Functions/Storage) を単一バックエンドとし、UIはすべて Firestore 由来データを表示。  
+- PWA 対応：`ServiceWorkerRegistration`が本番のみ`/sw.js`を登録、Web App Manifest を使用。  
+- マルチデバイス前提（最大9台）。書き込みはキュー/セマフォで直列化し、Firestore を唯一の真実とする。
+
+# ディレクトリと責務
+- `app/` … App Router ページ・レイアウト・エントリ。サーバーコンポーネントを基本とし、UIフローを定義。例: [`app/layout.tsx`](../../../app/layout.tsx), [`app/page.tsx`](../../../app/page.tsx)。
+- `components/` … 再利用 UI（Client も含む）。ビジネスロジックは持たず、外部から渡されたデータを表示。例: [`components/ServiceWorkerRegistration.tsx`](../../../components/ServiceWorkerRegistration.tsx)。
+- `hooks/` … クライアント専用の状態管理・購読ロジック。Firestore との橋渡しを行うが、実アクセスは `lib/firestore.ts` に集約。例: [`hooks/useAppData.ts`](../../../hooks/useAppData.ts)。
+- `lib/` … Firebase 初期化・Firestore 読み書き・ユーティリティ。副作用の所在を明示。例: [`lib/firebase.ts`](../../../lib/firebase.ts), [`lib/firestore.ts`](../../../lib/firestore.ts)。
+- `types/` … ドメイン型の単一ソース。`AppData` を中心に UI/Firestore 共有型を定義。例: [`types/index.ts`](../../../types/index.ts)。
+- `functions/` … Firebase Functions（管理/バックグラウンド処理）。Next 側からは HTTP/Callable 経由で利用。例: [`functions/src/index.ts`](../../../functions/src/index.ts) など。
+- `public/` … PWA リソース・アイコン・静的ファイル（`/sw.js` 等）。
+- `scripts/` … ビルド補助スクリプト（例: [`scripts/generate-sound-list.ts`](../../../scripts/generate-sound-list.ts)）。
+
+# 依存方向の原則
+- ページ(`app/`) → UI(`components/`) → Hooks(`hooks/`) → ロジック/IO(`lib/`) → Firebase SDK。  
+- 型(`types/`)は全レイヤから参照可。`functions/`はクライアントとは疎結合（共通型は`types/`を経由）。  
+- Firestore アクセスは必ず `lib/firestore.ts`（または `app/.../lib/firebase.ts` の集約層）を経由し、コンポーネント直呼びを禁止。
+
+# データモデルとストレージ
+- ユーザー固有データ: `/users/{userId}` ドキュメントに `AppData` を格納。欠陥豆マスタ: `/defectBeans` コレクション。  
+- 型は `types/index.ts` を唯一のソースとし、`any` 禁止。  
+- 日付/時刻は端末時計を信用せず、Firestore `serverTimestamp()` または保存済み値を使用。
+
+# 同期・整合性
+- UI更新フロー: Firestore → onSnapshot → hook state → UI。楽観的更新禁止。  
+- 9台同時利用を想定し、書き込みは `lib/firestore.ts` のキュー/セマフォで直列化。複数フィールド更新はトランザクション優先。  
+- 一操作一書き込み。段階的 setTimeout 書き込み禁止。
+
+# PWA/ビルド
+- 本番ビルド時のみ静的エクスポート。動的ルートは開発モードでのみサーバー挙動を許容。  
+- Service Worker は本番のみ登録し、キャッシュ破棄や通知を考慮。参考: [`components/ServiceWorkerRegistration.tsx`](../../../components/ServiceWorkerRegistration.tsx), [`public/sw.js`](../../../public/sw.js)。
+
+# 参考実装リンク
+- `next.config.ts`: [`../../../next.config.ts`](../../../next.config.ts)
+- ルートレイアウト: [`app/layout.tsx`](../../../app/layout.tsx)
+- ホームページ: [`app/page.tsx`](../../../app/page.tsx)
+- 型定義: [`types/index.ts`](../../../types/index.ts)
+- Firestore集約: [`lib/firestore.ts`](../../../lib/firestore.ts)
+- Firebase初期化: [`lib/firebase.ts`](../../../lib/firebase.ts)
+- アプリ状態購読: [`hooks/useAppData.ts`](../../../hooks/useAppData.ts)
+- PWA登録: [`components/ServiceWorkerRegistration.tsx`](../../../components/ServiceWorkerRegistration.tsx)
+- Functions入口: [`functions/src/index.ts`](../../../functions/src/index.ts)

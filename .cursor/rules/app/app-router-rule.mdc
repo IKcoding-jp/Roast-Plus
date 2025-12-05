@@ -1,0 +1,32 @@
+---
+description: App Router配下のページ/レイアウト実装ルール
+globs: app/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# 役割
+- 画面構造・ルーティング・メタ情報を定義する。データ取得や副作用はフック/`lib`へ委譲。  
+- デフォルトはサーバーコンポーネント。ブラウザAPIやイベントリスナーが必要な場合のみ `'use client'` を付与。  
+- 静的エクスポート前提。サーバー常駐を要する機能は禁止し、Firebase クライアントSDKを利用。
+
+# 実装規則
+- ページ内で Firestore/SDK を直接呼ばず、hooks (`hooks/useAppData.ts` 等) 経由で購読。  
+- 認証が必要なページではクライアント側で `useAuth` により未ログイン時 `/login` へ誘導。  
+- メタデータ/フォント/全体装飾は `app/layout.tsx` で集約し、ページ側で重複定義しない。  
+- PWA やスプラッシュ等のグローバル要素はレイアウトに配置し、ページ個別には置かない。
+
+# 依存関係
+- 参照可能: `components/`, `hooks/`, `lib/`, `types/`。  
+- 参照禁止: `functions/` 内のソース直接 import（HTTP/Callable 経由のみ）。
+
+# アンチパターン
+- ページで直接 `getFirestore` や `fetch` を多重に呼ぶこと。  
+- 端末時刻を使った判定。`lib`/Firestore 由来の値に統一。  
+- 大量のロジックをページに内包し肥大化させること（フック分離）。
+
+# 実装例
+- ルートレイアウト: [`app/layout.tsx`](../../../app/layout.tsx)  
+- ホーム: [`app/page.tsx`](../../../app/page.tsx)  
+- 認証ページ: [`app/login/page.tsx`](../../../app/login/page.tsx)  
+- 担当表ページ（複合ロジックをフック・ライブラリに委譲）: [`app/assignment/page.tsx`](../../../app/assignment/page.tsx)
+

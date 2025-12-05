@@ -1,0 +1,29 @@
+---
+description: テスト実装ルール（命名・対象・モック方針）
+globs: **/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
+alwaysApply: false
+---
+
+# 対象と狙い
+- 振る舞いを検証するテストを優先し、実装詳細への依存を最小化。  
+- Firestore/外部API はモックし、ローカル環境で再現性のあるテストにする。
+
+# 命名/配置
+- ファイル名: `*.test.ts(x)` または `*.spec.ts(x)`。  
+- テストケースは `describe`/`it` を用い、期待する振る舞いを日本語で簡潔に記述。
+
+# 実装指針
+- Firestoreアクセスはモックし、副作用を隔離。`lib/firestore.ts` の直列書き込みや `saveUserData` の呼び出し数を検証する。  
+- Hooksは React Testing Library などでレンダリングし、購読・書き込みの結果をアサート（例: `useAppData` のロック解除タイミング）。  
+- UIはユーザー操作ベースで検証し、DOM構造ではなく見えるテキストやロールをassert。  
+- 時刻は固定値/モックを使用し、端末時計に依存しない。
+
+# カバレッジの目安
+- 重要フロー（担当表シャッフル、通知、タイマー）は少なくとも成功/失敗の2系統を網羅。  
+- エラー分岐（サイズ超過、認証失敗など）は最低1ケース追加。
+
+# 参考コード（テスト対象例）
+- Firestore集約: [`lib/firestore.ts`](../../../lib/firestore.ts)  
+- アプリ状態フック: [`hooks/useAppData.ts`](../../../hooks/useAppData.ts)  
+- 通知フック: [`hooks/useNotifications.ts`](../../../hooks/useNotifications.ts)  
+- Functions OCR Callable: [`functions/src/index.ts`](../../../functions/src/index.ts)

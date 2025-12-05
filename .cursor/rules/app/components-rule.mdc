@@ -1,0 +1,30 @@
+---
+description: UIコンポーネント実装ルール
+globs: components/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# 役割
+- 表示とインタラクションを担当。データ取得や永続化は行わず、props/hook で受け取る。  
+- UIの一貫性・アクセシビリティ・レスポンシブ対応を担保する。
+
+# 実装規則
+- ビジネスロジックはフックまたは`lib`へ分離。コンポーネント内で Firestore SDK を直接呼ばない。  
+- Tailwind をインライン指定。タッチターゲット44px以上、aria-labelやroleを適宜付与。  
+- `use client` はブラウザAPI利用時のみ付与。再利用部品は副作用を持たない純粋UIを優先。  
+- トーストやモーダルなど状態管理が必要な場合はカスタムフックで state を渡す。
+
+# 依存関係
+- 参照可能: `hooks/`, `lib/`, `types/`, 共通アイコン/ユーティリティ。  
+- 参照禁止: `functions/` 直接 import、Firestore 直呼び、端末時刻依存。
+
+# アンチパターン
+- コンポーネント内で複数の副作用を持ちロジックが肥大化すること。  
+- 同一 UI パターンをコピペすること（共通化を検討）。  
+- Promise 未処理エラーを握り潰すこと。
+
+# 実装例
+- PWA 登録: [`components/ServiceWorkerRegistration.tsx`](../../../components/ServiceWorkerRegistration.tsx)  
+- トースト表示: [`components/Toast.tsx`](../../../components/Toast.tsx)  
+- 認証以外の汎用 UI: [`components/Loading.tsx`](../../../components/Loading.tsx), [`components/TastingRecordList.tsx`](../../../components/TastingRecordList.tsx)
+

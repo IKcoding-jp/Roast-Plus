@@ -79,23 +79,23 @@ export function ContinuousRoastDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full mx-4">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 whitespace-nowrap">
-          連続焙煎しますか？
+          続けて焙煎しますか？
         </h2>
         <p className="text-base sm:text-lg text-gray-600 mb-6 whitespace-nowrap">
           焙煎機が温かいうちに次の焙煎が可能です。
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <button
             onClick={onYes}
             className="px-4 sm:px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-sm sm:text-base min-h-[44px] whitespace-nowrap flex-1 sm:flex-none order-1 sm:order-2"
           >
-            はい（連続焙煎）
+            続けて焙煎する
           </button>
           <button
             onClick={onNo}
             className="px-4 sm:px-6 py-3 bg-[#00b8d4] text-white rounded-lg font-semibold hover:bg-[#00a0b8] transition-colors text-sm sm:text-base min-h-[44px] whitespace-nowrap flex-1 sm:flex-none order-2 sm:order-1"
           >
-            いいえ（アフターパージ）
+            アフターパージ
           </button>
         </div>
       </div>

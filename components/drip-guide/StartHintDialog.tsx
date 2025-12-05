@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useCallback } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import { Coffee, Timer } from 'phosphor-react';
 import { GiCoffeePot } from 'react-icons/gi';
 
@@ -20,7 +20,7 @@ const overlayMotion = {
     exit: { opacity: 0 },
 };
 
-const dialogMotion = {
+const dialogMotion: MotionProps = {
     initial: { opacity: 0, scale: 0.96, y: 12 },
     animate: { opacity: 1, scale: 1, y: 0 },
     exit: { opacity: 0, scale: 0.96, y: 12 },

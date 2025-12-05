@@ -3,6 +3,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Coffee, Timer } from 'phosphor-react';
+import { GiCoffeePot } from 'react-icons/gi';
 
 interface StartHintDialogProps {
     isOpen: boolean;
@@ -93,7 +94,7 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
                             <div className="px-5 py-4 space-y-3 text-sm text-gray-700">
                                 <div className="flex gap-3">
                                     <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
-                                        <Coffee size={18} weight="duotone" />
+                                        <GiCoffeePot size={18} />
                                     </div>
                                     <div className="flex-1">
                                         <p className="font-semibold text-gray-900">湯量は総量表示です</p>
@@ -118,20 +119,16 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
                                     </div>
                                 </div>
 
-                                <div className="rounded-lg bg-amber-50 px-4 py-3 text-xs text-amber-800">
-                                    焦らずゆっくり、香りを楽しみながら進めてください。
-                                </div>
                             </div>
 
                             <div className="flex items-center justify-between px-5 pb-5 pt-1">
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    aria-label="閉じる"
-                                    className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+                                    className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors"
                                 >
-                                    <span className="sr-only">閉じる</span>
-                                    ×
+                                    <span className="text-base">×</span>
+                                    <span className="text-sm font-medium">閉じる</span>
                                 </button>
                                 <button
                                     type="button"

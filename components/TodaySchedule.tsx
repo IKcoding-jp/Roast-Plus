@@ -498,9 +498,18 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
     setEditingLabelId(null);
   };
 
-  const handleDeleteGroup = (time: string) => {
-    setLocalTimeLabels(localTimeLabels.filter((label) => label.time !== time));
-    setEditingLabelId(null);
+  const handleDeleteLabel = (id: string) => {
+    const target = localTimeLabels.find((label) => label.id === id);
+    setLocalTimeLabels((prev) => {
+      const next = prev.filter((label) => label.id !== id);
+      if (target) {
+        const sameTimeRemaining = next.filter((label) => label.time === target.time);
+        setEditingLabelId(sameTimeRemaining[0]?.id ?? null);
+      } else {
+        setEditingLabelId(null);
+      }
+      return next;
+    });
   };
 
   return (
@@ -733,12 +742,14 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
 
         const initialTime = parseTime(editingLabel.time);
 
+        const labelsForTime = localTimeLabels.filter((label) => label.time === editingLabel.time);
         return createPortal(
           <TimeEditDialog
             initialHour={initialTime.hour}
             initialMinute={initialTime.minute}
             onSave={(hour, minute) => handleEditGroupSave(editingLabel.time, hour, minute)}
-            onDelete={() => handleDeleteGroup(editingLabel.time)}
+            labels={labelsForTime}
+            onDeleteLabel={handleDeleteLabel}
             onCancel={handleEditCancel}
           />,
           document.body
@@ -752,16 +763,18 @@ interface TimeEditDialogProps {
   initialHour: string;
   initialMinute: string;
   onSave: (hour: string, minute: string) => void;
-  onDelete: () => void;
   onCancel: () => void;
+  labels: TimeLabel[];
+  onDeleteLabel: (id: string) => void;
 }
 
 function TimeEditDialog({
   initialHour,
   initialMinute,
   onSave,
-  onDelete,
   onCancel,
+  labels,
+  onDeleteLabel,
 }: TimeEditDialogProps) {
   const [hour, setHour] = useState(initialHour);
   const [minute, setMinute] = useState(initialMinute);
@@ -835,6 +848,32 @@ function TimeEditDialog({
               </div>
             </div>
 
+            {/* この時間のラベル一覧（個別削除） */}
+            {labels.length > 0 && (
+              <div className="space-y-2 md:space-y-3">
+                <h4 className="text-base md:text-lg font-medium text-gray-800">この時間のラベル</h4>
+                <div className="space-y-2">
+                  {labels.map((label) => (
+                    <div
+                      key={label.id}
+                      className="flex items-center gap-2 md:gap-3 rounded-md border border-gray-200 px-3 py-2 bg-gray-50"
+                    >
+                      <div className="flex-1 text-sm md:text-base text-gray-800 truncate">
+                        {label.content || '内容なし'}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onDeleteLabel(label.id)}
+                        className="px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-sm bg-white text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors min-h-[36px]"
+                      >
+                        削除
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* フッター */}
             <div className="flex gap-2 md:gap-4 pt-3 md:pt-5 border-t border-gray-200 justify-center">
               <button
@@ -843,16 +882,6 @@ function TimeEditDialog({
                 className="px-3 md:px-5 py-1.5 md:py-2.5 text-base md:text-lg text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors min-h-[44px]"
               >
                 キャンセル
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onDelete();
-                  onCancel();
-                }}
-                className="px-3 md:px-5 py-1.5 md:py-2.5 text-base md:text-lg bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors min-h-[44px]"
-              >
-                削除
               </button>
               <button
                 type="submit"

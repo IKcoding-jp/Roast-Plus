@@ -576,7 +576,7 @@ export const AssignmentTable: React.FC<Props> = ({
                             {/* 左ラベル列 */}
                             <div className="p-3 md:p-4 py-2 border-r border-gray-100 h-full flex items-center justify-center">
                                 <div 
-                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap text-center hover:bg-gray-100 rounded transition-colors"
+                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base whitespace-nowrap text-center hover:bg-gray-100 rounded transition-colors overflow-visible"
                                     onClick={() => {
                                         setHeightConfig({
                                             taskLabelId: label.id,
@@ -634,9 +634,9 @@ export const AssignmentTable: React.FC<Props> = ({
                             )}
 
                             {/* 右ラベル列 */}
-                            <div className="p-3 md:p-4 py-2 h-full flex items-center relative pr-8 md:pr-10">
+                            <div className="p-3 md:p-4 py-2 h-full flex items-center relative">
                                 <div 
-                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base break-words whitespace-pre-wrap text-right hover:bg-gray-100 rounded transition-colors"
+                                    className="w-full p-1 cursor-pointer font-medium text-gray-800 text-sm md:text-base whitespace-nowrap text-center hover:bg-gray-100 rounded transition-colors overflow-visible"
                                     onClick={() => {
                                         setHeightConfig({
                                             taskLabelId: label.id,

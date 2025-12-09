@@ -98,6 +98,8 @@ export const ocrScheduleFromImage = onCall(
     secrets: ['OPENAI_API_KEY', 'GOOGLE_VISION_API_KEY'], // Secrets Managerからシークレットを取得
   },
   async (request) => {
+    const overallStart = Date.now();
+
     // 認証チェック
     if (!request.auth) {
       throw new HttpsError('unauthenticated', '認証が必要です');
@@ -138,6 +140,11 @@ export const ocrScheduleFromImage = onCall(
       const [result] = await visionClient.textDetection({
         image: { content: base64Data },
       });
+      console.info('[OCR_TIMING]', {
+        phase: 'vision',
+        durationMs: Date.now() - overallStart,
+        timestamp: new Date().toISOString(),
+      });
 
       const detections = result.textAnnotations;
       if (!detections || detections.length === 0) {
@@ -159,12 +166,26 @@ export const ocrScheduleFromImage = onCall(
       }
 
       // GPT-5 nanoでスケジュール形式に整形
+      const gptStart = Date.now();
       const scheduleData = await formatScheduleWithGPT(fullText);
+      console.info('[OCR_TIMING]', {
+        phase: 'gpt_format',
+        durationMs: Date.now() - gptStart,
+        timestamp: new Date().toISOString(),
+      });
+
+      console.info('[OCR_TIMING]', {
+        phase: 'total',
+        durationMs: Date.now() - overallStart,
+        timestamp: new Date().toISOString(),
+      });
 
       return scheduleData;
     } catch (error) {
       // 詳細なエラーログを出力
-      logDetailedError('[VISION_ERROR]', error);
+      logDetailedError('[VISION_ERROR]', error, {
+        durationMs: Date.now() - overallStart,
+      });
 
       // HttpsErrorはそのまま再throw
       if (error instanceof HttpsError) {
@@ -288,6 +309,7 @@ ${ocrText}
 JSONのみを返してください。説明文は不要です。`;
 
   try {
+    const gptStart = Date.now();
     const completion = await openai.chat.completions.create(
       {
         model: 'gpt-5-nano',
@@ -307,6 +329,11 @@ JSONのみを返してください。説明文は不要です。`;
         timeout: 60000, // 60秒のタイムアウト
       }
     );
+    console.info('[OCR_TIMING]', {
+      phase: 'openai_call',
+      durationMs: Date.now() - gptStart,
+      timestamp: new Date().toISOString(),
+    });
 
     const responseText = completion.choices[0]?.message?.content;
     if (!responseText) {

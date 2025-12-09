@@ -125,19 +125,25 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     // ガイド枠の表示座標をビデオ座標に変換
     const rawCropX = (guideSize.left + offsetX) / scale;
     const rawCropY = (guideSize.top + offsetY) / scale;
-    const rawCropSize = guideSize.width / scale;
+    const rawCropWidth = guideSize.width / scale;
+    const rawCropHeight = guideSize.height / scale;
 
     // 境界チェック（クランプ処理）
-    const cropSize = Math.min(rawCropSize, videoWidth, videoHeight);
-    const cropX = Math.max(0, Math.min(rawCropX, videoWidth - cropSize));
-    const cropY = Math.max(0, Math.min(rawCropY, videoHeight - cropSize));
+    const cropWidth = Math.min(rawCropWidth, videoWidth);
+    const cropHeight = Math.min(rawCropHeight, videoHeight);
+    if (cropWidth <= 0 || cropHeight <= 0) {
+      return;
+    }
+    const cropX = Math.max(0, Math.min(rawCropX, videoWidth - cropWidth));
+    const cropY = Math.max(0, Math.min(rawCropY, videoHeight - cropHeight));
 
-    const targetSize = 1024;
+    const targetWidth = 1024;
+    const targetHeight = Math.round(targetWidth * (cropHeight / cropWidth));
 
     // リサイズ用の新しいキャンバスを作成
     const resizedCanvas = document.createElement('canvas');
-    resizedCanvas.width = targetSize;
-    resizedCanvas.height = targetSize;
+    resizedCanvas.width = targetWidth;
+    resizedCanvas.height = targetHeight;
     const resizedContext = resizedCanvas.getContext('2d');
 
     if (!resizedContext) {
@@ -151,8 +157,8 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     // 切り取りとリサイズを一度に行う
     resizedContext.drawImage(
       tempCanvas,
-      cropX, cropY, cropSize, cropSize, // ソース（切り取り範囲）
-      0, 0, targetSize, targetSize // デスティネーション（リサイズ後のサイズ）
+      cropX, cropY, cropWidth, cropHeight, // ソース（切り取り範囲）
+      0, 0, targetWidth, targetHeight // デスティネーション（リサイズ後のサイズ）
     );
 
     // リサイズした画像をBlobとして取得
@@ -163,8 +169,8 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         
         // リサイズ用キャンバスの参照を保持（confirmCaptureで使用）
         // 一時キャンバスにリサイズ後の画像を保存
-        tempCanvas.width = targetSize;
-        tempCanvas.height = targetSize;
+        tempCanvas.width = targetWidth;
+        tempCanvas.height = targetHeight;
         const finalContext = tempCanvas.getContext('2d');
         if (finalContext) {
           finalContext.drawImage(resizedCanvas, 0, 0);
@@ -285,7 +291,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
               
               {/* 中央の正方形エリア */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div ref={guideRef} className="relative w-[80%] max-w-md aspect-square">
+                <div ref={guideRef} className="relative w-[70%] max-w-md aspect-[3/4]">
                   {/* 正方形の枠線 */}
                   <div className="absolute inset-0 border-2 border-white rounded-lg shadow-lg z-10">
                     {/* 角のマーカー */}

@@ -33,7 +33,7 @@ export const calculateAssignment = (
 
     // 2. 割り当て枠の作成
     // memberId === null（未割り当て）の枠は固定する
-    // 割り当て済みの枠のみをシャッフル対象として再抽選する
+    // シャッフル対象は班を跨いで再配置する（teamIdは固定しない）
 
     const slots: { teamId: string; taskLabelId: string }[] = [];
     const lockedSlots = new Set<string>(); // "teamId-taskLabelId"
@@ -171,9 +171,8 @@ export const calculateAssignment = (
         // 改善: 除外設定などにより「割り当て可能なメンバーが少ないスロット」を優先的に処理するため、
         // 候補者数を計算してソートする
         const slotsWithCount = slots.map(slot => {
-            // このスロットに割り当て可能なメンバー数（チーム一致かつ除外設定なし）
+            // このスロットに割り当て可能なメンバー数（除外設定なし）
             const count = eligibleMembers.filter(m =>
-                m.teamId === slot.teamId &&
                 !m.excludedTaskLabelIds.includes(slot.taskLabelId)
             ).length;
             return { ...slot, candidateCount: count };
@@ -201,7 +200,6 @@ export const calculateAssignment = (
             const lastAssignedToday = currentAssignmentMap.get(`${slot.teamId}-${slot.taskLabelId}`)?.memberId ?? null;
             const baseCandidates = eligibleMembers.filter(member => {
                 if (currentLoopAssignedMemberIds.has(member.id)) return false;
-                if (member.teamId !== slot.teamId) return false;
                 if (member.excludedTaskLabelIds.includes(slot.taskLabelId)) return false;
                 return true;
             });
@@ -215,8 +213,6 @@ export const calculateAssignment = (
             for (const member of baseCandidates) {
                 // 割り当て済みメンバーはスキップ
                 if (currentLoopAssignedMemberIds.has(member.id)) continue;
-                // チームが異なるメンバーはスキップ
-                if (member.teamId !== slot.teamId) continue;
                 // 除外ラベルに含まれる場合はスキップ
                 if (member.excludedTaskLabelIds.includes(slot.taskLabelId)) continue;
                 // currentAssignmentsの直近担当者は候補が複数いる場合のみ除外

@@ -278,7 +278,34 @@ export default function AssignmentPage() {
             // 5. Persist result
             await updateAssignmentDay(userId, targetDate, result);
 
-            // 6. Persist shuffle history
+            // 6. Sync member teams with shuffle result (班を跨いだ移動を反映)
+            const memberTeamUpdates = Array.from(
+                result.reduce<Map<string, string>>((acc, asg) => {
+                    if (asg.memberId) acc.set(asg.memberId, asg.teamId);
+                    return acc;
+                }, new Map())
+            )
+                .map(([memberId, teamId]) => {
+                    const currentTeam = members.find(m => m.id === memberId)?.teamId;
+                    return { memberId, teamId, currentTeam };
+                })
+                .filter(entry => entry.currentTeam !== entry.teamId);
+
+            if (memberTeamUpdates.length > 0) {
+                await Promise.all(
+                    memberTeamUpdates.map(({ memberId, teamId }) =>
+                        updateMemberTeam(userId, memberId, teamId)
+                    )
+                );
+                setMembers(prev =>
+                    prev.map(m => {
+                        const update = memberTeamUpdates.find(u => u.memberId === m.id);
+                        return update ? { ...m, teamId: update.teamId } : m;
+                    })
+                );
+            }
+
+            // 7. Persist shuffle history
             const historyId = uuidv4();
             await createShuffleHistory(userId, {
                 id: historyId,
@@ -286,7 +313,7 @@ export default function AssignmentPage() {
                 targetDate: targetDate,
             });
 
-            // 7. Mark event done
+            // 8. Mark event done
             await updateShuffleEventState(userId, targetDate, 'done');
 
         } catch (e) {

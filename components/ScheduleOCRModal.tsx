@@ -70,12 +70,6 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
         
         if (errorCode === 'unauthenticated' || err.message.includes('unauthenticated')) {
           errorMessage = '認証が必要です。再度ログインしてください。';
-        } else if (errorCode === 'deadline-exceeded' || err.message.includes('タイムアウト')) {
-          errorMessage = '処理がタイムアウトしました。通信環境を確認して、少し待ってから再実行してください。';
-        } else if (errorCode === 'unavailable' || err.message.includes('混み合っています')) {
-          errorMessage = 'サーバーが混み合っています。しばらく待ってから再実行してください。';
-        } else if (errorCode === 'resource-exhausted' || err.message.includes('レート制限')) {
-          errorMessage = 'リクエストが集中しています。少し時間をおいて再実行してください。';
         } else if (errorCode === 'functions/not-found' || err.message.includes('not-found') || err.message.includes('404')) {
           errorMessage = 'Firebase Functionsが見つかりません。デプロイを確認してください。';
           errorDetails = 'ocrScheduleFromImage関数がデプロイされているか確認してください。';

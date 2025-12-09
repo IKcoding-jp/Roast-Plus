@@ -8,6 +8,7 @@ import {
   clearRoastTimerSettingsCache,
 } from '@/lib/roastTimerSettings';
 import { playTimerSound, stopTimerSound } from '@/lib/sounds';
+import { roastTimerSoundFiles } from '@/lib/soundFiles';
 import type { RoastTimerSettings } from '@/types';
 
 interface RoastTimerSettingsProps {
@@ -19,6 +20,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isTestingSound, setIsTestingSound] = useState(false);
+  const [testResult, setTestResult] = useState<string>('');
 
   useEffect(() => {
     loadRoastTimerSettings()
@@ -55,30 +57,84 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
     }
   };
 
+  // 音源パスをバージョン付きで解決
+  const resolveAudioUrl = (path: string) => {
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    const version = process.env.NEXT_PUBLIC_APP_VERSION || 'dev';
+    return `${normalized}?v=${version}`;
+  };
+
   const handleTestSound = async () => {
     if (!settings) return;
 
     // 既存の音を停止
     stopTimerSound();
 
+    setTestResult('テスト開始...');
     setIsTestingSound(true);
     try {
-      const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
+      const audioUrl = resolveAudioUrl(settings.timerSoundFile);
+
+      // まずHEADで到達性を確認
+      let headStatus = '';
+      try {
+        const headRes = await fetch(audioUrl, { method: 'HEAD' });
+        headStatus = `${headRes.status} ${headRes.statusText}`;
+        if (!headRes.ok) {
+          setTestResult(`音源取得に失敗: ${headStatus}`);
+          alert(`音源取得に失敗: ${headStatus}`);
+          setIsTestingSound(false);
+          return;
+        }
+      } catch (err) {
+        setTestResult(`音源取得でエラー: ${String(err)}`);
+        alert(`音源取得でエラー: ${String(err)}`);
+        setIsTestingSound(false);
+        return;
+      }
+
+      const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume, { throwOnError: true });
       if (audio) {
-        // 音声の再生が完了したら状態をリセット
-        audio.addEventListener('ended', () => {
+        let settled = false;
+        const settle = (msg: string) => {
+          if (settled) return;
+          settled = true;
+          setTestResult(msg);
+          alert(msg);
           setIsTestingSound(false);
-        }, { once: true });
-        // エラーが発生した場合も状態をリセット
-        audio.addEventListener('error', () => {
-          setIsTestingSound(false);
-        }, { once: true });
+        };
+
+        // 成功/失敗をユーザーに表示
+        const handleSuccess = () => {
+          settle(`再生OK（音量: ${Math.round(settings.timerSoundVolume * 100)}% / HEAD: ${headStatus || '200 OK'}）`);
+        };
+        const handleError = (e?: Event) => {
+          const err = (audio as HTMLAudioElement).error;
+          settle(
+            `再生エラー: ${err?.message || '不明'} / readyState: ${audio.readyState}, networkState: ${audio.networkState}`
+          );
+        };
+        audio.addEventListener('ended', handleSuccess, { once: true });
+        audio.addEventListener('play', handleSuccess, { once: true });
+        audio.addEventListener('error', handleError, { once: true });
+
+        // 念のためタイムアウトで強制的に結果を表示（イベントが来ないケース用）
+        setTimeout(() => {
+          settle(
+            `再生確認: イベント未取得 / readyState: ${audio.readyState}, networkState: ${audio.networkState}, HEAD: ${headStatus || '200 OK'}`
+          );
+        }, 3000);
       } else {
+        const msg = '再生開始に失敗（playTimerSoundからnullが返却）';
+        setTestResult(msg);
+        alert(msg);
         setIsTestingSound(false);
       }
     } catch (error) {
       console.error('Failed to play test sound:', error);
-      alert('サウンドの再生に失敗しました');
+      const msg = `再生に失敗: ${String(error)}`;
+      setTestResult(msg);
+      alert(msg);
       setIsTestingSound(false);
     }
   };
@@ -150,8 +206,36 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
               )}
             </div>
 
+            {settings.timerSoundEnabled && testResult && (
+              <p className="text-xs sm:text-sm text-gray-600">{testResult}</p>
+            )}
+
             {settings.timerSoundEnabled && (
               <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                  音源
+                </label>
+                <select
+                  value={settings.timerSoundFile}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      timerSoundFile: e.target.value,
+                    })
+                  }
+                  className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+                >
+                  {roastTimerSoundFiles.map((f) => (
+                    <option key={f.value} value={f.value}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {settings.timerSoundEnabled && (
+              <div className="pt-2">
                 <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
                   音量: {Math.round(settings.timerSoundVolume * 100)}%
                 </label>

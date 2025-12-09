@@ -8,15 +8,32 @@ import { getRoastTimerSettings, setRoastTimerSettings } from './localStorage';
 import { roastTimerSoundFiles } from './soundFiles';
 import type { RoastTimerSettings } from '@/types';
 
-// デフォルト設定: 実際に存在する最初のファイルを使用
+// デフォルト設定: 実際に存在する最初のファイルを使用（なければ固定パスにフォールバック）
+const DEFAULT_TIMER_SOUND = roastTimerSoundFiles[0]?.value || '/sounds/roasttimer/alarm.mp3';
 const DEFAULT_SETTINGS: RoastTimerSettings = {
   goToRoastRoomTimeSeconds: 60,
   timerSoundEnabled: false,
-  timerSoundFile: roastTimerSoundFiles[0]?.value || '/sounds/roasttimer/alarm.mp3',
+  timerSoundFile: DEFAULT_TIMER_SOUND,
   timerSoundVolume: 1,
   notificationSoundEnabled: true,
-  notificationSoundFile: roastTimerSoundFiles[0]?.value || '/sounds/roasttimer/alarm.mp3',
+  notificationSoundFile: DEFAULT_TIMER_SOUND,
   notificationSoundVolume: 1,
+};
+
+const allowedTimerSounds = new Set(roastTimerSoundFiles.map((s) => s.value));
+
+const normalizePath = (path?: string): string => {
+  if (!path || path.trim() === '') return DEFAULT_TIMER_SOUND;
+  let normalized = path;
+  if (normalized.startsWith('/sounds/alarm/')) {
+    const fileName = normalized.replace('/sounds/alarm/', '');
+    normalized = `/sounds/roasttimer/${fileName}`;
+  }
+  // 許可リストに無い場合はデフォルトにフォールバック
+  if (!allowedTimerSounds.has(normalized)) {
+    normalized = DEFAULT_TIMER_SOUND;
+  }
+  return normalized;
 };
 
 // メモリ上のキャッシュ
@@ -51,16 +68,10 @@ export async function loadRoastTimerSettings(userId?: string): Promise<RoastTime
           ...DEFAULT_SETTINGS,
           ...(storedSettings as Partial<RoastTimerSettings>),
         };
-        
-        // 後方互換性: 古いパス（/sounds/alarm/）が選択されている場合は新しいパスに移行
-        if (merged.timerSoundFile.startsWith('/sounds/alarm/')) {
-          const fileName = merged.timerSoundFile.replace('/sounds/alarm/', '');
-          merged.timerSoundFile = `/sounds/roasttimer/${fileName}`;
-        }
-        if (merged.notificationSoundFile.startsWith('/sounds/alarm/')) {
-          const fileName = merged.notificationSoundFile.replace('/sounds/alarm/', '');
-          merged.notificationSoundFile = `/sounds/roasttimer/${fileName}`;
-        }
+
+        // パスを正規化（存在しないファイルの場合もデフォルトへフォールバック）
+        merged.timerSoundFile = normalizePath(merged.timerSoundFile);
+        merged.notificationSoundFile = normalizePath(merged.notificationSoundFile);
         
         settingsCache = merged;
         

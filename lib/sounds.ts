@@ -13,7 +13,8 @@ let notificationErrorHandler: ((e: Event) => void) | null = null;
  */
 export async function playTimerSound(
   soundFile: string,
-  volume: number
+  volume: number,
+  options?: { throwOnError?: boolean }
 ): Promise<HTMLAudioElement | null> {
   try {
     // 既存の音声を停止
@@ -33,6 +34,10 @@ export async function playTimerSound(
     const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.2.8';
     audioPath = `${audioPath}?v=${version}`;
     const audio = new Audio(audioPath);
+    audio.preload = 'auto';
+    // iOS/Safari向けに明示しておく
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (audio as any).playsInline = true;
     
     // エラーハンドリングを追加（参照を保持して削除可能にする）
     timerErrorHandler = (e: Event) => {
@@ -63,6 +68,9 @@ export async function playTimerSound(
   } catch (error) {
     console.error('Failed to play timer sound:', error);
     console.error('Sound file path:', soundFile);
+    if (options?.throwOnError) {
+      throw error;
+    }
     return null;
   }
 }

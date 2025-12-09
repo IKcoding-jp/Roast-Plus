@@ -203,10 +203,18 @@ function normalizeAppData(data: any): AppData {
       cleanedUserSettings.roastTimerSettings = {
         goToRoastRoomTimeSeconds: typeof settings.goToRoastRoomTimeSeconds === 'number' ? settings.goToRoastRoomTimeSeconds : 60,
         timerSoundEnabled: typeof settings.timerSoundEnabled === 'boolean' ? settings.timerSoundEnabled : true,
-        timerSoundFile: typeof settings.timerSoundFile === 'string' ? settings.timerSoundFile : '/sounds/alarm/alarm01.mp3',
+        timerSoundFile: typeof settings.timerSoundFile === 'string'
+          ? settings.timerSoundFile.startsWith('/sounds/alarm/')
+            ? settings.timerSoundFile.replace('/sounds/alarm/', '/sounds/roasttimer/')
+            : settings.timerSoundFile
+          : '/sounds/roasttimer/alarm.mp3',
         timerSoundVolume: typeof settings.timerSoundVolume === 'number' ? Math.max(0, Math.min(1, settings.timerSoundVolume)) : 0.5,
         notificationSoundEnabled: typeof settings.notificationSoundEnabled === 'boolean' ? settings.notificationSoundEnabled : true,
-        notificationSoundFile: typeof settings.notificationSoundFile === 'string' ? settings.notificationSoundFile : '/sounds/alarm/alarm01.mp3',
+        notificationSoundFile: typeof settings.notificationSoundFile === 'string'
+          ? settings.notificationSoundFile.startsWith('/sounds/alarm/')
+            ? settings.notificationSoundFile.replace('/sounds/alarm/', '/sounds/roasttimer/')
+            : settings.notificationSoundFile
+          : '/sounds/roasttimer/alarm.mp3',
         notificationSoundVolume: typeof settings.notificationSoundVolume === 'number' ? Math.max(0, Math.min(1, settings.notificationSoundVolume)) : 0.5,
       };
     }

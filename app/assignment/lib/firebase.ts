@@ -70,6 +70,19 @@ function getManagersCollection(userId: string) {
 
 const assignmentKey = (teamId: string, taskLabelId: string) => `${teamId}__${taskLabelId}`;
 
+const DEFAULT_TABLE_SETTINGS: TableSettings = {
+    colWidths: {
+        taskLabel: 120,
+        note: 120,
+        teams: {}
+    },
+    rowHeights: {},
+    headerLabels: {
+        left: '左ラベル',
+        right: '右ラベル'
+    }
+};
+
 const normalizeAssignmentsForDate = (assignments: Assignment[], date: string): Assignment[] => {
     const map = new Map<string, Assignment>();
     assignments.forEach((a) => {
@@ -376,17 +389,22 @@ export const subscribeTableSettings = (userId: string, callback: (settings: Tabl
     const docRef = doc(settingsCol, 'table');
     return onSnapshot(docRef, (snap) => {
         if (snap.exists()) {
-            callback(snap.data() as TableSettings);
-        } else {
-            // デフォルト値を返す
+            const data = snap.data() as Partial<TableSettings>;
             callback({
                 colWidths: {
-                    taskLabel: 120,
-                    note: 120,
-                    teams: {}
+                    ...DEFAULT_TABLE_SETTINGS.colWidths,
+                    ...data.colWidths,
+                    teams: {
+                        ...DEFAULT_TABLE_SETTINGS.colWidths.teams,
+                        ...(data.colWidths?.teams ?? {})
+                    }
                 },
-                rowHeights: {}
+                rowHeights: data.rowHeights ?? DEFAULT_TABLE_SETTINGS.rowHeights,
+                headerLabels: data.headerLabels ?? DEFAULT_TABLE_SETTINGS.headerLabels,
             });
+        } else {
+            // デフォルト値を返す
+            callback(DEFAULT_TABLE_SETTINGS);
         }
     });
 };

@@ -25,6 +25,15 @@ type Props = {
     onSwapAssignments: (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => Promise<void>;
 };
 
+const DEFAULT_TABLE_SETTINGS: TableSettings = {
+    colWidths: { taskLabel: 160, note: 160, teams: {} },
+    rowHeights: {},
+    headerLabels: {
+        left: '左ラベル',
+        right: '右ラベル'
+    }
+};
+
 export const AssignmentTable: React.FC<Props> = ({
     teams,
     taskLabels,
@@ -84,6 +93,7 @@ export const AssignmentTable: React.FC<Props> = ({
         id?: string;
         currentWidth: number;
         label: string;
+        currentTitle?: string;
     } | null>(null);
 
     // 高さ設定モーダル用
@@ -96,27 +106,32 @@ export const AssignmentTable: React.FC<Props> = ({
         currentRightLabel?: string; // 右ラベル編集用（参照用）
     } | null>(null);
 
-    // 幅変更保存
-    const handleSaveWidth = async (width: number) => {
+    // 幅変更保存 + ヘッダー名更新
+    const handleSaveWidth = async (width: number, headerName?: string) => {
         if (!widthConfig) return;
         
-        const currentSettings: TableSettings = tableSettings || {
-            colWidths: { taskLabel: 160, note: 160, teams: {} },
-            rowHeights: {}
-        };
+        const currentSettings: TableSettings = tableSettings || DEFAULT_TABLE_SETTINGS;
 
-        const newSettings = { 
+        const newSettings: TableSettings = { 
             ...currentSettings,
             colWidths: {
                 ...currentSettings.colWidths,
                 teams: { ...currentSettings.colWidths.teams }
-            }
+            },
+            rowHeights: { ...currentSettings.rowHeights },
+            headerLabels: { ...currentSettings.headerLabels }
         };
         
         if (widthConfig.type === 'taskLabel') {
             newSettings.colWidths.taskLabel = width;
+            if (headerName !== undefined) {
+                newSettings.headerLabels.left = headerName.trim() || DEFAULT_TABLE_SETTINGS.headerLabels.left;
+            }
         } else if (widthConfig.type === 'note') {
             newSettings.colWidths.note = width;
+            if (headerName !== undefined) {
+                newSettings.headerLabels.right = headerName.trim() || DEFAULT_TABLE_SETTINGS.headerLabels.right;
+            }
         } else if (widthConfig.type === 'team' && widthConfig.id) {
             newSettings.colWidths.teams[widthConfig.id] = width;
         }
@@ -130,14 +145,12 @@ export const AssignmentTable: React.FC<Props> = ({
         if (!heightConfig) return;
 
         // 高さの保存
-        const currentSettings: TableSettings = tableSettings || {
-            colWidths: { taskLabel: 160, note: 160, teams: {} },
-            rowHeights: {}
-        };
+        const currentSettings: TableSettings = tableSettings || DEFAULT_TABLE_SETTINGS;
 
-        const newSettings = { 
+        const newSettings: TableSettings = { 
             ...currentSettings,
-            rowHeights: { ...currentSettings.rowHeights }
+            rowHeights: { ...currentSettings.rowHeights },
+            headerLabels: { ...currentSettings.headerLabels }
         };
 
         newSettings.rowHeights[heightConfig.taskLabelId] = height;
@@ -253,14 +266,12 @@ export const AssignmentTable: React.FC<Props> = ({
         setShowMemberMenu(null);
     };
 
-    // チーム追加
+    // チーム追加（空欄も許容）
     const handleAddTeam = async () => {
-        if (!newTeamName.trim()) return;
-        
         const maxOrder = teams.length > 0 ? Math.max(...teams.map(t => t.order || 0)) : 0;
         const newTeam: Team = {
             id: uuidv4(),
-            name: newTeamName,
+            name: newTeamName.trim(),
             order: maxOrder + 1
         };
 
@@ -272,19 +283,19 @@ export const AssignmentTable: React.FC<Props> = ({
     // チーム更新 (インライン)
     const handleUpdateTeam = async (teamId: string) => {
         const team = teams.find(t => t.id === teamId);
-        if (team && editTeamName.trim()) {
-            await onUpdateTeam({ ...team, name: editTeamName });
+        if (team) {
+            await onUpdateTeam({ ...team, name: editTeamName.trim() });
         }
         setEditingTeamId(null);
     };
 
     // チーム更新 (モーダル経由)
     const handleUpdateTeamFromModal = async () => {
-        if (!activeTeamActionId || !activeTeamName.trim()) return;
+        if (!activeTeamActionId) return;
         
         const team = teams.find(t => t.id === activeTeamActionId);
         if (team) {
-            await onUpdateTeam({ ...team, name: activeTeamName });
+            await onUpdateTeam({ ...team, name: activeTeamName.trim() });
         }
         setActiveTeamActionId(null);
     };
@@ -390,6 +401,10 @@ export const AssignmentTable: React.FC<Props> = ({
     };
 
     const gridTemplateColumns = generateGridTemplateColumns();
+    const headerLabels = tableSettings?.headerLabels ?? DEFAULT_TABLE_SETTINGS.headerLabels;
+    const formatTeamTitle = (teamName?: string) => {
+        return teamName && teamName.trim().length > 0 ? `${teamName.trim()}班` : '';
+    };
 
     return (
         <div className="w-full max-w-full flex flex-col items-center gap-6">
@@ -436,11 +451,12 @@ export const AssignmentTable: React.FC<Props> = ({
                     onClick={() => setWidthConfig({
                         type: 'taskLabel',
                         currentWidth: tableSettings?.colWidths?.taskLabel ?? 160,
-                        label: '左ラベル列の幅'
+                        label: `${headerLabels.left}列の幅`,
+                        currentTitle: headerLabels.left
                     })}
                     title="クリックして幅を変更"
                 >
-                    左ラベル
+                    {headerLabels.left}
                 </div>
                 
                 {/* チーム列（チームがない場合も表示） */}
@@ -450,7 +466,7 @@ export const AssignmentTable: React.FC<Props> = ({
                             <div className="relative z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32 md:w-40">
                                 <input
                                     className="w-full px-1 md:p-2 md:text-base text-sm outline-none text-gray-900"
-                                    placeholder="班名"
+                                    placeholder="班名(任意)"
                                     value={newTeamName}
                                     onChange={e => setNewTeamName(e.target.value)}
                                     autoFocus
@@ -495,7 +511,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                         setActiveTeamName(team.name);
                                     }}
                                 >
-                                    {team.name}班
+                                    {formatTeamTitle(team.name)}
                                 </div>
                             )}
                         </div>
@@ -510,7 +526,8 @@ export const AssignmentTable: React.FC<Props> = ({
                         setWidthConfig({
                             type: 'note',
                             currentWidth: tableSettings?.colWidths?.note ?? 160,
-                            label: '右ラベル列の幅'
+                            label: `${headerLabels.right}列の幅`,
+                            currentTitle: headerLabels.right
                         });
                     }}
                     title="クリックして幅を変更"
@@ -529,7 +546,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                     <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32 md:w-40">
                                         <input
                                             className="w-full px-1 md:p-2 text-sm md:text-base outline-none text-gray-900"
-                                            placeholder="班名"
+                                            placeholder="班名(任意)"
                                             value={newTeamName}
                                             onChange={e => setNewTeamName(e.target.value)}
                                             autoFocus
@@ -554,7 +571,7 @@ export const AssignmentTable: React.FC<Props> = ({
                             )
                         )}
                     </div>
-                    <span>右ラベル</span>
+                    <span>{headerLabels.right}</span>
                     <span className="w-4"></span> {/* スペーサー */}
                 </div>
                 </div>
@@ -581,7 +598,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                         setHeightConfig({
                                             taskLabelId: label.id,
                                             currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
-                                            label: '左ラベルの設定',
+                                            label: `${headerLabels.left}の設定`,
                                             currentName: label.leftLabel,
                                             editMode: 'left',
                                             currentRightLabel: label.rightLabel || ''
@@ -641,7 +658,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                         setHeightConfig({
                                             taskLabelId: label.id,
                                             currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
-                                            label: '右ラベルの設定',
+                                            label: `${headerLabels.right}の設定`,
                                             currentName: label.rightLabel || '',
                                             editMode: 'right',
                                             currentRightLabel: label.leftLabel // 左ラベルは参照用に保持
@@ -663,7 +680,7 @@ export const AssignmentTable: React.FC<Props> = ({
                     <div className="pr-2">
                         <input
                             className="w-full p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-sm text-gray-800 placeholder-gray-500"
-                            placeholder="左ラベル"
+                            placeholder={headerLabels.left}
                             value={newLeftLabel}
                             onChange={e => setNewLeftLabel(e.target.value)}
                             onKeyDown={e => {
@@ -674,13 +691,13 @@ export const AssignmentTable: React.FC<Props> = ({
                     
                     {/* チーム列の空白（結合） */}
                     <div className="col-span-full px-2 text-center text-gray-600 text-xs font-bold flex items-center justify-center" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
-                        <span className="hidden md:inline">左と右を入力して追加</span>
+                        <span className="hidden md:inline">{headerLabels.left}と{headerLabels.right}を入力して追加</span>
                     </div>
 
                     <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
                         <input
                             className="w-full min-w-0 p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-right text-sm text-gray-800 placeholder-gray-500"
-                            placeholder="右ラベル(任意)"
+                            placeholder={`${headerLabels.right}(任意)`}
                             value={newRightLabel}
                             onChange={e => setNewRightLabel(e.target.value)}
                             onKeyDown={e => {
@@ -714,14 +731,14 @@ export const AssignmentTable: React.FC<Props> = ({
                                             className="w-full p-2 border rounded bg-white text-lg font-bold text-gray-800"
                                             value={editLeftLabel}
                                             onChange={e => setEditLeftLabel(e.target.value)}
-                                            placeholder="左ラベル"
+                                            placeholder={headerLabels.left}
                                         />
                                         <div className="flex gap-2">
                                             <input
                                                 className="flex-1 p-2 border rounded bg-white text-sm text-gray-600"
                                                 value={editRightLabel}
                                                 onChange={e => setEditRightLabel(e.target.value)}
-                                                placeholder="右ラベル"
+                                                placeholder={headerLabels.right}
                                             />
                                             <button 
                                                 onClick={() => saveLabel(label.id)} 
@@ -771,7 +788,7 @@ export const AssignmentTable: React.FC<Props> = ({
 
                                         return (
                                             <div key={team.id} className="flex flex-col gap-1">
-                                                <div className="text-[10px] text-gray-400 font-bold px-1">{team.name}班</div>
+                                                <div className="text-[10px] text-gray-400 font-bold px-1">{formatTeamTitle(team.name)}</div>
                                                 <button
                                                     onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                                     onMouseUp={handleCellTouchEnd}
@@ -823,7 +840,12 @@ export const AssignmentTable: React.FC<Props> = ({
                         >
                             <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                                 <h3 className="font-bold text-gray-800">
-                                    {teams.find(t => t.id === contextMenu.teamId)?.name}班 - {taskLabels.find(l => l.id === contextMenu.taskLabelId)?.leftLabel}
+                                    {(() => {
+                                        const team = teams.find(t => t.id === contextMenu.teamId);
+                                        const title = formatTeamTitle(team?.name);
+                                        const label = taskLabels.find(l => l.id === contextMenu.taskLabelId)?.leftLabel ?? '';
+                                        return title ? `${title} - ${label}` : label;
+                                    })()}
                                 </h3>
                                 <button onClick={() => setContextMenu(null)} className="text-gray-400 hover:text-gray-600">
                                     <MdClose size={20} />
@@ -991,7 +1013,12 @@ export const AssignmentTable: React.FC<Props> = ({
                         >
                             <div className="flex justify-between items-center mb-4">
                                 <div className="text-sm text-gray-500 font-bold">
-                                    {teams.find(t => t.id === showMemberMenu.teamId)?.name}班 - {taskLabels.find(l => l.id === showMemberMenu.taskLabelId)?.leftLabel}
+                                    {(() => {
+                                        const team = teams.find(t => t.id === showMemberMenu.teamId);
+                                        const title = formatTeamTitle(team?.name);
+                                        const label = taskLabels.find(l => l.id === showMemberMenu.taskLabelId)?.leftLabel ?? '';
+                                        return title ? `${title} - ${label}` : label;
+                                    })()}
                                 </div>
                                 <button onClick={() => setShowMemberMenu(null)}><MdClose /></button>
                             </div>
@@ -1157,6 +1184,20 @@ export const AssignmentTable: React.FC<Props> = ({
                             className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10"
                         >
                             <h3 className="text-lg font-bold text-gray-800 mb-4">{widthConfig.label}</h3>
+                            {(widthConfig.type === 'taskLabel' || widthConfig.type === 'note') && (
+                                <div className="mb-4">
+                                    <label className="block text-sm text-gray-600 mb-1">
+                                        列の表示名
+                                    </label>
+                                    <input
+                                        className="w-full p-2 border border-gray-300 rounded text-base text-gray-900"
+                                        value={widthConfig.currentTitle ?? ''}
+                                        onChange={e => setWidthConfig({ ...widthConfig, currentTitle: e.target.value })}
+                                        placeholder={`${widthConfig.type === 'taskLabel' ? '左' : '右'}ラベル名`}
+                                        onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
+                                    />
+                                </div>
+                            )}
                             <div className="flex items-center gap-2 mb-6">
                                 <input
                                     type="number"
@@ -1164,13 +1205,13 @@ export const AssignmentTable: React.FC<Props> = ({
                                     value={widthConfig.currentWidth}
                                     onChange={e => setWidthConfig({ ...widthConfig, currentWidth: parseInt(e.target.value) || 0 })}
                                     autoFocus
-                                    onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth)}
+                                    onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
                                 />
                                 <span className="text-gray-500 font-bold">px</span>
                             </div>
                             <div className="flex gap-2">
                                 <button onClick={() => setWidthConfig(null)} className="flex-1 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">キャンセル</button>
-                                <button onClick={() => handleSaveWidth(widthConfig.currentWidth)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
+                                <button onClick={() => handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
                             </div>
                         </motion.div>
                     </div>
@@ -1194,16 +1235,16 @@ export const AssignmentTable: React.FC<Props> = ({
                             
                             <div className="mb-4">
                                 <label className="block text-sm text-gray-500 mb-1">
-                                    {heightConfig.editMode === 'left' ? '左ラベル名' : '右ラベル名'}
+                                    {heightConfig.editMode === 'left' ? `${headerLabels.left}の名前` : `${headerLabels.right}の名前`}
                                 </label>
                                 <input
                                     className="w-full p-2 border border-gray-300 rounded text-lg text-gray-900"
                                     value={heightConfig.currentName}
                                     onChange={e => setHeightConfig({ ...heightConfig, currentName: e.target.value })}
-                                    placeholder={heightConfig.editMode === 'left' ? '左ラベルを入力' : '右ラベルを入力（任意）'}
+                                    placeholder={heightConfig.editMode === 'left' ? `${headerLabels.left}を入力` : `${headerLabels.right}を入力（任意）`}
                                 />
                                 {heightConfig.editMode === 'right' && (
-                                    <p className="text-xs text-gray-500 mt-1">右ラベルは任意です。空欄にすると削除されます。</p>
+                                    <p className="text-xs text-gray-500 mt-1">{headerLabels.right}は任意です。空欄にすると削除されます。</p>
                                 )}
                             </div>
 

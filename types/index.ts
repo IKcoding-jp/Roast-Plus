@@ -216,6 +216,10 @@ export interface TableSettings {
     teams: Record<string, number>;
   };
   rowHeights: Record<string, number>;
+  labelHeaders?: {
+    left?: string;
+    right?: string;
+  };
 }
 
 export interface AppData {

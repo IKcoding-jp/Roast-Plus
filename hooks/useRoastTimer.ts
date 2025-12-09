@@ -60,6 +60,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   const lastUpdateRef = useRef<number>(Date.now());
   const soundAudioRef = useRef<HTMLAudioElement | null>(null);
   const notificationAudioRef = useRef<HTMLAudioElement | null>(null); // 通知音用のAudioオブジェクト（アンロック済み）
+  const preparedTimerAudioRef = useRef<HTMLAudioElement | null>(null); // タイマー音用のアンロック済みAudio
   const hasResetRef = useRef(false); // リセットが実行されたかどうかを追跡
   const isInitialMountRef = useRef(true); // 初回マウントかどうかを追跡
   const pausedElapsedRef = useRef<number>(0); // 一時停止の累積時間（秒）
@@ -269,6 +270,125 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     return `${audioPath}?v=${version}`;
   }, []);
 
+  // タイマー音の準備（アンロック）を行う
+  // ※タイマー音は設定デフォルトがOFFのため、ONにした場合に確実に鳴らすための準備
+  const prepareTimerSound = useCallback(async () => {
+    try {
+      const settings = await loadRoastTimerSettings();
+      if (!settings.timerSoundEnabled) {
+        console.log('[RoastTimer] Timer sound is disabled, skipping unlock');
+        return;
+      }
+
+      // 既に準備済みなら再利用
+      if (preparedTimerAudioRef.current) {
+        return;
+      }
+
+      const DEFAULT_SOUND_FILE = settings.timerSoundFile || '/sounds/roasttimer/alarm.mp3';
+
+      let audioPath = resolveAudioPath(settings.timerSoundFile);
+      let audio = new Audio(audioPath);
+      let hasError = false;
+      let usedFallback = false;
+      let errorDetails:
+        | {
+            code?: number;
+            message?: string;
+            path: string;
+            readyState?: number;
+            networkState?: number;
+            MEDIA_ERR_ABORTED?: number;
+            MEDIA_ERR_NETWORK?: number;
+            MEDIA_ERR_DECODE?: number;
+            MEDIA_ERR_SRC_NOT_SUPPORTED?: number;
+          }
+        | null = null;
+
+      const attachErrorLogger = (target: HTMLAudioElement, path: string) => (e: Event) => {
+        hasError = true;
+        const error = target.error;
+        if (error) {
+          errorDetails = {
+            code: error.code,
+            message: error.message,
+            path,
+            MEDIA_ERR_ABORTED: error.MEDIA_ERR_ABORTED,
+            MEDIA_ERR_NETWORK: error.MEDIA_ERR_NETWORK,
+            MEDIA_ERR_DECODE: error.MEDIA_ERR_DECODE,
+            MEDIA_ERR_SRC_NOT_SUPPORTED: error.MEDIA_ERR_SRC_NOT_SUPPORTED,
+          };
+        } else {
+          errorDetails = {
+            path,
+            readyState: target.readyState,
+            networkState: target.networkState,
+          };
+        }
+        console.error('[RoastTimer] Timer audio loading error:', errorDetails);
+      };
+
+      let errorHandler: ((e: Event) => void) | null = attachErrorLogger(audio, audioPath);
+      audio.addEventListener('error', errorHandler);
+
+      // エラーイベントを待つための短い待機
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      if (hasError) {
+        audio.removeEventListener('error', errorHandler);
+        errorHandler = null;
+
+        // デフォルトファイルで再試行（元ファイルと異なる場合のみ）
+        if (settings.timerSoundFile !== DEFAULT_SOUND_FILE) {
+          audioPath = resolveAudioPath(DEFAULT_SOUND_FILE);
+          audio = new Audio(audioPath);
+          usedFallback = true;
+          hasError = false;
+          errorDetails = null;
+          errorHandler = attachErrorLogger(audio, audioPath);
+          audio.addEventListener('error', errorHandler);
+
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          if (hasError) {
+            audio.removeEventListener('error', errorHandler);
+            console.error('[RoastTimer] Fallback timer audio loading failed:', errorDetails);
+            return;
+          }
+        } else {
+          console.error('[RoastTimer] Default timer audio failed, skipping unlock');
+          return;
+        }
+      }
+
+      // 無音で再生しアンロック
+      audio.volume = 0;
+      audio.muted = true;
+
+      try {
+        await audio.play();
+        audio.pause();
+        audio.currentTime = 0;
+
+        audio.muted = false;
+        audio.volume = Math.max(0, Math.min(1, settings.timerSoundVolume));
+
+        if (errorHandler) {
+          audio.removeEventListener('error', errorHandler);
+        }
+        preparedTimerAudioRef.current = audio;
+        console.log('[RoastTimer] Timer sound prepared and unlocked', usedFallback ? '(fallback)' : '');
+      } catch (playError) {
+        if (errorHandler) {
+          audio.removeEventListener('error', errorHandler);
+        }
+        console.error('[RoastTimer] Failed to play timer audio for unlock:', playError);
+      }
+    } catch (error) {
+      console.error('[RoastTimer] Failed to prepare timer sound:', error);
+    }
+  }, [resolveAudioPath]);
+
   // 通知音の準備（アンロック）を行う
   const prepareNotificationSound = useCallback(async () => {
     try {
@@ -471,18 +591,31 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     // アラーム音を再生（タイマー音）
     try {
       const settings = await loadRoastTimerSettings();
+
       if (settings.timerSoundEnabled) {
-        const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
-        soundAudioRef.current = audio;
+        if (preparedTimerAudioRef.current) {
+          try {
+            preparedTimerAudioRef.current.currentTime = 0;
+            await preparedTimerAudioRef.current.play();
+            soundAudioRef.current = preparedTimerAudioRef.current;
+            console.log('[RoastTimer] Timer sound played from prepared ref');
+          } catch (err) {
+            console.error('[RoastTimer] Failed to play prepared timer audio, fallback', err);
+            const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
+            soundAudioRef.current = audio;
+          }
+        } else {
+          const audio = await playTimerSound(settings.timerSoundFile, settings.timerSoundVolume);
+          soundAudioRef.current = audio;
+        }
       }
-      
-      // 通知音を再生（アンロック済みAudioを使用）
-      // タイマー音が有効な場合のみ通知音も再生
-      if (settings.timerSoundEnabled) {
+
+      // 通知音は通知設定に基づき独立判定で再生
+      if (settings.notificationSoundEnabled) {
         void playNotificationSoundFromRef();
       }
     } catch (error) {
-      console.error('Failed to play timer sound:', error);
+      console.error('Failed to play timer/notification sound:', error);
     }
 
     // ローカル状態を更新
@@ -615,6 +748,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
       // 通知音の準備（アンロック）
       // ユーザーインタラクション内で実行する必要がある
+      await prepareTimerSound();
       await prepareNotificationSound();
 
       // サーバー時刻の取得を試みる（失敗した場合はローカル時刻を使用）
@@ -656,7 +790,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         throw error; // Firestoreへの保存に失敗した場合はエラーを投げる
       }
     },
-    [user, updateData, currentDeviceId, isLoading, prepareNotificationSound]
+    [user, updateData, currentDeviceId, isLoading, prepareTimerSound, prepareNotificationSound]
   );
 
   // タイマーを一時停止
@@ -706,6 +840,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
     // 通知音の準備（アンロック）
     // ユーザーインタラクション内で実行する必要がある
+    await prepareTimerSound();
     await prepareNotificationSound();
 
     const basePausedElapsed = localState.pausedElapsed ?? pausedElapsedRef.current ?? 0;
@@ -743,7 +878,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
     } catch (error) {
       console.error('Failed to save roast timer state to Firestore:', error);
     }
-  }, [localState, user, updateData, currentDeviceId, isLoading, prepareNotificationSound]);
+  }, [localState, user, updateData, currentDeviceId, isLoading, prepareTimerSound, prepareNotificationSound]);
 
   // タイマーをスキップ（即座に完了）
   const skipTimer = useCallback(async () => {

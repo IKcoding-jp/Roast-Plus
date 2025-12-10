@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { Loading } from '@/components/Loading';
 import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkProgress, addProgressToWorkProgress, addCompletedCountToWorkProgress, archiveWorkProgress, unarchiveWorkProgress, updateProgressHistoryEntry, deleteProgressHistoryEntry, extractTargetAmount, extractUnitFromWeight } from '@/lib/firestore';
-import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiMinus, HiSearch, HiOutlineCollection, HiArchive } from 'react-icons/hi';
-import { MdTimeline, MdSort } from 'react-icons/md';
+import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiSearch, HiOutlineCollection, HiArchive } from 'react-icons/hi';
+import { MdTimeline } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
 import { WorkProgressCard } from '@/components/work-progress/WorkProgressCard';
@@ -24,9 +23,11 @@ interface GroupedWorkProgress {
   workProgresses: WorkProgress[];
 }
 
+type WorkProgressInput = Partial<Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'>>;
+
 export default function ProgressPage() {
   const { user, loading: authLoading } = useAuth();
-  const { data, updateData, isLoading } = useAppData();
+  const { data, isLoading } = useAppData();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkProgressId, setEditingWorkProgressId] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>('createdAt');
@@ -37,30 +38,11 @@ export default function ProgressPage() {
   const [addingToGroupName, setAddingToGroupName] = useState<string | null>(null);
   const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
   const [showModeSelectDialog, setShowModeSelectDialog] = useState(false);
-  const [addMode, setAddMode] = useState<'group' | 'work' | null>(null);
   const [showAddGroupForm, setShowAddGroupForm] = useState(false);
   const [expandedHistoryIds, setExpandedHistoryIds] = useState<Set<string>>(new Set());
-  const [columnCount, setColumnCount] = useState(3);
   const [viewMode, setViewMode] = useState<'normal' | 'archived'>('normal');
   const [editingHistoryEntryId, setEditingHistoryEntryId] = useState<string | null>(null);
   const [editingHistoryWorkProgressId, setEditingHistoryWorkProgressId] = useState<string | null>(null);
-
-  // レスポンシブなカラム数を取得
-  useEffect(() => {
-    const updateColumnCount = () => {
-      if (window.innerWidth < 768) {
-        setColumnCount(1);
-      } else if (window.innerWidth < 1024) {
-        setColumnCount(2);
-      } else {
-        setColumnCount(3);
-      }
-    };
-
-    updateColumnCount();
-    window.addEventListener('resize', updateColumnCount);
-    return () => window.removeEventListener('resize', updateColumnCount);
-  }, []);
 
   // 作業をグループ化（groupNameが設定されている場合のみグループ化、未入力の場合は個別カードとして表示）
   const groupedWorkProgresses = useMemo(() => {
@@ -219,9 +201,13 @@ export default function ProgressPage() {
   }, [addingProgressWorkProgressId, data]);
 
   // 各種ハンドラー関数（簡易実装、必要に応じて実装）
-  const handleAddWorkProgress = async (workProgressData: Partial<WorkProgress>) => {
+  const handleAddWorkProgress = async (workProgressData: WorkProgressInput) => {
     if (!user || !data) return;
-    await addWorkProgress(user.uid, workProgressData as any, data);
+    const payload: Omit<WorkProgress, 'id' | 'createdAt' | 'updatedAt'> = {
+      ...workProgressData,
+      status: workProgressData.status ?? 'pending',
+    };
+    await addWorkProgress(user.uid, payload, data);
   };
 
   const handleUpdateWorkProgress = async (id: string, updates: Partial<WorkProgress>) => {
@@ -334,6 +320,7 @@ export default function ProgressPage() {
   };
 
   const formatAmount = (amount: number, unit: string) => {
+    void unit;
     return amount.toLocaleString('ja-JP');
   };
 
@@ -473,7 +460,6 @@ export default function ProgressPage() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={() => {
-                        setAddMode('work');
                         setShowAddForm(true);
                       }}
                       className="px-6 py-3 bg-amber-600 text-white rounded-xl shadow-lg hover:bg-amber-700 hover:shadow-xl transition-all flex items-center justify-center gap-2 font-bold"
@@ -483,7 +469,6 @@ export default function ProgressPage() {
                     </button>
                     <button
                       onClick={() => {
-                        setAddMode('group');
                         setShowAddGroupForm(true);
                       }}
                       className="px-6 py-3 bg-white text-amber-600 border border-amber-200 rounded-xl shadow-md hover:bg-amber-50 hover:shadow-lg transition-all flex items-center justify-center gap-2 font-bold"
@@ -582,7 +567,6 @@ export default function ProgressPage() {
                     <button
                       onClick={() => {
                         setAddingToGroupName(group.groupName);
-                        setAddMode('work');
                         setShowAddForm(true);
                       }}
                       className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50 transition-all flex items-center justify-center gap-2 text-sm font-medium"
@@ -724,9 +708,8 @@ export default function ProgressPage() {
                 <div className="space-y-3">
                   <button
                     onClick={() => {
-                      setShowModeSelectDialog(false);
-                      setAddMode('work');
-                      setShowAddForm(true);
+                    setShowModeSelectDialog(false);
+                    setShowAddForm(true);
                     }}
                     className="w-full py-3 px-4 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 transition-colors flex items-center justify-center gap-3"
                   >
@@ -737,9 +720,8 @@ export default function ProgressPage() {
                   </button>
                   <button
                     onClick={() => {
-                      setShowModeSelectDialog(false);
-                      setAddMode('group');
-                      setShowAddGroupForm(true);
+                    setShowModeSelectDialog(false);
+                    setShowAddGroupForm(true);
                     }}
                     className="w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold rounded-xl border border-gray-200 transition-colors flex items-center justify-center gap-3"
                   >
@@ -772,7 +754,6 @@ export default function ProgressPage() {
               setShowAddForm(false);
               setEditingWorkProgressId(null);
               setAddingToGroupName(null);
-              setAddMode(null);
             }}
             onSubmit={editingWorkProgressId
               ? (data) => handleUpdateWorkProgress(editingWorkProgressId, data)
@@ -874,9 +855,9 @@ function WorkProgressFormDialog({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: WorkProgressInput) => Promise<void>;
   onDelete?: () => void;
-  initialData?: any;
+  initialData?: WorkProgressInput;
   isEditing: boolean;
   defaultGroupName?: string | null;
 }) {
@@ -912,10 +893,14 @@ function WorkProgressFormDialog({
         weight = unit ? `${amount}${unit}` : amount;
       }
       
-      await onSubmit({
-        ...formData,
-        weight,
-      });
+      const payload: WorkProgressInput = {
+        groupName: formData.groupName || undefined,
+        taskName: formData.taskName,
+        memo: formData.memo || undefined,
+        status: formData.status,
+        weight: weight || undefined,
+      };
+      await onSubmit(payload);
       onClose();
     } catch (error) {
       console.error(error);
@@ -1161,7 +1146,7 @@ function FilterDialog({
               ].map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setFilterStatus(option.value as any)}
+                  onClick={() => setFilterStatus(option.value as WorkProgressStatus | 'all')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-all ${filterStatus === option.value
                     ? 'bg-amber-50 text-amber-700 border-amber-300 ring-1 ring-amber-300'
                     : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'

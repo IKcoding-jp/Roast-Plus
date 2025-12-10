@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAppData } from './useAppData';
 import type { Notification } from '@/types';
 
@@ -8,21 +8,18 @@ const READ_IDS_STORAGE_KEY = 'roastplus_notification_read_ids';
 
 export function useNotifications() {
   const { data, updateData, isLoading: appDataLoading } = useAppData();
-  const [readIds, setReadIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const hasMigratedRef = useRef(false);
-
-  // 既読状態をlocalStorageから読み込む
-  useEffect(() => {
+  const [readIds, setReadIds] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
     try {
       const stored = localStorage.getItem(READ_IDS_STORAGE_KEY);
-      if (stored) {
-        setReadIds(JSON.parse(stored));
-      }
+      return stored ? JSON.parse(stored) : [];
     } catch (error) {
       console.error('Failed to load readIds from localStorage:', error);
+      return [];
     }
-  }, []);
+  });
+  const [migrationDone, setMigrationDone] = useState(false);
+  const hasMigratedRef = useRef(false);
 
   // Firestoreから通知データを取得し、既存のlocalStorageデータを移行
   useEffect(() => {
@@ -30,21 +27,18 @@ export function useNotifications() {
       return;
     }
 
-    // 移行処理は一度だけ実行
     if (hasMigratedRef.current) {
-      setIsLoading(false);
       return;
     }
 
     // 移行処理を実行
     hasMigratedRef.current = true;
     
-    const migrateLocalStorageData = async () => {
+    const migrateLocalStorageData = () => {
       try {
         const oldStorageKey = 'roastplus_notifications';
         const stored = localStorage.getItem(oldStorageKey);
         
-        // 現在のFirestoreデータを取得（最新の値を取得）
         const currentData = data;
         const firestoreNotifications = currentData.notifications || [];
         const existingIds = new Set(firestoreNotifications.map(n => n.id));
@@ -52,37 +46,33 @@ export function useNotifications() {
         if (stored) {
           const oldData: { notifications: Notification[]; readIds: string[] } = JSON.parse(stored);
           
-          // 既読状態を新しいストレージキーに移行
           if (oldData.readIds && oldData.readIds.length > 0) {
             localStorage.setItem(READ_IDS_STORAGE_KEY, JSON.stringify(oldData.readIds));
             setReadIds(oldData.readIds);
           }
           
-          // 古い通知データを取得
           const oldNotifications = oldData.notifications || [];
-          
-          // 古い通知データを追加（重複を避ける）
           const newNotifications = [
             ...firestoreNotifications,
             ...oldNotifications.filter(n => !existingIds.has(n.id)),
           ];
           
-          // 変更がある場合のみ更新
           if (newNotifications.length !== firestoreNotifications.length) {
-            await updateData({
+            void updateData({
               ...currentData,
               notifications: newNotifications,
             });
           }
           
-          // 古いストレージキーを削除
           localStorage.removeItem(oldStorageKey);
         }
         
-        setIsLoading(false);
+        hasMigratedRef.current = true;
+        setMigrationDone(true);
       } catch (error) {
         console.error('Failed to migrate localStorage data:', error);
-        setIsLoading(false);
+        hasMigratedRef.current = true;
+        setMigrationDone(true);
       }
     };
 
@@ -90,7 +80,7 @@ export function useNotifications() {
   }, [appDataLoading, data, updateData]);
 
   // 通知データを取得
-  const notifications = data.notifications || [];
+  const notifications = useMemo(() => data.notifications || [], [data.notifications]);
 
   // 未確認通知数を計算
   const unreadCount = notifications.filter(n => !readIds.includes(n.id)).length;
@@ -164,6 +154,6 @@ export function useNotifications() {
     addNotification,
     updateNotification,
     deleteNotification,
-    isLoading: isLoading || appDataLoading,
+    isLoading: appDataLoading || !migrationDone,
   };
 }

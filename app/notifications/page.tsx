@@ -307,6 +307,7 @@ export default function NotificationsPage() {
         {/* 通知追加・編集モーダル */}
         {showModal && (
           <NotificationModal
+            key={editingNotification?.id ?? 'new'}
             notification={editingNotification}
             onSave={(notification) => {
               if (editingNotification) {
@@ -369,22 +370,6 @@ function NotificationModal({ notification, onSave, onCancel }: NotificationModal
   const [date, setDate] = useState(notification?.date || new Date().toISOString().split('T')[0]);
   const [type, setType] = useState<NotificationType>(notification?.type || 'announcement');
   const [errors, setErrors] = useState<{ title?: string; content?: string; date?: string }>({});
-
-  // 編集時にフォームの値を更新
-  useEffect(() => {
-    if (notification) {
-      setTitle(notification.title);
-      setContent(notification.content);
-      setDate(notification.date);
-      setType(notification.type);
-    } else {
-      setTitle('');
-      setContent('');
-      setDate(new Date().toISOString().split('T')[0]);
-      setType('announcement');
-    }
-    setErrors({});
-  }, [notification]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

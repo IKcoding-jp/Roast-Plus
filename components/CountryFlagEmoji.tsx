@@ -1,11 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface CountryFlagEmojiProps {
   countryName: string;
   className?: string;
 }
+
+type TwemojiInstance = {
+  parse: (element: Element, options: { folder: string; ext: string; size: string }) => void;
+};
+
+type TwemojiWindow = typeof window & { twemoji?: TwemojiInstance };
 
 // 国名と国旗のマッピング
 const getCountryFlag = (countryName: string): string => {
@@ -33,38 +39,36 @@ const getCountryFlag = (countryName: string): string => {
 export function CountryFlagEmoji({ countryName, className = '' }: CountryFlagEmojiProps) {
   const flagElementRef = useRef<HTMLSpanElement>(null);
   const flag = getCountryFlag(countryName);
-  const [isParsed, setIsParsed] = useState(false);
-
-  // countryNameが変更されたときにisParsedをリセット
-  useEffect(() => {
-    setIsParsed(false);
-  }, [countryName]);
+  const isParsedRef = useRef(false);
 
   // Twemojiで国旗を変換
   useEffect(() => {
     if (!flag || !flagElementRef.current) return;
 
+    isParsedRef.current = false;
+
     // 既にimgタグに変換されている場合はスキップ
     if (flagElementRef.current.querySelector('img')) {
-      setIsParsed(true);
+      isParsedRef.current = true;
       return;
     }
 
     const parseFlag = () => {
-      if ((window as any).twemoji && flagElementRef.current && !isParsed) {
+      const twemoji = (window as TwemojiWindow).twemoji;
+      if (twemoji && flagElementRef.current && !isParsedRef.current) {
         // 既にimgタグに変換されている場合はスキップ
         if (flagElementRef.current.querySelector('img')) {
-          setIsParsed(true);
+          isParsedRef.current = true;
           return;
         }
         
         try {
-          (window as any).twemoji.parse(flagElementRef.current, {
+          twemoji.parse(flagElementRef.current, {
             folder: 'svg',
             ext: '.svg',
             size: '16x16',
           });
-          setIsParsed(true);
+          isParsedRef.current = true;
         } catch (error) {
           console.error('Error parsing flag emoji:', error);
         }
@@ -72,7 +76,7 @@ export function CountryFlagEmoji({ countryName, className = '' }: CountryFlagEmo
     };
     
     // Twemojiが既に読み込まれている場合
-    if ((window as any).twemoji) {
+    if ((window as TwemojiWindow).twemoji) {
       parseFlag();
     } else {
       // Twemojiの読み込みを待つ
@@ -80,7 +84,7 @@ export function CountryFlagEmoji({ countryName, className = '' }: CountryFlagEmo
       let timeoutId: NodeJS.Timeout | null = null;
       
       checkInterval = setInterval(() => {
-        if ((window as any).twemoji) {
+        if ((window as TwemojiWindow).twemoji) {
           parseFlag();
           if (checkInterval) clearInterval(checkInterval);
           if (timeoutId) clearTimeout(timeoutId);
@@ -97,7 +101,7 @@ export function CountryFlagEmoji({ countryName, className = '' }: CountryFlagEmo
         if (timeoutId) clearTimeout(timeoutId);
       };
     }
-  }, [flag, countryName, isParsed]);
+  }, [flag, countryName]);
 
   if (!flag) {
     // デバッグ用: マッピングが見つからない場合

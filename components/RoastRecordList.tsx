@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import type { AppData, RoastTimerRecord } from '@/types';
+import type { AppData } from '@/types';
 import { formatTime } from '@/lib/roastTimerUtils';
 import { HiTrash, HiCalendar } from 'react-icons/hi';
 import { MdTimer } from 'react-icons/md';
@@ -27,9 +27,10 @@ const WEIGHTS: Array<200 | 300 | 500> = [200, 300, 500];
 export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
   const router = useRouter();
 
-  const roastTimerRecords = Array.isArray(data.roastTimerRecords)
-    ? data.roastTimerRecords
-    : [];
+  const roastTimerRecords = useMemo(
+    () => (Array.isArray(data.roastTimerRecords) ? data.roastTimerRecords : []),
+    [data.roastTimerRecords]
+  );
 
   // 状態管理
   const [searchQuery, setSearchQuery] = useState('');

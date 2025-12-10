@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { DripRecipe, DripStep } from '@/lib/drip-guide/types';
 import { StepEditor } from './StepEditor';
 import { FloppyDisk, ArrowLeft, ArrowClockwise } from 'phosphor-react';
@@ -14,7 +13,6 @@ interface RecipeFormProps {
 }
 
 export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit }) => {
-    const router = useRouter();
     const [name, setName] = useState(initialRecipe?.name || '');
     const [beanName, setBeanName] = useState(initialRecipe?.beanName || '');
     const [beanAmountGram, setBeanAmountGram] = useState(initialRecipe?.beanAmountGram || 20);

@@ -16,7 +16,7 @@ import {
     addTeam, deleteTeam, updateTeam, updateTableSettings,
     mutateAssignmentDay, getServerTodayDate,
     subscribeManager, setManager, deleteManager,
-    subscribePairExclusions, addPairExclusion, deletePairExclusion, fetchPairExclusions
+    subscribePairExclusions, addPairExclusion, deletePairExclusion
 } from './lib/firebase';
 import { calculateAssignment } from '@/app/assignment/lib/shuffle';
 import { AssignmentTable } from './components/AssignmentTable';

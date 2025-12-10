@@ -314,7 +314,7 @@ JSONのみを返してください。説明文は不要です。`;
     }
 
     // JSONをパース
-    let parsed: any;
+    let parsed: unknown;
     try {
       parsed = JSON.parse(responseText);
     } catch (parseError) {
@@ -335,34 +335,41 @@ JSONのみを返してください。説明文は不要です。`;
       throw new HttpsError('internal', 'GPT-5 nanoからの応答の解析に失敗しました。再度お試しください。');
     }
 
-    const timeLabelsData = parsed.timeLabels || [];
-    const roastSchedulesData = parsed.roastSchedules || [];
+    const parsedObject = parsed as { timeLabels?: unknown; roastSchedules?: unknown };
+    const timeLabelsData = Array.isArray(parsedObject.timeLabels) ? parsedObject.timeLabels : [];
+    const roastSchedulesData = Array.isArray(parsedObject.roastSchedules) ? parsedObject.roastSchedules : [];
 
     if (!Array.isArray(timeLabelsData) || !Array.isArray(roastSchedulesData)) {
       throw new HttpsError('internal', 'スケジュールデータの形式が正しくありません。');
     }
 
     // TimeLabel形式に変換（idとorderを追加）
-    const timeLabels: TimeLabel[] = timeLabelsData.map((item: any, index: number) => ({
-      id: `ocr-time-${Date.now()}-${index}`,
-      time: item.time || '00:00',
-      content: item.content || '',
-      memo: item.memo || '',
-      order: index,
-    }));
+    const timeLabels: TimeLabel[] = timeLabelsData.map((item, index: number) => {
+      const timeLabelItem = item as Record<string, unknown>;
+      return {
+        id: `ocr-time-${Date.now()}-${index}`,
+        time: typeof timeLabelItem.time === 'string' ? timeLabelItem.time : '00:00',
+        content: typeof timeLabelItem.content === 'string' ? timeLabelItem.content : '',
+        memo: typeof timeLabelItem.memo === 'string' ? timeLabelItem.memo : '',
+        order: index,
+      };
+    });
 
     // RoastSchedule形式に変換（idとdateを追加）
-    const roastSchedules: RoastSchedule[] = roastSchedulesData.map((item: any, index: number) => ({
-      id: `ocr-roast-${Date.now()}-${index}`,
-      date: '', // クライアント側で設定
-      time: item.time || '',
-      isRoasterOn: item.isRoasterOn || false,
-      isRoast: item.isRoast || false,
-      isAfterPurge: item.isAfterPurge || false,
-      isChaffCleaning: item.isChaffCleaning || false,
-      roastCount: item.roastCount,
-      order: index,
-    }));
+    const roastSchedules: RoastSchedule[] = roastSchedulesData.map((item, index: number) => {
+      const roastScheduleItem = item as Record<string, unknown>;
+      return {
+        id: `ocr-roast-${Date.now()}-${index}`,
+        date: '', // クライアント側で設定
+        time: typeof roastScheduleItem.time === 'string' ? roastScheduleItem.time : '',
+        isRoasterOn: Boolean(roastScheduleItem.isRoasterOn),
+        isRoast: Boolean(roastScheduleItem.isRoast),
+        isAfterPurge: Boolean(roastScheduleItem.isAfterPurge),
+        isChaffCleaning: Boolean(roastScheduleItem.isChaffCleaning),
+        roastCount: typeof roastScheduleItem.roastCount === 'number' ? roastScheduleItem.roastCount : undefined,
+        order: index,
+      };
+    });
 
     return {
       timeLabels,
@@ -399,23 +406,23 @@ JSONのみを返してください。説明文は不要です。`;
     let errorMessage = 'スケジュール整形中にエラーが発生しました';
     if (error instanceof Error) {
       // OpenAI APIのエラータイプを確認
-      const errorAny = error as any;
-      if (errorAny.status || errorAny.response) {
+      const openAiError = error as { status?: number; response?: { status?: number; statusText?: string }; message?: string };
+      if (openAiError.status || openAiError.response) {
         // APIエラーの場合
-        const httpStatus = errorAny.status || errorAny.response?.status;
-        const statusText = errorAny.statusText || errorAny.response?.statusText;
+        const httpStatus = openAiError.status ?? openAiError.response?.status;
+        const statusText = openAiError.response?.statusText;
         if (httpStatus === 401) {
           errorMessage = 'OpenAI APIキーが無効です。APIキーを確認してください。';
         } else if (httpStatus === 429) {
           errorMessage = 'OpenAI APIのレート制限に達しました。しばらく待ってから再度お試しください。';
         } else if (httpStatus === 500 || httpStatus === 502 || httpStatus === 503) {
           errorMessage = 'OpenAI APIサーバーエラーが発生しました。しばらく待ってから再度お試しください。';
-        } else if (errorAny.message?.includes('Connection') || errorAny.message?.includes('network') || errorAny.message?.includes('ECONNREFUSED') || errorAny.message?.includes('ETIMEDOUT')) {
+        } else if (openAiError.message?.includes('Connection') || openAiError.message?.includes('network') || openAiError.message?.includes('ECONNREFUSED') || openAiError.message?.includes('ETIMEDOUT')) {
           errorMessage = 'OpenAI APIへの接続エラーが発生しました。ネットワーク接続を確認してください。';
-        } else if (errorAny.message?.includes('timeout') || errorAny.message?.includes('TIMEOUT')) {
+        } else if (openAiError.message?.includes('timeout') || openAiError.message?.includes('TIMEOUT')) {
           errorMessage = 'OpenAI APIへのリクエストがタイムアウトしました。しばらく待ってから再度お試しください。';
         } else {
-          errorMessage = `OpenAI APIエラー: ${errorAny.message || statusText || '不明なエラー'}`;
+          errorMessage = `OpenAI APIエラー: ${openAiError.message || statusText || '不明なエラー'}`;
         }
       } else {
         errorMessage = error.message || errorMessage;

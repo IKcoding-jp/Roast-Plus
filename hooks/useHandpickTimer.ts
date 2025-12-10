@@ -408,6 +408,7 @@ export function useHandpickTimer() {
         setStatus((prevStatus) => {
             if (prevStatus === 'first-running' || prevStatus === 'first-paused') {
                 // 1回目終了→2回目待機状態へ
+                setRemainingSeconds(secondMinutes * 60);
                 return 'second-waiting';
             } else if (prevStatus === 'second-running' || prevStatus === 'second-paused') {
                 // 2回目終了→サイクル数+1、待機状態へ
@@ -417,15 +418,7 @@ export function useHandpickTimer() {
             }
             return prevStatus; // 変更不要な場合はそのまま返す
         });
-    }, [playCompleteSoundFromRef]);
-
-    // statusがsecond-waitingになった時にremainingSecondsを更新
-    useEffect(() => {
-        if (status === 'second-waiting' && remainingSeconds !== secondMinutes * 60) {
-            // 1回目終了後、2回目待機状態になった時に残り時間を設定
-            setRemainingSeconds(secondMinutes * 60);
-        }
-    }, [status, remainingSeconds, secondMinutes]);
+    }, [playCompleteSoundFromRef, secondMinutes]);
 
     // タイマーのカウントダウン処理
     useEffect(() => {

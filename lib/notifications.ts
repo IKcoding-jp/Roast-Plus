@@ -95,7 +95,7 @@ export async function scheduleNotification(
     // 現在の実装では、Service Workerの登録が必要
     if ('serviceWorker' in navigator && 'Notification' in window) {
       try {
-        const registration = await navigator.serviceWorker.ready;
+        await navigator.serviceWorker.ready;
         
         // 通知をスケジュール（実際の実装はService Worker側で行う）
         // ここでは通知IDを記録

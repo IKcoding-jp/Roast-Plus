@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { HiCheck, HiXCircle, HiX } from 'react-icons/hi';
+import { HiCheck, HiXCircle } from 'react-icons/hi';
 import type { DefectBean } from '@/types';
 
 interface DefectBeanCardProps {
@@ -11,8 +11,6 @@ interface DefectBeanCardProps {
   isSelected?: boolean;
   onSelect?: (id: string) => void;
   onToggleSetting?: (id: string, shouldRemove: boolean) => void;
-  onDelete?: (id: string, imageUrl: string) => void;
-  isUserDefectBean?: boolean;
   onEdit?: (id: string) => void;
   compareMode?: boolean;
 }
@@ -23,8 +21,6 @@ export function DefectBeanCard({
   isSelected = false,
   onSelect,
   onToggleSetting,
-  onDelete,
-  isUserDefectBean = false,
   onEdit,
   compareMode = false,
 }: DefectBeanCardProps) {

@@ -16,22 +16,14 @@ interface RoastSchedulerTabProps {
   isToday: boolean; // 選択日が今日かどうか
 }
 
-export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: RoastSchedulerTabProps) {
+export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isToday }: RoastSchedulerTabProps) {
   const [editingSchedule, setEditingSchedule] = useState<RoastSchedule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
-  if (!data) {
-    return (
-      <div className="rounded-2xl bg-white p-6 shadow-xl border-2 border-gray-300">
-        <p className="text-center text-gray-500">データがありません</p>
-      </div>
-    );
-  }
-
   // 選択日のスケジュールのみをフィルタリング
-  const roastSchedules = (data.roastSchedules || []).filter((s) => s.date === selectedDate);
+  const roastSchedules = (data?.roastSchedules || []).filter((s) => s.date === selectedDate);
 
   // 時間順にソート（orderが設定されている場合はorder順、設定されていない場合は時間順）
   const sortedSchedules = useMemo(() => {
@@ -126,6 +118,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
   };
 
   const handleSave = (schedule: RoastSchedule) => {
+    if (!data) return;
     // 全スケジュールを取得（選択日でフィルタリングする前）
     const allSchedules = data.roastSchedules || [];
     const updatedSchedules = [...allSchedules];
@@ -213,6 +206,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
   };
 
   const handleDelete = (id: string) => {
+    if (!data) return;
     // 全スケジュールから削除（選択日でフィルタリングする前）
     const allSchedules = data.roastSchedules || [];
     const updatedSchedules = allSchedules.filter((s) => s.id !== id);
@@ -264,7 +258,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
     }
 
     // 順序を更新（選択日のスケジュールのみを対象）
-    const allSchedules = data.roastSchedules || [];
+    const allSchedules = data?.roastSchedules || [];
     const updatedSchedules = [...allSchedules];
     const draggedSchedule = updatedSchedules.find((s) => s.id === draggedId);
     const targetSchedule = updatedSchedules.find((s) => s.id === targetId);
@@ -281,7 +275,6 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
       order: s.order ?? index * 10,
     }));
 
-    const draggedOrder = schedulesWithOrder[draggedIndex].order!;
     const targetOrder = schedulesWithOrder[targetIndex].order!;
 
     // 新しいorder値を計算
@@ -325,8 +318,19 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday }: Roa
     setDragOverId(null);
   };
 
+  if (!data) {
+    return (
+      <div className="rounded-2xl bg-white p-6 shadow-xl border-2 border-gray-300">
+        <p className="text-center text-gray-500">データがありません</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative rounded-2xl bg-white p-4 md:p-6 shadow-xl border-2 border-gray-300 h-full flex flex-col backdrop-blur-sm">
+    <div
+      className="relative rounded-2xl bg-white p-4 md:p-6 shadow-xl border-2 border-gray-300 h-full flex flex-col backdrop-blur-sm"
+      data-is-today={_isToday}
+    >
       {/* デスクトップ版：タイトルと追加ボタンを横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex items-center justify-between">
         <h2 className="text-base md:text-lg font-semibold text-gray-800">

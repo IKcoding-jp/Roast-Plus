@@ -13,17 +13,11 @@ import type { Member, Manager } from '@/types';
 export function useMembers(userId: string | null) {
   const [members, setMembers] = useState<Member[]>([]);
   const [manager, setManager] = useState<Manager | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [membersLoaded, setMembersLoaded] = useState(false);
-  const [managerLoaded, setManagerLoaded] = useState(false);
+  const [isMembersReady, setIsMembersReady] = useState(() => userId === null);
+  const [isManagerReady, setIsManagerReady] = useState(() => userId === null);
 
   useEffect(() => {
     if (!userId) {
-      setMembers([]);
-      setManager(null);
-      setMembersLoaded(true);
-      setManagerLoaded(true);
-      setLoading(false);
       return;
     }
 
@@ -35,10 +29,10 @@ export function useMembers(userId: string | null) {
         ...doc.data()
       } as Member));
       setMembers(membersData);
-      setMembersLoaded(true);
+      setIsMembersReady(true);
     }, (error) => {
       console.error('Failed to fetch members:', error);
-      setMembersLoaded(true);
+      setIsMembersReady(true);
     });
 
     // 管理者の購読
@@ -49,10 +43,10 @@ export function useMembers(userId: string | null) {
       } else {
         setManager(null);
       }
-      setManagerLoaded(true);
+      setIsManagerReady(true);
     }, (error) => {
       console.error('Failed to fetch manager:', error);
-      setManagerLoaded(true);
+      setIsManagerReady(true);
     });
 
     return () => {
@@ -61,14 +55,11 @@ export function useMembers(userId: string | null) {
     };
   }, [userId]);
 
-  // 両方のデータが読み込まれたらローディング完了
-  useEffect(() => {
-    if (membersLoaded && managerLoaded) {
-      setLoading(false);
-    }
-  }, [membersLoaded, managerLoaded]);
+  const effectiveMembers = userId ? members : [];
+  const effectiveManager = userId ? manager : null;
+  const loading = userId !== null && (!isMembersReady || !isManagerReady);
 
-  return { members, manager, loading };
+  return { members: effectiveMembers, manager: effectiveManager, loading };
 }
 
 /**

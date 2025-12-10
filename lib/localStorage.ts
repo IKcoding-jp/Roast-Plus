@@ -1,3 +1,5 @@
+import type { HandpickTimerSettings, RoastTimerSettings, RoastTimerState } from '@/types';
+
 // ローカルストレージ管理
 
 const SELECTED_MEMBER_ID_KEY = 'roastplus_selected_member_id';
@@ -5,6 +7,15 @@ const ROAST_TIMER_STATE_KEY = 'roastplus_roast_timer_state';
 const ROAST_TIMER_SETTINGS_KEY = 'roastplus_roast_timer_settings';
 const HANDPICK_TIMER_SETTINGS_KEY = 'roastplus_handpick_timer_settings';
 const DEVICE_ID_KEY = 'roastplus_device_id';
+
+const parseJson = <T>(value: string): T | null => {
+  try {
+    return JSON.parse(value) as T;
+  } catch (error) {
+    console.error('Failed to parse JSON from localStorage:', error);
+    return null;
+  }
+};
 
 /**
  * 選択されたメンバーIDを保存
@@ -31,7 +42,7 @@ export function getSelectedMemberId(): string | null {
 /**
  * ローストタイマー状態を保存
  */
-export function setRoastTimerState(state: any): void {
+export function setRoastTimerState(state: RoastTimerState | null | undefined): void {
   if (typeof window === 'undefined') return;
   
   if (state === null || state === undefined) {
@@ -44,24 +55,19 @@ export function setRoastTimerState(state: any): void {
 /**
  * ローストタイマー状態を取得
  */
-export function getRoastTimerState(): any | null {
+export function getRoastTimerState(): RoastTimerState | null {
   if (typeof window === 'undefined') return null;
   
   const stored = localStorage.getItem(ROAST_TIMER_STATE_KEY);
   if (!stored) return null;
   
-  try {
-    return JSON.parse(stored);
-  } catch (error) {
-    console.error('Failed to parse roast timer state from localStorage:', error);
-    return null;
-  }
+  return parseJson<RoastTimerState>(stored);
 }
 
 /**
  * ローストタイマー設定を保存
  */
-export function setRoastTimerSettings(settings: unknown): void {
+export function setRoastTimerSettings(settings: RoastTimerSettings | null | undefined): void {
   if (typeof window === 'undefined') return;
   
   if (settings === null || settings === undefined) {
@@ -74,24 +80,19 @@ export function setRoastTimerSettings(settings: unknown): void {
 /**
  * ローストタイマー設定を取得
  */
-export function getRoastTimerSettings(): unknown | null {
+export function getRoastTimerSettings(): RoastTimerSettings | null {
   if (typeof window === 'undefined') return null;
   
   const stored = localStorage.getItem(ROAST_TIMER_SETTINGS_KEY);
   if (!stored) return null;
   
-  try {
-    return JSON.parse(stored);
-  } catch (error) {
-    console.error('Failed to parse roast timer settings from localStorage:', error);
-    return null;
-  }
+  return parseJson<RoastTimerSettings>(stored);
 }
 
 /**
  * ハンドピックタイマー設定を保存
  */
-export function setHandpickTimerSettings(settings: unknown): void {
+export function setHandpickTimerSettings(settings: HandpickTimerSettings | null | undefined): void {
   if (typeof window === 'undefined') return;
   
   if (settings === null || settings === undefined) {
@@ -104,18 +105,13 @@ export function setHandpickTimerSettings(settings: unknown): void {
 /**
  * ハンドピックタイマー設定を取得
  */
-export function getHandpickTimerSettings(): unknown | null {
+export function getHandpickTimerSettings(): HandpickTimerSettings | null {
   if (typeof window === 'undefined') return null;
   
   const stored = localStorage.getItem(HANDPICK_TIMER_SETTINGS_KEY);
   if (!stored) return null;
   
-  try {
-    return JSON.parse(stored);
-  } catch (error) {
-    console.error('Failed to parse handpick timer settings from localStorage:', error);
-    return null;
-  }
+  return parseJson<HandpickTimerSettings>(stored);
 }
 
 /**

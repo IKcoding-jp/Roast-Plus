@@ -1,8 +1,6 @@
 'use client';
 
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft, HiClock } from 'react-icons/hi';
 import { RoastTimer } from '@/components/RoastTimer';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';

@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useRouter } from 'next/navigation';
 import { useAuth, signOut } from '@/lib/auth';
 import { useEffect, useState } from 'react';
@@ -11,9 +13,6 @@ import { IoSettings, IoTimer } from "react-icons/io5";
 import { MdTimer, MdTimeline, MdCoffeeMaker, MdAddCircle } from "react-icons/md";
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
-
-// バージョン情報（package.jsonと同期）
-const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間（3秒）
 

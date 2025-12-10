@@ -83,7 +83,6 @@ export function OCRTimeLabelEditor({
       ) : (
         sortedLabels.map((label) => {
           const isEditing = editingId === label.id;
-          const [hour, minute] = (label.time || '').split(':');
 
           return (
             <div

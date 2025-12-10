@@ -20,6 +20,49 @@ interface OCRConfirmModalProps {
 
 type TabType = 'timeLabels' | 'roastSchedules';
 
+const sortTimeLabels = (labels: TimeLabel[]) => {
+  const sorted = [...labels].sort((a, b) => {
+    if (a.time && b.time) {
+      return a.time.localeCompare(b.time);
+    }
+    return 0;
+  });
+  return sorted.map((label, index) => ({ ...label, order: index }));
+};
+
+const sortRoastSchedules = (schedules: RoastSchedule[]) => {
+  const sortedRoastSchedules = [...schedules];
+
+  sortedRoastSchedules.sort((a, b) => {
+    if (a.order !== undefined && b.order !== undefined) {
+      return a.order - b.order;
+    }
+    if (a.order !== undefined) return -1;
+    if (b.order !== undefined) return 1;
+    return 0;
+  });
+
+  const schedulesWithSortTime: Array<{ schedule: RoastSchedule; sortTime: string }> = [];
+  let lastRoastTime = '00:00';
+
+  for (const schedule of sortedRoastSchedules) {
+    let sortTime = schedule.time || '';
+
+    if (schedule.isAfterPurge && !sortTime) {
+      sortTime = lastRoastTime;
+    } else if (sortTime) {
+      lastRoastTime = sortTime;
+    } else {
+      sortTime = '99:99';
+    }
+
+    schedulesWithSortTime.push({ schedule, sortTime });
+  }
+
+  schedulesWithSortTime.sort((a, b) => a.sortTime.localeCompare(b.sortTime));
+  return schedulesWithSortTime.map(({ schedule }, index) => ({ ...schedule, order: index }));
+};
+
 export function OCRConfirmModal({
   timeLabels: initialTimeLabels,
   roastSchedules: initialRoastSchedules,
@@ -33,70 +76,12 @@ export function OCRConfirmModal({
   const { showToast } = useToastContext();
   const [activeTab, setActiveTab] = useState<TabType>('timeLabels');
   const [mode, setMode] = useState<'replace' | 'add'>('replace');
-  const [timeLabels, setTimeLabels] = useState<TimeLabel[]>(initialTimeLabels);
-  const [roastSchedules, setRoastSchedules] = useState<RoastSchedule[]>(initialRoastSchedules);
-
-  // 初期データをソート
-  useEffect(() => {
-    const sortedTimeLabels = [...timeLabels].sort((a, b) => {
-      if (a.time && b.time) {
-        return a.time.localeCompare(b.time);
-      }
-      return 0;
-    });
-    sortedTimeLabels.forEach((label, index) => {
-      label.order = index;
-    });
-    setTimeLabels(sortedTimeLabels);
-
-    // ローストスケジュールのソート：アフターパージは前のローストの後に配置
-    // まず、orderプロパティでソート（サーバー側で設定された順序を尊重）
-    const sortedRoastSchedules = [...roastSchedules];
-    
-    // orderプロパティがある場合はそれでソート
-    sortedRoastSchedules.sort((a, b) => {
-      if (a.order !== undefined && b.order !== undefined) {
-        return a.order - b.order;
-      }
-      if (a.order !== undefined) return -1;
-      if (b.order !== undefined) return 1;
-      return 0;
-    });
-
-    // アフターパージで時間が空の場合、前のローストの時間を参照してソート用の時間を設定
-    const schedulesWithSortTime: Array<{ schedule: RoastSchedule; sortTime: string }> = [];
-    let lastRoastTime = '00:00';
-
-    for (const schedule of sortedRoastSchedules) {
-      let sortTime = schedule.time || '';
-      
-      if (schedule.isAfterPurge && !sortTime) {
-        // アフターパージで時間が空の場合、前のローストの時間を使用（ソート用）
-        sortTime = lastRoastTime;
-      } else if (sortTime) {
-        // 時間がある場合は更新
-        lastRoastTime = sortTime;
-      } else {
-        // その他の時間がない項目は最後に
-        sortTime = '99:99';
-      }
-      
-      schedulesWithSortTime.push({ schedule, sortTime });
-    }
-
-    // ソート用の時間でソート
-    schedulesWithSortTime.sort((a, b) => {
-      return a.sortTime.localeCompare(b.sortTime);
-    });
-
-    // 元のスケジュール配列に戻す（時間は元のまま）
-    const finalSorted = schedulesWithSortTime.map(({ schedule }) => schedule);
-
-    finalSorted.forEach((schedule, index) => {
-      schedule.order = index;
-    });
-    setRoastSchedules(finalSorted);
-  }, []);
+  const [timeLabels, setTimeLabels] = useState<TimeLabel[]>(() =>
+    sortTimeLabels(initialTimeLabels)
+  );
+  const [roastSchedules, setRoastSchedules] = useState<RoastSchedule[]>(() =>
+    sortRoastSchedules(initialRoastSchedules)
+  );
 
   // ESCキーで閉じる
   useEffect(() => {

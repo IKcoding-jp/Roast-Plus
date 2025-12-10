@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { IoCreateOutline } from 'react-icons/io5';
 import { FaCoffee } from 'react-icons/fa';
-import type { AppData, TastingSession } from '@/types';
+import type { TastingRecord, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import {
   calculateAverageScores,
@@ -14,7 +14,7 @@ import {
 
 interface TastingSessionCarouselProps {
   sessions: TastingSession[];
-  tastingRecords: any[];
+  tastingRecords: TastingRecord[];
   activeMemberCount: number;
   router: ReturnType<typeof useRouter>;
 }

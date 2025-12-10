@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Warning } from 'phosphor-react';
+import { Warning } from 'phosphor-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ConfirmDialogProps {

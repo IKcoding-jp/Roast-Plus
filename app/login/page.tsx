@@ -44,8 +44,9 @@ function LoginForm() {
       const returnUrl = searchParams.get('returnUrl');
       const redirectUrl = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/';
       router.push(redirectUrl);
-    } catch (err: any) {
-      const errorCode = err.code;
+    } catch (err: unknown) {
+      const errorObj = err as { code?: string; message?: string };
+      const errorCode = errorObj.code;
       let errorMessage = 'エラーが発生しました';
 
       switch (errorCode) {
@@ -74,7 +75,7 @@ function LoginForm() {
           errorMessage = 'ネットワークエラーが発生しました';
           break;
         default:
-          errorMessage = err.message || 'エラーが発生しました';
+          errorMessage = errorObj.message || 'エラーが発生しました';
       }
 
       setError(errorMessage);

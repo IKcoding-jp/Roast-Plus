@@ -11,7 +11,7 @@ import { TastingRecordForm } from '@/components/TastingRecordForm';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import { Loading } from '@/components/Loading';
 import type { TastingSession, TastingRecord } from '@/types';
-import { HiPlus, HiFilter, HiArrowLeft } from 'react-icons/hi';
+import { HiPlus, HiArrowLeft } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
 function TastingPageContent() {
@@ -26,7 +26,6 @@ function TastingPageContent() {
   const sessionId = searchParams?.get('sessionId');
   const recordId = searchParams?.get('recordId');
   const isEditSession = searchParams?.get('edit') === 'true';
-  const isNewRecord = searchParams?.get('newRecord') === 'true';
 
   // 未認証時にログインページにリダイレクト
   useEffect(() => {

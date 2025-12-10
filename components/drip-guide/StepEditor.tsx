@@ -3,7 +3,6 @@
 import React from 'react';
 import { DripStep } from '@/lib/drip-guide/types';
 import { Trash, Plus, ListNumbers } from 'phosphor-react';
-import { clsx } from 'clsx';
 
 interface StepEditorProps {
     steps: DripStep[];
@@ -25,7 +24,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManua
         onChange([...steps, newStep]);
     };
 
-    const updateStep = (index: number, field: keyof DripStep, value: any) => {
+    const updateStep = (index: number, field: keyof DripStep, value: DripStep[keyof DripStep]) => {
         const newSteps = [...steps];
         newSteps[index] = { ...newSteps[index], [field]: value };
         // Sort by startTimeSec automatically? Maybe better to let user control or sort on save.

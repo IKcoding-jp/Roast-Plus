@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
 import type { AppData, RoastTimerState } from '@/types';
 import { setRoastTimerState as saveLocalState, getRoastTimerState as loadLocalState, getDeviceId } from '@/lib/localStorage';
-import { playTimerSound, playNotificationSound, stopTimerSound, stopAllSounds, stopAudio } from '@/lib/sounds';
+import { playTimerSound, playNotificationSound, stopAllSounds, stopAudio } from '@/lib/sounds';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import {
   ensureServerTimeSync,
@@ -57,7 +57,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   const { user } = useAuth();
   const [localState, setLocalState] = useState<RoastTimerState | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const lastUpdateRef = useRef<number>(Date.now());
+  const lastUpdateRef = useRef<number | null>(null);
   const soundAudioRef = useRef<HTMLAudioElement | null>(null);
   const notificationAudioRef = useRef<HTMLAudioElement | null>(null); // 通知音用のAudioオブジェクト（アンロック済み）
   const preparedTimerAudioRef = useRef<HTMLAudioElement | null>(null); // タイマー音用のアンロック済みAudio
@@ -76,6 +76,12 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       });
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (lastUpdateRef.current === null) {
+      lastUpdateRef.current = Date.now();
+    }
+  }, []);
 
   // Firestoreの状態をローカル状態に反映
   useEffect(() => {
@@ -100,10 +106,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         if (isInitialMountRef.current) {
           isInitialMountRef.current = false;
           saveLocalState(null);
-          setLocalState(null);
           pausedElapsedRef.current = 0;
-          // 初回マウント時に完了状態が残っている場合は、Firestoreから削除
-          // （リセットが完了していない可能性があるため）
           if (user && !isLoading) {
             updateData((currentData) => ({
               ...currentData,
@@ -123,11 +126,11 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
           };
           pausedElapsedRef.current = completedState.pausedElapsed ?? 0;
           isUpdatingFromFirestoreRef.current = true;
-          setLocalState(completedState);
           saveLocalState(completedState);
           setTimeout(() => {
+            setLocalState(completedState);
             isUpdatingFromFirestoreRef.current = false;
-          }, 100);
+          }, 0);
         }
         return;
       }
@@ -161,12 +164,11 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
         if (shouldUpdate) {
           isUpdatingFromFirestoreRef.current = true;
-          setLocalState(restoredState);
-          // フォールバック用にローカルストレージにも保存
           saveLocalState(restoredState);
           setTimeout(() => {
+            setLocalState(restoredState);
             isUpdatingFromFirestoreRef.current = false;
-          }, 100);
+          }, 0);
         }
       } else {
         // 開始時刻がない場合はそのまま反映（lastUpdatedAtとtriggeredByDeviceIdで比較）
@@ -182,11 +184,11 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         if (shouldUpdate) {
           isUpdatingFromFirestoreRef.current = true;
           pausedElapsedRef.current = normalizedState.pausedElapsed ?? 0;
-          setLocalState(normalizedState);
           saveLocalState(normalizedState);
           setTimeout(() => {
+            setLocalState(normalizedState);
             isUpdatingFromFirestoreRef.current = false;
-          }, 100);
+          }, 0);
         }
       }
       isInitialMountRef.current = false;
@@ -204,7 +206,6 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
           // 完了状態の場合は読み込まない
           if (storedState.status === 'completed') {
             saveLocalState(null);
-            setLocalState(null);
             pausedElapsedRef.current = 0;
             isInitialMountRef.current = false;
             return;
@@ -229,7 +230,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
             };
           }
 
-          setLocalState(stateToPersist);
+          setTimeout(() => setLocalState(stateToPersist), 0);
           pausedElapsedRef.current = stateToPersist.pausedElapsed ?? 0;
 
           // Firestoreにも保存（マイグレーション）。ただしAppDataの読み込み完了までは書き込みを遅延
@@ -252,8 +253,8 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         // 既に初期化済みで、Firestoreに状態がない場合はnullに設定
         // リセット後は、Firestoreの状態がundefinedになるまで待つ
         if (localState !== null && !hasResetRef.current) {
-          setLocalState(null);
           pausedElapsedRef.current = 0;
+          setTimeout(() => setLocalState(null), 0);
         }
         // リセットフラグが設定されている場合、Firestoreの状態がundefinedになったらリセットフラグをクリア
         if (hasResetRef.current && !firestoreState) {
@@ -261,7 +262,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         }
       }
     }
-  }, [user, data, updateData, currentDeviceId, isLoading]);
+  }, [user, data, updateData, currentDeviceId, isLoading, localState]);
 
   // 音声ファイルのパスを解決するヘルパー
   const resolveAudioPath = useCallback((path: string) => {
@@ -305,7 +306,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
           }
         | null = null;
 
-      const attachErrorLogger = (target: HTMLAudioElement, path: string) => (e: Event) => {
+      const attachErrorLogger = (target: HTMLAudioElement, path: string) => () => {
         hasError = true;
         const error = target.error;
         if (error) {
@@ -427,10 +428,10 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
         } | null = null;
 
         // エラーハンドリング
-        let errorHandler: ((e: Event) => void) | null = null;
-        let fallbackErrorHandler: ((e: Event) => void) | null = null;
+        let errorHandler: (() => void) | null = null;
+        let fallbackErrorHandler: (() => void) | null = null;
 
-        errorHandler = (e: Event) => {
+        errorHandler = () => {
           hasError = true;
           const error = audio.error;
           if (error) {
@@ -479,7 +480,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
           errorDetails = null;
           usedFallback = true;
 
-          fallbackErrorHandler = (e: Event) => {
+          fallbackErrorHandler = () => {
             hasError = true;
             const error = audio.error;
             if (error) {

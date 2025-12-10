@@ -9,7 +9,7 @@ interface LoadingProps {
 }
 
 export function Loading({ message = '読み込み中...', fullScreen = true }: LoadingProps) {
-  const [animationData, setAnimationData] = useState<any>(null);
+  const [animationData, setAnimationData] = useState<object | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import type { TastingRecord, TastingSession } from '@/types';
+import type { TastingRecord } from '@/types';
 
 // 平均スコアの型定義
 export interface AverageScores {

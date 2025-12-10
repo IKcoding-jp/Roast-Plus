@@ -1,22 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 const DEVELOPER_MODE_PASSWORD = '4869';
 const STORAGE_KEY = 'roastplus_developer_mode';
 
 export function useDeveloperMode() {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // ローカルストレージから状態を読み込む
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      setIsEnabled(stored === 'true');
-      setIsLoading(false);
-    }
-  }, []);
+  const [isEnabled, setIsEnabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === 'true';
+  });
+  const isLoading = typeof window === 'undefined';
 
   // パスワード検証
   const verifyPassword = useCallback((password: string): boolean => {

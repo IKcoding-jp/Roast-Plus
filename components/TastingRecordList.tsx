@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { TastingRecord, AppData } from '@/types';
+import type { AppData } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import { StarRating } from './StarRating';
 import { HiTrash } from 'react-icons/hi';

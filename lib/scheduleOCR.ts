@@ -38,29 +38,32 @@ export async function extractScheduleFromImage(
       timeLabels: data.timeLabels,
       roastSchedules,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const scheduleError = error as { code?: string; message?: string; details?: unknown; stack?: string };
     console.error('OCR処理エラー:', error);
     console.error('エラー詳細:', {
-      code: error?.code,
-      message: error?.message,
-      details: error?.details,
-      stack: error?.stack,
+      code: scheduleError?.code,
+      message: scheduleError?.message,
+      details: scheduleError?.details,
+      stack: scheduleError?.stack,
     });
     
     // Firebase Functionsのエラーを適切に処理
-    if (error?.code) {
+    if (scheduleError?.code) {
       // Firebase Functionsのエラーコードをそのまま伝播
-      const errorMessage = error.message || 'スケジュールの読み取りに失敗しました。';
-      const newError = new Error(errorMessage);
-      (newError as any).code = error.code;
-      (newError as any).details = error.details;
+      const errorMessage = scheduleError.message || 'スケジュールの読み取りに失敗しました。';
+      const newError = new Error(errorMessage) as Error & { code?: string; details?: unknown };
+      newError.code = scheduleError.code;
+      newError.details = scheduleError.details;
       throw newError;
     }
     
     // ネットワークエラーやFunctionsが存在しない場合
-    if (error?.message?.includes('not-found') || error?.message?.includes('404')) {
-      const newError = new Error('Firebase Functionsが見つかりません。デプロイを確認してください。');
-      (newError as any).code = 'functions/not-found';
+    if (scheduleError?.message?.includes('not-found') || scheduleError?.message?.includes('404')) {
+      const newError = new Error('Firebase Functionsが見つかりません。デプロイを確認してください。') as Error & {
+        code?: string;
+      };
+      newError.code = 'functions/not-found';
       throw newError;
     }
     

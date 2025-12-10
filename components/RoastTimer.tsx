@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { useRoastTimer } from '@/hooks/useRoastTimer';
-import { formatTime, formatTimeAsMinutes, formatTimeAsMinutesAndSeconds, calculateRecommendedTime } from '@/lib/roastTimerUtils';
+import { formatTime, formatTimeAsMinutesAndSeconds, calculateRecommendedTime } from '@/lib/roastTimerUtils';
 import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
@@ -289,7 +289,7 @@ export function RoastTimer() {
       setShowContinuousRoastDialog(false);
       setShowAfterPurgeDialog(false);
     }
-  }, [state?.dialogState, state?.status, showCompletionDialog, showContinuousRoastDialog, showAfterPurgeDialog]);
+  }, [state, showCompletionDialog, showContinuousRoastDialog, showAfterPurgeDialog]);
 
   // 重さに応じてデフォルト時間を設定（200g→8分、300g→9分、500g→10分）
   // 重さモードの場合のみ適用

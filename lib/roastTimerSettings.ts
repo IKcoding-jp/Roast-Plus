@@ -45,7 +45,8 @@ let loadPromise: Promise<RoastTimerSettings> | null = null;
  * 設定を読み込む（キャッシュがあればそれを返す）
  * userIdパラメータは互換性のため残しているが、使用しない
  */
-export async function loadRoastTimerSettings(userId?: string): Promise<RoastTimerSettings> {
+export async function loadRoastTimerSettings(_userId?: string): Promise<RoastTimerSettings> {
+  void _userId;
   // キャッシュがあればそれを返す
   if (settingsCache) {
     return settingsCache;
@@ -108,8 +109,9 @@ export async function loadRoastTimerSettings(userId?: string): Promise<RoastTime
  */
 export async function saveRoastTimerSettings(
   settings: RoastTimerSettings,
-  updateAppData?: unknown
+  _updateAppData?: unknown
 ): Promise<void> {
+  void _updateAppData;
   try {
     // キャッシュを更新
     settingsCache = { ...settings };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { DripRecipe } from './types';
 import { MOCK_RECIPES } from './mockData';
 
@@ -23,10 +23,11 @@ function migrateRecipeTo1Serving(recipe: DripRecipe): DripRecipe {
 }
 
 export function useRecipes() {
-    const [recipes, setRecipes] = useState<DripRecipe[]>([]);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [recipes, setRecipes] = useState<DripRecipe[]>(() => {
+        if (typeof window === 'undefined') {
+            return MOCK_RECIPES.filter((r) => r.isDefault);
+        }
 
-    useEffect(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
         const migrationFlag = localStorage.getItem(MIGRATION_FLAG_KEY);
         let loadedRecipes: DripRecipe[] = [];
@@ -40,32 +41,19 @@ export function useRecipes() {
             }
         }
 
-        // マイグレーション: 2人前基準から1人前基準への変換（1回だけ実行）
         if (loadedRecipes.length > 0 && migrationFlag !== 'true') {
-            console.log('Migrating recipes from 2 servings to 1 serving...');
             loadedRecipes = loadedRecipes.map(migrateRecipeTo1Serving);
-            // 変換後のレシピを保存
             localStorage.setItem(STORAGE_KEY, JSON.stringify(loadedRecipes));
-            // マイグレーションフラグを設定
             localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
         }
 
-        // デフォルトレシピを常に含める
-        const defaultRecipes = MOCK_RECIPES.filter(r => r.isDefault);
+        const defaultRecipes = MOCK_RECIPES.filter((r) => r.isDefault);
+        const userRecipeIds = new Set(loadedRecipes.map((r) => r.id));
+        const defaultRecipesToInclude = defaultRecipes.filter((r) => !userRecipeIds.has(r.id));
 
-        // ユーザーレシピのIDセットを作成
-        const userRecipeIds = new Set(loadedRecipes.map(r => r.id));
-
-        // デフォルトレシピから、ユーザーレシピと重複するIDを除外
-        // （ユーザーが編集したデフォルトレシピは、localStorageのバージョンを優先）
-        const defaultRecipesToInclude = defaultRecipes.filter(r => !userRecipeIds.has(r.id));
-
-        // デフォルトレシピとユーザーレシピを結合
-        const allRecipes = [...defaultRecipesToInclude, ...loadedRecipes];
-
-        setRecipes(allRecipes);
-        setIsLoaded(true);
-    }, []);
+        return [...defaultRecipesToInclude, ...loadedRecipes];
+    });
+    const [isLoaded] = useState(() => typeof window !== 'undefined');
 
     const saveRecipes = (newRecipes: DripRecipe[]) => {
         setRecipes(newRecipes);

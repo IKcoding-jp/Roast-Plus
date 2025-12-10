@@ -108,7 +108,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
         const handleSuccess = () => {
           settle(`再生OK（音量: ${Math.round(settings.timerSoundVolume * 100)}% / HEAD: ${headStatus || '200 OK'}）`);
         };
-        const handleError = (e?: Event) => {
+        const handleError = () => {
           const err = (audio as HTMLAudioElement).error;
           settle(
             `再生エラー: ${err?.message || '不明'} / readyState: ${audio.readyState}, networkState: ${audio.networkState}`

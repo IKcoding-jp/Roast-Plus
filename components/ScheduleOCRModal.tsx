@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState, useRef, useEffect } from 'react';
 import { CameraCapture } from './CameraCapture';
 import { OCRConfirmModal } from './OCRConfirmModal';
@@ -52,12 +54,13 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
       const { timeLabels, roastSchedules } = await extractScheduleFromImage(file, selectedDate);
       setOcrResult({ timeLabels, roastSchedules });
       setShowConfirm(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const scheduleError = err as { code?: string; message?: string; details?: unknown };
       console.error('OCR処理エラー:', err);
       console.error('エラー詳細:', {
-        code: err?.code,
-        message: err?.message,
-        details: err?.details,
+        code: scheduleError?.code,
+        message: scheduleError?.message,
+        details: scheduleError?.details,
       });
       
       let errorMessage = 'スケジュールの読み取りに失敗しました。画像を確認して再度お試しください。';
@@ -65,7 +68,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
       
       if (err instanceof Error) {
         // Firebase Functionsのエラーコードを確認
-        const errorCode = (err as any).code || '';
+        const errorCode = typeof scheduleError?.code === 'string' ? scheduleError.code : '';
         errorDetails = err.message || '';
         
         if (errorCode === 'unauthenticated' || err.message.includes('unauthenticated')) {

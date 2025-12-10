@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { HiPlus, HiArchive, HiChevronDown, HiChevronUp, HiPencil, HiTrash } from 'react-icons/hi';
-import { WorkProgress, WorkProgressStatus, ProgressEntry } from '@/types';
+import React from 'react';
+import { HiPlus, HiArchive, HiChevronDown, HiChevronUp } from 'react-icons/hi';
+import { WorkProgress, WorkProgressStatus } from '@/types';
 
 interface WorkProgressCardProps {
     workProgress: WorkProgress;

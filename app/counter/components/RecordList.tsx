@@ -1,14 +1,11 @@
 import React from 'react';
 import { RecordItem } from '../types';
-import { HiTrash } from 'react-icons/hi';
-
 type Props = {
     records: RecordItem[];
     onToggleCheck: (id: string) => void;
-    onDelete?: (id: string) => void;
 };
 
-export const RecordList = ({ records, onToggleCheck, onDelete }: Props) => {
+export const RecordList = ({ records, onToggleCheck }: Props) => {
     if (records.length === 0) {
         return (
             <div className="text-center py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200">

@@ -12,7 +12,7 @@
   Firestore,
 } from 'firebase/firestore';
 import app from './firebase';
-import type { AppData, DefectBean, DefectBeanSettings, WorkProgress, ProgressEntry } from '@/types';
+import type { AppData, DefectBean, DefectBeanSettings, WorkProgress, ProgressEntry, UserSettings } from '@/types';
 
 // Firestoreインスタンスのシングルトン管理
 let db: Firestore | null = null;
@@ -30,7 +30,7 @@ const writeQueues = new Map<string, {
   timeoutId: ReturnType<typeof setTimeout> | null;
   isWriting: boolean;
   retryCount: number;
-  pendingPromise: { resolve: () => void; reject: (error: any) => void } | null;
+  pendingPromise: { resolve: () => void; reject: (error: unknown) => void } | null;
 }>();
 
 // デバウンス待機時間（ミリ秒）
@@ -111,18 +111,18 @@ function releaseWriteSlot(): void {
 }
 
 // undefinedのフィールドを削除する関数。Firestoreはundefinedを保存できないため。
-function removeUndefinedFields(obj: any): any {
+function removeUndefinedFields<T>(obj: T): T {
   if (obj === null || obj === undefined) {
     return obj;
   }
   
   if (Array.isArray(obj)) {
-    return obj.map(removeUndefinedFields);
+    return obj.map((item) => removeUndefinedFields(item)) as unknown as T;
   }
   
   if (typeof obj === 'object') {
-    const cleaned: any = {};
-    for (const [key, value] of Object.entries(obj)) {
+    const cleaned: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
       if (value !== undefined) {
         const cleanedValue = removeUndefinedFields(value);
         // 空のオブジェクトを削除
@@ -142,13 +142,13 @@ function removeUndefinedFields(obj: any): any {
 }
 
 // データを正規化する関数。存在しないフィールドをデフォルト値で補完する。
-function normalizeAppData(data: any): AppData {
+function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
   const normalized: AppData = {
     // 注意: teams, members, manager, taskLabels, assignments は
     // 別コレクションとして管理されているため、/teams, /members, /taskLabels, /assignmentDays として保存される
     todaySchedules: Array.isArray(data?.todaySchedules) ? data.todaySchedules : [],
     roastSchedules: Array.isArray(data?.roastSchedules)
-      ? data.roastSchedules.map((schedule: any) => ({
+      ? data.roastSchedules.map((schedule) => ({
           ...schedule,
           // dateが存在しない場合は現在日時から日付部分を取得して補完する。
           date: schedule.date || new Date().toISOString().split('T')[0],
@@ -159,7 +159,7 @@ function normalizeAppData(data: any): AppData {
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],
     encouragementCount: typeof data?.encouragementCount === 'number' ? data.encouragementCount : 0,
     roastTimerRecords: Array.isArray(data?.roastTimerRecords)
-      ? data.roastTimerRecords.map((record: any) => ({
+      ? data.roastTimerRecords.map((record) => ({
           ...record,
           // roastDateが存在しない場合はcreatedAtから日付部分を取得、それもなければ現在日時の日付部分を使用
           roastDate:
@@ -168,7 +168,7 @@ function normalizeAppData(data: any): AppData {
         }))
       : [],
     workProgresses: Array.isArray(data?.workProgresses)
-      ? data.workProgresses.map((wp: any) => ({
+      ? data.workProgresses.map((wp) => ({
           ...wp,
           completedCount: typeof wp.completedCount === 'number' ? wp.completedCount : undefined,
         }))
@@ -178,7 +178,7 @@ function normalizeAppData(data: any): AppData {
   
   // userSettingsは存在する場合のみ処理。selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除する。
   if (data?.userSettings) {
-    const cleanedUserSettings: any = {};
+    const cleanedUserSettings: Partial<UserSettings> = {};
     if (data.userSettings.selectedMemberId !== undefined) {
       cleanedUserSettings.selectedMemberId = data.userSettings.selectedMemberId;
     }
@@ -294,14 +294,14 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
     
     const userDocRef = getUserDocRef(userId);
     // undefinedのフィールドを削除してから保存
-    const cleanedData = removeUndefinedFields(data);
+    const cleanedData = removeUndefinedFields<AppData>(data) as Partial<AppData> & Record<string, unknown>;
     
     // userSettingsの各フィールドを個別に削除処理
     // merge: trueを使ってもundefinedは保存できないため、明示的に削除する必要がある。
     // FieldValue.delete()を使って個別に削除する方法が確実
     if (data.userSettings) {
       // 元のdataオブジェクトからuserSettingsの各フィールドを抽出
-      const userSettingsUpdate: any = {};
+      const userSettingsUpdate: Partial<UserSettings> & Record<string, unknown> = {};
       let hasAnyField = false;
       
       // selectedMemberIdが存在する場合は設定、undefinedの場合は削除
@@ -344,25 +344,25 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       
       // どのフィールドも削除されていない場合はuserSettings全体を削除
       if (!hasAnyField) {
-        cleanedData.userSettings = deleteField() as any;
+        cleanedData.userSettings = deleteField();
       } else {
         cleanedData.userSettings = userSettingsUpdate;
       }
     } else if (data.userSettings === undefined) {
       // userSettingsがundefinedの場合は明示的にフィールドを削除
-      cleanedData.userSettings = deleteField() as any;
+      cleanedData.userSettings = deleteField();
     }
     
     // shuffleEventの削除処理
     if (data.shuffleEvent === undefined) {
       // shuffleEventがundefinedの場合は明示的にフィールドを削除
-      cleanedData.shuffleEvent = deleteField() as any;
+      cleanedData.shuffleEvent = deleteField();
     }
     
     // roastTimerStateの削除処理
     if (data.roastTimerState === undefined) {
       // roastTimerStateがundefinedの場合は明示的にフィールドを削除
-      cleanedData.roastTimerState = deleteField() as any;
+      cleanedData.roastTimerState = deleteField();
     }
     
     await setDoc(userDocRef, cleanedData, { merge: true });
@@ -427,14 +427,15 @@ async function executeWrite(userId: string, data: AppData, hasWaitedForQueue = f
       }
       
       return;
-    } catch (error: any) {
+    } catch (error: unknown) {
       queue.retryCount++;
       
       // Write stream exhaustedエラーを検出。エラーメッセージから判定する。
+      const errorInfo = error as { code?: string; message?: string };
       const isWriteStreamExhausted = 
-        error?.code === 'resource-exhausted' ||
-        (error?.message && typeof error.message === 'string' && 
-         error.message.toLowerCase().includes('write stream exhausted'));
+        errorInfo?.code === 'resource-exhausted' ||
+        (errorInfo?.message && typeof errorInfo.message === 'string' && 
+         errorInfo.message.toLowerCase().includes('write stream exhausted'));
       
       if (isWriteStreamExhausted && queue.retryCount <= MAX_RETRY_COUNT) {
         // Write stream exhaustedエラーの場合、指数バックオフで待機時間を設定
@@ -602,7 +603,7 @@ export async function updateDefectBeanMaster(
     const db = getDb();
     const defectBeanRef = doc(db, 'defectBeans', defectBeanId);
     
-    const updateData: any = {
+    const updateData: Partial<DefectBean> & { updatedAt: string } = {
       ...defectBean,
       updatedAt: new Date().toISOString(),
     };

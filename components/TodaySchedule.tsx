@@ -12,7 +12,27 @@ interface TodayScheduleProps {
   isToday: boolean; // 選択日が今日かどうか
 }
 
-export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodayScheduleProps) {
+interface TodayScheduleInnerProps extends TodayScheduleProps {
+  currentSchedule: TodaySchedule;
+}
+
+export function TodaySchedule(props: TodayScheduleProps) {
+  const { data, selectedDate } = props;
+  const todaySchedules = data?.todaySchedules ?? [];
+  const currentSchedule =
+    todaySchedules.find((s) => s.date === selectedDate) || {
+      id: `schedule-${selectedDate}`,
+      date: selectedDate,
+      timeLabels: [],
+    };
+  const scheduleKey = `${selectedDate}-${todaySchedules
+    .map((s) => `${s.id}:${s.timeLabels?.length ?? 0}`)
+    .join('|')}`;
+
+  return <TodayScheduleInner key={scheduleKey} {...props} currentSchedule={currentSchedule} />;
+}
+
+function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: TodayScheduleInnerProps) {
   const [isComposing, setIsComposing] = useState(false);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [addError, setAddError] = useState<string>('');
@@ -24,158 +44,55 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
   const todayScheduleIdRef = useRef<string>('');
   const originalTimeLabelsRef = useRef<TimeLabel[]>([]);
   const onUpdateRef = useRef(onUpdate);
-
   // 最新の参照を保持
   useEffect(() => {
     dataRef.current = data;
     onUpdateRef.current = onUpdate;
   }, [data, onUpdate]);
 
-  if (!data) {
-    return (
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <p className="text-center text-gray-500">データがありません</p>
-      </div>
-    );
-  }
-
-  const currentSchedule = data.todaySchedules?.find((s) => s.date === selectedDate) || {
-    id: `schedule-${selectedDate}`,
-    date: selectedDate,
-    timeLabels: [],
-  };
-
-  // refを先に宣言（useStateの初期化関数で使用するため）
   const lastDataRef = useRef<string>('');
   const localTimeLabelsRef = useRef<TimeLabel[]>(currentSchedule.timeLabels || []);
-  const lastTodaySchedulesStrRef = useRef<string>('');
-  const isInitializedRef = useRef<boolean>(false);
-  const localTimeLabelsLengthRef = useRef<number>(currentSchedule.timeLabels?.length || 0);
-  const lastSelectedDateRef = useRef<string>(selectedDate);
 
-  // 初期値をdataから取得（useStateの初期化関数を使用して初回レンダリング時のみ評価）
-  const [localTimeLabels, setLocalTimeLabels] = useState<TimeLabel[]>(() => {
-    const initialLabels = currentSchedule.timeLabels || [];
-    // 初期化時にrefも設定
-    if (initialLabels.length > 0) {
-      originalTimeLabelsRef.current = JSON.parse(JSON.stringify(initialLabels));
-      localTimeLabelsRef.current = JSON.parse(JSON.stringify(initialLabels));
-      lastDataRef.current = JSON.stringify(initialLabels);
-      localTimeLabelsLengthRef.current = initialLabels.length;
-    }
-    return initialLabels;
-  });
+  // 初期値をdataから取得
+  const [localTimeLabels, setLocalTimeLabels] = useState<TimeLabel[]>(currentSchedule.timeLabels || []);
   const [newHour, setNewHour] = useState<string>('');
   const [newMinute, setNewMinute] = useState<string>('');
 
-  // localTimeLabelsの長さを追跡
+  const clearAddError = useCallback(() => {
+    if (addError) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+        errorTimeoutRef.current = null;
+      }
+      setAddError('');
+    }
+  }, [addError]);
+
+  const handleHourInputChange = useCallback(
+    (value: string) => {
+      const hour = parseInt(value, 10);
+      if (value === '' || (!Number.isNaN(hour) && hour >= 0 && hour <= 23)) {
+        setNewHour(value);
+        clearAddError();
+      }
+    },
+    [clearAddError]
+  );
+
+  const handleMinuteInputChange = useCallback((value: string) => {
+    const minute = parseInt(value, 10);
+    if (value === '' || (!Number.isNaN(minute) && minute >= 0 && minute <= 59)) {
+      setNewMinute(value);
+    }
+  }, []);
+
   useEffect(() => {
-    localTimeLabelsLengthRef.current = localTimeLabels.length;
-  }, [localTimeLabels.length]);
-
-
-  // データが読み込まれたときにローカル状態を初期化・同期
-  useEffect(() => {
-    if (!data) return;
-
-    // 選択日が変わった場合は、ローカル状態を完全にリセット
-    if (lastSelectedDateRef.current !== selectedDate) {
-      // デバウンスタイマーをクリア
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-
-      lastSelectedDateRef.current = selectedDate;
-      isInitializedRef.current = false;
-
-      // 選択日が変わった時は、即座に新しい日付のデータを読み込む
-      const scheduleForSelectedDate = data.todaySchedules?.find((s) => s.date === selectedDate);
-      const newTimeLabels = scheduleForSelectedDate?.timeLabels || [];
-      setLocalTimeLabels(newTimeLabels);
-      localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-      originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-      todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
-      lastDataRef.current = JSON.stringify(newTimeLabels);
-      lastTodaySchedulesStrRef.current = JSON.stringify(data.todaySchedules || []);
-      isInitializedRef.current = true;
-      localTimeLabelsLengthRef.current = newTimeLabels.length;
-      return;
-    }
-
-    const scheduleForSelectedDate = data.todaySchedules?.find((s) => s.date === selectedDate);
-    const newTimeLabels = scheduleForSelectedDate?.timeLabels || [];
-    const newTimeLabelsStr = JSON.stringify(newTimeLabels);
-
-    // 初期化されていない場合、またはローカル状態とFirestoreの状態が不一致の場合は初期化
-    if (!isInitializedRef.current ||
-      (localTimeLabelsLengthRef.current === 0 && newTimeLabels.length > 0) ||
-      (localTimeLabelsLengthRef.current > 0 && newTimeLabels.length === 0)) {
-      setLocalTimeLabels(newTimeLabels);
-      localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-      originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-      todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
-      lastDataRef.current = newTimeLabelsStr;
-      lastTodaySchedulesStrRef.current = JSON.stringify(data.todaySchedules || []);
-      isInitializedRef.current = true;
-      localTimeLabelsLengthRef.current = newTimeLabels.length;
-      return;
-    }
-
-    // todaySchedules全体のJSON文字列を計算
-    const todaySchedulesStr = JSON.stringify(data.todaySchedules || []);
-
-    // 前回のtodaySchedulesと同じで、かつ更新中でない場合は何もしない（不要な実行を防止）
-    if (lastTodaySchedulesStrRef.current === todaySchedulesStr && lastDataRef.current !== '' && !isUpdatingRef.current) {
-      return;
-    }
-
-    lastTodaySchedulesStrRef.current = todaySchedulesStr;
-
-    // 外部からの更新の場合のみ同期
-    if (!isUpdatingRef.current) {
-      // 前回のデータと同じ場合は何もしない（無限ループ防止）
-      if (lastDataRef.current === newTimeLabelsStr) {
-        return;
-      }
-
-      // originalTimeLabelsRefと比較して、異なる場合のみ更新
-      const originalStr = JSON.stringify(originalTimeLabelsRef.current);
-      if (originalStr !== newTimeLabelsStr) {
-        setLocalTimeLabels(newTimeLabels);
-        localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
-        lastDataRef.current = newTimeLabelsStr;
-        localTimeLabelsLengthRef.current = newTimeLabels.length;
-      }
-    } else {
-      // ローカル更新中でも、Firestoreからの更新が来た場合は、localTimeLabelsの状態も更新する
-      // これにより、ラベルが消えることを防ぐ
-      // 前回のデータと同じ場合は何もしない（無限ループ防止）
-      if (lastDataRef.current === newTimeLabelsStr) {
-        // データが同じ場合でも、refを更新して整合性を保つ
-        originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
-        return;
-      }
-
-      const originalStr = JSON.stringify(originalTimeLabelsRef.current);
-      if (originalStr !== newTimeLabelsStr) {
-        setLocalTimeLabels(newTimeLabels);
-        localTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
-        lastDataRef.current = newTimeLabelsStr;
-        localTimeLabelsLengthRef.current = newTimeLabels.length;
-      } else {
-        // データが同じ場合でも、refを更新して整合性を保つ
-        originalTimeLabelsRef.current = JSON.parse(JSON.stringify(newTimeLabels));
-        todayScheduleIdRef.current = scheduleForSelectedDate?.id || `schedule-${selectedDate}`;
-        lastDataRef.current = newTimeLabelsStr;
-      }
-    }
-  }, [data, selectedDate]);
+    const initialLabels = currentSchedule.timeLabels || [];
+    originalTimeLabelsRef.current = JSON.parse(JSON.stringify(initialLabels));
+    localTimeLabelsRef.current = JSON.parse(JSON.stringify(initialLabels));
+    todayScheduleIdRef.current = currentSchedule.id;
+    lastDataRef.current = JSON.stringify(initialLabels);
+  }, [currentSchedule]);
 
   // デバウンス保存関数
   const debouncedSave = useCallback(
@@ -401,26 +318,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
     setNewMinute(''); // 入力欄をクリア
   };
 
-  const deleteTimeLabel = (id: string) => {
-    setLocalTimeLabels(localTimeLabels.filter((label) => label.id !== id));
-  };
-
-  const handleEditLabel = (id: string) => {
-    setEditingLabelId(id);
-  };
-
   const handleEditCancel = () => {
-    setEditingLabelId(null);
-  };
-
-  const handleEditSave = (id: string, hour: string, minute: string) => {
-    if (!hour) return; // 時が入力されていない場合は保存しない
-
-    const formattedHour = hour.padStart(2, '0');
-    const formattedMinute = minute ? minute.padStart(2, '0') : '00';
-    const newTime = `${formattedHour}:${formattedMinute}`;
-
-    updateTimeLabel(id, { time: newTime });
     setEditingLabelId(null);
   };
 
@@ -512,63 +410,29 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
     });
   };
 
+  if (!data) {
+    return (
+      <div className="rounded-lg bg-white p-6 shadow-md">
+        <p className="text-center text-gray-500">データがありません</p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl bg-white p-4 md:p-6 shadow-xl border-2 border-gray-300 h-full flex flex-col backdrop-blur-sm">
       {/* デスクトップ版：タイトルと時間入力欄を横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex flex-row items-center justify-between gap-2">
         <h2 className="hidden lg:block text-base md:text-lg font-semibold text-gray-800 whitespace-nowrap">本日のスケジュール</h2>
-        <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1 md:gap-1.5">
-            <input
-              type="number"
-              value={newHour}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
-                  setNewHour(value);
-                  // エラーをクリア（タイマーもクリア）
-                  if (addError) {
-                    if (errorTimeoutRef.current) {
-                      clearTimeout(errorTimeoutRef.current);
-                      errorTimeoutRef.current = null;
-                    }
-                    setAddError('');
-                  }
-                }
-              }}
-              min="0"
-              max="23"
-              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${addError
-                ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
-                }`}
-              placeholder="時"
-            />
-            <span className="text-gray-600 text-base md:text-base">:</span>
-            <input
-              type="number"
-              value={newMinute}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 59)) {
-                  setNewMinute(value);
-                }
-              }}
-              min="0"
-              max="59"
-              className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              placeholder="分"
-            />
-          </div>
-          <button
-            onClick={addTimeLabel}
-            className="flex items-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark"
-            aria-label="時間ラベルを追加"
-          >
-            <HiPlus className="h-3 md:h-3.5 w-3 md:w-3.5" />
-            <span>追加</span>
-          </button>
-        </div>
+        <TimeInputRow
+          newHour={newHour}
+          newMinute={newMinute}
+          addError={addError}
+          onHourChange={handleHourInputChange}
+          onMinuteChange={handleMinuteInputChange}
+          onAdd={addTimeLabel}
+          wrapperClassName="flex items-center gap-1.5 md:gap-2 flex-shrink-0"
+          buttonClassName="flex items-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark"
+        />
       </div>
 
       {localTimeLabels.length === 0 ? (
@@ -616,116 +480,34 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
               </div>
             ))}
             {/* モバイル版：時間入力欄をスケジュールの下に表示 */}
-            <div className="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2 pb-2">
-              <div className="flex items-center gap-1 md:gap-1.5">
-                <input
-                  type="number"
-                  value={newHour}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
-                      setNewHour(value);
-                      // エラーをクリア（タイマーもクリア）
-                      if (addError) {
-                        if (errorTimeoutRef.current) {
-                          clearTimeout(errorTimeoutRef.current);
-                          errorTimeoutRef.current = null;
-                        }
-                        setAddError('');
-                      }
-                    }
-                  }}
-                  min="0"
-                  max="23"
-                  className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${addError
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
-                    }`}
-                  placeholder="時"
-                />
-                <span className="text-gray-600 text-base md:text-base">:</span>
-                <input
-                  type="number"
-                  value={newMinute}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 59)) {
-                      setNewMinute(value);
-                    }
-                  }}
-                  min="0"
-                  max="59"
-                  className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  placeholder="分"
-                />
-              </div>
-              <button
-                onClick={addTimeLabel}
-                className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
-                aria-label="時間ラベルを追加"
-              >
-                <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                <span className="hidden sm:inline">追加</span>
-              </button>
-            </div>
+            <TimeInputRow
+              newHour={newHour}
+              newMinute={newMinute}
+              addError={addError}
+              onHourChange={handleHourInputChange}
+              onMinuteChange={handleMinuteInputChange}
+              onAdd={addTimeLabel}
+              wrapperClassName="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2 pb-2"
+              buttonClassName="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
+              labelClassName="hidden sm:inline"
+            />
           </div>
         </div>
       )}
 
       {/* モバイル版：時間入力欄をスケジュールの下に表示 */}
       {localTimeLabels.length === 0 && (
-        <div className="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2">
-          <div className="flex items-center gap-1 md:gap-1.5">
-            <input
-              type="number"
-              value={newHour}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
-                  setNewHour(value);
-                  // エラーをクリア（タイマーもクリア）
-                  if (addError) {
-                    if (errorTimeoutRef.current) {
-                      clearTimeout(errorTimeoutRef.current);
-                      errorTimeoutRef.current = null;
-                    }
-                    setAddError('');
-                  }
-                }
-              }}
-              min="0"
-              max="23"
-              className={`w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${addError
-                ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
-                }`}
-              placeholder="時"
-            />
-            <span className="text-gray-600 text-base md:text-base">:</span>
-            <input
-              type="number"
-              value={newMinute}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 59)) {
-                  setNewMinute(value);
-                }
-              }}
-              min="0"
-              max="59"
-              className="w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              placeholder="分"
-            />
-          </div>
-          <button
-            onClick={addTimeLabel}
-            className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
-            aria-label="時間ラベルを追加"
-          >
-            <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            <span className="hidden sm:inline">追加</span>
-          </button>
-        </div>
+        <TimeInputRow
+          newHour={newHour}
+          newMinute={newMinute}
+          addError={addError}
+          onHourChange={handleHourInputChange}
+          onMinuteChange={handleMinuteInputChange}
+          onAdd={addTimeLabel}
+          wrapperClassName="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2"
+          buttonClassName="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
+          labelClassName="hidden sm:inline"
+        />
       )}
 
 
@@ -745,6 +527,7 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
         const labelsForTime = localTimeLabels.filter((label) => label.time === editingLabel.time);
         return createPortal(
           <TimeEditDialog
+            key={editingLabel.id}
             initialHour={initialTime.hour}
             initialMinute={initialTime.minute}
             onSave={(hour, minute) => handleEditGroupSave(editingLabel.time, hour, minute)}
@@ -755,6 +538,70 @@ export function TodaySchedule({ data, onUpdate, selectedDate, isToday }: TodaySc
           document.body
         );
       })()}
+    </div>
+  );
+}
+
+type TimeInputRowProps = {
+  newHour: string;
+  newMinute: string;
+  addError: string;
+  onHourChange: (value: string) => void;
+  onMinuteChange: (value: string) => void;
+  onAdd: () => void;
+  wrapperClassName: string;
+  buttonClassName: string;
+  labelClassName?: string;
+};
+
+function TimeInputRow({
+  newHour,
+  newMinute,
+  addError,
+  onHourChange,
+  onMinuteChange,
+  onAdd,
+  wrapperClassName,
+  buttonClassName,
+  labelClassName,
+}: TimeInputRowProps) {
+  const hourInputClass = `w-12 md:w-14 rounded-md border px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+    addError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500'
+  }`;
+  const minuteInputClass =
+    'w-12 md:w-14 rounded-md border border-gray-300 px-1.5 md:px-2 py-1 md:py-1.5 text-base md:text-base text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
+
+  return (
+    <div className={wrapperClassName}>
+      <div className="flex items-center gap-1 md:gap-1.5">
+        <input
+          type="number"
+          value={newHour}
+          onChange={(e) => onHourChange(e.target.value)}
+          min="0"
+          max="23"
+          className={hourInputClass}
+          placeholder="時"
+        />
+        <span className="text-gray-600 text-base md:text-base">:</span>
+        <input
+          type="number"
+          value={newMinute}
+          onChange={(e) => onMinuteChange(e.target.value)}
+          min="0"
+          max="59"
+          className={minuteInputClass}
+          placeholder="分"
+        />
+      </div>
+      <button
+        onClick={onAdd}
+        className={buttonClassName}
+        aria-label="時間ラベルを追加"
+      >
+        <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
+        <span className={labelClassName}>追加</span>
+      </button>
     </div>
   );
 }
@@ -778,12 +625,6 @@ function TimeEditDialog({
 }: TimeEditDialogProps) {
   const [hour, setHour] = useState(initialHour);
   const [minute, setMinute] = useState(initialMinute);
-
-  // initialHour/initialMinuteが変更されたときにstateを更新
-  useEffect(() => {
-    setHour(initialHour);
-    setMinute(initialMinute);
-  }, [initialHour, initialMinute]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -6,7 +6,6 @@ import { DripGuideRunner } from '@/components/drip-guide/DripGuideRunner';
 import { useRecipes } from '@/lib/drip-guide/useRecipes';
 import { calculateRecipeForServings } from '@/lib/drip-guide/recipeCalculator';
 import Link from 'next/link';
-import { ArrowLeft } from 'phosphor-react';
 
 function RunRecipeContent() {
     const searchParams = useSearchParams();

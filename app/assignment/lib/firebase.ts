@@ -13,8 +13,7 @@ import {
     where,
     limit,
     deleteDoc,
-    runTransaction,
-    documentId
+    runTransaction
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {

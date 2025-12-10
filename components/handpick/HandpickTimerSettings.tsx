@@ -14,7 +14,6 @@ import { playNotificationSound, stopNotificationSound } from '@/lib/sounds';
 import {
   handpickStartSoundFiles,
   handpickCompleteSoundFiles,
-  type SoundFile,
 } from '@/lib/soundFiles';
 import type { HandpickTimerSettings } from '@/types';
 

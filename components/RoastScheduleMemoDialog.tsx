@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { RoastSchedule } from '@/types';
-import { ALL_BEANS, getRoastMachineMode, getRoastMachineModeForBlend, type BeanName } from '@/lib/beanConfig';
+import { ALL_BEANS, getRoastMachineModeForBlend, type BeanName } from '@/lib/beanConfig';
 import { HiX, HiFire } from 'react-icons/hi';
 import { FaSnowflake, FaBroom } from 'react-icons/fa';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
@@ -15,7 +15,20 @@ interface RoastScheduleMemoDialogProps {
   onCancel: () => void;
 }
 
-export function RoastScheduleMemoDialog({
+export function RoastScheduleMemoDialog(props: RoastScheduleMemoDialogProps) {
+  const key = [
+    props.schedule?.id ?? 'new',
+    props.schedule?.time ?? '',
+    props.schedule?.beanName ?? '',
+    props.schedule?.beanName2 ?? '',
+    props.schedule?.roastLevel ?? '',
+    props.selectedDate,
+  ].join('-');
+
+  return <RoastScheduleMemoDialogInner key={key} {...props} />;
+}
+
+function RoastScheduleMemoDialogInner({
   schedule,
   selectedDate,
   onSave,
@@ -54,26 +67,6 @@ export function RoastScheduleMemoDialog({
   >(schedule?.roastLevel || '');
   const [roastCount, setRoastCount] = useState(schedule?.roastCount?.toString() || '');
   const [bagCount, setBagCount] = useState<1 | 2 | ''>(schedule?.bagCount || '');
-
-  // scheduleが変更されたときにstateを更新
-  useEffect(() => {
-    const parsedTime = parseTime(schedule?.time || '');
-    setHour(parsedTime.hour);
-    setMinute(parsedTime.minute);
-    setIsRoasterOn(schedule?.isRoasterOn || false);
-    setIsRoast(schedule?.isRoast || false);
-    setIsAfterPurge(schedule?.isAfterPurge || false);
-    setIsChaffCleaning(schedule?.isChaffCleaning || false);
-    setBeanName((schedule?.beanName as BeanName | undefined) || '');
-    setBeanName2((schedule?.beanName2 as BeanName | undefined) || '');
-    const parsedBlendRatio = parseBlendRatio(schedule?.blendRatio);
-    setBlendRatio1(parsedBlendRatio.ratio1);
-    setBlendRatio2(parsedBlendRatio.ratio2);
-    setWeight(schedule?.weight || '');
-    setRoastLevel(schedule?.roastLevel || '');
-    setRoastCount(schedule?.roastCount?.toString() || '');
-    setBagCount(schedule?.bagCount || '');
-  }, [schedule]);
 
   // ブレンド割合を結合する関数
   const combineBlendRatio = (ratio1: string, ratio2: string): string | undefined => {
@@ -320,7 +313,7 @@ export function RoastScheduleMemoDialog({
                   <input
                     type="checkbox"
                     checked={isRoasterOn}
-                    onChange={(e) => handleMemoTypeChange('roasterOn')}
+                    onChange={() => handleMemoTypeChange('roasterOn')}
                     className="sr-only"
                   />
                   <HiFire className={`text-3xl md:text-4xl ${isRoasterOn ? 'text-orange-500' : 'text-gray-400'}`} />
@@ -336,7 +329,7 @@ export function RoastScheduleMemoDialog({
                   <input
                     type="checkbox"
                     checked={isRoast}
-                    onChange={(e) => handleMemoTypeChange('roast')}
+                    onChange={() => handleMemoTypeChange('roast')}
                     className="sr-only"
                   />
                   <PiCoffeeBeanFill className={`text-3xl md:text-4xl ${isRoast ? 'text-amber-700' : 'text-gray-400'}`} />
@@ -352,7 +345,7 @@ export function RoastScheduleMemoDialog({
                   <input
                     type="checkbox"
                     checked={isAfterPurge}
-                    onChange={(e) => handleMemoTypeChange('afterPurge')}
+                    onChange={() => handleMemoTypeChange('afterPurge')}
                     className="sr-only"
                   />
                   <FaSnowflake className={`text-3xl md:text-4xl ${isAfterPurge ? 'text-blue-500' : 'text-gray-400'}`} />
@@ -368,7 +361,7 @@ export function RoastScheduleMemoDialog({
                   <input
                     type="checkbox"
                     checked={isChaffCleaning}
-                    onChange={(e) => handleMemoTypeChange('chaffCleaning')}
+                    onChange={() => handleMemoTypeChange('chaffCleaning')}
                     className="sr-only"
                   />
                   <FaBroom className={`text-3xl md:text-4xl ${isChaffCleaning ? 'text-gray-700' : 'text-gray-400'}`} />

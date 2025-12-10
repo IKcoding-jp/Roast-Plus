@@ -19,7 +19,6 @@ export function RoastTimerControls({
     onSkip,
 }: RoastTimerControlsProps) {
     const isRunning = state?.status === 'running';
-    const isPaused = state?.status === 'paused';
     const isCompleted = state?.status === 'completed';
 
     if (!state || isCompleted) return null;

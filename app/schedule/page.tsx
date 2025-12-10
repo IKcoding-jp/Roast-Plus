@@ -105,23 +105,9 @@ export default function SchedulePage() {
   };
 
   // モバイル用の短縮日付フォーマット関数
-  const formatDateShort = (date: Date): string => {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-    const weekday = weekdays[date.getDay()];
-
-    return `${month}/${day}（${weekday}）`;
-  };
-
   const formatDateString = (dateString: string): string => {
     const date = new Date(dateString + 'T00:00:00');
     return formatDate(date);
-  };
-
-  const formatDateStringShort = (dateString: string): string => {
-    const date = new Date(dateString + 'T00:00:00');
-    return formatDateShort(date);
   };
 
   const formatTime = (date: Date): string => {
@@ -152,7 +138,6 @@ export default function SchedulePage() {
 
   // 選択日が今日かどうか（実際の今日の日付と比較）
   const today = getTodayString();
-  const effectiveToday = isWeekend(today) ? getPreviousWeekday(today) : today;
   const isToday = selectedDate === today; // 実際の今日の日付と比較
 
   // OCR結果を反映する処理
@@ -162,7 +147,6 @@ export default function SchedulePage() {
 
       // 既存のデータとマージするか確認
       const existingTodaySchedule = data.todaySchedules?.find((s) => s.date === selectedDate);
-      const existingRoastSchedules = data.roastSchedules?.filter((s) => s.date === selectedDate) || [];
 
       if (mode === 'replace') {
         // 置き換え

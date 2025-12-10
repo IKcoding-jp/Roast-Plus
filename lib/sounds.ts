@@ -40,7 +40,7 @@ export async function playTimerSound(
     (audio as any).playsInline = true;
     
     // エラーハンドリングを追加（参照を保持して削除可能にする）
-    timerErrorHandler = (e: Event) => {
+    timerErrorHandler = () => {
       const error = audio.error;
       if (error) {
         console.error('Audio loading error:', {
@@ -129,7 +129,7 @@ export async function playNotificationSound(
     const audio = new Audio(audioPath);
     
     // エラーハンドリングを追加（参照を保持して削除可能にする）
-    notificationErrorHandler = (e: Event) => {
+    notificationErrorHandler = () => {
       const error = audio.error;
       if (error) {
         console.error('Audio loading error:', {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { RoastTimerRecord, AppData } from '@/types';
 import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { formatTime } from '@/lib/roastTimerUtils';
@@ -29,8 +29,20 @@ interface RoastRecordFormProps {
   onCancel?: () => void; // キャンセル機能
 }
 
-export function RoastRecordForm({
-  data,
+export function RoastRecordForm(props: RoastRecordFormProps) {
+  const keyParts = [
+    props.record?.id ?? 'new',
+    props.initialValues?.beanName ?? '',
+    props.initialValues?.weight ?? '',
+    props.initialValues?.roastLevel ?? '',
+    props.initialValues?.duration ?? '',
+  ];
+  const remountKey = keyParts.join('-');
+  return <RoastRecordFormInner key={remountKey} {...props} />;
+}
+
+function RoastRecordFormInner({
+  data: _data,
   onSave,
   record,
   initialValues,
@@ -38,6 +50,7 @@ export function RoastRecordForm({
   onCancel,
 }: RoastRecordFormProps) {
   const { showToast } = useToastContext();
+  void _data;
 
   // 編集モードの場合、recordから初期値を設定
   const isEditMode = !!record;
@@ -62,30 +75,6 @@ export function RoastRecordForm({
   const [roastDate, setRoastDate] = useState<string>(
     record?.roastDate || new Date().toISOString().split('T')[0]
   );
-
-  // 初期値が設定された時にフォームに反映（recordが優先）
-  useEffect(() => {
-    if (record) {
-      setBeanName(record.beanName as BeanName | '');
-      setWeight(record.weight);
-      setRoastLevel(record.roastLevel);
-      const minutes = Math.floor(record.duration / 60);
-      const seconds = record.duration % 60;
-      setDurationMinutes(minutes.toString());
-      setDurationSeconds(seconds.toString().padStart(2, '0'));
-      setRoastDate(record.roastDate);
-    } else if (initialValues) {
-      if (initialValues.beanName) setBeanName(initialValues.beanName as BeanName);
-      if (initialValues.weight) setWeight(initialValues.weight);
-      if (initialValues.roastLevel) setRoastLevel(initialValues.roastLevel);
-      if (initialValues.duration) {
-        const minutes = Math.floor(initialValues.duration / 60);
-        const seconds = initialValues.duration % 60;
-        setDurationMinutes(minutes.toString());
-        setDurationSeconds(seconds.toString().padStart(2, '0'));
-      }
-    }
-  }, [record, initialValues]);
 
   // 全角数字を半角数字に変換
   const convertToHalfWidth = (str: string): string => {
@@ -326,4 +315,3 @@ export function RoastRecordForm({
     </form>
   );
 }
-

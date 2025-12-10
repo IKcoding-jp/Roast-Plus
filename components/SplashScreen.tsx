@@ -7,32 +7,31 @@ const SPLASH_DISPLAY_TIME = 3000; // 3秒
 const SPLASH_SHOWN_KEY = 'roastplus_splash_shown'; // セッション開始時のフラグ
 
 export function SplashScreen() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const splashShown = sessionStorage.getItem(SPLASH_SHOWN_KEY);
+    if (splashShown === 'true') {
+      return false;
+    }
+    sessionStorage.setItem(SPLASH_SHOWN_KEY, 'true');
+    return true;
+  });
   const [isFadingOut, setIsFadingOut] = useState(false);
-  const [animationData, setAnimationData] = useState<any>(null);
+  const [animationData, setAnimationData] = useState<object | null>(null);
   const [isTextVisible, setIsTextVisible] = useState(false);
 
   useEffect(() => {
-    // セッション開始時（ページが最初に読み込まれた時）のみ表示
-    // sessionStorageを使用することで、タブが開いている間は一度だけ表示される
-    if (typeof window === 'undefined') return;
+    if (!isVisible) return;
 
-    const splashShown = sessionStorage.getItem(SPLASH_SHOWN_KEY);
-    if (splashShown === 'true') {
-      // 既に表示済みの場合は何もしない
-      return;
-    }
-
-    // セッション開始フラグを設定
-    sessionStorage.setItem(SPLASH_SHOWN_KEY, 'true');
-
-    // Lottieアニメーションを読み込む
+    let isMounted = true;
     const loadAnimation = async () => {
       try {
         const response = await fetch('/animations/Loading coffee bean.json');
         if (response.ok) {
           const data = await response.json();
-          setAnimationData(data);
+          if (isMounted) {
+            setAnimationData(data);
+          }
         }
       } catch (error) {
         console.error('Error loading Lottie animation:', error);
@@ -41,30 +40,25 @@ export function SplashScreen() {
 
     loadAnimation();
 
-    // スプラッシュ画面を表示
-    setIsVisible(true);
-
-    // テキストを少し遅れてフェードイン（控えめなアニメーション）
     const textFadeInTimer = setTimeout(() => {
       setIsTextVisible(true);
     }, 200);
 
-    // 3秒後にフェードアウト開始
     const fadeOutTimer = setTimeout(() => {
       setIsFadingOut(true);
     }, SPLASH_DISPLAY_TIME);
 
-    // フェードアウト完了後に非表示
     const hideTimer = setTimeout(() => {
       setIsVisible(false);
-    }, SPLASH_DISPLAY_TIME + 300); // フェードアウトアニメーション時間を考慮
+    }, SPLASH_DISPLAY_TIME + 300);
 
     return () => {
+      isMounted = false;
       clearTimeout(textFadeInTimer);
       clearTimeout(fadeOutTimer);
       clearTimeout(hideTimer);
     };
-  }, []);
+  }, [isVisible]);
 
   if (!isVisible) {
     return null;

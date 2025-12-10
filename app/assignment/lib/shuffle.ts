@@ -44,16 +44,12 @@ export const calculateAssignment = (
         currentAssignmentMap.set(`${asg.teamId}-${asg.taskLabelId}`, asg);
     });
 
-    // 割り当て済みメンバーを追跡するセット (重複割り当て防止用)
-    const assignedMemberIds = new Set<string>();
-
     teams.forEach(team => {
         taskLabels.forEach(task => {
             const current = currentAssignmentMap.get(`${team.id}-${task.id}`);
 
             if (current && current.memberId === null) {
                 // 未割り当ての場合は固定（結果にそのまま含める）
-                // メンバーがいないので assignedMemberIds への追加は不要
                 assignments.push({
                     teamId: team.id,
                     taskLabelId: task.id,

@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MdAdd, MdDelete, MdEdit, MdSwapHoriz, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown, MdLinearScale, MdHeight, MdInfoOutline } from 'react-icons/md';
+import { MdAdd, MdDelete, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown, MdInfoOutline } from 'react-icons/md';
 import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
@@ -187,24 +187,12 @@ export const AssignmentTable: React.FC<Props> = ({
     const isLongPress = useRef(false);
     const touchStartPos = useRef<{ x: number, y: number } | null>(null);
 
-    // コンテキストメニューが開いたときにアコーディオンをリセット
-    useEffect(() => {
-        if (contextMenu?.memberId) {
-            setIsExclusionSettingsOpen(false); // メニューを開くたびに閉じた状態に戻す
-        } else {
-            setEditingMemberName('');
-        }
-    }, [contextMenu]);
-
-    // メンバー情報が更新されたら編集用ステートも更新
-    useEffect(() => {
-        if (contextMenu?.memberId) {
-            const member = members.find(m => m.id === contextMenu.memberId);
-            if (member) {
-                setEditingMemberName(member.name);
-            }
-        }
-    }, [contextMenu, members]);
+    const openContextMenu = (teamId: string, taskLabelId: string, memberId: string | null) => {
+        const member = memberId ? members.find((m) => m.id === memberId) : undefined;
+        setIsExclusionSettingsOpen(false);
+        setEditingMemberName(member?.name ?? '');
+        setContextMenu({ teamId, taskLabelId, memberId });
+    };
 
     // ラベル編集開始
     const startEditLabel = (label: TaskLabel) => {
@@ -328,7 +316,7 @@ export const AssignmentTable: React.FC<Props> = ({
 
         longPressTimer.current = setTimeout(() => {
             isLongPress.current = true;
-            setContextMenu({ teamId, taskLabelId, memberId });
+            openContextMenu(teamId, taskLabelId, memberId);
             setSelectedCell(null); // 選択は解除
             if (navigator.vibrate) navigator.vibrate(50);
         }, 500);
@@ -579,8 +567,6 @@ export const AssignmentTable: React.FC<Props> = ({
                 {/* ボディ */}
                 <div className="divide-y divide-gray-100 bg-white" style={{ minWidth: 'max-content' }}>
                 {taskLabels.map(label => {
-                    const isEditing = editingLabelId === label.id;
-
                     return (
                         <div 
                             key={label.id} 
@@ -631,7 +617,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                                 onTouchStart={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                                 onTouchEnd={handleCellTouchEnd}
                                                 onTouchMove={handleCellTouchMove}
-                                                onClick={(e) => handleCellClick(team.id, label.id)}
+                                                onClick={() => handleCellClick(team.id, label.id)}
                                                 className={`
                                                     w-full py-2 md:py-3 px-1 rounded-lg text-sm md:text-base font-bold text-center transition-all truncate select-none
                                                     ${member 
@@ -797,7 +783,7 @@ export const AssignmentTable: React.FC<Props> = ({
                                                     onTouchStart={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                                     onTouchEnd={handleCellTouchEnd}
                                                     onTouchMove={handleCellTouchMove}
-                                                    onClick={(e) => handleCellClick(team.id, label.id)}
+                                                    onClick={() => handleCellClick(team.id, label.id)}
                                                     className={`
                                                         w-full py-3 px-2 rounded-lg text-sm font-bold text-center transition-all truncate select-none
                                                         ${member 

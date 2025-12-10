@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState, useRef, useEffect } from 'react';
 import { HiCamera, HiX, HiCheck } from 'react-icons/hi';
 
@@ -48,6 +50,8 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
 
   // カメラを起動
   useEffect(() => {
+    let activeStream: MediaStream | null = null;
+
     const startCamera = async () => {
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -57,6 +61,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
             height: { ideal: 1080 },
           },
         });
+        activeStream = mediaStream;
         setStream(mediaStream);
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
@@ -72,11 +77,11 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
 
     // クリーンアップ
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [onCancel]);
 
   // 写真を撮影
   const capturePhoto = () => {

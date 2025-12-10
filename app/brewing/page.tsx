@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiHome, HiArrowLeft } from 'react-icons/hi';
+import { HiArrowLeft } from 'react-icons/hi';
 import { MdCoffeeMaker } from 'react-icons/md';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import type { TastingRecord, AppData, TastingSession } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import {
@@ -121,13 +121,16 @@ export function TastingRecordForm({
     record?.memberId || ''
   );
 
-  const [beanName, setBeanName] = useState(record?.beanName || '');
+  const [beanName, setBeanName] = useState(
+    record?.beanName || sessionInfo?.beanName || ''
+  );
   const [tastingDate, setTastingDate] = useState(
-    record?.tastingDate || new Date().toISOString().split('T')[0]
+    record?.tastingDate ||
+      (sessionInfo ? sessionInfo.createdAt.split('T')[0] : new Date().toISOString().split('T')[0])
   );
   const [roastLevel, setRoastLevel] = useState<
     '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
-  >(record?.roastLevel || '中深煎り');
+  >(record?.roastLevel || sessionInfo?.roastLevel || '中深煎り');
   const [bitterness, setBitterness] = useState(record?.bitterness || 3.0);
   const [acidity, setAcidity] = useState(record?.acidity || 3.0);
   const [body, setBody] = useState(record?.body || 3.0);
@@ -139,71 +142,48 @@ export function TastingRecordForm({
   );
   // 既存記録のIDを保持（上書き時に使用）
   const [existingRecordId, setExistingRecordId] = useState<string | null>(null);
-  // 前回のメンバーIDを保持（無限ループ防止）
-  const prevMemberIdRef = useRef<string>('');
 
-  // セッション情報から自動設定（新規作成時のみ）
-  useEffect(() => {
-    if (!record && sessionInfo) {
-      setBeanName(sessionInfo.beanName);
-      setRoastLevel(sessionInfo.roastLevel);
-      // 試飲日はセッションの作成日を使用
-      setTastingDate(sessionInfo.createdAt.split('T')[0]);
-    }
-  }, [record, session?.id, currentSessionId]);
+  const resetScores = () => {
+    setBitterness(3.0);
+    setAcidity(3.0);
+    setBody(3.0);
+    setSweetness(3.0);
+    setAroma(3.0);
+    setOverallRating(3.0);
+    setOverallImpression('');
+  };
 
-  // 編集時にrecordが変更された場合、selectedMemberIdを更新
-  useEffect(() => {
-    if (record?.memberId) {
-      setSelectedMemberId(record.memberId);
-    }
-  }, [record?.id]);
+  const applyExistingRecord = (existing: TastingRecord) => {
+    setExistingRecordId(existing.id);
+    setBitterness(existing.bitterness);
+    setAcidity(existing.acidity);
+    setBody(existing.body);
+    setSweetness(existing.sweetness);
+    setAroma(existing.aroma);
+    setOverallRating(existing.overallRating);
+    setOverallImpression(existing.overallImpression || '');
+  };
 
-  // 重複チェック（セッション内で同じメンバーの記録があるか）
-  useEffect(() => {
-    // 編集時は重複チェックしない
-    if (record !== null || !currentSessionId || !selectedMemberId) {
-      if (prevMemberIdRef.current !== selectedMemberId) {
-        setExistingRecordId(null);
-        prevMemberIdRef.current = selectedMemberId;
+  const handleMemberChange = (memberId: string) => {
+    setSelectedMemberId(memberId);
+
+    if (!memberId || record !== null || !currentSessionId) {
+      setExistingRecordId(null);
+      if (!record) {
+        resetScores();
       }
       return;
     }
 
-    // メンバーIDが変更されていない場合はスキップ（無限ループ防止）
-    if (prevMemberIdRef.current === selectedMemberId) {
-      return;
-    }
-
-    prevMemberIdRef.current = selectedMemberId;
-
-    const existingRecord = sessionRecords.find((r) => r.memberId === selectedMemberId);
+    const existingRecord = sessionRecords.find((r) => r.memberId === memberId);
 
     if (existingRecord) {
-      // 既存記録のIDを保持
-      setExistingRecordId(existingRecord.id);
-      // 既存記録のデータをフォームに反映
-      setBitterness(existingRecord.bitterness);
-      setAcidity(existingRecord.acidity);
-      setBody(existingRecord.body);
-      setSweetness(existingRecord.sweetness);
-      setAroma(existingRecord.aroma);
-      setOverallRating(existingRecord.overallRating);
-      setOverallImpression(existingRecord.overallImpression || '');
+      applyExistingRecord(existingRecord);
     } else {
       setExistingRecordId(null);
-      // 既存記録がない場合、デフォルト値にリセット
-      if (!record) {
-        setBitterness(3.0);
-        setAcidity(3.0);
-        setBody(3.0);
-        setSweetness(3.0);
-        setAroma(3.0);
-        setOverallRating(3.0);
-        setOverallImpression('');
-      }
+      resetScores();
     }
-  }, [selectedMemberId, currentSessionId, record, sessionRecords]);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,8 +242,6 @@ export function TastingRecordForm({
       onDelete(record.id);
     }
   };
-
-  const formatValue = (value: number) => value.toFixed(3);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -333,7 +311,7 @@ export function TastingRecordForm({
         </label>
         <select
           value={selectedMemberId}
-          onChange={(e) => setSelectedMemberId(e.target.value)}
+          onChange={(e) => handleMemberChange(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
           required
           disabled={readOnly}
@@ -453,4 +431,5 @@ export function TastingRecordForm({
     </form>
   );
 }
+
 

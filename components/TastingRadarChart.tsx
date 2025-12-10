@@ -12,13 +12,12 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
-  const [chartSize, setChartSize] = useState(size || 200);
+  const [chartSize, setChartSize] = useState(size ?? 200);
   const [isVisible, setIsVisible] = useState(false);
   const [pathLength, setPathLength] = useState(0);
 
   useEffect(() => {
     if (size) {
-      setChartSize(size);
       return;
     }
 
@@ -26,23 +25,23 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
-        // コンテナの幅と高さの両方を考慮してサイズを計算
-        // 幅と高さの小さい方の80%を使用し、より大きなサイズを確保
         const sizeBasedOnWidth = containerWidth * 0.85;
         const sizeBasedOnHeight = containerHeight * 0.85;
-        // 幅と高さの両方を考慮し、より大きなサイズを選択（最大500px、最小60px）
-        const calculatedSize = Math.min(500, Math.max(60, Math.min(sizeBasedOnWidth, sizeBasedOnHeight)));
+        const calculatedSize = Math.min(
+          500,
+          Math.max(60, Math.min(sizeBasedOnWidth, sizeBasedOnHeight))
+        );
         setChartSize(calculatedSize);
       }
     };
 
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    // ResizeObserverを使用してコンテナのサイズ変更を監視
     const resizeObserver = new ResizeObserver(updateSize);
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
+    window.addEventListener('resize', updateSize);
+    requestAnimationFrame(updateSize);
+
     return () => {
       window.removeEventListener('resize', updateSize);
       resizeObserver.disconnect();
@@ -77,7 +76,6 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
   // パスの長さを計算（recordやchartSizeが変更されたときに再計算）
   useEffect(() => {
     if (pathRef.current) {
-      // DOMの更新後にパスの長さを計算
       requestAnimationFrame(() => {
         if (pathRef.current) {
           const length = pathRef.current.getTotalLength();
@@ -85,11 +83,12 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
         }
       });
     }
-  }, [record.bitterness, record.acidity, record.body, record.sweetness, record.aroma, chartSize]);
+  }, [record.bitterness, record.acidity, record.body, record.sweetness, record.aroma, effectiveSize]);
 
-  const centerX = chartSize / 2;
-  const centerY = chartSize / 2;
-  const radius = chartSize * 0.35;
+  const effectiveSize = size ?? chartSize;
+  const centerX = effectiveSize / 2;
+  const centerY = effectiveSize / 2;
+  const radius = effectiveSize * 0.35;
   
   // 5軸のレーダーチャート（苦味、酸味、ボディ、甘み、香り）
   // 5つの軸を等間隔（72度ずつ）に配置
@@ -136,8 +135,8 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
     >
       <svg 
         ref={svgRef}
-        width={chartSize} 
-        height={chartSize} 
+        width={effectiveSize} 
+        height={effectiveSize} 
         className="overflow-visible"
       >
         {/* グリッド線（同心円） */}

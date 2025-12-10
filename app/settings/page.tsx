@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { useAppData } from '@/hooks/useAppData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
@@ -12,14 +11,13 @@ import LoginPage from '@/app/login/page';
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
-  const { data, updateData, isLoading: dataLoading } = useAppData();
   const { isEnabled, isLoading: devModeLoading, enableDeveloperMode, disableDeveloperMode } = useDeveloperMode();
   const { version, isUpdateAvailable, isChecking, checkForUpdates, applyUpdate } = useAppVersion();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  if (authLoading || devModeLoading || dataLoading) {
+  if (authLoading || devModeLoading) {
     return <Loading />;
   }
 

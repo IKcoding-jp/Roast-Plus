@@ -42,11 +42,13 @@ export interface Assignment {
   assignedDate: string; // YYYY-MM-DD
 }
 
+export type FirestoreTimestamp = { seconds: number; nanoseconds: number } | string;
+
 export interface AssignmentDay {
   date: string; // YYYY-MM-DD (document id)
   assignments: Assignment[];
-  updatedAt?: any;
-  createdAt?: any;
+  updatedAt?: FirestoreTimestamp;
+  createdAt?: FirestoreTimestamp;
 }
 
 export interface TimeLabel {
@@ -151,14 +153,14 @@ export interface ShuffleEvent {
   // Extended fields for assignment feature
   eventId?: string;
   state?: 'running' | 'done';
-  startedAt?: any;
+  startedAt?: FirestoreTimestamp;
   durationMs?: number;
   resultAssignments?: Assignment[];
 }
 
 export interface ShuffleHistory {
   id: string; // UUID
-  createdAt: any;
+  createdAt: FirestoreTimestamp;
   assignments: Assignment[];
   targetDate: string; // YYYY-MM-DD
 }
@@ -168,7 +170,7 @@ export interface PairExclusion {
   id: string;
   memberId1: string; // 正規化: memberId1 < memberId2
   memberId2: string;
-  createdAt: any; // Firestore Timestamp
+  createdAt: FirestoreTimestamp; // Firestore Timestamp
 }
 
 // ペアのメンバーIDを正規化するヘルパー関数

@@ -11,12 +11,11 @@ import { formatTime, type TimerPhase } from '@/lib/handpickTimerUtils';
 interface TimerDisplayProps {
     remainingSeconds: number;
     phase: TimerPhase;
-    isRunning: boolean;
     totalSeconds: number; // フェーズごとの合計時間
     onSkip?: () => void;
 }
 
-export function TimerDisplay({ remainingSeconds, phase, isRunning, totalSeconds, onSkip }: TimerDisplayProps) {
+export function TimerDisplay({ remainingSeconds, phase, totalSeconds, onSkip }: TimerDisplayProps) {
     const [circleSize, setCircleSize] = useState(340);
     const strokeWidth = 16;
 

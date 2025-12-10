@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { DripRecipe, DripStep } from '@/lib/drip-guide/types';
+import { DripRecipe } from '@/lib/drip-guide/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, ArrowCounterClockwise, X, ArrowLeft, Lightbulb, ArrowRight, CheckCircle } from 'phosphor-react';
 import { clsx } from 'clsx';
@@ -16,7 +16,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
-    const [animationData, setAnimationData] = useState<any>(null);
+    const [animationData, setAnimationData] = useState<unknown>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lottieRef = useRef<LottieRefCurrentProps>(null);
@@ -33,15 +33,6 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
     const currentStepIndex = isManualMode ? manualStepIndex : autoModeStepIndex;
     const currentStep = currentStepIndex !== -1 && currentStepIndex < steps.length ? steps[currentStepIndex] : null;
     const nextStep = currentStepIndex < steps.length - 1 ? steps[currentStepIndex + 1] : null;
-    const prevStep = currentStepIndex > 0 ? steps[currentStepIndex - 1] : null;
-
-    // Check for completion (auto mode only)
-    useEffect(() => {
-        if (!isManualMode && currentTime >= recipe.totalDurationSec && !isCompleted) {
-            setIsRunning(false);
-            setIsCompleted(true);
-        }
-    }, [currentTime, recipe.totalDurationSec, isCompleted, isManualMode]);
 
     // Load Lottie animation when completed
     useEffect(() => {
@@ -66,17 +57,31 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
 
     // Timer logic
     useEffect(() => {
-        if (isRunning) {
-            timerRef.current = setInterval(() => {
-                setCurrentTime((prev) => prev + 1);
-            }, 1000);
-        } else if (timerRef.current) {
-            clearInterval(timerRef.current);
+        if (!isRunning) {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+            }
+            return;
         }
+
+        timerRef.current = setInterval(() => {
+            setCurrentTime((prev) => {
+                const next = prev + 1;
+                if (!isManualMode && next >= recipe.totalDurationSec) {
+                    setIsRunning(false);
+                    setIsCompleted(true);
+                    return recipe.totalDurationSec;
+                }
+                return next;
+            });
+        }, 1000);
+
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [isRunning]);
+    }, [isRunning, isManualMode, recipe.totalDurationSec]);
+
+    const scrollKey = isManualMode ? manualStepIndex : currentTime;
 
     // Auto scroll to current step in mini map
     useEffect(() => {
@@ -90,7 +95,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                 });
             }
         }
-    }, [currentStep?.id, isManualMode ? manualStepIndex : currentTime]);
+    }, [currentStep, scrollKey]);
 
     // Set animation speed
     useEffect(() => {
@@ -205,9 +210,6 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
                                     ? index < currentStepIndex
                                     : currentTime > stepEndTime;
                                 const isCurrent = currentStep?.id === step.id;
-                                const isUpcoming = isManualMode
-                                    ? index > currentStepIndex
-                                    : step.startTimeSec > currentTime;
 
                                 return (
                                     <motion.div

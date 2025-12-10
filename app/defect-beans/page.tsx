@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft, HiSearch, HiPlus, HiX, HiCheckCircle, HiXCircle, HiCollection, HiOutlineCollection } from 'react-icons/hi';
+import { HiArrowLeft, HiSearch, HiPlus, HiCheckCircle, HiXCircle, HiCollection, HiOutlineCollection } from 'react-icons/hi';
 import { RiBookFill } from 'react-icons/ri';
 import { MdCompareArrows, MdSort, MdArrowUpward, MdArrowDownward } from 'react-icons/md';
 import LoginPage from '@/app/login/page';

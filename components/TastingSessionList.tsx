@@ -1,24 +1,18 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaCoffee } from 'react-icons/fa';
 import { HiSearch, HiPlus, HiX, HiFilter } from 'react-icons/hi';
-import type { AppData, TastingSession } from '@/types';
-import { TastingRadarChart } from './TastingRadarChart';
+import type { AppData } from '@/types';
 import { TastingSessionCarousel } from './TastingSessionCarousel';
-import {
-  calculateAverageScores,
-  getRecordsBySessionId,
-} from '@/lib/tastingUtils';
 import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/lib/auth';
 
 interface TastingSessionListProps {
   data: AppData;
-  onUpdate: (data: AppData) => void;
   filterButtonContainerId?: string;
   filterButtonContainerIdMobile?: string;
 }
@@ -32,7 +26,7 @@ const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎�
   '深煎り',
 ];
 
-export function TastingSessionList({ data, onUpdate, filterButtonContainerId, filterButtonContainerIdMobile }: TastingSessionListProps) {
+export function TastingSessionList({ data, filterButtonContainerId, filterButtonContainerIdMobile }: TastingSessionListProps) {
   const router = useRouter();
   const { user } = useAuth();
   const userId = user?.uid ?? null;
@@ -40,12 +34,14 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
   // 担当表の /users/{userId}/members コレクションからメンバーと管理者を取得
   const { members: allMembers, manager } = useMembers(userId);
 
-  const tastingSessions = Array.isArray(data.tastingSessions)
-    ? data.tastingSessions
-    : [];
-  const tastingRecords = Array.isArray(data.tastingRecords)
-    ? data.tastingRecords
-    : [];
+  const tastingSessions = useMemo(
+    () => (Array.isArray(data.tastingSessions) ? data.tastingSessions : []),
+    [data.tastingSessions]
+  );
+  const tastingRecords = useMemo(
+    () => (Array.isArray(data.tastingRecords) ? data.tastingRecords : []),
+    [data.tastingRecords]
+  );
   // アクティブメンバー数 + 管理者（存在する場合）
   const activeMemberCount = getActiveMembers(allMembers).length + (manager ? 1 : 0);
 
@@ -128,33 +124,6 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
     selectedRoastLevels,
   ]);
 
-  // 検索・フィルタ変更時のハンドラー
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-  };
-
-  const handleSortChange = (value: SortOption) => {
-    setSortOption(value);
-  };
-
-  const handleDateFromChange = (value: string) => {
-    setDateFrom(value);
-  };
-
-  const handleDateToChange = (value: string) => {
-    setDateTo(value);
-  };
-
-  const handleRoastLevelToggle = (
-    level: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
-  ) => {
-    setSelectedRoastLevels((prev) =>
-      prev.includes(level)
-        ? prev.filter((l) => l !== level)
-        : [...prev, level]
-    );
-  };
-
   // モーダル内での焙煎度合いトグル
   const handleTempRoastLevelToggle = (
     level: '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
@@ -223,10 +192,15 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
     return count;
   }, [searchQuery, dateFrom, dateTo, selectedRoastLevels]);
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
-  };
+  const filterButtonContainer = useMemo(() => {
+    if (!filterButtonContainerId || typeof document === 'undefined') return null;
+    return document.getElementById(filterButtonContainerId);
+  }, [filterButtonContainerId]);
+
+  const filterButtonContainerMobile = useMemo(() => {
+    if (!filterButtonContainerIdMobile || typeof document === 'undefined') return null;
+    return document.getElementById(filterButtonContainerIdMobile);
+  }, [filterButtonContainerIdMobile]);
 
   if (tastingSessions.length === 0) {
     return (
@@ -262,24 +236,6 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
       </div>
     );
   }
-
-  // フィルターボタンを外部コンテナにレンダリング
-  const [filterButtonContainer, setFilterButtonContainer] = useState<HTMLElement | null>(null);
-  const [filterButtonContainerMobile, setFilterButtonContainerMobile] = useState<HTMLElement | null>(null);
-  
-  useEffect(() => {
-    if (filterButtonContainerId) {
-      const container = document.getElementById(filterButtonContainerId);
-      setFilterButtonContainer(container);
-    }
-  }, [filterButtonContainerId]);
-
-  useEffect(() => {
-    if (filterButtonContainerIdMobile) {
-      const container = document.getElementById(filterButtonContainerIdMobile);
-      setFilterButtonContainerMobile(container);
-    }
-  }, [filterButtonContainerIdMobile]);
 
   const filterButton = (
     <button

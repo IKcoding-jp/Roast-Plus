@@ -158,7 +158,7 @@ export const ocrScheduleFromImage = onCall(
         fullText = fullText.substring(0, MAX_OCR_TEXT_LENGTH);
       }
 
-      // GPT-5 nanoでスケジュール形式に整形
+      // GPT-5.1でスケジュール形式に整形
       const scheduleData = await formatScheduleWithGPT(fullText);
 
       return scheduleData;
@@ -179,7 +179,7 @@ export const ocrScheduleFromImage = onCall(
 );
 
 /**
- * GPT-5 nanoを使用してOCR結果をTimeLabel配列とRoastSchedule配列に整形
+ * GPT-5.1を使用してOCR結果をTimeLabel配列とRoastSchedule配列に整形
  */
 async function formatScheduleWithGPT(ocrText: string): Promise<OCRScheduleResponse> {
   // Firebase Functions v2では、Secrets Managerで設定したシークレットは
@@ -192,8 +192,8 @@ async function formatScheduleWithGPT(ocrText: string): Promise<OCRScheduleRespon
 
   const openai = new OpenAI({
     apiKey: apiKey,
-    timeout: 60000, // 60秒のタイムアウト
-    maxRetries: 2, // 最大2回リトライ
+    timeout: 240000, // 240秒のタイムアウト（Function上限300秒より短く設定）
+    maxRetries: 1, // リトライは1回に抑え、総処理時間が300秒を超えないようにする
   });
 
   const prompt = `以下のホワイトボードのスケジュールテキストを解析し、本日のスケジュールとローストスケジュールを抽出してください。
@@ -290,7 +290,7 @@ JSONのみを返してください。説明文は不要です。`;
   try {
     const completion = await openai.chat.completions.create(
       {
-        model: 'gpt-5-nano',
+        model: 'gpt-5.1',
         messages: [
           {
             role: 'system',
@@ -304,13 +304,13 @@ JSONのみを返してください。説明文は不要です。`;
         response_format: { type: 'json_object' },
       },
       {
-        timeout: 60000, // 60秒のタイムアウト
+        timeout: 240000, // 240秒のタイムアウト（OpenAI応答を長く待つ）
       }
     );
 
     const responseText = completion.choices[0]?.message?.content;
     if (!responseText) {
-      throw new HttpsError('internal', 'GPT-5 nanoからの応答が空です');
+      throw new HttpsError('internal', 'GPT-5.1からの応答が空です');
     }
 
     // JSONをパース
@@ -332,7 +332,7 @@ JSONのみを返してください。説明文は不要です。`;
         responsePreview,
       });
 
-      throw new HttpsError('internal', 'GPT-5 nanoからの応答の解析に失敗しました。再度お試しください。');
+      throw new HttpsError('internal', 'GPT-5.1からの応答の解析に失敗しました。再度お試しください。');
     }
 
     const parsedObject = parsed as { timeLabels?: unknown; roastSchedules?: unknown };

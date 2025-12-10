@@ -13,11 +13,39 @@ interface CameraCaptureProps {
 export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const [guideSize, setGuideSize] = useState({ width: 0, height: 0, top: 0, left: 0, containerHeight: 0, containerWidth: 0 });
+  const streamRef = useRef<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const guideRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const onCancelRef = useRef(onCancel);
+
+  useEffect(() => {
+    onCancelRef.current = onCancel;
+  }, [onCancel]);
+
+  // videoエレメントが再マウントされた際に既存ストリームを再度紐付けする
+  useEffect(() => {
+    if (videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [capturedImage]);
+
+  const setStreamSafely = (mediaStream: MediaStream | null) => {
+    streamRef.current = mediaStream;
+    setStream(mediaStream);
+  };
+
+  const stopCurrentStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      setStream(null);
+    }
+  };
 
   // ガイド枠のサイズを計算
   useEffect(() => {
@@ -54,6 +82,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
 
     const startCamera = async () => {
       try {
+        setIsVideoReady(false);
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: 'environment', // 背面カメラを優先
@@ -62,14 +91,14 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
           },
         });
         activeStream = mediaStream;
-        setStream(mediaStream);
+        setStreamSafely(mediaStream);
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
         }
       } catch (error) {
         console.error('Failed to access camera:', error);
         alert('カメラへのアクセスに失敗しました。カメラの権限を確認してください。');
-        onCancel();
+        onCancelRef.current?.();
       }
     };
 
@@ -80,12 +109,36 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       if (activeStream) {
         activeStream.getTracks().forEach((track) => track.stop());
       }
+      stopCurrentStream();
     };
-  }, [onCancel]);
+  }, []);
+
+  const handleVideoReady = () => {
+    const video = videoRef.current;
+    if (video && video.videoWidth > 0 && video.videoHeight > 0) {
+      setIsVideoReady(true);
+    }
+  };
+
+  const canCapture = isVideoReady &&
+    guideSize.width > 0 &&
+    guideSize.height > 0 &&
+    guideSize.containerWidth > 0 &&
+    guideSize.containerHeight > 0;
 
   // 写真を撮影
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current) {
+      return;
+    }
+
+    if (!canCapture) {
+      console.error('Camera is not ready', {
+        videoWidth: videoRef.current?.videoWidth,
+        videoHeight: videoRef.current?.videoHeight,
+        guideSize,
+      });
+      alert('カメラの準備中です。少し待ってから撮影してください。');
       return;
     }
 
@@ -100,6 +153,11 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     // 一時キャンバスのサイズをビデオのサイズに合わせる
     const videoWidth = video.videoWidth;
     const videoHeight = video.videoHeight;
+    if (videoWidth === 0 || videoHeight === 0) {
+      console.error('Video metadata is not ready', { videoWidth, videoHeight });
+      alert('カメラの準備中です。少し待ってから撮影してください。');
+      return;
+    }
     tempCanvas.width = videoWidth;
     tempCanvas.height = videoHeight;
 
@@ -181,12 +239,6 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         if (finalContext) {
           finalContext.drawImage(resizedCanvas, 0, 0);
         }
-        
-        // ストリームを停止
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
-          setStream(null);
-        }
       }
     }, 'image/jpeg', 0.9);
   };
@@ -203,6 +255,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
           type: 'image/jpeg',
         });
         onCapture(file);
+        stopCurrentStream();
       }
     }, 'image/jpeg', 0.9);
   };
@@ -210,22 +263,33 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   // 撮影をやり直す
   const retakePhoto = async () => {
     setCapturedImage(null);
+    setIsVideoReady(false);
     
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-        },
-      });
-      setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
+    // 既存ストリームがあれば継続利用。無ければ再取得する。
+    if (!streamRef.current) {
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'environment',
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+        });
+        setStreamSafely(mediaStream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
+      } catch (error) {
+        console.error('Failed to restart camera:', error);
+        alert('カメラの再起動に失敗しました。');
       }
-    } catch (error) {
-      console.error('Failed to restart camera:', error);
-      alert('カメラの再起動に失敗しました。');
+    } else if (videoRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+      // 既存ストリームですでにメタデータが揃っている場合は即座に撮影可能にする
+      setIsVideoReady(true);
+    } else if (videoRef.current && streamRef.current) {
+      // ストリームはあるがvideoに未反映の場合、再紐付けして再生を試みる
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {});
     }
   };
 
@@ -257,6 +321,8 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
               ref={videoRef}
               autoPlay
               playsInline
+              onLoadedMetadata={handleVideoReady}
+              onCanPlay={handleVideoReady}
               className="w-full h-full object-cover"
             />
             {/* 縦長のガイド枠（ホワイトボード向け） */}
@@ -336,7 +402,10 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         ) : (
           <button
             onClick={capturePhoto}
-            className="w-20 h-20 bg-white rounded-full border-4 border-gray-300 hover:bg-gray-100 transition-colors flex items-center justify-center min-h-[80px] min-w-[80px]"
+            disabled={!canCapture}
+            className={`w-20 h-20 bg-white rounded-full border-4 border-gray-300 transition-colors flex items-center justify-center min-h-[80px] min-w-[80px] ${
+              canCapture ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'
+            }`}
           >
             <HiCamera className="h-10 w-10 text-gray-800" />
           </button>

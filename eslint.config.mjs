@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     ".history/**",
+    // Ignore compiled Firebase Functions output
+    "functions/lib/**",
   ]),
 ]);
 

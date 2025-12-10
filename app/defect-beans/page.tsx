@@ -224,16 +224,6 @@ export default function DefectBeansPage() {
     }
   };
 
-  // 欠点豆削除（旧関数、互換性のため残す）
-  const handleDeleteDefectBean = async (id: string, imageUrl: string) => {
-    try {
-      await removeDefectBean(id, imageUrl);
-    } catch (error) {
-      console.error('Failed to delete defect bean:', error);
-      alert('欠点豆の削除に失敗しました。');
-    }
-  };
-
   // 設定更新
   const handleToggleSetting = async (id: string, shouldRemove: boolean) => {
     try {

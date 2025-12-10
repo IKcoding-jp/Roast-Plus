@@ -11,7 +11,6 @@ interface CameraCaptureProps {
 }
 
 export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
-  const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [guideSize, setGuideSize] = useState({ width: 0, height: 0, top: 0, left: 0, containerHeight: 0, containerWidth: 0 });
@@ -36,14 +35,12 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
 
   const setStreamSafely = (mediaStream: MediaStream | null) => {
     streamRef.current = mediaStream;
-    setStream(mediaStream);
   };
 
   const stopCurrentStream = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
-      setStream(null);
     }
   };
 

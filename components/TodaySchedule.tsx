@@ -51,6 +51,7 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
   }, [data, onUpdate]);
 
   const lastDataRef = useRef<string>('');
+  const lastSelectedDateRef = useRef<string>(selectedDate);
   const localTimeLabelsRef = useRef<TimeLabel[]>(currentSchedule.timeLabels || []);
 
   // 初期値をdataから取得
@@ -85,6 +86,10 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
       setNewMinute(value);
     }
   }, []);
+
+  useEffect(() => {
+    lastSelectedDateRef.current = selectedDate;
+  }, [selectedDate]);
 
   useEffect(() => {
     const initialLabels = currentSchedule.timeLabels || [];

@@ -16,6 +16,11 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [pathLength, setPathLength] = useState(0);
 
+  const effectiveSize = size ?? chartSize;
+  const centerX = effectiveSize / 2;
+  const centerY = effectiveSize / 2;
+  const radius = effectiveSize * 0.35;
+
   useEffect(() => {
     if (size) {
       return;
@@ -85,11 +90,6 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
     }
   }, [record.bitterness, record.acidity, record.body, record.sweetness, record.aroma, effectiveSize]);
 
-  const effectiveSize = size ?? chartSize;
-  const centerX = effectiveSize / 2;
-  const centerY = effectiveSize / 2;
-  const radius = effectiveSize * 0.35;
-  
   // 5軸のレーダーチャート（苦味、酸味、ボディ、甘み、香り）
   // 5つの軸を等間隔（72度ずつ）に配置
   const axisLabels = [

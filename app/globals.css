@@ -102,6 +102,48 @@ select option {
   animation: gradient-shift 3s ease infinite;
 }
 
+/* Home: slide + card appear */
+@keyframes home-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes home-card-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-home-page {
+  animation: home-slide-in 0.55s cubic-bezier(0.25, 0.8, 0.3, 1) both;
+  will-change: opacity, transform;
+}
+
+.animate-home-card {
+  animation: home-card-appear 0.48s ease-out both;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-home-page,
+  .animate-home-card {
+    animation: none;
+  }
+}
+
 /* Scrollbar Hiding Utilities */
 .scrollbar-hide {
   -ms-overflow-style: none;

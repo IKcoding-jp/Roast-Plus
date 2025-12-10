@@ -175,7 +175,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F7F2EB] to-[#F3F0EA] text-[#1F2A44]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F7F2EB] to-[#F3F0EA] text-[#1F2A44] animate-home-page">
       {/* 開発用: Lottieアニメーション確認モーダル */}
       {showLoadingDebugModal && (
         <div
@@ -248,12 +248,15 @@ export default function HomePage() {
           className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
           style={cardHeight ? { gridAutoRows: `${cardHeight}px` } : { gridAutoRows: '1fr' }}
         >
-          {ACTIONS.map(({ key, title, description, href, icon: Icon }) => (
+          {ACTIONS.map(({ key, title, description, href, icon: Icon }, index) => (
             <button
               key={key}
               onClick={() => router.push(href)}
-              className="group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl bg-white/95 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#F5F2EB]"
-              style={cardHeight ? { height: `${cardHeight}px` } : undefined}
+              className="group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl bg-white/95 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#F5F2EB] animate-home-card"
+              style={{
+                ...(cardHeight ? { height: `${cardHeight}px` } : {}),
+                animationDelay: `${index * 60}ms`,
+              }}
               aria-label={title}
             >
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">

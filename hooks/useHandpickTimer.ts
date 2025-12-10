@@ -226,7 +226,7 @@ export function useHandpickTimer() {
     const resolveAudioPath = (path: string) => {
         const safePath = path && path.length > 0 ? path : '/sounds/handpicktimer/complete/complete1.mp3';
         const audioPath = safePath.startsWith('/') ? safePath : `/${safePath}`;
-        const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.5.4';
+        const version = process.env.NEXT_PUBLIC_APP_VERSION || '0.5.5';
         return `${audioPath}?v=${version}`;
     };
 

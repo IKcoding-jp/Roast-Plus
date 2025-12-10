@@ -12,7 +12,7 @@ export function useAppVersion() {
 
   // バージョン情報を取得
   useEffect(() => {
-    const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0';
+    const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '0.5.3';
     setVersion(appVersion);
   }, []);
 

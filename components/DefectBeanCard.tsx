@@ -85,9 +85,11 @@ export function DefectBeanCard({
         <div className="p-2 flex flex-col flex-1 min-h-0">
           {/* 名称 */}
           <div className="flex-shrink-0">
-            <h3 className="text-sm font-semibold text-gray-800 mb-1">
-              {defectBean.name}
-            </h3>
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">
+                {defectBean.name}
+              </h3>
+            </div>
           </div>
 
           {/* 詳細情報 */}

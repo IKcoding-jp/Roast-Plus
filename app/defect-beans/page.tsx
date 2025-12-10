@@ -488,7 +488,6 @@ export default function DefectBeansPage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {filteredDefectBeans.map((defectBean) => {
-              const isUserDefectBean = !defectBean.isMaster;
               return (
                 <DefectBeanCard
                   key={defectBean.id}
@@ -497,8 +496,6 @@ export default function DefectBeansPage() {
                   isSelected={selectedIds.has(defectBean.id)}
                   onSelect={compareMode ? handleSelect : undefined}
                   onToggleSetting={handleToggleSetting}
-                  onDelete={isUserDefectBean ? handleDeleteDefectBean : undefined}
-                  isUserDefectBean={isUserDefectBean}
                   onEdit={!compareMode ? handleEditDefectBean : undefined}
                   compareMode={compareMode}
                 />

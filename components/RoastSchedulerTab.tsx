@@ -244,7 +244,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
     e.preventDefault();
     setDragOverId(null);
 
-    if (!draggedId || draggedId === targetId) {
+    if (!data || !draggedId || draggedId === targetId) {
       setDraggedId(null);
       return;
     }

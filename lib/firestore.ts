@@ -135,7 +135,7 @@ function removeUndefinedFields<T>(obj: T): T {
         }
       }
     }
-    return cleaned;
+    return cleaned as unknown as T;
   }
   
   return obj;
@@ -294,14 +294,14 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
     
     const userDocRef = getUserDocRef(userId);
     // undefinedのフィールドを削除してから保存
-    const cleanedData = removeUndefinedFields<AppData>(data) as Partial<AppData> & Record<string, unknown>;
+    const cleanedData: Record<string, unknown> = removeUndefinedFields<AppData>(data) as unknown as Record<string, unknown>;
     
     // userSettingsの各フィールドを個別に削除処理
     // merge: trueを使ってもundefinedは保存できないため、明示的に削除する必要がある。
     // FieldValue.delete()を使って個別に削除する方法が確実
     if (data.userSettings) {
       // 元のdataオブジェクトからuserSettingsの各フィールドを抽出
-      const userSettingsUpdate: Partial<UserSettings> & Record<string, unknown> = {};
+      const userSettingsUpdate: Record<string, unknown> = {};
       let hasAnyField = false;
       
       // selectedMemberIdが存在する場合は設定、undefinedの場合は削除

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { RoastSchedule } from '@/types';
 import { ALL_BEANS, getRoastMachineModeForBlend, type BeanName } from '@/lib/beanConfig';
 import { HiX, HiFire } from 'react-icons/hi';

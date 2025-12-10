@@ -13,6 +13,7 @@ interface TimerDisplayProps {
     phase: TimerPhase;
     totalSeconds: number; // フェーズごとの合計時間
     onSkip?: () => void;
+    isRunning?: boolean;
 }
 
 export function TimerDisplay({ remainingSeconds, phase, totalSeconds, onSkip }: TimerDisplayProps) {

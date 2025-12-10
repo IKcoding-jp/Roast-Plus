@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings, Manager, PairExclusion
+    Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings, Manager, PairExclusion, FirestoreTimestamp
 } from '@/types';
 import {
     fetchTeams, fetchMembers, fetchTaskLabels,
@@ -32,6 +32,24 @@ import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
 import { FaUsers, FaUserTie } from "react-icons/fa";
 import { HiPlus, HiCog } from "react-icons/hi";
+
+const toMillisSafe = (value?: FirestoreTimestamp | null): number => {
+    if (!value) return 0;
+    if (typeof value === 'string') {
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    const candidate = value as { toMillis?: () => number; seconds?: number; nanoseconds?: number };
+    if (typeof candidate.toMillis === 'function') {
+        const result = candidate.toMillis();
+        return typeof result === 'number' ? result : 0;
+    }
+
+    const seconds = typeof candidate.seconds === 'number' ? candidate.seconds : 0;
+    const nanoseconds = typeof candidate.nanoseconds === 'number' ? candidate.nanoseconds : 0;
+    return seconds * 1000 + Math.floor(nanoseconds / 1_000_000);
+};
 
 export default function AssignmentPage() {
     const router = useRouter();
@@ -179,9 +197,9 @@ export default function AssignmentPage() {
 
             if (event && event.state === 'running') {
                 const now = Date.now();
-                if (!event.startedAt) return;
+                if (!event.startedAt || typeof event.durationMs !== 'number') return;
 
-                const startTime = event.startedAt.toMillis();
+                const startTime = toMillisSafe(event.startedAt);
                 const endTime = startTime + event.durationMs;
 
                 if (now < endTime) {

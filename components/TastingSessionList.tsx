@@ -13,6 +13,7 @@ import { useAuth } from '@/lib/auth';
 
 interface TastingSessionListProps {
   data: AppData;
+  onUpdate?: (newDataOrUpdater: AppData | ((currentData: AppData) => AppData)) => Promise<void> | void;
   filterButtonContainerId?: string;
   filterButtonContainerIdMobile?: string;
 }

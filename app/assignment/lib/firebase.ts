@@ -27,7 +27,8 @@ import {
     TableSettings,
     Manager,
     PairExclusion,
-    normalizePairIds
+    normalizePairIds,
+    FirestoreTimestamp
 } from '@/types';
 
 // ===== ヘルパー関数: ユーザー配下のコレクション参照 =====
@@ -68,6 +69,24 @@ function getManagersCollection(userId: string) {
 }
 
 const assignmentKey = (teamId: string, taskLabelId: string) => `${teamId}__${taskLabelId}`;
+
+const toMillisSafe = (value?: FirestoreTimestamp | null): number => {
+    if (!value) return 0;
+    if (typeof value === 'string') {
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    const candidate = value as { toMillis?: () => number; seconds?: number; nanoseconds?: number };
+    if (typeof candidate.toMillis === 'function') {
+        const result = candidate.toMillis();
+        return typeof result === 'number' ? result : 0;
+    }
+
+    const seconds = typeof candidate.seconds === 'number' ? candidate.seconds : 0;
+    const nanoseconds = typeof candidate.nanoseconds === 'number' ? candidate.nanoseconds : 0;
+    return seconds * 1000 + Math.floor(nanoseconds / 1_000_000);
+};
 
 const DEFAULT_TABLE_SETTINGS: TableSettings = {
     colWidths: {
@@ -437,11 +456,7 @@ export const fetchRecentShuffleHistory = async (userId: string, limitCount: numb
         const snapshot = await getDocs(shuffleHistoryCol);
         const allHistory = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ShuffleHistory));
         // createdAtでソート（存在しない場合は最後に）
-        allHistory.sort((a, b) => {
-            const aTime = a.createdAt?.toMillis?.() || 0;
-            const bTime = b.createdAt?.toMillis?.() || 0;
-            return bTime - aTime; // 降順
-        });
+        allHistory.sort((a, b) => toMillisSafe(b.createdAt) - toMillisSafe(a.createdAt)); // 降順
         return allHistory.slice(0, limitCount);
     }
 };
@@ -516,11 +531,7 @@ export const subscribePairExclusions = (
         (snapshot) => {
             const exclusions = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as PairExclusion));
             // クライアント側でソート
-            exclusions.sort((a, b) => {
-                const aTime = a.createdAt?.toMillis?.() || 0;
-                const bTime = b.createdAt?.toMillis?.() || 0;
-                return bTime - aTime; // 降順
-            });
+            exclusions.sort((a, b) => toMillisSafe(b.createdAt) - toMillisSafe(a.createdAt)); // 降順
             callback(exclusions);
         },
         (error) => {

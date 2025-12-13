@@ -1,4 +1,4 @@
-﻿import { 
+import { 
   getFirestore, 
   doc, 
   getDoc, 
@@ -70,6 +70,7 @@ const defaultData: AppData = {
   roastTimerRecords: [],
   workProgresses: [],
   counterRecords: [],
+  dripRecipes: [],
 };
 
 function getUserDocRef(userId: string) {
@@ -250,6 +251,11 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
   // defectBeanSettingsは存在する場合のみ処理
   if (data?.defectBeanSettings && typeof data.defectBeanSettings === 'object') {
     normalized.defectBeanSettings = data.defectBeanSettings;
+  }
+  
+  // dripRecipesは存在する場合のみ処理
+  if (Array.isArray(data?.dripRecipes)) {
+    normalized.dripRecipes = data.dripRecipes;
   }
   
   return normalized;

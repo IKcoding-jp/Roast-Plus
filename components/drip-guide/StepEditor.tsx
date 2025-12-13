@@ -110,6 +110,18 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManua
                                     rows={2}
                                 />
                             </div>
+
+                            {/* Note/Hint Input (Full width) */}
+                            <div className="col-span-12">
+                                <label className="block text-xs font-medium text-gray-500 mb-1">ヒント</label>
+                                <input
+                                    type="text"
+                                    value={step.note || ''}
+                                    onChange={(e) => updateStep(index, 'note', e.target.value || undefined)}
+                                    placeholder="例: 粉全体が均一に膨らむのを確認"
+                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                />
+                            </div>
                         </div>
                     </div>
                 ))}

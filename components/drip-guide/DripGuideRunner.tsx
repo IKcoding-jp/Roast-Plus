@@ -7,6 +7,7 @@ import { Play, Pause, ArrowCounterClockwise, X, ArrowLeft, Lightbulb, ArrowRight
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
+import { playNotificationSound } from '@/lib/sounds';
 
 interface DripGuideRunnerProps {
     recipe: DripRecipe;
@@ -20,6 +21,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lottieRef = useRef<LottieRefCurrentProps>(null);
+    const countdownSoundPlayedRef = useRef<boolean>(false);
     
     // Manual mode state
     const isManualMode = recipe.isManualMode ?? false;
@@ -104,12 +106,44 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
         }
     }, [animationData]);
 
+    // Play countdown sound 3 seconds before next step starts
+    useEffect(() => {
+        // 手動モードでは音声を再生しない
+        if (isManualMode) {
+            return;
+        }
+
+        // 次のステップが存在しない場合は何もしない
+        if (!nextStep) {
+            countdownSoundPlayedRef.current = false;
+            return;
+        }
+
+        // 次のステップ開始時刻の3秒前
+        const countdownTime = nextStep.startTimeSec - 3;
+
+        // 現在時刻がカウントダウン時刻に達したら音声を再生（1回のみ）
+        if (currentTime >= countdownTime && !countdownSoundPlayedRef.current) {
+            playNotificationSound('/sounds/countdown/countdown.mp3', 1).catch((error) => {
+                console.error('Failed to play countdown sound:', error);
+            });
+            countdownSoundPlayedRef.current = true;
+        }
+
+        // 次のステップが変わったらフラグをリセット
+        // （前のステップから次のステップに移った時）
+        if (currentTime < countdownTime) {
+            countdownSoundPlayedRef.current = false;
+        }
+    }, [currentTime, nextStep, isManualMode]);
+
     const toggleTimer = () => setIsRunning(!isRunning);
 
     const resetTimer = () => {
         setIsRunning(false);
         setCurrentTime(0);
         setIsCompleted(false);
+        countdownSoundPlayedRef.current = false; // Reset countdown sound flag
         if (isManualMode) {
             setManualStepIndex(0);
         }

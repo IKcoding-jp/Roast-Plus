@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DripRecipe } from './types';
 import { MOCK_RECIPES } from './mockData';
 
@@ -53,7 +53,11 @@ export function useRecipes() {
 
         return [...defaultRecipesToInclude, ...loadedRecipes];
     });
-    const [isLoaded] = useState(() => typeof window !== 'undefined');
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        setIsLoaded(true);
+    }, []);
 
     const saveRecipes = (newRecipes: DripRecipe[]) => {
         setRecipes(newRecipes);

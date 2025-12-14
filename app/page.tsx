@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -12,6 +12,7 @@ import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAuth, signOut } from '@/lib/auth';
+import { APP_VERSION } from '@/lib/version';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
 
@@ -88,7 +89,15 @@ const ACTIONS = [
   },
 ];
 
-export default function HomePage() {
+type HomePageProps = {
+  params?: Promise<Record<string, never>>;
+  searchParams?: Promise<Record<string, never>>;
+};
+
+export default function HomePage(_props: HomePageProps = {}) {
+  // Next.js 16ではparamsとsearchParamsがPromise型
+  // このページでは使用しないが、型定義を追加して開発ツールのエラーを防ぐ
+
   const { user, loading } = useAuth();
   const router = useRouter();
   const [showLoadingDebugModal, setShowLoadingDebugModal] = useState(false);
@@ -215,8 +224,9 @@ export default function HomePage() {
       {/* ヘッダー */}
       <header className="bg-[#261a14]/98 shadow-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-5">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <img src="/logo.png" alt="RoastPlus" className="h-8 w-auto md:h-10" />
+            <span className="absolute left-[160px] top-[28px] text-[10px] text-white/70 md:text-xs">v{APP_VERSION}</span>
           </div>
           <div className="flex items-center gap-3 md:gap-4">
             {isDeveloperMode && (

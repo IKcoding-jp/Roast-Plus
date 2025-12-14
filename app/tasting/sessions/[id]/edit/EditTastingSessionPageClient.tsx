@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, use } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 // 動的ルートからクエリパラメータ形式にリダイレクト
 export default function EditTastingSessionPageClient() {
-  const params = useParams();
+  const paramsValue = useParams();
+  // Next.js 16ではparamsがPromiseの場合があるため、use()でアンラップ
+  const params = paramsValue instanceof Promise ? use(paramsValue) : paramsValue;
   const router = useRouter();
 
   useEffect(() => {

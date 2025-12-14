@@ -12,7 +12,6 @@ import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAuth, signOut } from '@/lib/auth';
-import { APP_VERSION } from '@/lib/version';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
 
@@ -225,9 +224,8 @@ export default function HomePage(_props: HomePageProps = {}) {
       {/* ヘッダー */}
       <header className="bg-[#261a14]/98 shadow-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-5">
-          <div className="flex items-center gap-2">
+          <div className="relative flex items-center gap-2">
             <img src="/logo.png" alt="RoastPlus" className="h-8 w-auto md:h-10" />
-            <span className="absolute left-[160px] top-[28px] text-[10px] text-white/70 md:text-xs">v{APP_VERSION}</span>
           </div>
           <div className="flex items-center gap-3 md:gap-4">
             {isDeveloperMode && (

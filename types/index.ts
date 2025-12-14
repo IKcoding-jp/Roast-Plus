@@ -1,7 +1,10 @@
 // Shared domain types used across RoastPlus.
 
+// Import DripRecipe types from drip-guide
+import type { DripRecipe, DripStep } from '../lib/drip-guide/types';
+
 // Re-export DripRecipe types from drip-guide
-export type { DripRecipe, DripStep } from '@/lib/drip-guide/types';
+export type { DripRecipe, DripStep };
 
 export type RoastLevel = '浅煎り' | '中煎り' | '中深煎り' | '深煎り';
 export type RoastWeight = 200 | 300 | 500;

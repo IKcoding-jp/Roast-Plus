@@ -37,8 +37,10 @@ export function useRecipes() {
         const migrationFlag = localStorage.getItem(MIGRATION_FLAG_KEY);
         if (migrationFlag === 'true') {
             // 既に移行済み
-            setMigrationChecked(true);
-            setIsLoaded(true);
+            queueMicrotask(() => {
+                setMigrationChecked(true);
+                setIsLoaded(true);
+            });
             return;
         }
 
@@ -46,8 +48,10 @@ export function useRecipes() {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (!stored) {
             // localStorageにデータがない場合は移行不要
-            setMigrationChecked(true);
-            setIsLoaded(true);
+            queueMicrotask(() => {
+                setMigrationChecked(true);
+                setIsLoaded(true);
+            });
             return;
         }
 
@@ -56,8 +60,10 @@ export function useRecipes() {
             loadedRecipes = JSON.parse(stored);
         } catch (e) {
             console.error('Failed to parse recipes from localStorage', e);
-            setMigrationChecked(true);
-            setIsLoaded(true);
+            queueMicrotask(() => {
+                setMigrationChecked(true);
+                setIsLoaded(true);
+            });
             return;
         }
 
@@ -72,8 +78,10 @@ export function useRecipes() {
         if (firestoreRecipes.length > 0) {
             // Firestoreに既にデータがある場合は移行しない
             localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
-            setMigrationChecked(true);
-            setIsLoaded(true);
+            queueMicrotask(() => {
+                setMigrationChecked(true);
+                setIsLoaded(true);
+            });
             return;
         }
 
@@ -95,8 +103,10 @@ export function useRecipes() {
                 setIsLoaded(true);
             });
         } else {
-            setMigrationChecked(true);
-            setIsLoaded(true);
+            queueMicrotask(() => {
+                setMigrationChecked(true);
+                setIsLoaded(true);
+            });
         }
     }, [appDataLoading, migrationChecked, data, updateData]);
 

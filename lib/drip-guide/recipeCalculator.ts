@@ -6,7 +6,7 @@ import { DripRecipe, DripStep } from './types';
  * 例: 1人前基準のレシピ（蒸らし10g）を2人前にすると、蒸らし20gになります。
  * 
  * @param recipe 元のレシピ（1人前基準）
- * @param servings 人前数（1-4）
+ * @param servings 人前数（1-8）
  * @returns 計算済みのレシピ
  */
 export function calculateRecipeForServings(recipe: DripRecipe, servings: number): DripRecipe {

@@ -94,6 +94,7 @@ type HomePageProps = {
   searchParams?: Promise<Record<string, never>>;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function HomePage(_props: HomePageProps = {}) {
   // Next.js 16ではparamsとsearchParamsがPromise型
   // このページでは使用しないが、型定義を追加して開発ツールのエラーを防ぐ

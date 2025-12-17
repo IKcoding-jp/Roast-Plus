@@ -95,12 +95,17 @@ export const calculateAssignment = (
         });
     });
 
-    const getHistoryAssignment = (shuffleAgo: number, taskLabelId: string): string | null => {
+    // 同じ行（タスク）に過去に割り当てられたすべてのメンバーIDを取得
+    // 連続で同じ行に割り当てられないようにするため、すべてのメンバーをチェックする必要がある
+    const getHistoryAssignments = (shuffleAgo: number, taskLabelId: string): Set<string> => {
         // shuffleAgo: 1 = 1回前、2 = 2回前
         const shuffleResult = history[shuffleAgo - 1];
-        if (!shuffleResult) return null;
-        const asg = shuffleResult.find(a => a.taskLabelId === taskLabelId);
-        return asg?.memberId || null;
+        if (!shuffleResult) return new Set();
+        // 同じタスクラベルに割り当てられたすべてのメンバーIDを取得
+        const memberIds = shuffleResult
+            .filter(a => a.taskLabelId === taskLabelId && a.memberId !== null)
+            .map(a => a.memberId!);
+        return new Set(memberIds);
     };
 
     const pairHistory: Record<string, { shuffleAgo1: Set<string>, shuffleAgo2: Set<string> }> = {};
@@ -191,8 +196,9 @@ export const calculateAssignment = (
                 .filter(a => a.taskLabelId === slot.taskLabelId && a.memberId)
                 .map(a => a.memberId!);
 
-            const oneShuffleAgoMemberId = getHistoryAssignment(1, slot.taskLabelId);
-            const twoShufflesAgoMemberId = getHistoryAssignment(2, slot.taskLabelId);
+            // 1回前・2回前に同じ行（タスク）に割り当てられたすべてのメンバーIDを取得
+            const oneShuffleAgoMemberIds = getHistoryAssignments(1, slot.taskLabelId);
+            const twoShufflesAgoMemberIds = getHistoryAssignments(2, slot.taskLabelId);
             const lastAssignedToday = currentAssignmentMap.get(`${slot.teamId}-${slot.taskLabelId}`)?.memberId ?? null;
             const baseCandidates = eligibleMembers.filter(member => {
                 if (currentLoopAssignedMemberIds.has(member.id)) return false;
@@ -227,12 +233,19 @@ export const calculateAssignment = (
                 // スコアがInfinityでなければ他のペナルティも計算
                 if (score !== Infinity) {
                     // 場所の重複ペナルティ計算
-                    if (oneShuffleAgoMemberId === member.id) score += 10000; // 1回前と同じなら超高ペナルティ（絶対避ける）
+                    // 同じ行（タスク）に1回前に割り当てられていた場合は超高ペナルティ
+                    if (oneShuffleAgoMemberIds.has(member.id)) {
+                        score += 10000; // 1回前と同じ行なら超高ペナルティ（絶対避ける）
+                    }
 
-                    if (twoShufflesAgoMemberId === member.id) score += 20000; // 2回前と同じなら高ペナルティ（できるだけ避ける）
+                    // 同じ行（タスク）に2回前に割り当てられていた場合は高ペナルティ
+                    if (twoShufflesAgoMemberIds.has(member.id)) {
+                        score += 20000; // 2回前と同じ行なら高ペナルティ（できるだけ避ける）
+                    }
 
-                    if (oneShuffleAgoMemberId === member.id && twoShufflesAgoMemberId === member.id) {
-                        score += 50000; // 2回連続同じなら最大ペナルティ（何が何でも避ける）
+                    // 1回前と2回前の両方で同じ行に割り当てられていた場合は最大ペナルティ
+                    if (oneShuffleAgoMemberIds.has(member.id) && twoShufflesAgoMemberIds.has(member.id)) {
+                        score += 50000; // 2回連続同じ行なら最大ペナルティ（何が何でも避ける）
                     }
 
                     // ペアの重複ペナルティ計算
@@ -257,10 +270,20 @@ export const calculateAssignment = (
             candidates.sort((a, b) => a.score - b.score);
             const bestCandidate = candidates[0];
 
-            // 閾値を上げて、ペナルティが高くても他に候補がいなければ割り当てるようにする
-            // (最大ペナルティは約65000点なので、それより大きく設定)
-            // ただしInfinityは除外
-            if (bestCandidate && bestCandidate.score < 100000) {
+            // 連続で同じ行に割り当てられないようにするため、1回前に同じ行にいたメンバーは
+            // 他の候補がいる場合だけでなく、候補が1人しかいない場合でも割り当てをスキップする
+            // 1回前に同じ行にいたメンバーは絶対に避ける（連続を防ぐため）
+            if (bestCandidate && oneShuffleAgoMemberIds.has(bestCandidate.memberId)) {
+                // 割り当てをスキップ（nullにする）
+                currentLoopAssignments.push({
+                    teamId: slot.teamId,
+                    taskLabelId: slot.taskLabelId,
+                    memberId: null,
+                    assignedDate: targetDate
+                });
+                // 割り当て失敗（連続回避のため）は大きなペナルティとみなす
+                currentLoopTotalScore += 1000000;
+            } else if (bestCandidate && bestCandidate.score < 100000) {
                 currentLoopAssignments.push({
                     teamId: slot.teamId,
                     taskLabelId: slot.taskLabelId,

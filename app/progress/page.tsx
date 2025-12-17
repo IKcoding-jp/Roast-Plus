@@ -406,7 +406,7 @@ export default function ProgressPage() {
                 )}
                 <button
                   onClick={() => setShowModeSelectDialog(true)}
-                  className="px-4 py-2 text-sm font-bold text-white bg-amber-600 rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                  className="px-4 py-2 text-sm font-bold text-white bg-primary rounded-lg shadow-md hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 min-h-[44px]"
                 >
                   <HiPlus className="h-4 w-4" />
                   <span className="hidden sm:inline">追加</span>
@@ -462,7 +462,7 @@ export default function ProgressPage() {
                       onClick={() => {
                         setShowAddForm(true);
                       }}
-                      className="px-6 py-3 bg-amber-600 text-white rounded-xl shadow-lg hover:bg-amber-700 hover:shadow-xl transition-all flex items-center justify-center gap-2 font-bold"
+                      className="px-6 py-3 bg-primary text-white rounded-xl shadow-lg hover:bg-primary-dark hover:shadow-xl transition-all flex items-center justify-center gap-2 font-bold"
                     >
                       <HiPlus className="h-5 w-5" />
                       作業を追加
@@ -711,9 +711,9 @@ export default function ProgressPage() {
                     setShowModeSelectDialog(false);
                     setShowAddForm(true);
                     }}
-                    className="w-full py-3 px-4 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl border border-amber-200 transition-colors flex items-center justify-center gap-3"
+                    className="w-full py-3 px-4 bg-primary text-white font-bold rounded-xl shadow-md hover:bg-primary-dark transition-colors flex items-center justify-center gap-3"
                   >
-                    <div className="bg-white p-2 rounded-full shadow-sm">
+                    <div className="bg-white/20 p-2 rounded-full shadow-sm">
                       <HiPlus className="h-5 w-5" />
                     </div>
                     <span>作業を追加</span>

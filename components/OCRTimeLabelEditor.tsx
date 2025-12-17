@@ -216,7 +216,7 @@ export function OCRTimeLabelEditor({
       {/* 追加ボタン */}
       <button
         onClick={handleAdd}
-        className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+        className="w-full px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 min-h-[44px] shadow-md"
       >
         <HiPlus className="h-5 w-5" />
         <span>スケジュールを追加</span>

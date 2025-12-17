@@ -133,7 +133,7 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
                                 <button
                                     type="button"
                                     onClick={onStart}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-5 py-3 font-semibold text-white shadow-sm transition-all hover:bg-amber-700 active:scale-[0.99] touch-manipulation"
+                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-semibold text-white shadow-sm transition-all hover:bg-primary-dark active:scale-[0.99] touch-manipulation"
                                 >
                                     ガイド開始
                                 </button>

@@ -139,7 +139,7 @@ export function TastingSessionForm({
         )}
         <button
           type="submit"
-          className="flex-1 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+          className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
         >
           {isNew ? 'セッションを作成' : '更新'}
         </button>

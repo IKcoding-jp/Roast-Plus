@@ -228,7 +228,7 @@ export function TastingSessionList({ data, filterButtonContainerId, filterButton
           {/* アクションボタン */}
           <Link
             href="/tasting/sessions/new"
-            className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+            className="mt-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
           >
             <HiPlus className="w-5 h-5" />
             <span className="font-medium">セッションを作成</span>

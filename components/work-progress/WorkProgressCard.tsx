@@ -141,7 +141,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                 e.stopPropagation();
                                 onAddProgress(wp.id);
                             }}
-                            className="px-3 py-1.5 text-xs font-bold text-white bg-amber-600 rounded-lg hover:bg-amber-700 active:bg-amber-800 transition-colors flex items-center gap-1 shadow-sm"
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-primary rounded-lg hover:bg-primary-dark active:bg-primary-dark transition-colors flex items-center gap-1 shadow-sm"
                         >
                             <HiPlus className="h-4 w-4" />
                             記録
@@ -176,7 +176,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                 e.stopPropagation();
                                 onAddProgress(wp.id);
                             }}
-                            className="px-3 py-1.5 text-xs font-bold text-white bg-amber-600 rounded-lg hover:bg-amber-700 active:bg-amber-800 transition-colors flex items-center gap-1 shadow-sm"
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-primary rounded-lg hover:bg-primary-dark active:bg-primary-dark transition-colors flex items-center gap-1 shadow-sm"
                         >
                             <HiPlus className="h-4 w-4" />
                             記録

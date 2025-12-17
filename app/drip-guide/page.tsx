@@ -37,7 +37,7 @@ export default function DripGuidePage() {
                         </div>
                         <Link
                             href="/drip-guide/new"
-                            className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-amber-700 transition-colors shadow-sm min-h-[44px]"
+                            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-primary-dark transition-colors shadow-sm min-h-[44px]"
                         >
                             <Plus size={20} />
                             <span className="hidden sm:inline">新規レシピ</span>

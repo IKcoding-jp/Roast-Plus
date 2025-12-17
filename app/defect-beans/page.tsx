@@ -362,7 +362,7 @@ export default function DefectBeansPage() {
                   {!compareMode && (
                     <button
                       onClick={() => setShowAddForm(true)}
-                      className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-1.5 shadow-md"
+                      className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors min-h-[44px] flex items-center gap-1.5 shadow-md"
                       title="欠点豆を追加"
                     >
                       <HiPlus className="h-5 w-5" />
@@ -398,7 +398,7 @@ export default function DefectBeansPage() {
                 <button
                   onClick={() => setFilterOption('all')}
                   className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${filterOption === 'all'
-                    ? 'bg-amber-600 text-white'
+                    ? 'bg-primary text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   title="全て表示"

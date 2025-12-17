@@ -822,7 +822,7 @@ export function RoastTimer() {
             </button>
             <Link
               href="/roast-record"
-              className="px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
+              className="px-4 py-2.5 bg-primary text-white rounded-lg shadow-md hover:bg-primary-dark hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
               title="ロースト記録一覧"
               aria-label="ロースト記録一覧"
             >
@@ -1007,7 +1007,7 @@ export function RoastTimer() {
               </button>
               <Link
                 href="/roast-record"
-                className="px-4 py-2.5 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
+                className="px-4 py-2.5 bg-primary text-white rounded-lg shadow-md hover:bg-primary-dark hover:shadow-lg transition-all duration-200 flex items-center gap-2 min-h-[44px]"
                 title="ロースト記録一覧"
                 aria-label="ロースト記録一覧"
               >

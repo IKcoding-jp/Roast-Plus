@@ -342,7 +342,7 @@ export default function SchedulePage() {
             <div className="hidden sm:flex items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setIsOCROpen(true)}
-                className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition-colors flex items-center gap-2 min-h-[44px] shadow-md"
+                className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-primary text-white hover:bg-primary-dark rounded-lg transition-colors flex items-center gap-2 min-h-[44px] shadow-md"
                 title="画像から読み取り"
                 aria-label="画像から読み取り"
               >
@@ -368,7 +368,7 @@ export default function SchedulePage() {
             </button>
             <button
               onClick={() => setIsOCROpen(true)}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center shadow-md"
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-primary text-white hover:bg-primary-dark rounded-lg transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center shadow-md"
               title="画像から読み取り"
               aria-label="画像から読み取り"
             >

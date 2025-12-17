@@ -436,7 +436,7 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
           onMinuteChange={handleMinuteInputChange}
           onAdd={addTimeLabel}
           wrapperClassName="flex items-center gap-1.5 md:gap-2 flex-shrink-0"
-          buttonClassName="flex items-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark"
+          buttonClassName="flex items-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark shadow-md"
         />
       </div>
 
@@ -493,7 +493,7 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
               onMinuteChange={handleMinuteInputChange}
               onAdd={addTimeLabel}
               wrapperClassName="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2 pb-2"
-              buttonClassName="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
+              buttonClassName="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-base md:text-base font-medium text-white transition-colors hover:bg-primary-dark shadow-md min-w-[44px] min-h-[44px]"
               labelClassName="hidden sm:inline"
             />
           </div>
@@ -510,7 +510,7 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
           onMinuteChange={handleMinuteInputChange}
           onAdd={addTimeLabel}
           wrapperClassName="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2"
-          buttonClassName="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark min-w-[44px] min-h-[44px]"
+          buttonClassName="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark shadow-md min-w-[44px] min-h-[44px]"
           labelClassName="hidden sm:inline"
         />
       )}

@@ -311,7 +311,7 @@ function TastingPageContent() {
               {!isEmpty && (
                 <Link
                   href="/tasting/sessions/new"
-                  className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center gap-2 min-h-[44px] flex-shrink-0"
+                  className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-primary text-white rounded-lg shadow-md hover:bg-primary-dark transition-colors flex items-center gap-2 min-h-[44px] flex-shrink-0"
                   aria-label="新規セッション作成"
                 >
                   <HiPlus className="h-5 w-5 flex-shrink-0" />
@@ -336,7 +336,7 @@ function TastingPageContent() {
           <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-10">
             <Link
               href="/tasting/sessions/new"
-              className="w-full px-4 py-3 text-base bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+              className="w-full px-4 py-3 text-base bg-primary text-white rounded-lg shadow-md hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 min-h-[44px]"
               aria-label="新規セッション作成"
             >
               <HiPlus className="text-lg flex-shrink-0" />

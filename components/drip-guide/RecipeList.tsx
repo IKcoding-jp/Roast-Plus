@@ -179,7 +179,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                 onClick={() => handleOpenStart(recipe.id)}
                                 className={clsx(
                                     "mt-auto flex items-center justify-center gap-2 w-full py-3 sm:py-2.5 rounded-lg font-bold transition-all",
-                                    "bg-amber-600 text-white hover:bg-amber-700 active:scale-[0.98] touch-manipulation"
+                                    "bg-primary text-white hover:bg-primary-dark active:scale-[0.98] touch-manipulation"
                                 )}
                             >
                                 <Play size={20} weight="fill" />

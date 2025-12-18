@@ -1,0 +1,11 @@
+{"location":"useRoastTimer.ts:676","message":"updateTimer calling completeTimer","data":{"remaining":0,"status":"running"},"timestamp":1766050316597,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"useRoastTimer.ts:587","message":"completeTimer called","data":{"deviceId":"device_1765007190726_6firb0114","status":"running","hasPreparedAudio":true,"hasSoundAudio":false},"timestamp":1766050316597,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"useRoastTimer.ts:611","message":"Playing prepared audio","data":{"currentTime":0,"paused":true},"timestamp":1766050316597,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"useRoastTimer.ts:608","message":"Before timer sound play","data":{"hasPreparedAudio":true,"hasSoundAudio":false},"timestamp":1766050316597,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"useRoastTimer.ts:617","message":"Fallback to playTimerSound","data":{},"timestamp":1766050316598,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"sounds.ts:14","message":"playTimerSound called","data":{"soundFile":"/sounds/roasttimer/alarm1.mp3","hasExistingTimerAudio":false},"timestamp":1766050316598,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"sounds.ts:36","message":"New Audio created","data":{"audioPath":"/sounds/roasttimer/alarm1.mp3?v=0.5.8"},"timestamp":1766050316598,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"sounds.ts:64","message":"Before audio.play()","data":{"volume":1},"timestamp":1766050316599,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"sounds.ts:65","message":"After audio.play()","data":{"paused":false},"timestamp":1766050316658,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"useRoastTimer.ts:630","message":"Skipping notification sound (same file as timer sound)","data":{"timerSoundFile":"/sounds/roasttimer/alarm1.mp3","notificationSoundFile":"/sounds/roasttimer/alarm1.mp3"},"timestamp":1766050316659,"sessionId":"debug-session","runId":"run2","hypothesisId":"E"}
+{"location":"useRoastTimer.ts:624","message":"After timer sound play","data":{"hasSoundAudio":true},"timestamp":1766050316658,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}

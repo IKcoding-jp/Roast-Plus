@@ -65,6 +65,7 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
   const isInitialMountRef = useRef(true); // 初回マウントかどうかを追跡
   const pausedElapsedRef = useRef<number>(0); // 一時停止の累積時間（秒）
   const isUpdatingFromFirestoreRef = useRef(false); // Firestoreからの更新中かどうか
+  const localStateRef = useRef<RoastTimerState | null>(null); // 最新のlocalStateを保持
   const currentDeviceId = getDeviceId();
   const userId = user?.uid ?? null;
 
@@ -82,6 +83,11 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       lastUpdateRef.current = Date.now();
     }
   }, []);
+
+  // localStateRefを最新の状態に同期
+  useEffect(() => {
+    localStateRef.current = localState;
+  }, [localState]);
 
   // Firestoreの状態をローカル状態に反映
   useEffect(() => {
@@ -579,6 +585,12 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
   // タイマー完了処理
   const completeTimer = useCallback(async (currentState: RoastTimerState) => {
+    // インターバルを即座に停止（重複実行を防ぐ）
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    
     const updatedState: RoastTimerState = {
       ...currentState,
       status: 'completed',
@@ -596,6 +608,10 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       if (settings.timerSoundEnabled) {
         if (preparedTimerAudioRef.current) {
           try {
+            // 既存の音声を停止してから再生
+            if (soundAudioRef.current && soundAudioRef.current !== preparedTimerAudioRef.current) {
+              stopAudio(soundAudioRef.current);
+            }
             preparedTimerAudioRef.current.currentTime = 0;
             await preparedTimerAudioRef.current.play();
             soundAudioRef.current = preparedTimerAudioRef.current;
@@ -612,15 +628,17 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       }
 
       // 通知音は通知設定に基づき独立判定で再生
-      if (settings.notificationSoundEnabled) {
+      // ただし、タイマー音と通知音が同じファイルの場合は重複再生を避けるためスキップ
+      if (settings.notificationSoundEnabled && settings.timerSoundFile !== settings.notificationSoundFile) {
         void playNotificationSoundFromRef();
       }
     } catch (error) {
       console.error('Failed to play timer/notification sound:', error);
     }
 
-    // ローカル状態を更新
+    // ローカル状態を即座に更新（同期処理として扱う）
     saveLocalState(updatedState);
+    // 状態を同期的に更新（次のupdateTimerが実行される前に完了状態にする）
     setLocalState(updatedState);
 
     // Firestoreに完了状態を保存
@@ -636,28 +654,38 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
 
   // タイマーの更新処理（開始時刻ベースで計算）
   const updateTimer = useCallback(async () => {
-    if (!localState || !user || isLoading) return;
+    // 最新のlocalStateを取得
+    const currentState = localStateRef.current;
+    if (!currentState || !user || isLoading) {
+      return;
+    }
 
-    if (localState.status === 'running' && localState.startedAt) {
-      const pausedElapsed = localState.pausedElapsed ?? pausedElapsedRef.current ?? 0;
+    // 既に完了している場合は何もしない
+    if (currentState.status === 'completed') {
+      return;
+    }
+
+    if (currentState.status === 'running' && currentState.startedAt) {
+      const pausedElapsed = currentState.pausedElapsed ?? pausedElapsedRef.current ?? 0;
       pausedElapsedRef.current = pausedElapsed;
       // 開始時刻から経過時間を計算
       const elapsed = calculateElapsedTime(
-        localState.startedAt,
-        localState.pausedAt,
+        currentState.startedAt,
+        currentState.pausedAt,
         pausedElapsed,
-        localState.status
+        currentState.status
       );
-      const remaining = Math.max(0, localState.duration - elapsed);
+      const remaining = Math.max(0, currentState.duration - elapsed);
 
       // タイマーが完了した場合
       if (remaining <= 0) {
-        await completeTimer(localState);
+        // completeTimer内でインターバルを停止するため、ここでは停止しない
+        await completeTimer(currentState);
         return;
       }
 
       const updatedState: RoastTimerState = {
-        ...localState,
+        ...currentState,
         pausedElapsed,
         elapsed,
         remaining,
@@ -668,11 +696,16 @@ export function useRoastTimer({ data, updateData, isLoading }: UseRoastTimerArgs
       saveLocalState(updatedState);
       setLocalState(updatedState);
     }
-  }, [localState, user, isLoading, completeTimer]);
+  }, [user, isLoading, completeTimer]);
 
   // タイマーの定期更新（UI表示用）
   useEffect(() => {
     if (localState?.status === 'running') {
+      // 既存のインターバルをクリア
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       intervalRef.current = setInterval(updateTimer, UPDATE_INTERVAL);
       lastUpdateRef.current = Date.now();
     } else {

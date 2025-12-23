@@ -26,6 +26,7 @@
   --font-mono: var(--font-geist-mono);
   --font-nunito: var(--font-nunito);
 }
+
 /* stylelint-enable at-rule-no-unknown */
 
 @media (prefers-color-scheme: dark) {
@@ -140,6 +141,7 @@ select option {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .animate-home-page,
   .animate-home-card {
     animation: none;

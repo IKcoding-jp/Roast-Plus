@@ -14,7 +14,7 @@ import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAuth, signOut } from '@/lib/auth';
 import { Snowfall } from '@/components/Snowfall';
-import { FaTree, FaGift, FaSnowflake, FaHollyBerry } from 'react-icons/fa';
+import { FaTree, FaGift, FaSnowflake, FaHollyBerry, FaStar } from 'react-icons/fa';
 import { PiBellFill } from 'react-icons/pi';
 import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
 import { BsStars } from 'react-icons/bs';
@@ -192,8 +192,8 @@ export default function HomePage(_props: HomePageProps = {}) {
 
   return (
     <div className={`min-h-screen text-slate-100 animate-home-page relative transition-colors duration-1000 ${isChristmasMode
-        ? 'bg-[#051a0e] bg-[radial-gradient(circle_at_center,_#0a2f1a_0%,_#051a0e_100%)]'
-        : 'bg-gradient-to-b from-[#F7F2EB] to-[#F3F0EA] text-[#1F2A44]'
+      ? 'bg-[#051a0e] bg-[radial-gradient(circle_at_center,_#0a2f1a_0%,_#051a0e_100%)]'
+      : 'bg-gradient-to-b from-[#F7F2EB] to-[#F3F0EA] text-[#1F2A44]'
       }`}>
       {isChristmasMode && <Snowfall />}
 
@@ -239,28 +239,62 @@ export default function HomePage(_props: HomePageProps = {}) {
       )}
 
       {/* ヘッダー */}
-      <header className={`relative z-10 shadow-lg transition-colors duration-1000 ${isChristmasMode
-          ? 'bg-[#6d1a1a]/90 backdrop-blur-md border-b border-[#d4af37]/30'
-          : 'bg-[#261a14]/98'
+      <header className={`relative z-50 shadow-2xl transition-all duration-1000 ${isChristmasMode
+        ? 'bg-gradient-to-r from-[#4a0e0e] via-[#5d1212] to-[#2d0a0a] backdrop-blur-xl border-b-[0.5px] border-[#d4af37]/40'
+        : 'bg-[#261a14]/98'
         }`}>
+        {/* ヘッダー下部の極細ゴールドライン */}
+        {isChristmasMode && (
+          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent shadow-[0_-1px_10px_rgba(212,175,55,0.3)]"></div>
+        )}
+
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-5">
-          <div className="relative flex items-center gap-2">
-            <img src="/logo.png" alt="RoastPlus" className={`h-8 w-auto md:h-10 ${isChristmasMode ? 'brightness-110 drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]' : ''}`} />
+          <div className="relative flex items-center gap-3 group cursor-default">
+            {isChristmasMode ? (
+              <div className="flex items-center gap-3">
+                <div className="relative flex items-center justify-center">
+                  <FaTree className="text-[#1a472a] text-2xl md:text-3xl drop-shadow-[0_0_8px_rgba(26,71,42,0.4)]" />
+                  <FaCoffee className="absolute text-[#d4af37] text-[10px] md:text-xs translate-y-1" />
+                  <FaSnowflake className="absolute -top-1 -right-1 text-[#f8f1e7] text-[8px] animate-pulse" />
+                </div>
+
+                <div className="relative">
+                  <span className="text-2xl md:text-4xl font-black italic tracking-tighter flex items-center leading-none">
+                    <span className="text-[#e23636] relative">
+                      R
+                      <FaStar className="absolute -top-2 -left-2 text-[#d4af37] text-[10px] animate-pulse" />
+                    </span>
+                    <span className="text-[#f8f1e7]">oast</span>
+                    <span className="text-[#d4af37] ml-0.5">Plus</span>
+                  </span>
+                  <div className="absolute -bottom-1 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37] to-transparent"></div>
+                </div>
+
+                <div className="flex flex-col gap-0.5 opacity-80 scale-75 md:scale-100">
+                  <FaGift className="text-[#e23636] text-sm" />
+                  <FaSnowflake className="text-[#f8f1e7] text-[10px] animate-spin" style={{ animationDuration: '3s' }} />
+                </div>
+              </div>
+            ) : (
+              <img src="/logo.png" alt="RoastPlus" className="h-8 w-auto md:h-10" />
+            )}
           </div>
           <div className="flex items-center gap-3 md:gap-4">
             {isDeveloperMode && (
               <button
                 onClick={handleShowLoadingDebugModal}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-white transition-colors hover:bg-white/10"
+                className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner' : 'text-white hover:bg-white/10'
+                  }`}
                 aria-label="Lottieアニメーション確認モーダルを開く"
-                title="開発用: Lottieアニメーション確認"
               >
                 <PiCoffeeBeanFill className="h-6 w-6" />
               </button>
             )}
             <button
               onClick={handleLogout}
-              className={`text-sm font-medium transition-colors ${isChristmasMode ? 'text-[#f8f1e7] hover:text-[#d4af37]' : 'text-white hover:text-gray-200'
+              className={`text-sm font-semibold px-4 py-1.5 rounded-full transition-all duration-300 ${isChristmasMode
+                ? 'text-[#f8f1e7] bg-[#6d1a1a] hover:bg-[#8b2323] border border-[#d4af37]/40 hover:border-[#d4af37] shadow-lg'
+                : 'text-white hover:text-gray-200'
                 }`}
             >
               ログアウト
@@ -299,8 +333,8 @@ export default function HomePage(_props: HomePageProps = {}) {
                 key={key}
                 onClick={() => router.push(href)}
                 className={`group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 shadow-2xl transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 animate-home-card ${isChristmasMode
-                    ? 'bg-white/5 backdrop-blur-xl border border-[#d4af37]/40 hover:bg-white/10 hover:border-[#d4af37]/70 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] focus-visible:ring-[#d4af37] focus-visible:ring-offset-[#051a0e]'
-                    : 'bg-white/95 text-[#1F2A44] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-primary focus-visible:ring-offset-[#F5F2EB]'
+                  ? 'bg-white/5 backdrop-blur-xl border border-[#d4af37]/40 hover:bg-white/10 hover:border-[#d4af37]/70 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] focus-visible:ring-[#d4af37] focus-visible:ring-offset-[#051a0e]'
+                  : 'bg-white/95 text-[#1F2A44] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-primary focus-visible:ring-offset-[#F5F2EB]'
                   }`}
                 style={{
                   ...(cardHeight ? { height: `${cardHeight}px` } : {}),
@@ -316,8 +350,8 @@ export default function HomePage(_props: HomePageProps = {}) {
                 )}
 
                 <span className={`relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 ${isChristmasMode
-                    ? 'bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 text-[#d4af37] border border-[#d4af37]/30 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] shadow-[0_0_15px_rgba(212,175,55,0.1)]'
-                    : 'bg-primary/10 text-primary group-hover:bg-primary/15'
+                  ? 'bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 text-[#d4af37] border border-[#d4af37]/30 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] shadow-[0_0_15px_rgba(212,175,55,0.1)]'
+                  : 'bg-primary/10 text-primary group-hover:bg-primary/15'
                   }`}>
                   <Icon className="h-8 w-8 relative z-10" />
                   {isChristmasMode && (
@@ -326,8 +360,8 @@ export default function HomePage(_props: HomePageProps = {}) {
                 </span>
                 <div className="space-y-1 text-center relative z-10">
                   <p className={`font-bold transition-colors ${isChristmasMode
-                      ? 'text-[#f8f1e7] group-hover:text-[#d4af37]'
-                      : 'text-slate-900'
+                    ? 'text-[#f8f1e7] group-hover:text-[#d4af37]'
+                    : 'text-slate-900'
                     } ${title === 'ハンドピックタイマー' ? 'text-xs md:text-sm' : 'text-base md:text-lg'}`}>
                     {title}
                   </p>

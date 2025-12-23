@@ -11,7 +11,13 @@ import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAuth, signOut } from '@/lib/auth';
+import { Snowfall } from '@/components/Snowfall';
+import { FaTree, FaGift, FaSnowflake, FaHollyBerry } from 'react-icons/fa';
+import { PiBellFill } from 'react-icons/pi';
+import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
+import { BsStars } from 'react-icons/bs';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
 
@@ -104,6 +110,7 @@ export default function HomePage(_props: HomePageProps = {}) {
   const [splashVisible, setSplashVisible] = useState(true);
   const [cardHeight, setCardHeight] = useState<number | null>(null);
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
+  const { isChristmasMode } = useChristmasMode();
 
   // スプラッシュ画面の表示時間を管理
   useEffect(() => {
@@ -184,7 +191,12 @@ export default function HomePage(_props: HomePageProps = {}) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F7F2EB] to-[#F3F0EA] text-[#1F2A44] animate-home-page">
+    <div className={`min-h-screen text-[#1F2A44] animate-home-page relative transition-colors duration-700 ${isChristmasMode
+      ? 'bg-gradient-to-b from-[#1a472a] via-[#2d5a27] to-[#163d24]'
+      : 'bg-gradient-to-b from-[#F7F2EB] to-[#F3F0EA]'
+      }`}>
+      {isChristmasMode && <Snowfall />}
+
       {/* 開発用: Lottieアニメーション確認モーダル */}
       {showLoadingDebugModal && (
         <div
@@ -202,7 +214,7 @@ export default function HomePage(_props: HomePageProps = {}) {
                 className="text-2xl font-bold text-gray-500 transition-colors hover:text-gray-700"
                 aria-label="閉じる"
               >
-                
+
               </button>
             </div>
             <div className="mb-4">
@@ -222,7 +234,8 @@ export default function HomePage(_props: HomePageProps = {}) {
       )}
 
       {/* ヘッダー */}
-      <header className="bg-[#261a14]/98 shadow-md">
+      <header className={`shadow-md transition-colors duration-700 ${isChristmasMode ? 'bg-[#8b2323]/98' : 'bg-[#261a14]/98'
+        }`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-5">
           <div className="relative flex items-center gap-2">
             <img src="/logo.png" alt="RoastPlus" className="h-8 w-auto md:h-10" />
@@ -257,26 +270,51 @@ export default function HomePage(_props: HomePageProps = {}) {
           className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
           style={cardHeight ? { gridAutoRows: `${cardHeight}px` } : { gridAutoRows: '1fr' }}
         >
-          {ACTIONS.map(({ key, title, description, href, icon: Icon }, index) => (
-            <button
-              key={key}
-              onClick={() => router.push(href)}
-              className="group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl bg-white/95 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#F5F2EB] animate-home-card"
-              style={{
-                ...(cardHeight ? { height: `${cardHeight}px` } : {}),
-                animationDelay: `${index * 60}ms`,
-              }}
-              aria-label={title}
-            >
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
-                <Icon className="h-8 w-8" />
-              </span>
-              <div className="space-y-1 text-center">
-                <p className={`font-semibold text-slate-900 ${title === 'ハンドピックタイマー' ? 'text-xs md:text-sm' : 'text-base md:text-lg'}`}>{title}</p>
-                <p className="text-xs text-slate-500 md:text-sm">{description}</p>
-              </div>
-            </button>
-          ))}
+          {ACTIONS.map(({ key, title, description, href, icon: DefaultIcon }, index) => {
+            // クリスマスアイコンのマッピング
+            const ChristmasIcons: Record<string, any> = {
+              assignment: FaGift,
+              schedule: BsStars,
+              tasting: FaTree,
+              'roast-timer': PiBellFill,
+              'defect-beans': GiGingerbreadMan,
+              progress: FaSnowflake,
+              'drip-guide': GiCandyCanes,
+              'handpick-timer': FaHollyBerry,
+              counter: BsStars,
+              settings: IoSettings,
+            };
+            const Icon = isChristmasMode ? (ChristmasIcons[key] || DefaultIcon) : DefaultIcon;
+
+            return (
+              <button
+                key={key}
+                onClick={() => router.push(href)}
+                className={`group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 animate-home-card ${isChristmasMode
+                  ? 'bg-white/90 border border-[#d4af37]/30 focus-visible:ring-[#d4af37] focus-visible:ring-offset-[#1a472a]'
+                  : 'bg-white/95 focus-visible:ring-primary focus-visible:ring-offset-[#F5F2EB]'
+                  }`}
+                style={{
+                  ...(cardHeight ? { height: `${cardHeight}px` } : {}),
+                  animationDelay: `${index * 60}ms`,
+                }}
+                aria-label={title}
+              >
+                <span className={`flex h-14 w-14 items-center justify-center rounded-full transition-colors ${isChristmasMode
+                  ? 'bg-[#8b2323]/10 text-[#8b2323] group-hover:bg-[#8b2323]/20'
+                  : 'bg-primary/10 text-primary group-hover:bg-primary/15'
+                  }`}>
+                  <Icon className="h-8 w-8" />
+                </span>
+                <div className="space-y-1 text-center">
+                  <p className={`font-semibold text-slate-900 ${title === 'ハンドピックタイマー' ? 'text-xs md:text-sm' : 'text-base md:text-lg'}`}>
+                    {title}
+                  </p>
+                  <p className="text-xs text-slate-500 md:text-sm">{description}</p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </main>
     </div>

@@ -3,19 +3,31 @@
 import { useState, useCallback, useEffect } from 'react';
 
 const STORAGE_KEY = 'roastplus_christmas_mode';
+const MIGRATION_FLAG_KEY = 'roastplus_christmas_mode_migrated';
 
 export function useChristmasMode() {
-    const [isChristmasMode, setIsChristmasMode] = useState<boolean>(true);
+    const [isChristmasMode, setIsChristmasMode] = useState<boolean>(false);
 
     // 初期読み込み
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            // 保存されていない場合はデフォルトでtrue (オン)
-            if (stored === null) {
-                setIsChristmasMode(true);
+            // マイグレーション処理（一度だけ実行）
+            const migrationDone = localStorage.getItem(MIGRATION_FLAG_KEY) === 'true';
+
+            if (!migrationDone) {
+                // 既存のlocalStorageキーを削除して、新しいデフォルト（オフ）を適用
+                // これにより、デプロイ後に既存端末でもオフになる
+                if (localStorage.getItem(STORAGE_KEY) !== null) {
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+                localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
+                // デフォルトはfalse（オフ）
+                setIsChristmasMode(false);
             } else {
-                setIsChristmasMode(stored === 'true');
+                // マイグレーション済みの場合は、localStorageから読み込む
+                const stored = localStorage.getItem(STORAGE_KEY);
+                const value = stored === null ? false : stored === 'true';
+                setIsChristmasMode(value);
             }
         }
     }, []);

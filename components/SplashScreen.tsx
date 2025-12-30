@@ -66,29 +66,20 @@ export function SplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-300 ${
-        isFadingOut ? 'opacity-0' : 'opacity-100'
-      }`}
-      style={{ backgroundColor: '#F5F1EB' }}
+      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-300 ${isFadingOut ? 'opacity-0' : 'opacity-100'
+        }`}
+      style={{ backgroundColor: '#1a1412' }}
     >
       <div className="text-center space-y-8">
         {/* タイトルを上に */}
         <div
-          className={`transition-opacity duration-500 ${
-            isTextVisible ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`transition-opacity duration-500 ${isTextVisible ? 'opacity-100' : 'opacity-0'
+            }`}
         >
           <div className="space-y-4">
-            <h1 className="text-5xl font-bold text-[#2C1810] tracking-[0.1em] leading-tight">
-              ローストプラス
+            <h1 className="text-5xl font-bold text-white tracking-[0.05em] leading-tight font-[var(--font-playfair)]">
+              Roast<span className="text-[#EF8A00]">Plus</span>
             </h1>
-            <div className="flex items-center justify-center gap-2">
-              <div className="h-px w-16 bg-[#8B7355] opacity-30"></div>
-              <p className="text-xs text-[#6B5B52] font-light tracking-[0.3em] uppercase">
-                Roast Plus
-              </p>
-              <div className="h-px w-16 bg-[#8B7355] opacity-30"></div>
-            </div>
           </div>
         </div>
         {/* アニメーションを下に */}

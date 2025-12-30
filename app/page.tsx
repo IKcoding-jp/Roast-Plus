@@ -277,7 +277,14 @@ export default function HomePage(_props: HomePageProps = {}) {
                 </div>
               </div>
             ) : (
-              <img src="/logo.png" alt="RoastPlus" className="h-8 w-auto md:h-10" />
+              <div className="flex flex-col items-start leading-none">
+                <div className="flex items-center gap-1">
+                  <span className="text-2xl md:text-3xl font-bold tracking-tight text-white font-[var(--font-playfair)]">
+                    Roast
+                    <span className="text-[#EF8A00] ml-0.5">Plus</span>
+                  </span>
+                </div>
+              </div>
             )}
           </div>
           <div className="flex items-center gap-3 md:gap-4">

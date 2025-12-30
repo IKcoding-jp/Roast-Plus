@@ -23,7 +23,7 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
+
     // 新規登録時はパスワード確認
     if (activeTab === 'signup') {
       if (password !== confirmPassword) {
@@ -31,7 +31,7 @@ function LoginForm() {
         return;
       }
     }
-    
+
     setLoading(true);
 
     try {
@@ -87,9 +87,11 @@ function LoginForm() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB] px-4">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-8 text-center text-2xl font-bold text-gray-800">
-          ローストプラス
-        </h1>
+        <div className="mb-8 flex flex-col items-center bg-[#1a1412] py-6 rounded-xl shadow-inner">
+          <h1 className="text-4xl font-bold text-white tracking-tight font-[var(--font-playfair)]">
+            Roast<span className="text-orange-500">Plus</span>
+          </h1>
+        </div>
 
         {/* タブ */}
         <div className="mb-6 flex rounded-lg bg-gray-100 p-1">
@@ -100,11 +102,10 @@ function LoginForm() {
               setError(null);
               setConfirmPassword('');
             }}
-            className={`flex-1 rounded-md py-2 text-center text-sm font-medium transition-colors ${
-              activeTab === 'login'
-                ? 'bg-orange-500 text-white'
-                : 'text-gray-700 hover:text-gray-900'
-            }`}
+            className={`flex-1 rounded-md py-2 text-center text-sm font-medium transition-colors ${activeTab === 'login'
+              ? 'bg-orange-500 text-white'
+              : 'text-gray-700 hover:text-gray-900'
+              }`}
           >
             ログイン
           </button>
@@ -114,11 +115,10 @@ function LoginForm() {
               setActiveTab('signup');
               setError(null);
             }}
-            className={`flex-1 rounded-md py-2 text-center text-sm font-medium transition-colors ${
-              activeTab === 'signup'
-                ? 'bg-orange-500 text-white'
-                : 'text-gray-700 hover:text-gray-900'
-            }`}
+            className={`flex-1 rounded-md py-2 text-center text-sm font-medium transition-colors ${activeTab === 'signup'
+              ? 'bg-orange-500 text-white'
+              : 'text-gray-700 hover:text-gray-900'
+              }`}
           >
             新規登録
           </button>

@@ -8,6 +8,7 @@ import { Timer, Coffee, Drop, Trash, Pencil, Play, CaretDown } from 'phosphor-re
 import { clsx } from 'clsx';
 import { ConfirmDialog } from './ConfirmDialog';
 import { StartHintDialog } from './StartHintDialog';
+import { Start46Dialog } from './Start46Dialog';
 import { calculateRecipeForServings } from '@/lib/drip-guide/recipeCalculator';
 
 interface RecipeListProps {
@@ -101,13 +102,15 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                     {recipe.name}
                                 </h3>
                                 <div className="flex gap-1">
-                                    <Link
-                                        href={`/drip-guide/edit?id=${recipe.id}`}
-                                        className="p-3 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                                        title="編集"
-                                    >
-                                        <Pencil size={18} />
-                                    </Link>
+                                    {recipe.id !== 'recipe-046' && (
+                                        <Link
+                                            href={`/drip-guide/edit?id=${recipe.id}`}
+                                            className="p-3 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                            title="編集"
+                                        >
+                                            <Pencil size={18} />
+                                        </Link>
+                                    )}
                                     {!recipe.isDefault && (
                                         <button
                                             type="button"
@@ -200,14 +203,22 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                 onCancel={handleCancelDelete}
             />
 
-            <StartHintDialog
-                isOpen={startTargetId !== null}
-                onClose={handleCloseStart}
-                onStart={handleStartGuide}
-                totalWaterGram={startTargetCalculated?.totalWaterGram}
-                servings={startTargetRecipe ? getServingsForRecipe(startTargetRecipe.id) : undefined}
-                recipeName={startTargetRecipe?.name}
-            />
+            {startTargetRecipe?.id === 'recipe-046' ? (
+                <Start46Dialog
+                    isOpen={startTargetId !== null}
+                    onClose={handleCloseStart}
+                    initialServings={startTargetRecipe ? getServingsForRecipe(startTargetRecipe.id) : 1}
+                />
+            ) : (
+                <StartHintDialog
+                    isOpen={startTargetId !== null}
+                    onClose={handleCloseStart}
+                    onStart={handleStartGuide}
+                    totalWaterGram={startTargetCalculated?.totalWaterGram}
+                    servings={startTargetRecipe ? getServingsForRecipe(startTargetRecipe.id) : undefined}
+                    recipeName={startTargetRecipe?.name}
+                />
+            )}
         </>
     );
 };

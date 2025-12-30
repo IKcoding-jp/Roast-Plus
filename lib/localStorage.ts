@@ -7,6 +7,8 @@ const ROAST_TIMER_STATE_KEY = 'roastplus_roast_timer_state';
 const ROAST_TIMER_SETTINGS_KEY = 'roastplus_roast_timer_settings';
 const HANDPICK_TIMER_SETTINGS_KEY = 'roastplus_handpick_timer_settings';
 const DEVICE_ID_KEY = 'roastplus_device_id';
+const LAST_46_TASTE_KEY = 'roastplus_last_46_taste';
+const LAST_46_STRENGTH_KEY = 'roastplus_last_46_strength';
 
 const parseJson = <T>(value: string): T | null => {
   try {
@@ -132,5 +134,49 @@ export function getDeviceId(): string {
   }
   
   return deviceId;
+}
+
+/**
+ * 4:6メソッドの前回の味わい選択を保存
+ */
+export function setLast46Taste(taste: string | null): void {
+  if (typeof window === 'undefined') return;
+  
+  if (taste === null) {
+    localStorage.removeItem(LAST_46_TASTE_KEY);
+  } else {
+    localStorage.setItem(LAST_46_TASTE_KEY, taste);
+  }
+}
+
+/**
+ * 4:6メソッドの前回の味わい選択を取得
+ */
+export function getLast46Taste(): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  return localStorage.getItem(LAST_46_TASTE_KEY);
+}
+
+/**
+ * 4:6メソッドの前回の濃度選択を保存
+ */
+export function setLast46Strength(strength: string | null): void {
+  if (typeof window === 'undefined') return;
+  
+  if (strength === null) {
+    localStorage.removeItem(LAST_46_STRENGTH_KEY);
+  } else {
+    localStorage.setItem(LAST_46_STRENGTH_KEY, strength);
+  }
+}
+
+/**
+ * 4:6メソッドの前回の濃度選択を取得
+ */
+export function getLast46Strength(): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  return localStorage.getItem(LAST_46_STRENGTH_KEY);
 }
 

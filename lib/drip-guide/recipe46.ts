@@ -1,4 +1,11 @@
 import { DripRecipe, DripStep } from './types';
+import {
+  RECIPE46_TITLE,
+  RECIPE46_PURPOSE,
+  RECIPE46_DESCRIPTION,
+  RECIPE46_COMMON_NOTE,
+  RECIPE46_STEP_TEXT,
+} from './recipe46Content';
 
 /**
  * 4:6メソッド（粕谷）の味わいタイプ
@@ -102,9 +109,9 @@ export function generateRecipe46(servings: number, taste: Taste46, strength: Str
         id: 'step-1',
         startTimeSec: startTimes[0],
         title: '蒸らし（味：40%）',
-        description: '粉全体にまんべんなくお湯を注いで均一に湿らせます。',
+        description: RECIPE46_STEP_TEXT.bloom.description,
         targetTotalWater: cumulativeWater,
-        note: '粉全体が均一に膨らむのを確認',
+        note: RECIPE46_STEP_TEXT.bloom.note,
     });
 
     // 2投目（味調整）
@@ -113,8 +120,9 @@ export function generateRecipe46(servings: number, taste: Taste46, strength: Str
         id: 'step-2',
         startTimeSec: startTimes[1],
         title: '2投目（味：40%）',
-        description: '味わいを調整する2投目です。',
+        description: RECIPE46_STEP_TEXT.taste2.description,
         targetTotalWater: cumulativeWater,
+        note: RECIPE46_COMMON_NOTE,
     });
 
     // 3投目以降（濃度調整）
@@ -125,8 +133,9 @@ export function generateRecipe46(servings: number, taste: Taste46, strength: Str
             id: `step-${stepIndex + 1}`,
             startTimeSec: startTimes[stepIndex],
             title: `濃度調整（60%）${strengthCount > 1 ? `${i + 1}/${strengthCount}` : ''}`,
-            description: '濃度を調整する注湯です。',
+            description: RECIPE46_STEP_TEXT.strength.description,
             targetTotalWater: cumulativeWater,
+            note: RECIPE46_COMMON_NOTE,
         });
     }
 
@@ -135,13 +144,13 @@ export function generateRecipe46(servings: number, taste: Taste46, strength: Str
 
     return {
         id: 'recipe-046',
-        name: '4:6メソッド（粕谷）',
+        name: RECIPE46_TITLE,
         beanName: 'お好みの豆',
         beanAmountGram,
         totalWaterGram,
         totalDurationSec,
-        purpose: '4:6メソッド（粕谷）',
-        description: '粕谷哲氏が考案した4:6メソッド。味わいと濃度を分けて調整する手法です。',
+        purpose: RECIPE46_PURPOSE,
+        description: RECIPE46_DESCRIPTION,
         steps,
         isDefault: true,
         isManualMode: false, // 自動モード

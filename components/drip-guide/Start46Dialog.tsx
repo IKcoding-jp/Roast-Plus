@@ -6,6 +6,7 @@ import { Coffee, Timer, Drop } from 'phosphor-react';
 import { useRouter } from 'next/navigation';
 import { generateRecipe46, TASTE_LABELS, STRENGTH_LABELS, type Taste46, type Strength46 } from '@/lib/drip-guide/recipe46';
 import { getLast46Taste, getLast46Strength, setLast46Taste, setLast46Strength } from '@/lib/localStorage';
+import { RECIPE46_DESCRIPTION } from '@/lib/drip-guide/recipe46Content';
 
 interface Start46DialogProps {
     isOpen: boolean;
@@ -35,6 +36,7 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
     const [servings, setServings] = useState(initialServings);
     const [taste, setTaste] = useState<Taste46>('basic');
     const [strength, setStrength] = useState<Strength46>('light');
+    const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
 
     // 前回の選択を読み込む
     useEffect(() => {
@@ -128,6 +130,20 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
                             </div>
 
                             <div className="px-5 py-4 space-y-4">
+                                {/* 4:6メソッドのポイント（解説ボタン） */}
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDescriptionModalOpen(true)}
+                                    className="w-full rounded-lg bg-amber-50 border border-amber-100 p-3 text-left hover:bg-amber-100 transition-colors"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-semibold text-amber-800">
+                                            4:6メソッドのポイント（必読）
+                                        </span>
+                                        <span className="text-amber-600 text-xs">クリックして開く</span>
+                                    </div>
+                                </button>
+
                                 {/* 人前選択 */}
                                 <div>
                                     <label htmlFor="servings-46" className="block text-sm font-semibold text-gray-900 mb-2">
@@ -276,6 +292,53 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
                             </div>
                         </div>
                     </motion.div>
+
+                    {/* 4:6メソッドのポイント説明モーダル */}
+                    <AnimatePresence>
+                        {isDescriptionModalOpen && (
+                            <>
+                                <motion.div
+                                    {...overlayMotion}
+                                    className="fixed inset-0 z-[60] bg-black/55"
+                                    onClick={() => setIsDescriptionModalOpen(false)}
+                                />
+                                <motion.div
+                                    {...dialogMotion}
+                                    className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto"
+                                    onClick={() => setIsDescriptionModalOpen(false)}
+                                >
+                                    <div
+                                        className="w-full max-w-2xl rounded-2xl border border-amber-100 bg-white shadow-2xl my-8"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <div className="px-6 pt-6 pb-4">
+                                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                                4:6メソッドのポイント
+                                            </h3>
+                                            <div className="bg-amber-50 rounded-lg p-5 border border-amber-100">
+                                                <div className="whitespace-pre-wrap text-base leading-relaxed text-gray-800 space-y-3">
+                                                    {RECIPE46_DESCRIPTION.split('\n').map((line, index) => (
+                                                        <p key={index} className={line.trim() === '' ? 'h-3' : ''}>
+                                                            {line.trim() === '' ? '\u00A0' : line}
+                                                        </p>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-end px-6 pb-6">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsDescriptionModalOpen(false)}
+                                                className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3 font-semibold text-white shadow-sm transition-all hover:bg-amber-600 active:scale-[0.99] touch-manipulation"
+                                            >
+                                                閉じる
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
                 </>
             )}
         </AnimatePresence>

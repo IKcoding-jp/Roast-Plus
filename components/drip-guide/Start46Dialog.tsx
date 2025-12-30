@@ -6,7 +6,7 @@ import { Coffee, Timer, Drop } from 'phosphor-react';
 import { useRouter } from 'next/navigation';
 import { generateRecipe46, TASTE_LABELS, STRENGTH_LABELS, type Taste46, type Strength46 } from '@/lib/drip-guide/recipe46';
 import { getLast46Taste, getLast46Strength, setLast46Taste, setLast46Strength } from '@/lib/localStorage';
-import { RECIPE46_DESCRIPTION } from '@/lib/drip-guide/recipe46Content';
+import { RECIPE46_DESCRIPTION_SECTIONS } from '@/lib/drip-guide/recipe46Content';
 
 interface Start46DialogProps {
     isOpen: boolean;
@@ -41,10 +41,10 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
     // 前回の選択を読み込む
     useEffect(() => {
         if (!isOpen) return;
-        
+
         const lastTaste = getLast46Taste();
         const lastStrength = getLast46Strength();
-        
+
         if (lastTaste === 'basic' || lastTaste === 'sweet' || lastTaste === 'bright') {
             setTaste(lastTaste);
         }
@@ -85,7 +85,7 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
         // 前回の選択を保存
         setLast46Taste(taste);
         setLast46Strength(strength);
-        
+
         // /drip-guide/run へ遷移
         router.push(`/drip-guide/run?id=recipe-046&servings=${servings}&taste=${taste}&strength=${strength}`);
         onClose();
@@ -175,11 +175,10 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
                                                 key={t}
                                                 type="button"
                                                 onClick={() => setTaste(t)}
-                                                className={`py-3 px-4 rounded-lg text-sm font-medium transition-all min-h-[44px] ${
-                                                    taste === t
-                                                        ? 'bg-amber-500 text-white shadow-md'
-                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                }`}
+                                                className={`py-3 px-4 rounded-lg text-sm font-medium transition-all min-h-[44px] ${taste === t
+                                                    ? 'bg-amber-500 text-white shadow-md'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                    }`}
                                             >
                                                 {TASTE_LABELS[t]}
                                             </button>
@@ -198,11 +197,10 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
                                                 key={s}
                                                 type="button"
                                                 onClick={() => setStrength(s)}
-                                                className={`py-3 px-4 rounded-lg text-sm font-medium transition-all min-h-[44px] ${
-                                                    strength === s
-                                                        ? 'bg-amber-500 text-white shadow-md'
-                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                }`}
+                                                className={`py-3 px-4 rounded-lg text-sm font-medium transition-all min-h-[44px] ${strength === s
+                                                    ? 'bg-amber-500 text-white shadow-md'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                    }`}
                                             >
                                                 {STRENGTH_LABELS[s]}
                                             </button>
@@ -299,7 +297,7 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
                             <>
                                 <motion.div
                                     {...overlayMotion}
-                                    className="fixed inset-0 z-[60] bg-black/55"
+                                    className="fixed inset-0 z-[60] bg-black/40"
                                     onClick={() => setIsDescriptionModalOpen(false)}
                                 />
                                 <motion.div
@@ -308,28 +306,52 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
                                     onClick={() => setIsDescriptionModalOpen(false)}
                                 >
                                     <div
-                                        className="w-full max-w-2xl rounded-2xl border border-amber-100 bg-white shadow-2xl my-8"
+                                        className="w-full max-w-xl rounded-2xl bg-white shadow-xl relative overflow-hidden flex flex-col"
+                                        style={{ maxHeight: '90vh' }}
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        <div className="px-6 pt-6 pb-4">
-                                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                                            <h3 className="text-xl font-bold text-gray-900">
                                                 4:6メソッドのポイント
                                             </h3>
-                                            <div className="bg-amber-50 rounded-lg p-5 border border-amber-100">
-                                                <div className="whitespace-pre-wrap text-base leading-relaxed text-gray-800 space-y-3">
-                                                    {RECIPE46_DESCRIPTION.split('\n').map((line, index) => (
-                                                        <p key={index} className={line.trim() === '' ? 'h-3' : ''}>
-                                                            {line.trim() === '' ? '\u00A0' : line}
-                                                        </p>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex justify-end px-6 pb-6">
                                             <button
                                                 type="button"
                                                 onClick={() => setIsDescriptionModalOpen(false)}
-                                                className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3 font-semibold text-white shadow-sm transition-all hover:bg-amber-600 active:scale-[0.99] touch-manipulation"
+                                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                                            >
+                                                <span className="text-2xl leading-none">×</span>
+                                            </button>
+                                        </div>
+
+                                        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+                                            {RECIPE46_DESCRIPTION_SECTIONS.map((section: any, idx: number) => (
+                                                <div
+                                                    key={idx}
+                                                    className="flex gap-4"
+                                                >
+                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                                                        {section.icon === 'target' && <Drop size={20} weight="bold" />}
+                                                        {section.icon === 'rule' && <Coffee size={20} weight="bold" />}
+                                                        {section.icon === 'timer' && <Timer size={20} weight="bold" />}
+                                                        {section.icon === 'thermometer' && <Drop size={20} weight="duotone" />}
+                                                    </div>
+                                                    <div className="flex-1 border-b border-gray-50 pb-4">
+                                                        <h4 className="font-bold text-gray-900 mb-1 text-base">
+                                                            {section.title}
+                                                        </h4>
+                                                        <p className="text-[15px] leading-relaxed text-gray-600 whitespace-pre-wrap">
+                                                            {section.content}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsDescriptionModalOpen(false)}
+                                                className="bg-gray-900 text-white px-8 py-2.5 rounded-lg font-bold text-sm hover:bg-black transition-colors"
                                             >
                                                 閉じる
                                             </button>

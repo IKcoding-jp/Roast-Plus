@@ -223,15 +223,13 @@ function TastingPageContent() {
             </div>
           </header>
           <main>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <TastingRecordForm
-                record={record}
-                data={data}
-                onSave={handleSave}
-                onDelete={handleDelete}
-                onCancel={handleCancel}
-              />
-            </div>
+            <TastingRecordForm
+              record={record}
+              data={data}
+              onSave={handleSave}
+              onDelete={handleDelete}
+              onCancel={handleCancel}
+            />
           </main>
         </div>
       </div>

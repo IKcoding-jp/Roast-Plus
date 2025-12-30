@@ -174,59 +174,76 @@ export function TastingRadarChart({ record, size }: TastingRadarChartProps) {
           ref={pathRef}
           d={pathData}
           fill="#D97706"
-          fillOpacity={isVisible ? 0.3 : 0}
-          stroke="#D97706"
-          strokeWidth="2"
+          fillOpacity={isVisible ? 0.4 : 0}
+          stroke="#92400E"
+          strokeWidth="3"
+          strokeLinejoin="round"
           strokeDasharray={pathLength > 0 ? pathLength : 0}
           strokeDashoffset={isVisible ? 0 : pathLength}
           style={{
             transition: isVisible 
-              ? 'stroke-dashoffset 1s ease-out, fill-opacity 0.3s ease-out 0.7s' 
+              ? 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), fill-opacity 0.4s ease-out 0.8s' 
               : 'none',
           }}
         />
 
         {/* データポイント */}
         {points.map((point, index) => (
-          <circle
-            key={index}
-            cx={point.x}
-            cy={point.y}
-            r={isVisible ? 4 : 0}
-            fill="#D97706"
-            opacity={isVisible ? 1 : 0}
-            style={{
-              transition: isVisible
-                ? `r 0.3s ease-out ${0.7 + index * 0.1}s, opacity 0.3s ease-out ${0.7 + index * 0.1}s`
-                : 'none',
-              transformOrigin: `${point.x}px ${point.y}px`,
-            }}
-          />
+          <g key={index}>
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r={isVisible ? 6 : 0}
+              fill="white"
+              stroke="#D97706"
+              strokeWidth="2.5"
+              opacity={isVisible ? 1 : 0}
+              style={{
+                transition: isVisible
+                  ? `r 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${0.8 + index * 0.1}s, opacity 0.3s ease-out ${0.8 + index * 0.1}s`
+                  : 'none',
+                transformOrigin: `${point.x}px ${point.y}px`,
+              }}
+            />
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r={isVisible ? 2 : 0}
+              fill="#D97706"
+              opacity={isVisible ? 1 : 0}
+              style={{
+                transition: isVisible
+                  ? `r 0.3s ease-out ${1.0 + index * 0.1}s, opacity 0.3s ease-out ${1.0 + index * 0.1}s`
+                  : 'none',
+                transformOrigin: `${point.x}px ${point.y}px`,
+              }}
+            />
+          </g>
         ))}
 
         {/* 軸ラベルと値 */}
         {points.map((point, index) => {
           const axis = axes[index];
-          const labelX = centerX + (radius + 20) * Math.cos(axis.angle);
-          const labelY = centerY + (radius + 20) * Math.sin(axis.angle);
+          const labelX = centerX + (radius + 28) * Math.cos(axis.angle);
+          const labelY = centerY + (radius + 28) * Math.sin(axis.angle);
           
           return (
-            <g key={index}>
+            <g key={index} className="transition-opacity duration-300" style={{ opacity: isVisible ? 1 : 0, transitionDelay: `${1.2 + index * 0.05}s` }}>
               <text
                 x={labelX}
-                y={labelY}
+                y={labelY - 2}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-xs fill-gray-700 font-medium"
+                className="text-[10px] fill-gray-400 font-bold uppercase tracking-wider"
               >
                 {point.label}
               </text>
               <text
                 x={labelX}
-                y={labelY + 14}
+                y={labelY + 12}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-xs fill-amber-600 font-semibold"
+                className="text-sm fill-amber-700 font-black tabular-nums"
               >
                 {point.value.toFixed(1)}
               </text>

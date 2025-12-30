@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import type { TastingSession, TastingRecord, AppData } from '@/types';
 import { TastingRecordForm } from './TastingRecordForm';
 import { getRecordsBySessionId } from '@/lib/tastingUtils';
+import { Coffee } from 'phosphor-react';
 
 interface TastingSessionDetailProps {
   session: TastingSession;
@@ -114,60 +115,68 @@ export function TastingSessionDetail({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      {/* ヘッダー */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold text-gray-800">
-            {session.beanName}
-          </h2>
-          <span 
-            className="px-3 py-1 text-white text-sm rounded-full"
-            style={
-              session.roastLevel === '深煎り' 
-                ? { backgroundColor: '#120C0A' }
-                : session.roastLevel === '中深煎り'
-                ? { backgroundColor: '#4E3526' }
-                : session.roastLevel === '中煎り'
-                ? { backgroundColor: '#745138' }
-                : session.roastLevel === '浅煎り'
-                ? { backgroundColor: '#C78F5D' }
-                : { backgroundColor: '#6B7280' }
-            }
-          >
-            {session.roastLevel}
-          </span>
+    <div className="space-y-8 max-w-2xl mx-auto">
+      {/* ヘッダーカード */}
+      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-amber-50 rounded-2xl">
+              <Coffee size={32} weight="fill" className="text-amber-700" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-gray-800 tracking-tight">
+                {session.beanName}
+              </h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span 
+                  className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-sm uppercase tracking-wider"
+                  style={
+                    session.roastLevel === '深煎り' 
+                      ? { backgroundColor: '#120C0A' }
+                      : session.roastLevel === '中深煎り'
+                      ? { backgroundColor: '#4E3526' }
+                      : session.roastLevel === '中煎り'
+                      ? { backgroundColor: '#745138' }
+                      : session.roastLevel === '浅煎り'
+                      ? { backgroundColor: '#C78F5D' }
+                      : { backgroundColor: '#6B7280' }
+                  }
+                >
+                  {session.roastLevel}
+                </span>
+                <span className="text-sm font-medium text-gray-400">
+                  {new Date(session.createdAt).toLocaleDateString('ja-JP')}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* 記録編集フォーム（自分の記録がある場合、または編集モードの場合） */}
       {editingRecord ? (
-        <div className="mb-6">
-          <TastingRecordForm
-            record={editingRecord}
-            data={data}
-            sessionId={session.id}
-            session={session}
-            onSave={handleRecordSave}
-            onDelete={editingRecordId ? handleRecordDelete : undefined}
-            onCancel={handleCancel}
-          />
-        </div>
+        <TastingRecordForm
+          record={editingRecord}
+          data={data}
+          sessionId={session.id}
+          session={session}
+          onSave={handleRecordSave}
+          onDelete={editingRecordId ? handleRecordDelete : undefined}
+          onCancel={handleCancel}
+        />
       ) : null}
 
       {/* 記録追加フォームを表示 */}
       {!editingRecord && (
-        <div className="mb-6">
-          <TastingRecordForm
-            record={null}
-            data={data}
-            sessionId={session.id}
-            session={session}
-            onSave={handleRecordSave}
-            onDelete={handleRecordDelete}
-            onCancel={() => router.push('/tasting')}
-          />
-        </div>
+        <TastingRecordForm
+          record={null}
+          data={data}
+          sessionId={session.id}
+          session={session}
+          onSave={handleRecordSave}
+          onDelete={handleRecordDelete}
+          onCancel={() => router.push('/tasting')}
+        />
       )}
     </div>
   );

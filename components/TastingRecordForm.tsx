@@ -9,6 +9,19 @@ import {
 import { useToastContext } from '@/components/Toast';
 import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/lib/auth';
+import { 
+  Coffee, 
+  Drop, 
+  Wind, 
+  Cookie, 
+  Sun,
+  User,
+  Calendar,
+  Thermometer,
+  Smiley,
+  ChatCircleText
+} from 'phosphor-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
@@ -38,6 +51,9 @@ interface SliderInputProps {
   onChange: (value: number) => void;
   description?: string;
   readOnly?: boolean;
+  icon: React.ReactNode;
+  colorClass: string;
+  accentColor: string;
 }
 
 const SliderInput = ({
@@ -46,30 +62,64 @@ const SliderInput = ({
   onChange,
   description,
   readOnly = false,
+  icon,
+  colorClass,
+  accentColor,
 }: SliderInputProps) => (
-  <div className="mb-6">
-    <div className="flex justify-between items-center mb-2">
-      <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
-        {description && (
-          <span className="text-xs text-gray-500">{description}</span>
-        )}
+  <div className={`p-5 rounded-2xl border transition-all duration-200 ${readOnly ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-200 hover:border-amber-200 hover:shadow-md'}`}>
+    <div className="flex items-start justify-between mb-5">
+      <div className="flex items-center gap-3">
+        <div className={`p-3 rounded-xl ${colorClass}`}>
+          {icon}
+        </div>
+        <div>
+          <label className="text-lg font-bold text-gray-800 block leading-tight">{label}</label>
+          {description && (
+            <span className="text-xs text-gray-500 font-medium">{description}</span>
+          )}
+        </div>
       </div>
-      <span className="text-sm font-semibold text-amber-600">{value.toFixed(1)}</span>
+      <div className="flex flex-col items-end">
+        <span className={`text-3xl font-black ${accentColor} tabular-nums leading-none tracking-tight`}>
+          {value.toFixed(1)}
+        </span>
+      </div>
     </div>
-    <input
-      type="range"
-      min={MIN_VALUE}
-      max={MAX_VALUE}
-      step={STEP}
-      value={value}
-      onChange={(e) => onChange(parseFloat(e.target.value))}
-      className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
-      disabled={readOnly}
-    />
-    <div className="flex justify-between text-xs text-gray-500 mt-1">
-      <span>1.0</span>
-      <span>5.0</span>
+    
+    <div className="px-1 relative">
+      <input
+        type="range"
+        min={MIN_VALUE}
+        max={MAX_VALUE}
+        step={STEP}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className={`w-full h-3 bg-gray-100 rounded-full appearance-none cursor-pointer transition-all
+          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:h-8 
+          [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white 
+          [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:shadow-lg
+          ${accentColor.replace('text-', 'border-')}
+          hover:[&::-webkit-slider-thumb]:scale-110 active:[&::-webkit-slider-thumb]:scale-95
+          disabled:cursor-not-allowed`}
+        style={{
+          background: `linear-gradient(to right, currentColor 0%, currentColor ${(value - 1) / 4 * 100}%, #F3F4F6 ${(value - 1) / 4 * 100}%, #F3F4F6 100%)`,
+          color: accentColor.includes('amber') ? '#D97706' : 
+                 accentColor.includes('orange') ? '#EA580C' :
+                 accentColor.includes('stone') ? '#44403C' :
+                 accentColor.includes('rose') ? '#E11D48' :
+                 accentColor.includes('emerald') ? '#059669' : '#D97706'
+        }}
+        disabled={readOnly}
+      />
+      <div className="flex justify-between text-[10px] font-bold text-gray-400 mt-3 uppercase tracking-widest px-1">
+        <span>Min</span>
+        <div className="flex gap-2 items-center">
+          {[1, 2, 3, 4, 5].map((v) => (
+            <div key={v} className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${value >= v ? 'bg-amber-500' : 'bg-gray-200'}`} />
+          ))}
+        </div>
+        <span>Max</span>
+      </div>
     </div>
   </div>
 );
@@ -244,191 +294,274 @@ export function TastingRecordForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* 豆の名前（セッションモードでは非表示） */}
-      {!isSessionMode && (
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          豆の名前 <span className="text-red-500">*</span>
-        </label>
-          <input
-          type="text"
-          value={beanName}
-          onChange={(e) => setBeanName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-          placeholder="例: エチオピア"
-          required
-          disabled={readOnly}
-        />
-      </div>
-      )}
-
-      {/* 試飲日（セッションモードでは非表示） */}
-      {!isSessionMode && (
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          試飲日 <span className="text-red-500">*</span>
-        </label>
-          <input
-          type="date"
-          value={tastingDate}
-          onChange={(e) => setTastingDate(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-          required
-          disabled={readOnly}
-        />
-      </div>
-      )}
-
-      {/* 焙煎度合い（セッションモードでは非表示） */}
-      {!isSessionMode && (
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          焙煎度合い <span className="text-red-500">*</span>
-        </label>
-          <select
-          value={roastLevel}
-          onChange={(e) =>
-            setRoastLevel(e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り')
-          }
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-          required
-          disabled={readOnly}
-        >
-          {ROAST_LEVELS.map((level) => (
-            <option key={level} value={level}>
-              {level}
-            </option>
-          ))}
-        </select>
-      </div>
-      )}
-
-      {/* メンバー選択 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          メンバー <span className="text-red-500">*</span>
-        </label>
-        <select
-          value={selectedMemberId}
-          onChange={(e) => handleMemberChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-          required
-          disabled={readOnly}
-        >
-          <option value="" className="text-gray-900">
-            選択してください
-          </option>
-          {selectableMembers.map((member) => (
-            <option key={member.id} value={member.id} className="text-gray-900">
-              {member.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 評価項目 */}
-      <div className="bg-white rounded-lg p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">評価項目</h3>
-        <SliderInput 
-          label="苦味" 
-          value={bitterness} 
-          onChange={setBitterness}
-          description="コーヒーの苦みの強さ"
-          readOnly={readOnly}
-        />
-        <SliderInput 
-          label="酸味" 
-          value={acidity} 
-          onChange={setAcidity}
-          description="コーヒーの酸っぱさや爽やかさ"
-          readOnly={readOnly}
-        />
-        <SliderInput 
-          label="ボディ" 
-          value={body} 
-          onChange={setBody}
-          description="コーヒーの口当たりや重厚感"
-          readOnly={readOnly}
-        />
-        <SliderInput 
-          label="甘み" 
-          value={sweetness} 
-          onChange={setSweetness}
-          description="コーヒーに感じられる甘さ"
-          readOnly={readOnly}
-        />
-        <SliderInput 
-          label="香り" 
-          value={aroma} 
-          onChange={setAroma}
-          description="コーヒーの香りの強さや豊かさ"
-          readOnly={readOnly}
-        />
-      </div>
-
-      {/* レーダーチャートプレビュー */}
-      <div className="bg-white rounded-lg p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">プレビュー</h3>
-        <TastingRadarChart
-          record={{
-            bitterness,
-            acidity,
-            body,
-            sweetness,
-            aroma,
-          }}
-          size={240}
-        />
-      </div>
-
-      {/* コメント */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          全体的な印象
-        </label>
-          <textarea
-          value={overallImpression}
-          onChange={(e) => setOverallImpression(e.target.value)}
-          rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-          placeholder="コーヒーの全体的な印象を記録してください"
-          disabled={readOnly}
-        />
-      </div>
-
-      {/* ボタン */}
-      {!readOnly && (
-        <div className="flex gap-4">
-          {onDelete && record && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
-              削除
-            </button>
-          )}
-          <button
-            type="submit"
-            className="flex-1 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
-          >
-            {existingRecordId || record ? '上書き' : '作成'}
-          </button>
+    <motion.form 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      onSubmit={handleSubmit} 
+      className="space-y-8 pb-10"
+    >
+      {/* 基本情報カード */}
+      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-6">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-1 h-6 bg-amber-500 rounded-full" />
+          <h3 className="text-lg font-bold text-gray-800">基本情報</h3>
         </div>
-      )}
+
+        <div className="grid grid-cols-1 gap-6">
+          {/* メンバー選択 */}
+          <div className="relative group">
+            <label className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2 ml-1">
+              <User size={18} weight="bold" className="text-amber-500" />
+              メンバー <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <select
+                value={selectedMemberId}
+                onChange={(e) => handleMemberChange(e.target.value)}
+                className="w-full pl-4 pr-10 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all appearance-none text-gray-900 font-medium"
+                required
+                disabled={readOnly}
+              >
+                <option value="" className="text-gray-900">選択してください</option>
+                {selectableMembers.map((member) => (
+                  <option key={member.id} value={member.id} className="text-gray-900">
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* 豆の名前（セッションモードでは非表示） */}
+          {!isSessionMode && (
+            <div className="relative group">
+              <label className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2 ml-1">
+                <Coffee size={18} weight="bold" className="text-amber-500" />
+                豆の名前 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={beanName}
+                onChange={(e) => setBeanName(e.target.value)}
+                className="w-full px-4 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-gray-900 font-medium placeholder:text-gray-400"
+                placeholder="例: エチオピア イルガチェフェ"
+                required
+                disabled={readOnly}
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* 試飲日（セッションモードでは非表示） */}
+            {!isSessionMode && (
+              <div className="relative group">
+                <label className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2 ml-1">
+                  <Calendar size={18} weight="bold" className="text-amber-500" />
+                  試飲日 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={tastingDate}
+                  onChange={(e) => setTastingDate(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-gray-900 font-medium"
+                  required
+                  disabled={readOnly}
+                />
+              </div>
+            )}
+
+            {/* 焙煎度合い（セッションモードでは非表示） */}
+            {!isSessionMode && (
+              <div className="relative group">
+                <label className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2 ml-1">
+                  <Thermometer size={18} weight="bold" className="text-amber-500" />
+                  焙煎度合い <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    value={roastLevel}
+                    onChange={(e) =>
+                      setRoastLevel(e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り')
+                    }
+                    className="w-full pl-4 pr-10 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all appearance-none text-gray-900 font-medium"
+                    required
+                    disabled={readOnly}
+                  >
+                    {ROAST_LEVELS.map((level) => (
+                      <option key={level} value={level}>{level}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 評価項目セクション */}
+      <div className="space-y-6">
+        <div className="flex flex-col gap-2 px-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-6 bg-amber-500 rounded-full" />
+              <h3 className="text-lg font-bold text-gray-800">評価項目</h3>
+            </div>
+            <div className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold uppercase tracking-wider">
+              1.0 - 5.0 Scale
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 font-medium leading-relaxed">
+            ※ これらの項目は、味わいのバランスや特徴の数値であり、味の良し悪しを評価するものではありません。
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 gap-4">
+          <SliderInput 
+            label="苦味" 
+            value={bitterness} 
+            onChange={setBitterness}
+            description="コーヒーの苦みの強さ"
+            readOnly={readOnly}
+            icon={<Coffee size={24} weight="fill" className="text-stone-700" />}
+            colorClass="bg-stone-100"
+            accentColor="text-stone-800"
+          />
+          <SliderInput 
+            label="酸味" 
+            value={acidity} 
+            onChange={setAcidity}
+            description="コーヒーの酸っぱさや爽やかさ"
+            readOnly={readOnly}
+            icon={<Sun size={24} weight="fill" className="text-orange-600" />}
+            colorClass="bg-orange-50"
+            accentColor="text-orange-600"
+          />
+          <SliderInput 
+            label="ボディ" 
+            value={body} 
+            onChange={setBody}
+            description="コーヒーの口当たりや重厚感"
+            readOnly={readOnly}
+            icon={<Drop size={24} weight="fill" className="text-amber-800" />}
+            colorClass="bg-amber-50"
+            accentColor="text-amber-800"
+          />
+          <SliderInput 
+            label="甘み" 
+            value={sweetness} 
+            onChange={setSweetness}
+            description="コーヒーに感じられる甘さ"
+            readOnly={readOnly}
+            icon={<Cookie size={24} weight="fill" className="text-rose-600" />}
+            colorClass="bg-rose-50"
+            accentColor="text-rose-600"
+          />
+          <SliderInput 
+            label="香り" 
+            value={aroma} 
+            onChange={setAroma}
+            description="コーヒーの香りの強さや豊かさ"
+            readOnly={readOnly}
+            icon={<Wind size={24} weight="fill" className="text-emerald-600" />}
+            colorClass="bg-emerald-50"
+            accentColor="text-emerald-600"
+          />
+        </div>
+      </div>
+
+      {/* プレビュー & コメント */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+          <div className="w-full flex items-center gap-2 mb-6">
+            <div className="w-1 h-6 bg-amber-500 rounded-full" />
+            <h3 className="text-lg font-bold text-gray-800">プレビュー</h3>
+          </div>
+          <div className="bg-gray-50 rounded-2xl p-4 w-full flex justify-center">
+            <TastingRadarChart
+              record={{
+                bitterness,
+                acidity,
+                body,
+                sweetness,
+                aroma,
+              }}
+              size={240}
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-6">
+          <div className="w-full flex items-center gap-2 mb-2">
+            <div className="w-1 h-6 bg-amber-500 rounded-full" />
+            <h3 className="text-lg font-bold text-gray-800">全体的な印象</h3>
+          </div>
+          <div className="relative">
+            <label className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-2 ml-1">
+              <ChatCircleText size={18} weight="bold" className="text-amber-500" />
+              コメント
+            </label>
+            <textarea
+              value={overallImpression}
+              onChange={(e) => setOverallImpression(e.target.value)}
+              rows={6}
+              className="w-full px-4 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-gray-900 font-medium placeholder:text-gray-400 resize-none"
+              placeholder="コーヒーの全体的な印象、味の深み、後味などを自由に記録してください..."
+              disabled={readOnly}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* アクションボタン */}
+      <AnimatePresence>
+        {!readOnly && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="sticky bottom-6 flex gap-4 bg-white/80 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/20 z-20"
+          >
+            {onDelete && record && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="flex-1 px-6 py-4 bg-white border-2 border-gray-100 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-bold text-lg flex items-center justify-center gap-2"
+              >
+                削除
+              </button>
+            )}
+            <button
+              type="submit"
+              className="flex-[2] px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl hover:from-amber-700 hover:to-amber-600 shadow-lg shadow-amber-200 transition-all font-bold text-lg flex items-center justify-center gap-2"
+            >
+              <Smiley size={24} weight="bold" />
+              {existingRecordId || record ? '記録を更新する' : '記録を保存する'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {readOnly && (
         <div className="flex gap-4">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="flex-1 px-6 py-4 bg-white border-2 border-gray-100 text-gray-700 rounded-2xl hover:bg-gray-50 transition-all font-bold text-lg"
           >
             戻る
           </button>
         </div>
       )}
-    </form>
+    </motion.form>
   );
 }
 

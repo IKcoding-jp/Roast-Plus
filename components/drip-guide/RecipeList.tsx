@@ -85,10 +85,17 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
         );
     }
 
+    // recipe-046を一番右（最後）に配置するため、ソートする
+    const sortedRecipes = useMemo(() => {
+        const recipe046 = recipes.find((r) => r.id === 'recipe-046');
+        const others = recipes.filter((r) => r.id !== 'recipe-046');
+        return recipe046 ? [...others, recipe046] : recipes;
+    }, [recipes]);
+
     return (
         <>
             <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {recipes.map((recipe) => {
+                {sortedRecipes.map((recipe) => {
                     const servings = getServingsForRecipe(recipe.id);
                     const calculatedRecipe = calculateRecipeForServings(recipe, servings);
 

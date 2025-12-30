@@ -11,8 +11,9 @@ import { TastingRecordForm } from '@/components/TastingRecordForm';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import { Loading } from '@/components/Loading';
 import type { TastingSession, TastingRecord } from '@/types';
-import { HiPlus, HiArrowLeft } from 'react-icons/hi';
+import { CaretLeft, PencilCircle, Notebook, Coffee as CoffeeIcon, Plus } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function TastingPageContent() {
   const { user, loading: authLoading } = useAuth();
@@ -111,34 +112,40 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="max-w-2xl mx-auto">
-          <header className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-                <Link
-                  href="/tasting"
-                  className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
-                >
-                  <HiArrowLeft className="text-lg flex-shrink-0" />
-                  一覧に戻る
-                </Link>
-              </div>
-              <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 whitespace-nowrap">
+      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className="max-w-2xl mx-auto space-y-10">
+          <motion.header 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center text-center space-y-4"
+          >
+            <Link
+              href="/tasting"
+              className="group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+            >
+              <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
+              一覧に戻る
+            </Link>
+            
+            <div className="flex flex-col items-center space-y-2">
+              <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
+              <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
+              <PencilCircle size={48} weight="duotone" className="text-amber-600" />
+            </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
                 セッションを編集
               </h1>
-              <div className="hidden sm:block flex-1 flex-shrink-0"></div>
+              <p className="text-stone-400 font-medium">セッションの情報を更新します</p>
             </div>
-          </header>
+          </motion.header>
+
           <main>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <TastingSessionForm
-                session={session}
-                onSave={handleSave}
-                onCancel={handleCancel}
-                onDelete={handleDelete}
-              />
-            </div>
+            <TastingSessionForm
+              session={session}
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onDelete={handleDelete}
+            />
           </main>
         </div>
       </div>
@@ -203,25 +210,33 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="max-w-2xl mx-auto">
-          <header className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-                <Link
-                  href="/tasting"
-                  className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
-                >
-                  <HiArrowLeft className="text-lg flex-shrink-0" />
-                  一覧に戻る
-                </Link>
-              </div>
-              <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
+      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className="max-w-2xl mx-auto space-y-10">
+          <motion.header 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center text-center space-y-4"
+          >
+            <Link
+              href="/tasting"
+              className="group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+            >
+              <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
+              一覧に戻る
+            </Link>
+            
+            <div className="flex flex-col items-center space-y-3">
+            <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
+              <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
+              <Notebook size={48} weight="duotone" className="text-amber-600" />
+            </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
                 記録を編集
               </h1>
-              <div className="hidden sm:block flex-1 flex-shrink-0"></div>
+              <p className="text-stone-400 font-medium">試飲の感想を更新します</p>
             </div>
-          </header>
+          </motion.header>
+
           <main>
             <TastingRecordForm
               record={record}
@@ -255,25 +270,33 @@ function TastingPageContent() {
     }
 
     return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="max-w-4xl mx-auto">
-          <header className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-                <Link
-                  href="/tasting"
-                  className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-2 flex-shrink-0"
-                >
-                  <HiArrowLeft className="text-lg flex-shrink-0" />
-                  一覧に戻る
-                </Link>
-              </div>
-              <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
+      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className="max-w-4xl mx-auto space-y-10">
+          <motion.header 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center text-center space-y-4"
+          >
+            <Link
+              href="/tasting"
+              className="group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+            >
+              <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
+              一覧に戻る
+            </Link>
+            
+            <div className="flex flex-col items-center space-y-3">
+            <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
+              <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
+              <CoffeeIcon size={48} weight="duotone" className="text-amber-600" />
+            </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
                 記録の追加・編集
               </h1>
-              <div className="hidden sm:block flex-1 flex-shrink-0"></div>
+              <p className="text-stone-400 font-medium">セッションの試飲記録を管理します</p>
             </div>
-          </header>
+          </motion.header>
+
           <main>
             <TastingSessionDetail session={session} data={data} onUpdate={updateData} />
           </main>
@@ -289,30 +312,32 @@ function TastingPageContent() {
     <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
-          <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="relative flex flex-col sm:flex-row items-center gap-4">
             <div className="flex justify-between items-center w-full sm:w-auto sm:flex-1">
               <Link
                 href="/"
-                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                className="group p-2 text-stone-400 hover:text-amber-600 transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] bg-white rounded-2xl border border-stone-100 shadow-sm"
                 title="戻る"
                 aria-label="戻る"
               >
-                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
+                <CaretLeft size={24} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               </Link>
               <div id="filter-button-container-mobile" className="sm:hidden"></div>
             </div>
-            <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-bold text-gray-800">
+            
+            <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-black text-stone-800 tracking-tight">
               試飲感想記録
             </h1>
+
             <div className="hidden sm:flex justify-end items-center gap-2 sm:gap-3 w-full sm:w-auto sm:flex-1">
               <div id="filter-button-container"></div>
               {!isEmpty && (
                 <Link
                   href="/tasting/sessions/new"
-                  className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-primary text-white rounded-lg shadow-md hover:bg-primary-dark transition-colors flex items-center gap-2 min-h-[44px] flex-shrink-0"
+                  className="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl font-black text-sm shadow-md hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95 flex items-center gap-2 min-h-[44px] flex-shrink-0"
                   aria-label="新規セッション作成"
                 >
-                  <HiPlus className="h-5 w-5 flex-shrink-0" />
+                  <Plus size={20} weight="bold" />
                   <span className="whitespace-nowrap">セッションを作成</span>
                 </Link>
               )}
@@ -329,16 +354,15 @@ function TastingPageContent() {
           />
         </main>
 
-        {/* スマホ用：一番下に固定表示する「セッションを作成」ボタン */}
         {!isEmpty && (
-          <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-10">
+          <div className="sm:hidden fixed bottom-6 left-4 right-4 z-20">
             <Link
               href="/tasting/sessions/new"
-              className="w-full px-4 py-3 text-base bg-primary text-white rounded-lg shadow-md hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+              className="w-full px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl font-black text-lg shadow-2xl shadow-amber-900/20 hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95 flex items-center justify-center gap-3 min-h-[56px]"
               aria-label="新規セッション作成"
             >
-              <HiPlus className="text-lg flex-shrink-0" />
-              <span className="whitespace-nowrap font-medium">セッションを作成</span>
+              <Plus size={24} weight="bold" />
+              <span className="whitespace-nowrap">セッションを作成</span>
             </Link>
           </div>
         )}

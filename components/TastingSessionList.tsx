@@ -4,12 +4,21 @@ import { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaCoffee } from 'react-icons/fa';
-import { HiSearch, HiPlus, HiX, HiFilter } from 'react-icons/hi';
+import { 
+  Coffee, 
+  MagnifyingGlass, 
+  Plus, 
+  X, 
+  Faders,
+  CalendarBlank,
+  SortAscending,
+  Thermometer
+} from 'phosphor-react';
 import type { AppData } from '@/types';
 import { TastingSessionCarousel } from './TastingSessionCarousel';
 import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/lib/auth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TastingSessionListProps {
   data: AppData;
@@ -55,7 +64,29 @@ export function TastingSessionList({ data, filterButtonContainerId, filterButton
     Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>
   >([]);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
+  // ポータル先の要素を保持
+  const [containers, setContainers] = useState<{
+    desktop: HTMLElement | null;
+    mobile: HTMLElement | null;
+  }>({ desktop: null, mobile: null });
+
+  useEffect(() => {
+    setMounted(true);
+    const updateContainers = () => {
+      setContainers({
+        desktop: filterButtonContainerId ? document.getElementById(filterButtonContainerId) : null,
+        mobile: filterButtonContainerIdMobile ? document.getElementById(filterButtonContainerIdMobile) : null,
+      });
+    };
+    
+    updateContainers();
+    // 念のため少し遅らせて実行（ハイドレーション対策）
+    const timer = setTimeout(updateContainers, 100);
+    return () => clearTimeout(timer);
+  }, [filterButtonContainerId, filterButtonContainerIdMobile]);
+
   // モーダル内で使用する一時的なフィルター状態
   const [tempSearchQuery, setTempSearchQuery] = useState('');
   const [tempSortOption, setTempSortOption] = useState<SortOption>('newest');
@@ -193,249 +224,232 @@ export function TastingSessionList({ data, filterButtonContainerId, filterButton
     return count;
   }, [searchQuery, dateFrom, dateTo, selectedRoastLevels]);
 
-  const filterButtonContainer = useMemo(() => {
-    if (!filterButtonContainerId || typeof document === 'undefined') return null;
-    return document.getElementById(filterButtonContainerId);
-  }, [filterButtonContainerId]);
-
-  const filterButtonContainerMobile = useMemo(() => {
-    if (!filterButtonContainerIdMobile || typeof document === 'undefined') return null;
-    return document.getElementById(filterButtonContainerIdMobile);
-  }, [filterButtonContainerIdMobile]);
-
-  if (tastingSessions.length === 0) {
-    return (
-      <div className="py-12 sm:py-16 text-center">
-        <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
-          {/* アイコン */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-amber-100 rounded-full blur-xl opacity-50"></div>
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-amber-50 flex items-center justify-center">
-              <FaCoffee className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
-            </div>
-          </div>
-          
-          {/* メッセージ */}
-          <div className="space-y-2">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-              試飲セッションがありません
-            </h3>
-            <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
-              最初の試飲セッションを作成して、コーヒーの感想を記録しましょう。
-            </p>
-          </div>
-          
-          {/* アクションボタン */}
-          <Link
-            href="/tasting/sessions/new"
-            className="mt-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
-          >
-            <HiPlus className="w-5 h-5" />
-            <span className="font-medium">セッションを作成</span>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   const filterButton = (
     <button
       onClick={handleOpenFilterModal}
-      className={`px-3 py-2 md:px-3 md:py-2 rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg flex items-center justify-center gap-2 min-h-[44px] min-w-[44px] md:min-w-auto relative ${
-        activeFilterCount > 0 ? 'text-amber-600' : 'text-gray-600'
+      className={`px-4 py-2 rounded-2xl bg-white shadow-sm border transition-all hover:shadow-md hover:border-amber-200 flex items-center justify-center gap-2 min-h-[44px] relative group ${
+        activeFilterCount > 0 ? 'text-amber-600 border-amber-200' : 'text-stone-500 border-stone-100'
       }`}
       title="フィルター"
       aria-label="フィルター"
     >
-      <HiFilter className="h-5 w-5 flex-shrink-0" />
-      <span className="hidden md:block text-sm font-medium whitespace-nowrap">フィルター</span>
+      <Faders size={20} weight={activeFilterCount > 0 ? "fill" : "bold"} className="group-hover:scale-110 transition-transform" />
+      <span className="hidden md:block text-[10px] font-black uppercase tracking-[0.15em]">フィルター</span>
       {activeFilterCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold">
+        <span className="absolute -top-1.5 -right-1.5 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white">
           {activeFilterCount}
         </span>
       )}
     </button>
   );
 
+  if (tastingSessions.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center py-12 px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full bg-white rounded-[3rem] p-10 border border-stone-100 shadow-sm text-center space-y-8"
+        >
+          <div className="relative mx-auto w-32 h-32">
+            <div className="absolute inset-0 bg-amber-50 rounded-full scale-110 blur-2xl opacity-60"></div>
+            <div className="relative w-full h-full rounded-full bg-stone-50 flex items-center justify-center border-2 border-white shadow-inner">
+              <Coffee size={64} weight="duotone" className="text-amber-200" />
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <h3 className="text-2xl font-black text-stone-800 tracking-tight">
+              試飲セッションがありません
+            </h3>
+            <p className="text-stone-400 text-sm font-medium leading-relaxed">
+              最初の試飲セッションを作成して、<br />
+              コーヒーの奥深い世界を記録しましょう。
+            </p>
+          </div>
+          
+          <Link
+            href="/tasting/sessions/new"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl font-black text-lg shadow-xl shadow-amber-200 hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95"
+          >
+            <Plus size={24} weight="bold" />
+            <span>セッションを開始</span>
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* フィルターボタンを外部コンテナにPortalでレンダリング */}
-      {filterButtonContainer && createPortal(filterButton, filterButtonContainer)}
-      {filterButtonContainerMobile && createPortal(filterButton, filterButtonContainerMobile)}
+      {mounted && containers.desktop && createPortal(filterButton, containers.desktop)}
+      {mounted && containers.mobile && createPortal(filterButton, containers.mobile)}
       
-      <div className="space-y-3 h-full flex flex-col min-h-0">
+      <div className="h-full flex flex-col min-h-0">
 
       {/* フィルターモーダル */}
-      {isFilterModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={handleCloseFilterModal}
-        >
-          <div
-            className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* ヘッダー */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between z-10">
-              <h2 className="text-xl font-bold text-gray-800">フィルター</h2>
-              <button
-                onClick={handleCloseFilterModal}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                aria-label="閉じる"
-              >
-                <HiX className="h-6 w-6 text-gray-600" />
-              </button>
-            </div>
-
-            {/* コンテンツ */}
-            <div className="p-4 sm:p-6 space-y-6">
-              {/* 検索バー */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  豆の名前で検索
-                </label>
-                <input
-                  type="text"
-                  value={tempSearchQuery}
-                  onChange={(e) => setTempSearchQuery(e.target.value)}
-                  placeholder="豆の名前で検索"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-                />
-              </div>
-
-              {/* ソート */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  並び順
-                </label>
-                <select
-                  value={tempSortOption}
-                  onChange={(e) => setTempSortOption(e.target.value as SortOption)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+      <AnimatePresence>
+        {isFilterModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleCloseFilterModal}
+              className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative bg-white rounded-[3rem] shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col border border-stone-100"
+            >
+              {/* ヘッダー */}
+              <div className="p-8 pb-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-50 rounded-xl">
+                    <Faders size={24} weight="fill" className="text-amber-600" />
+                  </div>
+                  <h2 className="text-2xl font-black text-stone-800 tracking-tight">フィルター設定</h2>
+                </div>
+                <button
+                  onClick={handleCloseFilterModal}
+                  className="p-2 hover:bg-stone-50 rounded-full transition-colors text-stone-400"
+                  aria-label="閉じる"
                 >
-                  <option value="newest">新しい順</option>
-                  <option value="oldest">古い順</option>
-                  <option value="beanName">豆の名前順</option>
-                </select>
+                  <X size={24} weight="bold" />
+                </button>
               </div>
 
-              {/* 日付範囲 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  日付範囲
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      開始日
-                    </label>
+              {/* コンテンツ */}
+              <div className="flex-1 overflow-y-auto px-8 py-4 space-y-8">
+                {/* 検索バー */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                    <MagnifyingGlass size={16} weight="bold" />
+                    豆の名前で検索
+                  </label>
+                  <input
+                    type="text"
+                    value={tempSearchQuery}
+                    onChange={(e) => setTempSearchQuery(e.target.value)}
+                    placeholder="豆の名前を入力..."
+                    className="w-full px-5 py-4 bg-stone-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold placeholder:text-stone-300"
+                  />
+                </div>
+
+                {/* ソート */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                    <SortAscending size={16} weight="bold" />
+                    並び替え
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { id: 'newest', label: '新しい順' },
+                      { id: 'oldest', label: '古い順' },
+                      { id: 'beanName', label: '豆の名前順' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setTempSortOption(opt.id as SortOption)}
+                        className={`px-5 py-3.5 rounded-2xl text-left font-bold transition-all border-2 ${
+                          tempSortOption === opt.id 
+                            ? 'bg-amber-50 border-amber-500 text-amber-700' 
+                            : 'bg-stone-50 border-transparent text-stone-500 hover:bg-stone-100'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 日付範囲 */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                    <CalendarBlank size={16} weight="bold" />
+                    日付範囲
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
                     <input
                       type="date"
                       value={tempDateFrom}
                       onChange={(e) => setTempDateFrom(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+                      className="px-4 py-3.5 bg-stone-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold text-sm"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      終了日
-                    </label>
                     <input
                       type="date"
                       value={tempDateTo}
                       onChange={(e) => setTempDateTo(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+                      className="px-4 py-3.5 bg-stone-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold text-sm"
                     />
+                  </div>
+                </div>
+
+                {/* 焙煎度合い */}
+                <div className="space-y-3 pb-4">
+                  <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                    <Thermometer size={16} weight="bold" />
+                    焙煎度合い
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {ROAST_LEVELS.map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => handleTempRoastLevelToggle(level)}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all border-2 ${
+                          tempSelectedRoastLevels.includes(level)
+                            ? 'bg-stone-800 border-stone-800 text-white'
+                            : 'bg-stone-50 border-transparent text-stone-500 hover:bg-stone-100'
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* 焙煎度合い */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  焙煎度合い
-                </label>
-                <div className="flex flex-wrap gap-3">
-                  {ROAST_LEVELS.map((level) => (
-                    <label
-                      key={level}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={tempSelectedRoastLevels.includes(level)}
-                        onChange={() => handleTempRoastLevelToggle(level)}
-                        className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-600"
-                      />
-                      <span className="text-sm text-gray-700">{level}</span>
-                    </label>
-                  ))}
+              {/* フッター */}
+              <div className="p-8 pt-4 bg-stone-50/50 flex flex-col gap-3">
+                {(tempSearchQuery.trim() || tempDateFrom || tempDateTo || tempSelectedRoastLevels.length > 0) && (
+                  <button
+                    onClick={handleResetFilters}
+                    className="text-xs font-black text-amber-600 uppercase tracking-widest hover:underline mb-2 mx-auto"
+                  >
+                    フィルターをリセット
+                  </button>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleCloseFilterModal}
+                    className="flex-1 px-6 py-4 bg-white border-2 border-stone-100 text-stone-400 rounded-2xl font-black transition-all hover:bg-stone-100"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    onClick={handleApplyFilters}
+                    className="flex-1 px-6 py-4 bg-stone-800 text-white rounded-2xl font-black transition-all hover:bg-stone-900 shadow-xl shadow-stone-200"
+                  >
+                    適用
+                  </button>
                 </div>
               </div>
-
-              {/* フィルタリセット */}
-              {(tempSearchQuery.trim() || tempDateFrom || tempDateTo || tempSelectedRoastLevels.length > 0) && (
-                <button
-                  onClick={handleResetFilters}
-                  className="text-sm text-amber-600 hover:underline"
-                >
-                  フィルタをリセット
-                </button>
-              )}
-            </div>
-
-            {/* フッター */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 sm:px-6 py-4 flex gap-3">
-              <button
-                onClick={handleCloseFilterModal}
-                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium min-h-[44px]"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleApplyFilters}
-                className="flex-1 px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium min-h-[44px]"
-              >
-                適用
-              </button>
-            </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
-      {/* 結果数表示 */}
-      {filteredAndSortedSessions.length === 0 ? (
-        <div className="py-12 sm:py-16 text-center flex-shrink-0">
-          <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
-            {/* アイコン */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-amber-100 rounded-full blur-xl opacity-50"></div>
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-amber-50 flex items-center justify-center">
-                <HiSearch className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
-              </div>
-            </div>
-            
-            {/* メッセージ */}
-            <div className="space-y-2">
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                検索条件に一致するセッションがありません
-              </h3>
-              <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
-                別のキーワードで検索するか、フィルタを変更してみてください。
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="flex-1 min-h-0 overflow-y-hidden">
-          <TastingSessionCarousel
-            sessions={filteredAndSortedSessions}
-            tastingRecords={tastingRecords}
-            activeMemberCount={activeMemberCount}
-            router={router}
-          />
-        </div>
-      )}
+      <div className="flex-1 min-h-0 overflow-y-hidden pt-4 pb-8">
+        <TastingSessionCarousel
+          sessions={filteredAndSortedSessions}
+          tastingRecords={tastingRecords}
+          activeMemberCount={activeMemberCount}
+          router={router}
+        />
+      </div>
       </div>
     </>
   );

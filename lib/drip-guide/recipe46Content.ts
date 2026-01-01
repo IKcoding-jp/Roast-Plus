@@ -12,7 +12,7 @@ export const RECIPE46_TITLE = '4:6メソッド（粕谷 哲）';
 /**
  * レシピ一覧で表示する短い説明文（RecipeListのpurposeフィールドで使用）
  */
-export const RECIPE46_PURPOSE = '世界チャンピオン粕谷哲さんが考案したハンドドリップ手法';
+export const RECIPE46_PURPOSE = '前半40%で味わいを、後半60%で濃度を調整する画期的な手法';
 
 /**
  * 開始前に読む長文の説明（Start46Dialogで使用）

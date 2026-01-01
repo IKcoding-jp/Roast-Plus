@@ -1,4 +1,5 @@
 import { DripRecipe } from './types';
+import { RECIPE46_PURPOSE } from './recipe46Content';
 
 export const MOCK_RECIPES: DripRecipe[] = [
     // BYSN Standard Drip (細く中心に注ぐスタイル) - 1人前基準
@@ -114,7 +115,7 @@ export const MOCK_RECIPES: DripRecipe[] = [
         beanAmountGram: 10,
         totalWaterGram: 150,
         totalDurationSec: 210,
-        purpose: '世界チャンピオン粕谷哲さんが考案したハンドドリップ手法',
+        purpose: RECIPE46_PURPOSE,
         description: '粕谷哲氏が考案した4:6メソッド。味わいと濃度を分けて調整する手法です。',
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',

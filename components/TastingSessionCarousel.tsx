@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -33,6 +33,22 @@ export function TastingSessionCarousel({
   router,
 }: TastingSessionCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [chartSize, setChartSize] = useState(180); // デフォルトはスマートフォンサイズ
+
+  // 画面幅に応じてレーダーチャートサイズを決定
+  useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth >= 768) {
+        setChartSize(240); // タブレット以上
+      } else {
+        setChartSize(180); // スマートフォン
+      }
+    };
+    
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -99,7 +115,7 @@ export function TastingSessionCarousel({
                   href={`/tasting?sessionId=${session.id}`}
                   className="block h-full group"
                 >
-                  <div className="bg-white rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-amber-900/5 transition-all duration-500 flex flex-col h-full min-h-0 border border-stone-100 overflow-hidden relative">
+                  <div className="bg-white rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-amber-900/5 transition-all duration-500 flex flex-col h-full min-h-[600px] sm:min-h-0 border border-stone-100 overflow-hidden relative">
                     {/* 装飾的な背景要素 */}
                     <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none group-hover:scale-110 transition-transform duration-700">
                       <Coffee size={120} weight="fill" />
@@ -152,12 +168,12 @@ export function TastingSessionCarousel({
                       </div>
                     </div>
 
-                    {/* レーダーチャートセクション - 高さを固定してサイズを一定に保つ */}
-                    <div className="h-[280px] flex-shrink-0 flex items-center justify-center relative z-10 px-4">
+                    {/* レーダーチャートセクション - レスポンシブ対応 */}
+                    <div className="h-[200px] sm:h-[240px] md:h-[280px] flex-shrink-0 flex items-center justify-center relative z-10 px-4">
                       {recordCount > 0 ? (
                         <div className="w-full h-full flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">
                           <TastingRadarChart
-                            size={240}
+                            size={chartSize}
                             record={{
                               bitterness: averageScores.bitterness,
                               acidity: averageScores.acidity,
@@ -180,14 +196,14 @@ export function TastingSessionCarousel({
                     </div>
 
                     {/* みんなの感想セクション */}
-                    <div className="flex-1 flex flex-col min-h-0 p-6 pt-0 z-10">
+                    <div className="flex-1 flex flex-col min-h-0 p-4 sm:p-6 pt-0 z-10">
                       <div className="bg-stone-50 rounded-[2rem] p-5 flex flex-col flex-1 min-h-0 border border-stone-100/50">
                         <div className="flex items-center justify-between mb-4 flex-shrink-0">
                           <div className="flex items-center gap-2">
                             <div className="p-1.5 bg-white rounded-lg shadow-sm border border-stone-100">
                               <Quotes size={16} weight="fill" className="text-amber-600" />
                             </div>
-                            <h4 className="text-sm font-black text-stone-700 tracking-tight">みんなの感想</h4>
+                            <h4 className="text-base sm:text-sm font-black text-stone-700 tracking-tight">みんなの感想</h4>
                           </div>
                           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-full border border-stone-100 shadow-sm">
                             <Users size={12} weight="bold" className="text-stone-400" />
@@ -199,9 +215,9 @@ export function TastingSessionCarousel({
                         
                         <div className="flex-1 overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-stone-200 [&::-webkit-scrollbar-thumb]:rounded-full">
                           {comments.length > 0 ? (
-                            <ul className="space-y-3">
+                            <ul className="space-y-2.5 sm:space-y-3">
                               {comments.map((comment, commentIndex) => (
-                                <li key={commentIndex} className="text-xs text-stone-600 font-medium leading-relaxed flex gap-2">
+                                <li key={commentIndex} className="text-sm sm:text-xs text-stone-600 font-medium leading-relaxed flex gap-2">
                                   <div className="w-1 h-1 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                                   <span className="break-words">{comment}</span>
                                 </li>

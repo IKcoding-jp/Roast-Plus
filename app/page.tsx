@@ -70,6 +70,7 @@ const ACTIONS = [
     description: '淹れ方の手順',
     href: '/drip-guide',
     icon: MdCoffeeMaker,
+    badge: '新レシピ登場！',
   },
   {
     key: 'handpick-timer',
@@ -320,7 +321,7 @@ export default function HomePage(_props: HomePageProps = {}) {
           className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
           style={cardHeight ? { gridAutoRows: `${cardHeight}px` } : { gridAutoRows: '1fr' }}
         >
-          {ACTIONS.map(({ key, title, description, href, icon: DefaultIcon }, index) => {
+          {ACTIONS.map(({ key, title, description, href, icon: DefaultIcon, badge }: any, index) => {
             // クリスマスアイコンのマッピング
             const ChristmasIcons: Record<string, any> = {
               assignment: FaGift,
@@ -350,6 +351,15 @@ export default function HomePage(_props: HomePageProps = {}) {
                 }}
                 aria-label={title}
               >
+                {/* バッジ表示 */}
+                {badge && (
+                  <div className="absolute -top-1 -right-1 z-20 animate-pulse-scale sm:-top-2 sm:-right-2">
+                    <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] whitespace-nowrap font-bold text-white shadow-lg completed-label-gradient ring-2 ring-white/20 sm:px-3 sm:py-1">
+                      <BsStars className="text-[10px]" />
+                      {badge}
+                    </span>
+                  </div>
+                )}
                 {/* クリスマス飾りの装飾 ( corners ) */}
                 {isChristmasMode && (
                   <div className="absolute top-2 right-2 opacity-40 group-hover:opacity-100 transition-opacity">

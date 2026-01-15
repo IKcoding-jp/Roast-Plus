@@ -233,6 +233,7 @@ export interface AppData {
   defectBeanSettings?: DefectBeanSettings;
   workProgresses: WorkProgress[];
   dripRecipes?: DripRecipe[];
+  changelogEntries?: ChangelogEntry[];
 }
 
 export type NotificationType = 'update' | 'announcement' | 'improvement' | 'request' | 'bugfix';
@@ -298,5 +299,22 @@ export interface WorkProgress {
   progressHistory?: ProgressEntry[]; // 進捗記録の履歴
   completedCount?: number; // 完成数（目標量がない場合も記録可能、累積）
   archivedAt?: string; // アーカイブ日時（ISO 8601形式、アーカイブしたときに記録）
+}
+
+// 更新履歴・開発秘話のカテゴリ
+export type ChangelogEntryType = 'update' | 'story' | 'feature' | 'bugfix' | 'improvement';
+
+// 更新履歴・開発秘話エントリ
+export interface ChangelogEntry {
+  id: string;
+  type: ChangelogEntryType; // カテゴリ
+  title: string; // タイトル
+  content: string; // 本文
+  version?: string; // バージョン番号（例: "0.5.17"）
+  date: string; // YYYY-MM-DD
+  tags?: string[]; // タグ（例: ["UI", "焙煎", "Firebase"]）
+  order?: number; // 表示順序
+  createdAt: string; // 作成日時（ISO 8601形式）
+  updatedAt: string; // 更新日時（ISO 8601形式）
 }
 

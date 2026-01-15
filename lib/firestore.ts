@@ -1,8 +1,8 @@
-import { 
-  getFirestore, 
-  doc, 
-  getDoc, 
-  setDoc, 
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   onSnapshot,
@@ -115,11 +115,11 @@ function removeUndefinedFields<T>(obj: T): T {
   if (obj === null || obj === undefined) {
     return obj;
   }
-  
+
   if (Array.isArray(obj)) {
     return obj.map((item) => removeUndefinedFields(item)) as unknown as T;
   }
-  
+
   if (typeof obj === 'object') {
     const cleaned: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
@@ -137,7 +137,7 @@ function removeUndefinedFields<T>(obj: T): T {
     }
     return cleaned as unknown as T;
   }
-  
+
   return obj;
 }
 
@@ -149,10 +149,10 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
     todaySchedules: Array.isArray(data?.todaySchedules) ? data.todaySchedules : [],
     roastSchedules: Array.isArray(data?.roastSchedules)
       ? data.roastSchedules.map((schedule) => ({
-          ...schedule,
-          // dateが存在しない場合は現在日時から日付部分を取得して補完する。
-          date: schedule.date || new Date().toISOString().split('T')[0],
-        }))
+        ...schedule,
+        // dateが存在しない場合は現在日時から日付部分を取得して補完する。
+        date: schedule.date || new Date().toISOString().split('T')[0],
+      }))
       : [],
     tastingSessions: Array.isArray(data?.tastingSessions) ? data.tastingSessions : [],
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
@@ -160,21 +160,21 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
     encouragementCount: typeof data?.encouragementCount === 'number' ? data.encouragementCount : 0,
     roastTimerRecords: Array.isArray(data?.roastTimerRecords)
       ? data.roastTimerRecords.map((record) => ({
-          ...record,
-          // roastDateが存在しない場合はcreatedAtから日付部分を取得、それもなければ現在日時の日付部分を使用
-          roastDate:
-            record.roastDate ||
-            (record.createdAt ? record.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
-        }))
+        ...record,
+        // roastDateが存在しない場合はcreatedAtから日付部分を取得、それもなければ現在日時の日付部分を使用
+        roastDate:
+          record.roastDate ||
+          (record.createdAt ? record.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
+      }))
       : [],
     workProgresses: Array.isArray(data?.workProgresses)
       ? data.workProgresses.map((wp) => ({
-          ...wp,
-          completedCount: typeof wp.completedCount === 'number' ? wp.completedCount : undefined,
-        }))
+        ...wp,
+        completedCount: typeof wp.completedCount === 'number' ? wp.completedCount : undefined,
+      }))
       : [],
   };
-  
+
   // userSettingsは存在する場合のみ処理。selectedMemberId/selectedManagerIdがundefinedの場合はフィールドを削除する。
   if (data?.userSettings) {
     const cleanedUserSettings: Partial<UserSettings> = {};
@@ -221,7 +221,7 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
       normalized.userSettings = cleanedUserSettings;
     }
   }
-  
+
   // shuffleEventは存在する場合のみ処理
   if (data?.shuffleEvent && typeof data.shuffleEvent === 'object') {
     if (
@@ -235,27 +235,32 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
       };
     }
   }
-  
+
   // roastTimerStateは存在する場合のみ処理
   if (data?.roastTimerState && typeof data.roastTimerState === 'object') {
     normalized.roastTimerState = data.roastTimerState;
   }
-  
+
   // defectBeansは存在する場合のみ処理
   if (Array.isArray(data?.defectBeans)) {
     normalized.defectBeans = data.defectBeans;
   }
-  
+
   // defectBeanSettingsは存在する場合のみ処理
   if (data?.defectBeanSettings && typeof data.defectBeanSettings === 'object') {
     normalized.defectBeanSettings = data.defectBeanSettings;
   }
-  
+
   // dripRecipesは存在する場合のみ処理
   if (Array.isArray(data?.dripRecipes)) {
     normalized.dripRecipes = data.dripRecipes;
   }
-  
+
+  // changelogEntriesは存在する場合のみ処理
+  if (Array.isArray(data?.changelogEntries)) {
+    normalized.changelogEntries = data.changelogEntries;
+  }
+
   return normalized;
 }
 
@@ -263,14 +268,14 @@ export async function getUserData(userId: string): Promise<AppData> {
   try {
     const userDocRef = getUserDocRef(userId);
     const userDoc = await getDoc(userDocRef);
-    
+
     if (userDoc.exists()) {
       const data = userDoc.data();
       const normalizedData = normalizeAppData(data);
       // 正規化されたデータを返す（undefinedフィールドは削除済み）
       return normalizedData;
     }
-    
+
     // ドキュメントが存在しない場合はデフォルトデータを作成。初回書き込み時にundefinedフィールドを削除して保存する。
     const cleanedDefaultData = removeUndefinedFields(defaultData);
     await setDoc(userDocRef, cleanedDefaultData);
@@ -286,7 +291,7 @@ export async function getUserData(userId: string): Promise<AppData> {
 async function performWrite(userId: string, data: AppData): Promise<void> {
   // 書き込みスロットを取得する（利用可能になるまで待機）
   await acquireWriteSlot();
-  
+
   try {
     // 書き込み間隔の最小時間を確保する
     const now = Date.now();
@@ -295,11 +300,11 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       await new Promise(resolve => setTimeout(resolve, MIN_WRITE_INTERVAL - timeSinceLastWrite));
     }
     lastWriteTime = Date.now();
-    
+
     const userDocRef = getUserDocRef(userId);
     // undefinedのフィールドを削除してから保存
     const cleanedData: Record<string, unknown> = removeUndefinedFields<AppData>(data) as unknown as Record<string, unknown>;
-    
+
     // userSettingsの各フィールドを個別に削除処理
     // merge: trueを使ってもundefinedは保存できないため、明示的に削除する必要がある。
     // FieldValue.delete()を使って個別に削除する方法が確実
@@ -307,7 +312,7 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       // 元のdataオブジェクトからuserSettingsの各フィールドを抽出
       const userSettingsUpdate: Record<string, unknown> = {};
       let hasAnyField = false;
-      
+
       // selectedMemberIdが存在する場合は設定、undefinedの場合は削除
       if (data.userSettings.selectedMemberId !== undefined) {
         userSettingsUpdate.selectedMemberId = data.userSettings.selectedMemberId;
@@ -315,7 +320,7 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       } else {
         userSettingsUpdate.selectedMemberId = deleteField();
       }
-      
+
       // selectedManagerIdが存在する場合は設定、undefinedの場合は削除
       if (data.userSettings.selectedManagerId !== undefined) {
         userSettingsUpdate.selectedManagerId = data.userSettings.selectedManagerId;
@@ -323,7 +328,7 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       } else {
         userSettingsUpdate.selectedManagerId = deleteField();
       }
-      
+
       // taskLabelHeaderTextLeftが存在する場合は設定、undefinedの場合は削除
       if (data.userSettings.taskLabelHeaderTextLeft !== undefined) {
         userSettingsUpdate.taskLabelHeaderTextLeft = data.userSettings.taskLabelHeaderTextLeft;
@@ -331,7 +336,7 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       } else {
         userSettingsUpdate.taskLabelHeaderTextLeft = deleteField();
       }
-      
+
       // taskLabelHeaderTextRightが存在する場合は設定、undefinedの場合は削除
       if (data.userSettings.taskLabelHeaderTextRight !== undefined) {
         userSettingsUpdate.taskLabelHeaderTextRight = data.userSettings.taskLabelHeaderTextRight;
@@ -339,13 +344,13 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       } else {
         userSettingsUpdate.taskLabelHeaderTextRight = deleteField();
       }
-      
+
       // roastTimerSettingsが存在する場合は設定
       if (data.userSettings.roastTimerSettings !== undefined) {
         userSettingsUpdate.roastTimerSettings = data.userSettings.roastTimerSettings;
         hasAnyField = true;
       }
-      
+
       // どのフィールドも削除されていない場合はuserSettings全体を削除
       if (!hasAnyField) {
         cleanedData.userSettings = deleteField();
@@ -356,19 +361,19 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
       // userSettingsがundefinedの場合は明示的にフィールドを削除
       cleanedData.userSettings = deleteField();
     }
-    
+
     // shuffleEventの削除処理
     if (data.shuffleEvent === undefined) {
       // shuffleEventがundefinedの場合は明示的にフィールドを削除
       cleanedData.shuffleEvent = deleteField();
     }
-    
+
     // roastTimerStateの削除処理
     if (data.roastTimerState === undefined) {
       // roastTimerStateがundefinedの場合は明示的にフィールドを削除
       cleanedData.roastTimerState = deleteField();
     }
-    
+
     await setDoc(userDocRef, cleanedData, { merge: true });
   } finally {
     // 書き込み完了後にスロットを解放。エラーが発生しても必ず解放する。
@@ -413,12 +418,12 @@ async function executeWrite(userId: string, data: AppData, hasWaitedForQueue = f
       // 書き込み成功時の処理
       queue.isWriting = false;
       queue.retryCount = 0;
-      
+
       // 待機中のPromiseを解決。この書き込みが完了したことを通知する。
       if (currentPromise) {
         currentPromise.resolve();
       }
-      
+
       // 書き込み中に新しいデータが来ていた場合は次の書き込みを実行
       if (queue.pendingData) {
         const nextData = queue.pendingData;
@@ -429,25 +434,25 @@ async function executeWrite(userId: string, data: AppData, hasWaitedForQueue = f
         queue.pendingData = null;
         queue.pendingPromise = null;
       }
-      
+
       return;
     } catch (error: unknown) {
       queue.retryCount++;
-      
+
       // Write stream exhaustedエラーを検出。エラーメッセージから判定する。
       const errorInfo = error as { code?: string; message?: string };
-      const isWriteStreamExhausted = 
+      const isWriteStreamExhausted =
         errorInfo?.code === 'resource-exhausted' ||
-        (errorInfo?.message && typeof errorInfo.message === 'string' && 
-         errorInfo.message.toLowerCase().includes('write stream exhausted'));
-      
+        (errorInfo?.message && typeof errorInfo.message === 'string' &&
+          errorInfo.message.toLowerCase().includes('write stream exhausted'));
+
       if (isWriteStreamExhausted && queue.retryCount <= MAX_RETRY_COUNT) {
         // Write stream exhaustedエラーの場合、指数バックオフで待機時間を設定
         // 指数バックオフ + 待機キューの待機時間を考慮した遅延時間を計算する。
         const baseDelay = RETRY_DELAY * Math.pow(2, queue.retryCount - 1);
         const additionalDelay = writeWaitQueue.length * 300; // 待機中の書き込み数に応じて待機時間を追加
         const delay = Math.min(baseDelay + additionalDelay, 10000); // 最大10秒
-        
+
         console.warn(
           `Firestore write stream exhausted, retrying in ${delay}ms ` +
           `(attempt ${queue.retryCount}/${MAX_RETRY_COUNT}, ` +
@@ -456,11 +461,11 @@ async function executeWrite(userId: string, data: AppData, hasWaitedForQueue = f
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
-      
+
       // その他のエラーまたは最大リトライ回数に達した場合
       queue.isWriting = false;
       console.error('Failed to save data to Firestore:', error);
-      
+
       // 待機中のPromiseを拒否
       if (currentPromise) {
         currentPromise.reject(error);
@@ -484,7 +489,7 @@ export async function saveUserData(userId: string, data: AppData): Promise<void>
   }
 
   const queue = writeQueues.get(userId)!;
-  
+
   // 新しいPromiseを作成
   const promise = new Promise<void>((resolve, reject) => {
     // 既存のPromiseがあれば解決してから新しいPromiseに置き換える
@@ -495,7 +500,7 @@ export async function saveUserData(userId: string, data: AppData): Promise<void>
     }
     queue.pendingPromise = { resolve, reject };
   });
-  
+
   // 最新のデータをキューに保存
   queue.pendingData = data;
 
@@ -528,7 +533,7 @@ export function subscribeUserData(
   callback: (data: AppData) => void
 ): () => void {
   const userDocRef = getUserDocRef(userId);
-  
+
   return onSnapshot(
     userDocRef,
     (snapshot) => {
@@ -559,7 +564,7 @@ export async function getDefectBeanMasterData(): Promise<DefectBean[]> {
     const defectBeansRef = collection(db, 'defectBeans');
     // orderフィールドがない場合もあるため、すべて取得してからソートする
     const querySnapshot = await getDocs(defectBeansRef);
-    
+
     const defectBeans: DefectBean[] = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
@@ -576,7 +581,7 @@ export async function getDefectBeanMasterData(): Promise<DefectBean[]> {
         updatedAt: data.updatedAt || new Date().toISOString(),
       });
     });
-    
+
     // ソートを実行。orderフィールドがあるものは優先、ないものは名前順でソートする。
     defectBeans.sort((a, b) => {
       if (a.order !== undefined && b.order !== undefined) {
@@ -586,7 +591,7 @@ export async function getDefectBeanMasterData(): Promise<DefectBean[]> {
       if (b.order !== undefined) return 1;
       return a.name.localeCompare(b.name, 'ja');
     });
-    
+
     return defectBeans;
   } catch (error) {
     console.error('Failed to get defect bean master data:', error);
@@ -606,17 +611,17 @@ export async function updateDefectBeanMaster(
   try {
     const db = getDb();
     const defectBeanRef = doc(db, 'defectBeans', defectBeanId);
-    
+
     const updateData: Partial<DefectBean> & { updatedAt: string } = {
       ...defectBean,
       updatedAt: new Date().toISOString(),
     };
-    
+
     // id, isMaster, createdAtは更新しない
     delete updateData.id;
     delete updateData.isMaster;
     delete updateData.createdAt;
-    
+
     await updateDoc(defectBeanRef, updateData);
   } catch (error) {
     console.error('Failed to update defect bean master:', error);
@@ -652,18 +657,18 @@ export async function saveDefectBean(
 ): Promise<void> {
   const updatedDefectBeans = [...(appData.defectBeans || [])];
   const existingIndex = updatedDefectBeans.findIndex((db) => db.id === defectBean.id);
-  
+
   if (existingIndex >= 0) {
     updatedDefectBeans[existingIndex] = defectBean;
   } else {
     updatedDefectBeans.push(defectBean);
   }
-  
+
   const updatedData: AppData = {
     ...appData,
     defectBeans: updatedDefectBeans,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -681,12 +686,12 @@ export async function deleteDefectBean(
   const updatedDefectBeans = (appData.defectBeans || []).filter(
     (db) => db.id !== defectBeanId
   );
-  
+
   const updatedData: AppData = {
     ...appData,
     defectBeans: updatedDefectBeans.length > 0 ? updatedDefectBeans : undefined,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -709,12 +714,12 @@ export async function updateDefectBeanSetting(
       shouldRemove,
     },
   };
-  
+
   const updatedData: AppData = {
     ...appData,
     defectBeanSettings: updatedSettings,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -727,14 +732,14 @@ export async function updateDefectBeanSetting(
  */
 export function extractTargetAmount(weight?: string): number | undefined {
   if (!weight) return undefined;
-  
+
   // 正規表現で数値を抽出（小数点を含む、単位はkg、g、個、枚などに対応）
   const match = weight.match(/^(\d+(?:\.\d+)?)\s*(kg|g|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
   if (match && match[1]) {
     const amount = parseFloat(match[1]);
     return isNaN(amount) ? undefined : amount;
   }
-  
+
   return undefined;
 }
 
@@ -745,7 +750,7 @@ export function extractTargetAmount(weight?: string): number | undefined {
  */
 export function extractUnitFromWeight(weight?: string): string {
   if (!weight) return '';
-  
+
   // 正規表現で単位を抽出
   const match = weight.match(/^\d+(?:\.\d+)?\s*(kg|g|個|枚|本|箱|袋|パック|セット|回|時間|分|日|週|月|年)?$/i);
   return match && match[1] ? match[1] : '';
@@ -763,7 +768,7 @@ export async function addWorkProgress(
   appData: AppData
 ): Promise<void> {
   const now = new Date().toISOString();
-  
+
   // targetAmountが明示的にundefinedとして渡されている場合（完成数で管理する場合など）、
   // extractTargetAmountの結果を無視してundefinedを使用
   let targetAmount: number | undefined;
@@ -773,18 +778,18 @@ export async function addWorkProgress(
     // weightフィールドから目標量を抽出
     targetAmount = extractTargetAmount(workProgress.weight);
   }
-  
+
   const newWorkProgress: WorkProgress = {
     ...workProgress,
     id: crypto.randomUUID(),
     createdAt: now,
     updatedAt: now,
     // 進捗状態に応じて日時を設定
-    startedAt: workProgress.status === 'in_progress' || workProgress.status === 'completed' 
-      ? now 
+    startedAt: workProgress.status === 'in_progress' || workProgress.status === 'completed'
+      ? now
       : undefined,
-    completedAt: workProgress.status === 'completed' 
-      ? now 
+    completedAt: workProgress.status === 'completed'
+      ? now
       : undefined,
     // 目標量と現在の進捗量を設定
     targetAmount,
@@ -794,14 +799,14 @@ export async function addWorkProgress(
     // 完成数の初期化（指定されていない場合は0で初期化、またはundefinedのまま）
     completedCount: workProgress.completedCount !== undefined ? workProgress.completedCount : undefined,
   };
-  
+
   const updatedWorkProgresses = [...(appData.workProgresses || []), newWorkProgress];
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -820,14 +825,14 @@ export async function updateWorkProgress(
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
-  
+
   if (existingIndex < 0) {
     throw new Error(`WorkProgress with id ${workProgressId} not found`);
   }
-  
+
   const existing = workProgresses[existingIndex];
   const now = new Date().toISOString();
-  
+
   // weightフィールドが変更された場合、目標量を再計算
   let targetAmount = existing.targetAmount;
   if (updates.weight !== undefined && updates.weight !== existing.weight) {
@@ -840,7 +845,7 @@ export async function updateWorkProgress(
       updates.currentAmount = 0;
     }
   }
-  
+
   // targetAmountが明示的にundefinedとして渡された場合（進捗管理方式の変更など）
   if ('targetAmount' in updates && updates.targetAmount === undefined) {
     targetAmount = undefined;
@@ -848,15 +853,15 @@ export async function updateWorkProgress(
     updates.currentAmount = undefined;
     updates.progressHistory = undefined;
   }
-  
+
   // 進捗状態の変更を検出して日時を適切に設定
   let startedAt = existing.startedAt;
   let completedAt = existing.completedAt;
-  
+
   if (updates.status !== undefined && updates.status !== existing.status) {
     const oldStatus = existing.status;
     const newStatus = updates.status;
-    
+
     if (oldStatus === 'pending' && newStatus === 'in_progress') {
       // pending → in_progress: startedAtを設定
       startedAt = now;
@@ -882,7 +887,7 @@ export async function updateWorkProgress(
       startedAt = undefined;
     }
   }
-  
+
   const updatedWorkProgress: WorkProgress = {
     ...existing,
     ...updates,
@@ -891,15 +896,15 @@ export async function updateWorkProgress(
     completedAt,
     targetAmount: 'targetAmount' in updates ? updates.targetAmount : targetAmount,
   };
-  
+
   const updatedWorkProgresses = [...workProgresses];
   updatedWorkProgresses[existingIndex] = updatedWorkProgress;
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -921,14 +926,14 @@ export async function updateWorkProgresses(
 
   for (const [workProgressId, updateData] of updates.entries()) {
     const existingIndex = updatedWorkProgresses.findIndex((wp) => wp.id === workProgressId);
-    
+
     if (existingIndex < 0) {
       console.warn(`WorkProgress with id ${workProgressId} not found`);
       continue;
     }
 
     const existing = updatedWorkProgresses[existingIndex];
-    
+
     // weightフィールドが変更された場合、目標量を再計算
     let targetAmount = existing.targetAmount;
     if (updateData.weight !== undefined && updateData.weight !== existing.weight) {
@@ -1007,12 +1012,12 @@ export async function deleteWorkProgress(
   const updatedWorkProgresses = (appData.workProgresses || []).filter(
     (wp) => wp.id !== workProgressId
   );
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -1033,14 +1038,14 @@ export async function addCompletedCountToWorkProgress(
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
-  
+
   if (existingIndex < 0) {
     throw new Error(`WorkProgress with id ${workProgressId} not found`);
   }
-  
+
   const existing = workProgresses[existingIndex];
   const now = new Date().toISOString();
-  
+
   // 完成数を累積（マイナスの値も受け付ける）
   const completedCount = Math.max(0, (existing.completedCount || 0) + count);
 
@@ -1076,15 +1081,15 @@ export async function addCompletedCountToWorkProgress(
     startedAt,
     updatedAt: now,
   };
-  
+
   const updatedWorkProgresses = [...workProgresses];
   updatedWorkProgresses[existingIndex] = updatedWorkProgress;
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -1105,23 +1110,23 @@ export async function addProgressToWorkProgress(
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
-  
+
   if (existingIndex < 0) {
     throw new Error(`WorkProgress with id ${workProgressId} not found`);
   }
-  
+
   const existing = workProgresses[existingIndex];
-  
+
   // 目標量が設定されていない場合はエラー
   if (existing.targetAmount === undefined) {
     throw new Error('Target amount is not set');
   }
-  
+
   const now = new Date().toISOString();
-  
+
   // 進捗量を累積（負の値にならないように保護）
   const currentAmount = Math.max(0, (existing.currentAmount || 0) + amount);
-  
+
   // 進捗履歴に新しいエントリを追加
   const newProgressEntry: ProgressEntry = {
     id: crypto.randomUUID(),
@@ -1156,7 +1161,7 @@ export async function addProgressToWorkProgress(
       startedAt = now;
     }
   }
-  
+
   const updatedWorkProgress: WorkProgress = {
     ...existing,
     currentAmount,
@@ -1166,15 +1171,15 @@ export async function addProgressToWorkProgress(
     completedAt,
     updatedAt: now,
   };
-  
+
   const updatedWorkProgresses = [...workProgresses];
   updatedWorkProgresses[existingIndex] = updatedWorkProgress;
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -1191,28 +1196,28 @@ export async function archiveWorkProgress(
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
-  
+
   if (existingIndex < 0) {
     throw new Error(`WorkProgress with id ${workProgressId} not found`);
   }
-  
+
   const existing = workProgresses[existingIndex];
   const now = new Date().toISOString();
-  
+
   const updatedWorkProgress: WorkProgress = {
     ...existing,
     archivedAt: now,
     updatedAt: now,
   };
-  
+
   const updatedWorkProgresses = [...workProgresses];
   updatedWorkProgresses[existingIndex] = updatedWorkProgress;
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -1229,28 +1234,28 @@ export async function unarchiveWorkProgress(
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
-  
+
   if (existingIndex < 0) {
     throw new Error(`WorkProgress with id ${workProgressId} not found`);
   }
-  
+
   const existing = workProgresses[existingIndex];
   const now = new Date().toISOString();
-  
+
   const updatedWorkProgress: WorkProgress = {
     ...existing,
     archivedAt: undefined,
     updatedAt: now,
   };
-  
+
   const updatedWorkProgresses = [...workProgresses];
   updatedWorkProgresses[existingIndex] = updatedWorkProgress;
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -1271,21 +1276,21 @@ export async function updateProgressHistoryEntry(
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
-  
+
   if (existingIndex < 0) {
     throw new Error(`WorkProgress with id ${workProgressId} not found`);
   }
-  
+
   const existing = workProgresses[existingIndex];
   const progressHistory = existing.progressHistory || [];
   const historyEntryIndex = progressHistory.findIndex((entry) => entry.id === historyEntryId);
-  
+
   if (historyEntryIndex < 0) {
     throw new Error(`Progress history entry with id ${historyEntryId} not found`);
   }
-  
+
   const now = new Date().toISOString();
-  
+
   // 履歴エントリを更新
   const updatedHistory = [...progressHistory];
   updatedHistory[historyEntryIndex] = {
@@ -1293,11 +1298,11 @@ export async function updateProgressHistoryEntry(
     ...(updates.amount !== undefined && { amount: updates.amount }),
     ...(updates.memo !== undefined && { memo: updates.memo?.trim() || undefined }),
   };
-  
+
   // progressHistory全体からcurrentAmountまたはcompletedCountを再計算
   let currentAmount: number | undefined;
   let completedCount: number | undefined;
-  
+
   if (existing.targetAmount !== undefined) {
     // 進捗量モード：progressHistoryのamountの合計を計算
     currentAmount = updatedHistory.reduce((sum, entry) => sum + entry.amount, 0);
@@ -1309,12 +1314,12 @@ export async function updateProgressHistoryEntry(
     // 負の値にならないように保護
     completedCount = Math.max(0, completedCount);
   }
-  
+
   // 進捗状態の自動変更
   let status = existing.status;
   let completedAt = existing.completedAt;
   let startedAt = existing.startedAt;
-  
+
   if (existing.targetAmount !== undefined && currentAmount !== undefined) {
     // 進捗量モード
     if (currentAmount === 0 && status !== 'pending') {
@@ -1327,7 +1332,7 @@ export async function updateProgressHistoryEntry(
         startedAt = now;
       }
     }
-    
+
     if (currentAmount >= existing.targetAmount && status !== 'completed') {
       status = 'completed';
       completedAt = now;
@@ -1352,7 +1357,7 @@ export async function updateProgressHistoryEntry(
       }
     }
   }
-  
+
   const updatedWorkProgress: WorkProgress = {
     ...existing,
     currentAmount,
@@ -1363,15 +1368,15 @@ export async function updateProgressHistoryEntry(
     completedAt,
     updatedAt: now,
   };
-  
+
   const updatedWorkProgresses = [...workProgresses];
   updatedWorkProgresses[existingIndex] = updatedWorkProgress;
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }
 
@@ -1390,28 +1395,28 @@ export async function deleteProgressHistoryEntry(
 ): Promise<void> {
   const workProgresses = appData.workProgresses || [];
   const existingIndex = workProgresses.findIndex((wp) => wp.id === workProgressId);
-  
+
   if (existingIndex < 0) {
     throw new Error(`WorkProgress with id ${workProgressId} not found`);
   }
-  
+
   const existing = workProgresses[existingIndex];
   const progressHistory = existing.progressHistory || [];
   const historyEntryIndex = progressHistory.findIndex((entry) => entry.id === historyEntryId);
-  
+
   if (historyEntryIndex < 0) {
     throw new Error(`Progress history entry with id ${historyEntryId} not found`);
   }
-  
+
   const now = new Date().toISOString();
-  
+
   // 履歴エントリを削除
   const updatedHistory = progressHistory.filter((entry) => entry.id !== historyEntryId);
-  
+
   // progressHistory全体からcurrentAmountまたはcompletedCountを再計算
   let currentAmount: number | undefined;
   let completedCount: number | undefined;
-  
+
   if (existing.targetAmount !== undefined) {
     // 進捗量モード：progressHistoryのamountの合計を計算
     currentAmount = updatedHistory.reduce((sum, entry) => sum + entry.amount, 0);
@@ -1423,12 +1428,12 @@ export async function deleteProgressHistoryEntry(
     // 負の値にならないように保護
     completedCount = Math.max(0, completedCount);
   }
-  
+
   // 進捗状態の自動変更
   let status = existing.status;
   let completedAt = existing.completedAt;
   let startedAt = existing.startedAt;
-  
+
   if (existing.targetAmount !== undefined && currentAmount !== undefined) {
     // 進捗量モード
     if (currentAmount === 0 && status !== 'pending') {
@@ -1441,7 +1446,7 @@ export async function deleteProgressHistoryEntry(
         startedAt = now;
       }
     }
-    
+
     if (currentAmount >= existing.targetAmount && status !== 'completed') {
       status = 'completed';
       completedAt = now;
@@ -1466,7 +1471,7 @@ export async function deleteProgressHistoryEntry(
       }
     }
   }
-  
+
   const updatedWorkProgress: WorkProgress = {
     ...existing,
     currentAmount,
@@ -1477,14 +1482,14 @@ export async function deleteProgressHistoryEntry(
     completedAt,
     updatedAt: now,
   };
-  
+
   const updatedWorkProgresses = [...workProgresses];
   updatedWorkProgresses[existingIndex] = updatedWorkProgress;
-  
+
   const updatedData: AppData = {
     ...appData,
     workProgresses: updatedWorkProgresses,
   };
-  
+
   await saveUserData(userId, updatedData);
 }

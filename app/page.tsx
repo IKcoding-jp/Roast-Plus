@@ -70,7 +70,6 @@ const ACTIONS = [
     description: '淹れ方の手順',
     href: '/drip-guide',
     icon: MdCoffeeMaker,
-    badge: '新レシピ登場！',
   },
   {
     key: 'handpick-timer',

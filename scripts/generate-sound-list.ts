@@ -78,11 +78,9 @@ async function generateSoundFilesConstant() {
   const outputFile = join(process.cwd(), 'lib', 'soundFiles.ts');
   
   // 各フォルダから音声ファイル一覧を取得
-  const [alarmFiles, roastTimerFiles, startFiles, completeFiles] = await Promise.all([
+  const [alarmFiles, roastTimerFiles] = await Promise.all([
     getSoundFilesFromDirectory(join(baseDir, 'alarm'), '/sounds/alarm'),
     getSoundFilesFromDirectory(join(baseDir, 'roasttimer'), '/sounds/roasttimer'),
-    getSoundFilesFromDirectory(join(baseDir, 'handpicktimer', 'start'), '/sounds/handpicktimer/start'),
-    getSoundFilesFromDirectory(join(baseDir, 'handpicktimer', 'complete'), '/sounds/handpicktimer/complete'),
   ]);
   
   // TypeScript の定数ファイルを生成
@@ -100,10 +98,6 @@ export interface SoundFile {
 export const alarmSoundFiles: SoundFile[] = ${JSON.stringify(alarmFiles, null, 2)};
 
 export const roastTimerSoundFiles: SoundFile[] = ${JSON.stringify(roastTimerFiles, null, 2)};
-
-export const handpickStartSoundFiles: SoundFile[] = ${JSON.stringify(startFiles, null, 2)};
-
-export const handpickCompleteSoundFiles: SoundFile[] = ${JSON.stringify(completeFiles, null, 2)};
 `;
   
   await writeFile(outputFile, tsContent, 'utf-8');
@@ -111,8 +105,6 @@ export const handpickCompleteSoundFiles: SoundFile[] = ${JSON.stringify(complete
   console.log(`Generated sound files constant: ${outputFile}`);
   console.log(`Alarm files: ${alarmFiles.length}`);
   console.log(`Roast timer files: ${roastTimerFiles.length}`);
-  console.log(`Handpick start files: ${startFiles.length}`);
-  console.log(`Handpick complete files: ${completeFiles.length}`);
   console.log('All sound files constant generated successfully');
 }
 

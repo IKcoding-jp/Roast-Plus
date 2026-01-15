@@ -5,8 +5,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaCoffee, FaUsers } from 'react-icons/fa';
-import { IoSettings, IoTimer, IoSparkles, IoNewspaper } from 'react-icons/io5';
-import { MdAddCircle, MdCoffeeMaker, MdTimer, MdTimeline } from 'react-icons/md';
+import { IoSettings, IoSparkles, IoNewspaper } from 'react-icons/io5';
+import { MdCoffeeMaker, MdTimer, MdTimeline } from 'react-icons/md';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
 import { Loading } from '@/components/Loading';
@@ -70,20 +70,6 @@ const ACTIONS = [
     description: '淹れ方の手順',
     href: '/drip-guide',
     icon: MdCoffeeMaker,
-  },
-  {
-    key: 'handpick-timer',
-    title: 'ハンドピックタイマー',
-    description: '効率よくハンドピック',
-    href: '/handpick-timer',
-    icon: IoTimer,
-  },
-  {
-    key: 'counter',
-    title: 'カウンター',
-    description: '数え間違い防止',
-    href: '/counter',
-    icon: MdAddCircle,
   },
   {
     key: 'coffee-trivia',
@@ -344,8 +330,6 @@ export default function HomePage(_props: HomePageProps = {}) {
               'defect-beans': GiGingerbreadMan,
               progress: FaSnowflake,
               'drip-guide': GiCandyCanes,
-              'handpick-timer': FaHollyBerry,
-              counter: BsStars,
               'coffee-trivia': FaStar,
               changelog: FaSnowflake,
               settings: IoSettings,

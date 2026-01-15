@@ -1,11 +1,10 @@
-import type { HandpickTimerSettings, RoastTimerSettings, RoastTimerState } from '@/types';
+import type { RoastTimerSettings, RoastTimerState } from '@/types';
 
 // ローカルストレージ管理
 
 const SELECTED_MEMBER_ID_KEY = 'roastplus_selected_member_id';
 const ROAST_TIMER_STATE_KEY = 'roastplus_roast_timer_state';
 const ROAST_TIMER_SETTINGS_KEY = 'roastplus_roast_timer_settings';
-const HANDPICK_TIMER_SETTINGS_KEY = 'roastplus_handpick_timer_settings';
 const DEVICE_ID_KEY = 'roastplus_device_id';
 const LAST_46_TASTE_KEY = 'roastplus_last_46_taste';
 const LAST_46_STRENGTH_KEY = 'roastplus_last_46_strength';
@@ -89,31 +88,6 @@ export function getRoastTimerSettings(): RoastTimerSettings | null {
   if (!stored) return null;
   
   return parseJson<RoastTimerSettings>(stored);
-}
-
-/**
- * ハンドピックタイマー設定を保存
- */
-export function setHandpickTimerSettings(settings: HandpickTimerSettings | null | undefined): void {
-  if (typeof window === 'undefined') return;
-  
-  if (settings === null || settings === undefined) {
-    localStorage.removeItem(HANDPICK_TIMER_SETTINGS_KEY);
-  } else {
-    localStorage.setItem(HANDPICK_TIMER_SETTINGS_KEY, JSON.stringify(settings));
-  }
-}
-
-/**
- * ハンドピックタイマー設定を取得
- */
-export function getHandpickTimerSettings(): HandpickTimerSettings | null {
-  if (typeof window === 'undefined') return null;
-  
-  const stored = localStorage.getItem(HANDPICK_TIMER_SETTINGS_KEY);
-  if (!stored) return null;
-  
-  return parseJson<HandpickTimerSettings>(stored);
 }
 
 /**

@@ -130,18 +130,6 @@ export interface RoastTimerSettings {
   notificationSoundVolume: number;
 }
 
-export interface HandpickTimerSettings {
-  soundEnabled: boolean;
-  soundFile?: string;
-  soundVolume?: number;
-  startSoundEnabled: boolean;
-  startSoundFile: string;
-  startSoundVolume: number;
-  completeSoundEnabled: boolean;
-  completeSoundFile: string;
-  completeSoundVolume: number;
-}
-
 export interface UserSettings {
   selectedMemberId?: string; // 試飲記録用メンバー
   selectedManagerId?: string; // チェイス利用設定用
@@ -244,7 +232,6 @@ export interface AppData {
   defectBeans?: DefectBean[];
   defectBeanSettings?: DefectBeanSettings;
   workProgresses: WorkProgress[];
-  counterRecords: CounterRecord[];
   dripRecipes?: DripRecipe[];
 }
 
@@ -313,12 +300,3 @@ export interface WorkProgress {
   archivedAt?: string; // アーカイブ日時（ISO 8601形式、アーカイブしたときに記録）
 }
 
-export interface CounterRecord {
-  id: string;
-  name: string;
-  value: number;
-  createdAt: string; // ISO 8601
-  checked: boolean;
-  type?: 'manual' | 'sum' | 'diff';
-  sources?: { name: string; value: number }[];
-}

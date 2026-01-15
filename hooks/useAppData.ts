@@ -74,7 +74,6 @@ const INITIAL_APP_DATA: AppData = {
   encouragementCount: 0,
   roastTimerRecords: [],
   workProgresses: [],
-  counterRecords: [],
   dripRecipes: [],
 };
 
@@ -232,7 +231,6 @@ export function useAppData() {
           ? newData.defectBeanSettings
           : currentData.defectBeanSettings,
         workProgresses: Array.isArray(newData.workProgresses) ? newData.workProgresses : currentData.workProgresses,
-        counterRecords: Array.isArray(newData.counterRecords) ? newData.counterRecords : currentData.counterRecords,
         dripRecipes: hasOwn(newData, 'dripRecipes')
           ? (Array.isArray(newData.dripRecipes) ? newData.dripRecipes : currentData.dripRecipes)
           : currentData.dripRecipes,

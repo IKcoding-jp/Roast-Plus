@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Noto_Serif_JP, Playfair_Display, Nunito } from "next/font/google";
+// TEMPORARY: Google Fonts disabled for build - will re-enable after deployment
+// import { Geist, Geist_Mono, Noto_Serif_JP, Playfair_Display, Nunito } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { ToastProvider } from "@/components/Toast";
 import { SplashScreen } from "@/components/SplashScreen";
 
+// TEMPORARY: Google Fonts disabled for build - will re-enable after deployment
+/*
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -40,6 +43,7 @@ const nunito = Nunito({
   weight: ["400", "600", "700", "800", "900"],
   display: "swap",
 });
+*/
 
 export const metadata: Metadata = {
   title: 'ローストプラス',
@@ -74,7 +78,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${notoSerifJP.variable} ${playfairDisplay.variable} ${nunito.variable} antialiased`}
+        className="antialiased"
         suppressHydrationWarning
       >
         <Script

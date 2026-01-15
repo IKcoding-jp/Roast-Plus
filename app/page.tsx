@@ -5,7 +5,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaCoffee, FaUsers } from 'react-icons/fa';
-import { IoSettings, IoSparkles, IoNewspaper } from 'react-icons/io5';
+import { IoSettings, IoSparkles } from 'react-icons/io5';
+import { RiLightbulbFlashFill } from 'react-icons/ri';
 import { MdCoffeeMaker, MdTimer, MdTimeline } from 'react-icons/md';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
@@ -79,11 +80,11 @@ const ACTIONS = [
     icon: IoSparkles,
   },
   {
-    key: 'changelog',
-    title: '更新履歴・開発秘話',
-    description: 'アプリの進化を追う',
-    href: '/changelog',
-    icon: IoNewspaper,
+    key: 'dev-stories',
+    title: '開発秘話',
+    description: '開発の裏話を覗く',
+    href: '/dev-stories',
+    icon: RiLightbulbFlashFill,
   },
   {
     key: 'settings',
@@ -331,7 +332,7 @@ export default function HomePage(_props: HomePageProps = {}) {
               progress: FaSnowflake,
               'drip-guide': GiCandyCanes,
               'coffee-trivia': FaStar,
-              changelog: FaSnowflake,
+              'dev-stories': FaSnowflake,
               settings: IoSettings,
             };
             const Icon = isChristmasMode ? (ChristmasIcons[key] || DefaultIcon) : DefaultIcon;

@@ -8,7 +8,10 @@ import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
 import { HiArrowLeft } from 'react-icons/hi';
+import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
+import { VersionHistory } from '@/components/settings/VersionHistory';
+import { VERSION_HISTORY } from '@/data/dev-stories/version-history';
 
 export default function SettingsPage() {
     const { user, loading: authLoading } = useAuth();
@@ -167,6 +170,15 @@ export default function SettingsPage() {
                                 </div>
                             )}
                         </div>
+                    </div>
+
+                    {/* 更新履歴セクション */}
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <MdHistory className="h-5 w-5 text-gray-600" />
+                            更新履歴
+                        </h2>
+                        <VersionHistory entries={VERSION_HISTORY} maxDisplay={5} />
                     </div>
                 </main>
 

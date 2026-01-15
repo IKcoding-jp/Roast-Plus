@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Skill(roastplus-ui)",
+      "mcp__ide__getDiagnostics"
+    ]
+  }
+}

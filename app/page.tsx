@@ -5,7 +5,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaCoffee, FaUsers } from 'react-icons/fa';
-import { IoSettings, IoTimer } from 'react-icons/io5';
+import { IoSettings, IoTimer, IoSparkles, IoNewspaper } from 'react-icons/io5';
 import { MdAddCircle, MdCoffeeMaker, MdTimer, MdTimeline } from 'react-icons/md';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
@@ -70,7 +70,6 @@ const ACTIONS = [
     description: '淹れ方の手順',
     href: '/drip-guide',
     icon: MdCoffeeMaker,
-    badge: '新レシピ登場！',
   },
   {
     key: 'handpick-timer',
@@ -85,6 +84,20 @@ const ACTIONS = [
     description: '数え間違い防止',
     href: '/counter',
     icon: MdAddCircle,
+  },
+  {
+    key: 'coffee-trivia',
+    title: 'コーヒー雑学・クイズ',
+    description: '楽しく学ぶコーヒー知識',
+    href: '/coffee-trivia',
+    icon: IoSparkles,
+  },
+  {
+    key: 'changelog',
+    title: '更新履歴・開発秘話',
+    description: 'アプリの進化を追う',
+    href: '/changelog',
+    icon: IoNewspaper,
   },
   {
     key: 'settings',
@@ -333,6 +346,8 @@ export default function HomePage(_props: HomePageProps = {}) {
               'drip-guide': GiCandyCanes,
               'handpick-timer': FaHollyBerry,
               counter: BsStars,
+              'coffee-trivia': FaStar,
+              changelog: FaSnowflake,
               settings: IoSettings,
             };
             const Icon = isChristmasMode ? (ChristmasIcons[key] || DefaultIcon) : DefaultIcon;

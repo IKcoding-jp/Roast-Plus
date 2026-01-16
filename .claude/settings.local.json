@@ -3,7 +3,11 @@
     "allow": [
       "Bash(dir:*)",
       "Skill(roastplus-ui)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(npm run dev:*)",
+      "WebSearch"
     ]
   }
 }

@@ -116,11 +116,6 @@ export function TastingSessionCarousel({
                   className="block h-full group"
                 >
                   <div className="bg-white rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-amber-900/5 transition-all duration-500 flex flex-col h-full min-h-[600px] sm:min-h-0 border border-stone-100 overflow-hidden relative">
-                    {/* 装飾的な背景要素 */}
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none group-hover:scale-110 transition-transform duration-700">
-                      <Coffee size={120} weight="fill" />
-                    </div>
-
                     {/* ヘッダー部分 */}
                     <div className="p-6 pb-0 flex-shrink-0 z-10">
                       <div className="space-y-3">

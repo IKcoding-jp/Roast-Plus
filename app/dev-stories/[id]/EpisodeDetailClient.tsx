@@ -120,17 +120,6 @@ export default function EpisodeDetailClient({ id }: EpisodeDetailClientProps) {
                 {/* 日付 */}
                 <div className="text-sm text-gray-400 mb-4">{formatDate(episode.publishedAt)}</div>
 
-                {/* エピソード画像 */}
-                {episode.imageUrl && (
-                    <div className="mb-6 rounded-xl overflow-hidden shadow-sm">
-                        <img
-                            src={episode.imageUrl}
-                            alt={episode.title}
-                            className="w-full h-auto object-cover"
-                        />
-                    </div>
-                )}
-
                 {/* 対話セクション */}
                 <div className="mb-6">
                     <DialogueSection dialogues={episode.dialogues} />

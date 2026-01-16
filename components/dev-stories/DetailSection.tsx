@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 
 interface DetailSectionProps {
   content: string;
@@ -11,8 +12,8 @@ export const DetailSection: React.FC<DetailSectionProps> = ({ content, tags }) =
   return (
     <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
       {/* 詳細説明 */}
-      <div className="prose prose-sm max-w-none">
-        <p className="text-gray-700 whitespace-pre-line leading-relaxed">{content}</p>
+      <div className="max-w-none">
+        <MarkdownRenderer content={content} />
       </div>
 
       {/* タグ */}

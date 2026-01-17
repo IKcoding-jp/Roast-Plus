@@ -85,6 +85,7 @@ const ACTIONS = [
     description: '開発の裏話を覗く',
     href: '/dev-stories',
     icon: RiLightbulbFlashFill,
+    badge: 'NEW',
   },
   {
     key: 'settings',

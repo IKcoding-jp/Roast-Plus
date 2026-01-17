@@ -234,7 +234,8 @@ export const DEV_STORY_EPISODES: DevStoryEpisode[] = [
   {
     id: 'episode-003',
     title: 'ローストプラスは一度作り直している',
-    imageUrl: '/dev-stories/roast_plus_origin.png',
+    subtitle: 'FlutterからNext.jsへの技術移行',
+    imageUrl: '/dev-stories/flutter_to_nextjs.png',
     dialogues: [
       {
         id: 'msg-003-1',

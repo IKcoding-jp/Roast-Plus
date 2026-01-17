@@ -14,7 +14,8 @@
       "mcp__serena__activate_project",
       "mcp__serena__read_file",
       "Bash(npx tsc:*)",
-      "mcp__serena__find_file"
+      "mcp__serena__find_file",
+      "mcp__serena__search_for_pattern"
     ]
   }
 }

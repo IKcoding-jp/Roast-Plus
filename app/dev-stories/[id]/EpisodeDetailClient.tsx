@@ -122,7 +122,7 @@ export default function EpisodeDetailClient({ id }: EpisodeDetailClientProps) {
 
                 {/* 対話セクション */}
                 <div className="mb-6">
-                    <DialogueSection dialogues={episode.dialogues} />
+                    <DialogueSection dialogues={episode.dialogues} episodeId={episode.id} />
                 </div>
 
                 {/* 詳細説明セクション */}

@@ -18,18 +18,22 @@ export const DialogueBubble: React.FC<DialogueBubbleProps> = ({
   const isLeft = character.position === 'left';
 
   return (
-    <div className={`flex items-start gap-3 ${isLeft ? '' : 'flex-row-reverse'}`}>
-      {showAvatar && (
-        <CharacterAvatar characterId={character.id} size="md" />
-      )}
+    <div
+      className={`flex items-start gap-3 ${isLeft ? '' : 'flex-row-reverse'}`}
+    >
+      {showAvatar && <CharacterAvatar characterId={character.id} size="md" />}
       <div
         className={`max-w-[70%] rounded-2xl px-4 py-3 shadow-sm mt-2 ${
-          isLeft
-            ? 'rounded-tl-sm bg-amber-100 text-amber-900'
-            : 'rounded-tr-sm bg-gray-200 text-gray-800'
+          isLeft ? 'rounded-tl-sm' : 'rounded-tr-sm'
         }`}
+        style={{
+          backgroundColor: character.bubbleColor,
+          color: character.textColor,
+        }}
       >
-        <p className="whitespace-pre-line text-sm leading-relaxed">{message.content}</p>
+        <p className="whitespace-pre-line text-sm leading-relaxed">
+          {message.content}
+        </p>
       </div>
     </div>
   );

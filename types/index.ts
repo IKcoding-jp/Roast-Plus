@@ -323,7 +323,40 @@ export interface ChangelogEntry {
 // ========================================
 
 // キャラクターID
-export type CharacterId = 'asairi' | 'fukairi';
+export type CharacterId =
+  | 'asairi'
+  | 'fukairi'
+  | 'dori'
+  | 'server'
+  | 'mill'
+  | 'kettle'
+  | 'press'
+  | 'siphon';
+
+// エピソードIDとキャラクターペアのマッピング
+export type EpisodeCharacterPair = {
+  left: CharacterId;
+  right: CharacterId;
+};
+
+// キャラクターペア情報
+export interface CharacterPairInfo {
+  left: {
+    id: CharacterId;
+    name: string;
+    emoji: string;
+    subtitle: string;
+    description: string;
+  };
+  right: {
+    id: CharacterId;
+    name: string;
+    emoji: string;
+    subtitle: string;
+    description: string;
+  };
+  relationship: string;
+}
 
 // キャラクター設定
 export interface Character {

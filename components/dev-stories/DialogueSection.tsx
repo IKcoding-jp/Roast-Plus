@@ -2,52 +2,76 @@
 
 import React from 'react';
 import type { DialogueMessage } from '@/types';
-import { CHARACTERS } from '@/data/dev-stories/characters';
+import {
+  CHARACTERS,
+  getCharacterPairByEpisodeId,
+} from '@/data/dev-stories/characters';
 import { DialogueBubble } from './DialogueBubble';
 import { CharacterAvatar } from './CharacterAvatar';
 
 interface DialogueSectionProps {
   dialogues: DialogueMessage[];
+  episodeId: string;
 }
 
-export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogues }) => {
+export const DialogueSection: React.FC<DialogueSectionProps> = ({
+  dialogues,
+  episodeId,
+}) => {
+  const characterPair = getCharacterPairByEpisodeId(episodeId);
+
+  // フォールバック: ペアが見つからない場合はepisode-001のペアを使用
+  const pair = characterPair || getCharacterPairByEpisodeId('episode-001')!;
+
   return (
     <div className="bg-gradient-to-b from-amber-50 to-orange-50/50 rounded-2xl p-4 sm:p-6">
       {/* キャラクター紹介 */}
       <div className="mb-8">
         {/* 二人のキャラクター */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          {/* アサイリ */}
+          {/* 左側キャラクター */}
           <div className="bg-white/60 rounded-xl p-4 text-center">
             <div className="flex justify-center mb-3">
-              <CharacterAvatar characterId="asairi" size="lg" />
+              <CharacterAvatar characterId={pair.left.id} size="lg" />
             </div>
-            <h3 className="font-bold text-gray-800 mb-1">🌰 アサイリ</h3>
-            <p className="text-xs text-amber-700 font-medium mb-2">やさしくて世話焼き、でも芯がある人</p>
+            <h3 className="font-bold text-gray-800 mb-1">
+              {pair.left.emoji} {pair.left.name}
+            </h3>
+            <p
+              className="text-xs font-medium mb-2"
+              style={{ color: CHARACTERS[pair.left.id].textColor }}
+            >
+              {pair.left.subtitle}
+            </p>
             <p className="text-xs text-gray-500 leading-relaxed">
-              いつも周りを気にかけて「大丈夫？」って自然に声をかけるタイプ。フカイリの危なっかしさを放っておけない、安心感のかたまり。
+              {pair.left.description}
             </p>
           </div>
 
-          {/* フカイリ */}
+          {/* 右側キャラクター */}
           <div className="bg-white/60 rounded-xl p-4 text-center">
             <div className="flex justify-center mb-3">
-              <CharacterAvatar characterId="fukairi" size="lg" />
+              <CharacterAvatar characterId={pair.right.id} size="lg" />
             </div>
-            <h3 className="font-bold text-gray-800 mb-1">🕶️ フカイリ</h3>
-            <p className="text-xs text-gray-600 font-medium mb-2">クール気取りの不器用な努力家</p>
+            <h3 className="font-bold text-gray-800 mb-1">
+              {pair.right.emoji} {pair.right.name}
+            </h3>
+            <p
+              className="text-xs font-medium mb-2"
+              style={{ color: CHARACTERS[pair.right.id].textColor }}
+            >
+              {pair.right.subtitle}
+            </p>
             <p className="text-xs text-gray-500 leading-relaxed">
-              無口で皮肉っぽいけど、内心はめちゃくちゃ真面目。実はアサイリをすごく信頼してる、情に厚い仲間想い。
+              {pair.right.description}
             </p>
           </div>
         </div>
 
         {/* 二人の関係性 */}
         <div className="bg-white/40 rounded-xl p-4 text-center">
-          <p className="text-xs text-gray-600 leading-relaxed">
-            <span className="font-medium text-gray-700">🤝 幼なじみの相棒タイプ</span><br />
-            言葉が少なくても通じ合う二人。アサイリが日常担当、フカイリが裏方・決断担当。<br />
-            どちらかが欠けると成立しない、自然体の信頼関係。
+          <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-line">
+            {pair.relationship}
           </p>
         </div>
       </div>
@@ -58,7 +82,8 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogues }) =
           const character = CHARACTERS[message.characterId];
           // 連続した同じキャラクターのメッセージではアバターを非表示
           const prevMessage = index > 0 ? dialogues[index - 1] : null;
-          const showAvatar = !prevMessage || prevMessage.characterId !== message.characterId;
+          const showAvatar =
+            !prevMessage || prevMessage.characterId !== message.characterId;
 
           return (
             <DialogueBubble

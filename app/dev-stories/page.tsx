@@ -62,11 +62,34 @@ export default function DevStoriesPage() {
             >
               <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
             </Link>
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-800">開発秘話</h1>
               <p className="text-gray-500 text-sm mt-1 hidden sm:block">
                 アサイリとフカイリが、ローストプラスの開発を語ります。
               </p>
+            </div>
+            {/* キャラクター画像 */}
+            <div className="hidden sm:flex items-center gap-1">
+              <img
+                src="/avatars/header_characters.png"
+                alt="フカイリとアサイリ"
+                className="h-12 w-auto object-contain animate-wobble-left"
+              />
+              <img
+                src="/avatars/header_dori_server.png"
+                alt="ドリとサーバ"
+                className="h-12 w-auto object-contain animate-wobble-right"
+              />
+              <img
+                src="/avatars/header_mill_kettle.png"
+                alt="ミルとケトル"
+                className="h-12 w-auto object-contain animate-wobble-left"
+              />
+              <img
+                src="/avatars/header_press_siphon.png"
+                alt="プレスとサイフォン"
+                className="h-12 w-auto object-contain animate-wobble-right"
+              />
             </div>
           </div>
         </header>

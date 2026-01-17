@@ -13,7 +13,8 @@
       "mcp__serena__list_dir",
       "mcp__serena__activate_project",
       "mcp__serena__read_file",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "mcp__serena__find_file"
     ]
   }
 }

@@ -239,177 +239,177 @@ export const DEV_STORY_EPISODES: DevStoryEpisode[] = [
     dialogues: [
       {
         id: 'msg-003-1',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'ローストプラスって、最初はFlutterで作ってたんだろ？',
       },
       {
         id: 'msg-003-2',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'そうなんだ。Flutterっていうのは、1つのコードでiPhoneとAndroid両方のアプリが作れるフレームワーク（開発ツール）なんだよね。',
       },
       {
         id: 'msg-003-3',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: '便利じゃん！でも今はFlutterじゃないんだろ？何があった？',
       },
       {
         id: 'msg-003-4',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: '実は本番環境で大きな問題が起きてね...\nログインがうまくいかなくなったっていうわけ。',
       },
       {
         id: 'msg-003-5',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'ログインできなくなった？それヤバいじゃん！',
       },
       {
         id: 'msg-003-6',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'そうなんだ。開発中のテスト環境では動いてたのに、実際にユーザーが使う本番環境では動かなくなっちゃって...',
       },
       {
         id: 'msg-003-7',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: '原因はわかったのか？',
       },
       {
         id: 'msg-003-8',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: '正直、完全には特定できなかったんだ。\n何度も修正を試みたけど、直してもまた別の問題が出てきてね...',
       },
       {
         id: 'msg-003-9',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'もぐらたたき状態か。それは厄介だな。',
       },
       {
         id: 'msg-003-10',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'まさにそう！\nFlutterとFirebase（データを保存するサービス）の認証の組み合わせが複雑で、どこで問題が起きてるか追跡しづらかったんだ。',
       },
       {
         id: 'msg-003-11',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'で、作り直す決断をしたわけだ？',
       },
       {
         id: 'msg-003-12',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'そうなんだ。修正し続けるより、最初から作り直した方が早いし確実だと判断したっていうわけ。\n苦渋の決断だったけどね。',
       },
       {
         id: 'msg-003-13',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: '新しく選んだNext.jsってのは何だ？',
       },
       {
         id: 'msg-003-14',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'Next.jsは、ウェブアプリを作るためのフレームワークなんだ。\nReact（リアクト）っていう有名な技術をベースにしてるんだよ。',
       },
       {
         id: 'msg-003-15',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'なんでFlutterじゃなくてNext.jsにしたんだ？',
       },
       {
         id: 'msg-003-16',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'いくつか理由があるんだ。\nまず、ウェブ技術の方が情報が多くて、問題が起きても解決しやすいっていうわけ。',
       },
       {
         id: 'msg-003-17',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'それと、Flutterはアプリストアからダウンロードが必要だけど、ウェブアプリならURLにアクセスするだけで使えるんだ。',
       },
       {
         id: 'msg-003-18',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'アプリダウンロード不要ってのはいいな！手軽だ。',
       },
       {
         id: 'msg-003-19',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'それにね、Next.jsとFirebaseの組み合わせは認証の仕組みがシンプルで、トラブルが起きにくいんだよ。',
       },
       {
         id: 'msg-003-20',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: '他にも選択肢はあったのか？',
       },
       {
         id: 'msg-003-21',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'もちろん！React Native（リアクトネイティブ）とか、Flutter Webとか色々検討したんだ。\nでも、ローストプラスの使い方を考えると、ウェブアプリが一番合ってたっていうわけ。',
       },
       {
         id: 'msg-003-22',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'ユーザーにとって何が変わった？',
       },
       {
         id: 'msg-003-23',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'まず、ログインが安定したんだ！\n以前みたいに「あれ、ログインできない...」っていうストレスがなくなったっていうわけ。',
       },
       {
         id: 'msg-003-24',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'それは重要だな！他には？',
       },
       {
         id: 'msg-003-25',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'ページの読み込みも速くなったんだ。\nNext.jsは表示速度の最適化が得意なフレームワークなんだよ。',
       },
       {
         id: 'msg-003-26',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'でも作り直すのは大変だっただろ？',
       },
       {
         id: 'msg-003-27',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: '正直、かなり大変だったんだ。\n一からデザインを考え直して、機能も全部実装し直したからね。',
       },
       {
         id: 'msg-003-28',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'でも、バイブコーディングのおかげで思ったより早く形になったんだ。\nAIと一緒に開発できる時代でよかったよ。',
       },
       {
         id: 'msg-003-29',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: 'この失敗から学んだことは何だ？',
       },
       {
         id: 'msg-003-30',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'たくさんあるんだ。\nまず、本番環境でのテストをもっと早い段階でやるべきだったっていうこと。',
       },
       {
         id: 'msg-003-31',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'それと、技術選定は「作りやすさ」だけじゃなく「問題が起きたときの対処しやすさ」も大事だって学んだんだ。',
       },
       {
         id: 'msg-003-32',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: '失敗を次に活かしてるじゃん。それが大事だ。',
       },
       {
         id: 'msg-003-33',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'ユーザーの皆さんには迷惑をかけてしまって申し訳なかったけど、結果的により良いアプリになったと思うんだ。',
       },
       {
         id: 'msg-003-34',
-        characterId: 'mill',
+        characterId: 'kettle',
         content: '素直に失敗認めて改善する。それができてるなら問題ないだろ。',
       },
       {
         id: 'msg-003-35',
-        characterId: 'kettle',
+        characterId: 'mill',
         content: 'ありがとう。これからも安定して使えるアプリを目指して頑張るよ！\n使ってくれるみんなに感謝なんだ。',
       },
     ],
@@ -538,7 +538,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-3',
         characterId: 'press',
-        content: '3年でそんなに変わるってこと？',
+        content: '3年でそこまで変わるのか。テクノロジーって速いな。',
       },
       {
         id: 'msg-004-4',
@@ -569,7 +569,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-9',
         characterId: 'press',
-        content: 'あ、それで「AI」が流行語になったやつでしょ？',
+        content: 'あ、それで「AI」が一気に流行語になったわけか。納得。',
       },
       {
         id: 'msg-004-10',
@@ -579,7 +579,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-11',
         characterId: 'press',
-        content: 'Google製ってことは検索に強いってこと？',
+        content: 'Google製か。検索と連携できるのは強力だな。',
       },
       {
         id: 'msg-004-12',
@@ -589,7 +589,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-13',
         characterId: 'press',
-        content: 'このアプリもAIで作られてるんでしょ？',
+        content: 'なるほど、このアプリもそのClaudeで作られてるわけか。',
       },
       {
         id: 'msg-004-14',
@@ -599,7 +599,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-15',
         characterId: 'press',
-        content: '普通の人が使う分には、要するにどれも同じってこと？',
+        content: '使い分けか。でも普通の人にとっては、どれも似たようなものに見えるだろうな。',
       },
       // AIエージェントの登場（23メッセージ）
       {
@@ -620,7 +620,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-19',
         characterId: 'press',
-        content: '普通の会話みたいなやつでしょ？',
+        content: 'ああ、普通の会話みたいなやつな。今も基本はそれだよな。',
       },
       {
         id: 'msg-004-20',
@@ -630,7 +630,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-21',
         characterId: 'press',
-        content: 'それは面倒でしょ。',
+        content: 'それは確かに面倒だ。効率悪いな。',
       },
       {
         id: 'msg-004-22',
@@ -640,7 +640,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-23',
         characterId: 'press',
-        content: 'で、何が変わったの？',
+        content: '2025年か。で、何がどう変わったんだ？',
       },
       {
         id: 'msg-004-24',
@@ -650,7 +650,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-25',
         characterId: 'press',
-        content: '自分でやっちゃうってこと？じゃあ人間いらないでしょ？',
+        content: 'マジか、全部自動でやるのか。それは革命的だな。',
       },
       {
         id: 'msg-004-26',
@@ -680,7 +680,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-31',
         characterId: 'press',
-        content: 'エディタって要するに何？',
+        content: 'エディタってのは、要するにプログラムを書くためのソフトってことか。',
       },
       {
         id: 'msg-004-32',
@@ -690,7 +690,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-33',
         characterId: 'press',
-        content: '他のは？',
+        content: '一緒に開発できるのはいいな。他のツールは？',
       },
       {
         id: 'msg-004-34',
@@ -700,7 +700,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-35',
         characterId: 'press',
-        content: '黒い画面ってハッカーっぽいやつでしょ？',
+        content: '黒い画面か。ハッカーっぽくてかっこいいな。',
       },
       {
         id: 'msg-004-36',
@@ -721,7 +721,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-39',
         characterId: 'press',
-        content: 'これからAIはもっとすごくなるってこと？',
+        content: 'ここまで聞くと、これからもっとすごくなりそうだな。',
       },
       {
         id: 'msg-004-40',
@@ -741,7 +741,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-43',
         characterId: 'press',
-        content: '何でもできるAIってこと？それはすごいでしょ。',
+        content: '何でもできるAIか。それが実現したらマジですごいな。',
       },
       {
         id: 'msg-004-44',
@@ -751,7 +751,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-45',
         characterId: 'press',
-        content: '指数関数的って要するにどういうこと？',
+        content: '指数関数的か。要するに加速し続けるってことだな。',
       },
       {
         id: 'msg-004-46',
@@ -761,7 +761,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-47',
         characterId: 'press',
-        content: 'もっと速くなるってこと？',
+        content: '次の3年でもっと変わるのか。想像つかないな。',
       },
       {
         id: 'msg-004-48',
@@ -771,7 +771,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-49',
         characterId: 'press',
-        content: 'AIがAIを改良するってこと？SF映画じゃん。',
+        content: 'AIがAIを改良するって、まさにSF映画の世界だな。',
       },
       {
         id: 'msg-004-50',
@@ -781,7 +781,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-51',
         characterId: 'press',
-        content: 'シンギュラリティって聞いたことある。いつ来るの？',
+        content: 'シンギュラリティか、聞いたことあるな。2045年とか言われてたやつ。',
       },
       {
         id: 'msg-004-52',
@@ -801,7 +801,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-55',
         characterId: 'press',
-        content: '要するにAIと人間のコラボってことでしょ？',
+        content: '要するにAIと人間のコラボか。それなら納得だ。',
       },
       {
         id: 'msg-004-56',
@@ -817,7 +817,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
       {
         id: 'msg-004-58',
         characterId: 'press',
-        content: 'すごい時代に生きてるってことでしょ！ワクワクする！',
+        content: 'すごい時代に生きてるってことだな。これは楽しみだ！',
       },
     ],
     detailContent: `AIは2022年から2025年の3年間で劇的に進化しました。この記事では、主要なAIの特徴からAIエージェントの登場、そして今後の展望までを解説します。

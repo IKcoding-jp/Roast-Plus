@@ -5,12 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HiArrowLeft, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { RiLightbulbFlashFill } from 'react-icons/ri';
-import { MdConstruction } from 'react-icons/md';
 import { DialogueSection } from '@/components/dev-stories/DialogueSection';
 import { DetailSection } from '@/components/dev-stories/DetailSection';
 import { getEpisodeById, getSortedEpisodes } from '@/data/dev-stories/episodes';
-import { useDeveloperMode } from '@/hooks/useDeveloperMode';
-import { Loading } from '@/components/Loading';
 
 interface EpisodeDetailClientProps {
     id: string;
@@ -18,40 +15,9 @@ interface EpisodeDetailClientProps {
 
 export default function EpisodeDetailClient({ id }: EpisodeDetailClientProps) {
     const router = useRouter();
-    const { isEnabled: isDeveloperMode, isLoading } = useDeveloperMode();
 
     const episode = getEpisodeById(id);
     const episodes = getSortedEpisodes();
-
-    if (isLoading) {
-        return <Loading />;
-    }
-
-    // 開発者モードがオフの場合は開発中モーダルを表示
-    if (!isDeveloperMode) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#F7F7F5' }}>
-                <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
-                    <div className="flex justify-center mb-4">
-                        <div className="p-4 bg-amber-100 rounded-full">
-                            <MdConstruction className="h-12 w-12 text-amber-500" />
-                        </div>
-                    </div>
-                    <h2 className="text-xl font-bold text-gray-800 mb-2">開発中の機能です</h2>
-                    <p className="text-gray-600 mb-6">
-                        この機能は現在開発中です。<br />
-                        公開までしばらくお待ちください。
-                    </p>
-                    <button
-                        onClick={() => router.push('/')}
-                        className="w-full px-4 py-3 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 transition-colors"
-                    >
-                        ホームに戻る
-                    </button>
-                </div>
-            </div>
-        );
-    }
 
     // 前後のエピソード
     const currentIndex = episodes.findIndex((e) => e.id === id);

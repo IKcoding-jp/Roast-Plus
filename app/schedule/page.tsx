@@ -34,6 +34,16 @@ export default function SchedulePage() {
     return `${year}-${month}-${day}`;
   };
 
+  // 翌日の日付を取得
+  const getTomorrowString = () => {
+    const now = new Date();
+    now.setDate(now.getDate() + 1);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // 土日判定関数（0=日曜、6=土曜）
   const isWeekend = useCallback((dateString: string): boolean => {
     const date = new Date(dateString + 'T00:00:00');
@@ -126,19 +136,24 @@ export default function SchedulePage() {
 
   const moveToNextDay = useCallback(() => {
     const today = getTodayString();
+    const tomorrow = getTomorrowString();
     const nextWeekday = getNextWeekday(selectedDate);
-    
-    // 今日を超えないようにする（今日まで移動可能）
-    // 今日が土日の場合は、前の平日まで移動可能
-    const maxDate = isWeekend(today) ? getPreviousWeekday(today) : today;
+
+    // 翌日まで移動可能にする
+    // 翌日が土日の場合は、次の平日まで移動可能
+    const maxDate = isWeekend(tomorrow) ? getNextWeekday(today) : tomorrow;
     if (nextWeekday <= maxDate) {
       setSelectedDate(nextWeekday);
     }
-  }, [selectedDate, getNextWeekday, getPreviousWeekday, isWeekend]);
+  }, [selectedDate, getNextWeekday, isWeekend]);
 
   // 選択日が今日かどうか（実際の今日の日付と比較）
   const today = getTodayString();
+  const tomorrow = getTomorrowString();
   const isToday = selectedDate === today; // 実際の今日の日付と比較
+  // 翌日（土日なら次の平日）が最大選択可能日
+  const maxSelectableDate = isWeekend(tomorrow) ? getNextWeekday(today) : tomorrow;
+  const isMaxDate = selectedDate >= maxSelectableDate;
 
   // OCR結果を反映する処理
   const handleOCRSuccess = useCallback(
@@ -278,9 +293,9 @@ export default function SchedulePage() {
                   </button>
                   <button
                     onClick={moveToNextDay}
-                    disabled={isToday}
+                    disabled={isMaxDate}
                     className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors ${
-                      isToday
+                      isMaxDate
                         ? 'text-gray-300 cursor-not-allowed'
                         : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                     }`}
@@ -314,9 +329,9 @@ export default function SchedulePage() {
                 </button>
                 <button
                   onClick={moveToNextDay}
-                  disabled={isToday}
+                  disabled={isMaxDate}
                   className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md transition-colors ${
-                    isToday
+                    isMaxDate
                       ? 'text-gray-300 cursor-not-allowed'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}

@@ -35,6 +35,34 @@ export function DatePickerModal({
   const todayDate = new Date(today + 'T00:00:00');
   const currentYear = todayDate.getFullYear();
 
+  // 翌日の日付を取得
+  const getTomorrowString = () => {
+    const now = new Date();
+    now.setDate(now.getDate() + 1);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // 次の平日を取得する関数
+  const getNextWeekday = (dateString: string): string => {
+    const date = new Date(dateString + 'T00:00:00');
+    date.setDate(date.getDate() + 1);
+    while (date.getDay() === 0 || date.getDay() === 6) {
+      date.setDate(date.getDate() + 1);
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const tomorrow = getTomorrowString();
+  // 翌日（土日なら次の平日）が最大選択可能日
+  const maxSelectableDate = isWeekend(tomorrow) ? getNextWeekday(today) : tomorrow;
+  const maxSelectableDateObj = new Date(maxSelectableDate + 'T00:00:00');
+
   // 日付文字列フォーマット関数
   const formatDateString = (date: Date): string => {
     const year = date.getFullYear();
@@ -99,13 +127,13 @@ export function DatePickerModal({
   };
 
   const handleNextMonth = () => {
-    const nextMonth = currentMonth.month === 11 
+    const nextMonth = currentMonth.month === 11
       ? { year: currentMonth.year + 1, month: 0 }
       : { year: currentMonth.year, month: currentMonth.month + 1 };
     const nextMonthFirstDay = new Date(nextMonth.year, nextMonth.month, 1);
-    
-    // 今日より未来の月には進めない
-    if (nextMonthFirstDay > todayDate) {
+
+    // 最大選択可能日より未来の月には進めない
+    if (nextMonthFirstDay > maxSelectableDateObj) {
       return;
     }
 
@@ -129,13 +157,12 @@ export function DatePickerModal({
   };
 
   const canGoToNextMonth = useMemo(() => {
-    const todayDate = new Date(today + 'T00:00:00');
-    const nextMonth = currentMonth.month === 11 
+    const nextMonth = currentMonth.month === 11
       ? { year: currentMonth.year + 1, month: 0 }
       : { year: currentMonth.year, month: currentMonth.month + 1 };
     const nextMonthFirstDay = new Date(nextMonth.year, nextMonth.month, 1);
-    return nextMonthFirstDay <= todayDate;
-  }, [currentMonth, today]);
+    return nextMonthFirstDay <= maxSelectableDateObj;
+  }, [currentMonth, maxSelectableDateObj]);
 
   const handleDateClick = (dateString: string) => {
     // 土日は選択不可
@@ -143,8 +170,8 @@ export function DatePickerModal({
       return;
     }
 
-    // 今日より未来は選択不可
-    if (dateString > today) {
+    // 最大選択可能日より先は選択不可
+    if (dateString > maxSelectableDate) {
       return;
     }
 
@@ -271,7 +298,7 @@ export function DatePickerModal({
                 {calendarDays.map((day, index) => {
                   const isSelected = day.dateString === selectedDate;
                   const isWeekendDay = isWeekend(day.dateString);
-                  const isFuture = day.dateString > today;
+                  const isFuture = day.dateString > maxSelectableDate;
                   const isToday = day.dateString === today;
                   const isSelectable = !isWeekendDay && !isFuture && day.isCurrentMonth;
 

@@ -16,7 +16,10 @@
       "Bash(npx tsc:*)",
       "mcp__serena__find_file",
       "mcp__serena__search_for_pattern",
-      "Skill(example-skills:skill-creator)"
+      "Skill(example-skills:skill-creator)",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__chrome-devtools__click"
     ]
   },
   "enabledMcpjsonServers": [

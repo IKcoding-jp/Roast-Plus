@@ -328,7 +328,7 @@ export type CharacterId = 'asairi' | 'fukairi';
 // キャラクター設定
 export interface Character {
   id: CharacterId;
-  name: string; // 表示名（例: "アサイリちゃん"）
+  name: string; // 表示名（例: "アサイリ"）
   shortName: string; // 短縮名（例: "アサイリ"）
   position: 'left' | 'right'; // 対話での表示位置
   bubbleColor: string; // 吹き出しの背景色

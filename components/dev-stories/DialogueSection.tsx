@@ -17,27 +17,27 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogues }) =
       <div className="mb-8">
         {/* 二人のキャラクター */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          {/* アサイリちゃん */}
+          {/* アサイリ */}
           <div className="bg-white/60 rounded-xl p-4 text-center">
             <div className="flex justify-center mb-3">
               <CharacterAvatar characterId="asairi" size="lg" />
             </div>
-            <h3 className="font-bold text-gray-800 mb-1">🌰 アサイリちゃん</h3>
-            <p className="text-xs text-amber-700 font-medium mb-2">やさしくて世話焼き、でも芯がある子</p>
+            <h3 className="font-bold text-gray-800 mb-1">🌰 アサイリ</h3>
+            <p className="text-xs text-amber-700 font-medium mb-2">やさしくて世話焼き、でも芯がある人</p>
             <p className="text-xs text-gray-500 leading-relaxed">
-              いつも周りを気にかけて「大丈夫？」って自然に声をかけるタイプ。フカイリくんの危なっかしさを放っておけない、安心感のかたまり。
+              いつも周りを気にかけて「大丈夫？」って自然に声をかけるタイプ。フカイリの危なっかしさを放っておけない、安心感のかたまり。
             </p>
           </div>
 
-          {/* フカイリくん */}
+          {/* フカイリ */}
           <div className="bg-white/60 rounded-xl p-4 text-center">
             <div className="flex justify-center mb-3">
               <CharacterAvatar characterId="fukairi" size="lg" />
             </div>
-            <h3 className="font-bold text-gray-800 mb-1">🕶️ フカイリくん</h3>
+            <h3 className="font-bold text-gray-800 mb-1">🕶️ フカイリ</h3>
             <p className="text-xs text-gray-600 font-medium mb-2">クール気取りの不器用な努力家</p>
             <p className="text-xs text-gray-500 leading-relaxed">
-              無口で皮肉っぽいけど、内心はめちゃくちゃ真面目。実はアサイリちゃんをすごく信頼してる、情に厚い仲間想い。
+              無口で皮肉っぽいけど、内心はめちゃくちゃ真面目。実はアサイリをすごく信頼してる、情に厚い仲間想い。
             </p>
           </div>
         </div>
@@ -46,7 +46,7 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogues }) =
         <div className="bg-white/40 rounded-xl p-4 text-center">
           <p className="text-xs text-gray-600 leading-relaxed">
             <span className="font-medium text-gray-700">🤝 幼なじみの相棒タイプ</span><br />
-            言葉が少なくても通じ合う二人。アサイリちゃんが日常担当、フカイリくんが裏方・決断担当。<br />
+            言葉が少なくても通じ合う二人。アサイリが日常担当、フカイリが裏方・決断担当。<br />
             どちらかが欠けると成立しない、自然体の信頼関係。
           </p>
         </div>

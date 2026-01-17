@@ -32,7 +32,7 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
   const sizeConfig = SIZE_CONFIG[size];
   const avatarPath = AVATAR_PATHS[characterId];
 
-  // フカイリくんは画像が小さいので少し拡大
+  // フカイリは画像が小さいので少し拡大
   const scale = characterId === 'fukairi' ? 'scale-125' : '';
 
   return (

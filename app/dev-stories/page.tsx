@@ -65,7 +65,7 @@ export default function DevStoriesPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-800">開発秘話</h1>
               <p className="text-gray-500 text-sm mt-1 hidden sm:block">
-                アサイリちゃんとフカイリくんが、ローストプラスの開発を語ります。
+                アサイリとフカイリが、ローストプラスの開発を語ります。
               </p>
             </div>
           </div>

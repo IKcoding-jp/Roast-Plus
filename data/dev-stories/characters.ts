@@ -4,7 +4,7 @@ import type { Character, CharacterId } from '@/types';
 export const CHARACTERS: Record<CharacterId, Character> = {
   asairi: {
     id: 'asairi',
-    name: 'アサイリちゃん',
+    name: 'アサイリ',
     shortName: 'アサイリ',
     position: 'left',
     bubbleColor: '#FEF3C7', // amber-100
@@ -12,7 +12,7 @@ export const CHARACTERS: Record<CharacterId, Character> = {
   },
   fukairi: {
     id: 'fukairi',
-    name: 'フカイリくん',
+    name: 'フカイリ',
     shortName: 'フカイリ',
     position: 'right',
     bubbleColor: '#E5E7EB', // gray-200

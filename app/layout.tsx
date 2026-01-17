@@ -7,43 +7,14 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { ToastProvider } from "@/components/Toast";
 import { SplashScreen } from "@/components/SplashScreen";
 
-// TEMPORARY: Google Fonts disabled for build - will re-enable after deployment
-/*
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  preload: true,
-  display: "swap",
-});
+import { Zen_Old_Mincho } from "next/font/google";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const zenOldMincho = Zen_Old_Mincho({
+  weight: ["400", "500", "600", "700", "900"],
   subsets: ["latin"],
-  preload: false,
+  variable: "--font-zen-old-mincho",
   display: "swap",
 });
-
-const notoSerifJP = Noto_Serif_JP({
-  variable: "--font-noto-serif-jp",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
-
-const playfairDisplay = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
-
-const nunito = Nunito({
-  variable: "--font-nunito",
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
-  display: "swap",
-});
-*/
 
 export const metadata: Metadata = {
   title: 'ローストプラス',
@@ -78,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body
-        className="antialiased"
+        className={`${zenOldMincho.variable} antialiased font-serif`}
         suppressHydrationWarning
       >
         <Script

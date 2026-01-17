@@ -114,7 +114,7 @@ function TastingPageContent() {
     return (
       <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-2xl mx-auto space-y-10">
-          <motion.header 
+          <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center text-center space-y-4"
@@ -126,12 +126,12 @@ function TastingPageContent() {
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
             </Link>
-            
+
             <div className="flex flex-col items-center space-y-2">
               <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
-              <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
-              <PencilCircle size={48} weight="duotone" className="text-amber-600" />
-            </div>
+                <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
+                <PencilCircle size={48} weight="duotone" className="text-amber-600" />
+              </div>
               <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
                 セッションを編集
               </h1>
@@ -212,7 +212,7 @@ function TastingPageContent() {
     return (
       <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-2xl mx-auto space-y-10">
-          <motion.header 
+          <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center text-center space-y-4"
@@ -224,12 +224,12 @@ function TastingPageContent() {
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
             </Link>
-            
+
             <div className="flex flex-col items-center space-y-3">
-            <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
-              <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
-              <Notebook size={48} weight="duotone" className="text-amber-600" />
-            </div>
+              <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
+                <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
+                <Notebook size={48} weight="duotone" className="text-amber-600" />
+              </div>
               <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
                 記録を編集
               </h1>
@@ -272,7 +272,7 @@ function TastingPageContent() {
     return (
       <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
         <div className="max-w-4xl mx-auto space-y-10">
-          <motion.header 
+          <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center text-center space-y-4"
@@ -284,12 +284,12 @@ function TastingPageContent() {
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
             </Link>
-            
+
             <div className="flex flex-col items-center space-y-3">
-            <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
-              <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
-              <CoffeeIcon size={48} weight="duotone" className="text-amber-600" />
-            </div>
+              <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
+                <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
+                <CoffeeIcon size={48} weight="duotone" className="text-amber-600" />
+              </div>
               <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
                 記録の追加・編集
               </h1>
@@ -307,9 +307,9 @@ function TastingPageContent() {
 
   // 一覧表示（デフォルト）
   const isEmpty = tastingSessions.length === 0;
-  
+
   return (
-    <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
+    <div className="min-h-screen flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="relative flex flex-col sm:flex-row items-center gap-4">
@@ -324,7 +324,7 @@ function TastingPageContent() {
               </Link>
               <div id="filter-button-container-mobile" className="sm:hidden"></div>
             </div>
-            
+
             <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-black text-stone-800 tracking-tight">
               試飲感想記録
             </h1>
@@ -345,9 +345,9 @@ function TastingPageContent() {
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-hidden pb-20 sm:pb-0">
-          <TastingSessionList 
-            data={data} 
+        <main className="pb-20 sm:pb-0">
+          <TastingSessionList
+            data={data}
             onUpdate={updateData}
             filterButtonContainerId="filter-button-container"
             filterButtonContainerIdMobile="filter-button-container-mobile"

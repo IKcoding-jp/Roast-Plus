@@ -522,7 +522,7 @@ Flutterバージョンで不便をおかけしたユーザーの皆様には、�
     id: 'episode-004',
     title: 'AIの今と未来',
     subtitle: 'ChatGPTからAIエージェントへ、急速に進化するAIの世界',
-    imageUrl: undefined,
+    imageUrl: '/dev-stories/ai_future.png',
     dialogues: [
       // 導入（5メッセージ）
       {

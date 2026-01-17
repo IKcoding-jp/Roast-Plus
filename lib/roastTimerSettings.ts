@@ -10,14 +10,20 @@ import type { RoastTimerSettings } from '@/types';
 
 // デフォルト設定: 実際に存在する最初のファイルを使用（なければ固定パスにフォールバック）
 const DEFAULT_TIMER_SOUND = roastTimerSoundFiles[0]?.value || '/sounds/roasttimer/alarm.mp3';
+
+// 現在の設定バージョン
+// バージョン1: timerSoundEnabled のデフォルトを true に変更（既存ユーザーも強制的に有効化）
+const CURRENT_SETTINGS_VERSION = 1;
+
 const DEFAULT_SETTINGS: RoastTimerSettings = {
   goToRoastRoomTimeSeconds: 60,
-  timerSoundEnabled: false,
+  timerSoundEnabled: true,
   timerSoundFile: DEFAULT_TIMER_SOUND,
   timerSoundVolume: 1,
   notificationSoundEnabled: true,
   notificationSoundFile: DEFAULT_TIMER_SOUND,
   notificationSoundVolume: 1,
+  settingsVersion: CURRENT_SETTINGS_VERSION,
 };
 
 const allowedTimerSounds = new Set(roastTimerSoundFiles.map((s) => s.value));
@@ -73,11 +79,23 @@ export async function loadRoastTimerSettings(_userId?: string): Promise<RoastTim
         // パスを正規化（存在しないファイルの場合もデフォルトへフォールバック）
         merged.timerSoundFile = normalizePath(merged.timerSoundFile);
         merged.notificationSoundFile = normalizePath(merged.notificationSoundFile);
-        
+
+        // マイグレーション: バージョンが古い場合は設定を更新
+        const storedVersion = (storedSettings as Partial<RoastTimerSettings>).settingsVersion ?? 0;
+        let needsMigration = false;
+
+        // バージョン1マイグレーション: timerSoundEnabled を強制的に有効化
+        if (storedVersion < 1) {
+          merged.timerSoundEnabled = true;
+          merged.settingsVersion = CURRENT_SETTINGS_VERSION;
+          needsMigration = true;
+        }
+
         settingsCache = merged;
-        
+
         // 移行が発生した場合は設定を保存
-        if (settingsCache.timerSoundFile !== (storedSettings as Partial<RoastTimerSettings>).timerSoundFile ||
+        if (needsMigration ||
+            settingsCache.timerSoundFile !== (storedSettings as Partial<RoastTimerSettings>).timerSoundFile ||
             settingsCache.notificationSoundFile !== (storedSettings as Partial<RoastTimerSettings>).notificationSoundFile) {
           saveRoastTimerSettings(settingsCache).catch((error) => {
             console.error('Failed to save migrated settings:', error);

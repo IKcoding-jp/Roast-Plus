@@ -128,6 +128,7 @@ export interface RoastTimerSettings {
   notificationSoundEnabled: boolean;
   notificationSoundFile: string;
   notificationSoundVolume: number;
+  settingsVersion?: number; // マイグレーション管理用
 }
 
 export interface UserSettings {

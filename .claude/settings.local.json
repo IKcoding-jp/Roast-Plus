@@ -15,7 +15,13 @@
       "mcp__serena__read_file",
       "Bash(npx tsc:*)",
       "mcp__serena__find_file",
-      "mcp__serena__search_for_pattern"
+      "mcp__serena__search_for_pattern",
+      "Skill(example-skills:skill-creator)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "context7",
+    "serena",
+    "chrome-devtools"
+  ]
 }

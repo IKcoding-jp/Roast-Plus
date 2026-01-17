@@ -160,3 +160,26 @@ select option {
   display: none;
   /* Chrome, Safari and Opera */
 }
+
+/* ヘッダーキャラクター歩行アニメーション */
+@keyframes walk-characters {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes walk-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.animate-walk-characters {
+  animation: walk-characters 12s linear infinite, walk-bounce 0.4s ease-in-out infinite;
+}

@@ -287,7 +287,15 @@ export default function HomePage(_props: HomePageProps = {}) {
                 </div>
               </div>
             )}
+
+            {/* キャラクター画像 - フカイリとアサイリ */}
+            <img
+              src="/avatars/header_characters.png"
+              alt="フカイリとアサイリ"
+              className="h-10 md:h-14 w-auto object-contain ml-2"
+            />
           </div>
+
           <div className="flex items-center gap-3 md:gap-4">
             {isDeveloperMode && (
               <button

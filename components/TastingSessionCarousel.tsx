@@ -237,10 +237,6 @@ export function TastingSessionCarousel({
                         <div className="flex items-stretch border-b border-dashed border-[#8D6E63]/30">
                           {/* 感想 (左) */}
                           <div className="flex-1 p-8 border-r border-dashed border-[#8D6E63]/30 relative bg-[#fffdf5]">
-                            <div
-                              className="absolute inset-0 pointer-events-none opacity-10"
-                              style={{ backgroundImage: 'linear-gradient(#8D6E63 1px, transparent 1px)', backgroundSize: '100% 2rem' }}
-                            />
                             <div className="relative z-10 flex flex-col h-full">
                               <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2">
@@ -271,16 +267,36 @@ export function TastingSessionCarousel({
                           </div>
 
                           {/* チャート (右) */}
-                          <div className="w-[340px] flex-shrink-0 p-6 flex items-center justify-center relative overflow-hidden bg-[#fffdf5]">
+                          <div className="w-[340px] flex-shrink-0 p-8 flex flex-col justify-center relative overflow-hidden bg-[#fffdf5]">
                             {/* 紙の質感（粒状ノイズ） */}
                             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-stone-900 mix-blend-overlay" />
 
                             {recordCount > 0 ? (
-                              <div className="transform group-hover:scale-105 transition-transform duration-700 ease-out relative z-10">
-                                <TastingRadarChart
-                                  size={DESKTOP_CHART_SIZE}
-                                  record={averageScores}
-                                />
+                              <div className="space-y-4 w-full relative z-10">
+                                {[
+                                  { label: '苦味', value: averageScores.bitterness, color: '#44403C' },
+                                  { label: '酸味', value: averageScores.acidity, color: '#EA580C' },
+                                  { label: 'ボディ', value: averageScores.body, color: '#92400E' },
+                                  { label: '甘み', value: averageScores.sweetness, color: '#E11D48' },
+                                  { label: '香り', value: averageScores.aroma, color: '#059669' },
+                                ].map((item) => (
+                                  <div key={item.label} className="group/bar">
+                                    <div className="flex justify-between items-center mb-1.5 px-0.5">
+                                      <span className="text-xs font-serif font-black text-[#5D4037] tracking-wider">{item.label}</span>
+                                      <span className="text-xs font-black text-[#8D6E63]">{item.value.toFixed(1)}</span>
+                                    </div>
+                                    <div className="h-2.5 bg-[#EFEBE9] rounded-full overflow-hidden shadow-inner border border-[#D7CCC8]/30">
+                                      <motion.div
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: `${((item.value - 1) / 4) * 100}%` }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                                        className="h-full rounded-full shadow-sm"
+                                        style={{ backgroundColor: item.color }}
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
                               </div>
                             ) : (
                               <div className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-[#D7CCC8] rounded-xl p-8 opacity-60 bg-[#fffdf5]/50 backdrop-blur-sm">

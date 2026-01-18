@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { QuizCard } from '@/components/coffee-quiz/QuizCard';
 import { QuizResult } from '@/components/coffee-quiz/QuizResult';
-import { XPGainAnimation } from '@/components/coffee-quiz/XPGainAnimation';
 import { LevelUpModal } from '@/components/coffee-quiz/LevelUpModal';
 import { useQuizSession } from '@/hooks/useQuizSession';
 import { useQuizData } from '@/hooks/useQuizData';
@@ -90,7 +89,6 @@ export default function ReviewPage() {
   });
 
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [showXPAnimation, setShowXPAnimation] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
   const hasPlayedStartSound = useRef(false);
@@ -136,9 +134,8 @@ export default function ReviewPage() {
         playIncorrect();
       }
 
+      // XP音は少し遅らせる
       if (answerFeedback.xpEarned > 0) {
-        setShowXPAnimation(true);
-        // XP音は少し遅らせる
         setTimeout(() => playXP(), 200);
       }
 
@@ -155,7 +152,6 @@ export default function ReviewPage() {
   // 次の問題へ
   const handleNext = () => {
     setSelectedOptionId(null);
-    setShowXPAnimation(false);
     nextQuestion();
   };
 
@@ -254,6 +250,7 @@ export default function ReviewPage() {
                 correctOptionId={showFeedback ? answerFeedback?.correctOptionId ?? null : null}
                 showFeedback={showFeedback}
                 onSelectOption={handleSelectOption}
+                xpEarned={answerFeedback?.xpEarned}
               />
 
               {showFeedback && (
@@ -290,13 +287,6 @@ export default function ReviewPage() {
           )}
         </AnimatePresence>
       </main>
-
-      {/* XPアニメーション */}
-      <XPGainAnimation
-        xp={answerFeedback?.xpEarned ?? 0}
-        show={showXPAnimation}
-        onComplete={() => setShowXPAnimation(false)}
-      />
 
       {/* レベルアップモーダル */}
       <LevelUpModal

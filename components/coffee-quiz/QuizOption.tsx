@@ -11,6 +11,7 @@ interface QuizOptionProps {
   showFeedback: boolean;
   disabled: boolean;
   onClick: () => void;
+  xpEarned?: number;
 }
 
 const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
@@ -38,6 +39,7 @@ export function QuizOption({
   showFeedback,
   disabled,
   onClick,
+  xpEarned,
 }: QuizOptionProps) {
   // 状態に応じたスタイルを決定
   const getStyles = () => {
@@ -103,8 +105,18 @@ export function QuizOption({
       {/* 選択肢のテキスト */}
       <span className="flex-1 text-left font-medium text-sm">{option.text}</span>
 
-      {/* 正解/不正解アイコン */}
-      {showFeedback && isCorrect && (
+      {/* 正解/不正解アイコンとXP表示 */}
+      {showFeedback && isCorrect && isSelected && xpEarned !== undefined && xpEarned > 0 && (
+        <motion.span
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
+          className="flex items-center gap-1 px-2 py-0.5 bg-[#EF8A00] text-white rounded-full text-xs font-bold"
+        >
+          +{xpEarned} XP
+        </motion.span>
+      )}
+      {showFeedback && isCorrect && !isSelected && (
         <motion.span
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}

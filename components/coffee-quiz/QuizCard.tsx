@@ -14,6 +14,7 @@ interface QuizCardProps {
   correctOptionId: string | null;
   showFeedback: boolean;
   onSelectOption: (optionId: string) => void;
+  xpEarned?: number;
 }
 
 // カテゴリアイコン
@@ -73,6 +74,7 @@ export function QuizCard({
   correctOptionId,
   showFeedback,
   onSelectOption,
+  xpEarned,
 }: QuizCardProps) {
   return (
     <motion.div
@@ -141,6 +143,7 @@ export function QuizCard({
                 showFeedback={showFeedback}
                 disabled={showFeedback}
                 onClick={() => onSelectOption(option.id)}
+                xpEarned={selectedOptionId === option.id ? xpEarned : undefined}
               />
             ))}
           </AnimatePresence>

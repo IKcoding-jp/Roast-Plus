@@ -117,11 +117,11 @@ function TastingPageContent() {
           <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center text-center space-y-4"
+            className="relative flex flex-col items-center text-center pt-12"
           >
             <Link
               href="/tasting"
-              className="group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+              className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
             >
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
@@ -215,11 +215,11 @@ function TastingPageContent() {
           <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center text-center space-y-4"
+            className="relative flex flex-col items-center text-center pt-12"
           >
             <Link
               href="/tasting"
-              className="group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+              className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
             >
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
@@ -275,11 +275,11 @@ function TastingPageContent() {
           <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center text-center space-y-4"
+            className="relative flex flex-col items-center text-center pt-12"
           >
             <Link
               href="/tasting"
-              className="group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+              className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
             >
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
@@ -322,7 +322,18 @@ function TastingPageContent() {
               >
                 <CaretLeft size={24} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               </Link>
-              <div id="filter-button-container-mobile" className="sm:hidden"></div>
+              <div className="flex items-center gap-2 sm:hidden">
+                <div id="filter-button-container-mobile"></div>
+                {!isEmpty && (
+                  <Link
+                    href="/tasting/sessions/new"
+                    className="p-2.5 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl shadow-md hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95 flex items-center justify-center min-h-[44px] min-w-[44px]"
+                    aria-label="新規セッション作成"
+                  >
+                    <Plus size={22} weight="bold" />
+                  </Link>
+                )}
+              </div>
             </div>
 
             <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-black text-stone-800 tracking-tight">
@@ -354,18 +365,7 @@ function TastingPageContent() {
           />
         </main>
 
-        {!isEmpty && (
-          <div className="sm:hidden fixed bottom-6 left-4 right-4 z-20">
-            <Link
-              href="/tasting/sessions/new"
-              className="w-full px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl font-black text-lg shadow-2xl shadow-amber-900/20 hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95 flex items-center justify-center gap-3 min-h-[56px]"
-              aria-label="新規セッション作成"
-            >
-              <Plus size={24} weight="bold" />
-              <span className="whitespace-nowrap">セッションを作成</span>
-            </Link>
-          </div>
-        )}
+
       </div>
     </div>
   );

@@ -9,11 +9,11 @@ import {
 import { useToastContext } from '@/components/Toast';
 import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/lib/auth';
-import { 
-  Coffee, 
-  Drop, 
-  Wind, 
-  Cookie, 
+import {
+  Coffee,
+  Drop,
+  Wind,
+  Cookie,
   Sun,
   User,
   Calendar,
@@ -85,7 +85,7 @@ const SliderInput = ({
         </span>
       </div>
     </div>
-    
+
     <div className="px-1 relative">
       <input
         type="range"
@@ -103,11 +103,11 @@ const SliderInput = ({
           disabled:cursor-not-allowed`}
         style={{
           background: `linear-gradient(to right, currentColor 0%, currentColor ${(value - 1) / 4 * 100}%, #F3F4F6 ${(value - 1) / 4 * 100}%, #F3F4F6 100%)`,
-          color: accentColor.includes('amber') ? '#D97706' : 
-                 accentColor.includes('orange') ? '#EA580C' :
-                 accentColor.includes('stone') ? '#44403C' :
-                 accentColor.includes('rose') ? '#E11D48' :
-                 accentColor.includes('emerald') ? '#059669' : '#D97706'
+          color: accentColor.includes('amber') ? '#D97706' :
+            accentColor.includes('orange') ? '#EA580C' :
+              accentColor.includes('stone') ? '#44403C' :
+                accentColor.includes('rose') ? '#E11D48' :
+                  accentColor.includes('emerald') ? '#059669' : '#D97706'
         }}
         disabled={readOnly}
       />
@@ -137,24 +137,24 @@ export function TastingRecordForm({
   const { showToast } = useToastContext();
   const { user } = useAuth();
   const userId = user?.uid ?? null;
-  
+
   // 担当表の /users/{userId}/members コレクションからメンバーと管理者を取得
   const { members: allMembers, manager } = useMembers(userId);
-  
+
   // セッションIDの決定: 編集時はrecordから、新規作成時はpropsから
   const currentSessionId = record?.sessionId || sessionId || '';
-  
+
   // セッション情報の取得: propsから、またはdataから取得
-  const sessionInfo = session || (currentSessionId 
+  const sessionInfo = session || (currentSessionId
     ? data.tastingSessions.find((s) => s.id === currentSessionId)
     : undefined);
-  
+
   // セッションから記録を作成する場合かどうか（新規作成時、または編集時でもセッション情報がある場合）
   const isSessionMode = !!sessionInfo;
-  
+
   // 既存の記録がない場合のみ「作成」
   const isNew = !record;
-  
+
   // セッション内の記録を取得（重複チェック用）
   const sessionRecords = currentSessionId
     ? getRecordsBySessionId(data.tastingRecords, currentSessionId)
@@ -176,7 +176,7 @@ export function TastingRecordForm({
   );
   const [tastingDate, setTastingDate] = useState(
     record?.tastingDate ||
-      (sessionInfo ? sessionInfo.createdAt.split('T')[0] : new Date().toISOString().split('T')[0])
+    (sessionInfo ? sessionInfo.createdAt.split('T')[0] : new Date().toISOString().split('T')[0])
   );
   const [roastLevel, setRoastLevel] = useState<
     '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
@@ -257,8 +257,8 @@ export function TastingRecordForm({
     // セッションモードの場合はセッション情報から値を取得
     const finalBeanName = isSessionMode && sessionInfo ? sessionInfo.beanName : beanName.trim();
     const finalRoastLevel = isSessionMode && sessionInfo ? sessionInfo.roastLevel : roastLevel;
-    const finalTastingDate = isSessionMode && sessionInfo 
-      ? sessionInfo.createdAt.split('T')[0] 
+    const finalTastingDate = isSessionMode && sessionInfo
+      ? sessionInfo.createdAt.split('T')[0]
       : tastingDate;
 
     const now = new Date().toISOString();
@@ -294,10 +294,10 @@ export function TastingRecordForm({
   };
 
   return (
-    <motion.form 
+    <motion.form
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      onSubmit={handleSubmit} 
+      onSubmit={handleSubmit}
       className="space-y-8 pb-10"
     >
       {/* 基本情報カード */}
@@ -424,11 +424,11 @@ export function TastingRecordForm({
             ※ これらの項目は、味わいのバランスや特徴の数値であり、味の良し悪しを評価するものではありません。
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 gap-4">
-          <SliderInput 
-            label="苦味" 
-            value={bitterness} 
+          <SliderInput
+            label="苦味"
+            value={bitterness}
             onChange={setBitterness}
             description="コーヒーの苦みの強さ"
             readOnly={readOnly}
@@ -436,9 +436,9 @@ export function TastingRecordForm({
             colorClass="bg-stone-100"
             accentColor="text-stone-800"
           />
-          <SliderInput 
-            label="酸味" 
-            value={acidity} 
+          <SliderInput
+            label="酸味"
+            value={acidity}
             onChange={setAcidity}
             description="コーヒーの酸っぱさや爽やかさ"
             readOnly={readOnly}
@@ -446,9 +446,9 @@ export function TastingRecordForm({
             colorClass="bg-orange-50"
             accentColor="text-orange-600"
           />
-          <SliderInput 
-            label="ボディ" 
-            value={body} 
+          <SliderInput
+            label="ボディ"
+            value={body}
             onChange={setBody}
             description="コーヒーの口当たりや重厚感"
             readOnly={readOnly}
@@ -456,9 +456,9 @@ export function TastingRecordForm({
             colorClass="bg-amber-50"
             accentColor="text-amber-800"
           />
-          <SliderInput 
-            label="甘み" 
-            value={sweetness} 
+          <SliderInput
+            label="甘み"
+            value={sweetness}
             onChange={setSweetness}
             description="コーヒーに感じられる甘さ"
             readOnly={readOnly}
@@ -466,9 +466,9 @@ export function TastingRecordForm({
             colorClass="bg-rose-50"
             accentColor="text-rose-600"
           />
-          <SliderInput 
-            label="香り" 
-            value={aroma} 
+          <SliderInput
+            label="香り"
+            value={aroma}
             onChange={setAroma}
             description="コーヒーの香りの強さや豊かさ"
             readOnly={readOnly}
@@ -480,7 +480,7 @@ export function TastingRecordForm({
       </div>
 
       {/* プレビュー & コメント */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col items-center justify-center">
           <div className="w-full flex items-center gap-2 mb-6">
             <div className="w-1 h-6 bg-amber-500 rounded-full" />
@@ -525,7 +525,7 @@ export function TastingRecordForm({
       {/* アクションボタン */}
       <AnimatePresence>
         {!readOnly && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="sticky bottom-6 flex gap-4 bg-white/80 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/20 z-20"

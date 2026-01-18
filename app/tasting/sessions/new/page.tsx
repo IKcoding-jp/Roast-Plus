@@ -71,19 +71,19 @@ export default function NewTastingSessionPage() {
   return (
     <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-2xl mx-auto space-y-10">
-        <motion.header 
+        <motion.header
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center text-center space-y-4"
+          className="relative flex flex-col items-center text-center pt-12"
         >
           <Link
             href="/tasting"
-            className="group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+            className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
           >
             <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
             一覧に戻る
           </Link>
-          
+
           <div className="flex flex-col items-center space-y-3">
             <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
               <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />

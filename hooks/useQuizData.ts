@@ -2,19 +2,15 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type {
   QuizProgress,
   QuizCard,
   QuizSettings,
-  QuizStats,
-  LevelInfo,
-  StreakInfo,
-  EarnedBadge,
-  DailyGoal,
   QuizQuestion,
   QuizCategory,
+  EarnedBadge,
 } from '@/lib/coffee-quiz/types';
 import {
   DEFAULT_QUIZ_SETTINGS,
@@ -40,7 +36,12 @@ import {
   earnBadges,
   getTodayGoal,
 } from '@/lib/coffee-quiz/gamification';
-import { getQuestionById, getQuestionsStats } from '@/lib/coffee-quiz/questions';
+import { getQuestionById, getQuestionsStats, getQuestionsByIds } from '@/lib/coffee-quiz/questions';
+import {
+  updateCheckmarks,
+  getRevengeQuestionIds as getRevengeIds,
+  getRevengeCount,
+} from '@/lib/coffee-quiz/checkmark';
 import type { QuizDifficulty } from '@/lib/coffee-quiz/types';
 
 const QUIZ_PROGRESS_COLLECTION = 'quiz_progress';
@@ -224,10 +225,15 @@ export function useQuizData() {
       const newCards = progress.cards.filter((c) => c.questionId !== questionId);
       newCards.push(updatedCard);
 
+      // チェックマークを更新（既存ユーザーはcheckmarksがない場合があるため空配列をデフォルトに）
+      const currentCheckmarks = progress.checkmarks ?? [];
+      const newCheckmarks = updateCheckmarks(currentCheckmarks, questionId, isCorrect);
+
       // 新しいProgressを作成
       const newProgress: QuizProgress = {
         ...progress,
         cards: newCards,
+        checkmarks: newCheckmarks,
         level: newLevelInfo,
         streak: newStreak,
         stats: newStats,
@@ -277,6 +283,20 @@ export function useQuizData() {
     [progress, saveProgress]
   );
 
+  // リベンジ対象の問題を取得
+  const getRevengeQuestions = useCallback(async (): Promise<QuizQuestion[]> => {
+    if (!progress) return [];
+    const checkmarks = progress.checkmarks ?? [];
+    const questionIds = getRevengeIds(checkmarks);
+    if (questionIds.length === 0) return [];
+    return getQuestionsByIds(questionIds);
+  }, [progress]);
+
+  // リベンジ対象の問題数
+  const revengeCount = progress
+    ? getRevengeCount(progress.checkmarks ?? [])
+    : 0;
+
   // 今日のゴール
   const todayGoal = progress ? getTodayGoal(progress.dailyGoals) : null;
 
@@ -290,6 +310,8 @@ export function useQuizData() {
     todayGoal,
     isAuthenticated: !!user,
     questionsStats,
+    getRevengeQuestions,
+    revengeCount,
   };
 }
 
@@ -299,6 +321,7 @@ function createInitialProgress(userId: string): QuizProgress {
   return {
     userId,
     cards: [],
+    checkmarks: [],
     streak: { ...INITIAL_STREAK_INFO },
     level: { ...INITIAL_LEVEL_INFO },
     earnedBadges: [],

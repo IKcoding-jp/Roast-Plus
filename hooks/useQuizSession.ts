@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import type {
   QuizQuestion,
   QuizSession,
-  QuizSessionQuestion,
   QuizCategory,
 } from '@/lib/coffee-quiz/types';
 import {
@@ -15,12 +14,13 @@ import {
 } from '@/lib/coffee-quiz/questions';
 import { useQuizData } from './useQuizData';
 
-export type QuizMode = 'daily' | 'review' | 'category' | 'random';
+export type QuizMode = 'daily' | 'review' | 'category' | 'random' | 'single' | 'revenge' | 'shuffle';
 
 interface UseQuizSessionOptions {
   mode?: QuizMode;
   category?: QuizCategory;
   count?: number;
+  questionIds?: string[];  // 特定の問題IDを指定
 }
 
 interface QuizSessionState {
@@ -48,8 +48,8 @@ interface AnswerFeedback {
 }
 
 export function useQuizSession(options: UseQuizSessionOptions = {}) {
-  const { mode = 'daily', category, count = 10 } = options;
-  const { recordAnswer, progress, getDueCardsForReview } = useQuizData();
+  const { mode = 'daily', category, count = 10, questionIds } = options;
+  const { recordAnswer, progress, getDueCardsForReview, getRevengeQuestions } = useQuizData();
 
   const [state, setState] = useState<QuizSessionState>({
     session: null,
@@ -80,6 +80,8 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
     try {
       let loadedQuestions: QuizQuestion[] = [];
 
+      const { getQuestionsByIds } = await import('@/lib/coffee-quiz/questions');
+
       switch (mode) {
         case 'daily':
           loadedQuestions = await getDailyQuestions(
@@ -97,12 +99,21 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
           // 復習モード: FSRSで期限が来たカードの問題を取得
           const dueCards = getDueCardsForReview();
           const dueQuestionIds = dueCards.slice(0, count).map((c) => c.questionId);
-          // 問題を読み込み（getQuestionsByIdsを使用）
-          const { getQuestionsByIds } = await import('@/lib/coffee-quiz/questions');
           loadedQuestions = await getQuestionsByIds(dueQuestionIds);
           break;
         case 'random':
           loadedQuestions = await getRandomQuestions(count);
+          break;
+        case 'single':
+        case 'shuffle':
+          // 指定された問題IDで出題
+          if (questionIds && questionIds.length > 0) {
+            loadedQuestions = await getQuestionsByIds(questionIds);
+          }
+          break;
+        case 'revenge':
+          // リベンジモード: 赤チェックのある問題を出題
+          loadedQuestions = await getRevengeQuestions();
           break;
       }
 
@@ -142,7 +153,7 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
       console.error('Failed to start quiz session:', error);
       setState((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [mode, category, count, progress?.settings.enabledCategories, getDueCardsForReview]);
+  }, [mode, category, count, questionIds, progress?.settings.enabledCategories, getDueCardsForReview, getRevengeQuestions]);
 
   // 回答を送信
   const submitAnswer = useCallback(

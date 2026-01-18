@@ -147,12 +147,24 @@ export interface QuizSettings {
 }
 
 // ========================================
+// チェックマーク（正解/間違い履歴）
+// ========================================
+
+export interface QuestionCheckmark {
+  questionId: string;
+  blueCheck: number;  // 0-3: 正解履歴
+  redCheck: number;   // 0-3: 間違い履歴
+  updatedAt: string;  // ISO 8601
+}
+
+// ========================================
 // クイズ進捗（Firestoreに保存）
 // ========================================
 
 export interface QuizProgress {
   userId: string;
   cards: QuizCard[];
+  checkmarks: QuestionCheckmark[];  // 正解/間違いチェックマーク
   streak: StreakInfo;
   level: LevelInfo;
   earnedBadges: EarnedBadge[];
@@ -172,7 +184,7 @@ export interface QuizSession {
   startedAt: string; // ISO 8601
   completedAt?: string; // ISO 8601
   questions: QuizSessionQuestion[];
-  mode: 'daily' | 'review' | 'category' | 'random';
+  mode: 'daily' | 'review' | 'category' | 'random' | 'single' | 'revenge' | 'shuffle';
   category?: QuizCategory;
 }
 

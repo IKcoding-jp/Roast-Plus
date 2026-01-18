@@ -9,6 +9,7 @@ interface QuizResultProps {
   totalXP: number;
   accuracy: number;
   onRetry: () => void;
+  returnUrl?: string;  // 戻り先URL（デフォルト: /coffee-trivia）
 }
 
 // アイコン
@@ -45,6 +46,7 @@ export function QuizResult({
   totalXP,
   accuracy,
   onRetry,
+  returnUrl = '/coffee-trivia',
 }: QuizResultProps) {
   const isPerfect = accuracy === 100;
 
@@ -202,11 +204,11 @@ export function QuizResult({
             transition={{ delay: 0.8 }}
           >
             <Link
-              href="/coffee-trivia"
+              href={returnUrl}
               className="w-full flex items-center justify-center gap-2 bg-[#211714]/5 text-[#211714] py-3 px-5 rounded-xl font-semibold hover:bg-[#211714]/10 transition-colors"
             >
               <HomeIcon />
-              ダッシュボードへ
+              {returnUrl === '/coffee-trivia' ? 'ダッシュボードへ' : '戻る'}
             </Link>
           </motion.div>
         </div>

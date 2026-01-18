@@ -7,7 +7,6 @@ import { DailyGoalProgress } from './DailyGoalProgress';
 import { CategorySelector } from './CategorySelector';
 import { LevelDisplay } from './LevelDisplay';
 import type { QuizProgress, QuizCategory, QuizDifficulty } from '@/lib/coffee-quiz/types';
-import { useState } from 'react';
 
 // 問題の統計情報の型
 interface QuestionsStats {
@@ -19,6 +18,7 @@ interface QuestionsStats {
 interface QuizDashboardProps {
   progress: QuizProgress | null;
   dueCardsCount: number;
+  revengeCount: number;  // リベンジ対象の問題数
   loading: boolean;
   questionsStats: QuestionsStats | null;
 }
@@ -58,14 +58,19 @@ const TrophyIcon = () => (
   </svg>
 );
 
+const FlameIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+);
+
 export function QuizDashboard({
   progress,
   dueCardsCount,
+  revengeCount,
   loading,
   questionsStats,
 }: QuizDashboardProps) {
-  const [selectedCategory, setSelectedCategory] = useState<QuizCategory | null>(null);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -135,6 +140,19 @@ export function QuizDashboard({
           今日のクイズを始める
         </Link>
 
+        {/* リベンジモード */}
+        {revengeCount > 0 && (
+          <Link
+            href="/coffee-trivia/revenge"
+            className="group flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 transition-all"
+          >
+            <span className="animate-pulse">
+              <FlameIcon />
+            </span>
+            リベンジモード ({revengeCount}問)
+          </Link>
+        )}
+
         {dueCardsCount > 0 ? (
           <Link
             href="/coffee-trivia/review"
@@ -153,7 +171,7 @@ export function QuizDashboard({
         )}
       </motion.div>
 
-      {/* カテゴリ選択 */}
+      {/* カテゴリ別問題一覧 */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -164,30 +182,8 @@ export function QuizDashboard({
           カテゴリ別学習
         </h3>
         <CategorySelector
-          selectedCategory={selectedCategory}
-          onSelect={setSelectedCategory}
           stats={categoryStats}
         />
-
-        {selectedCategory && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="mt-3 pt-3 border-t border-[#211714]/5"
-          >
-            <Link
-              href={`/coffee-trivia/quiz?category=${selectedCategory}`}
-              className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg font-medium text-sm text-white bg-[#211714] hover:bg-[#3A2F2B] transition-colors"
-            >
-              <PlayIcon />
-              {selectedCategory === 'basics' && '基礎知識'}
-              {selectedCategory === 'roasting' && '焙煎理論'}
-              {selectedCategory === 'brewing' && '抽出理論'}
-              {selectedCategory === 'history' && '歴史と文化'}
-              のクイズを始める
-            </Link>
-          </motion.div>
-        )}
       </motion.div>
 
       {/* クイック統計 */}

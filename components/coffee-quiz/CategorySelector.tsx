@@ -1,12 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import type { QuizCategory } from '@/lib/coffee-quiz/types';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 
 interface CategorySelectorProps {
-  selectedCategory: QuizCategory | null;
-  onSelect: (category: QuizCategory | null) => void;
   stats?: Record<QuizCategory, { total: number; mastered: number }>;
 }
 
@@ -39,50 +38,57 @@ const BookIcon = () => (
   </svg>
 );
 
-const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12" />
+const ChevronRightIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="9 18 15 12 9 6" />
   </svg>
 );
 
 const CATEGORY_CONFIG: Record<QuizCategory, {
   icon: React.ComponentType;
-  selectedBg: string;
+  bg: string;
+  hoverBg: string;
   iconBg: string;
 }> = {
   basics: {
     icon: CoffeeIcon,
-    selectedBg: 'bg-[#211714]',
+    bg: 'bg-[#FDF8F0]',
+    hoverBg: 'hover:bg-[#211714]/5',
     iconBg: 'bg-[#FDF8F0]',
   },
   roasting: {
     icon: BeanIcon,
-    selectedBg: 'bg-[#EF8A00]',
+    bg: 'bg-[#FDF8F0]',
+    hoverBg: 'hover:bg-[#EF8A00]/10',
     iconBg: 'bg-[#EF8A00]/10',
   },
   brewing: {
     icon: DropletIcon,
-    selectedBg: 'bg-sky-600',
+    bg: 'bg-[#FDF8F0]',
+    hoverBg: 'hover:bg-sky-50',
     iconBg: 'bg-sky-50',
   },
   history: {
     icon: BookIcon,
-    selectedBg: 'bg-[#3A2F2B]',
+    bg: 'bg-[#FDF8F0]',
+    hoverBg: 'hover:bg-[#211714]/5',
     iconBg: 'bg-[#211714]/5',
   },
 };
 
 export function CategorySelector({
-  selectedCategory,
-  onSelect,
   stats,
 }: CategorySelectorProps) {
+  const router = useRouter();
   const categories: QuizCategory[] = ['basics', 'roasting', 'brewing', 'history'];
+
+  const handleCategoryClick = (category: QuizCategory) => {
+    router.push(`/coffee-trivia/category/${category}`);
+  };
 
   return (
     <div className="grid grid-cols-2 gap-2.5">
       {categories.map((category, index) => {
-        const isSelected = selectedCategory === category;
         const categoryStats = stats?.[category];
         const config = CATEGORY_CONFIG[category];
         const Icon = config.icon;
@@ -96,49 +102,35 @@ export function CategorySelector({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            onClick={() => onSelect(isSelected ? null : category)}
-            className={`relative rounded-xl p-3.5 transition-all text-left ${
-              isSelected
-                ? `${config.selectedBg} text-white`
-                : 'bg-[#FDF8F0] hover:bg-[#211714]/5 border border-[#211714]/5'
-            }`}
+            onClick={() => handleCategoryClick(category)}
+            className={`relative rounded-xl p-3.5 transition-all text-left ${config.bg} ${config.hoverBg} border border-[#211714]/5 group`}
           >
             <div className="flex items-start gap-2.5">
               {/* アイコン */}
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                isSelected ? 'bg-white/15' : config.iconBg
-              }`}>
-                <span className={isSelected ? 'text-white' : 'text-[#3A2F2B]'}>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${config.iconBg}`}>
+                <span className="text-[#3A2F2B]">
                   <Icon />
                 </span>
               </div>
 
               <div className="flex-1 min-w-0">
                 {/* カテゴリ名 */}
-                <span className={`font-medium text-sm block ${
-                  isSelected ? 'text-white' : 'text-[#211714]'
-                }`}>
+                <span className="font-medium text-sm block text-[#211714]">
                   {CATEGORY_LABELS[category]}
                 </span>
 
                 {/* 統計とプログレス */}
                 {categoryStats && (
                   <div className="mt-1.5">
-                    <div className={`h-1 rounded-full overflow-hidden ${
-                      isSelected ? 'bg-white/25' : 'bg-[#211714]/10'
-                    }`}>
+                    <div className="h-1 rounded-full overflow-hidden bg-[#211714]/10">
                       <motion.div
-                        className={`h-full rounded-full ${
-                          isSelected ? 'bg-white' : 'bg-[#EF8A00]'
-                        }`}
+                        className="h-full rounded-full bg-[#EF8A00]"
                         initial={{ width: 0 }}
                         animate={{ width: `${masteryPercent}%` }}
                         transition={{ duration: 0.4, delay: index * 0.05 }}
                       />
                     </div>
-                    <span className={`text-[10px] block mt-1 ${
-                      isSelected ? 'text-white/70' : 'text-[#3A2F2B]/60'
-                    }`}>
+                    <span className="text-[10px] block mt-1 text-[#3A2F2B]/60">
                       {categoryStats.mastered}/{categoryStats.total}問
                     </span>
                   </div>
@@ -146,16 +138,10 @@ export function CategorySelector({
               </div>
             </div>
 
-            {/* 選択インジケーター */}
-            {isSelected && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute top-2.5 right-2.5 w-5 h-5 bg-white/20 rounded-full flex items-center justify-center"
-              >
-                <CheckIcon />
-              </motion.div>
-            )}
+            {/* 矢印インジケーター */}
+            <div className="absolute top-1/2 right-2.5 -translate-y-1/2 text-[#3A2F2B]/30 group-hover:text-[#3A2F2B]/60 transition-colors">
+              <ChevronRightIcon />
+            </div>
           </motion.button>
         );
       })}

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, Suspense, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { QuizCard } from '@/components/coffee-quiz/QuizCard';
@@ -10,8 +9,6 @@ import { LevelUpModal } from '@/components/coffee-quiz/LevelUpModal';
 import { useQuizSession } from '@/hooks/useQuizSession';
 import { useQuizData } from '@/hooks/useQuizData';
 import { useQuizSound } from '@/hooks/useQuizSound';
-import type { QuizCategory } from '@/lib/coffee-quiz/types';
-import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 
 // アイコン
 const ArrowLeftIcon = () => (
@@ -25,6 +22,12 @@ const ArrowRightIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14" />
     <path d="m12 5 7 7-7 7" />
+  </svg>
+);
+
+const FlameIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
   </svg>
 );
 
@@ -42,19 +45,8 @@ const InboxIcon = () => (
   </svg>
 );
 
-function QuizPageContent() {
-  const searchParams = useSearchParams();
-  const categoryParam = searchParams.get('category') as QuizCategory | null;
-  const modeParam = searchParams.get('mode') || 'daily';
-  const questionIdsParam = searchParams.get('questionIds');
-  const returnUrlParam = searchParams.get('returnUrl');
-
-  // 問題IDリストを解析
-  const questionIds = questionIdsParam ? questionIdsParam.split(',').filter(Boolean) : undefined;
-  // 戻り先URL（デコード）
-  const returnUrl = returnUrlParam ? decodeURIComponent(returnUrlParam) : '/coffee-trivia';
-
-  const { isAuthenticated, loading: authLoading, progress } = useQuizData();
+function RevengePageContent() {
+  const { isAuthenticated, loading: authLoading, progress, revengeCount } = useQuizData();
 
   // 効果音フック
   const {
@@ -69,15 +61,6 @@ function QuizPageContent() {
     soundEnabled: progress?.settings.soundEnabled ?? true,
     vibrationEnabled: progress?.settings.vibrationEnabled ?? true,
   });
-
-  // モードを決定
-  const determineMode = () => {
-    if (modeParam === 'single') return 'single';
-    if (modeParam === 'shuffle') return 'shuffle';
-    if (modeParam === 'revenge') return 'revenge';
-    if (categoryParam) return 'category';
-    return modeParam as 'daily' | 'review' | 'random';
-  };
 
   const {
     session,
@@ -94,13 +77,8 @@ function QuizPageContent() {
     nextQuestion,
     resetSession,
   } = useQuizSession({
-    mode: determineMode(),
-    category: categoryParam || undefined,
-    count: questionIds?.length || 10,
-    questionIds,
+    mode: 'revenge',
   });
-
-  const isSingleMode = modeParam === 'single';
 
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
@@ -109,10 +87,10 @@ function QuizPageContent() {
 
   // セッション開始
   useEffect(() => {
-    if (isAuthenticated && !session && !isLoading) {
+    if (isAuthenticated && !session && !isLoading && revengeCount > 0) {
       startSession();
     }
-  }, [isAuthenticated, session, isLoading, startSession]);
+  }, [isAuthenticated, session, isLoading, revengeCount, startSession]);
 
   // セッション開始音
   useEffect(() => {
@@ -194,7 +172,7 @@ function QuizPageContent() {
           </div>
           <h2 className="text-lg font-bold text-[#211714] mb-2">ログインが必要です</h2>
           <p className="text-[#3A2F2B]/70 text-sm mb-4">
-            クイズに挑戦するにはログインしてください
+            リベンジモードに挑戦するにはログインしてください
           </p>
           <Link
             href="/login"
@@ -207,39 +185,76 @@ function QuizPageContent() {
     );
   }
 
+  // リベンジ対象の問題がない場合
+  if (!isLoading && revengeCount === 0) {
+    return (
+      <div className="min-h-screen bg-[#FDF8F0]">
+        <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            <Link
+              href="/coffee-trivia"
+              className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
+            >
+              <ArrowLeftIcon />
+              <span className="text-sm font-medium">戻る</span>
+            </Link>
+            <h1 className="font-semibold text-[#211714]">リベンジモード</h1>
+            <div className="w-14" />
+          </div>
+        </header>
+
+        <main className="max-w-lg mx-auto px-4 py-12">
+          <div className="text-center">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center text-green-500">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-[#211714] mb-2">苦手な問題はありません</h2>
+            <p className="text-[#3A2F2B]/70 text-sm mb-6">
+              素晴らしい！現在リベンジが必要な問題はありません。<br />
+              クイズを続けて学習を深めましょう。
+            </p>
+            <Link
+              href="/coffee-trivia"
+              className="inline-block bg-[#EF8A00] hover:bg-[#D67A00] text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
+            >
+              ダッシュボードへ戻る
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   // ローディング
   if (isLoading || !session) {
     return (
       <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin mx-auto mb-3" />
-          <p className="text-[#3A2F2B]/70 text-sm">問題を読み込み中...</p>
+          <div className="w-10 h-10 rounded-full border-2 border-red-500/20 border-t-red-500 animate-spin mx-auto mb-3" />
+          <p className="text-[#3A2F2B]/70 text-sm">苦手問題を読み込み中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FDF8F0]">
+    <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50">
       {/* ヘッダー */}
-      <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
+      <header className="sticky top-0 z-10 bg-gradient-to-r from-red-500 to-orange-500 px-4 py-3 shadow-lg">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link
-            href={returnUrl}
-            className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
+            href="/coffee-trivia"
+            className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors"
           >
             <ArrowLeftIcon />
             <span className="text-sm font-medium">戻る</span>
           </Link>
-          <h1 className="font-semibold text-[#211714]">
-            {modeParam === 'revenge'
-              ? 'リベンジモード'
-              : modeParam === 'single'
-              ? '問題'
-              : categoryParam
-              ? CATEGORY_LABELS[categoryParam]
-              : 'デイリークイズ'}
-          </h1>
+          <div className="flex items-center gap-2">
+            <FlameIcon />
+            <h1 className="font-bold text-white">リベンジモード</h1>
+          </div>
           <div className="w-14" />
         </div>
       </header>
@@ -248,41 +263,13 @@ function QuizPageContent() {
       <main className="max-w-lg mx-auto px-4 py-5">
         <AnimatePresence mode="wait">
           {isComplete ? (
-            isSingleMode ? (
-              // Singleモード: シンプルな完了表示
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 text-center shadow-sm border border-[#211714]/5"
-              >
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                  sessionStats.correct > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                }`}>
-                  {sessionStats.correct > 0 ? '✓' : '✗'}
-                </div>
-                <h2 className="text-lg font-bold text-[#211714] mb-2">
-                  {sessionStats.correct > 0 ? '正解！' : '不正解'}
-                </h2>
-                <p className="text-[#3A2F2B]/70 text-sm mb-4">
-                  +{sessionStats.totalXP} XP獲得
-                </p>
-                <Link
-                  href={returnUrl}
-                  className="inline-block bg-[#EF8A00] hover:bg-[#D67A00] text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
-                >
-                  問題一覧に戻る
-                </Link>
-              </motion.div>
-            ) : (
-              <QuizResult
-                correct={sessionStats.correct}
-                incorrect={sessionStats.incorrect}
-                totalXP={sessionStats.totalXP}
-                accuracy={sessionStats.accuracy}
-                onRetry={handleRetry}
-                returnUrl={returnUrl}
-              />
-            )
+            <QuizResult
+              correct={sessionStats.correct}
+              incorrect={sessionStats.incorrect}
+              totalXP={sessionStats.totalXP}
+              accuracy={sessionStats.accuracy}
+              onRetry={handleRetry}
+            />
           ) : currentQuestion ? (
             <>
               <QuizCard
@@ -302,7 +289,7 @@ function QuizPageContent() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   onClick={handleNext}
-                  className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                  className="w-full mt-4 flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
                 >
                   {currentIndex + 1 >= totalQuestions ? (
                     '結果を見る'
@@ -336,16 +323,16 @@ function QuizPageContent() {
   );
 }
 
-export default function QuizPage() {
+export default function RevengePage() {
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
+          <div className="w-8 h-8 rounded-full border-2 border-red-500/20 border-t-red-500 animate-spin" />
         </div>
       }
     >
-      <QuizPageContent />
+      <RevengePageContent />
     </Suspense>
   );
 }

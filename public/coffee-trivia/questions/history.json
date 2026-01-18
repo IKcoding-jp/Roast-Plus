@@ -1,0 +1,135 @@
+{
+  "category": "history",
+  "questions": [
+    {
+      "id": "history-001",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "コーヒーの発祥地とされている国はどこですか？",
+      "options": [
+        { "id": "a", "text": "エチオピア", "isCorrect": true },
+        { "id": "b", "text": "ブラジル", "isCorrect": false },
+        { "id": "c", "text": "コロンビア", "isCorrect": false },
+        { "id": "d", "text": "インドネシア", "isCorrect": false }
+      ],
+      "explanation": "コーヒーの原産地はエチオピアとされています。カルディの伝説では、ヤギ飼いがコーヒーの実を発見したと言われています。"
+    },
+    {
+      "id": "history-002",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "世界最大のコーヒー生産国はどこですか？",
+      "options": [
+        { "id": "a", "text": "ブラジル", "isCorrect": true },
+        { "id": "b", "text": "ベトナム", "isCorrect": false },
+        { "id": "c", "text": "コロンビア", "isCorrect": false },
+        { "id": "d", "text": "エチオピア", "isCorrect": false }
+      ],
+      "explanation": "ブラジルは世界のコーヒー生産量の約35%を占める最大の生産国です。2位はベトナム、3位はコロンビアです。"
+    },
+    {
+      "id": "history-003",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "日本に初めてコーヒーが伝来したのはいつ頃ですか？",
+      "options": [
+        { "id": "a", "text": "江戸時代（18世紀）", "isCorrect": true },
+        { "id": "b", "text": "明治時代", "isCorrect": false },
+        { "id": "c", "text": "大正時代", "isCorrect": false },
+        { "id": "d", "text": "昭和時代", "isCorrect": false }
+      ],
+      "explanation": "コーヒーは江戸時代に長崎の出島を通じてオランダ人により伝来しました。当初は薬として扱われていました。"
+    },
+    {
+      "id": "history-004",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「カフェ・ラテ」の発祥地とされる国はどこですか？",
+      "options": [
+        { "id": "a", "text": "イタリア", "isCorrect": true },
+        { "id": "b", "text": "フランス", "isCorrect": false },
+        { "id": "c", "text": "オーストリア", "isCorrect": false },
+        { "id": "d", "text": "アメリカ", "isCorrect": false }
+      ],
+      "explanation": "カフェ・ラテ（Caffè Latte）はイタリア語で「コーヒー牛乳」を意味し、イタリアで生まれました。"
+    },
+    {
+      "id": "history-005",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「エスプレッソ」という言葉の意味は何ですか？",
+      "options": [
+        { "id": "a", "text": "急速に・急行で", "isCorrect": true },
+        { "id": "b", "text": "濃い", "isCorrect": false },
+        { "id": "c", "text": "苦い", "isCorrect": false },
+        { "id": "d", "text": "熱い", "isCorrect": false }
+      ],
+      "explanation": "「エスプレッソ（Espresso）」はイタリア語で「急速に」を意味し、注文を受けてすぐに抽出することに由来します。"
+    },
+    {
+      "id": "history-006",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「サードウェーブコーヒー」の特徴として最も適切なものはどれですか？",
+      "options": [
+        { "id": "a", "text": "産地や農園の透明性を重視", "isCorrect": true },
+        { "id": "b", "text": "大量生産とコスト削減", "isCorrect": false },
+        { "id": "c", "text": "深煎り中心の味づくり", "isCorrect": false },
+        { "id": "d", "text": "インスタントコーヒーの普及", "isCorrect": false }
+      ],
+      "explanation": "サードウェーブは産地・農園・品種の透明性、浅煎りで個性を活かすロースティング、直接取引などを特徴とするムーブメントです。"
+    },
+    {
+      "id": "history-007",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「ファーストウェーブ」はどのような時代を指しますか？",
+      "options": [
+        { "id": "a", "text": "大量生産・大量消費の時代", "isCorrect": true },
+        { "id": "b", "text": "スペシャルティコーヒーの登場", "isCorrect": false },
+        { "id": "c", "text": "シングルオリジンブーム", "isCorrect": false },
+        { "id": "d", "text": "缶コーヒーの普及", "isCorrect": false }
+      ],
+      "explanation": "ファーストウェーブは19世紀後半〜1960年代の大量生産時代で、インスタントコーヒーや真空パックなどで一般家庭に普及しました。"
+    },
+    {
+      "id": "history-008",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「コピ・ルアク」の生産方法で正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "ジャコウネコが食べた実から採取", "isCorrect": true },
+        { "id": "b", "text": "高地で特別な方法で発酵", "isCorrect": false },
+        { "id": "c", "text": "海水で洗浄して精製", "isCorrect": false },
+        { "id": "d", "text": "月光の下で乾燥", "isCorrect": false }
+      ],
+      "explanation": "コピ・ルアク（Kopi Luwak）はインドネシアで、ジャコウネコ（ルアク）が食べたコーヒーチェリーの未消化の豆を採取して作られます。"
+    },
+    {
+      "id": "history-009",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「スターバックス」が創業した都市はどこですか？",
+      "options": [
+        { "id": "a", "text": "シアトル", "isCorrect": true },
+        { "id": "b", "text": "ニューヨーク", "isCorrect": false },
+        { "id": "c", "text": "ロサンゼルス", "isCorrect": false },
+        { "id": "d", "text": "サンフランシスコ", "isCorrect": false }
+      ],
+      "explanation": "スターバックスは1971年にワシントン州シアトルのパイクプレイスマーケットで創業しました。当初は焙煎豆の販売店でした。"
+    },
+    {
+      "id": "history-010",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ブルーマウンテン」コーヒーの産地はどこですか？",
+      "options": [
+        { "id": "a", "text": "ジャマイカ", "isCorrect": true },
+        { "id": "b", "text": "ハワイ", "isCorrect": false },
+        { "id": "c", "text": "コスタリカ", "isCorrect": false },
+        { "id": "d", "text": "ケニア", "isCorrect": false }
+      ],
+      "explanation": "ブルーマウンテンはジャマイカのブルーマウンテン山脈（標高800-1200m）で栽培される高級コーヒーで、日本への輸出量が多いことで知られています。"
+    }
+  ]
+}

@@ -22,7 +22,12 @@
       "mcp__chrome-devtools__click",
       "mcp__serena__find_symbol",
       "Bash(test:*)",
-      "mcp__chrome-devtools__take_screenshot"
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(cd:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(npm show:*)",
+      "Bash(grep:*)"
     ]
   },
   "enabledMcpjsonServers": [

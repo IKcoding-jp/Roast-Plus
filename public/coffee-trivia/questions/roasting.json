@@ -1,0 +1,135 @@
+{
+  "category": "roasting",
+  "questions": [
+    {
+      "id": "roasting-001",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "コーヒー焙煎で「1ハゼ」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "豆が膨張して弾ける音", "isCorrect": true },
+        { "id": "b", "text": "煙が出始める瞬間", "isCorrect": false },
+        { "id": "c", "text": "焙煎機の温度設定", "isCorrect": false },
+        { "id": "d", "text": "豆の色が変わる瞬間", "isCorrect": false }
+      ],
+      "explanation": "1ハゼは焙煎中に豆内部の水分が蒸発し、豆が膨張して「パチパチ」と弾ける音を立てる現象です。通常200℃前後で起こります。"
+    },
+    {
+      "id": "roasting-002",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "浅煎り・中煎り・深煎りで、カフェイン含有量が最も多いのはどれですか？",
+      "options": [
+        { "id": "a", "text": "浅煎り", "isCorrect": true },
+        { "id": "b", "text": "中煎り", "isCorrect": false },
+        { "id": "c", "text": "深煎り", "isCorrect": false },
+        { "id": "d", "text": "すべて同じ", "isCorrect": false }
+      ],
+      "explanation": "カフェインは焙煎が進むと若干減少します。また、深煎りは豆が膨張するため、同じ重量だと深煎りの方が豆の数が多くなり、結果的にカフェインは同程度になることもあります。"
+    },
+    {
+      "id": "roasting-003",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「メイラード反応」はコーヒー焙煎でどのような役割を果たしますか？",
+      "options": [
+        { "id": "a", "text": "香りと色の生成", "isCorrect": true },
+        { "id": "b", "text": "カフェインの増加", "isCorrect": false },
+        { "id": "c", "text": "水分の蒸発", "isCorrect": false },
+        { "id": "d", "text": "豆の硬さの維持", "isCorrect": false }
+      ],
+      "explanation": "メイラード反応は糖とアミノ酸の化学反応で、コーヒーの褐色化と複雑な香り成分の生成に関わります。約140-170℃で進行します。"
+    },
+    {
+      "id": "roasting-004",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「2ハゼ」が起こるのは一般的にどの焙煎度合いですか？",
+      "options": [
+        { "id": "a", "text": "シティロースト以降", "isCorrect": true },
+        { "id": "b", "text": "ライトロースト", "isCorrect": false },
+        { "id": "c", "text": "ミディアムロースト", "isCorrect": false },
+        { "id": "d", "text": "1ハゼの前", "isCorrect": false }
+      ],
+      "explanation": "2ハゼは1ハゼより高温（約225℃以降）で起こり、「ピチピチ」という小さな音が特徴です。シティロースト以降の深煎りで発生します。"
+    },
+    {
+      "id": "roasting-005",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎後のコーヒー豆から放出されるガスの主成分は何ですか？",
+      "options": [
+        { "id": "a", "text": "二酸化炭素", "isCorrect": true },
+        { "id": "b", "text": "酸素", "isCorrect": false },
+        { "id": "c", "text": "窒素", "isCorrect": false },
+        { "id": "d", "text": "水蒸気", "isCorrect": false }
+      ],
+      "explanation": "焙煎中に生成された二酸化炭素が豆内部に残り、焙煎後数日かけて放出されます。これが「ガス抜き」と呼ばれる現象です。"
+    },
+    {
+      "id": "roasting-006",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「RoR（Rate of Rise）」とは何を表しますか？",
+      "options": [
+        { "id": "a", "text": "焙煎中の温度上昇速度", "isCorrect": true },
+        { "id": "b", "text": "豆の品質等級", "isCorrect": false },
+        { "id": "c", "text": "焙煎機の回転速度", "isCorrect": false },
+        { "id": "d", "text": "豆の膨張率", "isCorrect": false }
+      ],
+      "explanation": "RoR（上昇率）は1分あたりの温度変化を表し、焙煎プロファイルの管理に重要な指標です。適切なRoRの管理で風味をコントロールします。"
+    },
+    {
+      "id": "roasting-007",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「発達時間（Development Time）」とは焙煎のどの区間を指しますか？",
+      "options": [
+        { "id": "a", "text": "1ハゼから焙煎終了まで", "isCorrect": true },
+        { "id": "b", "text": "投入から1ハゼまで", "isCorrect": false },
+        { "id": "c", "text": "2ハゼから焙煎終了まで", "isCorrect": false },
+        { "id": "d", "text": "冷却時間", "isCorrect": false }
+      ],
+      "explanation": "発達時間（DTR: Development Time Ratio）は1ハゼから焙煎終了までの時間で、通常は全焙煎時間の15-25%程度が理想とされます。"
+    },
+    {
+      "id": "roasting-008",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ベイクド」と呼ばれる焙煎の欠陥はどのような原因で起こりますか？",
+      "options": [
+        { "id": "a", "text": "焙煎時間が長すぎる・温度上昇が遅い", "isCorrect": true },
+        { "id": "b", "text": "焙煎温度が高すぎる", "isCorrect": false },
+        { "id": "c", "text": "冷却が不十分", "isCorrect": false },
+        { "id": "d", "text": "生豆の品質が低い", "isCorrect": false }
+      ],
+      "explanation": "ベイクドは焙煎時間が長すぎたり、途中で温度上昇が止まると起こります。フラットで味気ない風味になり、酸味や甘みが失われます。"
+    },
+    {
+      "id": "roasting-009",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎中に「チャフ」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "コーヒー豆の薄皮", "isCorrect": true },
+        { "id": "b", "text": "焙煎機の排気", "isCorrect": false },
+        { "id": "c", "text": "焦げた豆", "isCorrect": false },
+        { "id": "d", "text": "煙の成分", "isCorrect": false }
+      ],
+      "explanation": "チャフ（シルバースキン）はコーヒー豆を覆う薄い皮で、焙煎中に豆が膨張すると剥がれ落ちます。焙煎機には集塵機能があります。"
+    },
+    {
+      "id": "roasting-010",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「エンドサーミック」から「エクソサーミック」への転換点は焙煎のどの段階ですか？",
+      "options": [
+        { "id": "a", "text": "1ハゼ付近", "isCorrect": true },
+        { "id": "b", "text": "投入直後", "isCorrect": false },
+        { "id": "c", "text": "2ハゼ後", "isCorrect": false },
+        { "id": "d", "text": "冷却開始時", "isCorrect": false }
+      ],
+      "explanation": "焙煎初期は吸熱反応（エンドサーミック）、1ハゼ付近から発熱反応（エクソサーミック）に転換します。この転換点の管理が焙煎の鍵です。"
+    }
+  ]
+}

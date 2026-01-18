@@ -1,0 +1,135 @@
+{
+  "category": "basics",
+  "questions": [
+    {
+      "id": "basics-001",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの木は何科に属しますか？",
+      "options": [
+        { "id": "a", "text": "アカネ科", "isCorrect": true },
+        { "id": "b", "text": "バラ科", "isCorrect": false },
+        { "id": "c", "text": "マメ科", "isCorrect": false },
+        { "id": "d", "text": "ツバキ科", "isCorrect": false }
+      ],
+      "explanation": "コーヒーの木はアカネ科（Rubiaceae）に属します。クチナシやアカネと同じ科です。"
+    },
+    {
+      "id": "basics-002",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "世界で最も生産量が多いコーヒー豆の品種は？",
+      "options": [
+        { "id": "a", "text": "アラビカ種", "isCorrect": true },
+        { "id": "b", "text": "ロブスタ種", "isCorrect": false },
+        { "id": "c", "text": "リベリカ種", "isCorrect": false },
+        { "id": "d", "text": "エクセルサ種", "isCorrect": false }
+      ],
+      "explanation": "アラビカ種は世界のコーヒー生産量の約60-70%を占め、風味が豊かで高品質とされています。"
+    },
+    {
+      "id": "basics-003",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーチェリーの中に通常何個の種子（コーヒー豆）が入っていますか？",
+      "options": [
+        { "id": "a", "text": "1個", "isCorrect": false },
+        { "id": "b", "text": "2個", "isCorrect": true },
+        { "id": "c", "text": "3個", "isCorrect": false },
+        { "id": "d", "text": "4個", "isCorrect": false }
+      ],
+      "explanation": "通常コーヒーチェリーには2つの種子（フラットビーン）が向かい合って入っています。1つだけの場合はピーベリーと呼ばれます。"
+    },
+    {
+      "id": "basics-004",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「コーヒーベルト」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "コーヒー栽培に適した赤道付近の地帯", "isCorrect": true },
+        { "id": "b", "text": "コーヒー豆の外皮の部分", "isCorrect": false },
+        { "id": "c", "text": "コーヒーを収穫する際に使う道具", "isCorrect": false },
+        { "id": "d", "text": "コーヒー豆の等級を表す用語", "isCorrect": false }
+      ],
+      "explanation": "コーヒーベルトは北緯25度から南緯25度の間の熱帯・亜熱帯地域を指し、コーヒー栽培に適した気候条件が揃っています。"
+    },
+    {
+      "id": "basics-005",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "アラビカ種とロブスタ種を比較したとき、カフェイン含有量が多いのはどちらですか？",
+      "options": [
+        { "id": "a", "text": "アラビカ種", "isCorrect": false },
+        { "id": "b", "text": "ロブスタ種", "isCorrect": true },
+        { "id": "c", "text": "同じ", "isCorrect": false },
+        { "id": "d", "text": "栽培条件による", "isCorrect": false }
+      ],
+      "explanation": "ロブスタ種はアラビカ種の約2倍のカフェインを含みます。このため病害虫に強い特性がありますが、苦味が強くなります。"
+    },
+    {
+      "id": "basics-006",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒー豆を保存する際、最も避けるべき環境要因はどれですか？",
+      "options": [
+        { "id": "a", "text": "光・熱・湿気・酸素", "isCorrect": true },
+        { "id": "b", "text": "暗所・冷所", "isCorrect": false },
+        { "id": "c", "text": "密閉容器", "isCorrect": false },
+        { "id": "d", "text": "常温", "isCorrect": false }
+      ],
+      "explanation": "コーヒー豆の劣化を防ぐには、光・熱・湿気・酸素を避けることが重要です。密閉容器で冷暗所に保存するのがベストです。"
+    },
+    {
+      "id": "basics-007",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「ピーベリー」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "コーヒーチェリーに1つだけできた丸い豆", "isCorrect": true },
+        { "id": "b", "text": "最高品質のコーヒー豆の等級", "isCorrect": false },
+        { "id": "c", "text": "特定の産地のコーヒー豆", "isCorrect": false },
+        { "id": "d", "text": "深煎りのコーヒー豆", "isCorrect": false }
+      ],
+      "explanation": "ピーベリーは、通常2つできる種子が1つだけ育った丸い形のコーヒー豆です。全体の5-10%程度しかなく、凝縮された風味があるとされています。"
+    },
+    {
+      "id": "basics-008",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "スペシャルティコーヒーの定義として正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "SCAAカッピングスコア80点以上", "isCorrect": true },
+        { "id": "b", "text": "標高1500m以上で栽培", "isCorrect": false },
+        { "id": "c", "text": "オーガニック認証取得", "isCorrect": false },
+        { "id": "d", "text": "アラビカ種100%", "isCorrect": false }
+      ],
+      "explanation": "スペシャルティコーヒーはSCAA（米国スペシャルティコーヒー協会）のカッピングスコアで100点満点中80点以上を獲得したコーヒーを指します。"
+    },
+    {
+      "id": "basics-009",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「精製方法」で「ウォッシュド」の特徴はどれですか？",
+      "options": [
+        { "id": "a", "text": "クリーンでさっぱりした風味", "isCorrect": true },
+        { "id": "b", "text": "フルーティーで発酵感がある", "isCorrect": false },
+        { "id": "c", "text": "甘みが強くボディが重い", "isCorrect": false },
+        { "id": "d", "text": "スモーキーな風味", "isCorrect": false }
+      ],
+      "explanation": "ウォッシュド（水洗式）は果肉を除去し水で洗って乾燥させる方法で、クリーンで酸味の明確な風味になります。"
+    },
+    {
+      "id": "basics-010",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「ナチュラル」精製と「ハニー」精製の違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "乾燥時に残す果肉の量", "isCorrect": true },
+        { "id": "b", "text": "使用する水の量", "isCorrect": false },
+        { "id": "c", "text": "乾燥にかかる日数", "isCorrect": false },
+        { "id": "d", "text": "使用する豆の品種", "isCorrect": false }
+      ],
+      "explanation": "ナチュラルはチェリーをそのまま乾燥、ハニーは果肉を部分的に残して乾燥させます。残す量でイエロー、レッド、ブラックハニーと分かれます。"
+    }
+  ]
+}

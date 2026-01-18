@@ -1,0 +1,135 @@
+{
+  "category": "brewing",
+  "questions": [
+    {
+      "id": "brewing-001",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒー抽出に最適な湯温は一般的に何度ですか？",
+      "options": [
+        { "id": "a", "text": "90-96℃", "isCorrect": true },
+        { "id": "b", "text": "70-80℃", "isCorrect": false },
+        { "id": "c", "text": "100℃", "isCorrect": false },
+        { "id": "d", "text": "60-70℃", "isCorrect": false }
+      ],
+      "explanation": "90-96℃が一般的に推奨される温度帯です。温度が高すぎると過抽出、低すぎると抽出不足になります。"
+    },
+    {
+      "id": "brewing-002",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「ドリップコーヒー」で最初にお湯を少量注いで待つ工程を何といいますか？",
+      "options": [
+        { "id": "a", "text": "蒸らし（ブルーミング）", "isCorrect": true },
+        { "id": "b", "text": "攪拌（スターリング）", "isCorrect": false },
+        { "id": "c", "text": "浸漬（イマージョン）", "isCorrect": false },
+        { "id": "d", "text": "濾過（フィルタリング）", "isCorrect": false }
+      ],
+      "explanation": "蒸らし（ブルーミング）は、粉に含まれる二酸化炭素を放出させ、均一な抽出を促進する重要な工程です。通常30-45秒行います。"
+    },
+    {
+      "id": "brewing-003",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「TDS（Total Dissolved Solids）」はコーヒーの何を測定する指標ですか？",
+      "options": [
+        { "id": "a", "text": "溶解した固形分の濃度", "isCorrect": true },
+        { "id": "b", "text": "温度", "isCorrect": false },
+        { "id": "c", "text": "酸味の強さ", "isCorrect": false },
+        { "id": "d", "text": "カフェイン量", "isCorrect": false }
+      ],
+      "explanation": "TDSはコーヒー液中の溶解固形分の割合で、通常1.15-1.45%が理想とされます。屈折計で測定できます。"
+    },
+    {
+      "id": "brewing-004",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「抽出率」の理想的な範囲は何%ですか？",
+      "options": [
+        { "id": "a", "text": "18-22%", "isCorrect": true },
+        { "id": "b", "text": "10-15%", "isCorrect": false },
+        { "id": "c", "text": "25-30%", "isCorrect": false },
+        { "id": "d", "text": "5-10%", "isCorrect": false }
+      ],
+      "explanation": "SCAが定める理想的な抽出率は18-22%です。これより低いと酸っぱく、高いと苦くて渋い味になります。"
+    },
+    {
+      "id": "brewing-005",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒーの挽き目が細かすぎると、どのような味になりやすいですか？",
+      "options": [
+        { "id": "a", "text": "苦くて渋い（過抽出）", "isCorrect": true },
+        { "id": "b", "text": "酸っぱくて薄い", "isCorrect": false },
+        { "id": "c", "text": "甘くてまろやか", "isCorrect": false },
+        { "id": "d", "text": "味に変化なし", "isCorrect": false }
+      ],
+      "explanation": "挽き目が細かいと表面積が増え、抽出が速く進み過抽出になりやすいです。苦味や渋みが強くなります。"
+    },
+    {
+      "id": "brewing-006",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ペーパーフィルター」と「金属フィルター」の違いで正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "金属フィルターはオイルが残る", "isCorrect": true },
+        { "id": "b", "text": "ペーパーフィルターはオイルが残る", "isCorrect": false },
+        { "id": "c", "text": "抽出時間に違いはない", "isCorrect": false },
+        { "id": "d", "text": "味に違いは出ない", "isCorrect": false }
+      ],
+      "explanation": "金属フィルターは目が粗いため、コーヒーオイルや微粉が通過し、コクのある味わいになります。ペーパーはクリーンな味になります。"
+    },
+    {
+      "id": "brewing-007",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "エスプレッソ抽出で「チャネリング」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "湯がコーヒー粉の一部を通り抜ける現象", "isCorrect": true },
+        { "id": "b", "text": "クレマが均一に形成される状態", "isCorrect": false },
+        { "id": "c", "text": "適切な抽出圧の維持", "isCorrect": false },
+        { "id": "d", "text": "ミルクのスチーミング技法", "isCorrect": false }
+      ],
+      "explanation": "チャネリングは粉の密度のムラにより、湯が抵抗の少ない部分を選んで流れる現象です。過抽出と抽出不足が混在し、味が不安定になります。"
+    },
+    {
+      "id": "brewing-008",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「4:6メソッド」とはどのような抽出法ですか？",
+      "options": [
+        { "id": "a", "text": "湯を4割と6割に分けて風味をコントロールする方法", "isCorrect": true },
+        { "id": "b", "text": "4分間で6杯分を抽出する方法", "isCorrect": false },
+        { "id": "c", "text": "46℃のお湯で抽出する方法", "isCorrect": false },
+        { "id": "d", "text": "4種類のフィルターを使う方法", "isCorrect": false }
+      ],
+      "explanation": "粕谷哲氏が考案した方法で、最初の40%で甘みと酸味のバランス、後の60%で濃度を調整します。分割注湯でコントロールします。"
+    },
+    {
+      "id": "brewing-009",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "フレンチプレスの推奨浸漬時間はどのくらいですか？",
+      "options": [
+        { "id": "a", "text": "4分程度", "isCorrect": true },
+        { "id": "b", "text": "30秒程度", "isCorrect": false },
+        { "id": "c", "text": "10分以上", "isCorrect": false },
+        { "id": "d", "text": "1分程度", "isCorrect": false }
+      ],
+      "explanation": "フレンチプレスは浸漬式で、4分程度の抽出時間が一般的です。長すぎると過抽出、短すぎると抽出不足になります。"
+    },
+    {
+      "id": "brewing-010",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「アジテーション」が抽出に与える影響として正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "抽出を促進し均一にする", "isCorrect": true },
+        { "id": "b", "text": "抽出を遅らせる", "isCorrect": false },
+        { "id": "c", "text": "温度を下げる", "isCorrect": false },
+        { "id": "d", "text": "微粉を除去する", "isCorrect": false }
+      ],
+      "explanation": "アジテーション（撹拌）はコーヒー粉周辺の飽和したコーヒー液を動かし、新鮮な湯との接触を促進して抽出効率を上げます。"
+    }
+  ]
+}

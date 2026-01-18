@@ -27,7 +27,8 @@
       "mcp__context7__resolve-library-id",
       "mcp__context7__query-docs",
       "Bash(npm show:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Skill(frontend-design)"
     ]
   },
   "enabledMcpjsonServers": [

@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 import Link from 'next/link';
 import { QuizCard } from '@/components/coffee-quiz/QuizCard';
 import { QuizResult } from '@/components/coffee-quiz/QuizResult';
@@ -12,6 +11,36 @@ import { LevelUpModal } from '@/components/coffee-quiz/LevelUpModal';
 import { useQuizSession } from '@/hooks/useQuizSession';
 import { useQuizData } from '@/hooks/useQuizData';
 import type { QuizCategory } from '@/lib/coffee-quiz/types';
+import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
+
+// アイコン
+const ArrowLeftIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m12 19-7-7 7-7" />
+    <path d="M19 12H5" />
+  </svg>
+);
+
+const ArrowRightIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14" />
+    <path d="m12 5 7 7-7 7" />
+  </svg>
+);
+
+const LockIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
+const InboxIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+    <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+  </svg>
+);
 
 function QuizPageContent() {
   const searchParams = useSearchParams();
@@ -64,12 +93,10 @@ function QuizPageContent() {
   // フィードバック表示時のエフェクト
   useEffect(() => {
     if (answerFeedback) {
-      // XPアニメーション
       if (answerFeedback.xpEarned > 0) {
         setShowXPAnimation(true);
       }
 
-      // レベルアップモーダル
       if (answerFeedback.leveledUp && answerFeedback.newLevel) {
         setTimeout(() => {
           setNewLevel(answerFeedback.newLevel!);
@@ -95,24 +122,26 @@ function QuizPageContent() {
   // 認証チェック
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center max-w-sm">
-          <span className="text-4xl mb-4 block">🔐</span>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">ログインが必要です</h2>
-          <p className="text-gray-600 text-sm mb-4">
+      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center max-w-sm border border-[#211714]/5">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#211714]/5 flex items-center justify-center text-[#211714]/40">
+            <LockIcon />
+          </div>
+          <h2 className="text-lg font-bold text-[#211714] mb-2">ログインが必要です</h2>
+          <p className="text-[#3A2F2B]/70 text-sm mb-4">
             クイズに挑戦するにはログインしてください
           </p>
           <Link
             href="/login"
-            className="inline-block bg-amber-500 text-white py-2 px-6 rounded-xl font-bold hover:bg-amber-600 transition-colors"
+            className="inline-block bg-[#EF8A00] hover:bg-[#D67A00] text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
           >
             ログイン
           </Link>
@@ -124,36 +153,36 @@ function QuizPageContent() {
   // ローディング
   if (isLoading || !session) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">問題を読み込み中...</p>
+          <div className="w-10 h-10 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin mx-auto mb-3" />
+          <p className="text-[#3A2F2B]/70 text-sm">問題を読み込み中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
+    <div className="min-h-screen bg-[#FDF8F0]">
       {/* ヘッダー */}
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-amber-100 px-4 py-3">
+      <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link
             href="/coffee-trivia"
-            className="flex items-center gap-2 text-gray-600 hover:text-amber-600 transition-colors"
+            className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
           >
-            <HiArrowLeft className="w-5 h-5" />
+            <ArrowLeftIcon />
             <span className="text-sm font-medium">戻る</span>
           </Link>
-          <h1 className="font-bold text-gray-800">
-            {categoryParam ? `${categoryParam}クイズ` : 'デイリークイズ'}
+          <h1 className="font-semibold text-[#211714]">
+            {categoryParam ? CATEGORY_LABELS[categoryParam] : 'デイリークイズ'}
           </h1>
-          <div className="w-16" /> {/* スペーサー */}
+          <div className="w-14" />
         </div>
       </header>
 
       {/* メインコンテンツ */}
-      <main className="max-w-lg mx-auto px-4 py-6">
+      <main className="max-w-lg mx-auto px-4 py-5">
         <AnimatePresence mode="wait">
           {isComplete ? (
             <QuizResult
@@ -181,14 +210,14 @@ function QuizPageContent() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   onClick={handleNext}
-                  className="w-full mt-4 flex items-center justify-center gap-2 bg-amber-500 text-white py-4 px-6 rounded-xl font-bold hover:bg-amber-600 transition-colors"
+                  className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
                 >
                   {currentIndex + 1 >= totalQuestions ? (
                     '結果を見る'
                   ) : (
                     <>
                       次の問題へ
-                      <HiArrowRight className="w-5 h-5" />
+                      <ArrowRightIcon />
                     </>
                   )}
                 </motion.button>
@@ -196,8 +225,10 @@ function QuizPageContent() {
             </>
           ) : (
             <div className="text-center py-12">
-              <span className="text-4xl mb-4 block">📭</span>
-              <p className="text-gray-600">問題がありません</p>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#211714]/5 flex items-center justify-center text-[#211714]/40">
+                <InboxIcon />
+              </div>
+              <p className="text-[#3A2F2B]/70">問題がありません</p>
             </div>
           )}
         </AnimatePresence>
@@ -224,8 +255,8 @@ export default function QuizPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+        <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
         </div>
       }
     >

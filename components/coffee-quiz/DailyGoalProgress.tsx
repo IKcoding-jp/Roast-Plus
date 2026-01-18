@@ -9,6 +9,22 @@ interface DailyGoalProgressProps {
   targetQuestions: number;
 }
 
+// シンプルなターゲットアイコン
+const TargetIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+);
+
+// チェックアイコン
+const CheckIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
 export function DailyGoalProgress({
   goal,
   targetQuestions,
@@ -20,89 +36,82 @@ export function DailyGoalProgress({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-2xl p-5 border shadow-md ${
+      className={`rounded-xl p-4 border ${
         isComplete
-          ? 'bg-gradient-to-br from-emerald-50 to-green-100/50 border-emerald-200'
-          : 'bg-white/90 backdrop-blur-sm border-[#211714]/5'
+          ? 'bg-emerald-50 border-emerald-200'
+          : 'bg-white border-[#211714]/5'
       }`}
     >
       {/* ヘッダー */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <motion.div
-            animate={isComplete ? { scale: [1, 1.1, 1], rotate: [0, 10, -10, 0] } : {}}
-            transition={{ repeat: isComplete ? Infinity : 0, duration: 2 }}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-md ${
-              isComplete
-                ? 'bg-gradient-to-br from-emerald-400 to-green-500'
-                : 'bg-gradient-to-br from-[#EF8A00] to-[#D67A00]'
-            }`}
-          >
-            <span className="text-xl">{isComplete ? '✅' : '🎯'}</span>
-          </motion.div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2.5">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+            isComplete
+              ? 'bg-emerald-500 text-white'
+              : 'bg-[#FDF8F0] text-[#EF8A00]'
+          }`}>
+            {isComplete ? <CheckIcon /> : <TargetIcon />}
+          </div>
           <div>
-            <span className="font-bold text-[#211714] block">今日の目標</span>
-            <span className="text-xs text-[#3A2F2B]/60">
-              {isComplete ? '達成おめでとう！' : 'あと少し頑張ろう'}
+            <span className={`font-semibold text-sm block ${
+              isComplete ? 'text-emerald-800' : 'text-[#211714]'
+            }`}>今日の目標</span>
+            <span className={`text-[11px] ${
+              isComplete ? 'text-emerald-600' : 'text-[#3A2F2B]/60'
+            }`}>
+              {isComplete ? '達成' : 'あと少し'}
             </span>
           </div>
         </div>
         <div className="text-right">
-          <span
-            className={`text-lg font-bold ${
-              isComplete ? 'text-emerald-600' : 'text-[#EF8A00]'
-            }`}
-          >
+          <span className={`text-base font-bold ${
+            isComplete ? 'text-emerald-600' : 'text-[#211714]'
+          }`}>
             {completed}
           </span>
-          <span className="text-[#3A2F2B]/60 text-sm"> / {targetQuestions}問</span>
+          <span className={`text-sm ${
+            isComplete ? 'text-emerald-500' : 'text-[#3A2F2B]/50'
+          }`}> / {targetQuestions}</span>
         </div>
       </div>
 
       {/* プログレスバー */}
-      <div className="h-4 bg-[#211714]/5 rounded-full overflow-hidden mb-3 shadow-inner">
+      <div className={`h-2 rounded-full overflow-hidden mb-2.5 ${
+        isComplete ? 'bg-emerald-200' : 'bg-[#211714]/10'
+      }`}>
         <motion.div
-          className={`h-full rounded-full relative ${
-            isComplete
-              ? 'bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-500'
-              : 'bg-gradient-to-r from-[#EF8A00] via-[#FF9A1A] to-[#EF8A00]'
+          className={`h-full rounded-full ${
+            isComplete ? 'bg-emerald-500' : 'bg-[#EF8A00]'
           }`}
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(progress, 100)}%` }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        >
-          {/* シャイン効果 */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        </motion.div>
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        />
       </div>
 
       {/* 統計 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-emerald-500 text-sm">✓</span>
-            <span className="text-xs text-[#3A2F2B]/70">
-              正解率: {completed > 0 ? Math.round((correct / completed) * 100) : 0}%
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5 px-2 py-1 bg-[#EF8A00]/10 rounded-lg">
-          <span className="text-[#EF8A00] text-xs font-bold">+{goal?.xpEarned ?? 0}</span>
-          <span className="text-[#EF8A00]/70 text-xs">XP</span>
-        </div>
+      <div className="flex items-center justify-between text-xs">
+        <span className={isComplete ? 'text-emerald-600' : 'text-[#3A2F2B]/60'}>
+          正解率 {completed > 0 ? Math.round((correct / completed) * 100) : 0}%
+        </span>
+        <span className={`font-medium ${
+          isComplete ? 'text-emerald-600' : 'text-[#EF8A00]'
+        }`}>
+          +{goal?.xpEarned ?? 0} XP
+        </span>
       </div>
 
       {/* 完了メッセージ */}
       {isComplete && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="mt-4 text-center py-3 bg-emerald-100/50 rounded-xl"
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-3 text-center py-2 bg-emerald-100 rounded-lg"
         >
-          <span className="text-emerald-700 font-medium text-sm">
-            🎉 今日の目標達成！お疲れ様でした
+          <span className="text-emerald-700 font-medium text-xs">
+            今日の目標達成
           </span>
         </motion.div>
       )}

@@ -16,19 +16,19 @@ export function LevelDisplay({ level, compact = false }: LevelDisplayProps) {
 
   if (compact) {
     return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-[#211714]/5 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EF8A00] to-[#D67A00] flex items-center justify-center shadow-md">
-            <span className="text-white font-bold text-sm">{level.level}</span>
+      <div className="bg-white rounded-xl p-3 border border-[#211714]/5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-full bg-[#211714] flex items-center justify-center text-white font-bold text-sm">
+            {level.level}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-medium text-[#211714]">Lv.{level.level}</span>
-              <span className="text-xs text-[#3A2F2B]/60">{level.currentXP}/{level.xpToNextLevel}</span>
+              <span className="text-xs text-[#3A2F2B]/50">{level.currentXP}/{level.xpToNextLevel}</span>
             </div>
-            <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-[#211714]/10 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-[#EF8A00] to-[#FF9A1A] rounded-full"
+                className="h-full bg-[#EF8A00] rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -42,24 +42,17 @@ export function LevelDisplay({ level, compact = false }: LevelDisplayProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-gradient-to-br from-[#FDF8F0] to-[#F7F2EB] rounded-2xl p-5 border border-[#EF8A00]/10 shadow-md"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-xl p-4 border border-[#211714]/5"
     >
       <div className="flex items-center gap-4">
         {/* レベルバッジ */}
         <div className="relative">
-          <motion.div
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-            className="w-18 h-18 rounded-full bg-gradient-to-br from-[#EF8A00] via-[#FF9A1A] to-[#D67A00] flex items-center justify-center shadow-[0_4px_20px_rgba(239,138,0,0.3)]"
-          >
-            {/* インナーリング */}
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#211714] to-[#3A2F2B] flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">{level.level}</span>
-            </div>
-          </motion.div>
-          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-white text-[#EF8A00] text-xs font-bold px-3 py-0.5 rounded-full shadow-md border border-[#EF8A00]/20">
+          <div className="w-14 h-14 rounded-full bg-[#211714] flex items-center justify-center">
+            <span className="text-white font-bold text-xl">{level.level}</span>
+          </div>
+          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 bg-[#FDF8F0] text-[#3A2F2B] text-[10px] font-medium px-2 py-0.5 rounded-full">
             Lv.
           </span>
         </div>
@@ -67,26 +60,23 @@ export function LevelDisplay({ level, compact = false }: LevelDisplayProps) {
         {/* XP情報 */}
         <div className="flex-1">
           <div className="flex items-baseline justify-between mb-2">
-            <span className="text-[#3A2F2B]/70 text-sm">次のレベルまで</span>
-            <span className="text-[#EF8A00] font-bold">
+            <span className="text-[#3A2F2B]/60 text-xs">次のレベルまで</span>
+            <span className="text-[#211714] font-semibold text-sm">
               {level.xpToNextLevel - level.currentXP} XP
             </span>
           </div>
 
           {/* プログレスバー */}
-          <div className="h-4 bg-white rounded-full overflow-hidden shadow-inner border border-[#211714]/10">
+          <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-[#EF8A00] via-[#FF9A1A] to-[#EF8A00] rounded-full relative"
+              className="h-full bg-[#EF8A00] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-            >
-              {/* シャイン効果 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-            </motion.div>
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            />
           </div>
 
-          <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
+          <div className="flex items-center justify-between mt-1.5 text-[11px] text-[#3A2F2B]/50">
             <span>{level.currentXP} XP</span>
             <span>累計 {level.totalXP} XP</span>
           </div>

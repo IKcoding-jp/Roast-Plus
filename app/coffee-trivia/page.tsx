@@ -1,13 +1,31 @@
 'use client';
 
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft } from 'react-icons/hi';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
 import Link from 'next/link';
 import { QuizDashboard } from '@/components/coffee-quiz/QuizDashboard';
 import { useQuizData } from '@/hooks/useQuizData';
+
+// シンプルな戻るアイコン
+const ArrowLeftIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m12 19-7-7 7-7" />
+    <path d="M19 12H5" />
+  </svg>
+);
+
+// コーヒーカップアイコン
+const CoffeeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+    <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+    <line x1="6" y1="2" x2="6" y2="4" />
+    <line x1="10" y1="2" x2="10" y2="4" />
+    <line x1="14" y1="2" x2="14" y2="4" />
+  </svg>
+);
 
 export default function CoffeeTriviaPage() {
   const { user, loading: authLoading } = useAuth();
@@ -25,18 +43,20 @@ export default function CoffeeTriviaPage() {
   const dueCardsCount = getDueCardsForReview().length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-amber-50 to-orange-50">
-      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center bg-white/80 backdrop-blur-sm border-b border-amber-100">
+    <div className="min-h-screen flex flex-col bg-[#FDF8F0]">
+      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center bg-white border-b border-[#211714]/5">
         <Link
           href="/"
-          className="p-2 -ml-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-1.5 -ml-1.5 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
           title="戻る"
           aria-label="戻る"
         >
-          <HiArrowLeft className="h-6 w-6" />
+          <ArrowLeftIcon />
         </Link>
-        <h1 className="ml-3 text-lg font-bold text-gray-800 flex items-center gap-2">
-          <span>☕</span>
+        <h1 className="ml-2.5 text-base font-semibold text-[#211714] flex items-center gap-2">
+          <span className="text-[#EF8A00]">
+            <CoffeeIcon />
+          </span>
           コーヒークイズ
         </h1>
       </header>

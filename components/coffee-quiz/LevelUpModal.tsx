@@ -1,13 +1,27 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiX } from 'react-icons/hi';
 
 interface LevelUpModalProps {
   show: boolean;
   newLevel: number;
   onClose: () => void;
 }
+
+// 閉じるアイコン
+const XIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+// 星アイコン
+const StarIcon = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
 
 export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
   return (
@@ -28,37 +42,37 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
             onClick={(e) => e.stopPropagation()}
             className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-sm w-full"
           >
-            {/* ヘッダー */}
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-8 text-center relative">
+            {/* ヘッダー - ローストプラスカラー */}
+            <div className="bg-gradient-to-r from-[#EF8A00] via-[#D67A00] to-[#EF8A00] px-6 py-8 text-center relative">
               <button
                 onClick={onClose}
-                className="absolute top-3 right-3 text-white/70 hover:text-white"
+                className="absolute top-3 right-3 text-white/70 hover:text-white transition-colors"
               >
-                <HiX className="w-6 h-6" />
+                <XIcon />
               </button>
 
               {/* 星のアニメーション */}
               <motion.div
                 animate={{
                   rotate: [0, 360],
-                  scale: [1, 1.2, 1],
+                  scale: [1, 1.1, 1],
                 }}
                 transition={{
                   rotate: { repeat: Infinity, duration: 10, ease: 'linear' },
                   scale: { repeat: Infinity, duration: 1.5 },
                 }}
-                className="text-6xl mb-4"
+                className="text-white/90"
               >
-                ⭐
+                <StarIcon />
               </motion.div>
 
               <motion.h2
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-2xl font-bold text-white mb-2"
+                className="text-2xl font-bold text-white mt-3"
               >
-                レベルアップ！
+                レベルアップ
               </motion.h2>
             </div>
 
@@ -68,9 +82,9 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 mb-4"
+                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#FDF8F0] border-2 border-[#EF8A00]/20 mb-4"
               >
-                <span className="text-4xl font-bold text-purple-600">
+                <span className="text-4xl font-bold text-[#EF8A00]">
                   {newLevel}
                 </span>
               </motion.div>
@@ -79,11 +93,11 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-gray-600 mb-6"
+                className="text-[#3A2F2B] mb-6"
               >
-                おめでとうございます！
+                おめでとうございます
                 <br />
-                レベル {newLevel} に到達しました！
+                レベル {newLevel} に到達しました
               </motion.p>
 
               <motion.button
@@ -91,7 +105,7 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 onClick={onClose}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 transition-all"
+                className="w-full bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3 px-6 rounded-xl font-semibold transition-colors"
               >
                 続ける
               </motion.button>

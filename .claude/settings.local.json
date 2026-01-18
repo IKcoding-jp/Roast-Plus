@@ -21,7 +21,8 @@
       "mcp__chrome-devtools__take_snapshot",
       "mcp__chrome-devtools__click",
       "mcp__serena__find_symbol",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "mcp__chrome-devtools__take_screenshot"
     ]
   },
   "enabledMcpjsonServers": [

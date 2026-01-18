@@ -97,16 +97,27 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
   useEffect(() => {
     setMounted(true);
     const updateContainers = () => {
+      const desktopEl = filterButtonContainerId ? document.getElementById(filterButtonContainerId) : null;
+      const mobileEl = filterButtonContainerIdMobile ? document.getElementById(filterButtonContainerIdMobile) : null;
+
+      // コンテナが表示されている(0x0でない)場合のみ設定
       setContainers({
-        desktop: filterButtonContainerId ? document.getElementById(filterButtonContainerId) : null,
-        mobile: filterButtonContainerIdMobile ? document.getElementById(filterButtonContainerIdMobile) : null,
+        desktop: desktopEl && desktopEl.getBoundingClientRect().width > 0 ? desktopEl : null,
+        mobile: mobileEl && mobileEl.getBoundingClientRect().width > 0 ? mobileEl : null,
       });
     };
 
     updateContainers();
     // 念のため少し遅らせて実行（ハイドレーション対策）
     const timer = setTimeout(updateContainers, 100);
-    return () => clearTimeout(timer);
+
+    // リサイズ時にも再チェック
+    window.addEventListener('resize', updateContainers);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateContainers);
+    };
   }, [filterButtonContainerId, filterButtonContainerIdMobile]);
 
   // モーダル内で使用する一時的なフィルター状態
@@ -305,7 +316,24 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
     <>
       {/* フィルターボタンを外部コンテナにPortalでレンダリング */}
       {mounted && containers.desktop && createPortal(filterButton, containers.desktop)}
-      {mounted && containers.mobile && createPortal(filterButton, containers.mobile)}
+      {mounted && containers.mobile && createPortal(
+        <button
+          onClick={handleOpenFilterModal}
+          className={`px-4 py-2 rounded-2xl bg-white shadow-sm border transition-all hover:shadow-md hover:border-amber-200 flex items-center justify-center gap-2 min-h-[44px] relative group ${activeFilterCount > 0 ? 'text-amber-600 border-amber-200' : 'text-stone-500 border-stone-100'
+            }`}
+          title="フィルター"
+          aria-label="フィルター"
+        >
+          <Faders size={20} weight={activeFilterCount > 0 ? "fill" : "bold"} className="group-hover:scale-110 transition-transform" />
+          <span className="hidden md:block text-[10px] font-black uppercase tracking-[0.15em]">フィルター</span>
+          {activeFilterCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>,
+        containers.mobile
+      )}
 
       <div className="h-full flex flex-col min-h-0">
 

@@ -3,9 +3,14 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.6.1',
+    date: '2026-01-18',
+    summary: 'スケジュール読み取り機能の修正と改善',
+  },
+  {
     version: '0.6.0',
-    date: '2026-01-17',
-    summary: '開発秘話セクション追加',
+    date: '2026-01-18',
+    summary: 'AIテイスティング分析・スケジュールOCR・開発秘話の追加',
   },
   {
     version: '0.5.18',

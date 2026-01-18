@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -114,7 +114,7 @@ export function TastingSessionCarousel({
   }
 
   // セッションカードの共通データを準備
-  const sessionData = sessions.map((session) => {
+  const sessionData = useMemo(() => sessions.map((session) => {
     const sessionRecords = getRecordsBySessionId(tastingRecords, session.id);
     const recordCount = sessionRecords.length;
     const averageScores = calculateAverageScores(sessionRecords);
@@ -124,7 +124,19 @@ export function TastingSessionCarousel({
       .map((record) => record.overallImpression!);
 
     return { session, sessionRecords, recordCount, averageScores, comments };
-  });
+  }), [sessions, tastingRecords]);
+
+  // 自動分析をトリガーするuseEffect
+  useEffect(() => {
+    if (!onUpdateSession) return;
+
+    sessionData.forEach(({ session, recordCount, averageScores, comments }) => {
+      // 記録があり、分析がまだの場合は自動分析を開始
+      if (recordCount > 0 && !session.aiAnalysis && !isAnalyzing[session.id] && !analyzedIds.has(session.id)) {
+        triggerAutoAnalysis(session, comments, averageScores);
+      }
+    });
+  }, [sessionData, onUpdateSession, isAnalyzing, analyzedIds]);
 
   // 焙煎度に応じたバッジスタイル
   const getRoastBadgeStyle = (level: string) => {
@@ -148,11 +160,6 @@ export function TastingSessionCarousel({
             const roastStyle = getRoastBadgeStyle(session.roastLevel);
             const hasAnalysis = !!session.aiAnalysis;
             const analyzing = !!isAnalyzing[session.id];
-
-            // 記録があり、分析がまだの場合は自動分析を開始
-            if (recordCount > 0 && !hasAnalysis && !analyzing && onUpdateSession) {
-              triggerAutoAnalysis(session, comments, averageScores);
-            }
 
             return (
               <motion.div
@@ -343,11 +350,6 @@ export function TastingSessionCarousel({
           const roastStyle = getRoastBadgeStyle(session.roastLevel);
           const hasAnalysis = !!session.aiAnalysis;
           const analyzing = !!isAnalyzing[session.id];
-
-          // 記録があり、分析がまだの場合は自動分析を開始
-          if (recordCount > 0 && !hasAnalysis && !analyzing && onUpdateSession) {
-            triggerAutoAnalysis(session, comments, averageScores);
-          }
 
           return (
             <motion.div

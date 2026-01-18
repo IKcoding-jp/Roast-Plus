@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { XPGainAnimation } from '@/components/coffee-quiz/XPGainAnimation';
 import { LevelUpModal } from '@/components/coffee-quiz/LevelUpModal';
 import { useQuizSession } from '@/hooks/useQuizSession';
 import { useQuizData } from '@/hooks/useQuizData';
+import { useQuizSound } from '@/hooks/useQuizSound';
 import type { QuizCategory } from '@/lib/coffee-quiz/types';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 
@@ -48,7 +49,21 @@ function QuizPageContent() {
   const categoryParam = searchParams.get('category') as QuizCategory | null;
   const modeParam = searchParams.get('mode') || 'daily';
 
-  const { isAuthenticated, loading: authLoading } = useQuizData();
+  const { isAuthenticated, loading: authLoading, progress } = useQuizData();
+
+  // 効果音フック
+  const {
+    initialize: initializeSound,
+    playCorrect,
+    playIncorrect,
+    playLevelUp: playLevelUpSound,
+    playXP,
+    playStart,
+    playComplete,
+  } = useQuizSound({
+    soundEnabled: progress?.settings.soundEnabled ?? true,
+    vibrationEnabled: progress?.settings.vibrationEnabled ?? true,
+  });
 
   const {
     session,
@@ -74,6 +89,7 @@ function QuizPageContent() {
   const [showXPAnimation, setShowXPAnimation] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
+  const hasPlayedStartSound = useRef(false);
 
   // セッション開始
   useEffect(() => {
@@ -81,6 +97,15 @@ function QuizPageContent() {
       startSession();
     }
   }, [isAuthenticated, session, isLoading, startSession]);
+
+  // セッション開始音
+  useEffect(() => {
+    if (session && !hasPlayedStartSound.current) {
+      initializeSound();
+      playStart();
+      hasPlayedStartSound.current = true;
+    }
+  }, [session, initializeSound, playStart]);
 
   // 回答送信
   const handleSelectOption = async (optionId: string) => {
@@ -93,18 +118,28 @@ function QuizPageContent() {
   // フィードバック表示時のエフェクト
   useEffect(() => {
     if (answerFeedback) {
+      // 正解・不正解音
+      if (answerFeedback.isCorrect) {
+        playCorrect();
+      } else {
+        playIncorrect();
+      }
+
       if (answerFeedback.xpEarned > 0) {
         setShowXPAnimation(true);
+        // XP音は少し遅らせる
+        setTimeout(() => playXP(), 200);
       }
 
       if (answerFeedback.leveledUp && answerFeedback.newLevel) {
         setTimeout(() => {
           setNewLevel(answerFeedback.newLevel!);
           setShowLevelUp(true);
+          playLevelUpSound();
         }, 800);
       }
     }
-  }, [answerFeedback]);
+  }, [answerFeedback, playCorrect, playIncorrect, playXP, playLevelUpSound]);
 
   // 次の問題へ
   const handleNext = () => {
@@ -113,8 +148,16 @@ function QuizPageContent() {
     nextQuestion();
   };
 
+  // セッション完了時に音を再生
+  useEffect(() => {
+    if (isComplete) {
+      playComplete();
+    }
+  }, [isComplete, playComplete]);
+
   // リトライ
   const handleRetry = () => {
+    hasPlayedStartSound.current = false;
     resetSession();
     startSession();
   };

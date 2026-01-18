@@ -28,7 +28,9 @@
       "mcp__context7__query-docs",
       "Bash(npm show:*)",
       "Bash(grep:*)",
-      "Skill(frontend-design)"
+      "Skill(frontend-design)",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__get_symbols_overview"
     ]
   },
   "enabledMcpjsonServers": [

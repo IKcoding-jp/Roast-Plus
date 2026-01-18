@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { XPGainAnimation } from '@/components/coffee-quiz/XPGainAnimation';
 import { LevelUpModal } from '@/components/coffee-quiz/LevelUpModal';
 import { useQuizSession } from '@/hooks/useQuizSession';
 import { useQuizData } from '@/hooks/useQuizData';
+import { useQuizSound } from '@/hooks/useQuizSound';
 
 // アイコン
 const ArrowLeftIcon = () => (
@@ -51,9 +52,23 @@ const CheckCircleIcon = () => (
 
 export default function ReviewPage() {
   const router = useRouter();
-  const { isAuthenticated, loading: authLoading, getDueCardsForReview } = useQuizData();
+  const { isAuthenticated, loading: authLoading, getDueCardsForReview, progress } = useQuizData();
 
   const dueCardsCount = getDueCardsForReview().length;
+
+  // 効果音フック
+  const {
+    initialize: initializeSound,
+    playCorrect,
+    playIncorrect,
+    playLevelUp: playLevelUpSound,
+    playXP,
+    playStart,
+    playComplete,
+  } = useQuizSound({
+    soundEnabled: progress?.settings.soundEnabled ?? true,
+    vibrationEnabled: progress?.settings.vibrationEnabled ?? true,
+  });
 
   const {
     session,
@@ -78,6 +93,7 @@ export default function ReviewPage() {
   const [showXPAnimation, setShowXPAnimation] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
+  const hasPlayedStartSound = useRef(false);
 
   // 復習する問題がない場合はリダイレクト
   useEffect(() => {
@@ -93,6 +109,15 @@ export default function ReviewPage() {
     }
   }, [isAuthenticated, session, isLoading, dueCardsCount, startSession]);
 
+  // セッション開始音
+  useEffect(() => {
+    if (session && !hasPlayedStartSound.current) {
+      initializeSound();
+      playStart();
+      hasPlayedStartSound.current = true;
+    }
+  }, [session, initializeSound, playStart]);
+
   // 回答送信
   const handleSelectOption = async (optionId: string) => {
     if (showFeedback || !currentQuestion) return;
@@ -104,18 +129,28 @@ export default function ReviewPage() {
   // フィードバック表示時のエフェクト
   useEffect(() => {
     if (answerFeedback) {
+      // 正解・不正解音
+      if (answerFeedback.isCorrect) {
+        playCorrect();
+      } else {
+        playIncorrect();
+      }
+
       if (answerFeedback.xpEarned > 0) {
         setShowXPAnimation(true);
+        // XP音は少し遅らせる
+        setTimeout(() => playXP(), 200);
       }
 
       if (answerFeedback.leveledUp && answerFeedback.newLevel) {
         setTimeout(() => {
           setNewLevel(answerFeedback.newLevel!);
           setShowLevelUp(true);
+          playLevelUpSound();
         }, 800);
       }
     }
-  }, [answerFeedback]);
+  }, [answerFeedback, playCorrect, playIncorrect, playXP, playLevelUpSound]);
 
   // 次の問題へ
   const handleNext = () => {
@@ -124,8 +159,16 @@ export default function ReviewPage() {
     nextQuestion();
   };
 
+  // セッション完了時に音を再生
+  useEffect(() => {
+    if (isComplete) {
+      playComplete();
+    }
+  }, [isComplete, playComplete]);
+
   // リトライ
   const handleRetry = () => {
+    hasPlayedStartSound.current = false;
     resetSession();
     startSession();
   };

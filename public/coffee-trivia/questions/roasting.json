@@ -130,6 +130,851 @@
         { "id": "d", "text": "冷却開始時", "isCorrect": false }
       ],
       "explanation": "焙煎初期は吸熱反応（エンドサーミック）、1ハゼ付近から発熱反応（エクソサーミック）に転換します。この転換点の管理が焙煎の鍵です。"
+    },
+    {
+      "id": "roasting-011",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "「ライトロースト」の特徴として最も正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "酸味が強く、フルーティな風味", "isCorrect": true },
+        { "id": "b", "text": "苦味が強く、スモーキーな風味", "isCorrect": false },
+        { "id": "c", "text": "ボディが重く、チョコレート風味", "isCorrect": false },
+        { "id": "d", "text": "カフェインが最も少ない", "isCorrect": false }
+      ],
+      "explanation": "ライトローストは1ハゼ直後から少し経った程度の浅い焙煎で、酸味が際立ち、産地由来のフルーティな風味が活きます。"
+    },
+    {
+      "id": "roasting-012",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "「フレンチロースト」はどのような焙煎度合いですか？",
+      "options": [
+        { "id": "a", "text": "深煎り（2ハゼ以降）", "isCorrect": true },
+        { "id": "b", "text": "浅煎り", "isCorrect": false },
+        { "id": "c", "text": "中煎り", "isCorrect": false },
+        { "id": "d", "text": "極浅煎り", "isCorrect": false }
+      ],
+      "explanation": "フレンチローストは2ハゼを過ぎた深煎りで、豆の表面にオイルが浮き、苦味とスモーキーな風味が強くなります。"
+    },
+    {
+      "id": "roasting-013",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎によってコーヒー豆の重量はどう変化しますか？",
+      "options": [
+        { "id": "a", "text": "軽くなる（15-20%減少）", "isCorrect": true },
+        { "id": "b", "text": "重くなる", "isCorrect": false },
+        { "id": "c", "text": "変化しない", "isCorrect": false },
+        { "id": "d", "text": "軽くなったり重くなったりする", "isCorrect": false }
+      ],
+      "explanation": "焙煎により水分が蒸発し、豆の重量は約15-20%減少します。深煎りほど減少率は大きくなります。"
+    },
+    {
+      "id": "roasting-014",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎後、コーヒー豆を飲み頃にするために必要な期間は何と呼ばれますか？",
+      "options": [
+        { "id": "a", "text": "エイジング（ディガッシング）", "isCorrect": true },
+        { "id": "b", "text": "キュアリング", "isCorrect": false },
+        { "id": "c", "text": "ファーメンテーション", "isCorrect": false },
+        { "id": "d", "text": "ブルーミング", "isCorrect": false }
+      ],
+      "explanation": "焙煎直後は二酸化炭素が多く抽出が不安定なため、2-7日程度のガス抜き期間（ディガッシング）を経てから飲むのが理想的です。"
+    },
+    {
+      "id": "roasting-015",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎中に豆の色が茶色くなる主な原因は何ですか？",
+      "options": [
+        { "id": "a", "text": "メイラード反応とカラメル化", "isCorrect": true },
+        { "id": "b", "text": "水分の蒸発", "isCorrect": false },
+        { "id": "c", "text": "カフェインの変化", "isCorrect": false },
+        { "id": "d", "text": "酸素との反応", "isCorrect": false }
+      ],
+      "explanation": "メイラード反応（糖とアミノ酸の反応）とカラメル化（糖の熱分解）により、褐色の化合物が生成され、豆が茶色くなります。"
+    },
+    {
+      "id": "roasting-016",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "「シティロースト」はどのような焙煎度合いですか？",
+      "options": [
+        { "id": "a", "text": "中深煎り（1ハゼ終了後から2ハゼ前）", "isCorrect": true },
+        { "id": "b", "text": "極浅煎り", "isCorrect": false },
+        { "id": "c", "text": "極深煎り", "isCorrect": false },
+        { "id": "d", "text": "生豆に近い状態", "isCorrect": false }
+      ],
+      "explanation": "シティローストは1ハゼが終わってから2ハゼが始まる前の中深煎りで、バランスの取れた風味が特徴です。"
+    },
+    {
+      "id": "roasting-017",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎機のドラム内温度が急激に下がる瞬間は何と呼ばれますか？",
+      "options": [
+        { "id": "a", "text": "ターニングポイント", "isCorrect": true },
+        { "id": "b", "text": "1ハゼ", "isCorrect": false },
+        { "id": "c", "text": "2ハゼ", "isCorrect": false },
+        { "id": "d", "text": "発達時間", "isCorrect": false }
+      ],
+      "explanation": "ターニングポイントは生豆投入直後に温度が最も低くなる点で、そこから再び上昇し始めます。焙煎プロファイルの起点となります。"
+    },
+    {
+      "id": "roasting-018",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎後すぐの豆でドリップすると膨らみが大きいのはなぜですか？",
+      "options": [
+        { "id": "a", "text": "二酸化炭素が多く含まれているから", "isCorrect": true },
+        { "id": "b", "text": "水分が多いから", "isCorrect": false },
+        { "id": "c", "text": "カフェインが多いから", "isCorrect": false },
+        { "id": "d", "text": "温度が高いから", "isCorrect": false }
+      ],
+      "explanation": "焙煎直後の豆には二酸化炭素が多く含まれており、お湯を注ぐと急激にガスが放出されて膨らみます。"
+    },
+    {
+      "id": "roasting-019",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎度が深くなるにつれて、豆の体積はどう変化しますか？",
+      "options": [
+        { "id": "a", "text": "大きくなる", "isCorrect": true },
+        { "id": "b", "text": "小さくなる", "isCorrect": false },
+        { "id": "c", "text": "変化しない", "isCorrect": false },
+        { "id": "d", "text": "不規則に変化する", "isCorrect": false }
+      ],
+      "explanation": "焙煎により豆内部の水分が蒸発してガスが発生し、細胞構造が膨張するため、豆の体積は50-80%程度増加します。"
+    },
+    {
+      "id": "roasting-020",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "「ミディアムロースト」の風味の特徴はどれですか？",
+      "options": [
+        { "id": "a", "text": "酸味と苦味のバランスが良い", "isCorrect": true },
+        { "id": "b", "text": "酸味がほとんどない", "isCorrect": false },
+        { "id": "c", "text": "スモーキーで炭のような風味", "isCorrect": false },
+        { "id": "d", "text": "生豆のような青い風味", "isCorrect": false }
+      ],
+      "explanation": "ミディアムローストは1ハゼ中〜終了頃の焙煎で、酸味と苦味のバランスが良く、ナッツやキャラメルのような風味が出ます。"
+    },
+    {
+      "id": "roasting-021",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎中に発生する煙の主な成分は何ですか？",
+      "options": [
+        { "id": "a", "text": "水蒸気と有機化合物", "isCorrect": true },
+        { "id": "b", "text": "純粋な酸素", "isCorrect": false },
+        { "id": "c", "text": "カフェインガス", "isCorrect": false },
+        { "id": "d", "text": "窒素のみ", "isCorrect": false }
+      ],
+      "explanation": "焙煎中の煙は主に水蒸気と、メイラード反応やカラメル化で生じた有機化合物（揮発性成分）で構成されています。"
+    },
+    {
+      "id": "roasting-022",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "「イタリアンロースト」の特徴として正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "表面にオイルが浮き、非常に苦い", "isCorrect": true },
+        { "id": "b", "text": "酸味が強く、フルーティ", "isCorrect": false },
+        { "id": "c", "text": "マイルドでバランスが良い", "isCorrect": false },
+        { "id": "d", "text": "カフェインが最も多い", "isCorrect": false }
+      ],
+      "explanation": "イタリアンローストは最も深い焙煎で、表面にオイルが浮き、強い苦味とスモーキーな風味が特徴。エスプレッソによく使われます。"
+    },
+    {
+      "id": "roasting-023",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎後のコーヒー豆の賞味期限の目安はどれくらいですか？",
+      "options": [
+        { "id": "a", "text": "2週間〜1ヶ月程度", "isCorrect": true },
+        { "id": "b", "text": "1年以上", "isCorrect": false },
+        { "id": "c", "text": "3日以内", "isCorrect": false },
+        { "id": "d", "text": "永久に保存可能", "isCorrect": false }
+      ],
+      "explanation": "焙煎後のコーヒー豆は2週間〜1ヶ月が飲み頃です。それ以降も飲めますが、香りと風味は徐々に落ちていきます。"
+    },
+    {
+      "id": "roasting-024",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "「フルシティロースト」はどの段階の焙煎ですか？",
+      "options": [
+        { "id": "a", "text": "2ハゼの始まり頃", "isCorrect": true },
+        { "id": "b", "text": "1ハゼの前", "isCorrect": false },
+        { "id": "c", "text": "生豆の状態", "isCorrect": false },
+        { "id": "d", "text": "2ハゼ終了後", "isCorrect": false }
+      ],
+      "explanation": "フルシティローストは2ハゼが始まる頃の中深煎りで、しっかりとしたボディと控えめな酸味が特徴です。"
+    },
+    {
+      "id": "roasting-025",
+      "category": "roasting",
+      "difficulty": "beginner",
+      "question": "焙煎によって失われるコーヒー成分は何ですか？",
+      "options": [
+        { "id": "a", "text": "クロロゲン酸", "isCorrect": true },
+        { "id": "b", "text": "オイル", "isCorrect": false },
+        { "id": "c", "text": "繊維質", "isCorrect": false },
+        { "id": "d", "text": "ミネラル", "isCorrect": false }
+      ],
+      "explanation": "クロロゲン酸（抗酸化ポリフェノール）は焙煎で分解され、深煎りになるほど減少します。浅煎りはクロロゲン酸が多く残ります。"
+    },
+    {
+      "id": "roasting-026",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「ストラッカー反応」とは焙煎で何を生成する反応ですか？",
+      "options": [
+        { "id": "a", "text": "香り成分（アルデヒド）", "isCorrect": true },
+        { "id": "b", "text": "苦味成分", "isCorrect": false },
+        { "id": "c", "text": "酸味成分", "isCorrect": false },
+        { "id": "d", "text": "カフェイン", "isCorrect": false }
+      ],
+      "explanation": "ストラッカー反応はメイラード反応の一部で、アミノ酸が分解されてアルデヒドが生成され、コーヒーの香りに寄与します。"
+    },
+    {
+      "id": "roasting-027",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎プロファイルで「チャージ温度」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "生豆を投入する時のドラム温度", "isCorrect": true },
+        { "id": "b", "text": "1ハゼの温度", "isCorrect": false },
+        { "id": "c", "text": "排出時の温度", "isCorrect": false },
+        { "id": "d", "text": "冷却時の温度", "isCorrect": false }
+      ],
+      "explanation": "チャージ温度は生豆をドラムに投入する際の温度で、通常160-220℃程度。この温度がターニングポイントに影響します。"
+    },
+    {
+      "id": "roasting-028",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「ドラム式焙煎機」と「流動床式焙煎機」の違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "豆の加熱方法", "isCorrect": true },
+        { "id": "b", "text": "焙煎できる量", "isCorrect": false },
+        { "id": "c", "text": "使用する燃料", "isCorrect": false },
+        { "id": "d", "text": "焙煎度の範囲", "isCorrect": false }
+      ],
+      "explanation": "ドラム式は回転するドラムで熱伝導加熱、流動床式は熱風で豆を浮かせて対流加熱します。風味の特性が異なります。"
+    },
+    {
+      "id": "roasting-029",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎で「スコーチング」とはどのような欠陥ですか？",
+      "options": [
+        { "id": "a", "text": "豆の表面だけが焦げる現象", "isCorrect": true },
+        { "id": "b", "text": "豆が生焼けになる現象", "isCorrect": false },
+        { "id": "c", "text": "豆が割れる現象", "isCorrect": false },
+        { "id": "d", "text": "豆が白くなる現象", "isCorrect": false }
+      ],
+      "explanation": "スコーチングは高すぎる温度やドラムとの接触で豆の表面だけが焦げる欠陥。焦げた苦味や炭のような風味の原因になります。"
+    },
+    {
+      "id": "roasting-030",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「焙煎のカッピング」で焙煎後何時間後が理想的ですか？",
+      "options": [
+        { "id": "a", "text": "8-24時間後", "isCorrect": true },
+        { "id": "b", "text": "焙煎直後", "isCorrect": false },
+        { "id": "c", "text": "1週間後", "isCorrect": false },
+        { "id": "d", "text": "1ヶ月後", "isCorrect": false }
+      ],
+      "explanation": "焙煎後8-24時間が業界標準で、ガスがある程度抜けつつ鮮度も高い状態で風味を正確に評価できます。"
+    },
+    {
+      "id": "roasting-031",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「オムニロースト」とはどのようなコンセプトですか？",
+      "options": [
+        { "id": "a", "text": "様々な抽出方法に対応する焙煎", "isCorrect": true },
+        { "id": "b", "text": "すべての産地をブレンドする焙煎", "isCorrect": false },
+        { "id": "c", "text": "全自動の焙煎", "isCorrect": false },
+        { "id": "d", "text": "一度に大量に焙煎すること", "isCorrect": false }
+      ],
+      "explanation": "オムニローストはドリップでもエスプレッソでも美味しく抽出できる汎用性のある焙煎で、中煎り程度が多いです。"
+    },
+    {
+      "id": "roasting-032",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎中の「イエローイング」フェーズとは何ですか？",
+      "options": [
+        { "id": "a", "text": "生豆が黄色くなる初期段階", "isCorrect": true },
+        { "id": "b", "text": "1ハゼ後の段階", "isCorrect": false },
+        { "id": "c", "text": "2ハゼの段階", "isCorrect": false },
+        { "id": "d", "text": "冷却段階", "isCorrect": false }
+      ],
+      "explanation": "イエローイングは焙煎初期に豆が緑から黄色に変わる段階で、水分蒸発とクロロフィル分解が起きています。"
+    },
+    {
+      "id": "roasting-033",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「ドロップ温度」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "焙煎を終了して豆を排出する温度", "isCorrect": true },
+        { "id": "b", "text": "豆を投入する温度", "isCorrect": false },
+        { "id": "c", "text": "ターニングポイントの温度", "isCorrect": false },
+        { "id": "d", "text": "1ハゼの温度", "isCorrect": false }
+      ],
+      "explanation": "ドロップ温度は焙煎を終了し豆を冷却トレイに排出する時の温度。焙煎度を決める最終的な判断基準になります。"
+    },
+    {
+      "id": "roasting-034",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎で「アグトロン値」は何を測定しますか？",
+      "options": [
+        { "id": "a", "text": "焙煎度（豆の色）", "isCorrect": true },
+        { "id": "b", "text": "豆の水分量", "isCorrect": false },
+        { "id": "c", "text": "豆の大きさ", "isCorrect": false },
+        { "id": "d", "text": "カフェイン含有量", "isCorrect": false }
+      ],
+      "explanation": "アグトロン値は焙煎豆の色を数値化する指標で、0-100の範囲で表され、数値が小さいほど深煎りを示します。"
+    },
+    {
+      "id": "roasting-035",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「デクリーシングRoR」のメリットは何ですか？",
+      "options": [
+        { "id": "a", "text": "均一な焙煎とスムーズな風味発達", "isCorrect": true },
+        { "id": "b", "text": "焙煎時間の短縮", "isCorrect": false },
+        { "id": "c", "text": "カフェインの増加", "isCorrect": false },
+        { "id": "d", "text": "豆の重量増加", "isCorrect": false }
+      ],
+      "explanation": "RoR（温度上昇率）を徐々に下げていくプロファイルは、内部まで均一に焙煎でき、バランスの取れた風味を生み出します。"
+    },
+    {
+      "id": "roasting-036",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「サンプルロースター」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "少量の豆を焙煎して品質評価する小型焙煎機", "isCorrect": true },
+        { "id": "b", "text": "大量生産用の焙煎機", "isCorrect": false },
+        { "id": "c", "text": "家庭用の焙煎機", "isCorrect": false },
+        { "id": "d", "text": "試作品の焙煎機", "isCorrect": false }
+      ],
+      "explanation": "サンプルロースターは50-200g程度の少量を焙煎し、生豆の品質評価やレシピ開発に使用される小型焙煎機です。"
+    },
+    {
+      "id": "roasting-037",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎で「クラックレベル」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "1ハゼや2ハゼの音の強さ", "isCorrect": true },
+        { "id": "b", "text": "豆のひび割れの数", "isCorrect": false },
+        { "id": "c", "text": "焙煎機の故障レベル", "isCorrect": false },
+        { "id": "d", "text": "豆の品質レベル", "isCorrect": false }
+      ],
+      "explanation": "クラックレベルは1ハゼ・2ハゼの音の密度や強さを指し、焙煎の進行状況を判断する重要な指標です。"
+    },
+    {
+      "id": "roasting-038",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「プレヒート」とは焙煎で何を意味しますか？",
+      "options": [
+        { "id": "a", "text": "投入前にドラムを温める", "isCorrect": true },
+        { "id": "b", "text": "豆を予め温める", "isCorrect": false },
+        { "id": "c", "text": "焙煎後に再加熱する", "isCorrect": false },
+        { "id": "d", "text": "冷却前の工程", "isCorrect": false }
+      ],
+      "explanation": "プレヒートは豆を投入する前に焙煎機のドラムを適切な温度まで温めておく工程で、安定した焙煎に重要です。"
+    },
+    {
+      "id": "roasting-039",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「ソーキング」とは焙煎の何を指しますか？",
+      "options": [
+        { "id": "a", "text": "低温で豆の内部まで熱を浸透させる段階", "isCorrect": true },
+        { "id": "b", "text": "豆を水に浸すこと", "isCorrect": false },
+        { "id": "c", "text": "冷却時に水をかけること", "isCorrect": false },
+        { "id": "d", "text": "焙煎後に蒸らすこと", "isCorrect": false }
+      ],
+      "explanation": "ソーキング（ドライング）は焙煎初期に低温で熱を豆の内部まで浸透させる段階で、均一な焙煎の基礎になります。"
+    },
+    {
+      "id": "roasting-040",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎における「エアフロー」の役割は何ですか？",
+      "options": [
+        { "id": "a", "text": "チャフの除去と熱対流の調整", "isCorrect": true },
+        { "id": "b", "text": "豆を冷却する", "isCorrect": false },
+        { "id": "c", "text": "香りを閉じ込める", "isCorrect": false },
+        { "id": "d", "text": "カフェインを除去する", "isCorrect": false }
+      ],
+      "explanation": "エアフロー（排気）はチャフや煙を除去し、ドラム内の熱対流を調整することで焙煎プロファイルに影響を与えます。"
+    },
+    {
+      "id": "roasting-041",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「焙煎ログ」を記録する主な目的は何ですか？",
+      "options": [
+        { "id": "a", "text": "同じ結果を再現するため", "isCorrect": true },
+        { "id": "b", "text": "法律で義務付けられているため", "isCorrect": false },
+        { "id": "c", "text": "豆の産地を記録するため", "isCorrect": false },
+        { "id": "d", "text": "焙煎機のメンテナンス用", "isCorrect": false }
+      ],
+      "explanation": "焙煎ログは温度、時間、気圧などを記録し、良い焙煎結果を再現したり、問題を特定したりするために重要です。"
+    },
+    {
+      "id": "roasting-042",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「ダンパー」は焙煎機でどのような役割をしますか？",
+      "options": [
+        { "id": "a", "text": "排気量を調整する", "isCorrect": true },
+        { "id": "b", "text": "豆を投入する", "isCorrect": false },
+        { "id": "c", "text": "温度を直接制御する", "isCorrect": false },
+        { "id": "d", "text": "豆を排出する", "isCorrect": false }
+      ],
+      "explanation": "ダンパーは焙煎機の排気量を調整する部品で、ドラム内の対流や酸素量に影響し、風味プロファイルに影響します。"
+    },
+    {
+      "id": "roasting-043",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「バッチサイズ」が焙煎に与える影響は何ですか？",
+      "options": [
+        { "id": "a", "text": "熱伝達と焙煎時間に影響", "isCorrect": true },
+        { "id": "b", "text": "風味には影響しない", "isCorrect": false },
+        { "id": "c", "text": "豆の品種を決定する", "isCorrect": false },
+        { "id": "d", "text": "産地を変える", "isCorrect": false }
+      ],
+      "explanation": "バッチサイズ（一度に焙煎する量）は熱伝達効率や焙煎時間に影響し、同じ豆でも異なる風味になることがあります。"
+    },
+    {
+      "id": "roasting-044",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "焙煎で「クエンチング」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "焙煎後に急速冷却すること", "isCorrect": true },
+        { "id": "b", "text": "焙煎前に豆を温めること", "isCorrect": false },
+        { "id": "c", "text": "焙煎中に水をかけること", "isCorrect": false },
+        { "id": "d", "text": "豆を粉砕すること", "isCorrect": false }
+      ],
+      "explanation": "クエンチング（クーリング）は焙煎終了後に豆を急速冷却し、焙煎の進行を止める工程。適切な冷却が品質を保ちます。"
+    },
+    {
+      "id": "roasting-045",
+      "category": "roasting",
+      "difficulty": "intermediate",
+      "question": "「ホールビーン」と「グラウンド」で焙煎度の見た目が違う理由は？",
+      "options": [
+        { "id": "a", "text": "挽くと内部の色が見えるから", "isCorrect": true },
+        { "id": "b", "text": "挽くと焙煎が進むから", "isCorrect": false },
+        { "id": "c", "text": "挽くと色が変わる化学反応が起きるから", "isCorrect": false },
+        { "id": "d", "text": "照明の違い", "isCorrect": false }
+      ],
+      "explanation": "豆の表面は内部より焙煎が進んでいることが多く、挽くと内部の薄い色が見えて全体的に薄く見えます。"
+    },
+    {
+      "id": "roasting-046",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「フリック」という焙煎欠陥の原因は何ですか？",
+      "options": [
+        { "id": "a", "text": "急激な温度上昇による豆の焦げ", "isCorrect": true },
+        { "id": "b", "text": "低温での長時間焙煎", "isCorrect": false },
+        { "id": "c", "text": "豆の水分過多", "isCorrect": false },
+        { "id": "d", "text": "冷却不足", "isCorrect": false }
+      ],
+      "explanation": "フリック（ティッピング）は急激な温度上昇で豆の端や薄い部分だけが焦げる欠陥。チャージ温度が高すぎると起こりやすいです。"
+    },
+    {
+      "id": "roasting-047",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「DTR（Development Time Ratio）」の理想的な範囲は？",
+      "options": [
+        { "id": "a", "text": "15-25%", "isCorrect": true },
+        { "id": "b", "text": "5-10%", "isCorrect": false },
+        { "id": "c", "text": "40-50%", "isCorrect": false },
+        { "id": "d", "text": "60-70%", "isCorrect": false }
+      ],
+      "explanation": "DTRは1ハゼから焙煎終了までの時間が全焙煎時間に占める割合で、15-25%が一般的に良いバランスとされています。"
+    },
+    {
+      "id": "roasting-048",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「クロップ（収穫年）」によって焙煎アプローチを変える理由は？",
+      "options": [
+        { "id": "a", "text": "水分量と密度が異なるから", "isCorrect": true },
+        { "id": "b", "text": "カフェイン量が異なるから", "isCorrect": false },
+        { "id": "c", "text": "品種が変わるから", "isCorrect": false },
+        { "id": "d", "text": "産地が変わるから", "isCorrect": false }
+      ],
+      "explanation": "ニュークロップは水分量が高く密度も高いため、パストクロップより高い温度や長い時間が必要になることがあります。"
+    },
+    {
+      "id": "roasting-049",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ファースト・クラック・テンペラチャー」が低すぎると何が起こる？",
+      "options": [
+        { "id": "a", "text": "ベイクドな風味になりやすい", "isCorrect": true },
+        { "id": "b", "text": "焦げやすくなる", "isCorrect": false },
+        { "id": "c", "text": "カフェインが増える", "isCorrect": false },
+        { "id": "d", "text": "豆が割れやすくなる", "isCorrect": false }
+      ],
+      "explanation": "1ハゼの温度が低すぎる場合、それまでの焙煎時間が長すぎることを示し、ベイクドでフラットな風味になりやすいです。"
+    },
+    {
+      "id": "roasting-050",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "焙煎機の「BTプローブ」と「ETプローブ」の違いは？",
+      "options": [
+        { "id": "a", "text": "BTは豆温度、ETは環境（排気）温度", "isCorrect": true },
+        { "id": "b", "text": "BTは外部温度、ETは内部温度", "isCorrect": false },
+        { "id": "c", "text": "BTは湿度、ETは温度", "isCorrect": false },
+        { "id": "d", "text": "同じものの別名", "isCorrect": false }
+      ],
+      "explanation": "BT（Bean Temperature）は豆の温度を直接測定し、ET（Environment Temperature）はドラム内の空気や排気の温度を測定します。"
+    },
+    {
+      "id": "roasting-051",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「プロファイル焙煎」と「感覚焙煎」の主な違いは？",
+      "options": [
+        { "id": "a", "text": "データに基づくか経験に基づくか", "isCorrect": true },
+        { "id": "b", "text": "使用する豆の量", "isCorrect": false },
+        { "id": "c", "text": "焙煎機の種類", "isCorrect": false },
+        { "id": "d", "text": "焙煎する時間帯", "isCorrect": false }
+      ],
+      "explanation": "プロファイル焙煎は温度曲線などのデータを管理する方法、感覚焙煎は色・音・香りなど経験に基づく方法です。"
+    },
+    {
+      "id": "roasting-052",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「モーメンタム」が焙煎で重要な理由は？",
+      "options": [
+        { "id": "a", "text": "熱慣性が焙煎の進行に影響するから", "isCorrect": true },
+        { "id": "b", "text": "豆の重さを測るため", "isCorrect": false },
+        { "id": "c", "text": "ドラムの回転速度を表すから", "isCorrect": false },
+        { "id": "d", "text": "香りの強さを表すから", "isCorrect": false }
+      ],
+      "explanation": "焙煎の熱慣性（モーメンタム）により、火力を下げてもすぐに温度上昇が止まらないため、先を読んだ調整が必要です。"
+    },
+    {
+      "id": "roasting-053",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「コンベクション」と「コンダクション」の焙煎への影響の違いは？",
+      "options": [
+        { "id": "a", "text": "対流加熱は均一、伝導加熱は接触部が強く焙煎される", "isCorrect": true },
+        { "id": "b", "text": "焙煎時間だけの違い", "isCorrect": false },
+        { "id": "c", "text": "風味に影響しない", "isCorrect": false },
+        { "id": "d", "text": "カフェイン量の違い", "isCorrect": false }
+      ],
+      "explanation": "コンベクション（熱対流）は均一に加熱でき、コンダクション（熱伝導）はドラムに接触した部分が強く焙煎されます。"
+    },
+    {
+      "id": "roasting-054",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ラジエーション」は焙煎でどのように作用しますか？",
+      "options": [
+        { "id": "a", "text": "赤外線放射で豆の表面を加熱する", "isCorrect": true },
+        { "id": "b", "text": "豆を回転させる力", "isCorrect": false },
+        { "id": "c", "text": "煙を除去する作用", "isCorrect": false },
+        { "id": "d", "text": "豆を冷却する作用", "isCorrect": false }
+      ],
+      "explanation": "ラジエーション（放射熱）はドラムやバーナーからの赤外線放射で、豆の表面を直接加熱します。3つの熱伝達方法の1つです。"
+    },
+    {
+      "id": "roasting-055",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「フレームプロファイル」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "バーナーの火力変化のパターン", "isCorrect": true },
+        { "id": "b", "text": "豆の色の変化パターン", "isCorrect": false },
+        { "id": "c", "text": "焙煎機のブランド", "isCorrect": false },
+        { "id": "d", "text": "煙の排出パターン", "isCorrect": false }
+      ],
+      "explanation": "フレームプロファイルはガスバーナーの火力調整パターンで、温度プロファイルを制御するための入力値となります。"
+    },
+    {
+      "id": "roasting-056",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「グリーンコーヒーの密度」が焙煎に与える影響は？",
+      "options": [
+        { "id": "a", "text": "密度が高いほど熱が伝わりにくい", "isCorrect": true },
+        { "id": "b", "text": "密度は焙煎に影響しない", "isCorrect": false },
+        { "id": "c", "text": "密度が低いほど焙煎時間が長い", "isCorrect": false },
+        { "id": "d", "text": "密度が高いほど苦くなる", "isCorrect": false }
+      ],
+      "explanation": "高密度の豆（高地産）は細胞構造が詰まっているため熱が内部に伝わりにくく、より注意深い焙煎が必要です。"
+    },
+    {
+      "id": "roasting-057",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「焙煎の環境要因」で最も影響が大きいものは？",
+      "options": [
+        { "id": "a", "text": "周囲の気温と湿度", "isCorrect": true },
+        { "id": "b", "text": "照明の明るさ", "isCorrect": false },
+        { "id": "c", "text": "床の材質", "isCorrect": false },
+        { "id": "d", "text": "天井の高さ", "isCorrect": false }
+      ],
+      "explanation": "周囲の気温と湿度は焙煎機の熱効率や豆の水分蒸発に影響し、同じ設定でも異なる結果になることがあります。"
+    },
+    {
+      "id": "roasting-058",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「カラメリゼーション」と「メイラード反応」が始まる温度帯の違いは？",
+      "options": [
+        { "id": "a", "text": "メイラード反応の方が低温で始まる", "isCorrect": true },
+        { "id": "b", "text": "同じ温度で始まる", "isCorrect": false },
+        { "id": "c", "text": "カラメリゼーションの方が低温", "isCorrect": false },
+        { "id": "d", "text": "温度は関係ない", "isCorrect": false }
+      ],
+      "explanation": "メイラード反応は約140℃から、カラメリゼーションは約170℃以上で始まります。どちらも褐色化と風味生成に関与します。"
+    },
+    {
+      "id": "roasting-059",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「フルイダイズドベッドロースター」の特徴は？",
+      "options": [
+        { "id": "a", "text": "熱風で豆を浮かせて均一に焙煎", "isCorrect": true },
+        { "id": "b", "text": "ドラムで豆を転がす", "isCorrect": false },
+        { "id": "c", "text": "直火で焙煎する", "isCorrect": false },
+        { "id": "d", "text": "豆を圧縮して焙煎する", "isCorrect": false }
+      ],
+      "explanation": "流動床式（フルイダイズドベッド）は強力な熱風で豆を浮かせて焙煎し、均一で効率的な加熱が特徴です。"
+    },
+    {
+      "id": "roasting-060",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ロレットソフトウェア」などの焙煎管理ツールの主な機能は？",
+      "options": [
+        { "id": "a", "text": "温度曲線のリアルタイム記録と分析", "isCorrect": true },
+        { "id": "b", "text": "豆の自動投入", "isCorrect": false },
+        { "id": "c", "text": "焙煎機の自動洗浄", "isCorrect": false },
+        { "id": "d", "text": "豆の自動選別", "isCorrect": false }
+      ],
+      "explanation": "Cropster、Artisanなどの焙煎ソフトウェアは温度曲線を記録・分析し、プロファイルの再現や改善に使用されます。"
+    },
+    {
+      "id": "roasting-061",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ターンアラウンド・ターゲット」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "ターニングポイント到達の目標時間", "isCorrect": true },
+        { "id": "b", "text": "1ハゼの目標温度", "isCorrect": false },
+        { "id": "c", "text": "冷却完了の目標時間", "isCorrect": false },
+        { "id": "d", "text": "豆の投入量の目標", "isCorrect": false }
+      ],
+      "explanation": "ターンアラウンド・ターゲットは投入後にターニングポイントに到達する目標時間で、1分前後が一般的です。"
+    },
+    {
+      "id": "roasting-062",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「クラッシング」という焙煎欠陥の原因は？",
+      "options": [
+        { "id": "a", "text": "急激な温度変化で豆が割れる", "isCorrect": true },
+        { "id": "b", "text": "焙煎時間が短すぎる", "isCorrect": false },
+        { "id": "c", "text": "冷却が遅すぎる", "isCorrect": false },
+        { "id": "d", "text": "豆の水分が多すぎる", "isCorrect": false }
+      ],
+      "explanation": "クラッシングは急激な温度上昇で豆の内部と外部の膨張差により豆が割れる欠陥。チャージ温度管理が重要です。"
+    },
+    {
+      "id": "roasting-063",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「クエーカー」とは焙煎で何を指しますか？",
+      "options": [
+        { "id": "a", "text": "未熟豆が焙煎されても色づかない状態", "isCorrect": true },
+        { "id": "b", "text": "焙煎機のブランド", "isCorrect": false },
+        { "id": "c", "text": "焙煎士の資格", "isCorrect": false },
+        { "id": "d", "text": "特定の焙煎プロファイル", "isCorrect": false }
+      ],
+      "explanation": "クエーカーは未熟豆が焙煎しても糖分不足で褐色化せず、ピーナッツのような不快な風味を与えます。ハンドピックで除去します。"
+    },
+    {
+      "id": "roasting-064",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「メラノイジン」はコーヒーにどのような影響を与えますか？",
+      "options": [
+        { "id": "a", "text": "褐色化と抗酸化作用", "isCorrect": true },
+        { "id": "b", "text": "カフェインの増加", "isCorrect": false },
+        { "id": "c", "text": "酸味の増加", "isCorrect": false },
+        { "id": "d", "text": "水分の増加", "isCorrect": false }
+      ],
+      "explanation": "メラノイジンはメイラード反応で生成される高分子化合物で、コーヒーの褐色と抗酸化作用に寄与し、ボディ感にも影響します。"
+    },
+    {
+      "id": "roasting-065",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「フラッシングRoR」が起きる原因は何ですか？",
+      "options": [
+        { "id": "a", "text": "1ハゼで発熱反応が始まり温度上昇が加速", "isCorrect": true },
+        { "id": "b", "text": "火力を急に上げた", "isCorrect": false },
+        { "id": "c", "text": "豆を追加投入した", "isCorrect": false },
+        { "id": "d", "text": "冷却を始めた", "isCorrect": false }
+      ],
+      "explanation": "1ハゼ後にエクソサーミック（発熱）反応が始まると、RoRが急上昇することがあります。これを制御しないと過焙煎になります。"
+    },
+    {
+      "id": "roasting-066",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ウォーター・クエンチ」が品質に与える影響は？",
+      "options": [
+        { "id": "a", "text": "風味の劣化と保存性の低下", "isCorrect": true },
+        { "id": "b", "text": "風味の向上", "isCorrect": false },
+        { "id": "c", "text": "焙煎時間の短縮", "isCorrect": false },
+        { "id": "d", "text": "カフェインの増加", "isCorrect": false }
+      ],
+      "explanation": "水を使った冷却（ウォーター・クエンチ）は急速冷却できますが、蒸気で風味成分が飛び、水分で品質劣化のリスクがあります。"
+    },
+    {
+      "id": "roasting-067",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ファースト・クラック・デュレーション」が短いと何が起こる？",
+      "options": [
+        { "id": "a", "text": "酸味が強く、明るい風味になりやすい", "isCorrect": true },
+        { "id": "b", "text": "苦味が強くなる", "isCorrect": false },
+        { "id": "c", "text": "ボディが重くなる", "isCorrect": false },
+        { "id": "d", "text": "カフェインが減る", "isCorrect": false }
+      ],
+      "explanation": "1ハゼの継続時間が短いと、酸味が保持され、軽快でフルーティな風味になりやすいです。発達時間との関係で風味が決まります。"
+    },
+    {
+      "id": "roasting-068",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「焙煎デルタ」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "投入温度とターニングポイントの差", "isCorrect": true },
+        { "id": "b", "text": "1ハゼと2ハゼの温度差", "isCorrect": false },
+        { "id": "c", "text": "豆と排気の温度差", "isCorrect": false },
+        { "id": "d", "text": "焙煎前後の重量差", "isCorrect": false }
+      ],
+      "explanation": "デルタは投入温度（チャージ温度）からターニングポイントまでの温度降下で、投入量と熱量のバランスを示します。"
+    },
+    {
+      "id": "roasting-069",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ロースティングカーブ」のS字型が理想的とされる理由は？",
+      "options": [
+        { "id": "a", "text": "各段階で適切な化学反応が起こるから", "isCorrect": true },
+        { "id": "b", "text": "見た目が美しいから", "isCorrect": false },
+        { "id": "c", "text": "焙煎時間が短くなるから", "isCorrect": false },
+        { "id": "d", "text": "豆の重量が増えるから", "isCorrect": false }
+      ],
+      "explanation": "S字カーブでは序盤で熱を入れ、中盤で安定させ、終盤で発達させる各段階で適切な反応が起こり、バランスの良い風味になります。"
+    },
+    {
+      "id": "roasting-070",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「インプット・アウトプット比」とは焙煎で何を表しますか？",
+      "options": [
+        { "id": "a", "text": "投入した生豆と焙煎後の豆の重量比", "isCorrect": true },
+        { "id": "b", "text": "投入エネルギーと出力温度の比", "isCorrect": false },
+        { "id": "c", "text": "コストと売上の比", "isCorrect": false },
+        { "id": "d", "text": "酸味と苦味の比", "isCorrect": false }
+      ],
+      "explanation": "焙煎による重量減（シュリンケージ）を表し、通常15-20%減少します。深煎りほど重量減が大きくなります。"
+    },
+    {
+      "id": "roasting-071",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「スロー・ロースト」と「ファスト・ロースト」の風味の違いは？",
+      "options": [
+        { "id": "a", "text": "スローはボディ重視、ファストは酸味重視", "isCorrect": true },
+        { "id": "b", "text": "風味に違いはない", "isCorrect": false },
+        { "id": "c", "text": "ファストの方がボディが重い", "isCorrect": false },
+        { "id": "d", "text": "スローの方が酸味が強い", "isCorrect": false }
+      ],
+      "explanation": "スローローストはより多くの化学反応が進み重厚な風味に、ファストローストは酸味が保持され明るい風味になる傾向があります。"
+    },
+    {
+      "id": "roasting-072",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「焙煎のリプロダクション」で最も重要な要素は？",
+      "options": [
+        { "id": "a", "text": "同じ条件（温度曲線・時間・環境）の再現", "isCorrect": true },
+        { "id": "b", "text": "同じ焙煎機を使うこと", "isCorrect": false },
+        { "id": "c", "text": "同じ焙煎士が行うこと", "isCorrect": false },
+        { "id": "d", "text": "同じ時間帯に行うこと", "isCorrect": false }
+      ],
+      "explanation": "再現性の鍵は温度曲線、各フェーズの時間、環境条件を正確に記録し再現すること。機械や人が変わっても可能です。"
+    },
+    {
+      "id": "roasting-073",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「ポストロースト・ブレンド」と「プレロースト・ブレンド」の違いは？",
+      "options": [
+        { "id": "a", "text": "ブレンドを焙煎前にするか後にするか", "isCorrect": true },
+        { "id": "b", "text": "冷却前か後かの違い", "isCorrect": false },
+        { "id": "c", "text": "挽く前か後かの違い", "isCorrect": false },
+        { "id": "d", "text": "抽出前か後かの違い", "isCorrect": false }
+      ],
+      "explanation": "プレロースト・ブレンドは混ぜてから焙煎、ポストロースト・ブレンドは個別に焙煎してから混ぜる方法で、それぞれ長所短所があります。"
+    },
+    {
+      "id": "roasting-074",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「焙煎の熱効率」を上げる方法として正しいものは？",
+      "options": [
+        { "id": "a", "text": "バッチサイズを焙煎機の適正容量に合わせる", "isCorrect": true },
+        { "id": "b", "text": "常に最大火力で焙煎する", "isCorrect": false },
+        { "id": "c", "text": "冷却時間を省略する", "isCorrect": false },
+        { "id": "d", "text": "排気を完全に閉じる", "isCorrect": false }
+      ],
+      "explanation": "焙煎機の適正容量（通常70-80%程度）で焙煎すると熱効率が最適化され、安定した品質と省エネルギーが実現できます。"
+    },
+    {
+      "id": "roasting-075",
+      "category": "roasting",
+      "difficulty": "advanced",
+      "question": "「焙煎のキャリブレーション」とは何を行うことですか？",
+      "options": [
+        { "id": "a", "text": "温度計や計器の精度を調整・確認する", "isCorrect": true },
+        { "id": "b", "text": "豆の量を計る", "isCorrect": false },
+        { "id": "c", "text": "焙煎プロファイルを作成する", "isCorrect": false },
+        { "id": "d", "text": "カッピングを行う", "isCorrect": false }
+      ],
+      "explanation": "キャリブレーションは温度センサーや計器の精度を基準値に合わせる作業で、正確な焙煎管理と再現性に不可欠です。"
     }
   ]
 }

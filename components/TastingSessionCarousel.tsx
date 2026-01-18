@@ -46,6 +46,8 @@ export function TastingSessionCarousel({
   const [analyzedIds, setAnalyzedIds] = useState<Set<string>>(new Set());
   // AI分析モーダル用の状態
   const [aiModalSession, setAiModalSession] = useState<TastingSession | null>(null);
+  // アクティブなカードのインデックス
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // 自動分析を実行する関数
   const triggerAutoAnalysis = async (session: TastingSession, comments: string[], averageScores: any) => {
@@ -82,12 +84,17 @@ export function TastingSessionCarousel({
     return () => window.removeEventListener('resize', updateLayout);
   }, []);
 
-  // 横スクロール用のホイールイベント（モバイルのみ）
+  // 横スクロールの追跡とホイールイベント
   useEffect(() => {
-    if (isDesktop) return;
-
     const container = scrollContainerRef.current;
-    if (!container) return;
+    if (!container || isDesktop) return;
+
+    const handleScroll = () => {
+      const index = Math.round(container.scrollLeft / container.clientWidth);
+      if (index !== activeIndex) {
+        setActiveIndex(index);
+      }
+    };
 
     const handleWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
@@ -95,12 +102,14 @@ export function TastingSessionCarousel({
       container.scrollLeft += e.deltaY;
     };
 
+    container.addEventListener('scroll', handleScroll, { passive: true });
     container.addEventListener('wheel', handleWheel, { passive: false });
 
     return () => {
+      container.removeEventListener('scroll', handleScroll);
       container.removeEventListener('wheel', handleWheel);
     };
-  }, [isDesktop]);
+  }, [isDesktop, activeIndex]);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -346,14 +355,14 @@ export function TastingSessionCarousel({
   // モバイル向けレイアウト（横スクロールカルーセル）
   // ========================================
   return (
-    <div className="relative w-full h-[calc(100vh-140px)] overflow-hidden">
+    <div className="relative w-full h-[calc(100vh-140px)] overflow-hidden flex flex-col">
       {/* 横スクロールコンテナ */}
       <div
         ref={scrollContainerRef}
-        className="flex flex-row gap-4 px-4 h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory scrollbar-hide"
+        className="flex flex-row gap-4 px-4 h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory 
+                   [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-stone-200/50 [&::-webkit-scrollbar-track]:mx-8 [&::-webkit-scrollbar-track]:rounded-full
+                   [&::-webkit-scrollbar-thumb]:bg-[#8D6E63] [&::-webkit-scrollbar-thumb]:rounded-full"
         style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch'
         }}
       >
@@ -512,11 +521,12 @@ export function TastingSessionCarousel({
       </div>
 
       {/* ページインジケーター */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
+      <div className="flex-shrink-0 flex justify-center gap-1.5 py-4">
         {sessionData.map((_, index) => (
           <div
             key={index}
-            className="w-1.5 h-1.5 rounded-full bg-[#D7CCC8] transition-colors"
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === activeIndex ? 'bg-[#5D4037] scale-125' : 'bg-[#D7CCC8]'
+              }`}
           />
         ))}
       </div>

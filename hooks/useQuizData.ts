@@ -40,7 +40,8 @@ import {
   earnBadges,
   getTodayGoal,
 } from '@/lib/coffee-quiz/gamification';
-import { getQuestionById } from '@/lib/coffee-quiz/questions';
+import { getQuestionById, getQuestionsStats } from '@/lib/coffee-quiz/questions';
+import type { QuizDifficulty } from '@/lib/coffee-quiz/types';
 
 const QUIZ_PROGRESS_COLLECTION = 'quiz_progress';
 const SAVE_DEBOUNCE_MS = 1000;
@@ -54,13 +55,26 @@ interface AnswerResult {
   streakUpdated: boolean;
 }
 
+// 問題の統計情報の型
+export interface QuestionsStats {
+  total: number;
+  byCategory: Record<QuizCategory, number>;
+  byDifficulty: Record<QuizDifficulty, number>;
+}
+
 export function useQuizData() {
   const { user } = useAuth();
   const [progress, setProgress] = useState<QuizProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [questionsStats, setQuestionsStats] = useState<QuestionsStats | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingSaveRef = useRef<QuizProgress | null>(null);
+
+  // 問題の統計情報を読み込み
+  useEffect(() => {
+    getQuestionsStats().then(setQuestionsStats).catch(console.error);
+  }, []);
 
   // Firestoreからデータを読み込み
   useEffect(() => {
@@ -275,6 +289,7 @@ export function useQuizData() {
     updateSettings,
     todayGoal,
     isAuthenticated: !!user,
+    questionsStats,
   };
 }
 

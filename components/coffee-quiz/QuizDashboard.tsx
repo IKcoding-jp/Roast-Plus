@@ -6,13 +6,21 @@ import { StreakCounter } from './StreakCounter';
 import { DailyGoalProgress } from './DailyGoalProgress';
 import { CategorySelector } from './CategorySelector';
 import { LevelDisplay } from './LevelDisplay';
-import type { QuizProgress, QuizCategory } from '@/lib/coffee-quiz/types';
+import type { QuizProgress, QuizCategory, QuizDifficulty } from '@/lib/coffee-quiz/types';
 import { useState } from 'react';
+
+// 問題の統計情報の型
+interface QuestionsStats {
+  total: number;
+  byCategory: Record<QuizCategory, number>;
+  byDifficulty: Record<QuizDifficulty, number>;
+}
 
 interface QuizDashboardProps {
   progress: QuizProgress | null;
   dueCardsCount: number;
   loading: boolean;
+  questionsStats: QuestionsStats | null;
 }
 
 // シンプルなSVGアイコン
@@ -54,6 +62,7 @@ export function QuizDashboard({
   progress,
   dueCardsCount,
   loading,
+  questionsStats,
 }: QuizDashboardProps) {
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | null>(null);
 
@@ -65,23 +74,24 @@ export function QuizDashboard({
     );
   }
 
-  const categoryStats = progress
+  // カテゴリ統計: マスター済み数 / JSONの総問題数
+  const categoryStats = questionsStats
     ? {
         basics: {
-          total: progress.stats.categoryStats.basics.total,
-          mastered: progress.stats.categoryStats.basics.masteredCount,
+          total: questionsStats.byCategory.basics,
+          mastered: progress?.stats.categoryStats.basics.masteredCount ?? 0,
         },
         roasting: {
-          total: progress.stats.categoryStats.roasting.total,
-          mastered: progress.stats.categoryStats.roasting.masteredCount,
+          total: questionsStats.byCategory.roasting,
+          mastered: progress?.stats.categoryStats.roasting.masteredCount ?? 0,
         },
         brewing: {
-          total: progress.stats.categoryStats.brewing.total,
-          mastered: progress.stats.categoryStats.brewing.masteredCount,
+          total: questionsStats.byCategory.brewing,
+          mastered: progress?.stats.categoryStats.brewing.masteredCount ?? 0,
         },
         history: {
-          total: progress.stats.categoryStats.history.total,
-          mastered: progress.stats.categoryStats.history.masteredCount,
+          total: questionsStats.byCategory.history,
+          mastered: progress?.stats.categoryStats.history.masteredCount ?? 0,
         },
       }
     : undefined;
@@ -125,7 +135,7 @@ export function QuizDashboard({
           今日のクイズを始める
         </Link>
 
-        {dueCardsCount > 0 && (
+        {dueCardsCount > 0 ? (
           <Link
             href="/coffee-trivia/review"
             className="group flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-[#3A2F2B] bg-[#211714]/5 hover:bg-[#211714]/10 transition-colors"
@@ -135,6 +145,11 @@ export function QuizDashboard({
             </span>
             復習する ({dueCardsCount}問)
           </Link>
+        ) : (
+          <div className="flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-[#3A2F2B]/50 bg-[#211714]/5">
+            <RefreshIcon />
+            復習する問題はありません
+          </div>
         )}
       </motion.div>
 

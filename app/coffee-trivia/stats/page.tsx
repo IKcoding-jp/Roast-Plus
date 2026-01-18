@@ -51,7 +51,7 @@ const TargetIcon = () => (
 
 export default function StatsPage() {
   const { user, loading: authLoading } = useAuth();
-  const { progress, loading: quizLoading } = useQuizData();
+  const { progress, loading: quizLoading, questionsStats } = useQuizData();
 
   if (authLoading || quizLoading) {
     return <Loading />;
@@ -149,7 +149,10 @@ export default function StatsPage() {
                 {(['basics', 'roasting', 'brewing', 'history'] as QuizCategory[]).map(
                   (category) => {
                     const catStats = stats?.categoryStats[category];
-                    const accuracy = catStats?.accuracy ?? 0;
+                    const totalQuestions = questionsStats?.byCategory[category] ?? 0;
+                    const masteredCount = catStats?.masteredCount ?? 0;
+                    // マスター進捗率を計算
+                    const masteryProgress = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0;
 
                     return (
                       <div key={category} className="bg-[#FDF8F0] rounded-xl p-4 border border-[#211714]/5">
@@ -157,21 +160,23 @@ export default function StatsPage() {
                           <span className="font-medium text-[#211714]">
                             {CATEGORY_LABELS[category]}
                           </span>
-                          <span className="text-[#EF8A00] font-bold">{accuracy}%</span>
+                          <span className="text-[#EF8A00] font-bold">{masteryProgress}%</span>
                         </div>
                         <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
                           <motion.div
                             className="h-full bg-gradient-to-r from-[#EF8A00] to-[#D67A00] rounded-full"
                             initial={{ width: 0 }}
-                            animate={{ width: `${accuracy}%` }}
+                            animate={{ width: `${masteryProgress}%` }}
                             transition={{ delay: 0.2, duration: 0.5 }}
                           />
                         </div>
                         <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
                           <span>
-                            {catStats?.correct ?? 0}/{catStats?.total ?? 0}問正解
+                            マスター: {masteredCount}/{totalQuestions}問
                           </span>
-                          <span>{catStats?.masteredCount ?? 0}問マスター</span>
+                          <span>
+                            正解率: {catStats?.accuracy ?? 0}%（{catStats?.correct ?? 0}/{catStats?.total ?? 0}回答）
+                          </span>
                         </div>
                       </div>
                     );

@@ -29,7 +29,7 @@ const CoffeeIcon = () => (
 
 export default function CoffeeTriviaPage() {
   const { user, loading: authLoading } = useAuth();
-  const { progress, loading: quizLoading, getDueCardsForReview } = useQuizData();
+  const { progress, loading: quizLoading, getDueCardsForReview, questionsStats } = useQuizData();
   useAppLifecycle();
 
   if (authLoading) {
@@ -66,6 +66,7 @@ export default function CoffeeTriviaPage() {
           progress={progress}
           dueCardsCount={dueCardsCount}
           loading={quizLoading}
+          questionsStats={questionsStats}
         />
       </main>
     </div>

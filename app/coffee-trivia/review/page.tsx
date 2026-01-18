@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { QuizCard } from '@/components/coffee-quiz/QuizCard';
@@ -50,7 +49,6 @@ const CheckCircleIcon = () => (
 );
 
 export default function ReviewPage() {
-  const router = useRouter();
   const { isAuthenticated, loading: authLoading, getDueCardsForReview, progress } = useQuizData();
 
   const dueCardsCount = getDueCardsForReview().length;
@@ -93,12 +91,8 @@ export default function ReviewPage() {
   const [newLevel, setNewLevel] = useState(0);
   const hasPlayedStartSound = useRef(false);
 
-  // 復習する問題がない場合はリダイレクト
-  useEffect(() => {
-    if (!authLoading && isAuthenticated && dueCardsCount === 0 && !session) {
-      router.push('/coffee-trivia');
-    }
-  }, [authLoading, isAuthenticated, dueCardsCount, session, router]);
+  // 復習する問題がない場合のフラグ
+  const noReviewCards = !authLoading && isAuthenticated && dueCardsCount === 0 && !session;
 
   // セッション開始
   useEffect(() => {
@@ -193,6 +187,48 @@ export default function ReviewPage() {
             ログイン
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  // 復習する問題がない場合
+  if (noReviewCards) {
+    return (
+      <div className="min-h-screen bg-[#FDF8F0]">
+        <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            <Link
+              href="/coffee-trivia"
+              className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
+            >
+              <ArrowLeftIcon />
+              <span className="text-sm font-medium">戻る</span>
+            </Link>
+            <h1 className="font-semibold text-[#211714] flex items-center gap-2">
+              <RefreshIcon />
+              復習モード
+            </h1>
+            <div className="w-14" />
+          </div>
+        </header>
+        <main className="max-w-lg mx-auto px-4 py-12 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
+              <CheckCircleIcon />
+            </div>
+            <h2 className="text-lg font-bold text-[#211714] mb-2">お疲れ様です！</h2>
+            <p className="text-[#3A2F2B]/70 mb-6">
+              今のところ復習が必要な問題はありません。<br />
+              クイズに挑戦して新しい問題を覚えましょう！
+            </p>
+            <Link
+              href="/coffee-trivia"
+              className="inline-block bg-[#EF8A00] hover:bg-[#D67A00] text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
+            >
+              ダッシュボードへ戻る
+            </Link>
+          </div>
+        </main>
       </div>
     );
   }

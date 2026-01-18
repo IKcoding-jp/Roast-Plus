@@ -17,7 +17,7 @@ import {
   calculateAverageScores,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
-import { analyzeTastingSession } from '@/app/actions/analyzeTasting';
+import { analyzeTastingSession } from '@/lib/tastingAnalysis';
 import ReactMarkdown from 'react-markdown'; // もしマークダウンを使うなら。今回はテキストのみでもOK
 
 interface TastingSessionCarouselProps {

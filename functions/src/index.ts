@@ -1,5 +1,4 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { ImageAnnotatorClient } from '@google-cloud/vision';
 import OpenAI from 'openai';
 import type { TimeLabel, RoastSchedule } from './types';
 
@@ -9,10 +8,9 @@ interface OCRScheduleResponse {
   roastSchedules: RoastSchedule[];
 }
 
-// 定数: 画像サイズとOCRテキスト長の上限
+// 定数: 画像サイズの上限
 // Base64は元データの約1.33倍になるため、20MB制限に対して26MB相当の文字数を上限とする
 const MAX_BASE64_LENGTH = 26 * 1024 * 1024; // 約26MB分の文字数
-const MAX_OCR_TEXT_LENGTH = 10000; // OCRテキストの最大文字数
 
 /**
  * 詳細なエラーログを出力するヘルパー関数
@@ -40,62 +38,15 @@ function logDetailedError(
 }
 
 /**
- * Vision APIエラーからユーザー向けメッセージを生成
- */
-function getVisionErrorMessage(error: unknown): string {
-  const errorObj = error as Record<string, unknown>;
-  const message = error instanceof Error ? error.message : String(error);
-  const responseObj = errorObj?.response as Record<string, unknown> | undefined;
-  const status = errorObj?.status ?? errorObj?.code ?? responseObj?.status;
-
-  // ネットワーク接続エラー
-  if (
-    message.includes('ENOTFOUND') ||
-    message.includes('ECONNREFUSED') ||
-    message.includes('ENETUNREACH')
-  ) {
-    return 'Vision APIへの接続エラーが発生しました。ネットワーク接続を確認してください。';
-  }
-
-  // タイムアウト
-  if (
-    message.includes('ETIMEDOUT') ||
-    message.toLowerCase().includes('timeout')
-  ) {
-    return 'Vision APIへのリクエストがタイムアウトしました。しばらく待ってから再度お試しください。';
-  }
-
-  // HTTPステータスコードベースのエラー
-  if (status === 400) {
-    return 'リクエストが不正です。画像形式を確認してください。';
-  }
-  if (status === 403) {
-    return 'Vision APIの認証エラーが発生しました。APIキーを確認してください。';
-  }
-  if (status === 413) {
-    return '画像サイズが大きすぎます。20MB以下の画像をアップロードしてください。';
-  }
-  if (status === 429) {
-    return 'Vision APIのレート制限に達しました。しばらく待ってから再度お試しください。';
-  }
-  if (typeof status === 'number' && status >= 500) {
-    return 'Vision APIサーバーエラーが発生しました。しばらく待ってから再度お試しください。';
-  }
-
-  // その他のエラー
-  return `OCR処理中にエラーが発生しました: ${message}`;
-}
-
-/**
- * 画像からスケジュールを抽出するFirebase Function
+ * 画像からスケジュールを抽出するFirebase Function (OpenAI GPT-4o Vision版)
  */
 export const ocrScheduleFromImage = onCall(
   {
     cors: true,
     maxInstances: 10,
-    timeoutSeconds: 300, // 5分（Vision API + OpenAI APIの2段階処理を考慮）
-    memory: '512MiB', // 画像処理とGPT応答のJSONパースを考慮
-    secrets: ['OPENAI_API_KEY', 'GOOGLE_VISION_API_KEY'], // Secrets Managerからシークレットを取得
+    timeoutSeconds: 300, // 5分
+    memory: '512MiB',
+    secrets: ['OPENAI_API_KEY'], // Google Vision API Keyは不要になったため削除
   },
   async (request) => {
     // 認証チェック
@@ -125,88 +76,62 @@ export const ocrScheduleFromImage = onCall(
     }
 
     try {
-      // Base64プレフィックスを削除（data:image/jpeg;base64,など）
-      const base64Data = imageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
-
-      // Google Vision APIでOCR実行
-      const apiKey = process.env.GOOGLE_VISION_API_KEY?.trim();
-      if (!apiKey) {
-        throw new HttpsError('failed-precondition', 'GOOGLE_VISION_API_KEYが設定されていません。firebase functions:secrets:set GOOGLE_VISION_API_KEY で設定してください。');
-      }
-      const visionClient = new ImageAnnotatorClient({ apiKey });
-
-      const [result] = await visionClient.textDetection({
-        image: { content: base64Data },
-      });
-
-      const detections = result.textAnnotations;
-      if (!detections || detections.length === 0) {
-        throw new HttpsError('not-found', '画像からテキストを検出できませんでした');
+      // Base64プレフィックスを含んでいるか確認し、正規化
+      // GPT-4oの Vision API は data URL format (e.g. `data:image/jpeg;base64,...`) を受け入れる
+      // クライアントからプレフィックス付きで送られてくることを想定しているが、なければ付与する処理も考慮可能
+      // ここではクライアントがプレフィックス付きで送ってくる前提としつつ、念のためチェック
+      let formattedImage = imageBase64;
+      if (!imageBase64.startsWith('data:image/')) {
+        // プレフィックスがない場合はjpegとして扱う（またはエラーにするが、ここでは補完する）
+        formattedImage = `data:image/jpeg;base64,${imageBase64}`;
       }
 
-      // 最初の要素は全体のテキスト
-      let fullText = detections[0].description || '';
-      if (!fullText.trim()) {
-        throw new HttpsError('not-found', 'テキストが空です');
-      }
-
-      // OCRテキスト長の制限チェック
-      if (fullText.length > MAX_OCR_TEXT_LENGTH) {
-        console.warn(
-          `[OCR_TEXT_TRUNCATION] OCRテキストが上限を超過: ${fullText.length} 文字 → ${MAX_OCR_TEXT_LENGTH} 文字に切り捨て`
-        );
-        fullText = fullText.substring(0, MAX_OCR_TEXT_LENGTH);
-      }
-
-      // GPT-5.1でスケジュール形式に整形
-      const scheduleData = await formatScheduleWithGPT(fullText);
+      // GPT-4o Visionでスケジュール形式に整形
+      const scheduleData = await formatScheduleWithGPT(formattedImage);
 
       return scheduleData;
     } catch (error) {
       // 詳細なエラーログを出力
-      logDetailedError('[VISION_ERROR]', error);
+      logDetailedError('[OCR_ERROR]', error);
 
       // HttpsErrorはそのまま再throw
       if (error instanceof HttpsError) {
         throw error;
       }
 
-      // Vision APIのエラー種別に応じたメッセージを生成
-      const errorMessage = getVisionErrorMessage(error);
-      throw new HttpsError('internal', errorMessage);
+      // その他のエラー
+      const message = error instanceof Error ? error.message : String(error);
+      throw new HttpsError('internal', `スケジュール解析中にエラーが発生しました: ${message}`);
     }
   }
 );
 
 /**
- * GPT-5.1を使用してOCR結果をTimeLabel配列とRoastSchedule配列に整形
+ * GPT-4oを使用して画像から直接TimeLabel配列とRoastSchedule配列に整形
  */
-async function formatScheduleWithGPT(ocrText: string): Promise<OCRScheduleResponse> {
+async function formatScheduleWithGPT(imageBase64: string): Promise<OCRScheduleResponse> {
   // Firebase Functions v2では、Secrets Managerで設定したシークレットは
-  // process.envから直接読み取れる（onCallのsecretsオプションで指定したシークレット）
+  // process.envから直接読み取れる
   const apiKey = process.env.OPENAI_API_KEY?.trim();
-  
+
   if (!apiKey) {
     throw new HttpsError('failed-precondition', 'OPENAI_API_KEYが設定されていません。firebase functions:secrets:set OPENAI_API_KEY で設定してください。');
   }
 
   const openai = new OpenAI({
     apiKey: apiKey,
-    timeout: 240000, // 240秒のタイムアウト（Function上限300秒より短く設定）
-    maxRetries: 1, // リトライは1回に抑え、総処理時間が300秒を超えないようにする
+    timeout: 240000, // 240秒のタイムアウト
+    maxRetries: 1,
   });
 
-  const prompt = `以下のホワイトボードのスケジュールテキストを解析し、本日のスケジュールとローストスケジュールを抽出してください。
-
-テキスト:
-${ocrText}
+  const promptText = `以下のホワイトボードの画像を解析し、本日のスケジュールとローストスケジュールを抽出してください。
 
 以下のJSON形式で返してください。
 
 【本日のスケジュール（TimeLabel）の抽出ルール】
 - 時間はHH:mm形式（24時間表記）で必ず抽出してください
 - 時間と内容のペアを正確に抽出してください
-- 内容は元のテキストからそのまま抽出し、簡潔に要約してください（不要な装飾や記号は削除）
+- 内容は画像内のテキストからそのまま抽出し、簡潔に要約してください（不要な装飾や記号は削除）
 - **重要：時間が明示されていない項目でも、前の時間の直下に書かれている場合は抽出してください**
   - 例：「10:00 朝礼」の下に「ロースト2回・ハンドピック」と書かれている場合、「10:00 ロースト2回・ハンドピック」として抽出
   - 例：「13:00」の下に「ロースト1回・ハンドピック」と書かれている場合、「13:00 ロースト1回・ハンドピック」として抽出
@@ -226,7 +151,7 @@ ${ocrText}
 【重要：ローストスケジュールの順序】
 - 必ず時間順（早い順）に並べてください
 - アフターパージは、対応するローストの直後に配置してください（時間がない場合は空文字列 ""）
-  - 注意：アフターパージは全てのローストの後に来るわけではありません。テキスト上でローストの直後に書かれている場合のみ抽出してください
+  - 注意：アフターパージは全てのローストの後に来るわけではありません。画像上でローストの直後に書かれている場合のみ抽出してください
   - 例：11:20 2回目の直後に「アフターパージ」と書かれている場合、11:20の後に配置
 - チャフのお掃除は通常、最後に来ます
 - 順序の例（実際のホワイトボードの例）：
@@ -290,27 +215,38 @@ JSONのみを返してください。説明文は不要です。`;
   try {
     const completion = await openai.chat.completions.create(
       {
-        model: 'gpt-5.1',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
-            content: 'あなたはスケジュールを整形する専門家です。OCR結果から本日のスケジュールとローストスケジュールを正確に抽出し、JSON形式で返してください。\n\n重要な注意事項:\n1. 本日のスケジュールセクションに書かれている項目は、時間が明示されていなくても、前の時間の直下に書かれている場合は抽出してください\n2. 本日のスケジュールセクションに書かれている「ロースト○回・ハンドピック」などの作業内容は抽出してください（これらはローストスケジュールセクションとは別です）\n3. ローストスケジュールは必ず時間順（早い順）に並べてください\n4. アフターパージは対応するローストの直後に配置してください（時間がない場合も同様）\n5. チャフのお掃除は通常、最後に配置してください\n6. ローストスケジュールセクション（▲ローストスケジュール）に書かれている項目は本日のスケジュールから除外してください\n7. 時間と内容のペアを正確に抽出してください',
+            content: 'あなたはスケジュールを抽出する専門家です。ホワイトボードの画像から本日のスケジュールとローストスケジュールを正確に抽出し、JSON形式で返してください。\n\n詳細なルールはプロンプトに従ってください。',
           },
           {
             role: 'user',
-            content: prompt,
+            content: [
+              {
+                type: 'text',
+                text: promptText,
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: imageBase64,
+                },
+              },
+            ],
           },
         ],
         response_format: { type: 'json_object' },
       },
       {
-        timeout: 240000, // 240秒のタイムアウト（OpenAI応答を長く待つ）
+        timeout: 240000,
       }
     );
 
     const responseText = completion.choices[0]?.message?.content;
     if (!responseText) {
-      throw new HttpsError('internal', 'GPT-5.1からの応答が空です');
+      throw new HttpsError('internal', 'GPT-4oからの応答が空です');
     }
 
     // JSONをパース
@@ -332,7 +268,7 @@ JSONのみを返してください。説明文は不要です。`;
         responsePreview,
       });
 
-      throw new HttpsError('internal', 'GPT-5.1からの応答の解析に失敗しました。再度お試しください。');
+      throw new HttpsError('internal', 'GPT-4oからの応答の解析に失敗しました。再度お試しください。');
     }
 
     const parsedObject = parsed as { timeLabels?: unknown; roastSchedules?: unknown };
@@ -403,7 +339,7 @@ JSONのみを返してください。説明文は不要です。`;
     });
 
     // OpenAI APIのエラーを詳細に処理
-    let errorMessage = 'スケジュール整形中にエラーが発生しました';
+    let errorMessage = 'スケジュール解析中にエラーが発生しました';
     if (error instanceof Error) {
       // OpenAI APIのエラータイプを確認
       const openAiError = error as { status?: number; response?: { status?: number; statusText?: string }; message?: string };
@@ -428,7 +364,7 @@ JSONのみを返してください。説明文は不要です。`;
         errorMessage = error.message || errorMessage;
       }
     }
-    
+
     throw new HttpsError('internal', errorMessage);
   }
 }

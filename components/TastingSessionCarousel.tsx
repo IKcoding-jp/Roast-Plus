@@ -347,8 +347,8 @@ export function TastingSessionCarousel({
 
                         {/* フッター */}
                         <div className="px-8 py-4 bg-[#F5F5F5] border-t border-dashed border-[#8D6E63]/30 flex justify-between items-center">
-                          <div className="flex items-center gap-2 text-[#A1887F] text-[10px] font-serif italic tracking-wider">
-                            <CalendarBlank size={12} weight="fill" />
+                          <div className="flex items-center gap-2 text-[#A1887F] text-xs font-serif italic tracking-wider">
+                            <CalendarBlank size={14} weight="fill" />
                             <span>{formatDate(session.createdAt)}</span>
                           </div>
                           <div className="flex items-center gap-2 text-xs font-bold text-[#5D4037] uppercase tracking-widest group-hover:text-[#3E2723] group-hover:translate-x-1 transition-all duration-300 cursor-pointer">

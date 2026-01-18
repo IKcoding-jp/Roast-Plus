@@ -8,7 +8,6 @@ import {
   Users,
   CalendarBlank,
   CaretRight,
-  Sparkle,
   Notepad
 } from 'phosphor-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,6 +25,7 @@ interface TastingSessionCarouselProps {
   tastingRecords: TastingRecord[];
   activeMemberCount: number;
   router: ReturnType<typeof useRouter>;
+  onUpdateSession?: (sessionId: string, aiAnalysis: string) => void;
 }
 
 export function TastingSessionCarousel({
@@ -33,6 +33,7 @@ export function TastingSessionCarousel({
   tastingRecords,
   activeMemberCount,
   router,
+  onUpdateSession,
 }: TastingSessionCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -40,16 +41,17 @@ export function TastingSessionCarousel({
   const MOBILE_CHART_SIZE = 180;
 
   // AI分析の状態管理
-  const [analysisResults, setAnalysisResults] = useState<{ [key: string]: string }>({});
   const [isAnalyzing, setIsAnalyzing] = useState<{ [key: string]: boolean }>({});
+  // 分析済みIDを追跡（重複実行防止）
+  const [analyzedIds, setAnalyzedIds] = useState<Set<string>>(new Set());
 
-  const handleAnalyze = async (e: React.MouseEvent, session: TastingSession, comments: string[], averageScores: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (analysisResults[session.id] || isAnalyzing[session.id]) return;
+  // 自動分析を実行する関数
+  const triggerAutoAnalysis = async (session: TastingSession, comments: string[], averageScores: any) => {
+    // 既に分析済みまたは分析中の場合はスキップ
+    if (session.aiAnalysis || isAnalyzing[session.id] || analyzedIds.has(session.id)) return;
 
     setIsAnalyzing(prev => ({ ...prev, [session.id]: true }));
+    setAnalyzedIds(prev => new Set(prev).add(session.id));
 
     const result = await analyzeTastingSession({
       beanName: session.beanName,
@@ -58,8 +60,8 @@ export function TastingSessionCarousel({
       averageScores,
     });
 
-    if (result.status === 'success' && result.text) {
-      setAnalysisResults(prev => ({ ...prev, [session.id]: result.text! }));
+    if (result.status === 'success' && result.text && onUpdateSession) {
+      onUpdateSession(session.id, result.text);
     }
 
     setIsAnalyzing(prev => ({ ...prev, [session.id]: false }));
@@ -144,8 +146,13 @@ export function TastingSessionCarousel({
         <div className="flex flex-col gap-10 max-w-5xl mx-auto">
           {sessionData.map(({ session, recordCount, averageScores, comments }, index) => {
             const roastStyle = getRoastBadgeStyle(session.roastLevel);
-            const hasAnalysis = !!analysisResults[session.id];
+            const hasAnalysis = !!session.aiAnalysis;
             const analyzing = !!isAnalyzing[session.id];
+
+            // 記録があり、分析がまだの場合は自動分析を開始
+            if (recordCount > 0 && !hasAnalysis && !analyzing && onUpdateSession) {
+              triggerAutoAnalysis(session, comments, averageScores);
+            }
 
             return (
               <motion.div
@@ -192,10 +199,6 @@ export function TastingSessionCarousel({
                                     {roastStyle.label}
                                   </span>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2 text-[#5D4037] text-xs font-medium font-serif italic">
-                                <CalendarBlank size={14} weight="fill" />
-                                <span>{formatDate(session.createdAt)}</span>
                               </div>
                             </div>
                           </div>
@@ -276,17 +279,9 @@ export function TastingSessionCarousel({
                           <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/rice-paper.png")' }}></div>
 
                           <div className="relative z-10">
-                            {!hasAnalysis && !analyzing && (
+                            {!hasAnalysis && !analyzing && recordCount === 0 && (
                               <div className="flex items-center justify-center py-2">
-                                <button
-                                  onClick={(e) => handleAnalyze(e, session, comments, averageScores)}
-                                  className="group flex flex-col items-center gap-2 opacity-70 hover:opacity-100 transition-opacity"
-                                >
-                                  <div className="bg-[#5D4037] text-[#FFF8E1] p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform">
-                                    <Sparkle size={24} weight="fill" />
-                                  </div>
-                                  <span className="text-xs font-serif font-bold text-[#5D4037] tracking-widest border-b border-[#5D4037] pb-0.5">AIソムリエに分析を依頼</span>
-                                </button>
+                                <p className="text-xs font-serif text-[#8D6E63] italic">記録が追加されるとAI分析が開始されます</p>
                               </div>
                             )}
 
@@ -306,10 +301,10 @@ export function TastingSessionCarousel({
                                 <div className="absolute top-0 left-0 w-full h-1 bg-[#D7CCC8]/30"></div>
                                 <div className="flex items-center gap-2 mb-3">
                                   <Notepad size={20} weight="duotone" className="text-[#8D6E63]" />
-                                  <h4 className="text-sm font-serif font-bold text-[#5D4037]">AI試飲レポート</h4>
+                                  <h4 className="text-sm font-serif font-bold text-[#5D4037]">AIコーヒーマイスターのコメント</h4>
                                 </div>
                                 <p className="text-sm font-serif leading-loose text-[#4E342E] whitespace-pre-wrap">
-                                  {analysisResults[session.id]}
+                                  {session.aiAnalysis}
                                 </p>
                               </motion.div>
                             )}
@@ -318,8 +313,9 @@ export function TastingSessionCarousel({
 
                         {/* フッター */}
                         <div className="px-8 py-4 bg-[#F5F5F5] border-t border-dashed border-[#8D6E63]/30 flex justify-between items-center">
-                          <div className="text-[10px] text-[#A1887F] font-serif italic tracking-wider">
-                            ローストプラス オリジナルブレンド記録
+                          <div className="flex items-center gap-2 text-[#A1887F] text-[10px] font-serif italic tracking-wider">
+                            <CalendarBlank size={12} weight="fill" />
+                            <span>{formatDate(session.createdAt)}</span>
                           </div>
                           <div className="flex items-center gap-2 text-xs font-bold text-[#5D4037] uppercase tracking-widest group-hover:text-[#3E2723] group-hover:translate-x-1 transition-all duration-300 cursor-pointer">
                             詳細を見る <CaretRight size={14} weight="bold" />
@@ -345,8 +341,13 @@ export function TastingSessionCarousel({
       <div className="flex flex-col gap-6 px-4 pb-20">
         {sessionData.map(({ session, recordCount, averageScores, comments }, index) => {
           const roastStyle = getRoastBadgeStyle(session.roastLevel);
-          const hasAnalysis = !!analysisResults[session.id];
+          const hasAnalysis = !!session.aiAnalysis;
           const analyzing = !!isAnalyzing[session.id];
+
+          // 記録があり、分析がまだの場合は自動分析を開始
+          if (recordCount > 0 && !hasAnalysis && !analyzing && onUpdateSession) {
+            triggerAutoAnalysis(session, comments, averageScores);
+          }
 
           return (
             <motion.div
@@ -390,10 +391,6 @@ export function TastingSessionCarousel({
                               >
                                 {roastStyle.label}
                               </span>
-                              <div className="text-[#8D6E63] text-[10px] font-medium flex items-center gap-1">
-                                <CalendarBlank size={12} weight="fill" />
-                                {formatDate(session.createdAt)}
-                              </div>
                             </div>
                           </div>
                           <button
@@ -458,14 +455,8 @@ export function TastingSessionCarousel({
 
                           {/* AI分析 (モバイル) */}
                           <div className="border-t border-dashed border-[#D7CCC8] pt-4 mt-auto">
-                            {!hasAnalysis && !analyzing && (
-                              <button
-                                onClick={(e) => handleAnalyze(e, session, comments, averageScores)}
-                                className="w-full flex items-center justify-center gap-2 py-2 bg-[#F5F5F5] rounded border border-[#E0E0E0] active:scale-95 transition-transform"
-                              >
-                                <Sparkle size={16} weight="fill" className="text-[#8D6E63]" />
-                                <span className="text-xs font-serif font-bold text-[#5D4037]">AI分析</span>
-                              </button>
+                            {!hasAnalysis && !analyzing && recordCount === 0 && (
+                              <p className="text-center text-xs font-serif text-[#8D6E63] italic py-2">記録が追加されるとAI分析が開始されます</p>
                             )}
 
                             {analyzing && (
@@ -479,10 +470,10 @@ export function TastingSessionCarousel({
                               <div className="bg-[#fffcf0] p-3 rounded border border-[#D7CCC8]">
                                 <div className="flex items-center gap-1 mb-1">
                                   <Notepad size={14} className="text-[#8D6E63]" />
-                                  <span className="text-xs font-bold text-[#5D4037] font-serif">レポート</span>
+                                  <span className="text-xs font-bold text-[#5D4037] font-serif">AIコーヒーマイスターのコメント</span>
                                 </div>
                                 <p className="text-xs font-serif leading-loose text-[#4E342E] line-clamp-4">
-                                  {analysisResults[session.id]}
+                                  {session.aiAnalysis}
                                 </p>
                               </div>
                             )}
@@ -490,8 +481,11 @@ export function TastingSessionCarousel({
                         </div>
                       </div>
 
-                      {/* フッター */}
-                      <div className="p-4 bg-[#F5F5F5] border-t border-dashed border-[#8D6E63]/30 flex justify-end">
+                      <div className="p-4 bg-[#F5F5F5] border-t border-dashed border-[#8D6E63]/30 flex justify-between items-center">
+                        <div className="flex items-center gap-2 text-[#A1887F] text-[10px] font-serif italic tracking-wider">
+                          <CalendarBlank size={12} weight="fill" />
+                          <span>{formatDate(session.createdAt)}</span>
+                        </div>
                         <div className="flex items-center gap-1 text-[10px] font-bold text-[#5D4037] uppercase tracking-widest">
                           詳細を見る <CaretRight size={12} weight="bold" />
                         </div>

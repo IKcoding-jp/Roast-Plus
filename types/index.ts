@@ -99,6 +99,8 @@ export interface TastingSession {
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
   userId: string;
+  aiAnalysis?: string; // AIコーヒーマイスターのコメント
+  aiAnalysisUpdatedAt?: string; // 分析日時 (ISO 8601)
 }
 
 export interface TastingRecord {

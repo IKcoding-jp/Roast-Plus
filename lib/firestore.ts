@@ -154,7 +154,14 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
         date: schedule.date || new Date().toISOString().split('T')[0],
       }))
       : [],
-    tastingSessions: Array.isArray(data?.tastingSessions) ? data.tastingSessions : [],
+    tastingSessions: Array.isArray(data?.tastingSessions)
+      ? data.tastingSessions.map((session) => ({
+        ...session,
+        // aiAnalysis関連フィールドを保持
+        aiAnalysis: typeof session.aiAnalysis === 'string' ? session.aiAnalysis : undefined,
+        aiAnalysisUpdatedAt: typeof session.aiAnalysisUpdatedAt === 'string' ? session.aiAnalysisUpdatedAt : undefined,
+      }))
+      : [],
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],
     notifications: Array.isArray(data?.notifications) ? data.notifications : [],
     encouragementCount: typeof data?.encouragementCount === 'number' ? data.encouragementCount : 0,

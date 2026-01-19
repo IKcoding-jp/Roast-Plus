@@ -153,6 +153,7 @@ export interface QuizSettings {
 export interface QuestionCheckmark {
   questionId: string;
   blueCheck: number;  // 0-3: 正解履歴
+  redCheck: number;   // 0-3: 不正解履歴
   updatedAt: string;  // ISO 8601
 }
 

@@ -1,6 +1,6 @@
 // チェックマークロジック
-// 正解時: blue +1 (max 3)
-// 間違い時: blue > 0 なら blue -1
+// 正解時: redCheck > 0 なら redCheck - 1、それ以外は blueCheck + 1 (max 3)
+// 間違い時: blueCheck > 0 なら blueCheck - 1、それ以外は redCheck + 1 (max 3)
 
 import type { QuestionCheckmark } from './types';
 
@@ -9,28 +9,57 @@ const MIN_CHECKS = 0;
 
 /**
  * 正解時のチェックマーク更新
- * - blue +1 (max 3)
+ * - redCheck > 0 の場合: redCheck - 1
+ * - redCheck = 0 の場合: blueCheck + 1（最大3）
  */
 export function updateCheckmarkOnCorrect(
   checkmark: QuestionCheckmark
 ): QuestionCheckmark {
+  const redCheck = checkmark.redCheck ?? 0;
+
+  if (redCheck > 0) {
+    // 赤チェックがある場合は赤を減らす
+    return {
+      ...checkmark,
+      redCheck: redCheck - 1,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  // 赤チェックがない場合は青を増やす
   return {
     ...checkmark,
     blueCheck: Math.min(checkmark.blueCheck + 1, MAX_CHECKS),
+    redCheck: MIN_CHECKS,
     updatedAt: new Date().toISOString(),
   };
 }
 
 /**
  * 間違い時のチェックマーク更新
- * - blue > 0 なら blue -1
+ * - blueCheck > 0 の場合: blueCheck - 1
+ * - blueCheck = 0 の場合: redCheck + 1（最大3）
  */
 export function updateCheckmarkOnIncorrect(
   checkmark: QuestionCheckmark
 ): QuestionCheckmark {
+  const redCheck = checkmark.redCheck ?? 0;
+
+  if (checkmark.blueCheck > 0) {
+    // 青チェックがある場合は青を減らす
+    return {
+      ...checkmark,
+      blueCheck: checkmark.blueCheck - 1,
+      redCheck,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  // 青チェックがない場合は赤を増やす
   return {
     ...checkmark,
-    blueCheck: Math.max(checkmark.blueCheck - 1, MIN_CHECKS),
+    blueCheck: MIN_CHECKS,
+    redCheck: Math.min(redCheck + 1, MAX_CHECKS),
     updatedAt: new Date().toISOString(),
   };
 }
@@ -54,6 +83,7 @@ export function createCheckmark(questionId: string): QuestionCheckmark {
   return {
     questionId,
     blueCheck: 0,
+    redCheck: 0,
     updatedAt: new Date().toISOString(),
   };
 }

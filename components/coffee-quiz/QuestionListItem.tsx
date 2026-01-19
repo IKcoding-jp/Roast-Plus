@@ -83,7 +83,7 @@ export function QuestionListItem({
     >
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
-          {/* 問題ID & 難易度 */}
+          {/* 問題ID & 難易度 & チェックマーク */}
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs text-[#3A2F2B]/50 font-mono">
               {question.id}
@@ -97,19 +97,16 @@ export function QuestionListItem({
             >
               {DIFFICULTY_LABELS[question.difficulty]}
             </span>
+            <CheckmarkCompact
+              blueCheck={checkmark?.blueCheck ?? 0}
+              redCheck={checkmark?.redCheck ?? 0}
+            />
           </div>
 
           {/* 問題文（プレビュー） */}
           <p className="text-sm text-[#211714] line-clamp-2">
             {question.question}
           </p>
-
-          {/* チェックマーク */}
-          <div className="mt-2">
-            <CheckmarkCompact
-              blueCheck={checkmark?.blueCheck ?? 0}
-            />
-          </div>
         </div>
 
         {/* 矢印 */}

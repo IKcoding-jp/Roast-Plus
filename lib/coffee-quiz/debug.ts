@@ -15,7 +15,7 @@ let debugModeEnabled = false;
 export function setDebugMode(enabled: boolean): void {
   debugModeEnabled = enabled;
   if (typeof window !== 'undefined') {
-    (window as Window & { __QUIZ_DEBUG_MODE__: boolean }).__QUIZ_DEBUG_MODE__ = enabled;
+    (window as unknown as Window & { __QUIZ_DEBUG_MODE__: boolean }).__QUIZ_DEBUG_MODE__ = enabled;
     // localStorageに永続化
     try {
       localStorage.setItem('quiz_debug_mode', String(enabled));
@@ -31,15 +31,15 @@ export function setDebugMode(enabled: boolean): void {
 export function isDebugMode(): boolean {
   if (typeof window !== 'undefined') {
     // windowオブジェクトから取得
-    const windowValue = (window as Window & { __QUIZ_DEBUG_MODE__?: boolean }).__QUIZ_DEBUG_MODE__;
+    const windowValue = (window as unknown as Window & { __QUIZ_DEBUG_MODE__?: boolean }).__QUIZ_DEBUG_MODE__;
     if (windowValue !== undefined) return windowValue;
-    
+
     // localStorageから復元
     try {
       const stored = localStorage.getItem('quiz_debug_mode');
       if (stored !== null) {
         const enabled = stored === 'true';
-        (window as Window & { __QUIZ_DEBUG_MODE__: boolean }).__QUIZ_DEBUG_MODE__ = enabled;
+        (window as unknown as Window & { __QUIZ_DEBUG_MODE__: boolean }).__QUIZ_DEBUG_MODE__ = enabled;
         return enabled;
       }
     } catch {
@@ -57,7 +57,7 @@ export function isDebugMode(): boolean {
 export function setDebugDateOffset(days: number): void {
   debugDateOffset = days;
   if (typeof window !== 'undefined') {
-    (window as Window & { __QUIZ_DEBUG_DATE_OFFSET__: number }).__QUIZ_DEBUG_DATE_OFFSET__ = days;
+    (window as unknown as Window & { __QUIZ_DEBUG_DATE_OFFSET__: number }).__QUIZ_DEBUG_DATE_OFFSET__ = days;
     // localStorageに永続化
     try {
       localStorage.setItem('quiz_debug_date_offset', String(days));
@@ -73,16 +73,16 @@ export function setDebugDateOffset(days: number): void {
 export function getDebugDateOffset(): number {
   if (typeof window !== 'undefined') {
     // windowオブジェクトから取得
-    const windowValue = (window as Window & { __QUIZ_DEBUG_DATE_OFFSET__?: number }).__QUIZ_DEBUG_DATE_OFFSET__;
+    const windowValue = (window as unknown as Window & { __QUIZ_DEBUG_DATE_OFFSET__?: number }).__QUIZ_DEBUG_DATE_OFFSET__;
     if (windowValue !== undefined) return windowValue;
-    
+
     // localStorageから復元
     try {
       const stored = localStorage.getItem('quiz_debug_date_offset');
       if (stored !== null) {
         const offset = parseInt(stored, 10);
         if (!isNaN(offset)) {
-          (window as Window & { __QUIZ_DEBUG_DATE_OFFSET__: number }).__QUIZ_DEBUG_DATE_OFFSET__ = offset;
+          (window as unknown as Window & { __QUIZ_DEBUG_DATE_OFFSET__: number }).__QUIZ_DEBUG_DATE_OFFSET__ = offset;
           return offset;
         }
       }
@@ -120,8 +120,8 @@ export function resetDebugState(): void {
   debugDateOffset = 0;
   debugModeEnabled = false;
   if (typeof window !== 'undefined') {
-    (window as Window & { __QUIZ_DEBUG_MODE__?: boolean; __QUIZ_DEBUG_DATE_OFFSET__?: number }).__QUIZ_DEBUG_MODE__ = false;
-    (window as Window & { __QUIZ_DEBUG_MODE__?: boolean; __QUIZ_DEBUG_DATE_OFFSET__?: number }).__QUIZ_DEBUG_DATE_OFFSET__ = 0;
+    (window as unknown as Window & { __QUIZ_DEBUG_MODE__?: boolean; __QUIZ_DEBUG_DATE_OFFSET__?: number }).__QUIZ_DEBUG_MODE__ = false;
+    (window as unknown as Window & { __QUIZ_DEBUG_MODE__?: boolean; __QUIZ_DEBUG_DATE_OFFSET__?: number }).__QUIZ_DEBUG_DATE_OFFSET__ = 0;
     // localStorageからも削除
     try {
       localStorage.removeItem('quiz_debug_mode');

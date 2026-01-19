@@ -64,8 +64,8 @@ export function CheckmarkDisplay({
 
     for (let i = 0; i < maxChecks; i++) {
       const isActive = i < count;
-      const bgColor = isActive ? 'bg-blue-500' : 'bg-neutral-700/50';
-      const borderColor = isActive ? 'border-blue-400' : 'border-neutral-600';
+      const bgColor = isActive ? 'bg-blue-500' : 'bg-[#211714]/5';
+      const borderColor = isActive ? 'border-blue-400' : 'border-[#211714]/10';
 
       checks.push(
         <motion.div
@@ -118,12 +118,12 @@ export function CheckmarkCompact({
   return (
     <div className="flex items-center gap-2 text-xs">
       {blueCheck > 0 ? (
-        <span className="flex items-center gap-0.5 text-blue-400">
+        <span className="flex items-center gap-0.5 text-blue-500">
           <CheckIcon size={12} />
           {blueCheck}
         </span>
       ) : (
-        <span className="text-neutral-500">-</span>
+        <span className="text-[#3A2F2B]/40">-</span>
       )}
     </div>
   );

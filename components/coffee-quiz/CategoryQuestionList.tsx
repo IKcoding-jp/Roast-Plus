@@ -115,10 +115,10 @@ export function CategoryQuestionList({
       {/* ヘッダー */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-white">
+          <h2 className="text-lg font-bold text-[#211714]">
             {CATEGORY_LABELS[category]}
           </h2>
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-[#3A2F2B]/60">
             全{questions.length}問
           </p>
         </div>
@@ -131,12 +131,12 @@ export function CategoryQuestionList({
           onClick={handleShuffle10}
           className="
             flex items-center justify-center gap-2
-            bg-[#EF8A00]/20 hover:bg-[#EF8A00]/30
-            border border-[#EF8A00]/30
-            text-[#EF8A00]
+            bg-[#EF8A00] hover:bg-[#EF8A00]/90
+            text-white
             rounded-xl
             py-3 px-4
             transition-colors
+            shadow-sm
           "
         >
           <ShuffleIcon size={18} />
@@ -148,9 +148,9 @@ export function CategoryQuestionList({
           onClick={handleAllQuestions}
           className="
             flex items-center justify-center gap-2
-            bg-neutral-700/50 hover:bg-neutral-600/50
-            border border-neutral-600/50
-            text-neutral-200
+            bg-[#211714]/5 hover:bg-[#211714]/10
+            border border-[#211714]/10
+            text-[#211714]
             rounded-xl
             py-3 px-4
             transition-colors
@@ -163,7 +163,7 @@ export function CategoryQuestionList({
 
       {/* ソートオプション */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-neutral-500">並び替え:</span>
+        <span className="text-xs text-[#3A2F2B]/60">並び替え:</span>
         <div className="flex gap-1">
           {[
             { value: 'default', label: '順番' },
@@ -177,7 +177,7 @@ export function CategoryQuestionList({
                 text-xs px-2 py-1 rounded-md transition-colors
                 ${sortBy === option.value
                   ? 'bg-[#EF8A00]/20 text-[#EF8A00]'
-                  : 'bg-neutral-800/50 text-neutral-400 hover:text-neutral-200'
+                  : 'bg-[#211714]/5 text-[#3A2F2B]/60 hover:text-[#3A2F2B]'
                 }
               `}
             >

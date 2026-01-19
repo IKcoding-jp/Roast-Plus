@@ -43,19 +43,19 @@ export function QuestionListItem({
 }: QuestionListItemProps) {
   const difficultyConfig = {
     beginner: {
-      bg: 'bg-green-500/20',
-      text: 'text-green-400',
-      border: 'border-green-500/30',
+      bg: 'bg-green-100',
+      text: 'text-green-700',
+      border: 'border-green-200',
     },
     intermediate: {
-      bg: 'bg-yellow-500/20',
-      text: 'text-yellow-400',
-      border: 'border-yellow-500/30',
+      bg: 'bg-yellow-100',
+      text: 'text-yellow-700',
+      border: 'border-yellow-200',
     },
     advanced: {
-      bg: 'bg-red-500/20',
-      text: 'text-red-400',
-      border: 'border-red-500/30',
+      bg: 'bg-red-100',
+      text: 'text-red-700',
+      border: 'border-red-200',
     },
   };
 
@@ -69,14 +69,15 @@ export function QuestionListItem({
       onClick={onClick}
       className="
         w-full
-        bg-neutral-800/50
-        hover:bg-neutral-700/50
-        border border-neutral-700/50
-        hover:border-neutral-600/50
+        bg-white
+        hover:bg-[#211714]/5
+        border border-[#211714]/5
+        hover:border-[#211714]/10
         rounded-xl
         p-4
         text-left
         transition-colors duration-200
+        shadow-sm
         group
       "
     >
@@ -84,7 +85,7 @@ export function QuestionListItem({
         <div className="flex-1 min-w-0">
           {/* 問題ID & 難易度 */}
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs text-neutral-500 font-mono">
+            <span className="text-xs text-[#3A2F2B]/50 font-mono">
               {question.id}
             </span>
             <span
@@ -99,7 +100,7 @@ export function QuestionListItem({
           </div>
 
           {/* 問題文（プレビュー） */}
-          <p className="text-sm text-neutral-200 line-clamp-2">
+          <p className="text-sm text-[#211714] line-clamp-2">
             {question.question}
           </p>
 
@@ -114,7 +115,7 @@ export function QuestionListItem({
         {/* 矢印 */}
         <ChevronRightIcon
           size={20}
-          className="text-neutral-500 group-hover:text-neutral-300 transition-colors ml-2 flex-shrink-0"
+          className="text-[#3A2F2B]/40 group-hover:text-[#3A2F2B]/60 transition-colors ml-2 flex-shrink-0"
         />
       </div>
     </motion.button>

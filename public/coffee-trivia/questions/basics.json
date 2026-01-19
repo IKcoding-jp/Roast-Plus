@@ -1,0 +1,980 @@
+{
+  "category": "basics",
+  "questions": [
+    {
+      "id": "basics-001",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの木は何科に属しますか？",
+      "options": [
+        { "id": "a", "text": "アカネ科", "isCorrect": true },
+        { "id": "b", "text": "バラ科", "isCorrect": false },
+        { "id": "c", "text": "マメ科", "isCorrect": false },
+        { "id": "d", "text": "ツバキ科", "isCorrect": false }
+      ],
+      "explanation": "コーヒーの木はアカネ科（Rubiaceae）に属します。クチナシやアカネと同じ科です。"
+    },
+    {
+      "id": "basics-002",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "世界で最も生産量が多いコーヒー豆の品種は？",
+      "options": [
+        { "id": "a", "text": "アラビカ種", "isCorrect": true },
+        { "id": "b", "text": "ロブスタ種", "isCorrect": false },
+        { "id": "c", "text": "リベリカ種", "isCorrect": false },
+        { "id": "d", "text": "エクセルサ種", "isCorrect": false }
+      ],
+      "explanation": "アラビカ種は世界のコーヒー生産量の約60-70%を占め、風味が豊かで高品質とされています。"
+    },
+    {
+      "id": "basics-003",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーチェリーの中に通常何個の種子（コーヒー豆）が入っていますか？",
+      "options": [
+        { "id": "a", "text": "1個", "isCorrect": false },
+        { "id": "b", "text": "2個", "isCorrect": true },
+        { "id": "c", "text": "3個", "isCorrect": false },
+        { "id": "d", "text": "4個", "isCorrect": false }
+      ],
+      "explanation": "通常コーヒーチェリーには2つの種子（フラットビーン）が向かい合って入っています。1つだけの場合はピーベリーと呼ばれます。"
+    },
+    {
+      "id": "basics-004",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「コーヒーベルト」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "コーヒー栽培に適した赤道付近の地帯", "isCorrect": true },
+        { "id": "b", "text": "コーヒー豆の外皮の部分", "isCorrect": false },
+        { "id": "c", "text": "コーヒーを収穫する際に使う道具", "isCorrect": false },
+        { "id": "d", "text": "コーヒー豆の等級を表す用語", "isCorrect": false }
+      ],
+      "explanation": "コーヒーベルトは北緯25度から南緯25度の間の熱帯・亜熱帯地域を指し、コーヒー栽培に適した気候条件が揃っています。"
+    },
+    {
+      "id": "basics-005",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "アラビカ種とロブスタ種を比較したとき、カフェイン含有量が多いのはどちらですか？",
+      "options": [
+        { "id": "a", "text": "アラビカ種", "isCorrect": false },
+        { "id": "b", "text": "ロブスタ種", "isCorrect": true },
+        { "id": "c", "text": "同じ", "isCorrect": false },
+        { "id": "d", "text": "栽培条件による", "isCorrect": false }
+      ],
+      "explanation": "ロブスタ種はアラビカ種の約2倍のカフェインを含みます。このため病害虫に強い特性がありますが、苦味が強くなります。"
+    },
+    {
+      "id": "basics-006",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒー豆を保存する際、最も避けるべき環境要因はどれですか？",
+      "options": [
+        { "id": "a", "text": "光・熱・湿気・酸素", "isCorrect": true },
+        { "id": "b", "text": "暗所・冷所", "isCorrect": false },
+        { "id": "c", "text": "密閉容器", "isCorrect": false },
+        { "id": "d", "text": "常温", "isCorrect": false }
+      ],
+      "explanation": "コーヒー豆の劣化を防ぐには、光・熱・湿気・酸素を避けることが重要です。密閉容器で冷暗所に保存するのがベストです。"
+    },
+    {
+      "id": "basics-007",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「ピーベリー」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "コーヒーチェリーに1つだけできた丸い豆", "isCorrect": true },
+        { "id": "b", "text": "最高品質のコーヒー豆の等級", "isCorrect": false },
+        { "id": "c", "text": "特定の産地のコーヒー豆", "isCorrect": false },
+        { "id": "d", "text": "深煎りのコーヒー豆", "isCorrect": false }
+      ],
+      "explanation": "ピーベリーは、通常2つできる種子が1つだけ育った丸い形のコーヒー豆です。全体の5-10%程度しかなく、凝縮された風味があるとされています。"
+    },
+    {
+      "id": "basics-008",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "スペシャルティコーヒーの定義として正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "SCAAカッピングスコア80点以上", "isCorrect": true },
+        { "id": "b", "text": "標高1500m以上で栽培", "isCorrect": false },
+        { "id": "c", "text": "オーガニック認証取得", "isCorrect": false },
+        { "id": "d", "text": "アラビカ種100%", "isCorrect": false }
+      ],
+      "explanation": "スペシャルティコーヒーはSCAA（米国スペシャルティコーヒー協会）のカッピングスコアで100点満点中80点以上を獲得したコーヒーを指します。"
+    },
+    {
+      "id": "basics-009",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「精製方法」で「ウォッシュド」の特徴はどれですか？",
+      "options": [
+        { "id": "a", "text": "クリーンでさっぱりした風味", "isCorrect": true },
+        { "id": "b", "text": "フルーティーで発酵感がある", "isCorrect": false },
+        { "id": "c", "text": "甘みが強くボディが重い", "isCorrect": false },
+        { "id": "d", "text": "スモーキーな風味", "isCorrect": false }
+      ],
+      "explanation": "ウォッシュド（水洗式）は果肉を除去し水で洗って乾燥させる方法で、クリーンで酸味の明確な風味になります。"
+    },
+    {
+      "id": "basics-010",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「ナチュラル」精製と「ハニー」精製の違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "乾燥時に残す果肉の量", "isCorrect": true },
+        { "id": "b", "text": "使用する水の量", "isCorrect": false },
+        { "id": "c", "text": "乾燥にかかる日数", "isCorrect": false },
+        { "id": "d", "text": "使用する豆の品種", "isCorrect": false }
+      ],
+      "explanation": "ナチュラルはチェリーをそのまま乾燥、ハニーは果肉を部分的に残して乾燥させます。残す量でイエロー、レッド、ブラックハニーと分かれます。"
+    },
+    {
+      "id": "basics-011",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの「酸味」と「苦味」、浅煎りではどちらが強くなりやすいですか？",
+      "options": [
+        { "id": "a", "text": "酸味", "isCorrect": true },
+        { "id": "b", "text": "苦味", "isCorrect": false },
+        { "id": "c", "text": "両方同じ", "isCorrect": false },
+        { "id": "d", "text": "どちらも弱くなる", "isCorrect": false }
+      ],
+      "explanation": "浅煎りは酸味が際立ち、深煎りになるほど苦味が強くなります。これは焙煎による化学変化が関係しています。"
+    },
+    {
+      "id": "basics-012",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒー豆は植物のどの部分ですか？",
+      "options": [
+        { "id": "a", "text": "種子", "isCorrect": true },
+        { "id": "b", "text": "果肉", "isCorrect": false },
+        { "id": "c", "text": "根", "isCorrect": false },
+        { "id": "d", "text": "葉", "isCorrect": false }
+      ],
+      "explanation": "コーヒー豆はコーヒーの木の果実（チェリー）の中にある種子です。果肉を取り除いて加工されます。"
+    },
+    {
+      "id": "basics-013",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの「ボディ」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "口当たりの重さ・コク", "isCorrect": true },
+        { "id": "b", "text": "カフェインの量", "isCorrect": false },
+        { "id": "c", "text": "コーヒー豆の大きさ", "isCorrect": false },
+        { "id": "d", "text": "香りの強さ", "isCorrect": false }
+      ],
+      "explanation": "ボディはコーヒーの口当たりの重さや質感を表す用語で、ライト（軽い）からフル（重い）まで表現されます。"
+    },
+    {
+      "id": "basics-014",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの鮮度を保つのに最も重要なことは何ですか？",
+      "options": [
+        { "id": "a", "text": "密閉して保存する", "isCorrect": true },
+        { "id": "b", "text": "冷凍庫に入れる", "isCorrect": false },
+        { "id": "c", "text": "日光に当てる", "isCorrect": false },
+        { "id": "d", "text": "開封したまま置く", "isCorrect": false }
+      ],
+      "explanation": "コーヒーは酸素に触れると酸化して劣化します。密閉容器で保存し、空気との接触を最小限にすることが重要です。"
+    },
+    {
+      "id": "basics-015",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "一般的なコーヒー1杯（150ml）に含まれるカフェイン量はおよそどれくらいですか？",
+      "options": [
+        { "id": "a", "text": "約80-100mg", "isCorrect": true },
+        { "id": "b", "text": "約10-20mg", "isCorrect": false },
+        { "id": "c", "text": "約200-300mg", "isCorrect": false },
+        { "id": "d", "text": "約500mg以上", "isCorrect": false }
+      ],
+      "explanation": "ドリップコーヒー1杯（150ml）には約80-100mgのカフェインが含まれています。エスプレッソ1ショットは約60mgです。"
+    },
+    {
+      "id": "basics-016",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "「アイスコーヒー」と「コールドブリュー」の主な違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "抽出時の水温", "isCorrect": true },
+        { "id": "b", "text": "使用する豆の種類", "isCorrect": false },
+        { "id": "c", "text": "カフェイン含有量", "isCorrect": false },
+        { "id": "d", "text": "飲む温度", "isCorrect": false }
+      ],
+      "explanation": "アイスコーヒーは熱湯で抽出して冷やしたもの、コールドブリューは最初から冷水で長時間かけて抽出したものです。"
+    },
+    {
+      "id": "basics-017",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒー豆を挽いた後、風味が最も落ちやすい期間はいつですか？",
+      "options": [
+        { "id": "a", "text": "挽いた直後から数時間", "isCorrect": true },
+        { "id": "b", "text": "1週間後", "isCorrect": false },
+        { "id": "c", "text": "1ヶ月後", "isCorrect": false },
+        { "id": "d", "text": "挽いても変わらない", "isCorrect": false }
+      ],
+      "explanation": "挽いたコーヒーは表面積が増え、酸化が急速に進みます。15分程度で香りの揮発が始まるため、挽きたてが最も美味しいです。"
+    },
+    {
+      "id": "basics-018",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "デカフェ（カフェインレス）コーヒーのカフェイン除去率は一般的にどれくらいですか？",
+      "options": [
+        { "id": "a", "text": "約97%以上", "isCorrect": true },
+        { "id": "b", "text": "約50%", "isCorrect": false },
+        { "id": "c", "text": "約70%", "isCorrect": false },
+        { "id": "d", "text": "100%完全除去", "isCorrect": false }
+      ],
+      "explanation": "デカフェはカフェインの97%以上を除去したコーヒーです。完全にゼロにすることは難しく、微量のカフェインは残ります。"
+    },
+    {
+      "id": "basics-019",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの「フレーバー」と「アロマ」の違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "フレーバーは味、アロマは香り", "isCorrect": true },
+        { "id": "b", "text": "同じ意味", "isCorrect": false },
+        { "id": "c", "text": "フレーバーは香り、アロマは味", "isCorrect": false },
+        { "id": "d", "text": "産地による違い", "isCorrect": false }
+      ],
+      "explanation": "アロマは鼻で感じる香り、フレーバーは口に含んだときに感じる風味全体（味と香りの複合）を指します。"
+    },
+    {
+      "id": "basics-020",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの「後味」を表す専門用語は何ですか？",
+      "options": [
+        { "id": "a", "text": "アフターテイスト", "isCorrect": true },
+        { "id": "b", "text": "プレテイスト", "isCorrect": false },
+        { "id": "c", "text": "ミドルテイスト", "isCorrect": false },
+        { "id": "d", "text": "トップノート", "isCorrect": false }
+      ],
+      "explanation": "アフターテイストは飲んだ後に口の中に残る風味のことで、長く心地よく残るものが高品質とされます。"
+    },
+    {
+      "id": "basics-021",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの木は花を咲かせますか？",
+      "options": [
+        { "id": "a", "text": "はい、白い花を咲かせる", "isCorrect": true },
+        { "id": "b", "text": "いいえ、花は咲かない", "isCorrect": false },
+        { "id": "c", "text": "赤い花を咲かせる", "isCorrect": false },
+        { "id": "d", "text": "黄色い花を咲かせる", "isCorrect": false }
+      ],
+      "explanation": "コーヒーの木はジャスミンのような香りの白い花を咲かせます。花が散った後に果実（チェリー）が育ちます。"
+    },
+    {
+      "id": "basics-022",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒーの果実が熟すと何色になりますか？",
+      "options": [
+        { "id": "a", "text": "赤色", "isCorrect": true },
+        { "id": "b", "text": "青色", "isCorrect": false },
+        { "id": "c", "text": "黒色", "isCorrect": false },
+        { "id": "d", "text": "白色", "isCorrect": false }
+      ],
+      "explanation": "コーヒーの果実は熟すと赤くなるため「コーヒーチェリー」と呼ばれます。一部の品種では黄色に熟すものもあります。"
+    },
+    {
+      "id": "basics-023",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "「シングルオリジン」とはどのようなコーヒーですか？",
+      "options": [
+        { "id": "a", "text": "単一の産地や農園のコーヒー", "isCorrect": true },
+        { "id": "b", "text": "1杯分だけのコーヒー", "isCorrect": false },
+        { "id": "c", "text": "一度だけ焙煎したコーヒー", "isCorrect": false },
+        { "id": "d", "text": "一種類の抽出方法で淹れたコーヒー", "isCorrect": false }
+      ],
+      "explanation": "シングルオリジンは単一の産地、地域、または農園から来たコーヒーで、その産地特有の風味を楽しめます。"
+    },
+    {
+      "id": "basics-024",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "「ブレンドコーヒー」の目的として最も適切なものはどれですか？",
+      "options": [
+        { "id": "a", "text": "安定した味わいと風味のバランス", "isCorrect": true },
+        { "id": "b", "text": "カフェインを増やす", "isCorrect": false },
+        { "id": "c", "text": "コストを上げる", "isCorrect": false },
+        { "id": "d", "text": "保存期間を延ばす", "isCorrect": false }
+      ],
+      "explanation": "ブレンドは複数の産地の豆を混ぜ、安定した味わいを作り出し、単一の豆では出せない複雑さを生み出します。"
+    },
+    {
+      "id": "basics-025",
+      "category": "basics",
+      "difficulty": "beginner",
+      "question": "コーヒー豆の「欠点豆」に含まれないものはどれですか？",
+      "options": [
+        { "id": "a", "text": "ピーベリー", "isCorrect": true },
+        { "id": "b", "text": "虫食い豆", "isCorrect": false },
+        { "id": "c", "text": "カビ豆", "isCorrect": false },
+        { "id": "d", "text": "発酵豆", "isCorrect": false }
+      ],
+      "explanation": "ピーベリーは欠点豆ではなく、むしろプレミアムな豆として扱われます。欠点豆は虫食い、カビ、発酵などの異常がある豆です。"
+    },
+    {
+      "id": "basics-026",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「クレマ」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "エスプレッソ表面の泡状の層", "isCorrect": true },
+        { "id": "b", "text": "コーヒー豆の皮", "isCorrect": false },
+        { "id": "c", "text": "焙煎中に出る煙", "isCorrect": false },
+        { "id": "d", "text": "コーヒーに加えるクリーム", "isCorrect": false }
+      ],
+      "explanation": "クレマはエスプレッソの表面に浮かぶ赤褐色のクリーム状の泡で、コーヒーオイルとガスが乳化してできます。"
+    },
+    {
+      "id": "basics-027",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「カッピング」とは何をする行為ですか？",
+      "options": [
+        { "id": "a", "text": "コーヒーの品質を評価するテイスティング", "isCorrect": true },
+        { "id": "b", "text": "コーヒー豆を計量する", "isCorrect": false },
+        { "id": "c", "text": "コーヒーをカップに注ぐ", "isCorrect": false },
+        { "id": "d", "text": "コーヒー豆を洗う", "isCorrect": false }
+      ],
+      "explanation": "カッピングはプロがコーヒーの香り、風味、酸味、ボディなどを標準化された方法で評価するテイスティング技法です。"
+    },
+    {
+      "id": "basics-028",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「テロワール」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "産地の土壌・気候・環境が風味に与える影響", "isCorrect": true },
+        { "id": "b", "text": "焙煎の技術", "isCorrect": false },
+        { "id": "c", "text": "抽出方法", "isCorrect": false },
+        { "id": "d", "text": "コーヒー豆の品種", "isCorrect": false }
+      ],
+      "explanation": "テロワールはワイン用語から来ており、土壌、気候、標高などの環境要因がコーヒーの風味に与える影響を意味します。"
+    },
+    {
+      "id": "basics-029",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「マイクロロット」とはどのようなコーヒーですか？",
+      "options": [
+        { "id": "a", "text": "農園の特定区画で少量生産された豆", "isCorrect": true },
+        { "id": "b", "text": "非常に小さい豆", "isCorrect": false },
+        { "id": "c", "text": "電子レンジで焙煎した豆", "isCorrect": false },
+        { "id": "d", "text": "1杯分ずつ小分けされた豆", "isCorrect": false }
+      ],
+      "explanation": "マイクロロットは農園内の特定の区画で栽培・収穫され、個別に精製された少量の高品質な豆を指します。"
+    },
+    {
+      "id": "basics-030",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「SCA」とは何の略称ですか？",
+      "options": [
+        { "id": "a", "text": "Specialty Coffee Association", "isCorrect": true },
+        { "id": "b", "text": "Standard Coffee Analysis", "isCorrect": false },
+        { "id": "c", "text": "Single Cup Association", "isCorrect": false },
+        { "id": "d", "text": "South Coffee Alliance", "isCorrect": false }
+      ],
+      "explanation": "SCAはSpecialty Coffee Association（スペシャルティコーヒー協会）の略で、コーヒー業界の基準や教育を提供する団体です。"
+    },
+    {
+      "id": "basics-031",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「グリーンビーン」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "焙煎前の生豆", "isCorrect": true },
+        { "id": "b", "text": "緑色に着色した豆", "isCorrect": false },
+        { "id": "c", "text": "未熟な豆", "isCorrect": false },
+        { "id": "d", "text": "オーガニック認証の豆", "isCorrect": false }
+      ],
+      "explanation": "グリーンビーンは焙煎前のコーヒー生豆のことで、緑がかった灰色をしています。この状態で長期保存できます。"
+    },
+    {
+      "id": "basics-032",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「エイジング」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "生豆を長期熟成させること", "isCorrect": true },
+        { "id": "b", "text": "焙煎豆を冷凍保存すること", "isCorrect": false },
+        { "id": "c", "text": "古くなった豆を使うこと", "isCorrect": false },
+        { "id": "d", "text": "挽いた豆を寝かせること", "isCorrect": false }
+      ],
+      "explanation": "エイジングは生豆を特定の環境で長期間熟成させ、まろやかで独特の風味を発展させる技法です。"
+    },
+    {
+      "id": "basics-033",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「パルプドナチュラル」精製法の特徴はどれですか？",
+      "options": [
+        { "id": "a", "text": "果肉を除去し粘液質を残して乾燥", "isCorrect": true },
+        { "id": "b", "text": "完全に水洗いする", "isCorrect": false },
+        { "id": "c", "text": "果実ごと乾燥させる", "isCorrect": false },
+        { "id": "d", "text": "機械で強制乾燥する", "isCorrect": false }
+      ],
+      "explanation": "パルプドナチュラル（ハニープロセス）は果肉を除去した後、ミューシレージ（粘液質）を残したまま乾燥させる方法です。"
+    },
+    {
+      "id": "basics-034",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒー豆の「スクリーンサイズ」とは何を測定しますか？",
+      "options": [
+        { "id": "a", "text": "豆の大きさ（直径）", "isCorrect": true },
+        { "id": "b", "text": "豆の重さ", "isCorrect": false },
+        { "id": "c", "text": "豆の水分量", "isCorrect": false },
+        { "id": "d", "text": "豆の品質", "isCorrect": false }
+      ],
+      "explanation": "スクリーンサイズは網目のサイズで豆を選別する際の基準で、1/64インチ単位で表されます。大きい豆ほど高品質とされることが多いです。"
+    },
+    {
+      "id": "basics-035",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「ゲイシャ種」が有名になった産地はどこですか？",
+      "options": [
+        { "id": "a", "text": "パナマ", "isCorrect": true },
+        { "id": "b", "text": "日本", "isCorrect": false },
+        { "id": "c", "text": "ケニア", "isCorrect": false },
+        { "id": "d", "text": "インドネシア", "isCorrect": false }
+      ],
+      "explanation": "ゲイシャ種はエチオピア原産ですが、パナマのエスメラルダ農園で栽培されたものが2004年に高評価を得て世界的に有名になりました。"
+    },
+    {
+      "id": "basics-036",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「ウェット・ハル」精製法は主にどの国で使われますか？",
+      "options": [
+        { "id": "a", "text": "インドネシア", "isCorrect": true },
+        { "id": "b", "text": "ブラジル", "isCorrect": false },
+        { "id": "c", "text": "エチオピア", "isCorrect": false },
+        { "id": "d", "text": "コロンビア", "isCorrect": false }
+      ],
+      "explanation": "ウェット・ハル（ギリンバサー）はインドネシア独自の精製法で、半乾燥状態で脱殻し、独特のアーシーな風味を生み出します。"
+    },
+    {
+      "id": "basics-037",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「フェアトレード」認証の主な目的は何ですか？",
+      "options": [
+        { "id": "a", "text": "生産者に適正な価格を保証する", "isCorrect": true },
+        { "id": "b", "text": "最高品質を保証する", "isCorrect": false },
+        { "id": "c", "text": "オーガニック栽培を保証する", "isCorrect": false },
+        { "id": "d", "text": "輸送コストを削減する", "isCorrect": false }
+      ],
+      "explanation": "フェアトレードは発展途上国の生産者に公正な価格と取引条件を保証し、持続可能な生産を支援する認証制度です。"
+    },
+    {
+      "id": "basics-038",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「レインフォレスト・アライアンス」認証は何を重視していますか？",
+      "options": [
+        { "id": "a", "text": "環境保全と持続可能な農業", "isCorrect": true },
+        { "id": "b", "text": "最低価格の保証", "isCorrect": false },
+        { "id": "c", "text": "カフェイン含有量", "isCorrect": false },
+        { "id": "d", "text": "輸出量の増加", "isCorrect": false }
+      ],
+      "explanation": "レインフォレスト・アライアンスは生物多様性の保全、持続可能な農業、労働者の福祉を重視した認証制度です。"
+    },
+    {
+      "id": "basics-039",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「クロップイヤー」とはコーヒー業界で何を指しますか？",
+      "options": [
+        { "id": "a", "text": "コーヒーの収穫年度", "isCorrect": true },
+        { "id": "b", "text": "コーヒー豆の品種", "isCorrect": false },
+        { "id": "c", "text": "焙煎の年", "isCorrect": false },
+        { "id": "d", "text": "コーヒー農園の規模", "isCorrect": false }
+      ],
+      "explanation": "クロップイヤーはコーヒーの収穫年度を示し、新鮮さの目安になります。収穫時期は産地によって異なります。"
+    },
+    {
+      "id": "basics-040",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「ダイレクトトレード」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "ロースターが農家から直接購入する取引形態", "isCorrect": true },
+        { "id": "b", "text": "消費者が農家から直接購入する", "isCorrect": false },
+        { "id": "c", "text": "即日配送のサービス", "isCorrect": false },
+        { "id": "d", "text": "電話での直接注文", "isCorrect": false }
+      ],
+      "explanation": "ダイレクトトレードはロースターが仲介業者を介さず農家と直接取引し、品質と価格について交渉する形態です。"
+    },
+    {
+      "id": "basics-041",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒー豆の「デンシティ」とは何を意味しますか？",
+      "options": [
+        { "id": "a", "text": "豆の密度・硬さ", "isCorrect": true },
+        { "id": "b", "text": "豆の色の濃さ", "isCorrect": false },
+        { "id": "c", "text": "豆の香りの強さ", "isCorrect": false },
+        { "id": "d", "text": "豆の鮮度", "isCorrect": false }
+      ],
+      "explanation": "デンシティは豆の密度で、高地栽培の豆ほど密度が高くなります。密度が高い豆は複雑な風味を持つ傾向があります。"
+    },
+    {
+      "id": "basics-042",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「SHB（Strictly Hard Bean）」という等級は何を基準にしていますか？",
+      "options": [
+        { "id": "a", "text": "栽培標高", "isCorrect": true },
+        { "id": "b", "text": "豆のサイズ", "isCorrect": false },
+        { "id": "c", "text": "欠点豆の数", "isCorrect": false },
+        { "id": "d", "text": "カッピングスコア", "isCorrect": false }
+      ],
+      "explanation": "SHBは主に中米で使われる等級で、標高1200m以上で栽培された豆を指します。高地の豆は硬く、品質が高いとされます。"
+    },
+    {
+      "id": "basics-043",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「ニュークロップ」と「パストクロップ」の違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "収穫からの経過期間", "isCorrect": true },
+        { "id": "b", "text": "産地の違い", "isCorrect": false },
+        { "id": "c", "text": "品種の違い", "isCorrect": false },
+        { "id": "d", "text": "焙煎度の違い", "isCorrect": false }
+      ],
+      "explanation": "ニュークロップは最新の収穫年の豆、パストクロップは1年以上経過した豆を指します。ニュークロップの方が風味が活き活きしています。"
+    },
+    {
+      "id": "basics-044",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「リパス」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "過熟したコーヒーチェリー", "isCorrect": true },
+        { "id": "b", "text": "再利用された豆", "isCorrect": false },
+        { "id": "c", "text": "リサイクル包装", "isCorrect": false },
+        { "id": "d", "text": "再焙煎した豆", "isCorrect": false }
+      ],
+      "explanation": "リパスは熟しすぎて落果したコーヒーチェリーのことで、発酵臭や不快な風味の原因になるため欠点豆とされます。"
+    },
+    {
+      "id": "basics-045",
+      "category": "basics",
+      "difficulty": "intermediate",
+      "question": "「カトゥーラ」は何のことですか？",
+      "options": [
+        { "id": "a", "text": "アラビカ種の突然変異品種", "isCorrect": true },
+        { "id": "b", "text": "精製方法の名称", "isCorrect": false },
+        { "id": "c", "text": "焙煎度の名称", "isCorrect": false },
+        { "id": "d", "text": "産地の名称", "isCorrect": false }
+      ],
+      "explanation": "カトゥーラはブルボン種の突然変異で、ブラジルで発見されました。木が小さく収穫しやすいが、病気に弱い特徴があります。"
+    },
+    {
+      "id": "basics-046",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「嫌気性発酵」とはどのような精製方法ですか？",
+      "options": [
+        { "id": "a", "text": "酸素を遮断した環境で発酵させる方法", "isCorrect": true },
+        { "id": "b", "text": "好気性細菌を使う方法", "isCorrect": false },
+        { "id": "c", "text": "高温で急速発酵させる方法", "isCorrect": false },
+        { "id": "d", "text": "発酵を完全に止める方法", "isCorrect": false }
+      ],
+      "explanation": "嫌気性発酵（アナエロビック）は密閉容器で酸素を遮断し、独特の風味プロファイルを生み出す先進的な精製技術です。"
+    },
+    {
+      "id": "basics-047",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「Q グレーダー」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "SCAが認定するコーヒー品質評価の専門資格", "isCorrect": true },
+        { "id": "b", "text": "コーヒー豆の等級", "isCorrect": false },
+        { "id": "c", "text": "焙煎機のブランド", "isCorrect": false },
+        { "id": "d", "text": "カフェのランク", "isCorrect": false }
+      ],
+      "explanation": "Qグレーダーはコーヒー品質協会（CQI）が認定する資格で、カッピングによるコーヒー評価の国際的な専門家を指します。"
+    },
+    {
+      "id": "basics-048",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーに含まれる「クロロゲン酸」の主な特性は何ですか？",
+      "options": [
+        { "id": "a", "text": "抗酸化作用を持つポリフェノール", "isCorrect": true },
+        { "id": "b", "text": "覚醒作用を持つアルカロイド", "isCorrect": false },
+        { "id": "c", "text": "苦味の主成分", "isCorrect": false },
+        { "id": "d", "text": "香りの主成分", "isCorrect": false }
+      ],
+      "explanation": "クロロゲン酸はコーヒーに豊富に含まれるポリフェノールで、抗酸化作用があり、健康効果が注目されています。焙煎で減少します。"
+    },
+    {
+      "id": "basics-049",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「スコアシート」におけるコーヒーの「クリーンカップ」とは何を評価しますか？",
+      "options": [
+        { "id": "a", "text": "不快な風味や異臭がないこと", "isCorrect": true },
+        { "id": "b", "text": "カップの清潔さ", "isCorrect": false },
+        { "id": "c", "text": "透明度", "isCorrect": false },
+        { "id": "d", "text": "温度の適切さ", "isCorrect": false }
+      ],
+      "explanation": "クリーンカップは風味の透明性を評価する項目で、欠点や雑味がなく、産地特有の風味がクリアに感じられるかを測ります。"
+    },
+    {
+      "id": "basics-050",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「ティピカ」と「ブルボン」の関係はどれですか？",
+      "options": [
+        { "id": "a", "text": "どちらもアラビカ種の原種", "isCorrect": true },
+        { "id": "b", "text": "ティピカがブルボンの子孫", "isCorrect": false },
+        { "id": "c", "text": "全く異なる種", "isCorrect": false },
+        { "id": "d", "text": "ブルボンがロブスタとの交配種", "isCorrect": false }
+      ],
+      "explanation": "ティピカとブルボンはアラビカ種の二大原種で、多くの現代品種はこの2つから派生しています。どちらも風味が優れています。"
+    },
+    {
+      "id": "basics-051",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「COE（カップ・オブ・エクセレンス）」オークションの最低スコアは何点ですか？",
+      "options": [
+        { "id": "a", "text": "87点", "isCorrect": true },
+        { "id": "b", "text": "80点", "isCorrect": false },
+        { "id": "c", "text": "90点", "isCorrect": false },
+        { "id": "d", "text": "75点", "isCorrect": false }
+      ],
+      "explanation": "カップ・オブ・エクセレンスは最高品質のコーヒーを選ぶコンペで、最低87点以上を獲得した豆のみがオークションに出品されます。"
+    },
+    {
+      "id": "basics-052",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「トレーサビリティ」で最も詳細なレベルはどれですか？",
+      "options": [
+        { "id": "a", "text": "ロット（収穫区画）まで追跡可能", "isCorrect": true },
+        { "id": "b", "text": "国まで追跡可能", "isCorrect": false },
+        { "id": "c", "text": "地域まで追跡可能", "isCorrect": false },
+        { "id": "d", "text": "農園まで追跡可能", "isCorrect": false }
+      ],
+      "explanation": "最高レベルのトレーサビリティはロット単位で、農園内の特定区画、収穫日、精製方法まで追跡できます。"
+    },
+    {
+      "id": "basics-053",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「SL28」「SL34」という品種はどの国で開発されましたか？",
+      "options": [
+        { "id": "a", "text": "ケニア", "isCorrect": true },
+        { "id": "b", "text": "エチオピア", "isCorrect": false },
+        { "id": "c", "text": "コロンビア", "isCorrect": false },
+        { "id": "d", "text": "グアテマラ", "isCorrect": false }
+      ],
+      "explanation": "SL28とSL34はケニアのスコット研究所で選抜された品種で、明るい酸味と複雑な風味でケニアコーヒーを特徴づけています。"
+    },
+    {
+      "id": "basics-054",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「水分活性」はなぜ重要ですか？",
+      "options": [
+        { "id": "a", "text": "カビの発生リスクと保存性に影響", "isCorrect": true },
+        { "id": "b", "text": "焙煎温度を決定する", "isCorrect": false },
+        { "id": "c", "text": "カフェイン量を決定する", "isCorrect": false },
+        { "id": "d", "text": "風味には関係ない", "isCorrect": false }
+      ],
+      "explanation": "水分活性（Aw）は微生物が利用できる水分量を示し、0.7以下でカビの発生リスクが低下します。生豆の保存品質に重要です。"
+    },
+    {
+      "id": "basics-055",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「カルボニック・マセレーション」はどの産業から取り入れられた技術ですか？",
+      "options": [
+        { "id": "a", "text": "ワイン産業", "isCorrect": true },
+        { "id": "b", "text": "ビール産業", "isCorrect": false },
+        { "id": "c", "text": "チーズ産業", "isCorrect": false },
+        { "id": "d", "text": "紅茶産業", "isCorrect": false }
+      ],
+      "explanation": "カルボニック・マセレーションはワインの製造技術を応用したもので、CO2環境下で発酵させ、独特の風味を生み出します。"
+    },
+    {
+      "id": "basics-056",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「F1ハイブリッド」品種の主な特徴は何ですか？",
+      "options": [
+        { "id": "a", "text": "高収量と病害虫抵抗性の両立", "isCorrect": true },
+        { "id": "b", "text": "カフェインが非常に少ない", "isCorrect": false },
+        { "id": "c", "text": "自然に交配した品種", "isCorrect": false },
+        { "id": "d", "text": "焙煎が不要", "isCorrect": false }
+      ],
+      "explanation": "F1ハイブリッドは異なる品種を意図的に交配した第一世代で、両親の優れた特性（品質と耐病性）を持ちますが、種子からの繁殖が困難です。"
+    },
+    {
+      "id": "basics-057",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「フェノール」欠陥とは何が原因ですか？",
+      "options": [
+        { "id": "a", "text": "不適切な乾燥や保管によるカビ・細菌", "isCorrect": true },
+        { "id": "b", "text": "過度の焙煎", "isCorrect": false },
+        { "id": "c", "text": "品種の特性", "isCorrect": false },
+        { "id": "d", "text": "高標高での栽培", "isCorrect": false }
+      ],
+      "explanation": "フェノール（薬品臭）は不適切な乾燥や保管で発生するカビや細菌が原因で、消毒液のような不快な風味を与える重大な欠陥です。"
+    },
+    {
+      "id": "basics-058",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「ポテト欠陥」が主に見られる産地はどこですか？",
+      "options": [
+        { "id": "a", "text": "ルワンダ・ブルンジ", "isCorrect": true },
+        { "id": "b", "text": "ブラジル", "isCorrect": false },
+        { "id": "c", "text": "コロンビア", "isCorrect": false },
+        { "id": "d", "text": "インドネシア", "isCorrect": false }
+      ],
+      "explanation": "ポテト欠陥（生のジャガイモのような匂い）は主にルワンダやブルンジのコーヒーで見られ、特定の昆虫による被害が原因とされています。"
+    },
+    {
+      "id": "basics-059",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「ハイドロメーター」は何を測定しますか？",
+      "options": [
+        { "id": "a", "text": "生豆の水分含有量", "isCorrect": true },
+        { "id": "b", "text": "抽出液の温度", "isCorrect": false },
+        { "id": "c", "text": "焙煎温度", "isCorrect": false },
+        { "id": "d", "text": "カフェイン量", "isCorrect": false }
+      ],
+      "explanation": "ハイドロメーター（水分計）は生豆の水分含有量を測定し、理想的な10-12%の範囲を確認するために使用されます。"
+    },
+    {
+      "id": "basics-060",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「セントロカフェ」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "中米のコーヒー研究機関", "isCorrect": true },
+        { "id": "b", "text": "コーヒーチェーン店", "isCorrect": false },
+        { "id": "c", "text": "コーヒー品種の名前", "isCorrect": false },
+        { "id": "d", "text": "焙煎技術の名前", "isCorrect": false }
+      ],
+      "explanation": "CATIE（熱帯農業研究教育センター）と共にセントロカフェは中米のコーヒー品種開発と研究の重要な機関です。"
+    },
+    {
+      "id": "basics-061",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒー生産における「シェードグロウン」の利点は何ですか？",
+      "options": [
+        { "id": "a", "text": "生物多様性の保全と品質向上", "isCorrect": true },
+        { "id": "b", "text": "収穫量の大幅増加", "isCorrect": false },
+        { "id": "c", "text": "生産コストの削減", "isCorrect": false },
+        { "id": "d", "text": "カフェイン量の増加", "isCorrect": false }
+      ],
+      "explanation": "シェードグロウン（日陰栽培）は樹木の下でコーヒーを栽培し、ゆっくり熟成させることで風味が向上し、生態系も保全できます。"
+    },
+    {
+      "id": "basics-062",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「ラスト病」とはコーヒーの何ですか？",
+      "options": [
+        { "id": "a", "text": "葉を侵すカビによる病気", "isCorrect": true },
+        { "id": "b", "text": "根を侵す昆虫", "isCorrect": false },
+        { "id": "c", "text": "果実の腐敗", "isCorrect": false },
+        { "id": "d", "text": "乾燥不良", "isCorrect": false }
+      ],
+      "explanation": "コーヒーラスト病（さび病）は葉の裏にオレンジ色の胞子を形成するカビで、コーヒー生産に壊滅的な被害を与えることがあります。"
+    },
+    {
+      "id": "basics-063",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「カスティージョ」品種が開発された目的は何ですか？",
+      "options": [
+        { "id": "a", "text": "ラスト病への耐性", "isCorrect": true },
+        { "id": "b", "text": "カフェイン含有量の増加", "isCorrect": false },
+        { "id": "c", "text": "収穫の機械化", "isCorrect": false },
+        { "id": "d", "text": "標高への適応", "isCorrect": false }
+      ],
+      "explanation": "カスティージョはコロンビアで開発されたラスト病耐性品種で、高品質と病害耐性を両立させることを目指して作られました。"
+    },
+    {
+      "id": "basics-064",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「ディファレンシャル」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "先物相場との価格差", "isCorrect": true },
+        { "id": "b", "text": "品質の差異", "isCorrect": false },
+        { "id": "c", "text": "標高の違い", "isCorrect": false },
+        { "id": "d", "text": "品種間の差", "isCorrect": false }
+      ],
+      "explanation": "ディファレンシャルはニューヨーク先物市場（Cマーケット）の価格に対するプレミアムまたはディスカウントを指す取引用語です。"
+    },
+    {
+      "id": "basics-065",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「フレーバーホイール」の最初の開発者はどの組織ですか？",
+      "options": [
+        { "id": "a", "text": "SCAA（現SCA）", "isCorrect": true },
+        { "id": "b", "text": "COE", "isCorrect": false },
+        { "id": "c", "text": "ICO", "isCorrect": false },
+        { "id": "d", "text": "NCA", "isCorrect": false }
+      ],
+      "explanation": "コーヒーフレーバーホイールは1995年にSCAA（現SCA）が開発し、2016年に大幅改訂されました。風味表現の標準化に貢献しています。"
+    },
+    {
+      "id": "basics-066",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「WCR（ワールドコーヒーリサーチ）」の主な活動は何ですか？",
+      "options": [
+        { "id": "a", "text": "品種開発と気候変動対応の研究", "isCorrect": true },
+        { "id": "b", "text": "バリスタの養成", "isCorrect": false },
+        { "id": "c", "text": "カフェの運営", "isCorrect": false },
+        { "id": "d", "text": "コーヒー機器の製造", "isCorrect": false }
+      ],
+      "explanation": "WCRは気候変動に適応できる新品種の開発や、コーヒー栽培の持続可能性に関する研究を行う非営利研究機関です。"
+    },
+    {
+      "id": "basics-067",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「ICO（国際コーヒー機関）」の主な役割は何ですか？",
+      "options": [
+        { "id": "a", "text": "生産国と消費国間の協力促進", "isCorrect": true },
+        { "id": "b", "text": "コーヒーの価格設定", "isCorrect": false },
+        { "id": "c", "text": "焙煎技術の標準化", "isCorrect": false },
+        { "id": "d", "text": "カフェの認証", "isCorrect": false }
+      ],
+      "explanation": "ICOは生産国と消費国の政府間組織で、市場の透明性向上、統計収集、持続可能なコーヒー経済の促進を行っています。"
+    },
+    {
+      "id": "basics-068",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「ファーメンテーションタンク」の役割は何ですか？",
+      "options": [
+        { "id": "a", "text": "ミューシレージを分解する発酵工程", "isCorrect": true },
+        { "id": "b", "text": "豆を乾燥させる", "isCorrect": false },
+        { "id": "c", "text": "豆を焙煎する", "isCorrect": false },
+        { "id": "d", "text": "豆を冷却する", "isCorrect": false }
+      ],
+      "explanation": "ウォッシュド精製でファーメンテーションタンクを使い、発酵によってパーチメント周りの粘液質（ミューシレージ）を分解します。"
+    },
+    {
+      "id": "basics-069",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「サーマルショック」は焙煎でどのような問題を引き起こしますか？",
+      "options": [
+        { "id": "a", "text": "豆の内部と外部の焙煎ムラ", "isCorrect": true },
+        { "id": "b", "text": "焙煎機の故障", "isCorrect": false },
+        { "id": "c", "text": "カフェインの増加", "isCorrect": false },
+        { "id": "d", "text": "香りの向上", "isCorrect": false }
+      ],
+      "explanation": "急激な温度変化によるサーマルショックは、豆の外側が焼けすぎ内部が生焼けになる「ティッピング」などの欠陥を引き起こします。"
+    },
+    {
+      "id": "basics-070",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「バイオダイナミック農法」の特徴は何ですか？",
+      "options": [
+        { "id": "a", "text": "月の周期などを考慮した有機農法", "isCorrect": true },
+        { "id": "b", "text": "機械のみで栽培する農法", "isCorrect": false },
+        { "id": "c", "text": "化学肥料を多用する農法", "isCorrect": false },
+        { "id": "d", "text": "室内で栽培する農法", "isCorrect": false }
+      ],
+      "explanation": "バイオダイナミック農法はルドルフ・シュタイナーの理論に基づき、月の周期や天体の動きを考慮した全体論的な有機農法です。"
+    },
+    {
+      "id": "basics-071",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「アラビカ種」のゲノム数はどれですか？",
+      "options": [
+        { "id": "a", "text": "四倍体（4n=44）", "isCorrect": true },
+        { "id": "b", "text": "二倍体（2n=22）", "isCorrect": false },
+        { "id": "c", "text": "六倍体（6n=66）", "isCorrect": false },
+        { "id": "d", "text": "八倍体（8n=88）", "isCorrect": false }
+      ],
+      "explanation": "アラビカ種は四倍体で、エウゲニオイデス種とカネフォラ種の自然交配から生まれました。ロブスタ種は二倍体です。"
+    },
+    {
+      "id": "basics-072",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「CQI」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "コーヒー品質協会", "isCorrect": true },
+        { "id": "b", "text": "コーヒー数量指数", "isCorrect": false },
+        { "id": "c", "text": "カフェイン品質指標", "isCorrect": false },
+        { "id": "d", "text": "コーヒー価格指数", "isCorrect": false }
+      ],
+      "explanation": "CQI（Coffee Quality Institute）はSCAAが設立した非営利組織で、Qグレーダー資格の認定やコーヒー品質向上を推進しています。"
+    },
+    {
+      "id": "basics-073",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「スウィートネス」評価で満点を取るには何が必要ですか？",
+      "options": [
+        { "id": "a", "text": "5カップすべてに欠陥がないこと", "isCorrect": true },
+        { "id": "b", "text": "砂糖のような甘さがあること", "isCorrect": false },
+        { "id": "c", "text": "人工甘味料を加えること", "isCorrect": false },
+        { "id": "d", "text": "深煎りであること", "isCorrect": false }
+      ],
+      "explanation": "カッピング評価のスウィートネスは、5カップすべてに不快な風味がなく、甘みを感じられるかで判定され、各カップ2点×5で10点満点です。"
+    },
+    {
+      "id": "basics-074",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "「セミウォッシュド」精製法の別名はどれですか？",
+      "options": [
+        { "id": "a", "text": "セミラバド", "isCorrect": true },
+        { "id": "b", "text": "フルウォッシュド", "isCorrect": false },
+        { "id": "c", "text": "ドライプロセス", "isCorrect": false },
+        { "id": "d", "text": "エアロビック", "isCorrect": false }
+      ],
+      "explanation": "セミウォッシュド（セミラバド）は果肉除去後、発酵させずに機械でミューシレージを除去する精製法で、中米などで使われます。"
+    },
+    {
+      "id": "basics-075",
+      "category": "basics",
+      "difficulty": "advanced",
+      "question": "コーヒーの「オーバーオール」スコアとは何を表しますか？",
+      "options": [
+        { "id": "a", "text": "カッパーの総合的な印象点", "isCorrect": true },
+        { "id": "b", "text": "すべての項目の合計点", "isCorrect": false },
+        { "id": "c", "text": "欠点の総数", "isCorrect": false },
+        { "id": "d", "text": "平均点", "isCorrect": false }
+      ],
+      "explanation": "オーバーオールはSCAカッピングの最後の項目で、カッパー個人の総合評価を10点満点で付けます。最終スコアに大きく影響します。"
+    }
+  ]
+}

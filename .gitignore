@@ -42,3 +42,5 @@ next-env.d.ts
 
 # local history
 .history/
+nul
+.claude/settings.local.json

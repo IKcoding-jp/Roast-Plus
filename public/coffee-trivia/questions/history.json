@@ -1,0 +1,980 @@
+{
+  "category": "history",
+  "questions": [
+    {
+      "id": "history-001",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "コーヒーの発祥地とされている国はどこですか？",
+      "options": [
+        { "id": "a", "text": "エチオピア", "isCorrect": true },
+        { "id": "b", "text": "ブラジル", "isCorrect": false },
+        { "id": "c", "text": "コロンビア", "isCorrect": false },
+        { "id": "d", "text": "インドネシア", "isCorrect": false }
+      ],
+      "explanation": "コーヒーの原産地はエチオピアとされています。カルディの伝説では、ヤギ飼いがコーヒーの実を発見したと言われています。"
+    },
+    {
+      "id": "history-002",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "世界最大のコーヒー生産国はどこですか？",
+      "options": [
+        { "id": "a", "text": "ブラジル", "isCorrect": true },
+        { "id": "b", "text": "ベトナム", "isCorrect": false },
+        { "id": "c", "text": "コロンビア", "isCorrect": false },
+        { "id": "d", "text": "エチオピア", "isCorrect": false }
+      ],
+      "explanation": "ブラジルは世界のコーヒー生産量の約35%を占める最大の生産国です。2位はベトナム、3位はコロンビアです。"
+    },
+    {
+      "id": "history-003",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "日本に初めてコーヒーが伝来したのはいつ頃ですか？",
+      "options": [
+        { "id": "a", "text": "江戸時代（18世紀）", "isCorrect": true },
+        { "id": "b", "text": "明治時代", "isCorrect": false },
+        { "id": "c", "text": "大正時代", "isCorrect": false },
+        { "id": "d", "text": "昭和時代", "isCorrect": false }
+      ],
+      "explanation": "コーヒーは江戸時代に長崎の出島を通じてオランダ人により伝来しました。当初は薬として扱われていました。"
+    },
+    {
+      "id": "history-004",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「カフェ・ラテ」の発祥地とされる国はどこですか？",
+      "options": [
+        { "id": "a", "text": "イタリア", "isCorrect": true },
+        { "id": "b", "text": "フランス", "isCorrect": false },
+        { "id": "c", "text": "オーストリア", "isCorrect": false },
+        { "id": "d", "text": "アメリカ", "isCorrect": false }
+      ],
+      "explanation": "カフェ・ラテ（Caffè Latte）はイタリア語で「コーヒー牛乳」を意味し、イタリアで生まれました。"
+    },
+    {
+      "id": "history-005",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「エスプレッソ」という言葉の意味は何ですか？",
+      "options": [
+        { "id": "a", "text": "急速に・急行で", "isCorrect": true },
+        { "id": "b", "text": "濃い", "isCorrect": false },
+        { "id": "c", "text": "苦い", "isCorrect": false },
+        { "id": "d", "text": "熱い", "isCorrect": false }
+      ],
+      "explanation": "「エスプレッソ（Espresso）」はイタリア語で「急速に」を意味し、注文を受けてすぐに抽出することに由来します。"
+    },
+    {
+      "id": "history-006",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「サードウェーブコーヒー」の特徴として最も適切なものはどれですか？",
+      "options": [
+        { "id": "a", "text": "産地や農園の透明性を重視", "isCorrect": true },
+        { "id": "b", "text": "大量生産とコスト削減", "isCorrect": false },
+        { "id": "c", "text": "深煎り中心の味づくり", "isCorrect": false },
+        { "id": "d", "text": "インスタントコーヒーの普及", "isCorrect": false }
+      ],
+      "explanation": "サードウェーブは産地・農園・品種の透明性、浅煎りで個性を活かすロースティング、直接取引などを特徴とするムーブメントです。"
+    },
+    {
+      "id": "history-007",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "コーヒーの「ファーストウェーブ」はどのような時代を指しますか？",
+      "options": [
+        { "id": "a", "text": "大量生産・大量消費の時代", "isCorrect": true },
+        { "id": "b", "text": "スペシャルティコーヒーの登場", "isCorrect": false },
+        { "id": "c", "text": "シングルオリジンブーム", "isCorrect": false },
+        { "id": "d", "text": "缶コーヒーの普及", "isCorrect": false }
+      ],
+      "explanation": "ファーストウェーブは19世紀後半〜1960年代の大量生産時代で、インスタントコーヒーや真空パックなどで一般家庭に普及しました。"
+    },
+    {
+      "id": "history-008",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「コピ・ルアク」の生産方法で正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "ジャコウネコが食べた実から採取", "isCorrect": true },
+        { "id": "b", "text": "高地で特別な方法で発酵", "isCorrect": false },
+        { "id": "c", "text": "海水で洗浄して精製", "isCorrect": false },
+        { "id": "d", "text": "月光の下で乾燥", "isCorrect": false }
+      ],
+      "explanation": "コピ・ルアク（Kopi Luwak）はインドネシアで、ジャコウネコ（ルアク）が食べたコーヒーチェリーの未消化の豆を採取して作られます。"
+    },
+    {
+      "id": "history-009",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「スターバックス」が創業した都市はどこですか？",
+      "options": [
+        { "id": "a", "text": "シアトル", "isCorrect": true },
+        { "id": "b", "text": "ニューヨーク", "isCorrect": false },
+        { "id": "c", "text": "ロサンゼルス", "isCorrect": false },
+        { "id": "d", "text": "サンフランシスコ", "isCorrect": false }
+      ],
+      "explanation": "スターバックスは1971年にワシントン州シアトルのパイクプレイスマーケットで創業しました。当初は焙煎豆の販売店でした。"
+    },
+    {
+      "id": "history-010",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ブルーマウンテン」コーヒーの産地はどこですか？",
+      "options": [
+        { "id": "a", "text": "ジャマイカ", "isCorrect": true },
+        { "id": "b", "text": "ハワイ", "isCorrect": false },
+        { "id": "c", "text": "コスタリカ", "isCorrect": false },
+        { "id": "d", "text": "ケニア", "isCorrect": false }
+      ],
+      "explanation": "ブルーマウンテンはジャマイカのブルーマウンテン山脈（標高800-1200m）で栽培される高級コーヒーで、日本への輸出量が多いことで知られています。"
+    },
+    {
+      "id": "history-011",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "コーヒー発見の伝説に登場するヤギ飼いの名前は？",
+      "options": [
+        { "id": "a", "text": "カルディ", "isCorrect": true },
+        { "id": "b", "text": "モカ", "isCorrect": false },
+        { "id": "c", "text": "アラビカ", "isCorrect": false },
+        { "id": "d", "text": "バリスタ", "isCorrect": false }
+      ],
+      "explanation": "9世紀頃のエチオピアで、ヤギ飼いのカルディが興奮したヤギを見てコーヒーの実を発見したという伝説があります。"
+    },
+    {
+      "id": "history-012",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「モカ」という名前の由来となった港はどこにありますか？",
+      "options": [
+        { "id": "a", "text": "イエメン", "isCorrect": true },
+        { "id": "b", "text": "エチオピア", "isCorrect": false },
+        { "id": "c", "text": "サウジアラビア", "isCorrect": false },
+        { "id": "d", "text": "エジプト", "isCorrect": false }
+      ],
+      "explanation": "モカ港はイエメンにあり、15-17世紀にはコーヒー貿易の中心地でした。この港名がコーヒーの代名詞になりました。"
+    },
+    {
+      "id": "history-013",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "コーヒーハウスが最初に栄えた地域はどこですか？",
+      "options": [
+        { "id": "a", "text": "中東（オスマン帝国）", "isCorrect": true },
+        { "id": "b", "text": "ヨーロッパ", "isCorrect": false },
+        { "id": "c", "text": "アメリカ", "isCorrect": false },
+        { "id": "d", "text": "アジア", "isCorrect": false }
+      ],
+      "explanation": "16世紀にオスマン帝国で最初のコーヒーハウス（カフヴェハネ）が登場し、社交・情報交換の場として栄えました。"
+    },
+    {
+      "id": "history-014",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "世界で2番目に大きいコーヒー生産国はどこですか？",
+      "options": [
+        { "id": "a", "text": "ベトナム", "isCorrect": true },
+        { "id": "b", "text": "コロンビア", "isCorrect": false },
+        { "id": "c", "text": "インドネシア", "isCorrect": false },
+        { "id": "d", "text": "エチオピア", "isCorrect": false }
+      ],
+      "explanation": "ベトナムは1990年代から急成長し、現在では世界第2位の生産国です。主にロブスタ種を栽培しています。"
+    },
+    {
+      "id": "history-015",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「コーヒーベルト」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "コーヒーが栽培される熱帯地域", "isCorrect": true },
+        { "id": "b", "text": "コーヒー農園の名前", "isCorrect": false },
+        { "id": "c", "text": "コーヒー輸送ルート", "isCorrect": false },
+        { "id": "d", "text": "焙煎機のパーツ", "isCorrect": false }
+      ],
+      "explanation": "コーヒーベルトは南北回帰線の間（北緯25度〜南緯25度）の熱帯・亜熱帯地域で、コーヒー栽培に適しています。"
+    },
+    {
+      "id": "history-016",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "インスタントコーヒーを発明した国はどこですか？",
+      "options": [
+        { "id": "a", "text": "日本（加藤サトリ）", "isCorrect": true },
+        { "id": "b", "text": "アメリカ", "isCorrect": false },
+        { "id": "c", "text": "ドイツ", "isCorrect": false },
+        { "id": "d", "text": "イギリス", "isCorrect": false }
+      ],
+      "explanation": "1899年に日本人化学者の加藤サトリが最初のインスタントコーヒーを発明しました。その後アメリカで商業化されました。"
+    },
+    {
+      "id": "history-017",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「ジャワ」がコーヒーの別名として使われる理由は？",
+      "options": [
+        { "id": "a", "text": "インドネシアのジャワ島がかつて大産地だった", "isCorrect": true },
+        { "id": "b", "text": "発明者の名前", "isCorrect": false },
+        { "id": "c", "text": "プログラミング言語の名前", "isCorrect": false },
+        { "id": "d", "text": "味の表現", "isCorrect": false }
+      ],
+      "explanation": "インドネシアのジャワ島は17世紀からオランダ統治下でコーヒー栽培が盛んになり、コーヒーの代名詞になりました。"
+    },
+    {
+      "id": "history-018",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "缶コーヒーを世界で最初に商品化した国はどこですか？",
+      "options": [
+        { "id": "a", "text": "日本", "isCorrect": true },
+        { "id": "b", "text": "アメリカ", "isCorrect": false },
+        { "id": "c", "text": "韓国", "isCorrect": false },
+        { "id": "d", "text": "イタリア", "isCorrect": false }
+      ],
+      "explanation": "1969年にUCCが世界初のミルク入り缶コーヒーを発売しました。日本は缶コーヒー大国として知られています。"
+    },
+    {
+      "id": "history-019",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「フェアトレード」コーヒーの主な目的は何ですか？",
+      "options": [
+        { "id": "a", "text": "生産者に公正な価格を保証する", "isCorrect": true },
+        { "id": "b", "text": "味の品質を保証する", "isCorrect": false },
+        { "id": "c", "text": "有機栽培を認証する", "isCorrect": false },
+        { "id": "d", "text": "焙煎方法を規定する", "isCorrect": false }
+      ],
+      "explanation": "フェアトレードは発展途上国の生産者に適正な価格を保証し、持続可能な取引を促進する認証制度です。"
+    },
+    {
+      "id": "history-020",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「セカンドウェーブコーヒー」の代表的な企業はどこですか？",
+      "options": [
+        { "id": "a", "text": "スターバックス", "isCorrect": true },
+        { "id": "b", "text": "ブルーボトル", "isCorrect": false },
+        { "id": "c", "text": "インテリジェンシア", "isCorrect": false },
+        { "id": "d", "text": "スタンプタウン", "isCorrect": false }
+      ],
+      "explanation": "セカンドウェーブは1970-80年代から始まり、スターバックスのようなチェーン店がエスプレッソドリンクを普及させました。"
+    },
+    {
+      "id": "history-021",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ゲイシャ種」が世界的に注目されるきっかけとなった国はどこですか？",
+      "options": [
+        { "id": "a", "text": "パナマ", "isCorrect": true },
+        { "id": "b", "text": "エチオピア", "isCorrect": false },
+        { "id": "c", "text": "コスタリカ", "isCorrect": false },
+        { "id": "d", "text": "ブラジル", "isCorrect": false }
+      ],
+      "explanation": "2004年にパナマのエスメラルダ農園のゲイシャがベストオブパナマで優勝し、世界的なブームを巻き起こしました。"
+    },
+    {
+      "id": "history-022",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「SCA（スペシャルティコーヒー協会）」が設立された年は？",
+      "options": [
+        { "id": "a", "text": "2017年（SCAA+SCAE統合）", "isCorrect": true },
+        { "id": "b", "text": "1982年", "isCorrect": false },
+        { "id": "c", "text": "2000年", "isCorrect": false },
+        { "id": "d", "text": "1995年", "isCorrect": false }
+      ],
+      "explanation": "SCAは2017年にアメリカのSCAAとヨーロッパのSCAEが統合して誕生しました。スペシャルティコーヒーの基準を定めています。"
+    },
+    {
+      "id": "history-023",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ペーパードリップ」を発明したのは誰ですか？",
+      "options": [
+        { "id": "a", "text": "メリタ・ベンツ", "isCorrect": true },
+        { "id": "b", "text": "ルイジ・ベゼラ", "isCorrect": false },
+        { "id": "c", "text": "アラン・アドラー", "isCorrect": false },
+        { "id": "d", "text": "スコット・ラオ", "isCorrect": false }
+      ],
+      "explanation": "1908年にドイツのメリタ・ベンツが、息子のノートの紙を使ってコーヒーを濾すペーパーフィルターを発明しました。"
+    },
+    {
+      "id": "history-024",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "エスプレッソマシンの最初の特許を取得したのは誰ですか？",
+      "options": [
+        { "id": "a", "text": "アンジェロ・モリオンド", "isCorrect": true },
+        { "id": "b", "text": "ルイジ・ベゼラ", "isCorrect": false },
+        { "id": "c", "text": "アキーレ・ガッジア", "isCorrect": false },
+        { "id": "d", "text": "ファエマ", "isCorrect": false }
+      ],
+      "explanation": "1884年にイタリアのアンジェロ・モリオンドが蒸気式エスプレッソマシンの特許を取得しました。商業化はベゼラが行いました。"
+    },
+    {
+      "id": "history-025",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「コーヒーの第三の波」という言葉を最初に使ったのは誰ですか？",
+      "options": [
+        { "id": "a", "text": "トリッシュ・ロスギブ", "isCorrect": true },
+        { "id": "b", "text": "ジェームズ・ホフマン", "isCorrect": false },
+        { "id": "c", "text": "ハワード・シュルツ", "isCorrect": false },
+        { "id": "d", "text": "スコット・ラオ", "isCorrect": false }
+      ],
+      "explanation": "2002年にローストマガジンでトリッシュ・ロスギブが「Third Wave」という言葉を使い、新しいコーヒーの潮流を定義しました。"
+    },
+    {
+      "id": "history-026",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「カップオブエクセレンス（COE）」が始まった年は？",
+      "options": [
+        { "id": "a", "text": "1999年", "isCorrect": true },
+        { "id": "b", "text": "2005年", "isCorrect": false },
+        { "id": "c", "text": "1990年", "isCorrect": false },
+        { "id": "d", "text": "2010年", "isCorrect": false }
+      ],
+      "explanation": "カップオブエクセレンスは1999年にブラジルで始まった品評会で、高品質コーヒーを国際オークションで販売する仕組みを確立しました。"
+    },
+    {
+      "id": "history-027",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ウィーンのカフェ文化」がユネスコ無形文化遺産に登録された年は？",
+      "options": [
+        { "id": "a", "text": "2011年", "isCorrect": true },
+        { "id": "b", "text": "2015年", "isCorrect": false },
+        { "id": "c", "text": "2000年", "isCorrect": false },
+        { "id": "d", "text": "2020年", "isCorrect": false }
+      ],
+      "explanation": "2011年にウィーンのコーヒーハウス文化はユネスコの無形文化遺産に登録され、その伝統と社会的役割が認められました。"
+    },
+    {
+      "id": "history-028",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ブルーボトルコーヒー」が創業した都市はどこですか？",
+      "options": [
+        { "id": "a", "text": "サンフランシスコ（オークランド）", "isCorrect": true },
+        { "id": "b", "text": "シアトル", "isCorrect": false },
+        { "id": "c", "text": "ニューヨーク", "isCorrect": false },
+        { "id": "d", "text": "ポートランド", "isCorrect": false }
+      ],
+      "explanation": "2002年にジェームズ・フリーマンがオークランドのファーマーズマーケットで創業しました。サードウェーブの代表的存在です。"
+    },
+    {
+      "id": "history-029",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "コーヒーがヨーロッパで「悪魔の飲み物」と呼ばれた理由は？",
+      "options": [
+        { "id": "a", "text": "イスラム世界からの輸入品だったため", "isCorrect": true },
+        { "id": "b", "text": "黒い色だったため", "isCorrect": false },
+        { "id": "c", "text": "中毒性があったため", "isCorrect": false },
+        { "id": "d", "text": "苦い味だったため", "isCorrect": false }
+      ],
+      "explanation": "17世紀のヨーロッパでは、イスラム世界から来たコーヒーは異教の飲み物とされましたが、教皇クレメンス8世が洗礼を与えて認めました。"
+    },
+    {
+      "id": "history-030",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ナチュラルプロセス」と「ウォッシュドプロセス」、歴史的に古いのは？",
+      "options": [
+        { "id": "a", "text": "ナチュラル（乾式）", "isCorrect": true },
+        { "id": "b", "text": "ウォッシュド（水洗式）", "isCorrect": false },
+        { "id": "c", "text": "同時期に発明", "isCorrect": false },
+        { "id": "d", "text": "ハニープロセス", "isCorrect": false }
+      ],
+      "explanation": "ナチュラルプロセス（乾式）は古くからエチオピアやイエメンで行われていた伝統的な方法です。ウォッシュドは後に開発されました。"
+    },
+    {
+      "id": "history-031",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「葉さび病」がコーヒー産業に大きな影響を与えた地域は？",
+      "options": [
+        { "id": "a", "text": "セイロン（スリランカ）", "isCorrect": true },
+        { "id": "b", "text": "ブラジル", "isCorrect": false },
+        { "id": "c", "text": "ジャマイカ", "isCorrect": false },
+        { "id": "d", "text": "ハワイ", "isCorrect": false }
+      ],
+      "explanation": "1869年にセイロンで葉さび病が蔓延し、コーヒー産業が壊滅。その後紅茶に転換し、コーヒー栽培の中心は南米に移りました。"
+    },
+    {
+      "id": "history-032",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「カティモール」という品種はどの品種を掛け合わせて作られましたか？",
+      "options": [
+        { "id": "a", "text": "カトゥーラ × ティモール・ハイブリッド", "isCorrect": true },
+        { "id": "b", "text": "ブルボン × ティピカ", "isCorrect": false },
+        { "id": "c", "text": "ゲイシャ × パカマラ", "isCorrect": false },
+        { "id": "d", "text": "マラゴジッペ × カトゥアイ", "isCorrect": false }
+      ],
+      "explanation": "カティモールはカトゥーラとティモール・ハイブリッド（ロブスタとアラビカの自然交配種）を掛け合わせた病害抵抗性品種です。"
+    },
+    {
+      "id": "history-033",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「グアテマラ・アンティグア」がコーヒー産地として有名になった理由は？",
+      "options": [
+        { "id": "a", "text": "火山性土壌と標高が生む独特の風味", "isCorrect": true },
+        { "id": "b", "text": "世界最古のコーヒー農園がある", "isCorrect": false },
+        { "id": "c", "text": "品種の発祥地である", "isCorrect": false },
+        { "id": "d", "text": "最も生産量が多い", "isCorrect": false }
+      ],
+      "explanation": "アンティグアは3つの火山に囲まれた盆地で、火山性土壌と1500m超の標高がスモーキーで複雑な風味を生み出します。"
+    },
+    {
+      "id": "history-034",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "ジェームズ・ホフマンがワールドバリスタチャンピオンになった年は？",
+      "options": [
+        { "id": "a", "text": "2007年", "isCorrect": true },
+        { "id": "b", "text": "2010年", "isCorrect": false },
+        { "id": "c", "text": "2005年", "isCorrect": false },
+        { "id": "d", "text": "2015年", "isCorrect": false }
+      ],
+      "explanation": "イギリスのジェームズ・ホフマンは2007年WBC優勝。現在はSquare Mile Coffee創業者として知られ、YouTubeでも人気です。"
+    },
+    {
+      "id": "history-035",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「Q Grader」認定制度を運営している機関はどこですか？",
+      "options": [
+        { "id": "a", "text": "CQI（Coffee Quality Institute）", "isCorrect": true },
+        { "id": "b", "text": "SCA", "isCorrect": false },
+        { "id": "c", "text": "ICO", "isCorrect": false },
+        { "id": "d", "text": "NCA", "isCorrect": false }
+      ],
+      "explanation": "Q Graderはコーヒー品質協会（CQI）が認定するプロのコーヒー評価士資格で、スペシャルティコーヒーの判定ができます。"
+    },
+    {
+      "id": "history-036",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「カフェイン」という名前の由来は何ですか？",
+      "options": [
+        { "id": "a", "text": "コーヒー（Kaffee）から", "isCorrect": true },
+        { "id": "b", "text": "発見者の名前", "isCorrect": false },
+        { "id": "c", "text": "化学記号から", "isCorrect": false },
+        { "id": "d", "text": "産地名から", "isCorrect": false }
+      ],
+      "explanation": "カフェインはドイツ語のコーヒー（Kaffee）に由来します。1819年にドイツの化学者フリードリヒ・ルンゲが単離しました。"
+    },
+    {
+      "id": "history-037",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "世界で最も多く消費されるコーヒー豆の品種は？",
+      "options": [
+        { "id": "a", "text": "アラビカ種", "isCorrect": true },
+        { "id": "b", "text": "ロブスタ種", "isCorrect": false },
+        { "id": "c", "text": "リベリカ種", "isCorrect": false },
+        { "id": "d", "text": "エクセルサ種", "isCorrect": false }
+      ],
+      "explanation": "アラビカ種は世界のコーヒー生産の約60-70%を占め、風味の良さから高品質コーヒーに使用されます。"
+    },
+    {
+      "id": "history-038",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「アメリカーノ」の名前の由来は何ですか？",
+      "options": [
+        { "id": "a", "text": "アメリカ人がエスプレッソを薄めて飲んだことから", "isCorrect": true },
+        { "id": "b", "text": "アメリカで発明されたから", "isCorrect": false },
+        { "id": "c", "text": "アメリカの豆を使うから", "isCorrect": false },
+        { "id": "d", "text": "発明者の名前から", "isCorrect": false }
+      ],
+      "explanation": "第二次世界大戦中、イタリアに駐留したアメリカ兵がエスプレッソを水で薄めて飲んだことが由来とされています。"
+    },
+    {
+      "id": "history-039",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "コーヒーの「ボディ」とは何を表す用語ですか？",
+      "options": [
+        { "id": "a", "text": "口当たりや質感の厚み", "isCorrect": true },
+        { "id": "b", "text": "苦味の強さ", "isCorrect": false },
+        { "id": "c", "text": "香りの強さ", "isCorrect": false },
+        { "id": "d", "text": "温度", "isCorrect": false }
+      ],
+      "explanation": "ボディは口の中で感じるコーヒーの質感や重さを表す用語で、ライト・ミディアム・フルなどで表現されます。"
+    },
+    {
+      "id": "history-040",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「ドトールコーヒー」が日本で初めて導入したサービスは？",
+      "options": [
+        { "id": "a", "text": "セルフサービス式の低価格コーヒーショップ", "isCorrect": true },
+        { "id": "b", "text": "ドライブスルー", "isCorrect": false },
+        { "id": "c", "text": "コーヒーの通販", "isCorrect": false },
+        { "id": "d", "text": "缶コーヒーの自販機", "isCorrect": false }
+      ],
+      "explanation": "1980年に鳥羽博道が創業したドトールは、立ち飲みスタイルで150円コーヒーを提供し、日本のカフェ文化を変えました。"
+    },
+    {
+      "id": "history-041",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "コーヒー豆は実際には何ですか？",
+      "options": [
+        { "id": "a", "text": "コーヒーチェリーの種子", "isCorrect": true },
+        { "id": "b", "text": "木の実", "isCorrect": false },
+        { "id": "c", "text": "豆類の一種", "isCorrect": false },
+        { "id": "d", "text": "根の一部", "isCorrect": false }
+      ],
+      "explanation": "コーヒー豆はコーヒーの木になる果実（コーヒーチェリー）の中にある種子です。通常1つの果実に2粒入っています。"
+    },
+    {
+      "id": "history-042",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ボストン茶会事件」後、アメリカで何が増えましたか？",
+      "options": [
+        { "id": "a", "text": "コーヒーの消費", "isCorrect": true },
+        { "id": "b", "text": "紅茶の消費", "isCorrect": false },
+        { "id": "c", "text": "ワインの消費", "isCorrect": false },
+        { "id": "d", "text": "ビールの消費", "isCorrect": false }
+      ],
+      "explanation": "1773年のボストン茶会事件でイギリス紅茶に抗議した後、アメリカではコーヒーが愛国的飲料として広まりました。"
+    },
+    {
+      "id": "history-043",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ネスカフェ」が世界初のフリーズドライコーヒーを発売した年は？",
+      "options": [
+        { "id": "a", "text": "1965年", "isCorrect": true },
+        { "id": "b", "text": "1938年", "isCorrect": false },
+        { "id": "c", "text": "1980年", "isCorrect": false },
+        { "id": "d", "text": "1950年", "isCorrect": false }
+      ],
+      "explanation": "ネスレは1965年にフリーズドライ製法のネスカフェ・ゴールドブレンドを発売。1938年には初の噴霧乾燥インスタントを発売しました。"
+    },
+    {
+      "id": "history-044",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「サステナブルコーヒー」の代表的な認証はどれですか？",
+      "options": [
+        { "id": "a", "text": "レインフォレスト・アライアンス", "isCorrect": true },
+        { "id": "b", "text": "ISO9001", "isCorrect": false },
+        { "id": "c", "text": "JAS", "isCorrect": false },
+        { "id": "d", "text": "HACCP", "isCorrect": false }
+      ],
+      "explanation": "レインフォレスト・アライアンスは環境保全と農家の生活向上を目指す認証で、サステナブルコーヒーの主要な基準です。"
+    },
+    {
+      "id": "history-045",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「カプチーノ」の名前の由来は何ですか？",
+      "options": [
+        { "id": "a", "text": "カプチン修道会の修道服の色", "isCorrect": true },
+        { "id": "b", "text": "イタリアの地名", "isCorrect": false },
+        { "id": "c", "text": "発明者の名前", "isCorrect": false },
+        { "id": "d", "text": "カップの形", "isCorrect": false }
+      ],
+      "explanation": "カプチーノはカプチン修道会の修道士が着る茶色い修道服の色に似ていることから名付けられました。"
+    },
+    {
+      "id": "history-046",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「コーヒー危機」が起きた2001年の原因は何ですか？",
+      "options": [
+        { "id": "a", "text": "国際価格の暴落（過剰生産）", "isCorrect": true },
+        { "id": "b", "text": "病害の蔓延", "isCorrect": false },
+        { "id": "c", "text": "天候不順", "isCorrect": false },
+        { "id": "d", "text": "消費の減少", "isCorrect": false }
+      ],
+      "explanation": "2001年のコーヒー危機は、ベトナムの増産などによる世界的な過剰生産で価格が暴落し、多くの農家が貧困に陥りました。"
+    },
+    {
+      "id": "history-047",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "イタリアの「エスプレッソ文化」がユネスコ無形文化遺産に申請された年は？",
+      "options": [
+        { "id": "a", "text": "2022年", "isCorrect": true },
+        { "id": "b", "text": "2015年", "isCorrect": false },
+        { "id": "c", "text": "2010年", "isCorrect": false },
+        { "id": "d", "text": "2018年", "isCorrect": false }
+      ],
+      "explanation": "2022年にイタリアのエスプレッソ文化がユネスコ無形文化遺産に登録されました。バールでの社交文化が評価されました。"
+    },
+    {
+      "id": "history-048",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「デカフェ」の脱カフェイン技術を最初に商業化した人物は？",
+      "options": [
+        { "id": "a", "text": "ルートヴィヒ・ロゼリウス", "isCorrect": true },
+        { "id": "b", "text": "メリタ・ベンツ", "isCorrect": false },
+        { "id": "c", "text": "ルイジ・ベゼラ", "isCorrect": false },
+        { "id": "d", "text": "ネスレ", "isCorrect": false }
+      ],
+      "explanation": "1906年にドイツの商人ルートヴィヒ・ロゼリウスが商業的なデカフェプロセスを開発し、「カフェ・ハーグ」として販売しました。"
+    },
+    {
+      "id": "history-049",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ブルボン種」がその名前を得た島はどこですか？",
+      "options": [
+        { "id": "a", "text": "レユニオン島（旧ブルボン島）", "isCorrect": true },
+        { "id": "b", "text": "マダガスカル島", "isCorrect": false },
+        { "id": "c", "text": "モーリシャス島", "isCorrect": false },
+        { "id": "d", "text": "セーシェル諸島", "isCorrect": false }
+      ],
+      "explanation": "ティピカ種がイエメンからブルボン島（現レユニオン島）に持ち込まれ、そこで変異してブルボン種となりました。"
+    },
+    {
+      "id": "history-050",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ダイレクトトレード」と「フェアトレード」の主な違いは？",
+      "options": [
+        { "id": "a", "text": "ダイレクトトレードは認証なしの直接取引", "isCorrect": true },
+        { "id": "b", "text": "価格が異なる", "isCorrect": false },
+        { "id": "c", "text": "対象地域が異なる", "isCorrect": false },
+        { "id": "d", "text": "違いはない", "isCorrect": false }
+      ],
+      "explanation": "ダイレクトトレードはロースターと農家の直接取引で第三者認証なし、フェアトレードは最低価格保証のある認証制度です。"
+    },
+    {
+      "id": "history-051",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「シェードグロウン」コーヒーの特徴として正しいものは？",
+      "options": [
+        { "id": "a", "text": "日陰の樹木の下で栽培される", "isCorrect": true },
+        { "id": "b", "text": "直射日光で栽培される", "isCorrect": false },
+        { "id": "c", "text": "温室で栽培される", "isCorrect": false },
+        { "id": "d", "text": "水耕栽培される", "isCorrect": false }
+      ],
+      "explanation": "シェードグロウンは他の樹木の木陰で栽培する伝統的方法で、生態系保全や風味の向上に貢献します。"
+    },
+    {
+      "id": "history-052",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ガッジアのレバーマシン」が革新的だった理由は？",
+      "options": [
+        { "id": "a", "text": "9気圧の高圧抽出でクレマを実現", "isCorrect": true },
+        { "id": "b", "text": "電気を使わない", "isCorrect": false },
+        { "id": "c", "text": "自動で抽出する", "isCorrect": false },
+        { "id": "d", "text": "複数のショットを同時抽出", "isCorrect": false }
+      ],
+      "explanation": "1948年にアキーレ・ガッジアが発明したレバーマシンは、初めて9気圧の高圧抽出を実現し、クレマを生み出しました。"
+    },
+    {
+      "id": "history-053",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ケニアAA」の「AA」とは何を表しますか？",
+      "options": [
+        { "id": "a", "text": "豆のサイズ（スクリーン）の等級", "isCorrect": true },
+        { "id": "b", "text": "品質等級", "isCorrect": false },
+        { "id": "c", "text": "産地名", "isCorrect": false },
+        { "id": "d", "text": "品種名", "isCorrect": false }
+      ],
+      "explanation": "ケニアのAAはスクリーンサイズ17-18（約6.8mm以上）の大粒豆を指します。サイズが品質を保証するわけではありません。"
+    },
+    {
+      "id": "history-054",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「WBC（ワールドバリスタチャンピオンシップ）」が始まった年は？",
+      "options": [
+        { "id": "a", "text": "2000年", "isCorrect": true },
+        { "id": "b", "text": "1995年", "isCorrect": false },
+        { "id": "c", "text": "2005年", "isCorrect": false },
+        { "id": "d", "text": "1990年", "isCorrect": false }
+      ],
+      "explanation": "WBCは2000年にモナコで初開催されました。現在はSCAが主催する世界最高峰のバリスタ競技会です。"
+    },
+    {
+      "id": "history-055",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「マイクロロット」という概念が広まった背景は？",
+      "options": [
+        { "id": "a", "text": "スペシャルティコーヒーのトレーサビリティ重視", "isCorrect": true },
+        { "id": "b", "text": "大量生産の効率化", "isCorrect": false },
+        { "id": "c", "text": "価格の低下", "isCorrect": false },
+        { "id": "d", "text": "輸送コストの削減", "isCorrect": false }
+      ],
+      "explanation": "マイクロロットは特定区画や品種の少量生産で、サードウェーブのトレーサビリティと高品質追求から生まれた概念です。"
+    },
+    {
+      "id": "history-056",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「キリマンジャロ」コーヒーの産地はどこですか？",
+      "options": [
+        { "id": "a", "text": "タンザニア", "isCorrect": true },
+        { "id": "b", "text": "ケニア", "isCorrect": false },
+        { "id": "c", "text": "エチオピア", "isCorrect": false },
+        { "id": "d", "text": "ウガンダ", "isCorrect": false }
+      ],
+      "explanation": "キリマンジャロはタンザニアのキリマンジャロ山麓で栽培されるコーヒーで、日本で特に人気があります。"
+    },
+    {
+      "id": "history-057",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「マンデリン」コーヒーの産地はどこですか？",
+      "options": [
+        { "id": "a", "text": "インドネシア（スマトラ島）", "isCorrect": true },
+        { "id": "b", "text": "ベトナム", "isCorrect": false },
+        { "id": "c", "text": "インド", "isCorrect": false },
+        { "id": "d", "text": "フィリピン", "isCorrect": false }
+      ],
+      "explanation": "マンデリンはインドネシア・スマトラ島産のコーヒーで、マンデリン族の名前に由来します。独特の土っぽい風味が特徴です。"
+    },
+    {
+      "id": "history-058",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "コーヒーの木が最初に花を咲かせるのは植えてから何年後？",
+      "options": [
+        { "id": "a", "text": "3〜4年後", "isCorrect": true },
+        { "id": "b", "text": "1年後", "isCorrect": false },
+        { "id": "c", "text": "10年後", "isCorrect": false },
+        { "id": "d", "text": "半年後", "isCorrect": false }
+      ],
+      "explanation": "コーヒーの木は種をまいてから3〜4年で最初の収穫ができます。最盛期は6〜8年目頃で、20〜30年収穫できます。"
+    },
+    {
+      "id": "history-059",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「コナコーヒー」が栽培されている地域はどこですか？",
+      "options": [
+        { "id": "a", "text": "ハワイ島コナ地区", "isCorrect": true },
+        { "id": "b", "text": "マウイ島", "isCorrect": false },
+        { "id": "c", "text": "オアフ島", "isCorrect": false },
+        { "id": "d", "text": "カウアイ島", "isCorrect": false }
+      ],
+      "explanation": "コナコーヒーはハワイ島西岸のコナ地区で栽培され、アメリカ唯一の商業的コーヒー産地として知られています。"
+    },
+    {
+      "id": "history-060",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ピーベリー」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "果実に1粒だけ入った丸い豆", "isCorrect": true },
+        { "id": "b", "text": "小さい品種", "isCorrect": false },
+        { "id": "c", "text": "未成熟の豆", "isCorrect": false },
+        { "id": "d", "text": "発酵した豆", "isCorrect": false }
+      ],
+      "explanation": "ピーベリーは通常2粒ある種子が1粒だけ発育したもので、丸い形状が特徴です。全収穫の約5-10%程度です。"
+    },
+    {
+      "id": "history-061",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ロブスタ種」が「ロブスタ」と呼ばれる理由は？",
+      "options": [
+        { "id": "a", "text": "丈夫で病害に強い（robust）から", "isCorrect": true },
+        { "id": "b", "text": "発見者の名前", "isCorrect": false },
+        { "id": "c", "text": "原産地の名前", "isCorrect": false },
+        { "id": "d", "text": "味の表現から", "isCorrect": false }
+      ],
+      "explanation": "ロブスタ（カネフォラ種）は英語の「robust（丈夫な）」に由来し、病害や高温に強い耐性を持っています。"
+    },
+    {
+      "id": "history-062",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "日本初の喫茶店「可否茶館」が開業した年は？",
+      "options": [
+        { "id": "a", "text": "1888年", "isCorrect": true },
+        { "id": "b", "text": "1900年", "isCorrect": false },
+        { "id": "c", "text": "1868年", "isCorrect": false },
+        { "id": "d", "text": "1920年", "isCorrect": false }
+      ],
+      "explanation": "1888年に鄭永慶が東京・上野に「可否茶館」を開店しました。これが日本最初の本格的な喫茶店とされています。"
+    },
+    {
+      "id": "history-063",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ティピカ種」と「ブルボン種」の関係は？",
+      "options": [
+        { "id": "a", "text": "ブルボンはティピカの突然変異種", "isCorrect": true },
+        { "id": "b", "text": "全く別の品種", "isCorrect": false },
+        { "id": "c", "text": "ティピカがブルボンの子孫", "isCorrect": false },
+        { "id": "d", "text": "同じ品種の別名", "isCorrect": false }
+      ],
+      "explanation": "ティピカ種がブルボン島に持ち込まれ、そこで自然に突然変異してブルボン種が生まれました。両方がアラビカの基本品種です。"
+    },
+    {
+      "id": "history-064",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「エチオピア・イルガチェフェ」の「イルガチェフェ」の意味は？",
+      "options": [
+        { "id": "a", "text": "「湿地の草原」を意味する地名", "isCorrect": true },
+        { "id": "b", "text": "品種の名前", "isCorrect": false },
+        { "id": "c", "text": "精製方法", "isCorrect": false },
+        { "id": "d", "text": "農協の名前", "isCorrect": false }
+      ],
+      "explanation": "イルガチェフェはエチオピア南部の地名で、標高1700-2200mの高地でフローラルで華やかな風味のコーヒーが生産されます。"
+    },
+    {
+      "id": "history-065",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「カスカラ」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "コーヒーチェリーの果肉を乾燥させたもの", "isCorrect": true },
+        { "id": "b", "text": "焙煎の失敗品", "isCorrect": false },
+        { "id": "c", "text": "コーヒーの品種", "isCorrect": false },
+        { "id": "d", "text": "抽出器具の名前", "isCorrect": false }
+      ],
+      "explanation": "カスカラはスペイン語で「殻」を意味し、コーヒーの果肉（パルプ）を乾燥させたものです。ハーブティーのように飲みます。"
+    },
+    {
+      "id": "history-066",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「アナエロビック発酵」が注目されるようになった時期は？",
+      "options": [
+        { "id": "a", "text": "2010年代後半", "isCorrect": true },
+        { "id": "b", "text": "1990年代", "isCorrect": false },
+        { "id": "c", "text": "2000年代前半", "isCorrect": false },
+        { "id": "d", "text": "1980年代", "isCorrect": false }
+      ],
+      "explanation": "アナエロビック（嫌気性）発酵は2010年代後半から注目され、ユニークなフレーバーを生み出す精製方法として広まりました。"
+    },
+    {
+      "id": "history-067",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "世界で一人当たりのコーヒー消費量が最も多い国は？",
+      "options": [
+        { "id": "a", "text": "フィンランド", "isCorrect": true },
+        { "id": "b", "text": "アメリカ", "isCorrect": false },
+        { "id": "c", "text": "イタリア", "isCorrect": false },
+        { "id": "d", "text": "ブラジル", "isCorrect": false }
+      ],
+      "explanation": "フィンランドは一人当たり年間約12kgのコーヒーを消費し、世界最大の消費国です。北欧諸国は消費量が多い傾向があります。"
+    },
+    {
+      "id": "history-068",
+      "category": "history",
+      "difficulty": "beginner",
+      "question": "「コロンビア・スプレモ」の「スプレモ」とは何を表しますか？",
+      "options": [
+        { "id": "a", "text": "豆のサイズ等級（最上級）", "isCorrect": true },
+        { "id": "b", "text": "品質等級", "isCorrect": false },
+        { "id": "c", "text": "産地名", "isCorrect": false },
+        { "id": "d", "text": "品種名", "isCorrect": false }
+      ],
+      "explanation": "スプレモはコロンビアの豆のサイズ等級で、スクリーン17以上（約6.7mm以上）の大粒豆を指します。"
+    },
+    {
+      "id": "history-069",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「パカマラ」という品種はどの品種を掛け合わせたものですか？",
+      "options": [
+        { "id": "a", "text": "パカス × マラゴジッペ", "isCorrect": true },
+        { "id": "b", "text": "ブルボン × ティピカ", "isCorrect": false },
+        { "id": "c", "text": "カトゥーラ × ムンドノーボ", "isCorrect": false },
+        { "id": "d", "text": "ゲイシャ × SL28", "isCorrect": false }
+      ],
+      "explanation": "パカマラはエルサルバドルで開発された品種で、パカスとマラゴジッペの交配種です。大粒で複雑な風味が特徴です。"
+    },
+    {
+      "id": "history-070",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ブラジル・サントス」の「サントス」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "コーヒーを輸出していた港の名前", "isCorrect": true },
+        { "id": "b", "text": "品種の名前", "isCorrect": false },
+        { "id": "c", "text": "農園の名前", "isCorrect": false },
+        { "id": "d", "text": "精製方法", "isCorrect": false }
+      ],
+      "explanation": "サントスはブラジル・サンパウロ州の港町で、かつてコーヒー輸出の中心地でした。港の名前が銘柄になりました。"
+    },
+    {
+      "id": "history-071",
+      "category": "history",
+      "difficulty": "intermediate",
+      "question": "「ICO（国際コーヒー機関）」が設立された年は？",
+      "options": [
+        { "id": "a", "text": "1963年", "isCorrect": true },
+        { "id": "b", "text": "1980年", "isCorrect": false },
+        { "id": "c", "text": "1950年", "isCorrect": false },
+        { "id": "d", "text": "2000年", "isCorrect": false }
+      ],
+      "explanation": "ICOは1963年にロンドンで設立された政府間機関で、コーヒーの国際協力と市場安定を目的としています。"
+    },
+    {
+      "id": "history-072",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「SL28」と「SL34」はどの国で開発された品種ですか？",
+      "options": [
+        { "id": "a", "text": "ケニア", "isCorrect": true },
+        { "id": "b", "text": "エチオピア", "isCorrect": false },
+        { "id": "c", "text": "コロンビア", "isCorrect": false },
+        { "id": "d", "text": "ブラジル", "isCorrect": false }
+      ],
+      "explanation": "SL28とSL34は1930年代にケニアのScott Laboratories（SL）で選抜された品種で、ケニアコーヒーの代表的品種です。"
+    },
+    {
+      "id": "history-073",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「C市場」とはコーヒー取引においてどのような市場を指しますか？",
+      "options": [
+        { "id": "a", "text": "ニューヨーク商品取引所のアラビカ先物市場", "isCorrect": true },
+        { "id": "b", "text": "ロンドンの現物市場", "isCorrect": false },
+        { "id": "c", "text": "日本の卸売市場", "isCorrect": false },
+        { "id": "d", "text": "スペシャルティコーヒー専門市場", "isCorrect": false }
+      ],
+      "explanation": "C市場（C-Market）はニューヨーク商品取引所のアラビカコーヒー先物市場で、国際価格の基準となっています。"
+    },
+    {
+      "id": "history-074",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「スペシャルティコーヒー」という用語を最初に使った人物は？",
+      "options": [
+        { "id": "a", "text": "エルナ・クヌッセン", "isCorrect": true },
+        { "id": "b", "text": "ジョージ・ハウエル", "isCorrect": false },
+        { "id": "c", "text": "アルフレッド・ピート", "isCorrect": false },
+        { "id": "d", "text": "ハワード・シュルツ", "isCorrect": false }
+      ],
+      "explanation": "1974年にエルナ・クヌッセンがTea & Coffee Trade Journalで「specialty coffee」という用語を初めて使用しました。"
+    },
+    {
+      "id": "history-075",
+      "category": "history",
+      "difficulty": "advanced",
+      "question": "「ファエマE61」が革命的だった理由は何ですか？",
+      "options": [
+        { "id": "a", "text": "電動ポンプとヒートエクスチェンジャーの採用", "isCorrect": true },
+        { "id": "b", "text": "世界初のエスプレッソマシン", "isCorrect": false },
+        { "id": "c", "text": "自動グラインダー内蔵", "isCorrect": false },
+        { "id": "d", "text": "タッチパネル操作", "isCorrect": false }
+      ],
+      "explanation": "1961年発売のファエマE61は電動ポンプで9気圧を安定供給し、ヒートエクスチェンジャーで連続抽出を可能にした革新的マシンです。"
+    }
+  ]
+}

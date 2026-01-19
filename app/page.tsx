@@ -74,7 +74,7 @@ const ACTIONS = [
   },
   {
     key: 'coffee-trivia',
-    title: 'コーヒー雑学・クイズ',
+    title: 'コーヒークイズ',
     description: '楽しく学ぶコーヒー知識',
     href: '/coffee-trivia',
     icon: IoSparkles,

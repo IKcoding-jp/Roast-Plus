@@ -1,18 +1,49 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft } from 'react-icons/hi';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
 import Link from 'next/link';
-import { IoSparkles } from 'react-icons/io5';
+import { QuizDashboard, HelpGuideModal } from '@/components/coffee-quiz';
+import { useQuizData } from '@/hooks/useQuizData';
+
+// シンプルな戻るアイコン
+const ArrowLeftIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m12 19-7-7 7-7" />
+    <path d="M19 12H5" />
+  </svg>
+);
+
+// コーヒーカップアイコン
+const CoffeeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+    <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+    <line x1="6" y1="2" x2="6" y2="4" />
+    <line x1="10" y1="2" x2="10" y2="4" />
+    <line x1="14" y1="2" x2="14" y2="4" />
+  </svg>
+);
+
+// ヘルプアイコン
+const HelpCircleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <path d="M12 17h.01" />
+  </svg>
+);
 
 export default function CoffeeTriviaPage() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { progress, loading: quizLoading, getDueCardsForReview, questionsStats, categoryMasteryStats } = useQuizData();
+  const [showHelpGuide, setShowHelpGuide] = useState(false);
   useAppLifecycle();
 
-  if (loading) {
+  if (authLoading) {
     return <Loading />;
   }
 
@@ -20,37 +51,52 @@ export default function CoffeeTriviaPage() {
     return <LoginPage />;
   }
 
+  const dueCardsCount = getDueCardsForReview().length;
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
-      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center bg-white/50 backdrop-blur-sm border-b border-gray-200/50">
-        <Link
-          href="/"
-          className="p-2 -ml-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
-          title="戻る"
-          aria-label="戻る"
+    <div className="min-h-screen flex flex-col bg-[#FDF8F0]">
+      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between bg-white border-b border-[#211714]/5">
+        <div className="flex items-center">
+          <Link
+            href="/"
+            className="p-1.5 -ml-1.5 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
+            title="戻る"
+            aria-label="戻る"
+          >
+            <ArrowLeftIcon />
+          </Link>
+          <h1 className="ml-2.5 text-base font-semibold text-[#211714] flex items-center gap-2">
+            <span className="text-[#EF8A00]">
+              <CoffeeIcon />
+            </span>
+            コーヒークイズ
+          </h1>
+        </div>
+        <button
+          onClick={() => setShowHelpGuide(true)}
+          className="p-1.5 -mr-1.5 text-[#3A2F2B]/60 hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
+          title="使い方ガイド"
+          aria-label="使い方ガイド"
         >
-          <HiArrowLeft className="h-6 w-6" />
-        </Link>
-        <h1 className="ml-3 text-lg font-bold text-gray-800">コーヒー雑学・クイズ</h1>
+          <HelpCircleIcon />
+        </button>
       </header>
 
-      <main className="flex-1 container mx-auto p-4 lg:p-6 flex items-center justify-center">
-        <div className="text-center space-y-6 max-w-md">
-          <div className="flex justify-center">
-            <div className="p-6 bg-gradient-to-br from-[#EF8A00]/10 to-[#EF8A00]/5 rounded-full">
-              <IoSparkles className="h-20 w-20 text-[#EF8A00]" />
-            </div>
-          </div>
-          <div className="space-y-3">
-            <h2 className="text-2xl font-bold text-gray-800">開発中です</h2>
-            <p className="text-gray-600">
-              コーヒーに関する雑学やクイズを楽しめる機能を準備中です。
-              <br />
-              もうしばらくお待ちください。
-            </p>
-          </div>
-        </div>
+      <main className="flex-1 container mx-auto p-4 lg:p-6 max-w-lg">
+        <QuizDashboard
+          progress={progress}
+          dueCardsCount={dueCardsCount}
+          loading={quizLoading}
+          questionsStats={questionsStats}
+          categoryMasteryStats={categoryMasteryStats}
+        />
       </main>
+
+      {/* 使い方ガイドモーダル */}
+      <HelpGuideModal
+        show={showHelpGuide}
+        onClose={() => setShowHelpGuide(false)}
+      />
     </div>
   );
 }

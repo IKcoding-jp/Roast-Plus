@@ -1,0 +1,980 @@
+{
+  "category": "brewing",
+  "questions": [
+    {
+      "id": "brewing-001",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒー抽出に最適な湯温は一般的に何度ですか？",
+      "options": [
+        { "id": "a", "text": "90-96℃", "isCorrect": true },
+        { "id": "b", "text": "70-80℃", "isCorrect": false },
+        { "id": "c", "text": "100℃", "isCorrect": false },
+        { "id": "d", "text": "60-70℃", "isCorrect": false }
+      ],
+      "explanation": "90-96℃が一般的に推奨される温度帯です。温度が高すぎると過抽出、低すぎると抽出不足になります。"
+    },
+    {
+      "id": "brewing-002",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「ドリップコーヒー」で最初にお湯を少量注いで待つ工程を何といいますか？",
+      "options": [
+        { "id": "a", "text": "蒸らし（ブルーミング）", "isCorrect": true },
+        { "id": "b", "text": "攪拌（スターリング）", "isCorrect": false },
+        { "id": "c", "text": "浸漬（イマージョン）", "isCorrect": false },
+        { "id": "d", "text": "濾過（フィルタリング）", "isCorrect": false }
+      ],
+      "explanation": "蒸らし（ブルーミング）は、粉に含まれる二酸化炭素を放出させ、均一な抽出を促進する重要な工程です。通常30-45秒行います。"
+    },
+    {
+      "id": "brewing-003",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「TDS（Total Dissolved Solids）」はコーヒーの何を測定する指標ですか？",
+      "options": [
+        { "id": "a", "text": "溶解した固形分の濃度", "isCorrect": true },
+        { "id": "b", "text": "温度", "isCorrect": false },
+        { "id": "c", "text": "酸味の強さ", "isCorrect": false },
+        { "id": "d", "text": "カフェイン量", "isCorrect": false }
+      ],
+      "explanation": "TDSはコーヒー液中の溶解固形分の割合で、通常1.15-1.45%が理想とされます。屈折計で測定できます。"
+    },
+    {
+      "id": "brewing-004",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「抽出率」の理想的な範囲は何%ですか？",
+      "options": [
+        { "id": "a", "text": "18-22%", "isCorrect": true },
+        { "id": "b", "text": "10-15%", "isCorrect": false },
+        { "id": "c", "text": "25-30%", "isCorrect": false },
+        { "id": "d", "text": "5-10%", "isCorrect": false }
+      ],
+      "explanation": "SCAが定める理想的な抽出率は18-22%です。これより低いと酸っぱく、高いと苦くて渋い味になります。"
+    },
+    {
+      "id": "brewing-005",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒーの挽き目が細かすぎると、どのような味になりやすいですか？",
+      "options": [
+        { "id": "a", "text": "苦くて渋い（過抽出）", "isCorrect": true },
+        { "id": "b", "text": "酸っぱくて薄い", "isCorrect": false },
+        { "id": "c", "text": "甘くてまろやか", "isCorrect": false },
+        { "id": "d", "text": "味に変化なし", "isCorrect": false }
+      ],
+      "explanation": "挽き目が細かいと表面積が増え、抽出が速く進み過抽出になりやすいです。苦味や渋みが強くなります。"
+    },
+    {
+      "id": "brewing-006",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ペーパーフィルター」と「金属フィルター」の違いで正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "金属フィルターはオイルが残る", "isCorrect": true },
+        { "id": "b", "text": "ペーパーフィルターはオイルが残る", "isCorrect": false },
+        { "id": "c", "text": "抽出時間に違いはない", "isCorrect": false },
+        { "id": "d", "text": "味に違いは出ない", "isCorrect": false }
+      ],
+      "explanation": "金属フィルターは目が粗いため、コーヒーオイルや微粉が通過し、コクのある味わいになります。ペーパーはクリーンな味になります。"
+    },
+    {
+      "id": "brewing-007",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "エスプレッソ抽出で「チャネリング」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "湯がコーヒー粉の一部を通り抜ける現象", "isCorrect": true },
+        { "id": "b", "text": "クレマが均一に形成される状態", "isCorrect": false },
+        { "id": "c", "text": "適切な抽出圧の維持", "isCorrect": false },
+        { "id": "d", "text": "ミルクのスチーミング技法", "isCorrect": false }
+      ],
+      "explanation": "チャネリングは粉の密度のムラにより、湯が抵抗の少ない部分を選んで流れる現象です。過抽出と抽出不足が混在し、味が不安定になります。"
+    },
+    {
+      "id": "brewing-008",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「4:6メソッド」とはどのような抽出法ですか？",
+      "options": [
+        { "id": "a", "text": "湯を4割と6割に分けて風味をコントロールする方法", "isCorrect": true },
+        { "id": "b", "text": "4分間で6杯分を抽出する方法", "isCorrect": false },
+        { "id": "c", "text": "46℃のお湯で抽出する方法", "isCorrect": false },
+        { "id": "d", "text": "4種類のフィルターを使う方法", "isCorrect": false }
+      ],
+      "explanation": "粕谷哲氏が考案した方法で、最初の40%で甘みと酸味のバランス、後の60%で濃度を調整します。分割注湯でコントロールします。"
+    },
+    {
+      "id": "brewing-009",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "フレンチプレスの推奨浸漬時間はどのくらいですか？",
+      "options": [
+        { "id": "a", "text": "4分程度", "isCorrect": true },
+        { "id": "b", "text": "30秒程度", "isCorrect": false },
+        { "id": "c", "text": "10分以上", "isCorrect": false },
+        { "id": "d", "text": "1分程度", "isCorrect": false }
+      ],
+      "explanation": "フレンチプレスは浸漬式で、4分程度の抽出時間が一般的です。長すぎると過抽出、短すぎると抽出不足になります。"
+    },
+    {
+      "id": "brewing-010",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「アジテーション」が抽出に与える影響として正しいものはどれですか？",
+      "options": [
+        { "id": "a", "text": "抽出を促進し均一にする", "isCorrect": true },
+        { "id": "b", "text": "抽出を遅らせる", "isCorrect": false },
+        { "id": "c", "text": "温度を下げる", "isCorrect": false },
+        { "id": "d", "text": "微粉を除去する", "isCorrect": false }
+      ],
+      "explanation": "アジテーション（撹拌）はコーヒー粉周辺の飽和したコーヒー液を動かし、新鮮な湯との接触を促進して抽出効率を上げます。"
+    },
+    {
+      "id": "brewing-011",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「エスプレッソ」と「ドリップコーヒー」の主な違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "圧力をかけて抽出するかどうか", "isCorrect": true },
+        { "id": "b", "text": "使用する豆の品種", "isCorrect": false },
+        { "id": "c", "text": "焙煎度合い", "isCorrect": false },
+        { "id": "d", "text": "カフェイン量", "isCorrect": false }
+      ],
+      "explanation": "エスプレッソは約9気圧の高圧で短時間抽出、ドリップは重力で自然に抽出します。この違いが濃度や風味に大きく影響します。"
+    },
+    {
+      "id": "brewing-012",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒー豆を挽いてから使用するまで、どのくらいが理想的ですか？",
+      "options": [
+        { "id": "a", "text": "挽いてすぐ", "isCorrect": true },
+        { "id": "b", "text": "1週間以内", "isCorrect": false },
+        { "id": "c", "text": "1ヶ月以内", "isCorrect": false },
+        { "id": "d", "text": "いつでも同じ", "isCorrect": false }
+      ],
+      "explanation": "挽いた直後から酸化と香りの揮発が始まります。最高の風味を楽しむには、抽出直前に挽くのがベストです。"
+    },
+    {
+      "id": "brewing-013",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「コールドブリュー」の一般的な抽出時間はどのくらいですか？",
+      "options": [
+        { "id": "a", "text": "12-24時間", "isCorrect": true },
+        { "id": "b", "text": "5-10分", "isCorrect": false },
+        { "id": "c", "text": "1-2時間", "isCorrect": false },
+        { "id": "d", "text": "48-72時間", "isCorrect": false }
+      ],
+      "explanation": "冷水抽出は低温のため抽出が遅く、通常12-24時間かけます。滑らかで酸味が穏やかな味わいになります。"
+    },
+    {
+      "id": "brewing-014",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「浸漬式」と「透過式」の抽出法の違いは何ですか？",
+      "options": [
+        { "id": "a", "text": "粉を湯に漬けるか、湯を通すか", "isCorrect": true },
+        { "id": "b", "text": "挽き目の違い", "isCorrect": false },
+        { "id": "c", "text": "温度の違い", "isCorrect": false },
+        { "id": "d", "text": "使用する豆の量の違い", "isCorrect": false }
+      ],
+      "explanation": "浸漬式（フレンチプレス等）は粉を湯に浸して抽出、透過式（ドリップ等）は湯を粉に通して抽出します。"
+    },
+    {
+      "id": "brewing-015",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "ペーパードリップで「の」の字を描くように注ぐ理由は何ですか？",
+      "options": [
+        { "id": "a", "text": "粉全体に均一に湯を行き渡らせるため", "isCorrect": true },
+        { "id": "b", "text": "見た目が美しいため", "isCorrect": false },
+        { "id": "c", "text": "抽出時間を短くするため", "isCorrect": false },
+        { "id": "d", "text": "フィルターを濡らすため", "isCorrect": false }
+      ],
+      "explanation": "円を描くように注ぐことで、コーヒー粉全体に均一にお湯が行き渡り、ムラのない抽出ができます。"
+    },
+    {
+      "id": "brewing-016",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "一般的なドリップコーヒーの粉と湯の比率は？",
+      "options": [
+        { "id": "a", "text": "1:15〜1:17（粉1gに対し湯15-17g）", "isCorrect": true },
+        { "id": "b", "text": "1:5（粉1gに対し湯5g）", "isCorrect": false },
+        { "id": "c", "text": "1:30（粉1gに対し湯30g）", "isCorrect": false },
+        { "id": "d", "text": "1:1（粉1gに対し湯1g）", "isCorrect": false }
+      ],
+      "explanation": "一般的には粉1gに対して湯15-17gが標準です。好みや豆によって比率を調整します。"
+    },
+    {
+      "id": "brewing-017",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「モカポット」はどのような仕組みで抽出しますか？",
+      "options": [
+        { "id": "a", "text": "蒸気圧で湯を押し上げて抽出", "isCorrect": true },
+        { "id": "b", "text": "重力で湯を落として抽出", "isCorrect": false },
+        { "id": "c", "text": "手動で圧力をかけて抽出", "isCorrect": false },
+        { "id": "d", "text": "真空状態で抽出", "isCorrect": false }
+      ],
+      "explanation": "モカポットは下部の水が加熱されて蒸気圧が発生し、湯が上部のコーヒー粉を通過して抽出される仕組みです。"
+    },
+    {
+      "id": "brewing-018",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒーの抽出で「薄い」と感じたとき、次回どうすべきですか？",
+      "options": [
+        { "id": "a", "text": "粉の量を増やすか、挽き目を細かくする", "isCorrect": true },
+        { "id": "b", "text": "湯温を下げる", "isCorrect": false },
+        { "id": "c", "text": "抽出時間を短くする", "isCorrect": false },
+        { "id": "d", "text": "粉の量を減らす", "isCorrect": false }
+      ],
+      "explanation": "薄いと感じる場合は、粉の量を増やす、挽き目を細かくする、抽出時間を長くするなどで濃度を上げられます。"
+    },
+    {
+      "id": "brewing-019",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「プレインフュージョン」とはエスプレッソ抽出のどの工程ですか？",
+      "options": [
+        { "id": "a", "text": "本抽出前に低圧でコーヒー粉を湿らせる工程", "isCorrect": true },
+        { "id": "b", "text": "抽出後にミルクを注ぐ工程", "isCorrect": false },
+        { "id": "c", "text": "豆を挽く前の準備工程", "isCorrect": false },
+        { "id": "d", "text": "クレマを形成する工程", "isCorrect": false }
+      ],
+      "explanation": "プレインフュージョンは本抽出前に低圧（または無圧）で粉を濡らし、均一な抽出とチャネリング防止に役立ちます。"
+    },
+    {
+      "id": "brewing-020",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「サイフォン」の抽出で特徴的な現象は何ですか？",
+      "options": [
+        { "id": "a", "text": "気圧差を利用した湯の上昇と下降", "isCorrect": true },
+        { "id": "b", "text": "高圧蒸気による急速抽出", "isCorrect": false },
+        { "id": "c", "text": "冷水による長時間抽出", "isCorrect": false },
+        { "id": "d", "text": "真空パックでの保存", "isCorrect": false }
+      ],
+      "explanation": "サイフォンは加熱で膨張した空気が湯を上部に押し上げ、火を止めると冷却で生じる気圧差で抽出液が下部に戻ります。"
+    },
+    {
+      "id": "brewing-021",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「エアロプレス」の発明者は誰ですか？",
+      "options": [
+        { "id": "a", "text": "アラン・アドラー", "isCorrect": true },
+        { "id": "b", "text": "ジェームズ・ホフマン", "isCorrect": false },
+        { "id": "c", "text": "ルイジ・ベゼラ", "isCorrect": false },
+        { "id": "d", "text": "メリタ・ベンツ", "isCorrect": false }
+      ],
+      "explanation": "エアロプレスは2005年にフリスビーの発明でも有名なアラン・アドラーによって開発されました。"
+    },
+    {
+      "id": "brewing-022",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「バイパス」とはコーヒー抽出でどのような技術ですか？",
+      "options": [
+        { "id": "a", "text": "抽出液に湯を加えて濃度を調整する", "isCorrect": true },
+        { "id": "b", "text": "抽出を途中で止める", "isCorrect": false },
+        { "id": "c", "text": "豆を2回挽く", "isCorrect": false },
+        { "id": "d", "text": "フィルターを使わない", "isCorrect": false }
+      ],
+      "explanation": "バイパスは濃く抽出したコーヒーに湯を加えて薄める技術です。過抽出を避けながら好みの濃度に調整できます。"
+    },
+    {
+      "id": "brewing-023",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「WDT（Weiss Distribution Technique）」は何のための技術ですか？",
+      "options": [
+        { "id": "a", "text": "エスプレッソの粉を均一に分布させる", "isCorrect": true },
+        { "id": "b", "text": "抽出温度を測定する", "isCorrect": false },
+        { "id": "c", "text": "ミルクを泡立てる", "isCorrect": false },
+        { "id": "d", "text": "豆の鮮度を確認する", "isCorrect": false }
+      ],
+      "explanation": "WDTは細い針でエスプレッソ用のコーヒー粉をかき混ぜ、ダマをほぐして均一に分布させる技術です。"
+    },
+    {
+      "id": "brewing-024",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ブリューイングコントロールチャート」の縦軸と横軸は何を表しますか？",
+      "options": [
+        { "id": "a", "text": "TDS（濃度）と抽出率", "isCorrect": true },
+        { "id": "b", "text": "温度と時間", "isCorrect": false },
+        { "id": "c", "text": "挽き目と粉量", "isCorrect": false },
+        { "id": "d", "text": "酸味と苦味", "isCorrect": false }
+      ],
+      "explanation": "ブリューイングコントロールチャートは縦軸にTDS（濃度）、横軸に抽出率をとり、理想的な抽出範囲を示します。"
+    },
+    {
+      "id": "brewing-025",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "ドリップの「ドローダウン」が遅い場合、主な原因は何ですか？",
+      "options": [
+        { "id": "a", "text": "挽き目が細かすぎる", "isCorrect": true },
+        { "id": "b", "text": "湯温が高すぎる", "isCorrect": false },
+        { "id": "c", "text": "粉量が少なすぎる", "isCorrect": false },
+        { "id": "d", "text": "注湯速度が速すぎる", "isCorrect": false }
+      ],
+      "explanation": "ドローダウン（湯が落ちる速度）が遅い場合、挽き目が細かすぎて湯が通りにくくなっていることが多いです。"
+    },
+    {
+      "id": "brewing-026",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「軟水」と「硬水」、コーヒー抽出に一般的に適しているのは？",
+      "options": [
+        { "id": "a", "text": "軟水〜中程度の硬度の水", "isCorrect": true },
+        { "id": "b", "text": "硬水のみ", "isCorrect": false },
+        { "id": "c", "text": "純水（ミネラルゼロ）", "isCorrect": false },
+        { "id": "d", "text": "どれでも同じ", "isCorrect": false }
+      ],
+      "explanation": "適度なミネラルを含む軟水〜中硬度の水が抽出に最適です。硬水すぎると抽出が阻害され、純水だと風味が平坦になります。"
+    },
+    {
+      "id": "brewing-027",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ハリオV60」のリブ（溝）の役割は何ですか？",
+      "options": [
+        { "id": "a", "text": "空気の通り道を作り、抽出速度をコントロール", "isCorrect": true },
+        { "id": "b", "text": "見た目のデザイン", "isCorrect": false },
+        { "id": "c", "text": "保温効果", "isCorrect": false },
+        { "id": "d", "text": "フィルターの強度を上げる", "isCorrect": false }
+      ],
+      "explanation": "V60のスパイラルリブはフィルターと壁の間に空気の通り道を作り、抽出速度や均一性に影響を与えます。"
+    },
+    {
+      "id": "brewing-028",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「シングルオリジン」と「ブレンド」、一般的に抽出が難しいのは？",
+      "options": [
+        { "id": "a", "text": "シングルオリジン", "isCorrect": true },
+        { "id": "b", "text": "ブレンド", "isCorrect": false },
+        { "id": "c", "text": "どちらも同じ", "isCorrect": false },
+        { "id": "d", "text": "デカフェ", "isCorrect": false }
+      ],
+      "explanation": "シングルオリジンは個性が強く、抽出条件の影響を受けやすいです。ブレンドは複数豆で安定感がある傾向があります。"
+    },
+    {
+      "id": "brewing-029",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「レフラクトメーター」で測定するのは何ですか？",
+      "options": [
+        { "id": "a", "text": "TDS（溶解固形分濃度）", "isCorrect": true },
+        { "id": "b", "text": "pH値", "isCorrect": false },
+        { "id": "c", "text": "抽出温度", "isCorrect": false },
+        { "id": "d", "text": "カフェイン量", "isCorrect": false }
+      ],
+      "explanation": "レフラクトメーター（屈折計）は光の屈折率からコーヒー液中の溶解固形分濃度（TDS）を測定します。"
+    },
+    {
+      "id": "brewing-030",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "抽出率を上げずにTDSを上げるにはどうすればよいですか？",
+      "options": [
+        { "id": "a", "text": "粉の量を増やして同じ量の湯で抽出", "isCorrect": true },
+        { "id": "b", "text": "挽き目を細かくする", "isCorrect": false },
+        { "id": "c", "text": "抽出時間を長くする", "isCorrect": false },
+        { "id": "d", "text": "湯温を上げる", "isCorrect": false }
+      ],
+      "explanation": "抽出率は粉からどれだけ成分を取り出したか。粉を増やしても抽出率は同じですが、液中の成分濃度（TDS）は上がります。"
+    },
+    {
+      "id": "brewing-031",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「ターボショット」とはどのようなエスプレッソ抽出法ですか？",
+      "options": [
+        { "id": "a", "text": "細挽きで高い粉量比率、短時間で抽出", "isCorrect": true },
+        { "id": "b", "text": "粗挽きで長時間抽出", "isCorrect": false },
+        { "id": "c", "text": "常温の水で抽出", "isCorrect": false },
+        { "id": "d", "text": "ミルクを先に入れる方法", "isCorrect": false }
+      ],
+      "explanation": "ターボショットは非常に細かい挽き目で高いドーズ、短い抽出時間（約15秒）で高抽出率を狙う技法です。"
+    },
+    {
+      "id": "brewing-032",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「ブロンディング」とはエスプレッソ抽出で何を指しますか？",
+      "options": [
+        { "id": "a", "text": "抽出終盤で液の色が薄くなる現象", "isCorrect": true },
+        { "id": "b", "text": "クレマが消える現象", "isCorrect": false },
+        { "id": "c", "text": "豆が劣化する現象", "isCorrect": false },
+        { "id": "d", "text": "ミルクが焦げる現象", "isCorrect": false }
+      ],
+      "explanation": "ブロンディングは抽出後半でコーヒー成分が薄まり、液の色が金髪のように薄くなる現象です。過抽出の指標にもなります。"
+    },
+    {
+      "id": "brewing-033",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「ファインズマイグレーション」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "抽出中に微粉が移動してフィルターを詰まらせる現象", "isCorrect": true },
+        { "id": "b", "text": "豆の産地移動", "isCorrect": false },
+        { "id": "c", "text": "香りが拡散する現象", "isCorrect": false },
+        { "id": "d", "text": "カフェインが溶け出す過程", "isCorrect": false }
+      ],
+      "explanation": "ファインズマイグレーションは微粉（ファインズ）が抽出中に下に沈殿し、フィルターを詰まらせて抽出を遅くする現象です。"
+    },
+    {
+      "id": "brewing-034",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「スロースター」を使うエスプレッソ抽出の目的は？",
+      "options": [
+        { "id": "a", "text": "流量を絞って低圧から徐々に圧力を上げる", "isCorrect": true },
+        { "id": "b", "text": "温度を急速に上げる", "isCorrect": false },
+        { "id": "c", "text": "クレマを厚くする", "isCorrect": false },
+        { "id": "d", "text": "抽出時間を短くする", "isCorrect": false }
+      ],
+      "explanation": "スロースターは抽出初期の流量を制限し、プレインフュージョン効果を高めてチャネリングを防ぎます。"
+    },
+    {
+      "id": "brewing-035",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「EY（Extraction Yield）」の計算式は？",
+      "options": [
+        { "id": "a", "text": "（抽出液量 × TDS）÷ 粉量 × 100", "isCorrect": true },
+        { "id": "b", "text": "粉量 ÷ 湯量 × 100", "isCorrect": false },
+        { "id": "c", "text": "抽出時間 × 温度", "isCorrect": false },
+        { "id": "d", "text": "TDS × 粉量", "isCorrect": false }
+      ],
+      "explanation": "抽出率（EY）は、抽出液のグラム数にTDS%を掛け、使用した粉のグラム数で割って算出します。"
+    },
+    {
+      "id": "brewing-036",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「フラットベッド」と「センターダウン」、ドリップ後のコーヒー粉の状態として理想的なのは？",
+      "options": [
+        { "id": "a", "text": "フラットベッド（平らな状態）", "isCorrect": true },
+        { "id": "b", "text": "センターダウン（中央が凹む）", "isCorrect": false },
+        { "id": "c", "text": "どちらでも同じ", "isCorrect": false },
+        { "id": "d", "text": "粉が完全に洗い流された状態", "isCorrect": false }
+      ],
+      "explanation": "フラットベッドは粉全体に均一に湯が行き渡った証拠です。偏りがあると一部が過抽出・一部が抽出不足になります。"
+    },
+    {
+      "id": "brewing-037",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「カリタ式」ドリッパーの特徴は何ですか？",
+      "options": [
+        { "id": "a", "text": "穴が3つあり、抽出が安定しやすい", "isCorrect": true },
+        { "id": "b", "text": "穴が1つで流速が速い", "isCorrect": false },
+        { "id": "c", "text": "金属フィルター専用", "isCorrect": false },
+        { "id": "d", "text": "浸漬式の抽出方法", "isCorrect": false }
+      ],
+      "explanation": "カリタ式は底に3つの小さな穴があり、湯の抜けがゆっくりで安定した抽出ができる特徴があります。"
+    },
+    {
+      "id": "brewing-038",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「アイスコーヒー」を急冷式で作るメリットは何ですか？",
+      "options": [
+        { "id": "a", "text": "香りが閉じ込められ、風味が鮮やか", "isCorrect": true },
+        { "id": "b", "text": "作業時間が長くなる", "isCorrect": false },
+        { "id": "c", "text": "カフェインが増える", "isCorrect": false },
+        { "id": "d", "text": "保存期間が延びる", "isCorrect": false }
+      ],
+      "explanation": "急冷式は熱いコーヒーをすぐに氷で冷やすことで、香り成分が揮発する前に閉じ込められ、風味豊かになります。"
+    },
+    {
+      "id": "brewing-039",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒーを淹れる前にカップを温めておく理由は？",
+      "options": [
+        { "id": "a", "text": "コーヒーの温度低下を防ぐ", "isCorrect": true },
+        { "id": "b", "text": "カップの殺菌のため", "isCorrect": false },
+        { "id": "c", "text": "抽出時間を短くするため", "isCorrect": false },
+        { "id": "d", "text": "香りを強くするため", "isCorrect": false }
+      ],
+      "explanation": "冷たいカップにコーヒーを注ぐと急激に温度が下がります。予熱しておくことで、適温を長く保てます。"
+    },
+    {
+      "id": "brewing-040",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「ペーパーフィルター」を使う前に湯通しする理由は？",
+      "options": [
+        { "id": "a", "text": "紙の匂いを取り除き、ドリッパーを温める", "isCorrect": true },
+        { "id": "b", "text": "フィルターを柔らかくする", "isCorrect": false },
+        { "id": "c", "text": "抽出時間を長くする", "isCorrect": false },
+        { "id": "d", "text": "コーヒーの味を薄くする", "isCorrect": false }
+      ],
+      "explanation": "湯通しすることでペーパーの紙臭さを洗い流し、同時にドリッパーとサーバーを予熱できます。"
+    },
+    {
+      "id": "brewing-041",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「ネルドリップ」のネルとは何のことですか？",
+      "options": [
+        { "id": "a", "text": "布（フランネル）フィルター", "isCorrect": true },
+        { "id": "b", "text": "金属フィルター", "isCorrect": false },
+        { "id": "c", "text": "紙フィルター", "isCorrect": false },
+        { "id": "d", "text": "陶器フィルター", "isCorrect": false }
+      ],
+      "explanation": "ネルはフランネル（起毛した柔らかい布）の略で、布フィルターを使ったドリップ方法です。まろやかな味わいが特徴です。"
+    },
+    {
+      "id": "brewing-042",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "エスプレッソの「クレマ」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "抽出時にできる泡の層", "isCorrect": true },
+        { "id": "b", "text": "ミルクの泡", "isCorrect": false },
+        { "id": "c", "text": "コーヒーオイル", "isCorrect": false },
+        { "id": "d", "text": "砂糖を溶かしたもの", "isCorrect": false }
+      ],
+      "explanation": "クレマは高圧抽出でコーヒーオイルと空気が乳化してできる金褐色の泡の層です。新鮮な豆ほど厚いクレマができます。"
+    },
+    {
+      "id": "brewing-043",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒーメーカーの抽出で「保温プレート」を長時間使用するとどうなりますか？",
+      "options": [
+        { "id": "a", "text": "風味が劣化して煮詰まった味になる", "isCorrect": true },
+        { "id": "b", "text": "より美味しくなる", "isCorrect": false },
+        { "id": "c", "text": "カフェインが増える", "isCorrect": false },
+        { "id": "d", "text": "変化しない", "isCorrect": false }
+      ],
+      "explanation": "長時間の加熱保温はコーヒーの酸化と揮発を促進し、煮詰まった不快な味になります。淹れたてを飲むのがベストです。"
+    },
+    {
+      "id": "brewing-044",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「Rao Spin」とはどのような技法ですか？",
+      "options": [
+        { "id": "a", "text": "注湯後にドリッパーをスピンさせて抽出を均一にする", "isCorrect": true },
+        { "id": "b", "text": "豆を回転させながら挽く", "isCorrect": false },
+        { "id": "c", "text": "カップを回してミルクを混ぜる", "isCorrect": false },
+        { "id": "d", "text": "抽出後にコーヒーを冷ます", "isCorrect": false }
+      ],
+      "explanation": "Scott Raoが提唱した技法で、注湯後にドリッパーを軽く回すことで粉を平らにし、均一な抽出を促します。"
+    },
+    {
+      "id": "brewing-045",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「クレバードリッパー」の抽出方式は？",
+      "options": [
+        { "id": "a", "text": "浸漬式と透過式のハイブリッド", "isCorrect": true },
+        { "id": "b", "text": "完全な透過式", "isCorrect": false },
+        { "id": "c", "text": "完全な浸漬式", "isCorrect": false },
+        { "id": "d", "text": "エスプレッソ式", "isCorrect": false }
+      ],
+      "explanation": "クレバーはバルブで湯をせき止めて浸漬し、カップに置くとバルブが開いて透過するハイブリッド方式です。"
+    },
+    {
+      "id": "brewing-046",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「リテンション」とはグラインダーにおいて何を指しますか？",
+      "options": [
+        { "id": "a", "text": "グラインダー内部に残留する粉の量", "isCorrect": true },
+        { "id": "b", "text": "挽き目の細かさ", "isCorrect": false },
+        { "id": "c", "text": "グラインダーの回転速度", "isCorrect": false },
+        { "id": "d", "text": "豆の保存期間", "isCorrect": false }
+      ],
+      "explanation": "リテンションはグラインダー内に残る古い粉のことです。次の抽出に混入し、風味に悪影響を与える可能性があります。"
+    },
+    {
+      "id": "brewing-047",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「フラットバー」と「コニカルバー」、グラインダーの刃の違いで正しいのは？",
+      "options": [
+        { "id": "a", "text": "フラットは均一な挽き目、コニカルは微粉が多い傾向", "isCorrect": true },
+        { "id": "b", "text": "コニカルの方が高価", "isCorrect": false },
+        { "id": "c", "text": "フラットは手動専用", "isCorrect": false },
+        { "id": "d", "text": "違いはない", "isCorrect": false }
+      ],
+      "explanation": "フラットバーは粒度が均一になりやすく、コニカルは構造上やや微粉が出やすい傾向があります。"
+    },
+    {
+      "id": "brewing-048",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「デガッシング」が不十分な新鮮すぎる豆を使うとどうなりますか？",
+      "options": [
+        { "id": "a", "text": "膨らみすぎて抽出が不安定になる", "isCorrect": true },
+        { "id": "b", "text": "全く抽出できない", "isCorrect": false },
+        { "id": "c", "text": "特に問題ない", "isCorrect": false },
+        { "id": "d", "text": "抽出が速くなる", "isCorrect": false }
+      ],
+      "explanation": "焙煎直後の豆はCO2を多く含み、蒸らしで過度に膨らんで湯が均一に行き渡りません。数日置くのがベターです。"
+    },
+    {
+      "id": "brewing-049",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ウェーブドリッパー」の特徴は何ですか？",
+      "options": [
+        { "id": "a", "text": "平底と波型フィルターで均一な抽出", "isCorrect": true },
+        { "id": "b", "text": "円錐形で高速抽出", "isCorrect": false },
+        { "id": "c", "text": "金属フィルター専用", "isCorrect": false },
+        { "id": "d", "text": "浸漬式の抽出方法", "isCorrect": false }
+      ],
+      "explanation": "カリタウェーブなどは平底と波型のフィルターが特徴で、湯が均一に広がり安定した抽出ができます。"
+    },
+    {
+      "id": "brewing-050",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "エスプレッソの「ドーズ」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "使用するコーヒー粉の量", "isCorrect": true },
+        { "id": "b", "text": "抽出時間", "isCorrect": false },
+        { "id": "c", "text": "抽出圧力", "isCorrect": false },
+        { "id": "d", "text": "抽出液の量", "isCorrect": false }
+      ],
+      "explanation": "ドーズはポルタフィルターに入れるコーヒー粉の量（グラム）のことです。通常シングルで7-9g、ダブルで14-18g程度です。"
+    },
+    {
+      "id": "brewing-051",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ブリューレシオ」1:2とは何を意味しますか？",
+      "options": [
+        { "id": "a", "text": "粉1gに対して抽出液2g", "isCorrect": true },
+        { "id": "b", "text": "1分間に2回注湯", "isCorrect": false },
+        { "id": "c", "text": "2種類の豆を1:2で混ぜる", "isCorrect": false },
+        { "id": "d", "text": "湯温を2度ずつ下げる", "isCorrect": false }
+      ],
+      "explanation": "ブリューレシオは粉と抽出液の比率です。エスプレッソで1:2なら、18gの粉から36gの液を抽出することを意味します。"
+    },
+    {
+      "id": "brewing-052",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「スプロー（Spro-over）」とはどのような抽出法ですか？",
+      "options": [
+        { "id": "a", "text": "エスプレッソマシンでドリップ風に低圧長時間抽出", "isCorrect": true },
+        { "id": "b", "text": "ドリップでエスプレッソを再現", "isCorrect": false },
+        { "id": "c", "text": "2種類の抽出液を混ぜる", "isCorrect": false },
+        { "id": "d", "text": "冷水で抽出後に加熱", "isCorrect": false }
+      ],
+      "explanation": "スプローオーバーはエスプレッソマシンを使い、低圧（約2-3気圧）で長時間（1-2分）抽出するトレンドの技法です。"
+    },
+    {
+      "id": "brewing-053",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「ピストンレバーマシン」の特徴は何ですか？",
+      "options": [
+        { "id": "a", "text": "手動でレバーを操作して抽出圧を制御", "isCorrect": true },
+        { "id": "b", "text": "自動で圧力調整", "isCorrect": false },
+        { "id": "c", "text": "浸漬式の抽出", "isCorrect": false },
+        { "id": "d", "text": "複数のショットを同時抽出", "isCorrect": false }
+      ],
+      "explanation": "ピストンレバーマシンはバリスタがレバーを操作して圧力をコントロールします。プレッシャープロファイリングが可能です。"
+    },
+    {
+      "id": "brewing-054",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「SSP（Seasoned Specialty Pilots）」バーとは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "高品質なアフターマーケットのグラインダー刃", "isCorrect": true },
+        { "id": "b", "text": "特別なコーヒー豆の品種", "isCorrect": false },
+        { "id": "c", "text": "抽出技法の名称", "isCorrect": false },
+        { "id": "d", "text": "カフェの認証制度", "isCorrect": false }
+      ],
+      "explanation": "SSPは韓国のメーカーが製造する高品質なグラインダー用のバー（刃）で、粒度の均一性に優れています。"
+    },
+    {
+      "id": "brewing-055",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「PID制御」はエスプレッソマシンでどのような役割を果たしますか？",
+      "options": [
+        { "id": "a", "text": "ボイラー温度を精密に制御する", "isCorrect": true },
+        { "id": "b", "text": "抽出圧力を調整する", "isCorrect": false },
+        { "id": "c", "text": "粉量を計測する", "isCorrect": false },
+        { "id": "d", "text": "抽出時間を計る", "isCorrect": false }
+      ],
+      "explanation": "PID（比例・積分・微分）制御は温度を精密に管理し、±0.5℃程度の安定性を実現します。"
+    },
+    {
+      "id": "brewing-056",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「ディスクリビューション」と「タンピング」の順序はどちらが先ですか？",
+      "options": [
+        { "id": "a", "text": "ディストリビューション（分布）が先", "isCorrect": true },
+        { "id": "b", "text": "タンピングが先", "isCorrect": false },
+        { "id": "c", "text": "同時に行う", "isCorrect": false },
+        { "id": "d", "text": "どちらでも良い", "isCorrect": false }
+      ],
+      "explanation": "まず粉を均一に分布させ（ディストリビューション）、その後タンピングで圧縮します。順序を守ることで均一な抽出が可能です。"
+    },
+    {
+      "id": "brewing-057",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「コメットテール」とはエスプレッソ抽出で何を意味しますか？",
+      "options": [
+        { "id": "a", "text": "ネイキッドポルタフィルターで抽出の偏りが見える筋", "isCorrect": true },
+        { "id": "b", "text": "完璧な抽出の指標", "isCorrect": false },
+        { "id": "c", "text": "クレマの厚さ", "isCorrect": false },
+        { "id": "d", "text": "ミルクアートの技法", "isCorrect": false }
+      ],
+      "explanation": "ネイキッドポルタフィルターでコメットテール（彗星の尾）が見えると、チャネリングで抽出が偏っている証拠です。"
+    },
+    {
+      "id": "brewing-058",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「アロングイーズ」とはどのような種類のコーヒーですか？",
+      "options": [
+        { "id": "a", "text": "エスプレッソに湯を加えて薄めたもの", "isCorrect": true },
+        { "id": "b", "text": "長時間抽出したドリップ", "isCorrect": false },
+        { "id": "c", "text": "冷たいエスプレッソ", "isCorrect": false },
+        { "id": "d", "text": "ミルク入りエスプレッソ", "isCorrect": false }
+      ],
+      "explanation": "アロンジェ（Allongé）はエスプレッソを湯で薄めたフランス式の飲み方です。アメリカーノと似ていますが、より繊細な味わいです。"
+    },
+    {
+      "id": "brewing-059",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「マキネッタ」と「モカポット」の関係は？",
+      "options": [
+        { "id": "a", "text": "同じ器具の別名", "isCorrect": true },
+        { "id": "b", "text": "全く異なる器具", "isCorrect": false },
+        { "id": "c", "text": "マキネッタはモカポットの改良版", "isCorrect": false },
+        { "id": "d", "text": "モカポットはマキネッタより小型", "isCorrect": false }
+      ],
+      "explanation": "マキネッタはイタリア語でモカポットを指します。同じ器具の異なる呼び名です。"
+    },
+    {
+      "id": "brewing-060",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「バリスタ」の語源はどの言語ですか？",
+      "options": [
+        { "id": "a", "text": "イタリア語（バーテンダーの意）", "isCorrect": true },
+        { "id": "b", "text": "フランス語", "isCorrect": false },
+        { "id": "c", "text": "英語", "isCorrect": false },
+        { "id": "d", "text": "スペイン語", "isCorrect": false }
+      ],
+      "explanation": "バリスタはイタリア語で「バーテンダー」を意味し、エスプレッソを淹れる専門家を指すようになりました。"
+    },
+    {
+      "id": "brewing-061",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「ケメックス」の特徴的なデザインは何を兼ねていますか？",
+      "options": [
+        { "id": "a", "text": "ドリッパーとサーバーが一体", "isCorrect": true },
+        { "id": "b", "text": "保温機能", "isCorrect": false },
+        { "id": "c", "text": "計量カップ", "isCorrect": false },
+        { "id": "d", "text": "タイマー", "isCorrect": false }
+      ],
+      "explanation": "ケメックスは砂時計型のデザインで、上部がドリッパー、下部がサーバーを兼ねた一体型の美しいガラス器具です。"
+    },
+    {
+      "id": "brewing-062",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ターキッシュコーヒー」の特徴は何ですか？",
+      "options": [
+        { "id": "a", "text": "極細挽きの粉を煮出し、粉ごと飲む", "isCorrect": true },
+        { "id": "b", "text": "フィルターで濾す", "isCorrect": false },
+        { "id": "c", "text": "冷水で抽出する", "isCorrect": false },
+        { "id": "d", "text": "ミルクを加える", "isCorrect": false }
+      ],
+      "explanation": "トルココーヒーは極細挽きの粉を専用の鍋（イブリック/ジェズべ）で煮出し、カップに粉ごと注いで上澄みを飲みます。"
+    },
+    {
+      "id": "brewing-063",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「ベトナムコーヒー」に使われる「フィン」とは何ですか？",
+      "options": [
+        { "id": "a", "text": "カップの上に乗せる金属フィルター", "isCorrect": true },
+        { "id": "b", "text": "特別な種類の豆", "isCorrect": false },
+        { "id": "c", "text": "コンデンスミルク", "isCorrect": false },
+        { "id": "d", "text": "抽出時間の単位", "isCorrect": false }
+      ],
+      "explanation": "フィンはカップの上に直接乗せて使うベトナム式の金属フィルターです。ゆっくり抽出し、練乳と混ぜて飲みます。"
+    },
+    {
+      "id": "brewing-064",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「スウェットスポット」を探す際に調整する主な変数は？",
+      "options": [
+        { "id": "a", "text": "挽き目、粉量、抽出時間、温度", "isCorrect": true },
+        { "id": "b", "text": "カップの素材のみ", "isCorrect": false },
+        { "id": "c", "text": "豆の産地のみ", "isCorrect": false },
+        { "id": "d", "text": "フィルターの色のみ", "isCorrect": false }
+      ],
+      "explanation": "スウェットスポット（最適な抽出条件）を見つけるには、挽き目・粉量・抽出時間・温度などの変数を調整します。"
+    },
+    {
+      "id": "brewing-065",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「バスケット」のVST、IMS、プルマンの違いで重要なのは？",
+      "options": [
+        { "id": "a", "text": "穴の数、サイズ、精度が異なる", "isCorrect": true },
+        { "id": "b", "text": "色が異なるだけ", "isCorrect": false },
+        { "id": "c", "text": "サイズが異なるだけ", "isCorrect": false },
+        { "id": "d", "text": "違いはない", "isCorrect": false }
+      ],
+      "explanation": "各メーカーのバスケットは穴の数、サイズ、配置精度が異なり、抽出の均一性や流速に影響を与えます。"
+    },
+    {
+      "id": "brewing-066",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「9バール」がエスプレッソの標準圧力とされる理由は？",
+      "options": [
+        { "id": "a", "text": "歴史的にファエマE61で採用され広まった", "isCorrect": true },
+        { "id": "b", "text": "科学的に最適と証明された", "isCorrect": false },
+        { "id": "c", "text": "法律で定められている", "isCorrect": false },
+        { "id": "d", "text": "9が縁起の良い数字だから", "isCorrect": false }
+      ],
+      "explanation": "1961年にファエマE61が9気圧を採用し、その後多くのマシンが追随したことで業界標準になりました。"
+    },
+    {
+      "id": "brewing-067",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「ダブルリストレット」とはどのような抽出ですか？",
+      "options": [
+        { "id": "a", "text": "ダブルの粉量でシングルショット分の液量を抽出", "isCorrect": true },
+        { "id": "b", "text": "2回連続で抽出する", "isCorrect": false },
+        { "id": "c", "text": "2倍の湯量で抽出", "isCorrect": false },
+        { "id": "d", "text": "2種類の豆を混ぜる", "isCorrect": false }
+      ],
+      "explanation": "リストレットは通常より少ない液量で濃く抽出します。ダブルリストレットはダブルの粉量から約30-40mlを抽出します。"
+    },
+    {
+      "id": "brewing-068",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「ユニモーダル」と「バイモーダル」の粒度分布の違いは？",
+      "options": [
+        { "id": "a", "text": "粒度のピークが1つか2つか", "isCorrect": true },
+        { "id": "b", "text": "粉の色の違い", "isCorrect": false },
+        { "id": "c", "text": "抽出方法の違い", "isCorrect": false },
+        { "id": "d", "text": "豆の品種の違い", "isCorrect": false }
+      ],
+      "explanation": "ユニモーダルは粒度分布のピークが1つ（均一）、バイモーダルは2つのピーク（微粉とメイン）があります。グラインダー特性の指標です。"
+    },
+    {
+      "id": "brewing-069",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "「プアオーバー」とは何を指しますか？",
+      "options": [
+        { "id": "a", "text": "手動でお湯を注ぐドリップ方式", "isCorrect": true },
+        { "id": "b", "text": "機械式のドリップ", "isCorrect": false },
+        { "id": "c", "text": "エスプレッソの一種", "isCorrect": false },
+        { "id": "d", "text": "冷たいコーヒー", "isCorrect": false }
+      ],
+      "explanation": "プアオーバーは「注ぐ」という意味で、手動でゆっくりお湯を注いで抽出するハンドドリップ方式を指します。"
+    },
+    {
+      "id": "brewing-070",
+      "category": "brewing",
+      "difficulty": "beginner",
+      "question": "コーヒーの「苦味」が強すぎる場合の対処法は？",
+      "options": [
+        { "id": "a", "text": "挽き目を粗くするか、抽出時間を短くする", "isCorrect": true },
+        { "id": "b", "text": "挽き目を細かくする", "isCorrect": false },
+        { "id": "c", "text": "湯温を上げる", "isCorrect": false },
+        { "id": "d", "text": "粉の量を増やす", "isCorrect": false }
+      ],
+      "explanation": "苦味が強い場合は過抽出の可能性があります。挽き目を粗くするか、抽出時間を短くして調整します。"
+    },
+    {
+      "id": "brewing-071",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「スチームワンド」の先端が水面下に沈みすぎるとどうなりますか？",
+      "options": [
+        { "id": "a", "text": "空気が入らず、泡立たない", "isCorrect": true },
+        { "id": "b", "text": "より細かい泡ができる", "isCorrect": false },
+        { "id": "c", "text": "温度が上がりすぎる", "isCorrect": false },
+        { "id": "d", "text": "ミルクが飛び散る", "isCorrect": false }
+      ],
+      "explanation": "ワンドが深すぎると空気を取り込めず、ミルクがただ加熱されるだけで泡立ちません。表面近くで空気を入れます。"
+    },
+    {
+      "id": "brewing-072",
+      "category": "brewing",
+      "difficulty": "intermediate",
+      "question": "「サードウェーブコーヒー」で重視されるのは？",
+      "options": [
+        { "id": "a", "text": "産地や生産者へのこだわりと浅煎り", "isCorrect": true },
+        { "id": "b", "text": "大量生産と低価格", "isCorrect": false },
+        { "id": "c", "text": "深煎りとミルクドリンク", "isCorrect": false },
+        { "id": "d", "text": "インスタントコーヒー", "isCorrect": false }
+      ],
+      "explanation": "サードウェーブは産地・品種・精製方法などの透明性を重視し、豆の個性を活かした浅煎りが特徴です。"
+    },
+    {
+      "id": "brewing-073",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「デクリーシングプレッシャープロファイル」とは？",
+      "options": [
+        { "id": "a", "text": "抽出中に圧力を徐々に下げていく方式", "isCorrect": true },
+        { "id": "b", "text": "圧力を一定に保つ方式", "isCorrect": false },
+        { "id": "c", "text": "圧力を上げていく方式", "isCorrect": false },
+        { "id": "d", "text": "圧力を使わない方式", "isCorrect": false }
+      ],
+      "explanation": "デクリーシングプレッシャーは抽出中に圧力を徐々に下げる方式で、レバーマシンに近い抽出特性が得られます。"
+    },
+    {
+      "id": "brewing-074",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「パック」とはエスプレッソ抽出で何を指しますか？",
+      "options": [
+        { "id": "a", "text": "ポルタフィルター内の圧縮されたコーヒー粉", "isCorrect": true },
+        { "id": "b", "text": "抽出後の使用済み粉", "isCorrect": false },
+        { "id": "c", "text": "コーヒー豆の包装", "isCorrect": false },
+        { "id": "d", "text": "クレマの層", "isCorrect": false }
+      ],
+      "explanation": "パック（コーヒーパック）はポルタフィルターのバスケット内でタンピングされた圧縮状態のコーヒー粉のことです。"
+    },
+    {
+      "id": "brewing-075",
+      "category": "brewing",
+      "difficulty": "advanced",
+      "question": "「フロースルーブリューイング」とはどのような概念ですか？",
+      "options": [
+        { "id": "a", "text": "湯を継続的に流しながら抽出する透過式の考え方", "isCorrect": true },
+        { "id": "b", "text": "湯を止めて浸漬させる方式", "isCorrect": false },
+        { "id": "c", "text": "冷水で抽出する方式", "isCorrect": false },
+        { "id": "d", "text": "高圧で抽出する方式", "isCorrect": false }
+      ],
+      "explanation": "フロースルーは湯を絶え間なく流し続けて抽出する透過式の原理を指し、ドリップやエスプレッソが該当します。"
+    }
+  ]
+}

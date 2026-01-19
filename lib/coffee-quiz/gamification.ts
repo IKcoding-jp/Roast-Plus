@@ -15,6 +15,7 @@ import {
   INITIAL_LEVEL_INFO,
   INITIAL_STREAK_INFO,
 } from './types';
+import { getDebugTodayDateString, isDebugMode, getCurrentDate } from './debug';
 
 // ========================================
 // XP計算
@@ -140,6 +141,10 @@ export function addXP(levelInfo: LevelInfo, xpGained: number): {
  * 今日の日付文字列を取得（YYYY-MM-DD）
  */
 export function getTodayDateString(): string {
+  // デバッグモードの場合はデバッグ用の日付を使用
+  if (isDebugMode()) {
+    return getDebugTodayDateString();
+  }
   const now = new Date();
   return now.toISOString().split('T')[0];
 }
@@ -271,8 +276,8 @@ export function checkNewBadges(context: BadgeCheckContext): BadgeType[] {
       context.sessionTimeMs < 120000
   );
 
-  // 時間帯バッジ
-  const hour = new Date().getHours();
+  // 時間帯バッジ（デバッグモード対応）
+  const hour = getCurrentDate().getHours();
   checkBadge('early-bird', hour < 6);
   checkBadge('night-owl', hour >= 0 && hour < 5);
 

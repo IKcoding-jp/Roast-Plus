@@ -14,3 +14,4 @@ export { HelpGuideModal } from './HelpGuideModal';
 export { MasteryDisplay, MasteryCompact, CategoryMasteryDisplay } from './MasteryDisplay';
 export { QuestionListItem } from './QuestionListItem';
 export { CategoryQuestionList } from './CategoryQuestionList';
+export { DebugPanel } from './DebugPanel';

@@ -7,9 +7,11 @@ import { useAuth } from '@/lib/auth';
 import { Loading } from '@/components/Loading';
 import LoginPage from '@/app/login/page';
 import { useQuizData } from '@/hooks/useQuizData';
+import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { LevelDisplay } from '@/components/coffee-quiz/LevelDisplay';
 import { StreakCounter } from '@/components/coffee-quiz/StreakCounter';
 import { ResetConfirmDialog } from '@/components/coffee-quiz/ResetConfirmDialog';
+import { DebugPanel } from '@/components/coffee-quiz/DebugPanel';
 import { CATEGORY_LABELS, DIFFICULTY_LABELS } from '@/lib/coffee-quiz/types';
 import type { QuizCategory, QuizDifficulty } from '@/lib/coffee-quiz/types';
 
@@ -63,6 +65,7 @@ const TrashIcon = () => (
 export default function StatsPage() {
   const { user, loading: authLoading } = useAuth();
   const { progress, loading: quizLoading, questionsStats, difficultyMasteryStats, resetProgress } = useQuizData();
+  const { isEnabled: isDeveloperMode } = useDeveloperMode();
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
@@ -297,6 +300,9 @@ export default function StatsPage() {
                 データをリセット
               </button>
             </motion.div>
+
+            {/* デバッグパネル（開発者モード時のみ表示） */}
+            {isDeveloperMode && <DebugPanel />}
           </>
         )}
       </main>

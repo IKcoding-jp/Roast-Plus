@@ -9,6 +9,7 @@ import {
   type Grade,
 } from 'ts-fsrs';
 import type { QuizCard, QuizRating, QuizQuestion } from './types';
+import { getCurrentDate } from './debug';
 
 // Firestore Timestampの型定義
 interface FirestoreTimestamp {
@@ -103,7 +104,7 @@ export function createQuizCard(questionId: string): QuizCard {
 export function reviewCard(
   card: QuizCard,
   rating: QuizRating,
-  now: Date = new Date()
+  now: Date = getCurrentDate()
 ): { card: QuizCard; recordLog: RecordLog } {
   const fsrs = getFSRS();
   const fsrsRating = convertToFSRSRating(rating);
@@ -180,7 +181,7 @@ export function determineRating(
  * @param cards すべてのカード
  * @param now 現在時刻
  */
-export function getDueCards(cards: QuizCard[], now: Date = new Date()): QuizCard[] {
+export function getDueCards(cards: QuizCard[], now: Date = getCurrentDate()): QuizCard[] {
   return cards.filter((card) => {
     if (!card.due) return true; // 未学習のカードも含める
     const dueDate = toDate(card.due as unknown as Date | FirestoreTimestamp | string);
@@ -264,7 +265,7 @@ export function getNextReviewDate(card: QuizCard): Date | null {
 export function getCardStateLabel(card: QuizCard): string {
   if (!card.due) return '未学習';
 
-  const now = new Date();
+  const now = getCurrentDate();
   const due = toDate(card.due as unknown as Date | FirestoreTimestamp | string);
 
   if (!due) return '未学習';

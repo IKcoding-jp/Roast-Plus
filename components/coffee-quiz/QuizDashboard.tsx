@@ -7,6 +7,7 @@ import { DailyGoalProgress } from './DailyGoalProgress';
 import { CategorySelector } from './CategorySelector';
 import { LevelDisplay } from './LevelDisplay';
 import type { QuizProgress, QuizCategory, QuizDifficulty } from '@/lib/coffee-quiz/types';
+import { getDebugTodayDateString, isDebugMode } from '@/lib/coffee-quiz/debug';
 
 // 問題の統計情報の型
 interface QuestionsStats {
@@ -118,7 +119,7 @@ export function QuizDashboard({
         <DailyGoalProgress
           goal={
             progress.dailyGoals.find(
-              (g) => g.date === new Date().toISOString().split('T')[0]
+              (g) => g.date === (isDebugMode() ? getDebugTodayDateString() : new Date().toISOString().split('T')[0])
             ) || null
           }
           targetQuestions={progress.settings.dailyGoal}

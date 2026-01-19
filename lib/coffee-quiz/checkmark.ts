@@ -1,6 +1,6 @@
 // チェックマークロジック
-// 正解時: blue +1 (max 3), red -1 (min 0)
-// 間違い時: blue > 0 なら blue -1, blue == 0 なら red +1 (max 3)
+// 正解時: blue +1 (max 3)
+// 間違い時: blue > 0 なら blue -1
 
 import type { QuestionCheckmark } from './types';
 
@@ -10,7 +10,6 @@ const MIN_CHECKS = 0;
 /**
  * 正解時のチェックマーク更新
  * - blue +1 (max 3)
- * - red -1 (min 0)
  */
 export function updateCheckmarkOnCorrect(
   checkmark: QuestionCheckmark
@@ -18,7 +17,6 @@ export function updateCheckmarkOnCorrect(
   return {
     ...checkmark,
     blueCheck: Math.min(checkmark.blueCheck + 1, MAX_CHECKS),
-    redCheck: Math.max(checkmark.redCheck - 1, MIN_CHECKS),
     updatedAt: new Date().toISOString(),
   };
 }
@@ -26,21 +24,13 @@ export function updateCheckmarkOnCorrect(
 /**
  * 間違い時のチェックマーク更新
  * - blue > 0 なら blue -1
- * - blue == 0 なら red +1 (max 3)
  */
 export function updateCheckmarkOnIncorrect(
   checkmark: QuestionCheckmark
 ): QuestionCheckmark {
-  if (checkmark.blueCheck > 0) {
-    return {
-      ...checkmark,
-      blueCheck: checkmark.blueCheck - 1,
-      updatedAt: new Date().toISOString(),
-    };
-  }
   return {
     ...checkmark,
-    redCheck: Math.min(checkmark.redCheck + 1, MAX_CHECKS),
+    blueCheck: Math.max(checkmark.blueCheck - 1, MIN_CHECKS),
     updatedAt: new Date().toISOString(),
   };
 }
@@ -64,7 +54,6 @@ export function createCheckmark(questionId: string): QuestionCheckmark {
   return {
     questionId,
     blueCheck: 0,
-    redCheck: 0,
     updatedAt: new Date().toISOString(),
   };
 }
@@ -103,24 +92,4 @@ export function updateCheckmarks(
   const newCheckmark = createCheckmark(questionId);
   const updatedCheckmark = updateCheckmark(newCheckmark, isCorrect);
   return [...checkmarks, updatedCheckmark];
-}
-
-/**
- * リベンジ対象の問題を取得
- * redCheck >= 1 の問題をredCheckの多い順に返す
- */
-export function getRevengeQuestionIds(
-  checkmarks: QuestionCheckmark[]
-): string[] {
-  return checkmarks
-    .filter((c) => c.redCheck >= 1)
-    .sort((a, b) => b.redCheck - a.redCheck)
-    .map((c) => c.questionId);
-}
-
-/**
- * リベンジ対象の問題数を取得
- */
-export function getRevengeCount(checkmarks: QuestionCheckmark[]): number {
-  return checkmarks.filter((c) => c.redCheck >= 1).length;
 }

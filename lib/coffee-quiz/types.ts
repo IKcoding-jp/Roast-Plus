@@ -153,7 +153,6 @@ export interface QuizSettings {
 export interface QuestionCheckmark {
   questionId: string;
   blueCheck: number;  // 0-3: 正解履歴
-  redCheck: number;   // 0-3: 間違い履歴
   updatedAt: string;  // ISO 8601
 }
 
@@ -184,7 +183,7 @@ export interface QuizSession {
   startedAt: string; // ISO 8601
   completedAt?: string; // ISO 8601
   questions: QuizSessionQuestion[];
-  mode: 'daily' | 'review' | 'category' | 'random' | 'single' | 'revenge' | 'shuffle';
+  mode: 'daily' | 'review' | 'category' | 'random' | 'single' | 'shuffle';
   category?: QuizCategory;
 }
 

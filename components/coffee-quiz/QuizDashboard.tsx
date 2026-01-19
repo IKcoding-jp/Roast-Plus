@@ -18,7 +18,7 @@ interface QuestionsStats {
 interface QuizDashboardProps {
   progress: QuizProgress | null;
   dueCardsCount: number;
-  revengeCount: number;  // リベンジ対象の問題数
+
   loading: boolean;
   questionsStats: QuestionsStats | null;
 }
@@ -67,7 +67,6 @@ const FlameIcon = () => (
 export function QuizDashboard({
   progress,
   dueCardsCount,
-  revengeCount,
   loading,
   questionsStats,
 }: QuizDashboardProps) {
@@ -140,18 +139,6 @@ export function QuizDashboard({
           今日のクイズを始める
         </Link>
 
-        {/* リベンジモード */}
-        {revengeCount > 0 && (
-          <Link
-            href="/coffee-trivia/revenge"
-            className="group flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 transition-all"
-          >
-            <span className="animate-pulse">
-              <FlameIcon />
-            </span>
-            リベンジモード ({revengeCount}問)
-          </Link>
-        )}
 
         {dueCardsCount > 0 ? (
           <Link

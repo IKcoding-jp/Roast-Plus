@@ -74,7 +74,6 @@ function QuizPageContent() {
   const determineMode = () => {
     if (modeParam === 'single') return 'single';
     if (modeParam === 'shuffle') return 'shuffle';
-    if (modeParam === 'revenge') return 'revenge';
     if (categoryParam) return 'category';
     return modeParam as 'daily' | 'review' | 'random';
   };
@@ -232,9 +231,7 @@ function QuizPageContent() {
             <span className="text-sm font-medium">戻る</span>
           </Link>
           <h1 className="font-semibold text-[#211714]">
-            {modeParam === 'revenge'
-              ? 'リベンジモード'
-              : modeParam === 'single'
+            {modeParam === 'single'
               ? '問題'
               : categoryParam
               ? CATEGORY_LABELS[categoryParam]

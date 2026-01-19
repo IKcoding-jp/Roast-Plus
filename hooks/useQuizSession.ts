@@ -14,7 +14,7 @@ import {
 } from '@/lib/coffee-quiz/questions';
 import { useQuizData } from './useQuizData';
 
-export type QuizMode = 'daily' | 'review' | 'category' | 'random' | 'single' | 'revenge' | 'shuffle';
+export type QuizMode = 'daily' | 'review' | 'category' | 'random' | 'single' | 'shuffle';
 
 interface UseQuizSessionOptions {
   mode?: QuizMode;
@@ -49,7 +49,7 @@ interface AnswerFeedback {
 
 export function useQuizSession(options: UseQuizSessionOptions = {}) {
   const { mode = 'daily', category, count = 10, questionIds } = options;
-  const { recordAnswer, progress, getDueCardsForReview, getRevengeQuestions } = useQuizData();
+  const { recordAnswer, progress, getDueCardsForReview } = useQuizData();
 
   const [state, setState] = useState<QuizSessionState>({
     session: null,
@@ -111,10 +111,7 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
             loadedQuestions = await getQuestionsByIds(questionIds);
           }
           break;
-        case 'revenge':
-          // リベンジモード: 赤チェックのある問題を出題
-          loadedQuestions = await getRevengeQuestions();
-          break;
+        
       }
 
       // 選択肢をシャッフル
@@ -153,7 +150,7 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
       console.error('Failed to start quiz session:', error);
       setState((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [mode, category, count, questionIds, progress?.settings.enabledCategories, getDueCardsForReview, getRevengeQuestions]);
+  }, [mode, category, count, questionIds, progress?.settings.enabledCategories, getDueCardsForReview]);
 
   // 回答を送信
   const submitAnswer = useCallback(

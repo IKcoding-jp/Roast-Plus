@@ -39,8 +39,6 @@ import {
 import { getQuestionById, getQuestionsStats, getQuestionsByIds } from '@/lib/coffee-quiz/questions';
 import {
   updateCheckmarks,
-  getRevengeQuestionIds as getRevengeIds,
-  getRevengeCount,
 } from '@/lib/coffee-quiz/checkmark';
 import type { QuizDifficulty } from '@/lib/coffee-quiz/types';
 
@@ -283,19 +281,6 @@ export function useQuizData() {
     [progress, saveProgress]
   );
 
-  // リベンジ対象の問題を取得
-  const getRevengeQuestions = useCallback(async (): Promise<QuizQuestion[]> => {
-    if (!progress) return [];
-    const checkmarks = progress.checkmarks ?? [];
-    const questionIds = getRevengeIds(checkmarks);
-    if (questionIds.length === 0) return [];
-    return getQuestionsByIds(questionIds);
-  }, [progress]);
-
-  // リベンジ対象の問題数
-  const revengeCount = progress
-    ? getRevengeCount(progress.checkmarks ?? [])
-    : 0;
 
   // 今日のゴール
   const todayGoal = progress ? getTodayGoal(progress.dailyGoals) : null;
@@ -310,8 +295,7 @@ export function useQuizData() {
     todayGoal,
     isAuthenticated: !!user,
     questionsStats,
-    getRevengeQuestions,
-    revengeCount,
+
   };
 }
 

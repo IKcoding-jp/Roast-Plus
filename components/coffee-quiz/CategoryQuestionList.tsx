@@ -48,7 +48,7 @@ interface CategoryQuestionListProps {
   checkmarks: QuestionCheckmark[];
 }
 
-type SortOption = 'default' | 'difficulty' | 'redCheck';
+type SortOption = 'default' | 'difficulty';
 
 /**
  * カテゴリ別問題一覧コンテナ
@@ -80,13 +80,7 @@ export function CategoryQuestionList({
         const diffOrder = { beginner: 0, intermediate: 1, advanced: 2 };
         sorted.sort((a, b) => diffOrder[a.difficulty] - diffOrder[b.difficulty]);
         break;
-      case 'redCheck':
-        sorted.sort((a, b) => {
-          const aRed = checkmarkMap.get(a.id)?.redCheck ?? 0;
-          const bRed = checkmarkMap.get(b.id)?.redCheck ?? 0;
-          return bRed - aRed;
-        });
-        break;
+
       default:
         // デフォルト順序
         break;
@@ -174,7 +168,7 @@ export function CategoryQuestionList({
           {[
             { value: 'default', label: '順番' },
             { value: 'difficulty', label: '難易度' },
-            { value: 'redCheck', label: '苦手順' },
+
           ].map((option) => (
             <button
               key={option.value}

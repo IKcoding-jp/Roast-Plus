@@ -107,7 +107,6 @@ export function QuestionListItem({
           <div className="mt-2">
             <CheckmarkCompact
               blueCheck={checkmark?.blueCheck ?? 0}
-              redCheck={checkmark?.redCheck ?? 0}
             />
           </div>
         </div>

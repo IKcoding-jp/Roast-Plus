@@ -295,21 +295,32 @@ function QuizPageContent() {
 
               {/* 次へボタン */}
               {showFeedback && (
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  onClick={handleNext}
-                  className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
-                >
-                  {currentIndex + 1 >= totalQuestions ? (
-                    '結果を見る'
-                  ) : (
-                    <>
-                      次の問題へ
-                      <ArrowRightIcon />
-                    </>
-                  )}
-                </motion.button>
+                isSingleMode ? (
+                  // Singleモード: 直接一覧に戻るボタン
+                  <Link
+                    href={returnUrl}
+                    className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                  >
+                    <ArrowLeftIcon />
+                    一覧に戻る
+                  </Link>
+                ) : (
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    onClick={handleNext}
+                    className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                  >
+                    {currentIndex + 1 >= totalQuestions ? (
+                      '結果を見る'
+                    ) : (
+                      <>
+                        次の問題へ
+                        <ArrowRightIcon />
+                      </>
+                    )}
+                  </motion.button>
+                )
               )}
             </>
           ) : (

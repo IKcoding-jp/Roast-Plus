@@ -285,6 +285,16 @@ export function useQuizData() {
   // 今日のゴール
   const todayGoal = progress ? getTodayGoal(progress.dailyGoals) : null;
 
+  // 進捗をリセット
+  const resetProgress = useCallback(async () => {
+    if (!user) return;
+
+    const initialProgress = createInitialProgress(user.uid);
+    const docRef = doc(db, QUIZ_PROGRESS_COLLECTION, user.uid);
+    await setDoc(docRef, initialProgress);
+    setProgress(initialProgress);
+  }, [user]);
+
   return {
     progress,
     loading,
@@ -295,7 +305,7 @@ export function useQuizData() {
     todayGoal,
     isAuthenticated: !!user,
     questionsStats,
-
+    resetProgress,
   };
 }
 

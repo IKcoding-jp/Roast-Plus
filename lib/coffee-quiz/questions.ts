@@ -76,12 +76,15 @@ export async function getQuestionById(id: string): Promise<QuizQuestion | undefi
 }
 
 /**
- * 複数のIDで問題を取得
+ * 複数のIDで問題を取得（IDの順番を維持）
  */
 export async function getQuestionsByIds(ids: string[]): Promise<QuizQuestion[]> {
   const allQuestions = await loadAllQuestions();
-  const idSet = new Set(ids);
-  return allQuestions.filter((q) => idSet.has(q.id));
+  const questionMap = new Map(allQuestions.map(q => [q.id, q]));
+  // IDの順番を維持して返す
+  return ids
+    .map(id => questionMap.get(id))
+    .filter((q): q is QuizQuestion => q !== undefined);
 }
 
 /**

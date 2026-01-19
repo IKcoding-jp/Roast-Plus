@@ -107,7 +107,7 @@ export function CategoryQuestionList({
   const handleAllQuestions = () => {
     const ids = questions.map((q) => q.id).join(',');
     const returnUrl = encodeURIComponent(`/coffee-trivia/category/${category}`);
-    router.push(`/coffee-trivia/quiz?mode=category&questionIds=${ids}&returnUrl=${returnUrl}`);
+    router.push(`/coffee-trivia/quiz?mode=category&category=${category}&questionIds=${ids}&returnUrl=${returnUrl}`);
   };
 
   return (

@@ -90,7 +90,10 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
           );
           break;
         case 'category':
-          if (category) {
+          // questionIdsが指定されている場合はそちらを優先
+          if (questionIds && questionIds.length > 0) {
+            loadedQuestions = await getQuestionsByIds(questionIds);
+          } else if (category) {
             const categoryQuestions = await getQuestionsByCategory(category);
             loadedQuestions = categoryQuestions.slice(0, count);
           }

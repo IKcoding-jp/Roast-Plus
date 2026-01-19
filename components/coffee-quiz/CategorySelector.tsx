@@ -6,7 +6,7 @@ import type { QuizCategory } from '@/lib/coffee-quiz/types';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 
 interface CategorySelectorProps {
-  stats?: Record<QuizCategory, { total: number; averageMastery: number }>;
+  stats?: Record<QuizCategory, { total: number; masteredCount: number }>;
 }
 
 // カテゴリアイコン
@@ -92,7 +92,6 @@ export function CategorySelector({
         const categoryStats = stats?.[category];
         const config = CATEGORY_CONFIG[category];
         const Icon = config.icon;
-        const masteryPercent = categoryStats?.averageMastery ?? 0;
 
         return (
           <motion.button
@@ -117,21 +116,11 @@ export function CategorySelector({
                   {CATEGORY_LABELS[category]}
                 </span>
 
-                {/* 統計とプログレス */}
+                {/* 定着済み問題数 / 全問題数 */}
                 {categoryStats && (
-                  <div className="mt-1.5">
-                    <div className="h-1 rounded-full overflow-hidden bg-[#211714]/10">
-                      <motion.div
-                        className="h-full rounded-full bg-[#EF8A00]"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${masteryPercent}%` }}
-                        transition={{ duration: 0.4, delay: index * 0.05 }}
-                      />
-                    </div>
-                    <span className="text-[10px] block mt-1 text-[#3A2F2B]/60">
-                      定着率 {masteryPercent}%（{categoryStats.total}問）
-                    </span>
-                  </div>
+                  <span className="text-[11px] text-[#3A2F2B]/60 mt-1 block">
+                    {categoryStats.masteredCount}/{categoryStats.total}問
+                  </span>
                 )}
               </div>
             </div>

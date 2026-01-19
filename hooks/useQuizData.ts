@@ -285,14 +285,14 @@ export function useQuizData() {
   // 今日のゴール
   const todayGoal = progress ? getTodayGoal(progress.dailyGoals) : null;
 
-  // カテゴリ別平均定着率を計算
-  const categoryMasteryStats: Record<QuizCategory, number> = (() => {
+  // カテゴリ別平均定着率と定着済み問題数を計算
+  const categoryMasteryStats: Record<QuizCategory, { averageMastery: number; masteredCount: number }> = (() => {
     const categories: QuizCategory[] = ['basics', 'roasting', 'brewing', 'history'];
-    const result: Record<QuizCategory, number> = {
-      basics: 0,
-      roasting: 0,
-      brewing: 0,
-      history: 0,
+    const result: Record<QuizCategory, { averageMastery: number; masteredCount: number }> = {
+      basics: { averageMastery: 0, masteredCount: 0 },
+      roasting: { averageMastery: 0, masteredCount: 0 },
+      brewing: { averageMastery: 0, masteredCount: 0 },
+      history: { averageMastery: 0, masteredCount: 0 },
     };
 
     if (!progress || allQuestions.length === 0) return result;
@@ -309,7 +309,7 @@ export function useQuizData() {
       );
 
       if (categoryQuestionIds.length === 0) {
-        result[category] = 0;
+        result[category] = { averageMastery: 0, masteredCount: 0 };
         continue;
       }
 
@@ -318,7 +318,15 @@ export function useQuizData() {
         (sum, card) => sum + getCardMastery(card),
         0
       );
-      result[category] = Math.round(totalMastery / categoryQuestionIds.length);
+      // 定着済み問題数を計算（67%以上で定着済み）
+      const masteredCount = categoryCards.filter(
+        (card) => getCardMastery(card) >= 67
+      ).length;
+
+      result[category] = {
+        averageMastery: Math.round(totalMastery / categoryQuestionIds.length),
+        masteredCount,
+      };
     }
 
     return result;

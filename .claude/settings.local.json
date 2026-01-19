@@ -34,7 +34,12 @@
       "mcp__serena__list_memories",
       "mcp__serena__initial_instructions",
       "mcp__serena__think_about_collected_information",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "mcp__chrome-devtools__wait_for",
+      "mcp__serena__replace_content",
+      "mcp__serena__think_about_whether_you_are_done",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\n今日の目標達成UIの配色をオレンジ系に統一\n\nグリーン（emerald）系からアプリのメインカラーであるオレンジ系に変更し、\nコーヒーアプリ全体の暖かみのある配色と調和させた。\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   },
   "enabledMcpjsonServers": [

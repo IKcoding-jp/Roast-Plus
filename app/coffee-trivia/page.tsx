@@ -1,11 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
 import Link from 'next/link';
-import { QuizDashboard } from '@/components/coffee-quiz/QuizDashboard';
+import { QuizDashboard, HelpGuideModal } from '@/components/coffee-quiz';
 import { useQuizData } from '@/hooks/useQuizData';
 
 // シンプルな戻るアイコン
@@ -27,9 +28,19 @@ const CoffeeIcon = () => (
   </svg>
 );
 
+// ヘルプアイコン
+const HelpCircleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <path d="M12 17h.01" />
+  </svg>
+);
+
 export default function CoffeeTriviaPage() {
   const { user, loading: authLoading } = useAuth();
   const { progress, loading: quizLoading, getDueCardsForReview, questionsStats } = useQuizData();
+  const [showHelpGuide, setShowHelpGuide] = useState(false);
   useAppLifecycle();
 
   if (authLoading) {
@@ -44,21 +55,31 @@ export default function CoffeeTriviaPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FDF8F0]">
-      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center bg-white border-b border-[#211714]/5">
-        <Link
-          href="/"
-          className="p-1.5 -ml-1.5 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
-          title="戻る"
-          aria-label="戻る"
+      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between bg-white border-b border-[#211714]/5">
+        <div className="flex items-center">
+          <Link
+            href="/"
+            className="p-1.5 -ml-1.5 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
+            title="戻る"
+            aria-label="戻る"
+          >
+            <ArrowLeftIcon />
+          </Link>
+          <h1 className="ml-2.5 text-base font-semibold text-[#211714] flex items-center gap-2">
+            <span className="text-[#EF8A00]">
+              <CoffeeIcon />
+            </span>
+            コーヒークイズ
+          </h1>
+        </div>
+        <button
+          onClick={() => setShowHelpGuide(true)}
+          className="p-1.5 -mr-1.5 text-[#3A2F2B]/60 hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
+          title="使い方ガイド"
+          aria-label="使い方ガイド"
         >
-          <ArrowLeftIcon />
-        </Link>
-        <h1 className="ml-2.5 text-base font-semibold text-[#211714] flex items-center gap-2">
-          <span className="text-[#EF8A00]">
-            <CoffeeIcon />
-          </span>
-          コーヒークイズ
-        </h1>
+          <HelpCircleIcon />
+        </button>
       </header>
 
       <main className="flex-1 container mx-auto p-4 lg:p-6 max-w-lg">
@@ -69,6 +90,12 @@ export default function CoffeeTriviaPage() {
           questionsStats={questionsStats}
         />
       </main>
+
+      {/* 使い方ガイドモーダル */}
+      <HelpGuideModal
+        show={showHelpGuide}
+        onClose={() => setShowHelpGuide(false)}
+      />
     </div>
   );
 }

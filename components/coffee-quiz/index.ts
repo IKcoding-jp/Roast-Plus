@@ -10,6 +10,7 @@ export { DailyGoalProgress } from './DailyGoalProgress';
 export { LevelDisplay } from './LevelDisplay';
 export { XPGainAnimation } from './XPGainAnimation';
 export { LevelUpModal } from './LevelUpModal';
+export { HelpGuideModal } from './HelpGuideModal';
 export { CheckmarkDisplay, CheckmarkCompact } from './CheckmarkDisplay';
 export { QuestionListItem } from './QuestionListItem';
 export { CategoryQuestionList } from './CategoryQuestionList';

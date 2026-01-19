@@ -308,17 +308,55 @@ export function useQuizData() {
         categoryQuestionIds.includes(c.questionId)
       );
 
-      if (categoryCards.length === 0) {
+      if (categoryQuestionIds.length === 0) {
         result[category] = 0;
         continue;
       }
 
-      // 平均定着率を計算
+      // 平均定着率を計算（未学習の問題も含めた全問題数で計算）
       const totalMastery = categoryCards.reduce(
         (sum, card) => sum + getCardMastery(card),
         0
       );
-      result[category] = Math.round(totalMastery / categoryCards.length);
+      result[category] = Math.round(totalMastery / categoryQuestionIds.length);
+    }
+
+    return result;
+  })();
+
+  // 難易度別平均定着率を計算
+  const difficultyMasteryStats: Record<QuizDifficulty, number> = (() => {
+    const difficulties: QuizDifficulty[] = ['beginner', 'intermediate', 'advanced'];
+    const result: Record<QuizDifficulty, number> = {
+      beginner: 0,
+      intermediate: 0,
+      advanced: 0,
+    };
+
+    if (!progress || allQuestions.length === 0) return result;
+
+    for (const difficulty of difficulties) {
+      // この難易度の問題IDを取得
+      const difficultyQuestionIds = allQuestions
+        .filter((q) => q.difficulty === difficulty)
+        .map((q) => q.id);
+
+      // この難易度のカードを取得
+      const difficultyCards = progress.cards.filter((c) =>
+        difficultyQuestionIds.includes(c.questionId)
+      );
+
+      if (difficultyQuestionIds.length === 0) {
+        result[difficulty] = 0;
+        continue;
+      }
+
+      // 平均定着率を計算（未学習の問題も含めた全問題数で計算）
+      const totalMastery = difficultyCards.reduce(
+        (sum, card) => sum + getCardMastery(card),
+        0
+      );
+      result[difficulty] = Math.round(totalMastery / difficultyQuestionIds.length);
     }
 
     return result;
@@ -345,6 +383,7 @@ export function useQuizData() {
     isAuthenticated: !!user,
     questionsStats,
     categoryMasteryStats,
+    difficultyMasteryStats,
     resetProgress,
   };
 }

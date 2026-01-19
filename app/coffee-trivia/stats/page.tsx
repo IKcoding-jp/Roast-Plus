@@ -62,7 +62,7 @@ const TrashIcon = () => (
 
 export default function StatsPage() {
   const { user, loading: authLoading } = useAuth();
-  const { progress, loading: quizLoading, questionsStats, resetProgress } = useQuizData();
+  const { progress, loading: quizLoading, questionsStats, difficultyMasteryStats, resetProgress } = useQuizData();
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
@@ -226,35 +226,44 @@ export default function StatsPage() {
 
               <div className="space-y-3">
                 {(['beginner', 'intermediate', 'advanced'] as QuizDifficulty[]).map(
-                  (difficulty) => {
-                    const diffStats = stats?.difficultyStats[difficulty];
-                    const accuracy = diffStats?.accuracy ?? 0;
+                  (difficulty, index) => {
+                    const masteryPercent = difficultyMasteryStats?.[difficulty] ?? 0;
+                    const totalQuestions = questionsStats?.byDifficulty[difficulty] ?? 0;
 
                     return (
                       <div
                         key={difficulty}
-                        className="flex items-center gap-4 bg-[#FDF8F0] rounded-xl p-3 border border-[#211714]/5"
+                        className="bg-[#FDF8F0] rounded-xl p-4 border border-[#211714]/5"
                       >
-                        <span className="font-medium text-[#3A2F2B] w-16 text-sm">
-                          {DIFFICULTY_LABELS[difficulty]}
-                        </span>
-                        <div className="flex-1 h-2 bg-[#211714]/10 rounded-full overflow-hidden">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-[#211714]">
+                            {DIFFICULTY_LABELS[difficulty]}
+                          </span>
+                          <span className={`font-bold ${
+                            difficulty === 'beginner'
+                              ? 'text-emerald-600'
+                              : difficulty === 'intermediate'
+                              ? 'text-[#EF8A00]'
+                              : 'text-rose-600'
+                          }`}>{masteryPercent}%</span>
+                        </div>
+                        <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
                           <motion.div
                             className={`h-full rounded-full ${
                               difficulty === 'beginner'
-                                ? 'bg-emerald-500'
+                                ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
                                 : difficulty === 'intermediate'
-                                ? 'bg-[#EF8A00]'
-                                : 'bg-rose-500'
+                                ? 'bg-gradient-to-r from-[#EF8A00] to-[#D67A00]'
+                                : 'bg-gradient-to-r from-rose-500 to-rose-400'
                             }`}
                             initial={{ width: 0 }}
-                            animate={{ width: `${accuracy}%` }}
-                            transition={{ delay: 0.3, duration: 0.5 }}
+                            animate={{ width: `${masteryPercent}%` }}
+                            transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
                           />
                         </div>
-                        <span className="font-bold text-[#211714] w-12 text-right text-sm">
-                          {accuracy}%
-                        </span>
+                        <div className="text-xs text-[#3A2F2B]/60 mt-2">
+                          定着率（{totalQuestions}問）
+                        </div>
                       </div>
                     );
                   }

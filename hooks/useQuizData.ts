@@ -332,13 +332,13 @@ export function useQuizData() {
     return result;
   })();
 
-  // 難易度別平均定着率を計算
-  const difficultyMasteryStats: Record<QuizDifficulty, number> = (() => {
+  // 難易度別平均定着率と定着済み問題数を計算
+  const difficultyMasteryStats: Record<QuizDifficulty, { averageMastery: number; masteredCount: number }> = (() => {
     const difficulties: QuizDifficulty[] = ['beginner', 'intermediate', 'advanced'];
-    const result: Record<QuizDifficulty, number> = {
-      beginner: 0,
-      intermediate: 0,
-      advanced: 0,
+    const result: Record<QuizDifficulty, { averageMastery: number; masteredCount: number }> = {
+      beginner: { averageMastery: 0, masteredCount: 0 },
+      intermediate: { averageMastery: 0, masteredCount: 0 },
+      advanced: { averageMastery: 0, masteredCount: 0 },
     };
 
     if (!progress || allQuestions.length === 0) return result;
@@ -355,7 +355,7 @@ export function useQuizData() {
       );
 
       if (difficultyQuestionIds.length === 0) {
-        result[difficulty] = 0;
+        result[difficulty] = { averageMastery: 0, masteredCount: 0 };
         continue;
       }
 
@@ -364,7 +364,15 @@ export function useQuizData() {
         (sum, card) => sum + getCardMastery(card),
         0
       );
-      result[difficulty] = Math.round(totalMastery / difficultyQuestionIds.length);
+      // 定着済み問題数を計算（67%以上で定着済み）
+      const masteredCount = difficultyCards.filter(
+        (card) => getCardMastery(card) >= 67
+      ).length;
+
+      result[difficulty] = {
+        averageMastery: Math.round(totalMastery / difficultyQuestionIds.length),
+        masteredCount,
+      };
     }
 
     return result;

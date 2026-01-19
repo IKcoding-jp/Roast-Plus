@@ -230,8 +230,11 @@ export default function StatsPage() {
               <div className="space-y-3">
                 {(['beginner', 'intermediate', 'advanced'] as QuizDifficulty[]).map(
                   (difficulty, index) => {
-                    const masteryPercent = difficultyMasteryStats?.[difficulty] ?? 0;
+                    const diffStats = stats?.difficultyStats[difficulty];
                     const totalQuestions = questionsStats?.byDifficulty[difficulty] ?? 0;
+                    const masteredCount = difficultyMasteryStats?.[difficulty]?.masteredCount ?? 0;
+                    // マスター進捗率を計算
+                    const masteryProgress = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0;
 
                     return (
                       <div
@@ -248,7 +251,7 @@ export default function StatsPage() {
                               : difficulty === 'intermediate'
                               ? 'text-[#EF8A00]'
                               : 'text-rose-600'
-                          }`}>{masteryPercent}%</span>
+                          }`}>{masteryProgress}%</span>
                         </div>
                         <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
                           <motion.div
@@ -260,12 +263,17 @@ export default function StatsPage() {
                                 : 'bg-gradient-to-r from-rose-500 to-rose-400'
                             }`}
                             initial={{ width: 0 }}
-                            animate={{ width: `${masteryPercent}%` }}
+                            animate={{ width: `${masteryProgress}%` }}
                             transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
                           />
                         </div>
-                        <div className="text-xs text-[#3A2F2B]/60 mt-2">
-                          定着率（{totalQuestions}問）
+                        <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
+                          <span>
+                            マスター: {masteredCount}/{totalQuestions}問
+                          </span>
+                          <span>
+                            正解率: {diffStats?.accuracy ?? 0}%（{diffStats?.correct ?? 0}/{diffStats?.total ?? 0}回答）
+                          </span>
                         </div>
                       </div>
                     );

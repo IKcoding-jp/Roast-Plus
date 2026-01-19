@@ -88,7 +88,7 @@ export function CategoryPageContent({ category }: CategoryPageContentProps) {
     );
   }
 
-  const checkmarks = progress?.checkmarks ?? [];
+  const cards = progress?.cards ?? [];
 
   return (
     <div className="min-h-screen bg-[#FDF8F0]">
@@ -119,7 +119,7 @@ export function CategoryPageContent({ category }: CategoryPageContentProps) {
           <CategoryQuestionList
             category={category}
             questions={questions}
-            checkmarks={checkmarks}
+            cards={cards}
           />
         ) : (
           <div className="text-center py-12">

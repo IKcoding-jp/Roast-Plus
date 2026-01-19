@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import type { QuizQuestion, QuestionCheckmark, QuizCategory } from '@/lib/coffee-quiz/types';
+import type { QuizQuestion, QuizCard, QuizCategory } from '@/lib/coffee-quiz/types';
+import { getCardMastery } from '@/lib/coffee-quiz/fsrs';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 import { QuestionListItem } from './QuestionListItem';
 
@@ -45,7 +46,7 @@ const PlayIcon = ({ size = 18 }: { size?: number }) => (
 interface CategoryQuestionListProps {
   category: QuizCategory;
   questions: QuizQuestion[];
-  checkmarks: QuestionCheckmark[];
+  cards: QuizCard[];
 }
 
 type SortOption = 'default' | 'difficulty';
@@ -60,17 +61,19 @@ type SortOption = 'default' | 'difficulty';
 export function CategoryQuestionList({
   category,
   questions,
-  checkmarks,
+  cards,
 }: CategoryQuestionListProps) {
   const router = useRouter();
   const [sortBy, setSortBy] = useState<SortOption>('default');
 
-  // チェックマークをマップに変換
-  const checkmarkMap = useMemo(() => {
-    const map = new Map<string, QuestionCheckmark>();
-    checkmarks.forEach((c) => map.set(c.questionId, c));
+  // カードから定着率マップを作成
+  const masteryMap = useMemo(() => {
+    const map = new Map<string, number>();
+    cards.forEach((card) => {
+      map.set(card.questionId, getCardMastery(card));
+    });
     return map;
-  }, [checkmarks]);
+  }, [cards]);
 
   // ソートされた問題リスト
   const sortedQuestions = useMemo(() => {
@@ -86,7 +89,7 @@ export function CategoryQuestionList({
         break;
     }
     return sorted;
-  }, [questions, sortBy, checkmarkMap]);
+  }, [questions, sortBy]);
 
   // 個別問題を解く
   const handleQuestionClick = (questionId: string) => {
@@ -193,7 +196,7 @@ export function CategoryQuestionList({
           <QuestionListItem
             key={question.id}
             question={question}
-            checkmark={checkmarkMap.get(question.id)}
+            mastery={masteryMap.get(question.id) ?? 0}
             index={index}
             onClick={() => handleQuestionClick(question.id)}
           />

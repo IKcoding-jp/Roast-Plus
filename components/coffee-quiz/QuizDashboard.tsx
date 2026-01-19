@@ -18,9 +18,9 @@ interface QuestionsStats {
 interface QuizDashboardProps {
   progress: QuizProgress | null;
   dueCardsCount: number;
-
   loading: boolean;
   questionsStats: QuestionsStats | null;
+  categoryMasteryStats?: Record<QuizCategory, number>; // カテゴリ別平均定着率
 }
 
 // シンプルなSVGアイコン
@@ -69,6 +69,7 @@ export function QuizDashboard({
   dueCardsCount,
   loading,
   questionsStats,
+  categoryMasteryStats,
 }: QuizDashboardProps) {
   if (loading) {
     return (
@@ -78,24 +79,24 @@ export function QuizDashboard({
     );
   }
 
-  // カテゴリ統計: マスター済み数 / JSONの総問題数
+  // カテゴリ統計: 総問題数と平均定着率
   const categoryStats = questionsStats
     ? {
         basics: {
           total: questionsStats.byCategory.basics,
-          mastered: progress?.stats.categoryStats.basics.masteredCount ?? 0,
+          averageMastery: categoryMasteryStats?.basics ?? 0,
         },
         roasting: {
           total: questionsStats.byCategory.roasting,
-          mastered: progress?.stats.categoryStats.roasting.masteredCount ?? 0,
+          averageMastery: categoryMasteryStats?.roasting ?? 0,
         },
         brewing: {
           total: questionsStats.byCategory.brewing,
-          mastered: progress?.stats.categoryStats.brewing.masteredCount ?? 0,
+          averageMastery: categoryMasteryStats?.brewing ?? 0,
         },
         history: {
           total: questionsStats.byCategory.history,
-          mastered: progress?.stats.categoryStats.history.masteredCount ?? 0,
+          averageMastery: categoryMasteryStats?.history ?? 0,
         },
       }
     : undefined;

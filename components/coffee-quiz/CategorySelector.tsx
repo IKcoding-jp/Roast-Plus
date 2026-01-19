@@ -6,7 +6,7 @@ import type { QuizCategory } from '@/lib/coffee-quiz/types';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 
 interface CategorySelectorProps {
-  stats?: Record<QuizCategory, { total: number; mastered: number }>;
+  stats?: Record<QuizCategory, { total: number; averageMastery: number }>;
 }
 
 // カテゴリアイコン
@@ -92,9 +92,7 @@ export function CategorySelector({
         const categoryStats = stats?.[category];
         const config = CATEGORY_CONFIG[category];
         const Icon = config.icon;
-        const masteryPercent = categoryStats && categoryStats.total > 0
-          ? Math.round((categoryStats.mastered / categoryStats.total) * 100)
-          : 0;
+        const masteryPercent = categoryStats?.averageMastery ?? 0;
 
         return (
           <motion.button
@@ -131,7 +129,7 @@ export function CategorySelector({
                       />
                     </div>
                     <span className="text-[10px] block mt-1 text-[#3A2F2B]/60">
-                      {categoryStats.mastered}/{categoryStats.total}問
+                      定着率 {masteryPercent}%（{categoryStats.total}問）
                     </span>
                   </div>
                 )}

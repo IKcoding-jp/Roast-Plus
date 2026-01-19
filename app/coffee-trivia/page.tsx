@@ -39,7 +39,7 @@ const HelpCircleIcon = () => (
 
 export default function CoffeeTriviaPage() {
   const { user, loading: authLoading } = useAuth();
-  const { progress, loading: quizLoading, getDueCardsForReview, questionsStats } = useQuizData();
+  const { progress, loading: quizLoading, getDueCardsForReview, questionsStats, categoryMasteryStats } = useQuizData();
   const [showHelpGuide, setShowHelpGuide] = useState(false);
   useAppLifecycle();
 
@@ -88,6 +88,7 @@ export default function CoffeeTriviaPage() {
           dueCardsCount={dueCardsCount}
           loading={quizLoading}
           questionsStats={questionsStats}
+          categoryMasteryStats={categoryMasteryStats}
         />
       </main>
 

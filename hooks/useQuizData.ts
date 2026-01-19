@@ -25,6 +25,7 @@ import {
   getDueCards,
   sortCardsByPriority,
   isCardMastered,
+  getCardMastery,
 } from '@/lib/coffee-quiz/fsrs';
 import {
   calculateXP,
@@ -36,10 +37,7 @@ import {
   earnBadges,
   getTodayGoal,
 } from '@/lib/coffee-quiz/gamification';
-import { getQuestionById, getQuestionsStats, getQuestionsByIds } from '@/lib/coffee-quiz/questions';
-import {
-  updateCheckmarks,
-} from '@/lib/coffee-quiz/checkmark';
+import { getQuestionById, getQuestionsStats, getQuestionsByIds, loadAllQuestions } from '@/lib/coffee-quiz/questions';
 import type { QuizDifficulty } from '@/lib/coffee-quiz/types';
 
 const QUIZ_PROGRESS_COLLECTION = 'quiz_progress';
@@ -67,12 +65,19 @@ export function useQuizData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [questionsStats, setQuestionsStats] = useState<QuestionsStats | null>(null);
+  const [allQuestions, setAllQuestions] = useState<QuizQuestion[]>([]);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingSaveRef = useRef<QuizProgress | null>(null);
 
-  // 問題の統計情報を読み込み
+  // 問題の統計情報と全問題を読み込み
   useEffect(() => {
-    getQuestionsStats().then(setQuestionsStats).catch(console.error);
+    Promise.all([
+      getQuestionsStats(),
+      loadAllQuestions(),
+    ]).then(([stats, questions]) => {
+      setQuestionsStats(stats);
+      setAllQuestions(questions);
+    }).catch(console.error);
   }, []);
 
   // Firestoreからデータを読み込み
@@ -223,15 +228,10 @@ export function useQuizData() {
       const newCards = progress.cards.filter((c) => c.questionId !== questionId);
       newCards.push(updatedCard);
 
-      // チェックマークを更新（既存ユーザーはcheckmarksがない場合があるため空配列をデフォルトに）
-      const currentCheckmarks = progress.checkmarks ?? [];
-      const newCheckmarks = updateCheckmarks(currentCheckmarks, questionId, isCorrect);
-
       // 新しいProgressを作成
       const newProgress: QuizProgress = {
         ...progress,
         cards: newCards,
-        checkmarks: newCheckmarks,
         level: newLevelInfo,
         streak: newStreak,
         stats: newStats,
@@ -285,6 +285,45 @@ export function useQuizData() {
   // 今日のゴール
   const todayGoal = progress ? getTodayGoal(progress.dailyGoals) : null;
 
+  // カテゴリ別平均定着率を計算
+  const categoryMasteryStats: Record<QuizCategory, number> = (() => {
+    const categories: QuizCategory[] = ['basics', 'roasting', 'brewing', 'history'];
+    const result: Record<QuizCategory, number> = {
+      basics: 0,
+      roasting: 0,
+      brewing: 0,
+      history: 0,
+    };
+
+    if (!progress || allQuestions.length === 0) return result;
+
+    for (const category of categories) {
+      // このカテゴリの問題IDを取得
+      const categoryQuestionIds = allQuestions
+        .filter((q) => q.category === category)
+        .map((q) => q.id);
+
+      // このカテゴリのカードを取得
+      const categoryCards = progress.cards.filter((c) =>
+        categoryQuestionIds.includes(c.questionId)
+      );
+
+      if (categoryCards.length === 0) {
+        result[category] = 0;
+        continue;
+      }
+
+      // 平均定着率を計算
+      const totalMastery = categoryCards.reduce(
+        (sum, card) => sum + getCardMastery(card),
+        0
+      );
+      result[category] = Math.round(totalMastery / categoryCards.length);
+    }
+
+    return result;
+  })();
+
   // 進捗をリセット
   const resetProgress = useCallback(async () => {
     if (!user) return;
@@ -305,6 +344,7 @@ export function useQuizData() {
     todayGoal,
     isAuthenticated: !!user,
     questionsStats,
+    categoryMasteryStats,
     resetProgress,
   };
 }

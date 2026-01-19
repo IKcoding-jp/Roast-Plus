@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { QuizQuestion, QuestionCheckmark } from '@/lib/coffee-quiz/types';
+import type { QuizQuestion } from '@/lib/coffee-quiz/types';
 import { DIFFICULTY_LABELS } from '@/lib/coffee-quiz/types';
-import { CheckmarkCompact } from './CheckmarkDisplay';
+import { MasteryCompact } from './MasteryDisplay';
 
 // インラインSVGアイコン
 const ChevronRightIcon = ({ size = 20, className }: { size?: number; className?: string }) => (
@@ -24,7 +24,7 @@ const ChevronRightIcon = ({ size = 20, className }: { size?: number; className?:
 
 interface QuestionListItemProps {
   question: QuizQuestion;
-  checkmark?: QuestionCheckmark | null;
+  mastery?: number; // 0-100の定着率
   index: number;
   onClick: () => void;
 }
@@ -37,7 +37,7 @@ interface QuestionListItemProps {
  */
 export function QuestionListItem({
   question,
-  checkmark,
+  mastery = 0,
   index,
   onClick,
 }: QuestionListItemProps) {
@@ -83,7 +83,7 @@ export function QuestionListItem({
     >
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
-          {/* 問題ID & 難易度 & チェックマーク */}
+          {/* 問題ID & 難易度 & 定着率 */}
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs text-[#3A2F2B]/50 font-mono">
               {question.id}
@@ -97,10 +97,7 @@ export function QuestionListItem({
             >
               {DIFFICULTY_LABELS[question.difficulty]}
             </span>
-            <CheckmarkCompact
-              blueCheck={checkmark?.blueCheck ?? 0}
-              redCheck={checkmark?.redCheck ?? 0}
-            />
+            <MasteryCompact mastery={mastery} />
           </div>
 
           {/* 問題文（プレビュー） */}

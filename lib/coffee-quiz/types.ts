@@ -164,7 +164,7 @@ export interface QuestionCheckmark {
 export interface QuizProgress {
   userId: string;
   cards: QuizCard[];
-  checkmarks: QuestionCheckmark[];  // 正解/間違いチェックマーク
+  checkmarks?: QuestionCheckmark[];  // 正解/間違いチェックマーク（廃止予定）
   streak: StreakInfo;
   level: LevelInfo;
   earnedBadges: EarnedBadge[];

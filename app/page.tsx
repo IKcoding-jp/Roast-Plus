@@ -78,6 +78,7 @@ const ACTIONS = [
     description: '楽しく学ぶコーヒー知識',
     href: '/coffee-trivia',
     icon: IoSparkles,
+    badge: 'NEW',
   },
   {
     key: 'dev-stories',
@@ -357,7 +358,7 @@ export default function HomePage(_props: HomePageProps = {}) {
                 {/* バッジ表示 */}
                 {badge && (
                   <div className="absolute -top-1 -right-1 z-20 animate-pulse-scale sm:-top-2 sm:-right-2">
-                    <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] whitespace-nowrap font-bold text-white shadow-lg completed-label-gradient ring-2 ring-white/20 sm:px-3 sm:py-1">
+                    <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] whitespace-nowrap font-bold text-white shadow-lg ${badge === 'NEW' ? 'new-label-gradient' : 'completed-label-gradient'} ring-2 ring-white/20 sm:px-3 sm:py-1`}>
                       <BsStars className="text-[10px]" />
                       {badge}
                     </span>

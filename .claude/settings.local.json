@@ -49,7 +49,8 @@
       "mcp__chrome-devtools__fill",
       "mcp__serena__find_referencing_symbols",
       "Bash(git commit -m \"$\\(cat <<''EOF''\n定着率表示をボックス形式に変更\n\n- パーセンテージ表示を3つのボックス形式に変更（赤1つ/黄2つ/緑3つ）\n- カテゴリ選択画面は「X/Y問」形式で定着済み問題数を表示\n- HelpGuideModalの説明を「定着ボックスの見方」に更新\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "mcp__chrome-devtools__press_key"
+      "mcp__chrome-devtools__press_key",
+      "mcp__serena__insert_after_symbol"
     ]
   },
   "enabledMcpjsonServers": [

@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import type { QuizQuestion } from '@/lib/coffee-quiz/types';
 import { DIFFICULTY_LABELS } from '@/lib/coffee-quiz/types';
-import { MasteryCompact } from './MasteryDisplay';
+import { MasteryLabel } from './MasteryDisplay';
 
 // インラインSVGアイコン
 const ChevronRightIcon = ({ size = 20, className }: { size?: number; className?: string }) => (
@@ -97,7 +97,7 @@ export function QuestionListItem({
             >
               {DIFFICULTY_LABELS[question.difficulty]}
             </span>
-            <MasteryCompact mastery={mastery} />
+            <MasteryLabel mastery={mastery} />
           </div>
 
           {/* 問題文（プレビュー） */}

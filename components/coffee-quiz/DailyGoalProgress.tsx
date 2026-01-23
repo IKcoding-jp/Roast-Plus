@@ -40,7 +40,7 @@ export function DailyGoalProgress({
       animate={{ opacity: 1, y: 0 }}
       className={`rounded-xl p-4 border ${
         isComplete
-          ? 'bg-[#FFF5E6] border-[#EF8A00]/30'
+          ? 'bg-[#ECFDF5] border-[#10B981]/30'
           : 'bg-white border-[#211714]/5'
       }`}
     >
@@ -49,17 +49,17 @@ export function DailyGoalProgress({
         <div className="flex items-center gap-2.5">
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
             isComplete
-              ? 'bg-[#EF8A00] text-white'
+              ? 'bg-[#059669] text-white'
               : 'bg-[#FDF8F0] text-[#EF8A00]'
           }`}>
             {isComplete ? <CheckIcon /> : <TargetIcon />}
           </div>
           <div>
             <span className={`font-semibold text-sm block ${
-              isComplete ? 'text-[#B36800]' : 'text-[#211714]'
+              isComplete ? 'text-[#065F46]' : 'text-[#211714]'
             }`}>今日の目標</span>
             <span className={`text-[11px] ${
-              isComplete ? 'text-[#D67A00]' : 'text-[#3A2F2B]/60'
+              isComplete ? 'text-[#047857]' : 'text-[#3A2F2B]/60'
             }`}>
               {isComplete ? '達成' : 'あと少し'}
             </span>
@@ -67,23 +67,23 @@ export function DailyGoalProgress({
         </div>
         <div className="text-right">
           <span className={`text-base font-bold ${
-            isComplete ? 'text-[#D67A00]' : 'text-[#211714]'
+            isComplete ? 'text-[#047857]' : 'text-[#211714]'
           }`}>
             {completed}
           </span>
           <span className={`text-sm ${
-            isComplete ? 'text-[#EF8A00]/70' : 'text-[#3A2F2B]/50'
+            isComplete ? 'text-[#10B981]/70' : 'text-[#3A2F2B]/50'
           }`}> / {targetQuestions}</span>
         </div>
       </div>
 
       {/* プログレスバー */}
       <div className={`h-2 rounded-full overflow-hidden mb-2.5 ${
-        isComplete ? 'bg-[#EF8A00]/20' : 'bg-[#211714]/10'
+        isComplete ? 'bg-[#10B981]/20' : 'bg-[#211714]/10'
       }`}>
         <motion.div
           className={`h-full rounded-full ${
-            isComplete ? 'bg-[#EF8A00]' : 'bg-[#EF8A00]'
+            isComplete ? 'bg-[#059669]' : 'bg-[#EF8A00]'
           }`}
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(progress, 100)}%` }}
@@ -93,11 +93,11 @@ export function DailyGoalProgress({
 
       {/* 統計 */}
       <div className="flex items-center justify-between text-xs">
-        <span className={isComplete ? 'text-[#D67A00]' : 'text-[#3A2F2B]/60'}>
+        <span className={isComplete ? 'text-[#047857]' : 'text-[#3A2F2B]/60'}>
           正解率 {completed > 0 ? Math.round((correct / completed) * 100) : 0}%
         </span>
         <span className={`font-medium ${
-          isComplete ? 'text-[#D67A00]' : 'text-[#EF8A00]'
+          isComplete ? 'text-[#047857]' : 'text-[#EF8A00]'
         }`}>
           +{goal?.xpEarned ?? 0} XP
         </span>
@@ -108,9 +108,9 @@ export function DailyGoalProgress({
         <motion.div
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3 text-center py-2 bg-[#EF8A00]/15 rounded-lg"
+          className="mt-3 text-center py-2 bg-[#10B981]/15 rounded-lg"
         >
-          <span className="text-[#B36800] font-medium text-xs">
+          <span className="text-[#065F46] font-medium text-xs">
             今日の目標達成
           </span>
         </motion.div>

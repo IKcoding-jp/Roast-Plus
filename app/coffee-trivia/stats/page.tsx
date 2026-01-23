@@ -62,7 +62,7 @@ const TrashIcon = () => (
 );
 
 export default function StatsPage() {
-  const { progress, loading: quizLoading, questionsStats, difficultyMasteryStats, resetProgress } = useQuizData();
+  const { progress, loading: quizLoading, questionsStats, categoryMasteryStats, difficultyMasteryStats, resetProgress } = useQuizData();
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -172,9 +172,10 @@ export default function StatsPage() {
                   (category) => {
                     const catStats = stats?.categoryStats[category];
                     const totalQuestions = questionsStats?.byCategory[category] ?? 0;
-                    const masteredCount = catStats?.masteredCount ?? 0;
-                    // マスター進捗率を計算
-                    const masteryProgress = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0;
+                    const masteryData = categoryMasteryStats[category];
+                    const answeredCorrectlyCount = masteryData?.answeredCorrectlyCount ?? 0;
+                    // 正解済み進捗率を計算
+                    const progressPercent = totalQuestions > 0 ? Math.round((answeredCorrectlyCount / totalQuestions) * 100) : 0;
 
                     return (
                       <div key={category} className="bg-[#FDF8F0] rounded-xl p-4 border border-[#211714]/5">
@@ -182,19 +183,19 @@ export default function StatsPage() {
                           <span className="font-medium text-[#211714]">
                             {CATEGORY_LABELS[category]}
                           </span>
-                          <span className="text-[#EF8A00] font-bold">{masteryProgress}%</span>
+                          <span className="text-[#EF8A00] font-bold">{progressPercent}%</span>
                         </div>
                         <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
                           <motion.div
                             className="h-full bg-gradient-to-r from-[#EF8A00] to-[#D67A00] rounded-full"
                             initial={{ width: 0 }}
-                            animate={{ width: `${masteryProgress}%` }}
+                            animate={{ width: `${progressPercent}%` }}
                             transition={{ delay: 0.2, duration: 0.5 }}
                           />
                         </div>
                         <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
                           <span>
-                            マスター: {masteredCount}/{totalQuestions}問
+                            正解済み: {answeredCorrectlyCount}/{totalQuestions}問
                           </span>
                           <span>
                             正解率: {catStats?.accuracy ?? 0}%（{catStats?.correct ?? 0}/{catStats?.total ?? 0}回答）
@@ -226,9 +227,10 @@ export default function StatsPage() {
                   (difficulty, index) => {
                     const diffStats = stats?.difficultyStats[difficulty];
                     const totalQuestions = questionsStats?.byDifficulty[difficulty] ?? 0;
-                    const masteredCount = difficultyMasteryStats?.[difficulty]?.masteredCount ?? 0;
-                    // マスター進捗率を計算
-                    const masteryProgress = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0;
+                    const masteryData = difficultyMasteryStats?.[difficulty];
+                    const answeredCorrectlyCount = masteryData?.answeredCorrectlyCount ?? 0;
+                    // 正解済み進捗率を計算
+                    const progressPercent = totalQuestions > 0 ? Math.round((answeredCorrectlyCount / totalQuestions) * 100) : 0;
 
                     return (
                       <div
@@ -245,7 +247,7 @@ export default function StatsPage() {
                               : difficulty === 'intermediate'
                               ? 'text-[#EF8A00]'
                               : 'text-rose-600'
-                          }`}>{masteryProgress}%</span>
+                          }`}>{progressPercent}%</span>
                         </div>
                         <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
                           <motion.div
@@ -257,13 +259,13 @@ export default function StatsPage() {
                                 : 'bg-gradient-to-r from-rose-500 to-rose-400'
                             }`}
                             initial={{ width: 0 }}
-                            animate={{ width: `${masteryProgress}%` }}
+                            animate={{ width: `${progressPercent}%` }}
                             transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
                           />
                         </div>
                         <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
                           <span>
-                            マスター: {masteredCount}/{totalQuestions}問
+                            正解済み: {answeredCorrectlyCount}/{totalQuestions}問
                           </span>
                           <span>
                             正解率: {diffStats?.accuracy ?? 0}%（{diffStats?.correct ?? 0}/{diffStats?.total ?? 0}回答）

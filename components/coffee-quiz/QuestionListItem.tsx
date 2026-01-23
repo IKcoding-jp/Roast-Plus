@@ -22,9 +22,12 @@ const ChevronRightIcon = ({ size = 20, className }: { size?: number; className?:
   </svg>
 );
 
+type AnswerStatus = 'correct' | 'incorrect' | 'unanswered';
+
 interface QuestionListItemProps {
   question: QuizQuestion;
   mastery?: number; // 0-100の定着率
+  answerStatus?: AnswerStatus; // 回答状態
   index: number;
   onClick: () => void;
 }
@@ -38,6 +41,7 @@ interface QuestionListItemProps {
 export function QuestionListItem({
   question,
   mastery = 0,
+  answerStatus = 'unanswered',
   index,
   onClick,
 }: QuestionListItemProps) {
@@ -85,6 +89,16 @@ export function QuestionListItem({
         <div className="flex-1 min-w-0">
           {/* 問題ID & 難易度 & 定着率 */}
           <div className="flex items-center gap-2 mb-2">
+            {/* 回答ステータス */}
+            <span className={`text-xl font-bold ${
+              answerStatus === 'correct' ? 'text-green-500' :
+              answerStatus === 'incorrect' ? 'text-red-400' :
+              'text-[#3A2F2B]/30'
+            }`}>
+              {answerStatus === 'correct' ? '○' :
+               answerStatus === 'incorrect' ? '×' :
+               '−'}
+            </span>
             <span className="text-xs text-[#3A2F2B]/50 font-mono">
               {question.id}
             </span>

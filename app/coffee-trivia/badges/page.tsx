@@ -2,9 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
 import { Loading } from '@/components/Loading';
-import LoginPage from '@/app/login/page';
 import { useQuizData } from '@/hooks/useQuizData';
 import { BADGE_DEFINITIONS } from '@/lib/coffee-quiz/types';
 import type { BadgeType } from '@/lib/coffee-quiz/types';
@@ -67,15 +65,10 @@ const AwardIcon = () => (
 );
 
 export default function BadgesPage() {
-  const { user, loading: authLoading } = useAuth();
   const { progress, loading: quizLoading } = useQuizData();
 
-  if (authLoading || quizLoading) {
+  if (quizLoading) {
     return <Loading />;
-  }
-
-  if (!user) {
-    return <LoginPage />;
   }
 
   const earnedBadgeTypes = new Set(progress?.earnedBadges.map((b) => b.type) || []);

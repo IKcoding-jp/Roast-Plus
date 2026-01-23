@@ -1,4 +1,5 @@
 import type { RoastTimerSettings, RoastTimerState } from '@/types';
+import type { QuizProgress } from '@/lib/coffee-quiz/types';
 
 // ローカルストレージ管理
 
@@ -152,5 +153,104 @@ export function getLast46Strength(): string | null {
   if (typeof window === 'undefined') return null;
   
   return localStorage.getItem(LAST_46_STRENGTH_KEY);
+}
+
+
+// =============================================
+// クイズ進捗管理
+// =============================================
+
+const QUIZ_PROGRESS_KEY = 'roastplus_quiz_progress';
+const QUIZ_PROGRESS_VERSION = 1;
+
+interface StoredQuizProgress {
+  version: number;
+  progress: QuizProgress;
+}
+
+interface ExportedQuizProgress {
+  exportedAt: string;
+  version: number;
+  progress: QuizProgress;
+}
+
+/**
+ * クイズ進捗を保存
+ */
+export function setQuizProgress(progress: QuizProgress | null): void {
+  if (typeof window === 'undefined') return;
+  
+  if (progress === null) {
+    localStorage.removeItem(QUIZ_PROGRESS_KEY);
+  } else {
+    const stored: StoredQuizProgress = {
+      version: QUIZ_PROGRESS_VERSION,
+      progress,
+    };
+    localStorage.setItem(QUIZ_PROGRESS_KEY, JSON.stringify(stored));
+  }
+}
+
+/**
+ * クイズ進捗を取得
+ */
+export function getQuizProgress(): QuizProgress | null {
+  if (typeof window === 'undefined') return null;
+  
+  const stored = localStorage.getItem(QUIZ_PROGRESS_KEY);
+  if (!stored) return null;
+  
+  const parsed = parseJson<StoredQuizProgress>(stored);
+  if (!parsed || parsed.version !== QUIZ_PROGRESS_VERSION) return null;
+  
+  return parsed.progress;
+}
+
+/**
+ * クイズ進捗をエクスポート（JSON文字列）
+ */
+export function exportQuizProgress(): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  const progress = getQuizProgress();
+  if (!progress) return null;
+  
+  const exported: ExportedQuizProgress = {
+    exportedAt: new Date().toISOString(),
+    version: QUIZ_PROGRESS_VERSION,
+    progress,
+  };
+  
+  return JSON.stringify(exported, null, 2);
+}
+
+/**
+ * クイズ進捗をインポート
+ */
+export function importQuizProgress(jsonString: string): { success: boolean; error?: string } {
+  if (typeof window === 'undefined') {
+    return { success: false, error: 'ブラウザ環境でのみ使用可能です' };
+  }
+  
+  try {
+    const imported = JSON.parse(jsonString) as ExportedQuizProgress;
+    
+    // バージョンチェック
+    if (imported.version !== QUIZ_PROGRESS_VERSION) {
+      return { success: false, error: `バージョンが一致しません (期待: ${QUIZ_PROGRESS_VERSION}, 実際: ${imported.version})` };
+    }
+    
+    // 必須フィールドチェック
+    if (!imported.progress || !imported.progress.userId) {
+      return { success: false, error: '無効なデータ形式です' };
+    }
+    
+    // 保存
+    setQuizProgress(imported.progress);
+    
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: 'JSONの解析に失敗しました' };
+  }
 }
 

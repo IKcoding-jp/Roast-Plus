@@ -163,34 +163,6 @@ export default function ReviewPage() {
     startSession();
   };
 
-  // 認証チェック
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center max-w-sm border border-[#211714]/5">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#211714]/5 flex items-center justify-center text-[#211714]/40">
-            <LockIcon />
-          </div>
-          <h2 className="text-lg font-bold text-[#211714] mb-2">ログインが必要です</h2>
-          <Link
-            href="/login"
-            className="inline-block bg-[#EF8A00] hover:bg-[#D67A00] text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
-          >
-            ログイン
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   // 復習する問題がない場合
   if (noReviewCards) {
     return (

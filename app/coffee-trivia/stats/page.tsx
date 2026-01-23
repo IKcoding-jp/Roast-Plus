@@ -3,15 +3,14 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
 import { Loading } from '@/components/Loading';
-import LoginPage from '@/app/login/page';
 import { useQuizData } from '@/hooks/useQuizData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { LevelDisplay } from '@/components/coffee-quiz/LevelDisplay';
 import { StreakCounter } from '@/components/coffee-quiz/StreakCounter';
 import { ResetConfirmDialog } from '@/components/coffee-quiz/ResetConfirmDialog';
 import { DebugPanel } from '@/components/coffee-quiz/DebugPanel';
+import { DataManagement } from '@/components/coffee-quiz/DataManagement';
 import { CATEGORY_LABELS, DIFFICULTY_LABELS } from '@/lib/coffee-quiz/types';
 import type { QuizCategory, QuizDifficulty } from '@/lib/coffee-quiz/types';
 
@@ -63,16 +62,15 @@ const TrashIcon = () => (
 );
 
 export default function StatsPage() {
-  const { user, loading: authLoading } = useAuth();
   const { progress, loading: quizLoading, questionsStats, difficultyMasteryStats, resetProgress } = useQuizData();
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
-  const handleReset = async () => {
+  const handleReset = () => {
     setIsResetting(true);
     try {
-      await resetProgress();
+      resetProgress();
       setShowResetDialog(false);
     } catch (error) {
       console.error('Failed to reset progress:', error);
@@ -81,12 +79,8 @@ export default function StatsPage() {
     }
   };
 
-  if (authLoading || quizLoading) {
+  if (quizLoading) {
     return <Loading />;
-  }
-
-  if (!user) {
-    return <LoginPage />;
   }
 
   const stats = progress?.stats;
@@ -295,6 +289,11 @@ export default function StatsPage() {
                 </span>
                 データ管理
               </h2>
+
+              {/* バックアップ・リストア */}
+              <div className="mb-4">
+                <DataManagement />
+              </div>
 
               <p className="text-[#3A2F2B]/70 text-sm mb-4">
                 学習データをリセットして、最初からやり直すことができます。

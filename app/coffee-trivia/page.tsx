@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/lib/auth';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
-import LoginPage from '@/app/login/page';
 import Link from 'next/link';
 import { QuizDashboard, HelpGuideModal } from '@/components/coffee-quiz';
 import { useQuizData } from '@/hooks/useQuizData';
@@ -38,17 +36,12 @@ const HelpCircleIcon = () => (
 );
 
 export default function CoffeeTriviaPage() {
-  const { user, loading: authLoading } = useAuth();
   const { progress, loading: quizLoading, getDueCardsForReview, questionsStats, categoryMasteryStats } = useQuizData();
   const [showHelpGuide, setShowHelpGuide] = useState(false);
   useAppLifecycle();
 
-  if (authLoading) {
+  if (quizLoading) {
     return <Loading />;
-  }
-
-  if (!user) {
-    return <LoginPage />;
   }
 
   const dueCardsCount = getDueCardsForReview().length;

@@ -1,5 +1,6 @@
 // クイズ問題ローダー
-import type { QuizQuestion, QuizCategory, QuizDifficulty } from './types';
+import type { QuizQuestion, QuizCategory, QuizDifficulty, QuizCard } from './types';
+import { getCardMastery } from './fsrs';
 
 // 問題データのキャッシュ
 let questionsCache: QuizQuestion[] | null = null;
@@ -124,22 +125,44 @@ export async function getRandomQuestions(
  */
 export async function getDailyQuestions(
   count: number = 10,
-  enabledCategories?: QuizCategory[]
+  enabledCategories?: QuizCategory[],
+  cards?: QuizCard[]
 ): Promise<QuizQuestion[]> {
   const categories = enabledCategories || ['basics', 'roasting', 'brewing', 'history'];
-  const questionsPerCategory = Math.ceil(count / categories.length);
-
-  const selectedQuestions: QuizQuestion[] = [];
-
+  
+  // すべての有効カテゴリから問題を取得
+  const allQuestions: QuizQuestion[] = [];
   for (const category of categories) {
     const categoryQuestions = await getQuestionsByCategory(category);
-    const shuffled = shuffleArray([...categoryQuestions]);
-    selectedQuestions.push(...shuffled.slice(0, questionsPerCategory));
+    allQuestions.push(...categoryQuestions);
   }
 
-  // シャッフルして指定数に調整
-  const shuffled = shuffleArray(selectedQuestions);
-  return shuffled.slice(0, count);
+  // カード情報からマスター済み問題IDを取得（定着率67%以上）
+  const masteredIds = new Set(
+    (cards ?? [])
+      .filter(card => getCardMastery(card) >= 67)
+      .map(card => card.questionId)
+  );
+
+  // 未マスター問題を優先的に選択
+  const nonMasteredQuestions = allQuestions.filter(q => !masteredIds.has(q.id));
+
+  let selected: QuizQuestion[];
+
+  if (nonMasteredQuestions.length >= count) {
+    // 十分な未マスター問題がある場合
+    selected = shuffleArray(nonMasteredQuestions).slice(0, count);
+  } else {
+    // 不足分はマスター問題から補充
+    const masteredQuestions = allQuestions.filter(q => masteredIds.has(q.id));
+    selected = [
+      ...nonMasteredQuestions,
+      ...shuffleArray(masteredQuestions).slice(0, count - nonMasteredQuestions.length)
+    ];
+    selected = shuffleArray(selected);
+  }
+
+  return selected;
 }
 
 /**

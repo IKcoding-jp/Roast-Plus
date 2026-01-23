@@ -3,6 +3,9 @@
 ## Overview
 コーヒー焙煎・抽出業務支援アプリ（Next.js PWA）
 
+## Git
+- **ベースブランチ**: `main`（PR作成時は必ず`main`をベースに指定）
+
 ## Tech Stack
 - Next.js 16 (App Router) / React 19 / TypeScript 5
 - Tailwind CSS v4 / Framer Motion / Lottie

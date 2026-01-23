@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '@/lib/auth';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getQuizProgress, setQuizProgress as saveToLocalStorage } from '@/lib/localStorage';
 import type {
   QuizProgress,
   QuizCard,
@@ -40,7 +38,6 @@ import {
 import { getQuestionById, getQuestionsStats, getQuestionsByIds, loadAllQuestions } from '@/lib/coffee-quiz/questions';
 import type { QuizDifficulty } from '@/lib/coffee-quiz/types';
 
-const QUIZ_PROGRESS_COLLECTION = 'quiz_progress';
 const SAVE_DEBOUNCE_MS = 1000;
 
 interface AnswerResult {
@@ -60,14 +57,19 @@ export interface QuestionsStats {
 }
 
 export function useQuizData() {
-  const { user } = useAuth();
   const [progress, setProgress] = useState<QuizProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [questionsStats, setQuestionsStats] = useState<QuestionsStats | null>(null);
   const [allQuestions, setAllQuestions] = useState<QuizQuestion[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingSaveRef = useRef<QuizProgress | null>(null);
+
+  // SSR対策: クライアントサイドでのみlocalStorageを使用
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // 問題の統計情報と全問題を読み込み
   useEffect(() => {
@@ -80,49 +82,30 @@ export function useQuizData() {
     }).catch(console.error);
   }, []);
 
-  // Firestoreからデータを読み込み
+  // localStorageからデータを読み込み
   useEffect(() => {
-    if (!user) {
-      setProgress(null);
-      setLoading(false);
-      return;
-    }
+    if (!isHydrated) return;
 
-    const docRef = doc(db, QUIZ_PROGRESS_COLLECTION, user.uid);
-
-    const unsubscribe = onSnapshot(
-      docRef,
-      (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.data() as QuizProgress;
-          // ペンディングの保存がなければ更新
-          if (!pendingSaveRef.current) {
-            setProgress(data);
-          }
-        } else {
-          // 初期データを作成
-          const initialProgress = createInitialProgress(user.uid);
-          setProgress(initialProgress);
-          // Firestoreに保存
-          setDoc(docRef, initialProgress).catch(console.error);
-        }
-        setLoading(false);
-      },
-      (err) => {
-        console.error('Quiz progress subscription error:', err);
-        setError(err);
-        setLoading(false);
+    try {
+      const stored = getQuizProgress();
+      if (stored) {
+        setProgress(stored);
+      } else {
+        // 初期データを作成
+        const initialProgress = createInitialProgress();
+        setProgress(initialProgress);
+        saveToLocalStorage(initialProgress);
       }
-    );
-
-    return () => unsubscribe();
-  }, [user]);
+    } catch (err) {
+      console.error('Failed to load quiz progress:', err);
+      setError(err as Error);
+    }
+    setLoading(false);
+  }, [isHydrated]);
 
   // デバウンス付き保存
   const saveProgress = useCallback(
-    async (newProgress: QuizProgress) => {
-      if (!user) return;
-
+    (newProgress: QuizProgress) => {
       pendingSaveRef.current = newProgress;
       setProgress(newProgress);
 
@@ -130,10 +113,9 @@ export function useQuizData() {
         clearTimeout(saveTimeoutRef.current);
       }
 
-      saveTimeoutRef.current = setTimeout(async () => {
+      saveTimeoutRef.current = setTimeout(() => {
         try {
-          const docRef = doc(db, QUIZ_PROGRESS_COLLECTION, user.uid);
-          await setDoc(docRef, {
+          saveToLocalStorage({
             ...newProgress,
             updatedAt: new Date().toISOString(),
           });
@@ -144,7 +126,7 @@ export function useQuizData() {
         }
       }, SAVE_DEBOUNCE_MS);
     },
-    [user]
+    []
   );
 
   // 回答を記録
@@ -379,14 +361,11 @@ export function useQuizData() {
   })();
 
   // 進捗をリセット
-  const resetProgress = useCallback(async () => {
-    if (!user) return;
-
-    const initialProgress = createInitialProgress(user.uid);
-    const docRef = doc(db, QUIZ_PROGRESS_COLLECTION, user.uid);
-    await setDoc(docRef, initialProgress);
+  const resetProgress = useCallback(() => {
+    const initialProgress = createInitialProgress();
+    saveToLocalStorage(initialProgress);
     setProgress(initialProgress);
-  }, [user]);
+  }, []);
 
   return {
     progress,
@@ -396,7 +375,7 @@ export function useQuizData() {
     getDueCardsForReview,
     updateSettings,
     todayGoal,
-    isAuthenticated: !!user,
+    isAuthenticated: true, // localStorageベースなので常にtrue
     questionsStats,
     categoryMasteryStats,
     difficultyMasteryStats,
@@ -405,10 +384,10 @@ export function useQuizData() {
 }
 
 // 初期Progressを作成
-function createInitialProgress(userId: string): QuizProgress {
+function createInitialProgress(): QuizProgress {
   const now = new Date().toISOString();
   return {
-    userId,
+    userId: 'local', // localStorageベースなので固定値
     cards: [],
     checkmarks: [],
     streak: { ...INITIAL_STREAK_INFO },

@@ -184,28 +184,6 @@ function QuizPageContent() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center max-w-sm border border-[#211714]/5">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#211714]/5 flex items-center justify-center text-[#211714]/40">
-            <LockIcon />
-          </div>
-          <h2 className="text-lg font-bold text-[#211714] mb-2">ログインが必要です</h2>
-          <p className="text-[#3A2F2B]/70 text-sm mb-4">
-            クイズに挑戦するにはログインしてください
-          </p>
-          <Link
-            href="/login"
-            className="inline-block bg-[#EF8A00] hover:bg-[#D67A00] text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
-          >
-            ログイン
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   // ローディング
   if (isLoading || !session) {
     return (

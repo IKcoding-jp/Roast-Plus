@@ -15,3 +15,4 @@ export { MasteryDisplay, MasteryCompact, CategoryMasteryDisplay } from './Master
 export { QuestionListItem } from './QuestionListItem';
 export { CategoryQuestionList } from './CategoryQuestionList';
 export { DebugPanel } from './DebugPanel';
+export { DataManagement } from './DataManagement';

@@ -57,12 +57,23 @@ export interface AssignmentDay {
   createdAt?: FirestoreTimestamp;
 }
 
+export interface SubTask {
+  id: string;
+  content: string;
+  assignee?: string; // 担当者名（自由入力）
+  order: number;
+}
+
 export interface TimeLabel {
   id: string;
   time: string; // HH:mm
   content: string;
   memo?: string;
   order?: number;
+  // === スケジュール機能改善で追加 ===
+  assignee?: string; // メインタスクの担当者
+  subTasks?: SubTask[]; // 連続タスク（小さい↓）
+  continuesUntil?: string; // 時間経過終了時間（HH:mm）
 }
 
 export interface TodaySchedule {

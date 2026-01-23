@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import type { AppData, TodaySchedule, TimeLabel } from '@/types';
-import { HiPlus, HiX, HiClock } from 'react-icons/hi';
+import { HiPlus, HiX, HiClock, HiUser, HiArrowDown } from 'react-icons/hi';
 
 interface TodayScheduleProps {
   data: AppData | null;
@@ -469,16 +469,56 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
                 {/* 内容入力（複数） */}
                 <div className="flex-1 min-w-0 flex flex-col gap-2">
                   {group.labels.map((label) => (
-                    <div key={label.id} className="w-full">
-                      <input
-                        type="text"
-                        value={label.content}
-                        onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
-                        onCompositionStart={handleCompositionStart}
-                        onCompositionEnd={handleCompositionEnd}
-                        className="w-full bg-transparent border-0 border-b border-transparent focus:border-amber-400 text-base md:text-base text-gray-900 focus:outline-none placeholder:text-gray-400 transition-colors py-1"
-                        placeholder="内容を入力"
-                      />
+                    <div key={label.id} className={`w-full ${label.continuesUntil ? 'border-l-2 border-dashed border-amber-400 pl-3' : ''}`}>
+                      {/* メインコンテンツ行 */}
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={label.content}
+                          onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
+                          onCompositionStart={handleCompositionStart}
+                          onCompositionEnd={handleCompositionEnd}
+                          className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-amber-400 text-base md:text-base text-gray-900 focus:outline-none placeholder:text-gray-400 transition-colors py-1"
+                          placeholder="内容を入力"
+                        />
+                        {/* 時間経過終了時間の表示 */}
+                        {label.continuesUntil && (
+                          <span className="flex-shrink-0 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full whitespace-nowrap">
+                            〜{label.continuesUntil}まで
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* 担当者表示 */}
+                      {label.assignee && (
+                        <div className="flex items-center gap-1.5 mt-1 ml-1">
+                          <HiUser className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                            {label.assignee}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* サブタスク表示 */}
+                      {label.subTasks && label.subTasks.length > 0 && (
+                        <div className="mt-2 ml-4 space-y-1.5">
+                          {label.subTasks
+                            .sort((a, b) => a.order - b.order)
+                            .map((subTask) => (
+                              <div key={subTask.id} className="flex items-start gap-2">
+                                <HiArrowDown className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1">
+                                  <span className="text-sm text-gray-700">{subTask.content}</span>
+                                  {subTask.assignee && (
+                                    <span className="ml-2 text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded-full">
+                                      {subTask.assignee}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

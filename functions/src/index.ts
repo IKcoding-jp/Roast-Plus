@@ -260,6 +260,43 @@ async function formatScheduleWithGPT(imageBase64: string): Promise<OCRScheduleRe
 - ローストスケジュールセクション（▲ローストスケジュール）に書かれている項目は除外してください
 - 時間順に並べてください
 
+【担当者の検出】
+- 括弧内の「○○さん」パターンを担当者として抽出してください
+- 例：「パッケージ（浅田さん、小山さん）」
+  → content: "パッケージ", assignee: "浅田さん、小山さん"
+- 担当者が明記されていない場合はassigneeフィールドを省略してください
+
+【連続タスク（小さい↓）の検出】
+- 同じ時間帯で↓（下向き矢印）で繋がるタスクをsubTasksとして抽出してください
+- subTasksは親タスクの下に続く作業の流れを表します
+- 例：
+  13:00 パッケージ（3kg）
+    ↓ 洗い物
+    ↓ ハンドピック
+- 上記の場合の結果：
+  {
+    "time": "13:00",
+    "content": "パッケージ（3kg）",
+    "subTasks": [
+      { "content": "洗い物", "order": 0 },
+      { "content": "ハンドピック", "order": 1 }
+    ]
+  }
+- サブタスクにも担当者がある場合は assignee を追加してください
+- 連続タスクがない場合はsubTasksフィールドを省略してください
+
+【時間経過（大きい↓）の検出】
+- 矢印やライン、囲み線で時間範囲（継続時間）を示す表記を検出してください
+- 開始時間から終了時間まで継続するタスクの場合、continuesUntilに終了時間を設定してください
+- 例：「13:00 メンテナンス」～「15:00」まで継続を示す縦線や矢印がある場合
+- 結果：
+  {
+    "time": "13:00",
+    "content": "メンテナンス",
+    "continuesUntil": "15:00"
+  }
+- 継続時間がない場合はcontinuesUntilフィールドを省略してください
+
 【ローストスケジュール（RoastSchedule）の抽出ルール】
 - 予熱オン（予熱、予熱開始など）: isRoasterOn: true, time: "HH:mm"
 - ロースト（焙煎、ロースト開始など）: isRoast: true, time: "HH:mm", roastCount: 数値（何回目か、1回目、2回目などから抽出）
@@ -299,7 +336,17 @@ async function formatScheduleWithGPT(imageBase64: string): Promise<OCRScheduleRe
     },
     {
       "time": "13:00",
-      "content": "ロースト1回・ハンドピック"
+      "content": "パッケージ",
+      "assignee": "浅田さん、小山さん",
+      "subTasks": [
+        { "content": "洗い物", "order": 0 },
+        { "content": "ハンドピック", "order": 1 }
+      ]
+    },
+    {
+      "time": "14:00",
+      "content": "メンテナンス",
+      "continuesUntil": "16:00"
     }
   ],
   "roastSchedules": [
@@ -397,15 +444,34 @@ JSONのみを返してください。説明文は不要です。`;
       throw new HttpsError('internal', 'スケジュールデータの形式が正しくありません。');
     }
 
-    // TimeLabel形式に変換（idとorderを追加）
+    // TimeLabel形式に変換（idとorderを追加、新フィールド対応）
     const timeLabels: TimeLabel[] = timeLabelsData.map((item, index: number) => {
       const timeLabelItem = item as Record<string, unknown>;
+      
+      // サブタスクの変換
+      let subTasks: { id: string; content: string; assignee?: string; order: number }[] | undefined;
+      if (Array.isArray(timeLabelItem.subTasks)) {
+        subTasks = timeLabelItem.subTasks.map((subTask: unknown, subIndex: number) => {
+          const subTaskItem = subTask as Record<string, unknown>;
+          return {
+            id: `ocr-subtask-${Date.now()}-${index}-${subIndex}`,
+            content: typeof subTaskItem.content === 'string' ? subTaskItem.content : '',
+            assignee: typeof subTaskItem.assignee === 'string' ? subTaskItem.assignee : undefined,
+            order: typeof subTaskItem.order === 'number' ? subTaskItem.order : subIndex,
+          };
+        });
+      }
+      
       return {
         id: `ocr-time-${Date.now()}-${index}`,
         time: typeof timeLabelItem.time === 'string' ? timeLabelItem.time : '00:00',
         content: typeof timeLabelItem.content === 'string' ? timeLabelItem.content : '',
         memo: typeof timeLabelItem.memo === 'string' ? timeLabelItem.memo : '',
         order: index,
+        // 新フィールド
+        assignee: typeof timeLabelItem.assignee === 'string' ? timeLabelItem.assignee : undefined,
+        subTasks: subTasks && subTasks.length > 0 ? subTasks : undefined,
+        continuesUntil: typeof timeLabelItem.continuesUntil === 'string' ? timeLabelItem.continuesUntil : undefined,
       };
     });
 

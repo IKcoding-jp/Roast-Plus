@@ -1,167 +1,50 @@
 'use client';
 
-interface MasteryDisplayProps {
+import { motion } from 'framer-motion';
+
+interface MasteryLabelProps {
   mastery: number; // 0-100
-  size?: 'sm' | 'md' | 'lg';
-  showLabel?: boolean;
 }
 
 /**
- * 定着率の色を取得
- * 0-33%: 赤系（学習中）
- * 34-66%: 黄/オレンジ系（定着中）
- * 67-100%: 緑系（定着済み）
+ * 王冠アイコン
  */
-function getMasteryColor(mastery: number): {
-  bg: string;
-  bar: string;
-  text: string;
-  label: string;
-} {
-  if (mastery >= 67) {
-    return {
-      bg: 'bg-green-100',
-      bar: 'bg-green-500',
-      text: 'text-green-600',
-      label: '定着済み',
-    };
-  }
-  if (mastery >= 34) {
-    return {
-      bg: 'bg-amber-100',
-      bar: 'bg-amber-500',
-      text: 'text-amber-600',
-      label: '定着中',
-    };
-  }
-  return {
-    bg: 'bg-red-100',
-    bar: 'bg-red-400',
-    text: 'text-red-500',
-    label: '学習中',
-  };
-}
-
-/**
- * 定着率からボックス数を計算
- * 67%以上: 3つ
- * 34-66%: 2つ
- * 1-33%: 1つ
- * 0%: 0つ
- */
-function getMasteryBoxCount(mastery: number): number {
-  if (mastery >= 67) return 3;
-  if (mastery >= 34) return 2;
-  if (mastery > 0) return 1;
-  return 0;
-}
-
-/**
- * 定着率表示コンポーネント（フル版）
- * 3つのボックスで定着度を表示
- */
-export function MasteryDisplay({
-  mastery,
-  size = 'md',
-  showLabel = false,
-}: MasteryDisplayProps) {
-  const sizeConfig = {
-    sm: {
-      box: 'w-3 h-3',
-      gap: 'gap-0.5',
-      text: 'text-[10px]',
-    },
-    md: {
-      box: 'w-4 h-4',
-      gap: 'gap-1',
-      text: 'text-xs',
-    },
-    lg: {
-      box: 'w-5 h-5',
-      gap: 'gap-1',
-      text: 'text-sm',
-    },
-  };
-
-  const config = sizeConfig[size];
-  const boxCount = getMasteryBoxCount(mastery);
-  const color = getMasteryColor(mastery);
-
+function CrownIcon() {
   return (
-    <div className="flex flex-col gap-1">
-      <div className={`flex items-center ${config.gap}`}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={`${config.box} rounded-sm ${
-              i < boxCount
-                ? `${color.bar}`
-                : 'bg-[#211714]/10'
-            }`}
-          />
-        ))}
-      </div>
-      {showLabel && (
-        <span className={`${config.text} ${color.text}`}>
-          {color.label}
-        </span>
-      )}
-    </div>
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="flex-shrink-0"
+    >
+      <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+    </svg>
   );
 }
 
 /**
- * コンパクト版定着率表示
- * 問題一覧などで使用
+ * マスターラベルコンポーネント
+ * 定着率67%以上で「マスター」ラベルを表示
+ * 67%未満は何も表示しない
+ * ゴールド＆王冠デザインで高級感を演出
  */
-export function MasteryCompact({ mastery }: { mastery: number }) {
-  const boxCount = getMasteryBoxCount(mastery);
-  const color = getMasteryColor(mastery);
+export function MasteryLabel({ mastery }: MasteryLabelProps) {
+  if (mastery < 67) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center gap-0.5">
-      {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className={`w-3 h-3 rounded-sm ${
-            i < boxCount
-              ? `${color.bar}`
-              : 'bg-[#211714]/10'
-          }`}
-        />
-      ))}
-    </div>
-  );
-}
-
-/**
- * カテゴリ全体の平均定着率表示
- */
-export function CategoryMasteryDisplay({
-  averageMastery,
-  totalQuestions,
-}: {
-  averageMastery: number;
-  totalQuestions: number;
-}) {
-  const boxCount = getMasteryBoxCount(averageMastery);
-  const color = getMasteryColor(averageMastery);
-
-  return (
-    <div className="mt-1.5">
-      <div className="flex items-center gap-0.5">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={`w-2.5 h-2.5 rounded-sm ${
-              i < boxCount ? color.bar : 'bg-[#211714]/10'
-            }`}
-          />
-        ))}
-        <span className="text-[10px] text-[#3A2F2B]/60 ml-1">
-          {totalQuestions}問
-        </span>
-      </div>
-    </div>
+    <motion.span
+      className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full
+                 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400
+                 text-amber-900 font-semibold border border-amber-500/50 shadow-sm"
+      animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+      transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+      style={{ backgroundSize: '200% 100%' }}
+    >
+      <CrownIcon />
+      マスター
+    </motion.span>
   );
 }

@@ -77,6 +77,13 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
         setStartTargetId(null);
     };
 
+    // recipe-046を一番右（最後）に配置するため、ソートする（Hooksは条件分岐の前に配置）
+    const sortedRecipes = useMemo(() => {
+        const recipe046 = recipes.find((r) => r.id === 'recipe-046');
+        const others = recipes.filter((r) => r.id !== 'recipe-046');
+        return recipe046 ? [...others, recipe046] : recipes;
+    }, [recipes]);
+
     if (recipes.length === 0) {
         return (
             <div className="text-center py-10 text-gray-500">
@@ -85,13 +92,6 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
             </div>
         );
     }
-
-    // recipe-046を一番右（最後）に配置するため、ソートする
-    const sortedRecipes = useMemo(() => {
-        const recipe046 = recipes.find((r) => r.id === 'recipe-046');
-        const others = recipes.filter((r) => r.id !== 'recipe-046');
-        return recipe046 ? [...others, recipe046] : recipes;
-    }, [recipes]);
 
     return (
         <>

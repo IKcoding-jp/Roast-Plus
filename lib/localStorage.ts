@@ -249,7 +249,7 @@ export function importQuizProgress(jsonString: string): { success: boolean; erro
     setQuizProgress(imported.progress);
     
     return { success: true };
-  } catch (e) {
+  } catch {
     return { success: false, error: 'JSONの解析に失敗しました' };
   }
 }

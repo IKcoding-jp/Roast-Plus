@@ -92,7 +92,6 @@ export const calculateAssignment = (
 ): Assignment[] => {
     // 1. 対象メンバーの抽出（アクティブなメンバーのみ）
     const eligibleMembers = members.filter(m => m.active !== false);
-    const teamsCount = teams.length;
 
     // 2. 固定枠（memberId === null）の特定
     const lockedSlots = new Map<string, boolean>(); // "teamId-taskLabelId" -> true

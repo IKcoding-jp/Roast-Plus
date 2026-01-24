@@ -61,7 +61,10 @@ export function DatePickerModal({
   const tomorrow = getTomorrowString();
   // 翌日（土日なら次の平日）が最大選択可能日
   const maxSelectableDate = isWeekend(tomorrow) ? getNextWeekday(today) : tomorrow;
-  const maxSelectableDateObj = new Date(maxSelectableDate + 'T00:00:00');
+  const maxSelectableDateObj = useMemo(
+    () => new Date(maxSelectableDate + 'T00:00:00'),
+    [maxSelectableDate]
+  );
 
   // 日付文字列フォーマット関数
   const formatDateString = (date: Date): string => {

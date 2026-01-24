@@ -1,9 +1,8 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
-
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { IconType } from 'react-icons';
 import { FaCoffee, FaUsers } from 'react-icons/fa';
 import { IoSettings, IoSparkles } from 'react-icons/io5';
 import { RiLightbulbFlashFill } from 'react-icons/ri';
@@ -24,7 +23,16 @@ import { BsStars } from 'react-icons/bs';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
 
-const ACTIONS = [
+interface Action {
+  key: string;
+  title: string;
+  description: string;
+  href: string;
+  icon: IconType;
+  badge?: string;
+}
+
+const ACTIONS: Action[] = [
   {
     key: 'assignment',
     title: '担当表',
@@ -155,6 +163,8 @@ export default function HomePage(_props: HomePageProps = {}) {
     if (!loading && user) {
       checkUserConsent();
     } else if (!loading && !user) {
+      // ログインページにリダイレクトされるまでの間、ローディング状態を解除
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCheckingConsent(false);
     }
   }, [user, loading, router]);
@@ -337,9 +347,9 @@ export default function HomePage(_props: HomePageProps = {}) {
           className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
           style={cardHeight ? { gridAutoRows: `${cardHeight}px` } : { gridAutoRows: '1fr' }}
         >
-          {ACTIONS.map(({ key, title, description, href, icon: DefaultIcon, badge }: any, index) => {
+          {ACTIONS.map(({ key, title, description, href, icon: DefaultIcon, badge }, index) => {
             // クリスマスアイコンのマッピング
-            const ChristmasIcons: Record<string, any> = {
+            const ChristmasIcons: Record<string, IconType> = {
               assignment: FaGift,
               schedule: BsStars,
               tasting: FaTree,

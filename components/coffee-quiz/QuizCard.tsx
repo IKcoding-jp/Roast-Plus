@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuizOption } from './QuizOption';
 import { QuizProgress } from './QuizProgress';

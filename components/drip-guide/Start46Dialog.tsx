@@ -46,9 +46,11 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
         const lastStrength = getLast46Strength();
 
         if (lastTaste === 'basic' || lastTaste === 'sweet' || lastTaste === 'bright') {
+             
             setTaste(lastTaste);
         }
         if (lastStrength === 'light' || lastStrength === 'strong2' || lastStrength === 'strong3') {
+             
             setStrength(lastStrength);
         }
     }, [isOpen]);
@@ -56,8 +58,10 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
     // 人前が変更された場合に更新
     useEffect(() => {
         if (initialServings !== servings) {
+             
             setServings(initialServings);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialServings変更時のみ実行
     }, [initialServings]);
 
     const handleKeyDown = useCallback(
@@ -324,7 +328,7 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
                                         </div>
 
                                         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-                                            {RECIPE46_DESCRIPTION_SECTIONS.map((section: any, idx: number) => (
+                                            {RECIPE46_DESCRIPTION_SECTIONS.map((section, idx) => (
                                                 <div
                                                     key={idx}
                                                     className="flex gap-4"

@@ -279,7 +279,7 @@ export function OCRTimeLabelEditor({
                       </span>
                     </label>
                     <div className="space-y-2 ml-4">
-                      {editingSubTasks.map((subTask, index) => (
+                      {editingSubTasks.map((subTask) => (
                         <div key={subTask.id} className="flex items-start gap-2 p-2 bg-gray-50 rounded-md">
                           <span className="text-gray-400 text-sm mt-2">↓</span>
                           <div className="flex-1 space-y-2">

@@ -4,14 +4,13 @@ import { useState } from 'react';
 import type { TastingSession } from '@/types';
 import { useToastContext } from '@/components/Toast';
 import { motion } from 'framer-motion';
-import { 
+import {
   Coffee,
-  CaretLeft, 
-  CalendarBlank, 
-  Thermometer, 
-  Trash, 
-  X, 
-  Plus, 
+  CalendarBlank,
+  Thermometer,
+  Trash,
+  X,
+  Plus,
   Check,
   CaretDown
 } from 'phosphor-react';

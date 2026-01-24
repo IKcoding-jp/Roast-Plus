@@ -35,7 +35,7 @@ import {
   earnBadges,
   getTodayGoal,
 } from '@/lib/coffee-quiz/gamification';
-import { getQuestionById, getQuestionsStats, getQuestionsByIds, loadAllQuestions } from '@/lib/coffee-quiz/questions';
+import { getQuestionById, getQuestionsStats, loadAllQuestions } from '@/lib/coffee-quiz/questions';
 import type { QuizDifficulty } from '@/lib/coffee-quiz/types';
 
 const SAVE_DEBOUNCE_MS = 1000;
@@ -68,6 +68,7 @@ export function useQuizData() {
 
   // SSR対策: クライアントサイドでのみlocalStorageを使用
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- ハイドレーション検知
     setIsHydrated(true);
   }, []);
 
@@ -89,17 +90,21 @@ export function useQuizData() {
     try {
       const stored = getQuizProgress();
       if (stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorageからの初期化
         setProgress(stored);
       } else {
         // 初期データを作成
         const initialProgress = createInitialProgress();
+         
         setProgress(initialProgress);
         saveToLocalStorage(initialProgress);
       }
     } catch (err) {
       console.error('Failed to load quiz progress:', err);
+       
       setError(err as Error);
     }
+     
     setLoading(false);
   }, [isHydrated]);
 

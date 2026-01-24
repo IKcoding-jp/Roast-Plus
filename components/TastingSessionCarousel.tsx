@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -12,13 +12,12 @@ import {
 } from 'phosphor-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TastingRecord, TastingSession } from '@/types';
-import { TastingRadarChart } from './TastingRadarChart';
 import {
   calculateAverageScores,
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';
 import { analyzeTastingSession } from '@/lib/tastingAnalysis';
-import ReactMarkdown from 'react-markdown'; // もしマークダウンを使うなら。今回はテキストのみでもOK
+import type { AverageScores } from '@/lib/tastingUtils';
 
 interface TastingSessionCarouselProps {
   sessions: TastingSession[];
@@ -37,8 +36,6 @@ export function TastingSessionCarousel({
 }: TastingSessionCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isDesktop, setIsDesktop] = useState(false);
-  const DESKTOP_CHART_SIZE = 280;
-  const MOBILE_CHART_SIZE = 180;
 
   // AI分析の状態管理
   const [isAnalyzing, setIsAnalyzing] = useState<{ [key: string]: boolean }>({});
@@ -50,7 +47,7 @@ export function TastingSessionCarousel({
   const [activeIndex, setActiveIndex] = useState(0);
 
   // 自動分析を実行する関数
-  const triggerAutoAnalysis = async (session: TastingSession, comments: string[], averageScores: any, recordCount: number) => {
+  const triggerAutoAnalysis = useCallback(async (session: TastingSession, comments: string[], averageScores: AverageScores, recordCount: number) => {
     // 分析中の場合はスキップ
     if (isAnalyzing[session.id] || analyzedIds.has(session.id)) return;
 
@@ -69,7 +66,7 @@ export function TastingSessionCarousel({
     }
 
     setIsAnalyzing(prev => ({ ...prev, [session.id]: false }));
-  };
+  }, [isAnalyzing, analyzedIds, onUpdateSession]);
 
   // ... (既存のuseEffectなどはそのまま) ...
 
@@ -116,15 +113,7 @@ export function TastingSessionCarousel({
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
   };
 
-  if (sessions.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-stone-500 font-serif italic">試飲セッションがありません</p>
-      </div>
-    );
-  }
-
-  // セッションカードの共通データを準備
+  // セッションカードの共通データを準備（Hooksは条件分岐の前に配置）
   const sessionData = useMemo(() => sessions.map((session) => {
     const sessionRecords = getRecordsBySessionId(tastingRecords, session.id);
     const recordCount = sessionRecords.length;
@@ -137,9 +126,9 @@ export function TastingSessionCarousel({
     return { session, sessionRecords, recordCount, averageScores, comments };
   }), [sessions, tastingRecords]);
 
-  // 自動分析をトリガーするuseEffect
+  // 自動分析をトリガーするuseEffect（Hooksは条件分岐の前に配置）
   useEffect(() => {
-    if (!onUpdateSession) return;
+    if (!onUpdateSession || sessions.length === 0) return;
 
     sessionData.forEach(({ session, recordCount, averageScores, comments }) => {
       // 記録があり、未分析または記録数が変わった場合は自動分析を開始
@@ -152,7 +141,15 @@ export function TastingSessionCarousel({
         triggerAutoAnalysis(session, comments, averageScores, recordCount);
       }
     });
-  }, [sessionData, onUpdateSession, isAnalyzing, analyzedIds]);
+  }, [sessionData, onUpdateSession, isAnalyzing, analyzedIds, triggerAutoAnalysis, sessions.length]);
+
+  if (sessions.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-stone-500 font-serif italic">試飲セッションがありません</p>
+      </div>
+    );
+  }
 
   // 焙煎度に応じたバッジスタイル
   const getRoastBadgeStyle = (level: string) => {
@@ -258,7 +255,7 @@ export function TastingSessionCarousel({
                                   <ul className="space-y-4">
                                     {comments.map((comment, commentIndex) => (
                                       <li key={commentIndex} className="text-[#4E342E] font-medium leading-relaxed relative pl-4 border-l-2 border-[#D7CCC8]">
-                                        <span className="text-sm font-serif italic block">"{comment}"</span>
+                                        <span className="text-sm font-serif italic block">&ldquo;{comment}&rdquo;</span>
                                       </li>
                                     ))}
                                   </ul>

@@ -13,7 +13,7 @@ import { Loading } from '@/components/Loading';
 import type { TastingSession, TastingRecord } from '@/types';
 import { CaretLeft, PencilCircle, Notebook, Coffee as CoffeeIcon, Plus } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 function TastingPageContent() {
   const { user, loading: authLoading } = useAuth();

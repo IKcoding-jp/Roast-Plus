@@ -8,7 +8,6 @@ import {
   isEmailJSConfigured,
   CONTACT_TYPES,
   ContactFormData,
-  ContactType,
 } from '@/lib/emailjs';
 
 type FormStatus = 'idle' | 'sending' | 'success' | 'error';

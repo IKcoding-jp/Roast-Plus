@@ -53,6 +53,7 @@ export const Snowfall = () => {
         depth,
       };
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 初期化時の1回のみ実行
     setSnowflakes(flakes);
   }, []);
 

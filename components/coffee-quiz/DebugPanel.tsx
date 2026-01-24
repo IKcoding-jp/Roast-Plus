@@ -57,8 +57,11 @@ export function DebugPanel({ onDateChange }: DebugPanelProps) {
 
   // 初期化時にデバッグ状態を読み込み
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 初期化時の1回のみ実行
     setDebugEnabled(isDebugMode());
+     
     setDateOffsetState(getDebugDateOffset());
+     
     setDebugInfo(getDebugInfo());
   }, []);
 

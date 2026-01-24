@@ -22,11 +22,13 @@ export function useChristmasMode() {
                 }
                 localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
                 // デフォルトはfalse（オフ）
+                // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorageからの初期化
                 setIsChristmasMode(false);
             } else {
                 // マイグレーション済みの場合は、localStorageから読み込む
                 const stored = localStorage.getItem(STORAGE_KEY);
                 const value = stored === null ? false : stored === 'true';
+                 
                 setIsChristmasMode(value);
             }
         }

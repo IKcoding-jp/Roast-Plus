@@ -3,7 +3,6 @@ import {
   FSRS,
   Rating,
   createEmptyCard,
-  type Card,
   type RecordLog,
   type FSRSParameters,
   type Grade,

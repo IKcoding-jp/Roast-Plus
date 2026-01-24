@@ -46,8 +46,10 @@ export const StartHoffmannDialog: React.FC<StartHoffmannDialogProps> = ({
     // 人前が変更された場合に更新
     useEffect(() => {
         if (initialServings !== servings) {
+             
             setServings(initialServings);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialServings変更時のみ実行
     }, [initialServings]);
 
     const handleKeyDown = useCallback(

@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
     ".history/**",
     // Ignore compiled Firebase Functions output
     "functions/lib/**",
+    // Ignore Claude/Codex skill examples
+    ".claude/**",
+    ".codex/**",
   ]),
 ]);
 

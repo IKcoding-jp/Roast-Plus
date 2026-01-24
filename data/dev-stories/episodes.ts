@@ -1342,6 +1342,432 @@ G検定は、日本ディープラーニング協会（JDLA）が主催するAI�
     publishedAt: '2026-01-24',
     order: 5,
   },
+  {
+    id: 'episode-006',
+    title: 'Claude Codeを使ってみた',
+    subtitle: 'CLIベースのAIコーディングエージェントで開発が劇的に変わった',
+    imageUrl: '/dev-stories/ai_future.png',
+    dialogues: [
+      // 導入（5メッセージ）
+      {
+        id: 'msg-006-1',
+        characterId: 'press',
+        content: '最近Claude Codeってツールを使い始めたって聞いたけど、要するにどういうものなの？',
+      },
+      {
+        id: 'msg-006-2',
+        characterId: 'siphon',
+        content: 'Claude CodeはAnthropicが作ったCLIベースのコーディングエージェントなんだよね。ターミナルで動くAIアシスタントみたいなもの。',
+      },
+      {
+        id: 'msg-006-3',
+        characterId: 'press',
+        content: 'CLIって何？Cursorみたいな画面じゃないの？',
+      },
+      {
+        id: 'msg-006-4',
+        characterId: 'siphon',
+        content: 'CLIはCommand Line Interfaceの略で、黒い画面にコマンドを打ち込んで操作するんだよね。GUIみたいなボタンやメニューはないんだ。',
+      },
+      {
+        id: 'msg-006-5',
+        characterId: 'press',
+        content: 'へぇ、なんでわざわざそんな不便そうなものを？',
+      },
+      // コーディングエージェントの種類（10メッセージ）
+      {
+        id: 'msg-006-6',
+        characterId: 'siphon',
+        content: '実はコーディングエージェントには色々なタイプがあって、それぞれ特徴があるんだよね。',
+      },
+      {
+        id: 'msg-006-7',
+        characterId: 'press',
+        content: 'どんな種類があるの？',
+      },
+      {
+        id: 'msg-006-8',
+        characterId: 'siphon',
+        content: 'まずIDE型。CursorやAntigravityみたいに、エディタにAIが組み込まれているタイプだね。',
+      },
+      {
+        id: 'msg-006-9',
+        characterId: 'press',
+        content: 'Cursorは使ってたよね。他には？',
+      },
+      {
+        id: 'msg-006-10',
+        characterId: 'siphon',
+        content: 'CLI型はClaude Code、Codex、Gemini CLIなど。ターミナルで動くから、軽くて柔軟性が高いんだよね。',
+      },
+      {
+        id: 'msg-006-11',
+        characterId: 'press',
+        content: 'ノーコード系もあるよね？',
+      },
+      {
+        id: 'msg-006-12',
+        characterId: 'siphon',
+        content: 'そうそう。LovableやBoltみたいに、コードを書かずにアプリが作れるツールもあるね。初心者向けだけど、カスタマイズに限界があるんだよね。',
+      },
+      {
+        id: 'msg-006-13',
+        characterId: 'press',
+        content: 'Devinってのも聞いたことあるけど？',
+      },
+      {
+        id: 'msg-006-14',
+        characterId: 'siphon',
+        content: 'Devinは自律型エージェントで、タスクを渡すとほぼ全自動で開発してくれるんだ。でもまだ高価で、細かい制御が難しいんだよね。',
+      },
+      {
+        id: 'msg-006-15',
+        characterId: 'press',
+        content: 'なるほど。で、なんでClaude Codeを選んだの？',
+      },
+      // Claude Codeの便利機能（15メッセージ）
+      {
+        id: 'msg-006-16',
+        characterId: 'siphon',
+        content: 'Claude Codeには他のツールにない便利な機能がたくさんあるんだよね。まず「スキル」という機能から説明するね。',
+      },
+      {
+        id: 'msg-006-17',
+        characterId: 'press',
+        content: 'スキルって何？',
+      },
+      {
+        id: 'msg-006-18',
+        characterId: 'siphon',
+        content: '/commit や /review-pr みたいに、よく使う操作をコマンド一発で実行できる機能なんだ。自分でカスタムスキルも作れるんだよね。',
+      },
+      {
+        id: 'msg-006-19',
+        characterId: 'press',
+        content: 'コミットが一発でできるのは便利だな。',
+      },
+      {
+        id: 'msg-006-20',
+        characterId: 'siphon',
+        content: '次に「MCP連携」。これがすごいんだ。外部ツールとClaude Codeを繋げられるんだよね。',
+      },
+      {
+        id: 'msg-006-21',
+        characterId: 'press',
+        content: 'MCP？具体的にどういうこと？',
+      },
+      {
+        id: 'msg-006-22',
+        characterId: 'siphon',
+        content: 'ローストプラスでは3つのMCPを使ってるんだ。Serenaでコード探索、Context7で最新ドキュメント参照、Chrome DevToolsでUI確認。',
+      },
+      {
+        id: 'msg-006-23',
+        characterId: 'press',
+        content: 'AIがブラウザを操作できるってこと？',
+      },
+      {
+        id: 'msg-006-24',
+        characterId: 'siphon',
+        content: 'そう！スクリーンショットを撮ったり、ボタンをクリックしたり、コンソールログを確認したりできるんだよね。デバッグが劇的に楽になった。',
+      },
+      {
+        id: 'msg-006-25',
+        characterId: 'press',
+        content: 'マルチエージェントってのも聞いたけど？',
+      },
+      {
+        id: 'msg-006-26',
+        characterId: 'siphon',
+        content: 'Task toolを使うと、複数のAIエージェントを並列で動かせるんだ。コード探索、テスト実行、ドキュメント生成を同時に進められるんだよね。',
+      },
+      {
+        id: 'msg-006-27',
+        characterId: 'press',
+        content: '並列処理か。効率良さそうだな。',
+      },
+      {
+        id: 'msg-006-28',
+        characterId: 'siphon',
+        content: '最後に「自動承認モード」。通常はファイル編集のたびに確認が必要だけど、信頼できる操作は自動で承認できるんだよね。',
+      },
+      {
+        id: 'msg-006-29',
+        characterId: 'press',
+        content: '確認なしで編集されるのは怖くない？',
+      },
+      {
+        id: 'msg-006-30',
+        characterId: 'siphon',
+        content: '最初は怖かったけど、Gitでバージョン管理してるから、いつでも戻せるんだ。慣れると開発スピードが劇的に上がるんだよね。',
+      },
+      // 開発効率の向上（5メッセージ）
+      {
+        id: 'msg-006-31',
+        characterId: 'press',
+        content: 'ローストプラスの開発でどう変わった？',
+      },
+      {
+        id: 'msg-006-32',
+        characterId: 'siphon',
+        content: 'この開発秘話ページ自体がClaude Codeで作られてるんだ。エピソードの追加も、Issue作成からPRまで一気通貫でできるんだよね。',
+      },
+      {
+        id: 'msg-006-33',
+        characterId: 'press',
+        content: '具体的にどのくらい速くなった？',
+      },
+      {
+        id: 'msg-006-34',
+        characterId: 'siphon',
+        content: '体感で3倍くらい速くなったかな。特にコード探索とデバッグの時間が大幅に短縮されたんだよね。',
+      },
+      {
+        id: 'msg-006-35',
+        characterId: 'press',
+        content: 'Cursorと比べてどう？',
+      },
+      // Claude Codeがトップレベルな理由（5メッセージ）
+      {
+        id: 'msg-006-36',
+        characterId: 'siphon',
+        content: 'Cursorも素晴らしいツールだけど、Claude Codeの方が自律性が高いんだよね。ファイルを探して、読んで、編集するまで全部自分でやってくれる。',
+      },
+      {
+        id: 'msg-006-37',
+        characterId: 'press',
+        content: 'なんでClaude Codeがトップレベルだと思うの？',
+      },
+      {
+        id: 'msg-006-38',
+        characterId: 'siphon',
+        content: 'まずClaudeのモデル性能が高い。コードの理解力と生成力が優れてるんだ。それにMCP連携で拡張性が無限大なんだよね。',
+      },
+      {
+        id: 'msg-006-39',
+        characterId: 'press',
+        content: 'デメリットはないの？',
+      },
+      {
+        id: 'msg-006-40',
+        characterId: 'siphon',
+        content: 'CLIに慣れてないと最初は戸惑うかもね。あと、APIの使用量によってはコストがかかる。でも、開発効率を考えると十分元が取れると思うんだよね。',
+      },
+      {
+        id: 'msg-006-41',
+        characterId: 'press',
+        content: 'なるほど、AIと一緒に開発する時代が本格的に来たってことだな。',
+      },
+      {
+        id: 'msg-006-42',
+        characterId: 'siphon',
+        content: 'そうだね。Claude Codeのようなツールを使いこなせるかどうかで、開発者の生産性に大きな差が出る時代になってきたんだよね。',
+      },
+    ],
+    detailContent: `Claude Codeは、Anthropicが開発したCLIベースのAIコーディングエージェントです。この記事では、コーディングエージェントの種類からClaude Codeの便利機能、そしてローストプラスでの活用例までを解説します。
+
+## コーディングエージェントとは
+
+コーディングエージェントは、AIがプログラミングを支援してくれるツールの総称です。単なるコード補完だけでなく、ファイルの読み書き、テストの実行、デバッグまで自律的に行えるものが増えています。
+
+## コーディングエージェントの種類
+
+| タイプ | ツール例 | 特徴 | 向いている人 |
+|--------|----------|------|-------------|
+| **IDE型** | Cursor, Antigravity | エディタにAI統合、直感的なUI | 初心者〜中級者 |
+| **CLI型** | Claude Code, Codex, Gemini CLI | ターミナルで動作、軽量・柔軟 | 中級者〜上級者 |
+| **ノーコード型** | Lovable, Bolt | コード不要でアプリ作成 | 非エンジニア |
+| **自律型** | Devin | タスクを渡すと全自動で開発 | 特定のユースケース |
+
+### IDE型の特徴
+
+CursorやAntigravityは、Visual Studio Codeのようなエディタ画面にAIが組み込まれています。
+
+- **メリット**: GUIで直感的、コードハイライトや補完が充実
+- **デメリット**: エディタに依存、カスタマイズに限界
+
+### CLI型の特徴
+
+Claude CodeやCodexは、ターミナル（黒い画面）で動作します。
+
+- **メリット**: 軽量で高速、スクリプトとの連携が容易、拡張性が高い
+- **デメリット**: CLIに慣れが必要
+
+### ノーコード型の特徴
+
+LovableやBoltは、自然言語でアプリを作成できます。
+
+- **メリット**: プログラミング知識不要、素早くプロトタイプ作成
+- **デメリット**: 細かいカスタマイズが困難、複雑なアプリには不向き
+
+### 自律型の特徴
+
+Devinは、タスクを渡すとほぼ全自動で開発を進めます。
+
+- **メリット**: 人間の介入が最小限
+- **デメリット**: 高コスト、細かい制御が難しい
+
+## Claude Codeの便利機能
+
+### スキル（Skills）
+
+よく使う操作をコマンド一発で実行できる機能です。
+
+**組み込みスキル例：**
+- \`/commit\` - 変更をコミット
+- \`/review-pr\` - PRをレビュー
+
+**カスタムスキル：**
+自分で定義したスキルを追加できます。ローストプラスでは以下のようなスキルを使っています：
+
+- \`/roastplus-ui\` - UIデザインシステムの参照
+- \`/nextjs-firestore\` - Firebase連携パターンの参照
+
+### MCP連携（Model Context Protocol）
+
+外部ツールとClaude Codeを連携させる仕組みです。
+
+| MCP | 用途 | 主な機能 |
+|-----|------|----------|
+| **Serena** | コード探索 | シンボル検索、参照追跡、パターン検索 |
+| **Context7** | ドキュメント参照 | 最新のライブラリドキュメントを取得 |
+| **Chrome DevTools** | UI確認 | スクリーンショット、クリック操作、コンソール確認 |
+
+#### Serenaの活用例
+
+\`\`\`
+// シンボル検索でファイル内の関数を一覧取得
+get_symbols_overview("src/components/Button.tsx")
+
+// 特定のシンボルの参照元を検索
+find_referencing_symbols("handleClick")
+\`\`\`
+
+#### Context7の活用例
+
+\`\`\`
+// Next.jsの最新ドキュメントを取得
+resolve-library-id("nextjs")
+query-docs("/vercel/next.js", "App Router server components")
+\`\`\`
+
+#### Chrome DevToolsの活用例
+
+\`\`\`
+// ページのスクリーンショットを撮影
+take_screenshot()
+
+// ボタンをクリック
+click("button.submit")
+
+// コンソールログを確認
+list_console_messages()
+\`\`\`
+
+### マルチエージェント
+
+Task toolを使って、複数のAIエージェントを並列で実行できます。
+
+**活用例：**
+1. **探索エージェント** - コードベースを調査
+2. **実装エージェント** - コードを書く
+3. **テストエージェント** - テストを実行
+
+これらを並列で動かすことで、大幅な時間短縮が可能です。
+
+### 自動承認モード
+
+通常、ファイル編集には毎回確認が必要ですが、信頼できる操作は自動で承認できます。
+
+**設定例：**
+- \`Read\` - ファイル読み込みは常に自動承認
+- \`Edit\` - 特定のディレクトリのみ自動承認
+- \`Bash(npm *)\` - npmコマンドは自動承認
+
+**注意点：**
+- Gitでバージョン管理していれば、いつでも戻せる
+- 最初は慎重に、慣れてきたら範囲を広げる
+
+## ローストプラスでの活用例
+
+### 1. 開発秘話ページの作成
+
+この開発秘話ページ自体がClaude Codeで作られています。
+
+**ワークフロー：**
+1. Issue作成（ghコマンド）
+2. ブランチ作成
+3. コード生成・編集
+4. 動作確認（Chrome DevTools）
+5. PR作成
+
+### 2. UI改善
+
+Chrome DevTools MCPを使って、実際の画面を確認しながら開発できます。
+
+- スクリーンショットでデザイン確認
+- クリック操作でインタラクション確認
+- コンソールでエラー確認
+
+### 3. コードリファクタリング
+
+Serena MCPを使って、シンボル単位でコードを理解・修正できます。
+
+- 関数の参照元を追跡
+- 安全にリネーム
+- 影響範囲を把握
+
+## なぜClaude Codeがトップレベルなのか
+
+### 1. Claudeモデルの高い性能
+
+- 長いコンテキストの理解力
+- 正確なコード生成
+- 自然な対話
+
+### 2. MCP連携による拡張性
+
+- 任意の外部ツールと連携可能
+- コミュニティが活発でMCPが増え続けている
+
+### 3. 自律的なファイル操作
+
+- ファイルを探して、読んで、編集するまで全部自動
+- 人間は指示を出すだけ
+
+### 4. スキルによるカスタマイズ
+
+- よく使う操作を定義できる
+- チーム内で共有可能
+
+## Cursorとの比較
+
+| 項目 | Claude Code | Cursor |
+|------|-------------|--------|
+| **インターフェース** | CLI | GUI |
+| **自律性** | 高い | 中程度 |
+| **拡張性** | MCP連携で無限大 | 拡張機能で対応 |
+| **学習コスト** | やや高い | 低い |
+| **動作速度** | 軽量で高速 | エディタに依存 |
+
+**使い分けの提案：**
+- **Cursor**: 普段の開発、GUIで直感的に操作したい時
+- **Claude Code**: 複雑なタスク、自動化したい時、MCP連携が必要な時
+
+## まとめ
+
+Claude Codeは、CLIベースながら高い自律性とMCP連携による拡張性を持つ強力なコーディングエージェントです。
+
+- **スキル**で定型作業を自動化
+- **MCP連携**で外部ツールと統合
+- **マルチエージェント**で並列処理
+- **自動承認モード**で高速開発
+
+AIと一緒に開発する時代が本格的に到来しています。Claude Codeのようなツールを使いこなすことで、開発効率を大幅に向上させることができます。`,
+    tags: ['Claude Code', 'AIエージェント', 'MCP', 'CLI', '開発効率'],
+    publishedAt: '2026-01-25',
+    order: 6,
+  },
 ];
 
 // エピソードをIDで取得

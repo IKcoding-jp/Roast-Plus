@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.7.0',
+    date: '2026-01-24',
+    summary: 'James Hoffmann V60レシピ・クイズ機能強化・利用規約同意機能を追加',
+  },
+  {
     version: '0.6.1',
     date: '2026-01-18',
     summary: 'スケジュール読み取り機能の修正と改善',

@@ -77,7 +77,7 @@ export default function SettingsPage() {
                             </Link>
                         </div>
                         <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
-                            設定
+                            その他
                         </h1>
                         <div className="hidden sm:block flex-1 flex-shrink-0"></div>
                     </div>

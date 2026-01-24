@@ -88,8 +88,8 @@ const ACTIONS = [
   },
   {
     key: 'settings',
-    title: '設定',
-    description: '自分好みにカスタマイズ',
+    title: 'その他',
+    description: '設定やアプリ情報など',
     href: '/settings',
     icon: IoSettings,
   },

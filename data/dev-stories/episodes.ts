@@ -1633,37 +1633,6 @@ Devinは、タスクを渡すとほぼ全自動で開発を進めます。
 | **Context7** | ドキュメント参照 | 最新のライブラリドキュメントを取得 |
 | **Chrome DevTools** | UI確認 | スクリーンショット、クリック操作、コンソール確認 |
 
-#### Serenaの活用例
-
-\`\`\`
-// シンボル検索でファイル内の関数を一覧取得
-get_symbols_overview("src/components/Button.tsx")
-
-// 特定のシンボルの参照元を検索
-find_referencing_symbols("handleClick")
-\`\`\`
-
-#### Context7の活用例
-
-\`\`\`
-// Next.jsの最新ドキュメントを取得
-resolve-library-id("nextjs")
-query-docs("/vercel/next.js", "App Router server components")
-\`\`\`
-
-#### Chrome DevToolsの活用例
-
-\`\`\`
-// ページのスクリーンショットを撮影
-take_screenshot()
-
-// ボタンをクリック
-click("button.submit")
-
-// コンソールログを確認
-list_console_messages()
-\`\`\`
-
 ### マルチエージェント
 
 Task toolを使って、複数のAIエージェントを並列で実行できます。

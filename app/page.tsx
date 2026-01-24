@@ -13,7 +13,9 @@ import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
-import { useAuth, signOut } from '@/lib/auth';
+import { useAuth } from '@/lib/auth';
+import { getUserData } from '@/lib/firestore';
+import { needsConsent } from '@/lib/consent';
 import { Snowfall } from '@/components/Snowfall';
 import { FaTree, FaGift, FaSnowflake, FaHollyBerry, FaStar } from 'react-icons/fa';
 import { PiBellFill } from 'react-icons/pi';
@@ -110,6 +112,7 @@ export default function HomePage(_props: HomePageProps = {}) {
   const [showLoadingDebugModal, setShowLoadingDebugModal] = useState(false);
   const [splashVisible, setSplashVisible] = useState(true);
   const [cardHeight, setCardHeight] = useState<number | null>(null);
+  const [checkingConsent, setCheckingConsent] = useState(true);
   const { isEnabled: isDeveloperMode } = useDeveloperMode();
   const { isChristmasMode } = useChristmasMode();
 
@@ -125,6 +128,32 @@ export default function HomePage(_props: HomePageProps = {}) {
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  // 同意状態をチェック
+  useEffect(() => {
+    async function checkUserConsent() {
+      if (!user) return;
+
+      try {
+        const userData = await getUserData(user.uid);
+        if (needsConsent(userData.userConsent)) {
+          // 同意が必要な場合は同意画面へリダイレクト
+          router.push('/consent');
+          return;
+        }
+      } catch (error) {
+        console.error('同意状態の確認に失敗:', error);
+      }
+
+      setCheckingConsent(false);
+    }
+
+    if (!loading && user) {
+      checkUserConsent();
+    } else if (!loading && !user) {
+      setCheckingConsent(false);
     }
   }, [user, loading, router]);
 
@@ -173,17 +202,8 @@ export default function HomePage(_props: HomePageProps = {}) {
     setShowLoadingDebugModal(true);
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      router.push('/login');
-    } catch (error) {
-      console.error('ログアウトエラー:', error);
-    }
-  };
-
   // スプラッシュ表示中はLoadingを出さない
-  if (loading && !splashVisible) {
+  if ((loading || checkingConsent) && !splashVisible) {
     return <Loading />;
   }
 
@@ -301,15 +321,7 @@ export default function HomePage(_props: HomePageProps = {}) {
                 <PiCoffeeBeanFill className="h-6 w-6" />
               </button>
             )}
-            <button
-              onClick={handleLogout}
-              className={`text-sm font-semibold px-4 py-1.5 rounded-full transition-all duration-300 ${isChristmasMode
-                ? 'text-[#f8f1e7] bg-[#6d1a1a] hover:bg-[#8b2323] border border-[#d4af37]/40 hover:border-[#d4af37] shadow-lg'
-                : 'text-white hover:text-gray-200'
-                }`}
-            >
-              ログアウト
-            </button>
+
           </div>
         </div>
       </header>

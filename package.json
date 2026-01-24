@@ -10,6 +10,7 @@
     "generate:sound-list": "tsx scripts/generate-sound-list.ts"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@types/uuid": "^10.0.0",
     "clsx": "^2.1.1",
     "firebase": "^12.5.0",

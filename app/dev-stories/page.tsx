@@ -29,7 +29,7 @@ export default function DevStoriesPage() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-800">開発秘話</h1>
               <p className="text-gray-500 text-sm mt-1 hidden sm:block">
-                アサイリとフカイリが、ローストプラスの開発を語ります。
+                様々なキャラクターが、ローストプラスの開発を語ります。
               </p>
             </div>
             {/* キャラクター画像 */}

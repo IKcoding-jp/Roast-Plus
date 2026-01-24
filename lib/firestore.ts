@@ -269,6 +269,19 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
     normalized.changelogEntries = data.changelogEntries;
   }
 
+  // userConsentは存在する場合のみ処理
+  if (data?.userConsent && typeof data.userConsent === 'object') {
+    const consent = data.userConsent;
+    if (typeof consent.hasAgreed === 'boolean') {
+      normalized.userConsent = {
+        hasAgreed: consent.hasAgreed,
+        agreedAt: typeof consent.agreedAt === 'string' ? consent.agreedAt : '',
+        agreedTermsVersion: typeof consent.agreedTermsVersion === 'string' ? consent.agreedTermsVersion : '',
+        agreedPrivacyVersion: typeof consent.agreedPrivacyVersion === 'string' ? consent.agreedPrivacyVersion : '',
+      };
+    }
+  }
+
   return normalized;
 }
 

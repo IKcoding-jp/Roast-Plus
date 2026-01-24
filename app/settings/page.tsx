@@ -1,27 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
+import { useAuth, signOut } from '@/lib/auth';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
-import { HiArrowLeft } from 'react-icons/hi';
+import { HiArrowLeft, HiDocumentText, HiShieldCheck, HiLogout, HiMail } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import { VersionHistory } from '@/components/settings/VersionHistory';
 import { VERSION_HISTORY } from '@/data/dev-stories/version-history';
+import { getUserData } from '@/lib/firestore';
+import { formatConsentDate } from '@/lib/consent';
+import { UserConsent } from '@/types';
 
 export default function SettingsPage() {
+    const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const { isEnabled, isLoading: devModeLoading, enableDeveloperMode, disableDeveloperMode } = useDeveloperMode();
     const { version, isUpdateAvailable, isChecking, checkForUpdates, applyUpdate } = useAppVersion();
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [userConsent, setUserConsent] = useState<UserConsent | null>(null);
 
     const { isChristmasMode, setChristmasMode } = useChristmasMode();
+
+    // 同意日時を取得
+    useEffect(() => {
+        async function fetchUserConsent() {
+            if (!user) return;
+            try {
+                const userData = await getUserData(user.uid);
+                if (userData.userConsent) {
+                    setUserConsent(userData.userConsent);
+                }
+            } catch (error) {
+                console.error('同意情報の取得に失敗:', error);
+            }
+        }
+        fetchUserConsent();
+    }, [user]);
 
     if (authLoading || devModeLoading) {
         return <Loading />;
@@ -59,6 +81,15 @@ export default function SettingsPage() {
         setShowPasswordModal(false);
         setPassword('');
         setPasswordError(null);
+    };
+
+    const handleLogout = async () => {
+        try {
+            await signOut();
+            router.push('/login');
+        } catch (error) {
+            console.error('ログアウトエラー:', error);
+        }
     };
 
     return (
@@ -179,6 +210,90 @@ export default function SettingsPage() {
                             更新履歴
                         </h2>
                         <VersionHistory entries={VERSION_HISTORY} maxDisplay={5} />
+                    </div>
+
+                    {/* 法的情報セクション */}
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <HiDocumentText className="h-5 w-5 text-gray-600" />
+                            法的情報
+                        </h2>
+                        <div className="space-y-4">
+                            {/* 利用規約リンク */}
+                            <Link
+                                href="/terms"
+                                className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <HiDocumentText className="h-5 w-5 text-orange-500" />
+                                    <span className="text-gray-800 font-medium">利用規約</span>
+                                </div>
+                                <span className="text-gray-400">&gt;</span>
+                            </Link>
+
+                            {/* プライバシーポリシーリンク */}
+                            <Link
+                                href="/privacy-policy"
+                                className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <HiShieldCheck className="h-5 w-5 text-orange-500" />
+                                    <span className="text-gray-800 font-medium">プライバシーポリシー</span>
+                                </div>
+                                <span className="text-gray-400">&gt;</span>
+                            </Link>
+
+                            {/* お問い合わせリンク */}
+                            <Link
+                                href="/contact"
+                                className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <HiMail className="h-5 w-5 text-orange-500" />
+                                    <span className="text-gray-800 font-medium">お問い合わせ</span>
+                                </div>
+                                <span className="text-gray-400">&gt;</span>
+                            </Link>
+
+                            {/* 同意日時 */}
+                            {userConsent && userConsent.hasAgreed && (
+                                <div className="pt-4 border-t border-gray-200">
+                                    <p className="text-sm text-gray-500">
+                                        同意日: {formatConsentDate(userConsent.agreedAt)}
+                                    </p>
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        利用規約 v{userConsent.agreedTermsVersion} / プライバシーポリシー v{userConsent.agreedPrivacyVersion}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* アカウントセクション */}
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <HiLogout className="h-5 w-5 text-gray-600" />
+                            アカウント
+                        </h2>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">ログイン中のアカウント</p>
+                                    <p className="text-sm font-medium text-gray-800">
+                                        {user.email || 'メールアドレスなし'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t border-gray-200">
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full px-4 py-3 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors font-medium flex items-center justify-center gap-2"
+                                >
+                                    <HiLogout className="h-5 w-5" />
+                                    ログアウト
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </main>
 

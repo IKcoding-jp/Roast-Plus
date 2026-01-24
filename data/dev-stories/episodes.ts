@@ -1346,7 +1346,7 @@ G検定は、日本ディープラーニング協会（JDLA）が主催するAI�
     id: 'episode-006',
     title: 'Claude Codeを使ってみた',
     subtitle: 'CLIベースのAIコーディングエージェントで開発が劇的に変わった',
-    imageUrl: '/dev-stories/ai_future.png',
+    imageUrl: '/dev-stories/claude_code.png',
     dialogues: [
       // 導入（5メッセージ）
       {
@@ -1695,6 +1695,7 @@ Task toolを使って、複数のAIエージェントを並列で実行できま
 この開発秘話ページ自体がClaude Codeで作られています。
 
 **ワークフロー：**
+
 1. Issue作成（ghコマンド）
 2. ブランチ作成
 3. コード生成・編集

@@ -78,7 +78,6 @@ const ACTIONS = [
     description: '楽しく学ぶコーヒー知識',
     href: '/coffee-trivia',
     icon: IoSparkles,
-    badge: 'NEW',
   },
   {
     key: 'dev-stories',
@@ -86,7 +85,6 @@ const ACTIONS = [
     description: '開発の裏話を覗く',
     href: '/dev-stories',
     icon: RiLightbulbFlashFill,
-    badge: 'NEW',
   },
   {
     key: 'settings',

@@ -9,6 +9,7 @@ import { clsx } from 'clsx';
 import { ConfirmDialog } from './ConfirmDialog';
 import { StartHintDialog } from './StartHintDialog';
 import { Start46Dialog } from './Start46Dialog';
+import { StartHoffmannDialog } from './StartHoffmannDialog';
 import { calculateRecipeForServings } from '@/lib/drip-guide/recipeCalculator';
 
 interface RecipeListProps {
@@ -109,7 +110,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                     {recipe.name}
                                 </h3>
                                 <div className="flex gap-1">
-                                    {recipe.id !== 'recipe-046' && (
+                                    {recipe.id !== 'recipe-046' && recipe.id !== 'recipe-hoffmann' && (
                                         <Link
                                             href={`/drip-guide/edit?id=${recipe.id}`}
                                             className="p-3 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
@@ -212,6 +213,12 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
 
             {startTargetRecipe?.id === 'recipe-046' ? (
                 <Start46Dialog
+                    isOpen={startTargetId !== null}
+                    onClose={handleCloseStart}
+                    initialServings={startTargetRecipe ? getServingsForRecipe(startTargetRecipe.id) : 1}
+                />
+            ) : startTargetRecipe?.id === 'recipe-hoffmann' ? (
+                <StartHoffmannDialog
                     isOpen={startTargetId !== null}
                     onClose={handleCloseStart}
                     initialServings={startTargetRecipe ? getServingsForRecipe(startTargetRecipe.id) : 1}

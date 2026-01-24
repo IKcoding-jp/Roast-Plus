@@ -1,5 +1,6 @@
 import { DripRecipe } from './types';
 import { RECIPE46_PURPOSE } from './recipe46Content';
+import { RECIPE_HOFFMANN_PURPOSE } from './recipeHoffmannContent';
 
 export const MOCK_RECIPES: DripRecipe[] = [
     // BYSN Standard Drip (細く中心に注ぐスタイル) - 1人前基準
@@ -102,6 +103,62 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 description: '残りを注ぐ、その後撹拌 → 落ちきり',
                 targetTotalWater: 150,
                 note: '撹拌（ドリッパーを軽く回す）',
+            },
+        ],
+    },
+
+    // James Hoffmann Ultimate V60 Technique - 1人前基準（15g/250g）
+    {
+        id: 'recipe-hoffmann',
+        name: 'James Hoffmann V60',
+        beanName: 'お好みの豆',
+        beanAmountGram: 15,
+        totalWaterGram: 250,
+        totalDurationSec: 210,
+        purpose: RECIPE_HOFFMANN_PURPOSE,
+        description: '2007年世界バリスタチャンピオンJames Hoffmann氏が考案。ゆすりとかき混ぜでクリアな味わいを引き出します。',
+        createdAt: '2024-01-15T00:00:00Z',
+        updatedAt: '2024-01-15T00:00:00Z',
+        isDefault: true,
+        isManualMode: false,
+        steps: [
+            {
+                id: 'step-1',
+                startTimeSec: 0,
+                title: '蒸らし',
+                description: '中心から外側へ螺旋状に注ぎ、ゆすって均一に湿らせます。',
+                targetTotalWater: 30,
+                note: '豆の2倍の湯量→ゆすり→45秒待機',
+            },
+            {
+                id: 'step-2',
+                startTimeSec: 45,
+                title: '第1注湯（60%）',
+                description: '総湯量の60%まで中心から外側へ注ぎます。',
+                targetTotalWater: 150,
+                note: '30秒かけて注ぐ',
+            },
+            {
+                id: 'step-3',
+                startTimeSec: 75,
+                title: '第2注湯（100%）',
+                description: '残りの40%を少しゆっくり注ぎます。',
+                targetTotalWater: 250,
+                note: '水位を維持しながら注ぐ',
+            },
+            {
+                id: 'step-4',
+                startTimeSec: 105,
+                title: 'かき混ぜ＆ゆすり',
+                description: 'スプーンで両方向に軽くかき混ぜ→ドリッパーを回してゆすり。',
+                note: '壁の粉を落とし平らな粉面を作る',
+            },
+            {
+                id: 'step-5',
+                startTimeSec: 120,
+                title: '落ち切り待ち',
+                description: '全てのお湯が落ち切るのを待ちます。',
+                note: '目標: 約3:30で完了',
             },
         ],
     },

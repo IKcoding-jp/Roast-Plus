@@ -165,6 +165,26 @@ export const EPISODE_CHARACTER_PAIRS: Record<string, CharacterPairInfo> = {
     relationship:
       '🌌 シンプルと複雑の対比\nプレスが「要するに？」と聞き、サイフォンが深く広く語る。\nシンプル vs 深遠の対比で、未来をロマンチックに語る。',
   },
+  'episode-006': {
+    left: {
+      id: 'press',
+      name: 'プレス',
+      emoji: '🏺',
+      subtitle: 'シンプルで直球、本質を絞り出す効率主義者',
+      description:
+        'ストレートにグイッと押し込む。複雑なことをシンプルに捉えたがる。',
+    },
+    right: {
+      id: 'siphon',
+      name: 'サイフォン',
+      emoji: '🔬',
+      subtitle: '知的で詩的、科学と美を語るロマンチスト',
+      description:
+        '科学的で美しいプロセスを大切にする。技術の進化を楽しむ。',
+    },
+    relationship:
+      '🔧 シンプル vs 深遠\nプレスが「要するに？」と聞き、サイフォンが詳しく解説する。',
+  },
 };
 
 // エピソードIDからキャラクターペアを取得

@@ -38,6 +38,11 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             {children}
           </ul>
         ),
+        ol: ({ children }) => (
+          <ol className="list-decimal list-inside space-y-1.5 mb-4 text-gray-700">
+            {children}
+          </ol>
+        ),
         li: ({ children }) => <li className="leading-relaxed">{children}</li>,
         strong: ({ children }) => (
           <strong className="font-semibold text-gray-800">{children}</strong>
@@ -62,11 +67,21 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             {children}
           </td>
         ),
-        code: ({ children }) => (
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800">
+        pre: ({ children }) => (
+          <pre className="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4 text-sm">
             {children}
-          </code>
+          </pre>
         ),
+        code: ({ className, children }) => {
+          const isInline = !className;
+          return isInline ? (
+            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800">
+              {children}
+            </code>
+          ) : (
+            <code className="font-mono">{children}</code>
+          );
+        },
       }}
     >
         {content}

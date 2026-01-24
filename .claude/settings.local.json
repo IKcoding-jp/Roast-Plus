@@ -39,7 +39,7 @@
       "mcp__serena__replace_content",
       "mcp__serena__think_about_whether_you_are_done",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\n今日の目標達成UIの配色をオレンジ系に統一\n\nグリーン（emerald）系からアプリのメインカラーであるオレンジ系に変更し、\nコーヒーアプリ全体の暖かみのある配色と調和させた。\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)",
       "mcp__serena__create_text_file",
       "Bash(more:*)",
       "mcp__chrome-devtools__list_pages",
@@ -48,7 +48,6 @@
       "mcp__chrome-devtools__evaluate_script",
       "mcp__chrome-devtools__fill",
       "mcp__serena__find_referencing_symbols",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\n定着率表示をボックス形式に変更\n\n- パーセンテージ表示を3つのボックス形式に変更（赤1つ/黄2つ/緑3つ）\n- カテゴリ選択画面は「X/Y問」形式で定着済み問題数を表示\n- HelpGuideModalの説明を「定着ボックスの見方」に更新\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "mcp__chrome-devtools__press_key",
       "mcp__serena__insert_after_symbol",
       "mcp__plugin_serena_serena__find_symbol",
@@ -56,12 +55,14 @@
       "mcp__plugin_serena_serena__read_file",
       "Bash(uv run:*)",
       "Bash(source .env.local)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git checkout:*)"
     ]
   },
   "enabledMcpjsonServers": [
     "context7",
     "serena",
     "chrome-devtools"
-  ]
+  ],
+  "outputStyle": "Learning"
 }

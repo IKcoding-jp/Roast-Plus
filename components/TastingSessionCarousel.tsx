@@ -25,7 +25,7 @@ interface TastingSessionCarouselProps {
   tastingRecords: TastingRecord[];
   activeMemberCount: number;
   router: ReturnType<typeof useRouter>;
-  onUpdateSession?: (sessionId: string, aiAnalysis: string) => void;
+  onUpdateSession?: (sessionId: string, aiAnalysis: string, recordCount: number) => void;
 }
 
 export function TastingSessionCarousel({
@@ -50,9 +50,9 @@ export function TastingSessionCarousel({
   const [activeIndex, setActiveIndex] = useState(0);
 
   // 自動分析を実行する関数
-  const triggerAutoAnalysis = async (session: TastingSession, comments: string[], averageScores: any) => {
-    // 既に分析済みまたは分析中の場合はスキップ
-    if (session.aiAnalysis || isAnalyzing[session.id] || analyzedIds.has(session.id)) return;
+  const triggerAutoAnalysis = async (session: TastingSession, comments: string[], averageScores: any, recordCount: number) => {
+    // 分析中の場合はスキップ
+    if (isAnalyzing[session.id] || analyzedIds.has(session.id)) return;
 
     setIsAnalyzing(prev => ({ ...prev, [session.id]: true }));
     setAnalyzedIds(prev => new Set(prev).add(session.id));
@@ -65,7 +65,7 @@ export function TastingSessionCarousel({
     });
 
     if (result.status === 'success' && result.text && onUpdateSession) {
-      onUpdateSession(session.id, result.text);
+      onUpdateSession(session.id, result.text, recordCount);
     }
 
     setIsAnalyzing(prev => ({ ...prev, [session.id]: false }));
@@ -142,9 +142,14 @@ export function TastingSessionCarousel({
     if (!onUpdateSession) return;
 
     sessionData.forEach(({ session, recordCount, averageScores, comments }) => {
-      // 記録があり、分析がまだの場合は自動分析を開始
-      if (recordCount > 0 && !session.aiAnalysis && !isAnalyzing[session.id] && !analyzedIds.has(session.id)) {
-        triggerAutoAnalysis(session, comments, averageScores);
+      // 記録があり、未分析または記録数が変わった場合は自動分析を開始
+      const needsReanalysis = recordCount > 0 && (
+        !session.aiAnalysis ||                                    // 未分析
+        session.aiAnalysisRecordCount !== recordCount             // 記録数が変わった
+      );
+
+      if (needsReanalysis && !isAnalyzing[session.id] && !analyzedIds.has(session.id)) {
+        triggerAutoAnalysis(session, comments, averageScores, recordCount);
       }
     });
   }, [sessionData, onUpdateSession, isAnalyzing, analyzedIds]);

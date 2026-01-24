@@ -112,6 +112,7 @@ export interface TastingSession {
   userId: string;
   aiAnalysis?: string; // AIコーヒーマイスターのコメント
   aiAnalysisUpdatedAt?: string; // 分析日時 (ISO 8601)
+  aiAnalysisRecordCount?: number; // AI分析時の記録数
 }
 
 export interface TastingRecord {

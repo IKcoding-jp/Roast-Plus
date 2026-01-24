@@ -56,7 +56,7 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
   const activeMemberCount = getActiveMembers(allMembers).length + (manager ? 1 : 0);
 
   // AI分析結果をFirestoreに保存するコールバック
-  const handleUpdateSession = (sessionId: string, aiAnalysis: string) => {
+  const handleUpdateSession = (sessionId: string, aiAnalysis: string, recordCount: number) => {
     if (!onUpdate) return;
 
     onUpdate((currentData) => {
@@ -66,6 +66,7 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
             ...session,
             aiAnalysis,
             aiAnalysisUpdatedAt: new Date().toISOString(),
+            aiAnalysisRecordCount: recordCount,
           }
           : session
       );

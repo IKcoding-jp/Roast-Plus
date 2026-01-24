@@ -160,6 +160,7 @@ function normalizeAppData(data: Partial<AppData> | undefined | null): AppData {
         // aiAnalysis関連フィールドを保持
         aiAnalysis: typeof session.aiAnalysis === 'string' ? session.aiAnalysis : undefined,
         aiAnalysisUpdatedAt: typeof session.aiAnalysisUpdatedAt === 'string' ? session.aiAnalysisUpdatedAt : undefined,
+        aiAnalysisRecordCount: typeof session.aiAnalysisRecordCount === 'number' ? session.aiAnalysisRecordCount : undefined,
       }))
       : [],
     tastingRecords: Array.isArray(data?.tastingRecords) ? data.tastingRecords : [],

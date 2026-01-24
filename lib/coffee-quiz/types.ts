@@ -31,6 +31,7 @@ export interface QuizQuestion {
 export interface QuizCard extends FSRSCard {
   questionId: string;
   lastReviewedAt?: string; // ISO 8601
+  hasAnsweredCorrectly?: boolean; // 一度でも正解したことがあるか
 }
 
 export type QuizRating = 'again' | 'hard' | 'good' | 'easy';

@@ -6,7 +6,7 @@ import type { QuizCategory } from '@/lib/coffee-quiz/types';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 
 interface CategorySelectorProps {
-  stats?: Record<QuizCategory, { total: number; masteredCount: number }>;
+  stats?: Record<QuizCategory, { total: number; answeredCorrectlyCount: number }>;
 }
 
 // カテゴリアイコン
@@ -116,10 +116,10 @@ export function CategorySelector({
                   {CATEGORY_LABELS[category]}
                 </span>
 
-                {/* 定着済み問題数 / 全問題数 */}
+                {/* 正解済み問題数 / 全問題数 */}
                 {categoryStats && (
                   <span className="text-[11px] text-[#3A2F2B]/60 mt-1 block">
-                    {categoryStats.masteredCount}/{categoryStats.total}問
+                    {categoryStats.answeredCorrectlyCount}/{categoryStats.total}問
                   </span>
                 )}
               </div>

@@ -21,7 +21,7 @@ interface QuizDashboardProps {
   dueCardsCount: number;
   loading: boolean;
   questionsStats: QuestionsStats | null;
-  categoryMasteryStats?: Record<QuizCategory, { averageMastery: number; masteredCount: number }>; // カテゴリ別定着統計
+  categoryMasteryStats?: Record<QuizCategory, { averageMastery: number; masteredCount: number; answeredCorrectlyCount: number }>; // カテゴリ別定着統計
 }
 
 // シンプルなSVGアイコン
@@ -80,24 +80,24 @@ export function QuizDashboard({
     );
   }
 
-  // カテゴリ統計: 総問題数と定着済み問題数
+  // カテゴリ統計: 総問題数と正解済み問題数
   const categoryStats = questionsStats
     ? {
         basics: {
           total: questionsStats.byCategory.basics,
-          masteredCount: categoryMasteryStats?.basics?.masteredCount ?? 0,
+          answeredCorrectlyCount: categoryMasteryStats?.basics?.answeredCorrectlyCount ?? 0,
         },
         roasting: {
           total: questionsStats.byCategory.roasting,
-          masteredCount: categoryMasteryStats?.roasting?.masteredCount ?? 0,
+          answeredCorrectlyCount: categoryMasteryStats?.roasting?.answeredCorrectlyCount ?? 0,
         },
         brewing: {
           total: questionsStats.byCategory.brewing,
-          masteredCount: categoryMasteryStats?.brewing?.masteredCount ?? 0,
+          answeredCorrectlyCount: categoryMasteryStats?.brewing?.answeredCorrectlyCount ?? 0,
         },
         history: {
           total: questionsStats.byCategory.history,
-          masteredCount: categoryMasteryStats?.history?.masteredCount ?? 0,
+          answeredCorrectlyCount: categoryMasteryStats?.history?.answeredCorrectlyCount ?? 0,
         },
       }
     : undefined;

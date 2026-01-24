@@ -86,7 +86,8 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
         case 'daily':
           loadedQuestions = await getDailyQuestions(
             count,
-            progress?.settings.enabledCategories
+            progress?.settings.enabledCategories,
+            progress?.cards  // マスター判定用
           );
           break;
         case 'category':
@@ -153,7 +154,7 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
       console.error('Failed to start quiz session:', error);
       setState((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [mode, category, count, questionIds, progress?.settings.enabledCategories, getDueCardsForReview]);
+  }, [mode, category, count, questionIds, progress?.settings.enabledCategories, progress?.cards, getDueCardsForReview]);
 
   // 回答を送信
   const submitAnswer = useCallback(

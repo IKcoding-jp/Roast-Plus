@@ -75,6 +75,20 @@ export function CategoryQuestionList({
     return map;
   }, [cards]);
 
+  // 回答状態マップを作成（'correct' | 'incorrect' | 'unanswered'）
+  const answerStatusMap = useMemo(() => {
+    const map = new Map<string, 'correct' | 'incorrect' | 'unanswered'>();
+    cards.forEach((card) => {
+      if (card.hasAnsweredCorrectly) {
+        map.set(card.questionId, 'correct');
+      } else {
+        // カードが存在するが正解していない = 不正解
+        map.set(card.questionId, 'incorrect');
+      }
+    });
+    return map;
+  }, [cards]);
+
   // ソートされた問題リスト
   const sortedQuestions = useMemo(() => {
     const sorted = [...questions];
@@ -197,6 +211,7 @@ export function CategoryQuestionList({
             key={question.id}
             question={question}
             mastery={masteryMap.get(question.id) ?? 0}
+            answerStatus={answerStatusMap.get(question.id) ?? 'unanswered'}
             index={index}
             onClick={() => handleQuestionClick(question.id)}
           />

@@ -157,6 +157,14 @@ export function useQuizData() {
       const rating = determineRating(isCorrect, responseTimeMs);
       const { card: updatedCard } = reviewCard(card, rating);
 
+      // 正解時にhasAnsweredCorrectlyフラグを設定（一度trueになったら変更しない）
+      if (isCorrect) {
+        updatedCard.hasAnsweredCorrectly = true;
+      } else if (card.hasAnsweredCorrectly) {
+        // 既存のフラグを維持
+        updatedCard.hasAnsweredCorrectly = true;
+      }
+
       // 連続正解数を計算（セッション内）
       const consecutiveCorrect = isCorrect ? 1 : 0; // 簡易版、セッション状態管理で改善可能
 
@@ -268,13 +276,13 @@ export function useQuizData() {
   const todayGoal = progress ? getTodayGoal(progress.dailyGoals) : null;
 
   // カテゴリ別平均定着率と定着済み問題数を計算
-  const categoryMasteryStats: Record<QuizCategory, { averageMastery: number; masteredCount: number }> = (() => {
+  const categoryMasteryStats: Record<QuizCategory, { averageMastery: number; masteredCount: number; answeredCorrectlyCount: number }> = (() => {
     const categories: QuizCategory[] = ['basics', 'roasting', 'brewing', 'history'];
-    const result: Record<QuizCategory, { averageMastery: number; masteredCount: number }> = {
-      basics: { averageMastery: 0, masteredCount: 0 },
-      roasting: { averageMastery: 0, masteredCount: 0 },
-      brewing: { averageMastery: 0, masteredCount: 0 },
-      history: { averageMastery: 0, masteredCount: 0 },
+    const result: Record<QuizCategory, { averageMastery: number; masteredCount: number; answeredCorrectlyCount: number }> = {
+      basics: { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 },
+      roasting: { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 },
+      brewing: { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 },
+      history: { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 },
     };
 
     if (!progress || allQuestions.length === 0) return result;
@@ -291,7 +299,7 @@ export function useQuizData() {
       );
 
       if (categoryQuestionIds.length === 0) {
-        result[category] = { averageMastery: 0, masteredCount: 0 };
+        result[category] = { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 };
         continue;
       }
 
@@ -300,14 +308,19 @@ export function useQuizData() {
         (sum, card) => sum + getCardMastery(card),
         0
       );
-      // 定着済み問題数を計算（67%以上で定着済み）
+      // 定着済み問題数を計算（67%以上で定着済み＝マスター）
       const masteredCount = categoryCards.filter(
         (card) => getCardMastery(card) >= 67
+      ).length;
+      // 一度でも正解した問題数を計算（X/75問の表示用）
+      const answeredCorrectlyCount = categoryCards.filter(
+        (card) => card.hasAnsweredCorrectly === true
       ).length;
 
       result[category] = {
         averageMastery: Math.round(totalMastery / categoryQuestionIds.length),
         masteredCount,
+        answeredCorrectlyCount,
       };
     }
 
@@ -315,12 +328,12 @@ export function useQuizData() {
   })();
 
   // 難易度別平均定着率と定着済み問題数を計算
-  const difficultyMasteryStats: Record<QuizDifficulty, { averageMastery: number; masteredCount: number }> = (() => {
+  const difficultyMasteryStats: Record<QuizDifficulty, { averageMastery: number; masteredCount: number; answeredCorrectlyCount: number }> = (() => {
     const difficulties: QuizDifficulty[] = ['beginner', 'intermediate', 'advanced'];
-    const result: Record<QuizDifficulty, { averageMastery: number; masteredCount: number }> = {
-      beginner: { averageMastery: 0, masteredCount: 0 },
-      intermediate: { averageMastery: 0, masteredCount: 0 },
-      advanced: { averageMastery: 0, masteredCount: 0 },
+    const result: Record<QuizDifficulty, { averageMastery: number; masteredCount: number; answeredCorrectlyCount: number }> = {
+      beginner: { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 },
+      intermediate: { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 },
+      advanced: { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 },
     };
 
     if (!progress || allQuestions.length === 0) return result;
@@ -337,7 +350,7 @@ export function useQuizData() {
       );
 
       if (difficultyQuestionIds.length === 0) {
-        result[difficulty] = { averageMastery: 0, masteredCount: 0 };
+        result[difficulty] = { averageMastery: 0, masteredCount: 0, answeredCorrectlyCount: 0 };
         continue;
       }
 
@@ -346,14 +359,19 @@ export function useQuizData() {
         (sum, card) => sum + getCardMastery(card),
         0
       );
-      // 定着済み問題数を計算（67%以上で定着済み）
+      // 定着済み問題数を計算（67%以上で定着済み＝マスター）
       const masteredCount = difficultyCards.filter(
         (card) => getCardMastery(card) >= 67
+      ).length;
+      // 一度でも正解した問題数を計算
+      const answeredCorrectlyCount = difficultyCards.filter(
+        (card) => card.hasAnsweredCorrectly === true
       ).length;
 
       result[difficulty] = {
         averageMastery: Math.round(totalMastery / difficultyQuestionIds.length),
         masteredCount,
+        answeredCorrectlyCount,
       };
     }
 

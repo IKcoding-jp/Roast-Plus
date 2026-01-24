@@ -11,7 +11,7 @@ export { LevelDisplay } from './LevelDisplay';
 export { XPGainAnimation } from './XPGainAnimation';
 export { LevelUpModal } from './LevelUpModal';
 export { HelpGuideModal } from './HelpGuideModal';
-export { MasteryDisplay, MasteryCompact, CategoryMasteryDisplay } from './MasteryDisplay';
+export { MasteryLabel } from './MasteryDisplay';
 export { QuestionListItem } from './QuestionListItem';
 export { CategoryQuestionList } from './CategoryQuestionList';
 export { DebugPanel } from './DebugPanel';

@@ -73,6 +73,7 @@ const ACTIONS = [
     description: '淹れ方の手順',
     href: '/drip-guide',
     icon: MdCoffeeMaker,
+    badge: '新レシピ登場',
   },
   {
     key: 'coffee-trivia',
@@ -87,6 +88,7 @@ const ACTIONS = [
     description: '開発の裏話を覗く',
     href: '/dev-stories',
     icon: RiLightbulbFlashFill,
+    badge: '新エピソード登場',
   },
   {
     key: 'settings',

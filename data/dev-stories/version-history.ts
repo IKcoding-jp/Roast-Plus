@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.9.5',
+    date: '2026-01-25',
+    summary: 'RoastTimer.tsx を責務別に分割 #34',
+  },
+  {
     version: '0.9.4',
     date: '2026-01-25',
     summary: 'デバッグ用 console.log を削除 #40',

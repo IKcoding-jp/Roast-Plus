@@ -326,7 +326,7 @@ export interface WorkProgress {
 }
 
 // 更新履歴・開発秘話のカテゴリ（レガシー、後方互換用）
-export type ChangelogEntryType = 'update' | 'story' | 'feature' | 'bugfix' | 'improvement';
+export type ChangelogEntryType = 'update' | 'story' | 'feature' | 'bugfix' | 'improvement' | 'docs' | 'style';
 
 // 更新履歴・開発秘話エントリ（レガシー、後方互換用）
 export interface ChangelogEntry {

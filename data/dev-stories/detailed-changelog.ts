@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.9.4',
+    version: '0.9.4',
+    date: '2026-01-25',
+    type: 'update',
+    title: 'デバッグ用 console.log を削除 #40',
+    content: `
+- デバッグ用 console.log を削除 #40
+    `.trim(),
+    tags: [],
+    createdAt: '2026-01-25T21:07:56.277Z',
+    updatedAt: '2026-01-25T21:07:56.277Z',
+  },
+  {
     id: 'v0.9.3',
     version: '0.9.3',
     date: '2026-01-25',

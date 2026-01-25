@@ -1,20 +1,18 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { APP_VERSION } from '@/lib/version';
 
 /**
  * アプリのバージョン情報とService Worker更新状態を管理するカスタムフック
+ *
+ * バージョンはlib/version.tsのAPP_VERSIONから取得します。
+ * このファイルはGitHub Actionsによって自動更新されます。
  */
 export function useAppVersion() {
-  const [version, setVersion] = useState<string>('');
+  const [version] = useState<string>(APP_VERSION);
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
-
-  // バージョン情報を取得
-  useEffect(() => {
-    const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '0.5.6';
-    setVersion(appVersion);
-  }, []);
 
   // Service Worker更新の検出
   useEffect(() => {

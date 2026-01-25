@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.9.5',
+    version: '0.9.5',
+    date: '2026-01-25',
+    type: 'improvement',
+    title: 'RoastTimer.tsx を責務別に分割 #34',
+    content: `
+- RoastTimer.tsx を責務別に分割 #34
+    `.trim(),
+    tags: [],
+    createdAt: '2026-01-25T21:26:16.392Z',
+    updatedAt: '2026-01-25T21:26:16.392Z',
+  },
+  {
     id: 'v0.9.4',
     version: '0.9.4',
     date: '2026-01-25',

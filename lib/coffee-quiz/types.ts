@@ -185,7 +185,7 @@ export interface QuizSession {
   startedAt: string; // ISO 8601
   completedAt?: string; // ISO 8601
   questions: QuizSessionQuestion[];
-  mode: 'daily' | 'review' | 'category' | 'random' | 'single' | 'shuffle';
+  mode: 'daily' | 'review' | 'category' | 'random' | 'single' | 'shuffle' | 'sequential';
   category?: QuizCategory;
 }
 

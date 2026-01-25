@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.9.2',
+    version: '0.9.2',
+    date: '2026-01-25',
+    type: 'bugfix',
+    title: 'スマホでもヘッダーキャラクターを表示 #32',
+    content: `
+- スマホでもヘッダーキャラクターを表示 #32
+    `.trim(),
+    tags: [],
+    createdAt: '2026-01-25T20:40:28.101Z',
+    updatedAt: '2026-01-25T20:40:28.101Z',
+  },
+  {
     id: 'v0.9.1',
     version: '0.9.1',
     date: '2026-01-25',

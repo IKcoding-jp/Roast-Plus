@@ -14,71 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
-    id: 'v0.9.5',
-    version: '0.9.5',
-    date: '2026-01-25',
-    type: 'improvement',
-    title: 'RoastTimer.tsx を責務別に分割 #34',
-    content: `
-- RoastTimer.tsx を責務別に分割 #34
-    `.trim(),
-    tags: [],
-    createdAt: '2026-01-25T21:26:16.392Z',
-    updatedAt: '2026-01-25T21:26:16.392Z',
-  },
-  {
-    id: 'v0.9.4',
-    version: '0.9.4',
-    date: '2026-01-25',
-    type: 'update',
-    title: 'デバッグ用 console.log を削除 #40',
-    content: `
-- デバッグ用 console.log を削除 #40
-    `.trim(),
-    tags: [],
-    createdAt: '2026-01-25T21:07:56.277Z',
-    updatedAt: '2026-01-25T21:07:56.277Z',
-  },
-  {
-    id: 'v0.9.3',
-    version: '0.9.3',
-    date: '2026-01-25',
-    type: 'bugfix',
-    title: '試飲感想記録ページのレイアウトシフトを修正 #31',
-    content: `
-- 試飲感想記録ページのレイアウトシフトを修正 #31
-    `.trim(),
-    tags: [],
-    createdAt: '2026-01-25T20:57:52.472Z',
-    updatedAt: '2026-01-25T20:57:52.472Z',
-  },
-  {
-    id: 'v0.9.2',
-    version: '0.9.2',
-    date: '2026-01-25',
-    type: 'bugfix',
-    title: 'スマホでもヘッダーキャラクターを表示 #32',
-    content: `
-- スマホでもヘッダーキャラクターを表示 #32
-    `.trim(),
-    tags: [],
-    createdAt: '2026-01-25T20:40:28.101Z',
-    updatedAt: '2026-01-25T20:40:28.101Z',
-  },
-  {
     id: 'v0.9.1',
     version: '0.9.1',
     date: '2026-01-25',
-    type: 'docs',
-    title: '開発秘話の読みやすさを改善',
+    type: 'improvement',
+    title: 'UI改善・バグ修正・コード整理',
     content: `
-- 開発秘話エピソード6「Claude Codeを使ってみた」を、より分かりやすい言葉で書き直しました
-- 難しい専門用語を、コーヒーに例えた分かりやすい表現に変更しました
-- 開発ツールの比較を、ハンドドリップとバリスタに例えて説明しています
+- RoastTimer.tsx を責務別に分割してコードを整理
+- デバッグ用 console.log を削除
+- 試飲感想記録ページのレイアウトシフトを修正
+- スマホでもヘッダーキャラクターを表示
+- 開発秘話エピソード6を非エンジニア向けに改善
     `.trim(),
-    tags: ['開発秘話'],
+    tags: ['UI', 'バグ修正', 'リファクタリング'],
     createdAt: '2026-01-25T20:14:39.382Z',
-    updatedAt: '2026-01-25T20:14:39.382Z',
+    updatedAt: '2026-01-25T21:26:16.392Z',
   },
   {
     id: 'v0.9.0',

@@ -35,6 +35,7 @@ interface PRLabel {
 interface VersionBumpResult {
   versionType: VersionType;
   changelogType: ChangelogEntryType;
+  skip?: boolean; // バージョン更新をスキップするか
 }
 
 // ====== バージョン判定ロジック ======
@@ -76,17 +77,21 @@ function determineVersionBump(
   if (/^fix(\(.+\))?:/i.test(title)) {
     return { versionType: 'patch', changelogType: 'bugfix' };
   }
-  // docs: 形式
+  // docs: 形式 → スキップ（技術的変更）
   if (/^docs(\(.+\))?:/i.test(title)) {
-    return { versionType: 'patch', changelogType: 'docs' };
+    return { versionType: 'patch', changelogType: 'docs', skip: true };
   }
-  // style: 形式
+  // style: 形式 → スキップ（技術的変更）
   if (/^style(\(.+\))?:/i.test(title)) {
-    return { versionType: 'patch', changelogType: 'style' };
+    return { versionType: 'patch', changelogType: 'style', skip: true };
   }
-  // refactor: または perf: 形式
+  // refactor: または perf: 形式 → スキップ（技術的変更）
   if (/^(refactor|perf)(\(.+\))?:/i.test(title)) {
-    return { versionType: 'patch', changelogType: 'improvement' };
+    return { versionType: 'patch', changelogType: 'improvement', skip: true };
+  }
+  // chore: 形式 → スキップ（技術的変更）
+  if (/^chore(\(.+\))?:/i.test(title)) {
+    return { versionType: 'patch', changelogType: 'update', skip: true };
   }
 
   // [feat], [fix] などの形式
@@ -197,6 +202,35 @@ function getNowISO(): string {
   return new Date().toISOString();
 }
 
+// 同日の最新エントリを取得（存在する場合）
+function getSameDayLatestVersion(): { version: string; content: string } | null {
+  const versionHistoryPath = join(process.cwd(), 'data', 'dev-stories', 'version-history.ts');
+  const content = readFileSync(versionHistoryPath, 'utf-8');
+  const today = getTodayDate();
+
+  // 最新エントリの日付をチェック
+  const dateMatch = content.match(/date:\s*'(\d{4}-\d{2}-\d{2})'/);
+  const versionMatch = content.match(/version:\s*'([\d.]+)'/);
+
+  if (dateMatch && versionMatch && dateMatch[1] === today) {
+    // 詳細changelogから同じバージョンのcontentを取得
+    const detailedPath = join(process.cwd(), 'data', 'dev-stories', 'detailed-changelog.ts');
+    const detailedContent = readFileSync(detailedPath, 'utf-8');
+
+    // 該当バージョンのcontentを抽出
+    const contentMatch = detailedContent.match(
+      new RegExp(`id:\\s*'v${versionMatch[1]}'[\\s\\S]*?content:\\s*\\\`\\n([\\s\\S]*?)\\n\\s*\\\`\\.trim\\(\\)`)
+    );
+
+    return {
+      version: versionMatch[1],
+      content: contentMatch ? contentMatch[1].trim() : '',
+    };
+  }
+
+  return null;
+}
+
 // ====== ファイル更新処理 ======
 function updatePackageJson(newVersion: string): void {
   const path = join(process.cwd(), 'package.json');
@@ -248,6 +282,77 @@ function updateVersionHistory(newVersion: string, summary: string): void {
 
   writeFileSync(path, updatedContent);
   console.log(`✓ version-history.ts updated with ${newVersion}`);
+}
+
+// 同日の既存エントリを更新（内容を追記）
+function appendToSameDayEntry(
+  existingVersion: string,
+  existingContent: string,
+  newSummary: string,
+  title: string
+): void {
+  const today = getTodayDate();
+  const isoNow = getNowISO();
+
+  // version-history.ts の summary を更新
+  const versionHistoryPath = join(process.cwd(), 'data', 'dev-stories', 'version-history.ts');
+  const versionHistoryContent = readFileSync(versionHistoryPath, 'utf-8');
+
+  // 「〜 など N件の更新」形式に変更
+  const existingSummaryMatch = versionHistoryContent.match(
+    new RegExp(`version:\\s*'${existingVersion}'[\\s\\S]*?summary:\\s*'([^']*)'`)
+  );
+
+  if (existingSummaryMatch) {
+    const existingSummary = existingSummaryMatch[1];
+    let newSummaryText: string;
+
+    // 既存が「N件の更新」形式かチェック
+    const countMatch = existingSummary.match(/など\s*(\d+)件の更新$/);
+    if (countMatch) {
+      // 既に件数表記がある場合は+1
+      const newCount = parseInt(countMatch[1]) + 1;
+      newSummaryText = existingSummary.replace(/など\s*\d+件の更新$/, `など ${newCount}件の更新`);
+    } else {
+      // 初めてまとめる場合は「〜 など 2件の更新」に
+      newSummaryText = `${existingSummary} など 2件の更新`;
+    }
+
+    const updatedVersionHistory = versionHistoryContent.replace(
+      new RegExp(`(version:\\s*'${existingVersion}'[\\s\\S]*?summary:\\s*')([^']*)'`),
+      `$1${newSummaryText}'`
+    );
+    writeFileSync(versionHistoryPath, updatedVersionHistory);
+    console.log(`✓ version-history.ts updated (appended to ${existingVersion})`);
+  }
+
+  // detailed-changelog.ts の content に追記
+  const detailedPath = join(process.cwd(), 'data', 'dev-stories', 'detailed-changelog.ts');
+  const detailedContent = readFileSync(detailedPath, 'utf-8');
+
+  // 新しい内容を既存contentに追加
+  const newContentLine = `- ${title}`;
+  const updatedContent = existingContent + '\n' + newContentLine;
+  const escapedUpdatedContent = escapeForTemplate(updatedContent);
+
+  // content部分を更新
+  const contentPattern = new RegExp(
+    `(id:\\s*'v${existingVersion}'[\\s\\S]*?content:\\s*\\\`\\n)[\\s\\S]*?(\\n\\s*\\\`\\.trim\\(\\))`
+  );
+
+  const updatedDetailed = detailedContent.replace(
+    contentPattern,
+    `$1${escapedUpdatedContent}$2`
+  );
+
+  // updatedAtも更新
+  const finalUpdated = updatedDetailed.replace(
+    new RegExp(`(id:\\s*'v${existingVersion}'[\\s\\S]*?updatedAt:\\s*')[^']*'`),
+    `$1${isoNow}'`
+  );
+
+  writeFileSync(detailedPath, finalUpdated);
+  console.log(`✓ detailed-changelog.ts updated (appended to ${existingVersion})`);
 }
 
 function updateDetailedChangelog(
@@ -332,11 +437,40 @@ async function main() {
   }
 
   // バージョン判定
-  const { versionType, changelogType } = determineVersionBump(
+  const { versionType, changelogType, skip } = determineVersionBump(
     prTitle,
     prBody,
     prLabels
   );
+
+  // 技術的な変更（refactor/chore/docs/style）はスキップ
+  if (skip) {
+    console.log(`⏭ Technical change detected (${changelogType}). Skipping version update.`);
+    console.log('   Use feat: or fix: prefix for user-facing changes.');
+    return;
+  }
+
+  // タイトルから要約を抽出
+  const summary = extractSummary(prTitle);
+
+  // 同日の既存エントリをチェック
+  const sameDayEntry = getSameDayLatestVersion();
+
+  if (sameDayEntry) {
+    // 同日の場合は既存エントリに追記（新バージョンは作らない）
+    console.log(`📅 Same-day entry found (v${sameDayEntry.version}). Appending to existing version.`);
+    console.log('');
+
+    appendToSameDayEntry(
+      sameDayEntry.version,
+      sameDayEntry.content,
+      summary,
+      summary
+    );
+
+    console.log('\n✅ Appended to existing version successfully!');
+    return;
+  }
 
   // 現在のバージョン取得
   const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
@@ -348,9 +482,6 @@ async function main() {
   console.log(`Version bump: ${currentVersion} → ${newVersion} (${versionType})`);
   console.log(`Changelog type: ${changelogType}`);
   console.log('');
-
-  // タイトルから要約を抽出
-  const summary = extractSummary(prTitle);
 
   // PRラベルからタグを生成
   const tags = extractTags(prLabels);

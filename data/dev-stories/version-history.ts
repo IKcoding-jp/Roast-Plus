@@ -3,29 +3,9 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
-    version: '0.9.5',
-    date: '2026-01-25',
-    summary: 'RoastTimer.tsx を責務別に分割 #34',
-  },
-  {
-    version: '0.9.4',
-    date: '2026-01-25',
-    summary: 'デバッグ用 console.log を削除 #40',
-  },
-  {
-    version: '0.9.3',
-    date: '2026-01-25',
-    summary: '試飲感想記録ページのレイアウトシフトを修正 #31',
-  },
-  {
-    version: '0.9.2',
-    date: '2026-01-25',
-    summary: 'スマホでもヘッダーキャラクターを表示 #32',
-  },
-  {
     version: '0.9.1',
     date: '2026-01-25',
-    summary: '開発秘話エピソード6を非エンジニア向けに改善',
+    summary: 'UI改善・バグ修正・コード整理 など 5件の更新',
   },
   {
     version: '0.9.0',

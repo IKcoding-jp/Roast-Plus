@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.9.3',
+    version: '0.9.3',
+    date: '2026-01-25',
+    type: 'bugfix',
+    title: '試飲感想記録ページのレイアウトシフトを修正 #31',
+    content: `
+- 試飲感想記録ページのレイアウトシフトを修正 #31
+    `.trim(),
+    tags: [],
+    createdAt: '2026-01-25T20:57:52.472Z',
+    updatedAt: '2026-01-25T20:57:52.472Z',
+  },
+  {
     id: 'v0.9.2',
     version: '0.9.2',
     date: '2026-01-25',

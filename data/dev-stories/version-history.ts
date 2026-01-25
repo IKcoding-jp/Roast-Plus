@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.9.3',
+    date: '2026-01-25',
+    summary: '試飲感想記録ページのレイアウトシフトを修正 #31',
+  },
+  {
     version: '0.9.2',
     date: '2026-01-25',
     summary: 'スマホでもヘッダーキャラクターを表示 #32',

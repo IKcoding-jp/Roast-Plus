@@ -390,6 +390,19 @@ export function useQuizData() {
     setProgress(initialProgress);
   }, []);
 
+  // localStorageから進捗を再読み込み
+  const refreshProgress = useCallback(() => {
+    if (!isHydrated) return;
+    try {
+      const stored = getQuizProgress();
+      if (stored) {
+        setProgress(stored);
+      }
+    } catch (err) {
+      console.error('Failed to refresh quiz progress:', err);
+    }
+  }, [isHydrated]);
+
   return {
     progress,
     loading,
@@ -403,6 +416,7 @@ export function useQuizData() {
     categoryMasteryStats,
     difficultyMasteryStats,
     resetProgress,
+    refreshProgress,
   };
 }
 

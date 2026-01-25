@@ -33,9 +33,14 @@ interface CategoryPageContentProps {
 
 export function CategoryPageContent({ category }: CategoryPageContentProps) {
   const router = useRouter();
-  const { progress, loading: progressLoading } = useQuizData();
+  const { progress, loading: progressLoading, refreshProgress } = useQuizData();
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // ページ表示時に進捗データを再読み込み（クイズ回答後の反映用）
+  useEffect(() => {
+    refreshProgress();
+  }, [refreshProgress]);
 
   // カテゴリの検証
   const validCategories: QuizCategory[] = ['basics', 'roasting', 'brewing', 'history'];

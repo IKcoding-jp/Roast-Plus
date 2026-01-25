@@ -22,6 +22,7 @@ import {
   ChatCircleText
 } from 'phosphor-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Input, Select, Textarea, Button } from '@/components/ui';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
@@ -314,27 +315,14 @@ export function TastingRecordForm({
               <User size={18} weight="bold" className="text-amber-500" />
               メンバー <span className="text-red-500">*</span>
             </label>
-            <div className="relative">
-              <select
-                value={selectedMemberId}
-                onChange={(e) => handleMemberChange(e.target.value)}
-                className="w-full pl-4 pr-10 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all appearance-none text-gray-900 font-medium"
-                required
-                disabled={readOnly}
-              >
-                <option value="" className="text-gray-900">選択してください</option>
-                {selectableMembers.map((member) => (
-                  <option key={member.id} value={member.id} className="text-gray-900">
-                    {member.name}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
+            <Select
+              value={selectedMemberId}
+              onChange={(e) => handleMemberChange(e.target.value)}
+              options={selectableMembers.map((member) => ({ value: member.id, label: member.name }))}
+              placeholder="選択してください"
+              required
+              disabled={readOnly}
+            />
           </div>
 
           {/* 豆の名前（セッションモードでは非表示） */}
@@ -344,11 +332,10 @@ export function TastingRecordForm({
                 <Coffee size={18} weight="bold" className="text-amber-500" />
                 豆の名前 <span className="text-red-500">*</span>
               </label>
-              <input
+              <Input
                 type="text"
                 value={beanName}
                 onChange={(e) => setBeanName(e.target.value)}
-                className="w-full px-4 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-gray-900 font-medium placeholder:text-gray-400"
                 placeholder="例: エチオピア イルガチェフェ"
                 required
                 disabled={readOnly}
@@ -364,11 +351,10 @@ export function TastingRecordForm({
                   <Calendar size={18} weight="bold" className="text-amber-500" />
                   試飲日 <span className="text-red-500">*</span>
                 </label>
-                <input
+                <Input
                   type="date"
                   value={tastingDate}
                   onChange={(e) => setTastingDate(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-gray-900 font-medium"
                   required
                   disabled={readOnly}
                 />
@@ -382,26 +368,15 @@ export function TastingRecordForm({
                   <Thermometer size={18} weight="bold" className="text-amber-500" />
                   焙煎度合い <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <select
-                    value={roastLevel}
-                    onChange={(e) =>
-                      setRoastLevel(e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り')
-                    }
-                    className="w-full pl-4 pr-10 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all appearance-none text-gray-900 font-medium"
-                    required
-                    disabled={readOnly}
-                  >
-                    {ROAST_LEVELS.map((level) => (
-                      <option key={level} value={level}>{level}</option>
-                    ))}
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                <Select
+                  value={roastLevel}
+                  onChange={(e) =>
+                    setRoastLevel(e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り')
+                  }
+                  options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
+                  required
+                  disabled={readOnly}
+                />
               </div>
             )}
           </div>
@@ -510,11 +485,10 @@ export function TastingRecordForm({
               <ChatCircleText size={18} weight="bold" className="text-amber-500" />
               コメント
             </label>
-            <textarea
+            <Textarea
               value={overallImpression}
               onChange={(e) => setOverallImpression(e.target.value)}
               rows={6}
-              className="w-full px-4 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-gray-900 font-medium placeholder:text-gray-400 resize-none"
               placeholder="コーヒーの全体的な印象、味の深み、後味などを自由に記録してください..."
               disabled={readOnly}
             />
@@ -531,34 +505,39 @@ export function TastingRecordForm({
             className="sticky bottom-6 flex gap-4 bg-white/80 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/20 z-20"
           >
             {onDelete && record && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={handleDelete}
-                className="flex-1 px-6 py-4 bg-white border-2 border-gray-100 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-bold text-lg flex items-center justify-center gap-2"
+                className="flex-1"
               >
                 削除
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               type="submit"
-              className="flex-[2] px-6 py-4 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl hover:from-amber-700 hover:to-amber-600 shadow-lg shadow-amber-200 transition-all font-bold text-lg flex items-center justify-center gap-2"
+              variant="primary"
+              size="lg"
+              className="flex-[2]"
             >
               <Smiley size={24} weight="bold" />
               {existingRecordId || record ? '記録を更新する' : '記録を保存する'}
-            </button>
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
 
       {readOnly && (
         <div className="flex gap-4">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={onCancel}
-            className="flex-1 px-6 py-4 bg-white border-2 border-gray-100 text-gray-700 rounded-2xl hover:bg-gray-50 transition-all font-bold text-lg"
+            fullWidth
+            size="lg"
           >
             戻る
-          </button>
+          </Button>
         </div>
       )}
     </motion.form>

@@ -11,9 +11,9 @@ import {
   Trash,
   X,
   Plus,
-  Check,
-  CaretDown
+  Check
 } from 'phosphor-react';
+import { Input, Select, Button } from '@/components/ui';
 
 interface TastingSessionFormProps {
   session: TastingSession | null;
@@ -88,11 +88,10 @@ export function TastingSessionForm({
             <Coffee size={20} weight="bold" className="text-amber-600" />
             豆の名前 <span className="text-red-500">*</span>
           </label>
-          <input
+          <Input
             type="text"
             value={beanName}
             onChange={(e) => setBeanName(e.target.value)}
-            className="w-full px-6 py-5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold placeholder:text-stone-300 shadow-inner text-lg"
             required
             placeholder="例: コロンビア・エチオピアなど"
           />
@@ -105,27 +104,16 @@ export function TastingSessionForm({
               <Thermometer size={20} weight="bold" className="text-amber-600" />
               焙煎度合い <span className="text-red-500">*</span>
             </label>
-            <div className="relative">
-              <select
-                value={roastLevel}
-                onChange={(e) =>
-                  setRoastLevel(
-                    e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
-                  )
-                }
-                className="w-full px-6 py-5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold appearance-none shadow-inner text-lg"
-                required
-              >
-                {ROAST_LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400">
-                <CaretDown size={20} weight="bold" />
-              </div>
-            </div>
+            <Select
+              value={roastLevel}
+              onChange={(e) =>
+                setRoastLevel(
+                  e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
+                )
+              }
+              options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
+              required
+            />
           </div>
 
           {/* 試飲日 */}
@@ -134,11 +122,10 @@ export function TastingSessionForm({
               <CalendarBlank size={20} weight="bold" className="text-amber-600" />
               試飲日 <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               type="date"
               value={createdAt}
               onChange={(e) => setCreatedAt(e.target.value)}
-              className="w-full px-6 py-5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold shadow-inner text-lg"
               required
             />
           </div>
@@ -148,26 +135,32 @@ export function TastingSessionForm({
       {/* ボタン */}
       <div className="flex flex-col sm:flex-row gap-4">
         {!isNew && onDelete && (
-          <button
+          <Button
             type="button"
+            variant="danger"
             onClick={handleDelete}
-            className="flex-1 px-6 py-5 bg-white border-2 border-red-100 text-red-500 rounded-2xl font-black text-lg shadow-sm hover:bg-red-50 transition-all flex items-center justify-center gap-2 order-3 sm:order-1 whitespace-nowrap"
+            size="lg"
+            className="flex-1 order-3 sm:order-1"
           >
             <Trash size={24} weight="bold" />
             削除
-          </button>
+          </Button>
         )}
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={onCancel}
-          className="flex-1 px-6 py-5 bg-white border-2 border-stone-100 text-stone-400 rounded-2xl font-black text-lg shadow-sm hover:bg-stone-50 transition-all flex items-center justify-center gap-2 order-2 whitespace-nowrap"
+          size="lg"
+          className="flex-1 order-2"
         >
           <X size={24} weight="bold" />
           キャンセル
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
-          className="flex-[1.5] px-8 py-5 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl font-black text-lg shadow-xl shadow-amber-200/50 hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-3 whitespace-nowrap"
+          variant="primary"
+          size="lg"
+          className="flex-[1.5] order-1 sm:order-3"
         >
           {isNew ? (
             <>
@@ -180,7 +173,7 @@ export function TastingSessionForm({
               更新する
             </>
           )}
-        </button>
+        </Button>
       </div>
     </motion.form>
   );

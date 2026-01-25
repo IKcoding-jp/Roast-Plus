@@ -7,6 +7,9 @@
     "build": "npm run generate:sound-list && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "generate:sound-list": "tsx scripts/generate-sound-list.ts"
   },
   "dependencies": {
@@ -30,13 +33,18 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.1.2",
     "eslint": "^9",
     "eslint-config-next": "^16.0.8",
+    "jsdom": "^27.4.0",
     "tailwindcss": "^4",
     "tsx": "^4.7.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }

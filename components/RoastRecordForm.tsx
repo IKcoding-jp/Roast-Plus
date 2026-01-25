@@ -5,6 +5,7 @@ import type { RoastTimerRecord, AppData } from '@/types';
 import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { formatTime } from '@/lib/roastTimerUtils';
 import { useToastContext } from '@/components/Toast';
+import { Input, Select, Button } from '@/components/ui';
 
 const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
   '浅煎り',
@@ -168,19 +169,13 @@ function RoastRecordFormInner({
         <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
           豆の名前 <span className="text-red-500">*</span>
         </label>
-        <select
+        <Select
           value={beanName}
           onChange={(e) => setBeanName(e.target.value as BeanName)}
-          className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+          options={ALL_BEANS.map((bean) => ({ value: bean, label: bean }))}
+          placeholder="選択してください"
           required
-        >
-          <option value="">選択してください</option>
-          {ALL_BEANS.map((bean) => (
-            <option key={bean} value={bean}>
-              {bean}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       {/* 重さ */}
@@ -188,21 +183,15 @@ function RoastRecordFormInner({
         <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
           重さ <span className="text-red-500">*</span>
         </label>
-        <select
-          value={weight}
+        <Select
+          value={weight.toString()}
           onChange={(e) =>
             setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')
           }
-          className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+          options={WEIGHTS.map((w) => ({ value: w.toString(), label: `${w}g` }))}
+          placeholder="選択してください"
           required
-        >
-          <option value="">選択してください</option>
-          {WEIGHTS.map((w) => (
-            <option key={w} value={w}>
-              {w}g
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       {/* 焙煎度合い */}
@@ -210,23 +199,17 @@ function RoastRecordFormInner({
         <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
           焙煎度合い <span className="text-red-500">*</span>
         </label>
-        <select
+        <Select
           value={roastLevel}
           onChange={(e) =>
             setRoastLevel(
               e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
             )
           }
-          className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+          options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
+          placeholder="選択してください"
           required
-        >
-          <option value="">選択してください</option>
-          {ROAST_LEVELS.map((level) => (
-            <option key={level} value={level}>
-              {level}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       {/* 実際のロースト時間 */}
@@ -236,25 +219,23 @@ function RoastRecordFormInner({
         </label>
         <div className="flex gap-3 sm:gap-4">
           <div className="flex-1">
-            <input
+            <Input
               type="text"
               inputMode="numeric"
               value={durationMinutes}
               onChange={(e) => handleDurationMinutesChange(e.target.value)}
               placeholder="分"
-              className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
               required
             />
           </div>
           <div className="flex-1">
-            <input
+            <Input
               type="text"
               inputMode="numeric"
               value={durationSeconds}
               onChange={(e) => handleDurationSecondsChange(e.target.value)}
               placeholder="秒"
               maxLength={2}
-              className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
             />
           </div>
         </div>
@@ -270,11 +251,10 @@ function RoastRecordFormInner({
         <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
           焙煎日 <span className="text-red-500">*</span>
         </label>
-        <input
+        <Input
           type="date"
           value={roastDate}
           onChange={(e) => setRoastDate(e.target.value)}
-          className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
           required
         />
       </div>
@@ -282,34 +262,36 @@ function RoastRecordFormInner({
       {/* ボタン */}
       <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row gap-3">
         {isEditMode && onDelete && (
-          <button
+          <Button
             type="button"
+            variant="danger"
             onClick={() => {
               if (record && window.confirm('この記録を削除しますか？')) {
                 onDelete(record.id);
               }
             }}
-            className="w-full sm:w-auto px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors text-base sm:text-lg min-h-[44px]"
+            className="w-full sm:w-auto"
           >
             削除
-          </button>
+          </Button>
         )}
         <div className="flex-1 flex gap-3">
           {onCancel && (
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onCancel}
-              className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400 transition-colors text-base sm:text-lg min-h-[44px]"
             >
               キャンセル
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="submit"
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-base sm:text-lg min-h-[44px]"
+            variant="primary"
+            className="flex-1"
           >
             {isEditMode ? '更新' : '保存'}
-          </button>
+          </Button>
         </div>
       </div>
     </form>

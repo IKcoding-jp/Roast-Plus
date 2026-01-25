@@ -6,6 +6,7 @@ import { StepEditor } from './StepEditor';
 import { FloppyDisk, ArrowLeft, ArrowClockwise } from 'phosphor-react';
 import Link from 'next/link';
 import { MOCK_RECIPES } from '@/lib/drip-guide/mockData';
+import { Input, Textarea, Button } from '@/components/ui';
 
 interface RecipeFormProps {
     initialRecipe?: DripRecipe;
@@ -105,11 +106,10 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">レシピ名 <span className="text-red-500">*</span></label>
-                            <input
+                            <Input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 placeholder="例: BYSN Standard Drip"
                                 required
                             />
@@ -117,11 +117,10 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">豆の名前 <span className="text-red-500">*</span></label>
-                            <input
+                            <Input
                                 type="text"
                                 value={beanName}
                                 onChange={(e) => setBeanName(e.target.value)}
-                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 placeholder="例: Ethiopia Yirgacheffe"
                                 required
                             />
@@ -129,33 +128,30 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">用途・タグ</label>
-                            <input
+                            <Input
                                 type="text"
                                 value={purpose}
                                 onChange={(e) => setPurpose(e.target.value)}
-                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 placeholder="例: 試飲会用"
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">豆の量 (g)</label>
-                            <input
+                            <Input
                                 type="number"
                                 value={beanAmountGram}
                                 onChange={(e) => setBeanAmountGram(parseInt(e.target.value) || 0)}
-                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 min={1}
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">総湯量 (g)</label>
-                            <input
+                            <Input
                                 type="number"
                                 value={totalWaterGram}
                                 onChange={(e) => setTotalWaterGram(parseInt(e.target.value) || 0)}
-                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 min={1}
                             />
                         </div>
@@ -165,7 +161,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                             <div className="flex gap-2 items-center">
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <input
+                                        <Input
                                             type="number"
                                             value={Math.floor(totalDurationSec / 60)}
                                             onChange={(e) => {
@@ -173,7 +169,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                                 const seconds = totalDurationSec % 60;
                                                 setTotalDurationSec(minutes * 60 + seconds);
                                             }}
-                                            className="w-20 p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base text-right"
+                                            className="w-20 text-right"
                                             min={0}
                                         />
                                         <span className="text-gray-600 text-sm whitespace-nowrap font-medium">分</span>
@@ -181,7 +177,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <input
+                                        <Input
                                             type="number"
                                             value={totalDurationSec % 60}
                                             onChange={(e) => {
@@ -189,7 +185,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                                 const seconds = parseInt(e.target.value) || 0;
                                                 setTotalDurationSec(minutes * 60 + seconds);
                                             }}
-                                            className="w-20 p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base text-right"
+                                            className="w-20 text-right"
                                             min={0}
                                             max={59}
                                         />
@@ -201,10 +197,9 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
 
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">説明・メモ</label>
-                            <textarea
+                            <Textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full p-3 sm:p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-base"
                                 rows={3}
                                 placeholder="レシピの特徴や注意点など"
                             />
@@ -259,22 +254,23 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10">
                 <div className="max-w-3xl mx-auto flex flex-row gap-3 justify-center">
                     {initialRecipe?.isDefault && (
-                        <button
+                        <Button
                             type="button"
+                            variant="secondary"
                             onClick={handleResetToDefault}
-                            className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg font-medium text-base hover:bg-gray-200 transition-colors active:scale-95 touch-manipulation"
                         >
                             <ArrowClockwise size={20} />
                             デフォルトに戻す
-                        </button>
+                        </Button>
                     )}
-                    <button
+                    <Button
                         type="submit"
-                        className="flex items-center justify-center gap-2 bg-amber-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg hover:bg-amber-700 transition-transform active:scale-95 touch-manipulation"
+                        variant="primary"
+                        size="lg"
                     >
                         <FloppyDisk size={24} />
                         レシピを保存
-                    </button>
+                    </Button>
                 </div>
             </div>
         </form>

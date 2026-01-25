@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { HiX, HiCamera, HiTrash } from 'react-icons/hi';
 import { CameraCapture } from './CameraCapture';
 import type { DefectBean } from '@/types';
+import { Input, Textarea, Button } from '@/components/ui';
 
 interface DefectBeanFormProps {
   mode?: 'add' | 'edit';
@@ -221,11 +222,10 @@ export function DefectBeanForm({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               名称 <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[44px] text-gray-900 bg-white"
               placeholder="例: カビ豆"
               required
             />
@@ -236,11 +236,11 @@ export function DefectBeanForm({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               特徴（見た目の説明）
             </label>
-            <textarea
+            <Textarea
               value={characteristics}
               onChange={(e) => setCharacteristics(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[100px] resize-y text-gray-900 bg-white"
               placeholder="例: 黒いカビが生えている。表面が黒ずんでいる。"
+              rows={4}
             />
           </div>
 
@@ -249,11 +249,11 @@ export function DefectBeanForm({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               味への影響
             </label>
-            <textarea
+            <Textarea
               value={tasteImpact}
               onChange={(e) => setTasteImpact(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[100px] resize-y text-gray-900 bg-white"
               placeholder="例: カビ臭さがコーヒーの風味を損なう。"
+              rows={4}
             />
           </div>
 
@@ -262,40 +262,41 @@ export function DefectBeanForm({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               省く理由
             </label>
-            <textarea
+            <Textarea
               value={removalReason}
               onChange={(e) => setRemovalReason(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[100px] resize-y text-gray-900 bg-white"
               placeholder="例: 品質を保つため、カビ豆は必ず除去する。"
+              rows={4}
             />
           </div>
 
           {/* ボタン */}
           <div className={`flex gap-3 pt-4 border-t border-gray-200 ${mode === 'edit' && onDelete ? 'justify-between' : 'justify-end'}`}>
             {mode === 'edit' && onDelete && (
-              <button
+              <Button
                 type="button"
+                variant="danger"
                 onClick={handleDelete}
-                className="px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 disabled={isSubmitting || isDeleting}
               >
                 <HiTrash className="h-5 w-5" />
                 {isDeleting ? '削除中...' : '削除'}
-              </button>
+              </Button>
             )}
             <div className="flex gap-3">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={onCancel}
-                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors min-h-[44px]"
                 disabled={isSubmitting || isDeleting}
               >
                 キャンセル
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                variant="primary"
                 disabled={isSubmitting || isDeleting}
+                loading={isSubmitting}
               >
                 {isSubmitting
                   ? mode === 'edit'
@@ -304,7 +305,7 @@ export function DefectBeanForm({
                   : mode === 'edit'
                     ? '更新'
                     : '追加'}
-              </button>
+              </Button>
             </div>
           </div>
         </form>

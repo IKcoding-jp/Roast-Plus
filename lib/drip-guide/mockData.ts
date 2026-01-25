@@ -107,6 +107,60 @@ export const MOCK_RECIPES: DripRecipe[] = [
         ],
     },
 
+    // 4:6メソッド（粕谷 哲） - デフォルトレシピ（削除不可）
+    // 注意: 実際のRunではクエリから再生成するため、この固定値は一覧表示用の最低限の値
+    {
+        id: 'recipe-046',
+        name: '4:6メソッド（粕谷 哲）',
+        beanName: 'お好みの豆',
+        beanAmountGram: 10,
+        totalWaterGram: 150,
+        totalDurationSec: 210,
+        purpose: RECIPE46_PURPOSE,
+        description: '粕谷哲氏が考案した4:6メソッド。味わいと濃度を分けて調整する手法です。',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+        isDefault: true,
+        isManualMode: false,
+        steps: [
+            {
+                id: 'step-1',
+                startTimeSec: 0,
+                title: '蒸らし（味：40%）',
+                description: '粉全体にまんべんなくお湯を注いで均一に湿らせます。',
+                targetTotalWater: 25,
+            },
+            {
+                id: 'step-2',
+                startTimeSec: 45,
+                title: '2投目（味：40%）',
+                description: '味わいを調整する2投目です。',
+                targetTotalWater: 60,
+            },
+            {
+                id: 'step-3',
+                startTimeSec: 90,
+                title: '濃度調整（60%）',
+                description: '濃度を調整する注湯です。',
+                targetTotalWater: 90,
+            },
+            {
+                id: 'step-4',
+                startTimeSec: 135,
+                title: '濃度調整（60%）',
+                description: '濃度を調整する注湯です。',
+                targetTotalWater: 120,
+            },
+            {
+                id: 'step-5',
+                startTimeSec: 165,
+                title: '濃度調整（60%）',
+                description: '濃度を調整する注湯です。',
+                targetTotalWater: 150,
+            },
+        ],
+    },
+
     // James Hoffmann Ultimate V60 Technique - 1人前基準（15g/250g）
     {
         id: 'recipe-hoffmann',
@@ -159,60 +213,6 @@ export const MOCK_RECIPES: DripRecipe[] = [
                 title: '落ち切り待ち',
                 description: '全てのお湯が落ち切るのを待ちます。',
                 note: '目標: 約3:30で完了',
-            },
-        ],
-    },
-
-    // 4:6メソッド（粕谷 哲） - デフォルトレシピ（削除不可）
-    // 注意: 実際のRunではクエリから再生成するため、この固定値は一覧表示用の最低限の値
-    {
-        id: 'recipe-046',
-        name: '4:6メソッド（粕谷 哲）',
-        beanName: 'お好みの豆',
-        beanAmountGram: 10,
-        totalWaterGram: 150,
-        totalDurationSec: 210,
-        purpose: RECIPE46_PURPOSE,
-        description: '粕谷哲氏が考案した4:6メソッド。味わいと濃度を分けて調整する手法です。',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z',
-        isDefault: true,
-        isManualMode: false,
-        steps: [
-            {
-                id: 'step-1',
-                startTimeSec: 0,
-                title: '蒸らし（味：40%）',
-                description: '粉全体にまんべんなくお湯を注いで均一に湿らせます。',
-                targetTotalWater: 25,
-            },
-            {
-                id: 'step-2',
-                startTimeSec: 45,
-                title: '2投目（味：40%）',
-                description: '味わいを調整する2投目です。',
-                targetTotalWater: 60,
-            },
-            {
-                id: 'step-3',
-                startTimeSec: 90,
-                title: '濃度調整（60%）',
-                description: '濃度を調整する注湯です。',
-                targetTotalWater: 90,
-            },
-            {
-                id: 'step-4',
-                startTimeSec: 135,
-                title: '濃度調整（60%）',
-                description: '濃度を調整する注湯です。',
-                targetTotalWater: 120,
-            },
-            {
-                id: 'step-5',
-                startTimeSec: 165,
-                title: '濃度調整（60%）',
-                description: '濃度を調整する注湯です。',
-                targetTotalWater: 150,
             },
         ],
     },

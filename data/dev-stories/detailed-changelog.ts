@@ -14,6 +14,78 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.9.0',
+    version: '0.9.0',
+    date: '2026-01-25',
+    type: 'feature',
+    title: '再利用可能なUIコンポーネントライブラリを追加',
+    content: `
+## Summary
+
+- \`.claude/skills/roastplus-ui/components.md\` のデザインパターンに準拠したUIコンポーネントを作成
+- 通常モードとクリスマスモードの両方に対応
+- アクセシビリティを考慮（最小タッチサイズ44px、フォーカスリング、aria属性）
+
+## 作成したコンポーネント
+
+### components/ui/
+| コンポーネント | 説明 |
+|---------------|------|
+| \`Button.tsx\` | 5 variants (primary, secondary, danger, outline, ghost) × 3 sizes (sm, md, lg) |
+| \`Input.tsx\` | テキスト入力（ラベル、エラー表示対応） |
+| \`Select.tsx\` | ドロップダウン選択 |
+| \`Textarea.tsx\` | 複数行テキスト入力 |
+| \`Card.tsx\` | 3 variants (default, hoverable, action) |
+| \`index.ts\` | 統一インポート用エクスポート |
+
+### その他
+- \`docs/UI_AUDIT.md\` - UI一貫性監査レポート
+- \`app/ui-test/page.tsx\` - コンポーネントテストページ（/ui-test でアクセス可能）
+
+## 使用方法
+
+\`\`\`tsx
+import { Button, Input, Select, Textarea, Card } from '@/components/ui';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
+
+function MyForm() {
+  const { isChristmasMode } = useChristmasMode();
+
+  return (
+    <Card isChristmasMode={isChristmasMode}>
+      <Input label="名前" isChristmasMode={isChristmasMode} />
+      <Button variant="primary" isChristmasMode={isChristmasMode}>
+        送信
+      </Button>
+    </Card>
+  );
+}
+\`\`\`
+
+## Test plan
+
+- [x] 開発サーバーで動作確認（\`npm run dev\`）
+- [x] すべてのButton variants表示確認
+- [x] すべてのButton sizes表示確認
+- [x] Button states (disabled, loading, fullWidth) 動作確認
+- [x] Input（ラベル、プレースホルダー、エラー）動作確認
+- [x] Select ドロップダウン動作確認
+- [x] Textarea 動作確認
+- [x] Card variants 表示確認
+- [x] クリスマスモード切り替え動作確認
+- [x] コンソールエラーなし確認
+
+## Related Issues
+
+Closes #41 (Phase 1: UIコンポーネント基盤作成)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+    `.trim(),
+    tags: [],
+    createdAt: '2026-01-25T19:57:29.187Z',
+    updatedAt: '2026-01-25T19:57:29.187Z',
+  },
+  {
     id: 'v0.8.0',
     version: '0.8.0',
     date: '2026-01-26',

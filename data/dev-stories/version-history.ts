@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.9.0',
+    date: '2026-01-25',
+    summary: '再利用可能なUIコンポーネントライブラリを追加',
+  },
+  {
     version: '0.8.0',
     date: '2026-01-26',
     summary: 'クイズ自動遷移・バッジデザイン刷新・更新履歴詳細ページ・Vitest導入',

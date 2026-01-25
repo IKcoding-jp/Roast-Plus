@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Loading } from '@/components/Loading';
 import { useQuizData } from '@/hooks/useQuizData';
 import { BADGE_DEFINITIONS } from '@/lib/coffee-quiz/types';
-import type { BadgeType } from '@/lib/coffee-quiz/types';
 import {
   LuArrowLeft,
   LuTrophy,
@@ -13,7 +12,53 @@ import {
   LuCircleCheck,
   LuBookOpen,
   LuAward,
+  LuTarget,
+  LuCoffee,
+  LuBean,
+  LuLibrary,
+  LuStar,
+  LuSparkles,
+  LuPartyPopper,
+  LuSunrise,
+  LuBird,
+  LuZap,
+  LuCircleCheckBig,
 } from 'react-icons/lu';
+import type { BadgeType } from '@/lib/coffee-quiz/types';
+
+// バッジタイプに応じたLucideアイコンを返す
+function getBadgeIcon(type: BadgeType, isEarned: boolean) {
+  const className = isEarned ? 'text-[#EF8A00]' : 'text-[#3A2F2B]/40';
+  const size = 24;
+
+  const iconMap: Record<BadgeType, React.ReactNode> = {
+    // ストリーク系
+    'streak-3': <LuFlame size={size} className={className} />,
+    'streak-7': <LuFlame size={size} className={className} />,
+    'streak-30': <LuFlame size={size} className={className} />,
+    'streak-100': <LuTrophy size={size} className={className} />,
+    // 正解数系
+    'correct-10': <LuCircleCheck size={size} className={className} />,
+    'correct-50': <LuCircleCheck size={size} className={className} />,
+    'correct-100': <LuTarget size={size} className={className} />,
+    'correct-500': <LuTrophy size={size} className={className} />,
+    // カテゴリマスタリー
+    'master-basics': <LuCoffee size={size} className={className} />,
+    'master-roasting': <LuBean size={size} className={className} />,
+    'master-brewing': <LuCoffee size={size} className={className} />,
+    'master-history': <LuLibrary size={size} className={className} />,
+    // パーフェクト
+    'perfect-session': <LuStar size={size} className={className} />,
+    'perfect-week': <LuSparkles size={size} className={className} />,
+    // その他
+    'first-quiz': <LuPartyPopper size={size} className={className} />,
+    'early-bird': <LuSunrise size={size} className={className} />,
+    'night-owl': <LuBird size={size} className={className} />,
+    'speed-demon': <LuZap size={size} className={className} />,
+  };
+
+  return iconMap[type] || <LuCircleCheckBig size={size} className={className} />;
+}
 
 export default function BadgesPage() {
   const { progress, loading: quizLoading } = useQuizData();
@@ -184,12 +229,8 @@ function BadgeSection({
               }`}
             >
               <div className="flex items-center gap-3 mb-2">
-                <span
-                  className={`text-2xl ${
-                    isEarned ? '' : 'grayscale opacity-50'
-                  }`}
-                >
-                  {badge.icon}
+                <span className="flex-shrink-0">
+                  {getBadgeIcon(badge.type, isEarned)}
                 </span>
                 <div className="flex-1 min-w-0">
                   <h3

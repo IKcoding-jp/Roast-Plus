@@ -77,6 +77,27 @@ npm run build    # ビルド
 npm run lint     # Lint
 ```
 
+## GitHub CLI (Issue/PR作成時の注意)
+Markdownコンテンツ（コードブロック、バッククォートなど）を含むIssue/PRを作成・編集する際は、**必ず一時ファイルを使用**すること。
+
+**理由：** Bashがバッククォート(`` ` ``)をコマンド置換として解釈してしまうため
+
+**正しい方法：**
+```bash
+# 1. 一時ファイルにbodyを書き出す（Writeツール使用）
+# 2. --body-file オプションで指定
+gh issue create --title "タイトル" --body-file temp-issue-body.md
+gh issue edit 123 --body-file temp-issue-body.md
+# 3. 一時ファイルを削除
+rm temp-issue-body.md
+```
+
+**避けるべき方法：**
+```bash
+# NG: --body に直接Markdownを書く（バッククォートがBashに解釈される）
+gh issue create --body "```typescript ..."
+```
+
 ## Context Management
 - タスク完了後は `/clear` を推奨
 - 長いセッションでは `/compact` を使用

@@ -3,102 +3,88 @@
 ## Overview
 コーヒー焙煎・抽出業務支援アプリ（Next.js PWA）
 
-## Git
-- **ベースブランチ**: `main`（PR作成時は必ず`main`をベースに指定）
-
 ## Tech Stack
 - Next.js 16 (App Router) / React 19 / TypeScript 5
 - Tailwind CSS v4 / Framer Motion / Lottie
 - Firebase (Auth, Firestore, Storage)
 
-## Ignored Directories (DO NOT READ)
-- `node_modules/`, `.next/`, `out/`, `.git/`
-- `coverage/`, `dist/`, `.turbo/`
-- `public/sounds/`, `public/lottie/` (静的アセット)
+## Workflows
+
+### 1. 探索→計画→コード→コミット型（標準）
+1. ファイルを読んで理解（コード作成は禁止）
+2. 「think hard」で計画立案
+3. 実装・検証
+4. PR作成、README更新
+
+### 2. TDD型
+1. 入出力ペアからテスト作成
+2. テスト実行で失敗確認 → コミット
+3. 実装で全テスト合格まで反復
+4. コード確定後コミット
+
+### 3. ビジュアル反復型
+Chrome DevTools MCPでスクショ確認しながらUI改善
+
+## Thinking Keywords
+| キーワード | 用途 |
+|-----------|------|
+| `think` | 通常の推論 |
+| `think hard` | 複雑な問題、設計判断 |
+| `ultrathink` | 最も困難なアーキテクチャ決定 |
 
 ## Tool Usage Policy
 
-### Serena MCP (コード探索時は必須)
-コードの探索・把握には**必ず**Serena MCPを使用すること。
+### Serena MCP（コード探索）
+- `get_symbols_overview` / `find_symbol` - シンボル検索
+- `search_for_pattern` - パターン検索
+- Glob/Grep/Task(Explore)より優先
 
-**主要ツール：**
-- `get_symbols_overview` - ファイルのシンボル一覧取得
-- `find_symbol` - シンボル検索（クラス、関数、変数など）
-- `find_referencing_symbols` - 参照元の検索
-- `search_for_pattern` - コードベース全体のパターン検索
-- `list_dir` / `find_file` - ディレクトリ・ファイル探索
+### Context7 MCP（実装時）
+`resolve-library-id` → `query-docs` で最新ドキュメント参照
 
-**注意：** Glob/Grep/Task(Explore)の直接使用よりSerenaを優先
-
-### Context7 MCP (コード実装時は必須)
-コードを実装する際は**必ず**Context7 MCPで最新ドキュメントを参照すること。
-
-**使用手順：**
-1. `resolve-library-id` - ライブラリIDを取得
-2. `query-docs` - 該当機能のドキュメント・コード例を取得
-
-**対象ライブラリ例：**
-- Next.js, React, TypeScript
-- Tailwind CSS, Framer Motion
-- Firebase (Auth, Firestore, Storage)
-
-**注意：** 古い知識に頼らず、常に最新のAPIやベストプラクティスを確認
-
-### Chrome DevTools MCP (動作確認時は必須)
-UIの動作確認・デバッグには**必ず**Chrome DevTools MCPを使用すること。
-
-**主要ツール：**
-- `take_snapshot` - ページのA11Yツリースナップショット取得
-- `take_screenshot` - スクリーンショット撮影
-- `click` / `fill` / `hover` - UI操作
-- `navigate_page` - ページ遷移
-- `list_console_messages` - コンソールログ確認
-- `list_network_requests` - ネットワークリクエスト確認
-- `evaluate_script` - JavaScript実行
-
-**確認フロー：**
-1. `navigate_page` でページにアクセス
-2. `take_snapshot` で要素確認
-3. `click` / `fill` で操作
-4. `take_screenshot` で結果確認
-5. エラー時は `list_console_messages` でログ確認
+### Chrome DevTools MCP（動作確認）
+`navigate_page` → `take_snapshot` → 操作 → `take_screenshot`
 
 ## Code Style
-- 日本語コメント可
-- コンポーネント: `src/components/`
-- ページ: `src/app/`
-- 型定義: `src/types/`
-- Firebase: `src/lib/firebase/`
+- ディレクトリ: `app/`, `components/`, `lib/`, `hooks/`, `types/`
+- 命名: PascalCase（コンポーネント）, camelCase（関数）, UPPER_SNAKE_CASE（定数）
+- 型定義: interface優先、ユニオン型はtype
+- 詳細は `docs/coding-standards.md` 参照
+
+## Testing
+- **推奨**: Vitest
+- テストファイル: `*.test.ts`, `*.test.tsx`
+- 詳細は `docs/testing-strategy.md` 参照
 
 ## Commands
 ```bash
 npm run dev      # 開発サーバー
 npm run build    # ビルド
 npm run lint     # Lint
+npm run test     # テスト（Vitest導入後）
 ```
 
-## GitHub CLI (Issue/PR作成時の注意)
-Markdownコンテンツ（コードブロック、バッククォートなど）を含むIssue/PRを作成・編集する際は、**必ず一時ファイルを使用**すること。
+## Development Flow
+1. **Issue作成** → 機能追加・修正の起点（Claudeが作成）
+2. **ブランチ作成** → `feature/#123-xxx` または `fix/#123-xxx`
+3. **実装・動作確認**
+4. **コミット＆プッシュ**
+5. **PR作成** → `Closes #123` を含める
+6. **mainにマージ**
 
-**理由：** Bashがバッククォート(`` ` ``)をコマンド置換として解釈してしまうため
+⚠️ **mainブランチへの直接コミット禁止**
 
-**正しい方法：**
-```bash
-# 1. 一時ファイルにbodyを書き出す（Writeツール使用）
-# 2. --body-file オプションで指定
-gh issue create --title "タイトル" --body-file temp-issue-body.md
-gh issue edit 123 --body-file temp-issue-body.md
-# 3. 一時ファイルを削除
-rm temp-issue-body.md
-```
+## Git & GitHub CLI
+- **ベースブランチ**: `main`
+- Issue/PR作成時は `--body-file` で一時ファイルを使用（バッククォート問題回避）
 
-**避けるべき方法：**
-```bash
-# NG: --body に直接Markdownを書く（バッククォートがBashに解釈される）
-gh issue create --body "```typescript ..."
-```
+## Shortcuts
+| キー | 機能 |
+|-----|------|
+| `Escape` | 現在の生成を中断 |
+| `Ctrl+Esc` | 全応答を中止、履歴遡行 |
+| `/clear` | コンテキストリセット |
+| `/compact` | 長いセッションを圧縮 |
 
-## Context Management
-- タスク完了後は `/clear` を推奨
-- 長いセッションでは `/compact` を使用
-- 詳細ドキュメントは `docs/` を参照
+## Ignored Directories
+`node_modules/`, `.next/`, `out/`, `.git/`, `coverage/`, `public/sounds/`, `public/lottie/`

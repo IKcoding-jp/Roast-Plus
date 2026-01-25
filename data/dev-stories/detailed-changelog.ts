@@ -14,6 +14,35 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.8.0',
+    version: '0.8.0',
+    date: '2026-01-26',
+    type: 'feature',
+    title: 'クイズ自動遷移・バッジデザイン刷新・更新履歴詳細ページ・Vitest導入',
+    content: `
+## 機能追加
+- クイズで正解後に次の問題へ自動遷移する機能を追加
+- 更新履歴の詳細表示専用ページを追加
+- バッジアイコンをLucideに変更してモダンなデザインに
+- ドリップガイドのレシピ表示順序を最適化
+- 開発秘話 Episode 006「Claude Codeを使ってみた」を追加
+- ホーム画面にカテゴリラベルを追加
+
+## バグ修正
+- カテゴリ別クイズで回答後に○×マークが即時反映されない問題を修正
+- スマホ画面で「○○時まで」表記がはみ出る問題を修正
+- バッジアイコンが正しく表示されない問題を修正
+
+## 開発者向け
+- Vitestテストフレームワークを導入
+- PRマージ時のバージョン自動更新機能を追加
+- ESLintエラー・警告を全て解消
+    `.trim(),
+    tags: ['クイズ', 'UI', 'テスト', 'CI/CD'],
+    createdAt: '2026-01-26T00:00:00.000Z',
+    updatedAt: '2026-01-26T00:00:00.000Z',
+  },
+  {
     id: 'v0.7.0',
     version: '0.7.0',
     date: '2026-01-24',

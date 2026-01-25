@@ -1,7 +1,7 @@
 /**
  * アプリケーションバージョン情報
- * 
- * 注意: package.jsonのversionフィールドと手動で同期してください。
- * 将来的にはビルドスクリプトで自動生成することも可能です。
+ *
+ * このファイルはGitHub Actionsによって自動更新されます。
+ * 手動で編集しないでください。
  */
-export const APP_VERSION = '0.7.0';
+export const APP_VERSION = '0.8.0';

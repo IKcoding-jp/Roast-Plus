@@ -11,6 +11,7 @@ import { Loading } from '@/components/Loading';
 import { HiArrowLeft, HiDocumentText, HiShieldCheck, HiLogout, HiMail } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
+import { Button } from '@/components/ui';
 import { VERSION_HISTORY } from '@/data/dev-stories/version-history';
 import { getUserData } from '@/lib/firestore';
 import { formatConsentDate } from '@/lib/consent';
@@ -180,23 +181,22 @@ export default function SettingsPage() {
                                     <p className="text-sm text-gray-600 mb-3">
                                         新しいバージョンが利用可能です。更新を適用してください。
                                     </p>
-                                    <button
-                                        onClick={applyUpdate}
-                                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
-                                    >
+                                    <Button variant="primary" size="md" onClick={applyUpdate}>
                                         更新する
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
                             {!isUpdateAvailable && process.env.NODE_ENV === 'production' && (
                                 <div className="pt-4 border-t border-gray-200">
-                                    <button
+                                    <Button
+                                        variant="outline"
+                                        size="md"
                                         onClick={checkForUpdates}
                                         disabled={isChecking}
-                                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        loading={isChecking}
                                     >
                                         {isChecking ? '確認中...' : '更新を確認'}
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
                         </div>
@@ -297,13 +297,16 @@ export default function SettingsPage() {
                                 </div>
                             </div>
                             <div className="pt-4 border-t border-gray-200">
-                                <button
+                                <Button
+                                    variant="danger"
+                                    size="md"
+                                    fullWidth
                                     onClick={handleLogout}
-                                    className="w-full px-4 py-3 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors font-medium flex items-center justify-center gap-2"
+                                    className="!bg-red-50 !text-red-600 hover:!bg-red-100"
                                 >
-                                    <HiLogout className="h-5 w-5" />
+                                    <HiLogout className="h-5 w-5 mr-2" />
                                     ログアウト
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -342,19 +345,17 @@ export default function SettingsPage() {
                                     )}
                                 </div>
                                 <div className="flex gap-3 justify-end">
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="secondary"
+                                        size="md"
                                         onClick={handleCancelPassword}
-                                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                                     >
                                         キャンセル
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                                    >
+                                    </Button>
+                                    <Button type="submit" variant="primary" size="md">
                                         確定
-                                    </button>
+                                    </Button>
                                 </div>
                             </form>
                         </div>

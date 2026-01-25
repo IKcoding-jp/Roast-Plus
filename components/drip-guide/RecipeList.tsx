@@ -77,11 +77,18 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
         setStartTargetId(null);
     };
 
-    // recipe-046を一番右（最後）に配置するため、ソートする（Hooksは条件分岐の前に配置）
+    // デフォルトレシピの表示順序を明示的に指定（BYSN → 井崎 → 粕谷 → Hoffmann）
     const sortedRecipes = useMemo(() => {
-        const recipe046 = recipes.find((r) => r.id === 'recipe-046');
-        const others = recipes.filter((r) => r.id !== 'recipe-046');
-        return recipe046 ? [...others, recipe046] : recipes;
+        const defaultOrder = ['recipe-001', 'recipe-003', 'recipe-046', 'recipe-hoffmann'];
+        return [...recipes].sort((a, b) => {
+            const indexA = defaultOrder.indexOf(a.id);
+            const indexB = defaultOrder.indexOf(b.id);
+            // デフォルトレシピは指定順序で、カスタムレシピはその後に
+            if (indexA === -1 && indexB === -1) return 0;
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+        });
     }, [recipes]);
 
     if (recipes.length === 0) {

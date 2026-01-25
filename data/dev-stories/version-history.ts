@@ -5,7 +5,7 @@ export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
     version: '0.9.1',
     date: '2026-01-25',
-    summary: 'UI改善・バグ修正・コード整理 など 5件の更新',
+    summary: 'UI改善・バグ修正・コード整理 など 6件の更新',
   },
   {
     version: '0.9.0',

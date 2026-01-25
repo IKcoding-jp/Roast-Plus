@@ -38,22 +38,22 @@ export default function DevStoriesPage() {
               <img
                 src="/avatars/header_characters.png"
                 alt="フカイリとアサイリ"
-                className="h-8 sm:h-12 w-auto object-contain animate-wobble-left"
+                className="h-10 sm:h-12 w-auto object-contain animate-wobble-left"
               />
               <img
                 src="/avatars/header_dori_server.png"
                 alt="ドリとサーバ"
-                className="h-8 sm:h-12 w-auto object-contain animate-wobble-right"
+                className="h-10 sm:h-12 w-auto object-contain animate-wobble-right"
               />
               <img
                 src="/avatars/header_mill_kettle.png"
                 alt="ミルとケトル"
-                className="h-8 sm:h-12 w-auto object-contain animate-wobble-left"
+                className="h-10 sm:h-12 w-auto object-contain animate-wobble-left"
               />
               <img
                 src="/avatars/header_press_siphon.png"
                 alt="プレスとサイフォン"
-                className="h-8 sm:h-12 w-auto object-contain animate-wobble-right"
+                className="h-10 sm:h-12 w-auto object-contain animate-wobble-right"
               />
             </div>
           </div>

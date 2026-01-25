@@ -66,6 +66,7 @@ function QuizPageContent() {
   // モードを決定
   const determineMode = () => {
     if (modeParam === 'single') return 'single';
+    if (modeParam === 'sequential') return 'sequential';
     if (modeParam === 'shuffle') return 'shuffle';
     if (categoryParam) return 'category';
     return modeParam as 'daily' | 'review' | 'random';
@@ -93,6 +94,7 @@ function QuizPageContent() {
   });
 
   const isSingleMode = modeParam === 'single';
+  const isSequentialMode = modeParam === 'sequential';
 
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
@@ -145,8 +147,21 @@ function QuizPageContent() {
           playLevelUpSound();
         }, 800);
       }
+
+      // sequentialモードで正解時は自動的に次の問題へ遷移
+      if (isSequentialMode && answerFeedback.isCorrect) {
+        const isLastQuestion = currentIndex + 1 >= totalQuestions;
+        // 最後の問題でない場合のみ自動遷移（1.2秒後）
+        if (!isLastQuestion) {
+          const timer = setTimeout(() => {
+            setSelectedOptionId(null);
+            nextQuestion();
+          }, 1200);
+          return () => clearTimeout(timer);
+        }
+      }
     }
-  }, [answerFeedback, playCorrect, playIncorrect, playXP, playLevelUpSound]);
+  }, [answerFeedback, playCorrect, playIncorrect, playXP, playLevelUpSound, isSequentialMode, currentIndex, totalQuestions, nextQuestion]);
 
   // 次の問題へ
   const handleNext = () => {
@@ -275,6 +290,66 @@ function QuizPageContent() {
                     <ArrowLeftIcon />
                     一覧に戻る
                   </Link>
+                ) : isSequentialMode ? (
+                  // Sequentialモード: 正解で自動遷移、不正解は手動で次へ
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 space-y-2"
+                  >
+                    {answerFeedback?.isCorrect ? (
+                      // 正解時
+                      currentIndex + 1 >= totalQuestions ? (
+                        // 最後の問題
+                        <Link
+                          href={returnUrl}
+                          className="w-full flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                        >
+                          <ArrowLeftIcon />
+                          問題一覧に戻る
+                        </Link>
+                      ) : (
+                        // 自動遷移中の表示
+                        <>
+                          <div className="w-full flex items-center justify-center gap-2 bg-[#EF8A00]/80 text-white py-3.5 px-5 rounded-xl font-semibold">
+                            <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                            次の問題へ移動中...
+                          </div>
+                          <Link
+                            href={returnUrl}
+                            className="w-full flex items-center justify-center gap-2 bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] py-3 px-5 rounded-xl font-medium transition-colors border border-[#211714]/10"
+                          >
+                            <ArrowLeftIcon />
+                            一覧に戻る
+                          </Link>
+                        </>
+                      )
+                    ) : (
+                      // 不正解時
+                      <>
+                        {currentIndex + 1 < totalQuestions && (
+                          <motion.button
+                            onClick={handleNext}
+                            className="w-full flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                          >
+                            次の問題へ
+                            <ArrowRightIcon />
+                          </motion.button>
+                        )}
+                        <Link
+                          href={returnUrl}
+                          className={`w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-medium transition-colors ${
+                            currentIndex + 1 >= totalQuestions
+                              ? 'bg-[#EF8A00] hover:bg-[#D67A00] text-white font-semibold py-3.5'
+                              : 'bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] border border-[#211714]/10'
+                          }`}
+                        >
+                          <ArrowLeftIcon />
+                          {currentIndex + 1 >= totalQuestions ? '問題一覧に戻る' : '一覧に戻る'}
+                        </Link>
+                      </>
+                    )}
+                  </motion.div>
                 ) : (
                   <motion.button
                     initial={{ opacity: 0, y: 20 }}

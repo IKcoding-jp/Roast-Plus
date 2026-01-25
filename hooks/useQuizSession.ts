@@ -14,7 +14,7 @@ import {
 } from '@/lib/coffee-quiz/questions';
 import { useQuizData } from './useQuizData';
 
-export type QuizMode = 'daily' | 'review' | 'category' | 'random' | 'single' | 'shuffle';
+export type QuizMode = 'daily' | 'review' | 'category' | 'random' | 'single' | 'shuffle' | 'sequential';
 
 interface UseQuizSessionOptions {
   mode?: QuizMode;
@@ -110,6 +110,7 @@ export function useQuizSession(options: UseQuizSessionOptions = {}) {
           break;
         case 'single':
         case 'shuffle':
+        case 'sequential':
           // 指定された問題IDで出題
           if (questionIds && questionIds.length > 0) {
             loadedQuestions = await getQuestionsByIds(questionIds);

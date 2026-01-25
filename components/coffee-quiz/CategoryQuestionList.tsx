@@ -54,7 +54,7 @@ type SortOption = 'default' | 'difficulty';
 /**
  * カテゴリ別問題一覧コンテナ
  * 出題オプション:
- * 1. 個別問題クリック - 1問だけ解いて一覧に戻る
+ * 1. 個別問題クリック - クリックした問題から連続出題（正解で次へ自動遷移）
  * 2. シャッフル10問 - ランダム10問出題
  * 3. 全問連続 - カテゴリ全問題を出題
  */
@@ -105,10 +105,15 @@ export function CategoryQuestionList({
     return sorted;
   }, [questions, sortBy]);
 
-  // 個別問題を解く
+  // 個別問題を解く（クリックした問題から連続出題）
   const handleQuestionClick = (questionId: string) => {
+    // クリックした問題のインデックスを取得
+    const clickedIndex = sortedQuestions.findIndex(q => q.id === questionId);
+    // クリックした問題から最後までの問題IDリストを作成
+    const remainingQuestions = sortedQuestions.slice(clickedIndex);
+    const ids = remainingQuestions.map(q => q.id).join(',');
     const returnUrl = encodeURIComponent(`/coffee-trivia/category/${category}`);
-    router.push(`/coffee-trivia/quiz?mode=single&questionIds=${questionId}&returnUrl=${returnUrl}`);
+    router.push(`/coffee-trivia/quiz?mode=sequential&questionIds=${ids}&returnUrl=${returnUrl}`);
   };
 
   // シャッフル10問

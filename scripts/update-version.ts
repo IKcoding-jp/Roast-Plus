@@ -156,6 +156,39 @@ function extractTags(labels: PRLabel[]): string[] {
     .filter((name) => !excludeLabels.includes(name.toLowerCase()));
 }
 
+function extractUserFacingContent(body: string, title: string): string {
+  /**
+   * PR本文から「ユーザー向け更新内容」セクションを抽出する
+   *
+   * 対応フォーマット:
+   * - ## ユーザー向け更新内容
+   * - ## What's Changed (for users)
+   * - ## Release Notes
+   *
+   * セクションがない場合は、タイトルから簡潔な説明を生成
+   */
+  if (!body || !body.trim()) {
+    return `- ${title}`;
+  }
+
+  // ユーザー向けセクションのパターン（複数対応）
+  const sectionPatterns = [
+    /##\s*ユーザー向け更新内容\s*\n([\s\S]*?)(?=\n##\s|\n---|\Z|$)/i,
+    /##\s*(?:What's Changed|Release Notes)\s*(?:\(for users\))?\s*\n([\s\S]*?)(?=\n##\s|\n---|\Z|$)/i,
+    /##\s*更新内容\s*\n([\s\S]*?)(?=\n##\s|\n---|\Z|$)/i,
+  ];
+
+  for (const pattern of sectionPatterns) {
+    const match = body.match(pattern);
+    if (match && match[1]?.trim()) {
+      return match[1].trim();
+    }
+  }
+
+  // セクションがない場合は、タイトルのみを使用（技術的なPR本文は使わない）
+  return `- ${title}`;
+}
+
 function getTodayDate(): string {
   return new Date().toISOString().split('T')[0];
 }
@@ -230,8 +263,8 @@ function updateDetailedChangelog(
   const today = getTodayDate();
   const isoNow = getNowISO();
 
-  // コンテンツの生成（PRボディがあればそれを使用、なければタイトルから生成）
-  const contentText = body && body.trim() ? body.trim() : `- ${title}`;
+  // コンテンツの生成（ユーザー向けセクションを抽出、なければタイトルから生成）
+  const contentText = extractUserFacingContent(body, title);
   const escapedContent = escapeForTemplate(contentText);
   const escapedTitle = escapeForSingleQuote(title);
 

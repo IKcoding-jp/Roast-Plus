@@ -17,51 +17,14 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
     id: 'v0.9.1',
     version: '0.9.1',
     date: '2026-01-25',
-    type: 'update',
-    title: '開発秘話エピソード6を非エンジニア向けに改善',
+    type: 'docs',
+    title: '開発秘話の読みやすさを改善',
     content: `
-## 概要
-
-このPRはIssue #30 を解決します。
-
-開発秘話エピソード6「Claude Codeを使ってみた」を、非エンジニア・技術に詳しくないユーザーでも理解できる内容に改善しました。
-
-## 変更内容
-
-### 対話部分（dialogues）
-- **技術用語を平易な表現に置き換え**
-  - CLI → 「お手紙タイプ」「文字で会話する方式」
-  - IDE型 → 「カラフル画面タイプ」
-  - MCP連携 → 「外部ツール連携」
-  - マルチエージェント → 削除（複雑すぎるため）
-- **コーヒーアプリらしいたとえ話を追加**
-  - Cursor vs Claude Code → ハンドドリップ vs バリスタ
-  - スキル機能 → 料理のレシピ
-- **素朴な疑問を増やして読みやすく**
-  - 「どういうものなの？」「どんなことができるの？」など
-- **メッセージ数を42→40に整理**
-
-### 詳細記事（detailContent）
-- **「向いている人」欄を削除**（初心者〜上級者の記載が読者を遠ざけるため）
-- **表の列名を分かりやすく**（「タイプ」「どんなもの？」「代表的なツール」）
-- **専門用語を排除**
-  - シンボル検索、参照追跡 → 「コードの中身を賢く探す」
-  - MCP → 「連携ツール」
-- **「何ができるか」「どう便利か」を強調**
-- **コーヒーへの愛情でまとめを締め**
-
-## テスト
-
-- [x] npm run build が通ること
-- [x] 変更はデータファイル（episodes.ts）のみで、ロジックに影響なし
-
-## 参考
-
-他のエピソード（1〜5）の対話トーンを参考にし、一貫性を持たせました。
-
-Fixes #30
+- 開発秘話エピソード6「Claude Codeを使ってみた」を、より分かりやすい言葉で書き直しました
+- 難しい専門用語を、コーヒーに例えた分かりやすい表現に変更しました
+- 開発ツールの比較を、ハンドドリップとバリスタに例えて説明しています
     `.trim(),
-    tags: [],
+    tags: ['開発秘話'],
     createdAt: '2026-01-25T20:14:39.382Z',
     updatedAt: '2026-01-25T20:14:39.382Z',
   },
@@ -69,71 +32,14 @@ Fixes #30
     id: 'v0.9.0',
     version: '0.9.0',
     date: '2026-01-25',
-    type: 'feature',
-    title: '再利用可能なUIコンポーネントライブラリを追加',
+    type: 'improvement',
+    title: 'アプリ全体のデザイン統一',
     content: `
-## Summary
-
-- \`.claude/skills/roastplus-ui/components.md\` のデザインパターンに準拠したUIコンポーネントを作成
-- 通常モードとクリスマスモードの両方に対応
-- アクセシビリティを考慮（最小タッチサイズ44px、フォーカスリング、aria属性）
-
-## 作成したコンポーネント
-
-### components/ui/
-| コンポーネント | 説明 |
-|---------------|------|
-| \`Button.tsx\` | 5 variants (primary, secondary, danger, outline, ghost) × 3 sizes (sm, md, lg) |
-| \`Input.tsx\` | テキスト入力（ラベル、エラー表示対応） |
-| \`Select.tsx\` | ドロップダウン選択 |
-| \`Textarea.tsx\` | 複数行テキスト入力 |
-| \`Card.tsx\` | 3 variants (default, hoverable, action) |
-| \`index.ts\` | 統一インポート用エクスポート |
-
-### その他
-- \`docs/UI_AUDIT.md\` - UI一貫性監査レポート
-- \`app/ui-test/page.tsx\` - コンポーネントテストページ（/ui-test でアクセス可能）
-
-## 使用方法
-
-\`\`\`tsx
-import { Button, Input, Select, Textarea, Card } from '@/components/ui';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
-
-function MyForm() {
-  const { isChristmasMode } = useChristmasMode();
-
-  return (
-    <Card isChristmasMode={isChristmasMode}>
-      <Input label="名前" isChristmasMode={isChristmasMode} />
-      <Button variant="primary" isChristmasMode={isChristmasMode}>
-        送信
-      </Button>
-    </Card>
-  );
-}
-\`\`\`
-
-## Test plan
-
-- [x] 開発サーバーで動作確認（\`npm run dev\`）
-- [x] すべてのButton variants表示確認
-- [x] すべてのButton sizes表示確認
-- [x] Button states (disabled, loading, fullWidth) 動作確認
-- [x] Input（ラベル、プレースホルダー、エラー）動作確認
-- [x] Select ドロップダウン動作確認
-- [x] Textarea 動作確認
-- [x] Card variants 表示確認
-- [x] クリスマスモード切り替え動作確認
-- [x] コンソールエラーなし確認
-
-## Related Issues
-
-Closes #41 (Phase 1: UIコンポーネント基盤作成)
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+- ボタンや入力欄などの見た目を統一しました
+- タップしやすい大きさに調整しました
+- クリスマスモードにも対応しています
     `.trim(),
-    tags: [],
+    tags: ['デザイン'],
     createdAt: '2026-01-25T19:57:29.187Z',
     updatedAt: '2026-01-25T19:57:29.187Z',
   },

@@ -213,7 +213,7 @@ gh pr create --base main --title "[Issue #番号] タイトル" --body-file /tmp
 **必ずユーザーに確認してから**マージを実行:
 
 ```bash
-gh pr merge --squash --delete-branch
+gh pr merge --merge --delete-branch
 ```
 
 ---

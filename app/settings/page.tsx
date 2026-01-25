@@ -11,7 +11,6 @@ import { Loading } from '@/components/Loading';
 import { HiArrowLeft, HiDocumentText, HiShieldCheck, HiLogout, HiMail } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
-import { VersionHistory } from '@/components/settings/VersionHistory';
 import { VERSION_HISTORY } from '@/data/dev-stories/version-history';
 import { getUserData } from '@/lib/firestore';
 import { formatConsentDate } from '@/lib/consent';
@@ -204,13 +203,26 @@ export default function SettingsPage() {
                     </div>
 
                     {/* 更新履歴セクション */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <MdHistory className="h-5 w-5 text-gray-600" />
-                            更新履歴
-                        </h2>
-                        <VersionHistory entries={VERSION_HISTORY} maxDisplay={5} />
-                    </div>
+                    <Link
+                        href="/changelog"
+                        className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                    >
+                        <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                                    <MdHistory className="h-5 w-5 text-amber-500" />
+                                    更新履歴
+                                </h2>
+                                <p className="text-sm text-gray-600">
+                                    アプリの更新内容を確認する
+                                </p>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    最新: v{VERSION_HISTORY[0]?.version} ({VERSION_HISTORY[0]?.date})
+                                </p>
+                            </div>
+                            <span className="text-gray-400 text-xl">&gt;</span>
+                        </div>
+                    </Link>
 
                     {/* 法的情報セクション */}
                     <div className="bg-white rounded-lg shadow-md p-6">

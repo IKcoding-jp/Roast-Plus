@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Button } from '@/components/ui';
 
 interface CompletionDialogProps {
   isOpen: boolean;
@@ -36,12 +37,9 @@ export function CompletionDialog({ isOpen, onClose, onContinue }: CompletionDial
           タッパーと木べらを持って焙煎室に行きましょう。
         </p>
         <div className="flex gap-3 sm:gap-4 justify-end">
-          <button
-            onClick={onContinue}
-            className="px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-base sm:text-lg min-h-[44px]"
-          >
+          <Button variant="primary" size="md" onClick={onContinue}>
             OK
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -85,18 +83,22 @@ export function ContinuousRoastDialog({
           焙煎機が温かいうちに次の焙煎が可能です。
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={onYes}
-            className="px-4 sm:px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-sm sm:text-base min-h-[44px] whitespace-nowrap flex-1 sm:flex-none order-1 sm:order-2"
+            className="flex-1 sm:flex-none order-1 sm:order-2 whitespace-nowrap"
           >
             続けて焙煎する
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
+            size="md"
             onClick={onNo}
-            className="px-4 sm:px-6 py-3 bg-[#00b8d4] text-white rounded-lg font-semibold hover:bg-[#00a0b8] transition-colors text-sm sm:text-base min-h-[44px] whitespace-nowrap flex-1 sm:flex-none order-2 sm:order-1"
+            className="flex-1 sm:flex-none order-2 sm:order-1 whitespace-nowrap !bg-[#00b8d4] hover:!bg-[#00a0b8]"
           >
             アフターパージ
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -134,18 +136,12 @@ export function AfterPurgeDialog({ isOpen, onClose, onRecord }: AfterPurgeDialog
           機械をアフターパージに設定してください。{'\n'}焙煎時間の記録ができます。
         </p>
         <div className="flex gap-3 sm:gap-4 justify-end">
-          <button
-            onClick={onClose}
-            className="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors text-base sm:text-lg min-h-[44px]"
-          >
+          <Button variant="secondary" size="md" onClick={onClose}>
             閉じる
-          </button>
-          <button
-            onClick={onRecord}
-            className="px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-base sm:text-lg min-h-[44px]"
-          >
+          </Button>
+          <Button variant="primary" size="md" onClick={onRecord}>
             記録に進む
-          </button>
+          </Button>
         </div>
       </div>
     </div>

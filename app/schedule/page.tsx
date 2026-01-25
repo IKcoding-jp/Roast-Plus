@@ -12,6 +12,7 @@ import { HiArrowLeft, HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCame
 import { DatePickerModal } from '@/components/DatePickerModal';
 import { ScheduleOCRModal } from '@/components/ScheduleOCRModal';
 import LoginPage from '@/app/login/page';
+import { Button } from '@/components/ui';
 import type { TimeLabel, RoastSchedule } from '@/types';
 
 type TabType = 'today' | 'roast';
@@ -355,15 +356,17 @@ export default function SchedulePage() {
           </div>
           <div className="flex-1 flex justify-end items-center">
             <div className="hidden sm:flex items-center gap-2 sm:gap-3">
-              <button
+              <Button
+                variant="primary"
+                size="md"
                 onClick={() => setIsOCROpen(true)}
-                className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-primary text-white hover:bg-primary-dark rounded-lg transition-colors flex items-center gap-2 min-h-[44px] shadow-md"
+                className="shadow-md"
                 title="画像から読み取り"
                 aria-label="画像から読み取り"
               >
-                <HiCamera className="h-5 w-5 flex-shrink-0" />
+                <HiCamera className="h-5 w-5 flex-shrink-0 mr-2" />
                 <span className="font-medium">AIで読み取る</span>
-              </button>
+              </Button>
             </div>
           </div>
         </header>
@@ -381,14 +384,16 @@ export default function SchedulePage() {
             >
               本日のスケジュール
             </button>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => setIsOCROpen(true)}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-primary text-white hover:bg-primary-dark rounded-lg transition-colors text-xs sm:text-sm min-h-[44px] flex items-center justify-center shadow-md"
+              className="!px-3 !py-2 sm:!px-4 sm:!py-2.5 shadow-md"
               title="画像から読み取り"
               aria-label="画像から読み取り"
             >
               <HiCamera className="h-5 w-5 sm:h-6 sm:w-6" />
-            </button>
+            </Button>
             <button
               onClick={() => setActiveTab('roast')}
               className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-colors text-xs sm:text-sm min-h-[44px] ${

@@ -32,6 +32,7 @@ import { IoArrowBack } from "react-icons/io5";
 import { PiShuffleBold } from "react-icons/pi";
 import { FaUsers, FaUserTie } from "react-icons/fa";
 import { HiPlus, HiCog } from "react-icons/hi";
+import { Button } from '@/components/ui';
 
 const toMillisSafe = (value?: FirestoreTimestamp | null): number => {
     if (!value) return 0;
@@ -472,9 +473,14 @@ export default function AssignmentPage() {
                 <div className="w-full px-4 h-16 relative flex items-center justify-center">
                     {/* 左側: 戻るボタン */}
                     <div className="absolute left-4 flex items-center z-10">
-                        <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900 p-2 -ml-2">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => router.back()}
+                            className="!text-gray-600 hover:!text-gray-900 !p-2 -ml-2"
+                        >
                             <IoArrowBack size={24} />
-                        </button>
+                        </Button>
                     </div>
 
                     {/* 中央: 見出し */}
@@ -490,25 +496,26 @@ export default function AssignmentPage() {
                     {/* 右側: 設定ボタン + シャッフルボタン */}
                     <div className="absolute right-4 flex items-center gap-2 z-10">
                         {isDeveloperMode && (
-                            <button
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => setIsPairExclusionModalOpen(true)}
-                                className="flex items-center gap-1 px-3 py-2 rounded-full font-bold shadow-md transition-colors bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                                className="!rounded-full !px-3 !py-2 shadow-md !bg-white !text-gray-700 hover:!bg-gray-100 !border !border-gray-300"
                                 title="ペア除外設定"
                             >
                                 <HiCog className="w-5 h-5" />
-                            </button>
+                            </Button>
                         )}
-                        <button
+                        <Button
+                            variant="primary"
+                            size="sm"
                             onClick={handleShuffle}
                             disabled={isShuffleDisabled}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md transition-colors ${isShuffleDisabled
-                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                : 'bg-primary text-white hover:bg-primary-dark active:scale-95'
-                                }`}
+                            className="!rounded-full !px-4 !py-2 shadow-md active:scale-95"
                         >
-                            <PiShuffleBold />
+                            <PiShuffleBold className="mr-1" />
                             <span className="hidden md:inline">シャッフル</span>
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </header>

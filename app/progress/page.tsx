@@ -9,6 +9,7 @@ import { addWorkProgress, updateWorkProgress, updateWorkProgresses, deleteWorkPr
 import { HiArrowLeft, HiPlus, HiX, HiPencil, HiTrash, HiFilter, HiSearch, HiOutlineCollection, HiArchive } from 'react-icons/hi';
 import { MdTimeline } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
+import { Button } from '@/components/ui';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
 import { WorkProgressCard } from '@/components/work-progress/WorkProgressCard';
 import { QuickAddModal } from '@/components/work-progress/QuickAddModal';
@@ -385,42 +386,50 @@ export default function ProgressPage() {
           <div className="flex justify-end items-center gap-2 sm:gap-3 flex-shrink-0">
             {viewMode === 'normal' && !showEmptyState && (
               <>
-                <button
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => setShowFilterDialog(true)}
-                  className="px-3 py-2 text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 min-h-[44px] min-w-[44px]"
+                  className="shadow-md !bg-white !text-gray-700 hover:!bg-gray-50"
                   aria-label="フィルタと並び替え"
                   title="フィルタと並び替え"
                 >
                   <HiFilter className="h-4 w-4" />
-                  <span className="hidden md:inline text-sm font-medium whitespace-nowrap">フィルター</span>
-                </button>
+                  <span className="hidden md:inline ml-2 text-sm font-medium whitespace-nowrap">フィルター</span>
+                </Button>
                 {archivedWorkProgressesByDate.length > 0 && (
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setViewMode('archived')}
-                    className="px-3 py-2 text-sm bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                    className="shadow-md !bg-white !text-gray-700 hover:!bg-gray-50"
                     aria-label="アーカイブ一覧"
                     title="アーカイブ一覧"
                   >
                     <HiArchive className="h-4 w-4" />
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => setShowModeSelectDialog(true)}
-                  className="px-4 py-2 text-sm font-bold text-white bg-primary rounded-lg shadow-md hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                  className="shadow-md"
                 >
                   <HiPlus className="h-4 w-4" />
-                  <span className="hidden sm:inline">追加</span>
-                </button>
+                  <span className="hidden sm:inline ml-2">追加</span>
+                </Button>
               </>
             )}
             {viewMode === 'archived' && (
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setViewMode('normal')}
-                className="px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                className="shadow-sm !bg-white !text-gray-700 !border !border-gray-300 hover:!bg-gray-50"
               >
                 <MdTimeline className="h-4 w-4" />
-                <span className="hidden sm:inline">一覧に戻る</span>
-              </button>
+                <span className="hidden sm:inline ml-2">一覧に戻る</span>
+              </Button>
             )}
           </div>
         </div>
@@ -458,24 +467,24 @@ export default function ProgressPage() {
                     まずは新しい作業を追加してみましょう。
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button
-                      onClick={() => {
-                        setShowAddForm(true);
-                      }}
-                      className="px-6 py-3 bg-primary text-white rounded-xl shadow-lg hover:bg-primary-dark hover:shadow-xl transition-all flex items-center justify-center gap-2 font-bold"
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      onClick={() => setShowAddForm(true)}
+                      className="shadow-lg hover:shadow-xl !rounded-xl"
                     >
-                      <HiPlus className="h-5 w-5" />
+                      <HiPlus className="h-5 w-5 mr-2" />
                       作業を追加
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowAddGroupForm(true);
-                      }}
-                      className="px-6 py-3 bg-white text-amber-600 border border-amber-200 rounded-xl shadow-md hover:bg-amber-50 hover:shadow-lg transition-all flex items-center justify-center gap-2 font-bold"
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={() => setShowAddGroupForm(true)}
+                      className="shadow-md hover:shadow-lg !rounded-xl"
                     >
-                      <HiOutlineCollection className="h-5 w-5" />
+                      <HiOutlineCollection className="h-5 w-5 mr-2" />
                       グループを作成
-                    </button>
+                    </Button>
                   </div>
                   {archivedWorkProgressesByDate.length > 0 && (
                     <button
@@ -706,30 +715,36 @@ export default function ProgressPage() {
                   新しい作業を追加するか、作業をまとめるグループを作成するか選択してください。
                 </p>
                 <div className="space-y-3">
-                  <button
+                  <Button
+                    variant="primary"
+                    size="md"
+                    fullWidth
                     onClick={() => {
-                    setShowModeSelectDialog(false);
-                    setShowAddForm(true);
+                      setShowModeSelectDialog(false);
+                      setShowAddForm(true);
                     }}
-                    className="w-full py-3 px-4 bg-primary text-white font-bold rounded-xl shadow-md hover:bg-primary-dark transition-colors flex items-center justify-center gap-3"
+                    className="shadow-md !rounded-xl !py-3"
                   >
-                    <div className="bg-white/20 p-2 rounded-full shadow-sm">
+                    <div className="bg-white/20 p-2 rounded-full shadow-sm mr-3">
                       <HiPlus className="h-5 w-5" />
                     </div>
                     <span>作業を追加</span>
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    fullWidth
                     onClick={() => {
-                    setShowModeSelectDialog(false);
-                    setShowAddGroupForm(true);
+                      setShowModeSelectDialog(false);
+                      setShowAddGroupForm(true);
                     }}
-                    className="w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold rounded-xl border border-gray-200 transition-colors flex items-center justify-center gap-3"
+                    className="!bg-gray-50 hover:!bg-gray-100 !text-gray-700 !border !border-gray-200 !rounded-xl !py-3"
                   >
-                    <div className="bg-white p-2 rounded-full shadow-sm">
+                    <div className="bg-white p-2 rounded-full shadow-sm mr-3">
                       <HiOutlineCollection className="h-5 w-5" />
                     </div>
                     <span>グループを作成</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
@@ -1007,22 +1022,27 @@ function WorkProgressFormDialog({
 
           <div className="mt-8 flex gap-3">
             {isEditing && onDelete && (
-              <button
+              <Button
                 type="button"
+                variant="danger"
+                size="md"
                 onClick={onDelete}
-                className="px-4 py-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl font-bold transition-colors flex items-center justify-center"
+                className="!bg-red-50 !text-red-600 hover:!bg-red-100 !rounded-xl"
                 title="削除"
               >
                 <HiTrash className="h-5 w-5" />
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="md"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-amber-600 text-white rounded-xl font-bold shadow-md hover:bg-amber-700 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              loading={isSubmitting}
+              className="flex-1 shadow-md hover:shadow-lg !rounded-xl"
             >
               {isSubmitting ? '保存中...' : (isEditing ? '更新する' : '追加する')}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -1072,20 +1092,24 @@ function GroupFormDialog({
             />
           </div>
           <div className="flex gap-3">
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="md"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold transition-colors"
+              className="flex-1 !rounded-xl"
             >
               キャンセル
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="primary"
+              size="md"
               disabled={!groupName.trim()}
-              className="flex-1 px-4 py-2.5 bg-amber-600 text-white rounded-xl font-bold shadow-md hover:bg-amber-700 transition-colors disabled:opacity-50"
+              className="flex-1 shadow-md !rounded-xl"
             >
               {isEditing ? '更新' : '作成'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -1174,12 +1198,15 @@ function FilterDialog({
         </div>
 
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
-          <button
+          <Button
+            variant="primary"
+            size="md"
+            fullWidth
             onClick={onClose}
-            className="w-full py-3 bg-amber-600 text-white font-bold rounded-xl shadow-md hover:bg-amber-700 transition-colors"
+            className="shadow-md !rounded-xl"
           >
             完了
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -65,16 +65,15 @@ for ISSUE_NUM in "$@"; do
     echo -e "${BLUE}Issue #$ISSUE_NUM の処理${NC}"
     echo -e "${BLUE}────────────────────────────────────────────${NC}"
 
-    # Issue情報を取得
+    # Issue情報を取得（ghの--jqオプションを使用、外部jqコマンド不要）
     echo -e "${YELLOW}➜ Issue情報を取得中...${NC}"
 
-    ISSUE_JSON=$(gh issue view "$ISSUE_NUM" --json title,labels 2>/dev/null) || {
+    ISSUE_TITLE=$(gh issue view "$ISSUE_NUM" --json title --jq '.title' 2>/dev/null) || {
         echo -e "${RED}✗ Issue #$ISSUE_NUM が見つかりません${NC}"
         continue
     }
 
-    ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.title')
-    ISSUE_LABELS=$(echo "$ISSUE_JSON" | jq -r '.labels[].name' 2>/dev/null | tr '\n' ',' | sed 's/,$//')
+    ISSUE_LABELS=$(gh issue view "$ISSUE_NUM" --json labels --jq '.labels[].name' 2>/dev/null | tr '\n' ',' | sed 's/,$//')
 
     echo -e "  タイトル: ${GREEN}$ISSUE_TITLE${NC}"
     echo -e "  ラベル: ${GREEN}$ISSUE_LABELS${NC}"

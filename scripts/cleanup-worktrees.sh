@@ -91,8 +91,8 @@ for dir in "$PARENT_DIR"/"$REPO_NAME"-issue-*; do
             echo -e "  状態: ${GREEN}マージ済み${NC}"
             worktrees_to_delete+=("$ISSUE_NUM:$WORKTREE_DIR:$BRANCH_NAME")
         else
-            # PRがマージされているかチェック
-            PR_STATE=$(gh pr view "$BRANCH_NAME" --json state 2>/dev/null | jq -r '.state' 2>/dev/null) || PR_STATE=""
+            # PRがマージされているかチェック（ghの--jqオプションを使用）
+            PR_STATE=$(gh pr view "$BRANCH_NAME" --json state --jq '.state' 2>/dev/null) || PR_STATE=""
 
             if [ "$PR_STATE" = "MERGED" ]; then
                 echo -e "  状態: ${GREEN}PRマージ済み${NC}"

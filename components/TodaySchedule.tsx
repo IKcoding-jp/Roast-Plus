@@ -471,19 +471,19 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
                   {group.labels.map((label) => (
                     <div key={label.id} className={`w-full ${label.continuesUntil ? 'border-l-2 border-dashed border-amber-400 pl-3' : ''}`}>
                       {/* メインコンテンツ行 */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
                         <input
                           type="text"
                           value={label.content}
                           onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
                           onCompositionStart={handleCompositionStart}
                           onCompositionEnd={handleCompositionEnd}
-                          className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-amber-400 text-base md:text-base text-gray-900 focus:outline-none placeholder:text-gray-400 transition-colors py-1"
+                          className="flex-1 min-w-0 bg-transparent border-0 border-b border-transparent focus:border-amber-400 text-base md:text-base text-gray-900 focus:outline-none placeholder:text-gray-400 transition-colors py-1"
                           placeholder="内容を入力"
                         />
                         {/* 時間経過終了時間の表示 */}
                         {label.continuesUntil && (
-                          <span className="flex-shrink-0 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full whitespace-nowrap">
+                          <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full whitespace-nowrap">
                             〜{label.continuesUntil}まで
                           </span>
                         )}

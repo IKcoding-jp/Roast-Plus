@@ -445,7 +445,6 @@ export function RoastTimer() {
   };
 
   const handleReset = () => {
-    console.log('handleReset called');
     // 音を確実に停止
     stopSound();
     resetTimer();

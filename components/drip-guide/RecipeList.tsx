@@ -25,20 +25,17 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
     const router = useRouter();
 
     const handleDeleteClick = (recipeId: string) => {
-        console.log('Delete button clicked for recipe:', recipeId);
         setDeleteTargetId(recipeId);
     };
 
     const handleConfirmDelete = () => {
         if (deleteTargetId) {
-            console.log('Deleting recipe:', deleteTargetId);
             onDelete(deleteTargetId);
             setDeleteTargetId(null);
         }
     };
 
     const handleCancelDelete = () => {
-        console.log('Delete cancelled');
         setDeleteTargetId(null);
     };
 

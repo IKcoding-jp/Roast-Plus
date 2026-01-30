@@ -183,23 +183,38 @@ export const mutateAssignmentDay = async (
 
 // マスタデータ取得
 export const fetchTeams = async (userId: string): Promise<Team[]> => {
-    const teamsCol = getTeamsCollection(userId);
-    const q = query(teamsCol, orderBy('order'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Team));
+    try {
+        const teamsCol = getTeamsCollection(userId);
+        const q = query(teamsCol, orderBy('order'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Team));
+    } catch (error) {
+        console.error('Failed to fetch teams:', error);
+        throw error;
+    }
 };
 
 export const fetchMembers = async (userId: string): Promise<Member[]> => {
-    const membersCol = getMembersCollection(userId);
-    const snapshot = await getDocs(membersCol);
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Member));
+    try {
+        const membersCol = getMembersCollection(userId);
+        const snapshot = await getDocs(membersCol);
+        return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Member));
+    } catch (error) {
+        console.error('Failed to fetch members:', error);
+        throw error;
+    }
 };
 
 export const fetchTaskLabels = async (userId: string): Promise<TaskLabel[]> => {
-    const taskLabelsCol = getTaskLabelsCollection(userId);
-    const q = query(taskLabelsCol, orderBy('order'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as TaskLabel));
+    try {
+        const taskLabelsCol = getTaskLabelsCollection(userId);
+        const q = query(taskLabelsCol, orderBy('order'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as TaskLabel));
+    } catch (error) {
+        console.error('Failed to fetch task labels:', error);
+        throw error;
+    }
 };
 
 // リアルタイム監視
@@ -260,145 +275,213 @@ export const subscribeShuffleEvent = (userId: string, date: string, callback: (d
 
 // 更新系
 export const updateAssignmentDay = async (userId: string, date: string, assignments: Assignment[]) => {
-    await mutateAssignmentDay(userId, date, () => assignments);
+    try {
+        await mutateAssignmentDay(userId, date, () => assignments);
+    } catch (error) {
+        console.error('Failed to update assignment day:', error);
+        throw error;
+    }
 };
 
 export const createShuffleEvent = async (userId: string, event: ShuffleEvent) => {
-    const shuffleEventsCol = getShuffleEventsCollection(userId);
-    const docRef = doc(shuffleEventsCol, event.date);
-    await setDoc(docRef, event);
+    try {
+        const shuffleEventsCol = getShuffleEventsCollection(userId);
+        const docRef = doc(shuffleEventsCol, event.date);
+        await setDoc(docRef, event);
+    } catch (error) {
+        console.error('Failed to create shuffle event:', error);
+        throw error;
+    }
 };
 
 export const updateShuffleEventState = async (userId: string, date: string, state: 'running' | 'done') => {
-    const shuffleEventsCol = getShuffleEventsCollection(userId);
-    const docRef = doc(shuffleEventsCol, date);
-    await updateDoc(docRef, { state });
+    try {
+        const shuffleEventsCol = getShuffleEventsCollection(userId);
+        const docRef = doc(shuffleEventsCol, date);
+        await updateDoc(docRef, { state });
+    } catch (error) {
+        console.error('Failed to update shuffle event state:', error);
+        throw error;
+    }
 };
 
 export const updateMemberExclusions = async (userId: string, memberId: string, excludedTaskLabelIds: string[]) => {
-    const membersCol = getMembersCollection(userId);
-    const docRef = doc(membersCol, memberId);
-    await updateDoc(docRef, { excludedTaskLabelIds });
+    try {
+        const membersCol = getMembersCollection(userId);
+        const docRef = doc(membersCol, memberId);
+        await updateDoc(docRef, { excludedTaskLabelIds });
+    } catch (error) {
+        console.error('Failed to update member exclusions:', error);
+        throw error;
+    }
 };
 
 export const updateMemberTeam = async (userId: string, memberId: string, newTeamId: string) => {
-    const membersCol = getMembersCollection(userId);
-    const docRef = doc(membersCol, memberId);
-    await updateDoc(docRef, { teamId: newTeamId });
+    try {
+        const membersCol = getMembersCollection(userId);
+        const docRef = doc(membersCol, memberId);
+        await updateDoc(docRef, { teamId: newTeamId });
+    } catch (error) {
+        console.error('Failed to update member team:', error);
+        throw error;
+    }
 };
 
 // チーム管理
 export const addTeam = async (userId: string, team: Team) => {
-    const teamsCol = getTeamsCollection(userId);
-    const docRef = doc(teamsCol, team.id);
-    await setDoc(docRef, team);
+    try {
+        const teamsCol = getTeamsCollection(userId);
+        const docRef = doc(teamsCol, team.id);
+        await setDoc(docRef, team);
+    } catch (error) {
+        console.error('Failed to add team:', error);
+        throw error;
+    }
 };
 
 export const deleteTeam = async (userId: string, teamId: string) => {
-    const teamsCol = getTeamsCollection(userId);
-    const docRef = doc(teamsCol, teamId);
-    await deleteDoc(docRef);
+    try {
+        const teamsCol = getTeamsCollection(userId);
+        const docRef = doc(teamsCol, teamId);
+        await deleteDoc(docRef);
+    } catch (error) {
+        console.error('Failed to delete team:', error);
+        throw error;
+    }
 };
 
 export const updateTeam = async (userId: string, team: Team) => {
-    const teamsCol = getTeamsCollection(userId);
-    const docRef = doc(teamsCol, team.id);
-    await updateDoc(docRef, { ...team });
+    try {
+        const teamsCol = getTeamsCollection(userId);
+        const docRef = doc(teamsCol, team.id);
+        await updateDoc(docRef, { ...team });
+    } catch (error) {
+        console.error('Failed to update team:', error);
+        throw error;
+    }
 };
 
 // メンバー管理
 export const addMember = async (userId: string, member: Member) => {
-    const membersCol = getMembersCollection(userId);
-    const docRef = doc(membersCol, member.id);
-    await setDoc(docRef, member);
+    try {
+        const membersCol = getMembersCollection(userId);
+        const docRef = doc(membersCol, member.id);
+        await setDoc(docRef, member);
+    } catch (error) {
+        console.error('Failed to add member:', error);
+        throw error;
+    }
 };
 
 export const deleteMember = async (userId: string, memberId: string, dateStr?: string) => {
-    const membersCol = getMembersCollection(userId);
-    const docRef = doc(membersCol, memberId);
-    await deleteDoc(docRef);
+    try {
+        const membersCol = getMembersCollection(userId);
+        const docRef = doc(membersCol, memberId);
+        await deleteDoc(docRef);
 
-    // 指定された日付（今日）の割り当てからも削除する
-    if (dateStr) {
-        const assignmentDaysCol = getAssignmentDaysCollection(userId);
-        const assignmentDocRef = doc(assignmentDaysCol, dateStr);
-        const snapshot = await import('firebase/firestore').then(m => m.getDoc(assignmentDocRef));
+        // 指定された日付（今日）の割り当てからも削除する
+        if (dateStr) {
+            const assignmentDaysCol = getAssignmentDaysCollection(userId);
+            const assignmentDocRef = doc(assignmentDaysCol, dateStr);
+            const snapshot = await import('firebase/firestore').then(m => m.getDoc(assignmentDocRef));
 
-        if (snapshot.exists()) {
-            const data = snapshot.data() as AssignmentDay;
-            const assignments = data.assignments || [];
+            if (snapshot.exists()) {
+                const data = snapshot.data() as AssignmentDay;
+                const assignments = data.assignments || [];
 
-            // 該当メンバーの割り当てを探す
-            const updatedAssignments = assignments.map(a => {
-                if (a.memberId === memberId) {
-                    return { ...a, memberId: null };
+                // 該当メンバーの割り当てを探す
+                const updatedAssignments = assignments.map(a => {
+                    if (a.memberId === memberId) {
+                        return { ...a, memberId: null };
+                    }
+                    return a;
+                });
+
+                // 変更があった場合のみ更新
+                if (JSON.stringify(assignments) !== JSON.stringify(updatedAssignments)) {
+                    await updateDoc(assignmentDocRef, { assignments: updatedAssignments });
                 }
-                return a;
-            });
-
-            // 変更があった場合のみ更新
-            if (JSON.stringify(assignments) !== JSON.stringify(updatedAssignments)) {
-                await updateDoc(assignmentDocRef, { assignments: updatedAssignments });
             }
         }
+    } catch (error) {
+        console.error('Failed to delete member:', error);
+        throw error;
     }
 };
 
 export const updateMember = async (userId: string, member: Member) => {
-    const membersCol = getMembersCollection(userId);
-    const docRef = doc(membersCol, member.id);
-    await updateDoc(docRef, { ...member });
+    try {
+        const membersCol = getMembersCollection(userId);
+        const docRef = doc(membersCol, member.id);
+        await updateDoc(docRef, { ...member });
+    } catch (error) {
+        console.error('Failed to update member:', error);
+        throw error;
+    }
 };
 
 // 作業ラベル管理
 export const addTaskLabel = async (userId: string, taskLabel: TaskLabel) => {
-    const taskLabelsCol = getTaskLabelsCollection(userId);
-    const docRef = doc(taskLabelsCol, taskLabel.id);
-    await setDoc(docRef, taskLabel);
+    try {
+        const taskLabelsCol = getTaskLabelsCollection(userId);
+        const docRef = doc(taskLabelsCol, taskLabel.id);
+        await setDoc(docRef, taskLabel);
+    } catch (error) {
+        console.error('Failed to add task label:', error);
+        throw error;
+    }
 };
 
 export const deleteTaskLabel = async (userId: string, taskLabelId: string) => {
-    const taskLabelsCol = getTaskLabelsCollection(userId);
-    const docRef = doc(taskLabelsCol, taskLabelId);
-    await deleteDoc(docRef);
+    try {
+        const taskLabelsCol = getTaskLabelsCollection(userId);
+        const docRef = doc(taskLabelsCol, taskLabelId);
+        await deleteDoc(docRef);
+    } catch (error) {
+        console.error('Failed to delete task label:', error);
+        throw error;
+    }
 };
 
 export const updateTaskLabel = async (userId: string, taskLabel: TaskLabel) => {
-    const taskLabelsCol = getTaskLabelsCollection(userId);
-    const docRef = doc(taskLabelsCol, taskLabel.id);
-    await updateDoc(docRef, { ...taskLabel });
+    try {
+        const taskLabelsCol = getTaskLabelsCollection(userId);
+        const docRef = doc(taskLabelsCol, taskLabel.id);
+        await updateDoc(docRef, { ...taskLabel });
+    } catch (error) {
+        console.error('Failed to update task label:', error);
+        throw error;
+    }
 };
 
 // 過去の履歴を取得（公平性ロジック用）
 export const fetchRecentAssignments = async (userId: string, endDate: string, days: number): Promise<AssignmentDay[]> => {
-    // endDate より前の直近 n 日分を取得
-    // date 文字列比較で簡易的にフィルタリング
-    // 実際は where('date', '<', endDate) 等を使うが、dateがドキュメントIDなので where(documentId(), ...) が必要
-    // ここでは簡易的に、コレクション全体から日付でフィルタするか、
-    // 日付文字列生成して個別にgetするか。
-    // daysが少ない(7日)ので、個別にgetDocsする方が確実かつ低コストかも。
+    try {
+        const assignmentDaysCol = getAssignmentDaysCollection(userId);
+        const promises = [];
+        const targetDate = new Date(endDate);
 
-    const assignmentDaysCol = getAssignmentDaysCollection(userId);
-    const promises = [];
-    const targetDate = new Date(endDate);
-
-    for (let i = 1; i <= days; i++) {
-        const d = new Date(targetDate);
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        promises.push(getDocs(query(assignmentDaysCol, where('__name__', '==', dateStr))));
-    }
-
-    const snapshots = await Promise.all(promises);
-    const results: AssignmentDay[] = [];
-
-    snapshots.forEach(snap => {
-        if (!snap.empty) {
-            snap.forEach(d => results.push({ ...d.data(), date: d.id } as AssignmentDay));
+        for (let i = 1; i <= days; i++) {
+            const d = new Date(targetDate);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            promises.push(getDocs(query(assignmentDaysCol, where('__name__', '==', dateStr))));
         }
-    });
 
-    return results;
+        const snapshots = await Promise.all(promises);
+        const results: AssignmentDay[] = [];
+
+        snapshots.forEach(snap => {
+            if (!snap.empty) {
+                snap.forEach(d => results.push({ ...d.data(), date: d.id } as AssignmentDay));
+            }
+        });
+
+        return results;
+    } catch (error) {
+        console.error('Failed to fetch recent assignments:', error);
+        throw error;
+    }
 };
 
 // テーブル設定管理
@@ -428,19 +511,29 @@ export const subscribeTableSettings = (userId: string, callback: (settings: Tabl
 };
 
 export const updateTableSettings = async (userId: string, settings: TableSettings) => {
-    const settingsCol = getAssignmentSettingsCollection(userId);
-    const docRef = doc(settingsCol, 'table');
-    await setDoc(docRef, settings, { merge: true });
+    try {
+        const settingsCol = getAssignmentSettingsCollection(userId);
+        const docRef = doc(settingsCol, 'table');
+        await setDoc(docRef, settings, { merge: true });
+    } catch (error) {
+        console.error('Failed to update table settings:', error);
+        throw error;
+    }
 };
 
 // シャッフル履歴管理
 export const createShuffleHistory = async (userId: string, history: Omit<ShuffleHistory, 'createdAt'>) => {
-    const shuffleHistoryCol = getShuffleHistoryCollection(userId);
-    const docRef = doc(shuffleHistoryCol, history.id);
-    await setDoc(docRef, {
-        ...history,
-        createdAt: serverTimestamp(),
-    });
+    try {
+        const shuffleHistoryCol = getShuffleHistoryCollection(userId);
+        const docRef = doc(shuffleHistoryCol, history.id);
+        await setDoc(docRef, {
+            ...history,
+            createdAt: serverTimestamp(),
+        });
+    } catch (error) {
+        console.error('Failed to create shuffle history:', error);
+        throw error;
+    }
 };
 
 export const fetchRecentShuffleHistory = async (userId: string, limitCount: number = 2): Promise<ShuffleHistory[]> => {
@@ -483,22 +576,32 @@ export const subscribeManager = (userId: string, callback: (manager: Manager | n
  * 管理者を設定（追加/更新）
  */
 export const setManager = async (userId: string, name: string): Promise<void> => {
-    const managersCol = getManagersCollection(userId);
-    const docRef = doc(managersCol, MANAGER_DOC_ID);
-    await setDoc(docRef, {
-        id: MANAGER_DOC_ID,
-        name,
-        updatedAt: serverTimestamp(),
-    });
+    try {
+        const managersCol = getManagersCollection(userId);
+        const docRef = doc(managersCol, MANAGER_DOC_ID);
+        await setDoc(docRef, {
+            id: MANAGER_DOC_ID,
+            name,
+            updatedAt: serverTimestamp(),
+        });
+    } catch (error) {
+        console.error('Failed to set manager:', error);
+        throw error;
+    }
 };
 
 /**
  * 管理者を削除
  */
 export const deleteManager = async (userId: string): Promise<void> => {
-    const managersCol = getManagersCollection(userId);
-    const docRef = doc(managersCol, MANAGER_DOC_ID);
-    await deleteDoc(docRef);
+    try {
+        const managersCol = getManagersCollection(userId);
+        const docRef = doc(managersCol, MANAGER_DOC_ID);
+        await deleteDoc(docRef);
+    } catch (error) {
+        console.error('Failed to delete manager:', error);
+        throw error;
+    }
 };
 
 // ===== ペア除外設定管理 =====
@@ -511,10 +614,15 @@ function getPairExclusionsCollection(userId: string) {
  * ペア除外設定を取得
  */
 export const fetchPairExclusions = async (userId: string): Promise<PairExclusion[]> => {
-    const pairExclusionsCol = getPairExclusionsCollection(userId);
-    const q = query(pairExclusionsCol, orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as PairExclusion));
+    try {
+        const pairExclusionsCol = getPairExclusionsCollection(userId);
+        const q = query(pairExclusionsCol, orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as PairExclusion));
+    } catch (error) {
+        console.error('Failed to fetch pair exclusions:', error);
+        throw error;
+    }
 };
 
 /**
@@ -550,38 +658,51 @@ export const addPairExclusion = async (
     memberId1: string,
     memberId2: string
 ): Promise<void> => {
-    // IDを正規化（小さいIDを先に）
-    const [normalizedId1, normalizedId2] = normalizePairIds(memberId1, memberId2);
+    try {
+        // IDを正規化（小さいIDを先に）
+        const [normalizedId1, normalizedId2] = normalizePairIds(memberId1, memberId2);
 
-    // 重複チェック
-    const pairExclusionsCol = getPairExclusionsCollection(userId);
-    const existingQuery = query(
-        pairExclusionsCol,
-        where('memberId1', '==', normalizedId1),
-        where('memberId2', '==', normalizedId2)
-    );
-    const existingSnapshot = await getDocs(existingQuery);
+        // 重複チェック
+        const pairExclusionsCol = getPairExclusionsCollection(userId);
+        const existingQuery = query(
+            pairExclusionsCol,
+            where('memberId1', '==', normalizedId1),
+            where('memberId2', '==', normalizedId2)
+        );
+        const existingSnapshot = await getDocs(existingQuery);
 
-    if (!existingSnapshot.empty) {
-        throw new Error('この組み合わせは既に登録されています');
+        if (!existingSnapshot.empty) {
+            throw new Error('この組み合わせは既に登録されています');
+        }
+
+        // 新規追加
+        const id = crypto.randomUUID();
+        const docRef = doc(pairExclusionsCol, id);
+        await setDoc(docRef, {
+            id,
+            memberId1: normalizedId1,
+            memberId2: normalizedId2,
+            createdAt: serverTimestamp(),
+        });
+    } catch (error) {
+        if (error instanceof Error && error.message === 'この組み合わせは既に登録されています') {
+            throw error;
+        }
+        console.error('Failed to add pair exclusion:', error);
+        throw error;
     }
-
-    // 新規追加
-    const id = crypto.randomUUID();
-    const docRef = doc(pairExclusionsCol, id);
-    await setDoc(docRef, {
-        id,
-        memberId1: normalizedId1,
-        memberId2: normalizedId2,
-        createdAt: serverTimestamp(),
-    });
 };
 
 /**
  * ペア除外設定を削除
  */
 export const deletePairExclusion = async (userId: string, exclusionId: string): Promise<void> => {
-    const pairExclusionsCol = getPairExclusionsCollection(userId);
-    const docRef = doc(pairExclusionsCol, exclusionId);
-    await deleteDoc(docRef);
+    try {
+        const pairExclusionsCol = getPairExclusionsCollection(userId);
+        const docRef = doc(pairExclusionsCol, exclusionId);
+        await deleteDoc(docRef);
+    } catch (error) {
+        console.error('Failed to delete pair exclusion:', error);
+        throw error;
+    }
 };

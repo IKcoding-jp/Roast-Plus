@@ -106,8 +106,8 @@ export default function ClockPage() {
 
         {/* 日付表示 */}
         <p
-          className="mt-4 sm:mt-6 text-gray-400 tracking-widest"
-          style={{ fontSize: 'clamp(1.2rem, 4vw, 3rem)', fontFamily: 'var(--font-inter), sans-serif' }}
+          className="mt-4 sm:mt-6 font-bold text-[#211714]/60 tracking-widest"
+          style={{ fontSize: 'clamp(1.5rem, 5vw, 5vw)', fontFamily: 'var(--font-inter), sans-serif' }}
         >
           {formatDate(now)}
         </p>

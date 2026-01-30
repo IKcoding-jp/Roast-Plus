@@ -21,10 +21,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
     title: 'デジタル時計ページの追加とカスタマイズ設定',
     content: `
 - デジタル時計ページの追加とカスタマイズ設定
+- React Hooks eslint-disable箇所の見直し
     `.trim(),
     tags: [],
     createdAt: '2026-01-30T21:17:52.917Z',
-    updatedAt: '2026-01-30T21:17:52.917Z',
+    updatedAt: '2026-01-30T21:27:56.601Z',
   },
   {
     id: 'v0.9.1',

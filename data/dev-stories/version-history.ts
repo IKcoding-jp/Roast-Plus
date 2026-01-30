@@ -5,7 +5,7 @@ export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
     version: '0.10.0',
     date: '2026-01-30',
-    summary: 'デジタル時計ページの追加とカスタマイズ設定',
+    summary: 'デジタル時計ページの追加とカスタマイズ設定 など 2件の更新',
   },
   {
     version: '0.9.1',

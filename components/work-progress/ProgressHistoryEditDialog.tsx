@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HiX, HiCheck, HiTrash } from 'react-icons/hi';
 import { ProgressEntry } from '@/types';
+import { useToastContext } from '@/components/Toast';
 
 interface ProgressHistoryEditDialogProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ export const ProgressHistoryEditDialog: React.FC<ProgressHistoryEditDialogProps>
     onUpdate,
     onDelete,
 }) => {
+    const { showToast } = useToastContext();
     const [amount, setAmount] = useState<string>('');
     const [memo, setMemo] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,7 +63,7 @@ export const ProgressHistoryEditDialog: React.FC<ProgressHistoryEditDialogProps>
             onClose();
         } catch (error) {
             console.error('Failed to update progress history:', error);
-            alert('履歴の更新に失敗しました');
+            showToast('履歴の更新に失敗しました', 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -79,7 +81,7 @@ export const ProgressHistoryEditDialog: React.FC<ProgressHistoryEditDialogProps>
             onClose();
         } catch (error) {
             console.error('Failed to delete progress history:', error);
-            alert('履歴の削除に失敗しました');
+            showToast('履歴の削除に失敗しました', 'error');
         } finally {
             setIsSubmitting(false);
         }

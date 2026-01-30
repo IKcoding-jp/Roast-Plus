@@ -7,6 +7,7 @@ import { HiX, HiCamera, HiTrash } from 'react-icons/hi';
 import { CameraCapture } from './CameraCapture';
 import type { DefectBean } from '@/types';
 import { Input, Textarea, Button } from '@/components/ui';
+import { useToastContext } from '@/components/Toast';
 
 interface DefectBeanFormProps {
   mode?: 'add' | 'edit';
@@ -31,6 +32,7 @@ export function DefectBeanForm({
   onDelete,
   onCancel,
 }: DefectBeanFormProps) {
+  const { showToast } = useToastContext();
   const [showCamera, setShowCamera] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -79,12 +81,12 @@ export function DefectBeanForm({
 
     // 追加モード時は画像が必須
     if (mode === 'add' && !imageFile) {
-      alert('画像を選択してください。');
+      showToast('画像を選択してください。', 'warning');
       return;
     }
 
     if (!name.trim()) {
-      alert('名称を入力してください。');
+      showToast('名称を入力してください。', 'warning');
       return;
     }
 
@@ -101,14 +103,14 @@ export function DefectBeanForm({
         await onUpdate(defectBeanData, imageFile);
       } else {
         if (!imageFile) {
-          alert('画像を選択してください。');
+          showToast('画像を選択してください。', 'warning');
           return;
         }
         await onSubmit(defectBeanData, imageFile);
       }
     } catch (error) {
       console.error(`Failed to ${mode === 'edit' ? 'update' : 'submit'} defect bean:`, error);
-      alert(`欠点豆の${mode === 'edit' ? '更新' : '追加'}に失敗しました。`);
+      showToast(`欠点豆の${mode === 'edit' ? '更新' : '追加'}に失敗しました。`, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -126,7 +128,7 @@ export function DefectBeanForm({
       await onDelete();
     } catch (error) {
       console.error('Failed to delete defect bean:', error);
-      alert('欠点豆の削除に失敗しました。');
+      showToast('欠点豆の削除に失敗しました。', 'error');
     } finally {
       setIsDeleting(false);
     }

@@ -8,6 +8,7 @@ import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
+import { useToastContext } from '@/components/Toast';
 import { HiArrowLeft, HiDocumentText, HiShieldCheck, HiLogout, HiMail } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
@@ -21,6 +22,7 @@ export default function SettingsPage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const { isEnabled, isLoading: devModeLoading, enableDeveloperMode, disableDeveloperMode } = useDeveloperMode();
+    const { showToast } = useToastContext();
     const { version, isUpdateAvailable, isChecking, checkForUpdates, applyUpdate } = useAppVersion();
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [password, setPassword] = useState('');
@@ -40,10 +42,11 @@ export default function SettingsPage() {
                 }
             } catch (error) {
                 console.error('同意情報の取得に失敗:', error);
+                showToast('同意情報の取得に失敗しました。', 'error');
             }
         }
         fetchUserConsent();
-    }, [user]);
+    }, [user, showToast]);
 
     if (authLoading || devModeLoading) {
         return <Loading />;
@@ -89,6 +92,7 @@ export default function SettingsPage() {
             router.push('/login');
         } catch (error) {
             console.error('ログアウトエラー:', error);
+            showToast('ログアウトに失敗しました。', 'error');
         }
     };
 

@@ -7,12 +7,42 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { ToastProvider } from "@/components/Toast";
 import { SplashScreen } from "@/components/SplashScreen";
 
-import { Zen_Old_Mincho } from "next/font/google";
+import { Zen_Old_Mincho, Inter, Roboto_Mono, Oswald, Orbitron, Noto_Sans_JP } from "next/font/google";
 
 const zenOldMincho = Zen_Old_Mincho({
   weight: ["400", "500", "600", "700", "900"],
   subsets: ["latin"],
   variable: "--font-zen-old-mincho",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+  variable: "--font-roboto-mono",
+  display: "swap",
+});
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-oswald",
+  display: "swap",
+});
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  variable: "--font-orbitron",
+  display: "swap",
+});
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ["latin"],
+  variable: "--font-noto-sans-jp",
   display: "swap",
 });
 
@@ -49,7 +79,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body
-        className={`${zenOldMincho.variable} antialiased font-serif`}
+        className={`${zenOldMincho.variable} ${inter.variable} ${robotoMono.variable} ${oswald.variable} ${orbitron.variable} ${notoSansJP.variable} antialiased font-serif`}
         suppressHydrationWarning
       >
         <Script

@@ -20,6 +20,7 @@ import { FaTree, FaGift, FaSnowflake, FaHollyBerry, FaStar } from 'react-icons/f
 import { PiBellFill } from 'react-icons/pi';
 import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
 import { BsStars } from 'react-icons/bs';
+import { HiClock } from 'react-icons/hi';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
 
@@ -323,6 +324,19 @@ export default function HomePage(_props: HomePageProps = {}) {
           </div>
 
           <div className="flex items-center gap-3 md:gap-4">
+            <button
+              onClick={() => router.push('/clock')}
+              className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${
+                isChristmasMode
+                  ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner'
+                  : 'text-white hover:bg-white/10'
+              }`}
+              aria-label="デジタル時計を表示"
+              title="デジタル時計"
+            >
+              <HiClock className="h-6 w-6" />
+            </button>
+
             {isDeveloperMode && (
               <button
                 onClick={handleShowLoadingDebugModal}

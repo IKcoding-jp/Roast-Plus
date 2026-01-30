@@ -67,8 +67,9 @@ export function useQuizData() {
   const pendingSaveRef = useRef<QuizProgress | null>(null);
 
   // SSR対策: クライアントサイドでのみlocalStorageを使用
+  // useEffect内でのsetStateはハイドレーション完了を検知する標準パターン
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- ハイドレーション検知
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsHydrated(true);
   }, []);
 
@@ -90,7 +91,7 @@ export function useQuizData() {
     try {
       const stored = getQuizProgress();
       if (stored) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorageからの初期化
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setProgress(stored);
       } else {
         // 初期データを作成

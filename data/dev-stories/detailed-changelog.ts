@@ -24,10 +24,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
 - React Hooks eslint-disable箇所の見直し
 - エラーハンドリング改善（alert→Toast統一）
 - Firebase関数とカメラ処理のエラーハンドリングを強化
+- security: CORSドメイン制限とセキュリティヘッダーを追加
     `.trim(),
     tags: [],
     createdAt: '2026-01-30T21:17:52.917Z',
-    updatedAt: '2026-01-30T22:28:07.246Z',
+    updatedAt: '2026-01-30T23:19:13.842Z',
   },
   {
     id: 'v0.9.1',

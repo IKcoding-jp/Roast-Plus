@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.10.0',
+    version: '0.10.0',
+    date: '2026-01-30',
+    type: 'feature',
+    title: 'デジタル時計ページの追加とカスタマイズ設定',
+    content: `
+- デジタル時計ページの追加とカスタマイズ設定
+    `.trim(),
+    tags: [],
+    createdAt: '2026-01-30T21:17:52.917Z',
+    updatedAt: '2026-01-30T21:17:52.917Z',
+  },
+  {
     id: 'v0.9.1',
     version: '0.9.1',
     date: '2026-01-25',

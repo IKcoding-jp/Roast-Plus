@@ -22,10 +22,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
     content: `
 - デジタル時計ページの追加とカスタマイズ設定
 - React Hooks eslint-disable箇所の見直し
+- エラーハンドリング改善（alert→Toast統一）
     `.trim(),
     tags: [],
     createdAt: '2026-01-30T21:17:52.917Z',
-    updatedAt: '2026-01-30T21:27:56.601Z',
+    updatedAt: '2026-01-30T21:39:52.926Z',
   },
   {
     id: 'v0.9.1',

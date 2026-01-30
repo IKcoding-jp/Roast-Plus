@@ -75,29 +75,30 @@ export default function ClockPage() {
         {/* デジタル時計 */}
         <time
           className="flex items-baseline justify-center gap-1 leading-none"
+          style={{ fontFamily: 'var(--font-inter), sans-serif', fontFeatureSettings: '"tnum"' }}
           dateTime={now.toISOString()}
         >
           <span
-            className="font-mono font-black text-[#211714]"
-            style={{ fontSize: 'clamp(6rem, 28vw, 28vw)', letterSpacing: '-0.04em' }}
+            className="font-black text-[#211714]"
+            style={{ fontSize: 'clamp(6rem, 28vw, 28vw)' }}
           >
             {time.h}
           </span>
           <span
-            className="font-mono font-black text-amber-600"
-            style={{ fontSize: 'clamp(4rem, 18vw, 18vw)', letterSpacing: '-0.04em' }}
+            className="font-black text-amber-600"
+            style={{ fontSize: 'clamp(4rem, 18vw, 18vw)' }}
           >
             :
           </span>
           <span
-            className="font-mono font-black text-[#211714]"
-            style={{ fontSize: 'clamp(6rem, 28vw, 28vw)', letterSpacing: '-0.04em' }}
+            className="font-black text-[#211714]"
+            style={{ fontSize: 'clamp(6rem, 28vw, 28vw)' }}
           >
             {time.m}
           </span>
           <span
-            className="font-mono font-black text-amber-600/70 ml-1"
-            style={{ fontSize: 'clamp(2.5rem, 10vw, 10vw)', letterSpacing: '-0.04em' }}
+            className="font-black text-amber-600/70 ml-1"
+            style={{ fontSize: 'clamp(2.5rem, 10vw, 10vw)' }}
           >
             {time.s}
           </span>
@@ -105,8 +106,8 @@ export default function ClockPage() {
 
         {/* 日付表示 */}
         <p
-          className="mt-4 sm:mt-6 font-mono text-gray-400 tracking-widest"
-          style={{ fontSize: 'clamp(1.2rem, 4vw, 3rem)' }}
+          className="mt-4 sm:mt-6 text-gray-400 tracking-widest"
+          style={{ fontSize: 'clamp(1.2rem, 4vw, 3rem)', fontFamily: 'var(--font-inter), sans-serif' }}
         >
           {formatDate(now)}
         </p>

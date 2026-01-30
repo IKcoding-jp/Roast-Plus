@@ -7,12 +7,18 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { ToastProvider } from "@/components/Toast";
 import { SplashScreen } from "@/components/SplashScreen";
 
-import { Zen_Old_Mincho } from "next/font/google";
+import { Zen_Old_Mincho, Inter } from "next/font/google";
 
 const zenOldMincho = Zen_Old_Mincho({
   weight: ["400", "500", "600", "700", "900"],
   subsets: ["latin"],
   variable: "--font-zen-old-mincho",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -49,7 +55,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body
-        className={`${zenOldMincho.variable} antialiased font-serif`}
+        className={`${zenOldMincho.variable} ${inter.variable} antialiased font-serif`}
         suppressHydrationWarning
       >
         <Script

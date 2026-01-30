@@ -7,6 +7,7 @@ import type { TastingSession, TastingRecord, AppData } from '@/types';
 import { TastingRecordForm } from './TastingRecordForm';
 import { getRecordsBySessionId } from '@/lib/tastingUtils';
 import { Coffee } from 'phosphor-react';
+import { useToastContext } from '@/components/Toast';
 
 interface TastingSessionDetailProps {
   session: TastingSession;
@@ -21,6 +22,7 @@ export function TastingSessionDetail({
 }: TastingSessionDetailProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const { showToast } = useToastContext();
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
   const tastingRecords = Array.isArray(data.tastingRecords)
@@ -83,7 +85,7 @@ export function TastingSessionDetail({
       router.push('/tasting');
     } catch (error) {
       console.error('Failed to save tasting record:', error);
-      alert('記録の保存に失敗しました。もう一度お試しください。');
+      showToast('記録の保存に失敗しました。もう一度お試しください。', 'error');
     }
   };
 
@@ -106,7 +108,7 @@ export function TastingSessionDetail({
       router.push('/tasting');
     } catch (error) {
       console.error('Failed to delete tasting record:', error);
-      alert('記録の削除に失敗しました。もう一度お試しください。');
+      showToast('記録の削除に失敗しました。もう一度お試しください。', 'error');
     }
   };
 

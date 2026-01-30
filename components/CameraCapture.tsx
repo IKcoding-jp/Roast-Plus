@@ -4,6 +4,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { HiCamera, HiX, HiCheck } from 'react-icons/hi';
+import { useToastContext } from '@/components/Toast';
 
 interface CameraCaptureProps {
   onCapture: (file: File) => void;
@@ -11,6 +12,7 @@ interface CameraCaptureProps {
 }
 
 export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
+  const { showToast } = useToastContext();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [guideSize, setGuideSize] = useState({ width: 0, height: 0, top: 0, left: 0, containerHeight: 0, containerWidth: 0 });
@@ -94,7 +96,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         }
       } catch (error) {
         console.error('Failed to access camera:', error);
-        alert('カメラへのアクセスに失敗しました。カメラの権限を確認してください。');
+        showToast('カメラへのアクセスに失敗しました。カメラの権限を確認してください。', 'error');
         onCancelRef.current?.();
       }
     };
@@ -108,7 +110,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       }
       stopCurrentStream();
     };
-  }, []);
+  }, [showToast]);
 
   const handleVideoReady = () => {
     const video = videoRef.current;
@@ -135,7 +137,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         videoHeight: videoRef.current?.videoHeight,
         guideSize,
       });
-      alert('カメラの準備中です。少し待ってから撮影してください。');
+      showToast('カメラの準備中です。少し待ってから撮影してください。', 'warning');
       return;
     }
 
@@ -152,7 +154,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     const videoHeight = video.videoHeight;
     if (videoWidth === 0 || videoHeight === 0) {
       console.error('Video metadata is not ready', { videoWidth, videoHeight });
-      alert('カメラの準備中です。少し待ってから撮影してください。');
+      showToast('カメラの準備中です。少し待ってから撮影してください。', 'warning');
       return;
     }
     tempCanvas.width = videoWidth;
@@ -278,7 +280,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         }
       } catch (error) {
         console.error('Failed to restart camera:', error);
-        alert('カメラの再起動に失敗しました。');
+        showToast('カメラの再起動に失敗しました。', 'error');
       }
     } else if (videoRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
       // 既存ストリームですでにメタデータが揃っている場合は即座に撮影可能にする

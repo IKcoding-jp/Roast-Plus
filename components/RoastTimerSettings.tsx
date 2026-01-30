@@ -10,12 +10,14 @@ import {
 import { playTimerSound, stopTimerSound } from '@/lib/sounds';
 import { roastTimerSoundFiles } from '@/lib/soundFiles';
 import type { RoastTimerSettings } from '@/types';
+import { useToastContext } from '@/components/Toast';
 
 interface RoastTimerSettingsProps {
   onClose: () => void;
 }
 
 export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
+  const { showToast } = useToastContext();
   const [settings, setSettings] = useState<RoastTimerSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -51,7 +53,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
       onClose();
     } catch (error) {
       console.error('Failed to save settings:', error);
-      alert('設定の保存に失敗しました');
+      showToast('設定の保存に失敗しました', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -82,13 +84,13 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
         headStatus = `${headRes.status} ${headRes.statusText}`;
         if (!headRes.ok) {
           setTestResult(`音源取得に失敗: ${headStatus}`);
-          alert(`音源取得に失敗: ${headStatus}`);
+          showToast(`音源取得に失敗: ${headStatus}`, 'error');
           setIsTestingSound(false);
           return;
         }
       } catch (err) {
         setTestResult(`音源取得でエラー: ${String(err)}`);
-        alert(`音源取得でエラー: ${String(err)}`);
+        showToast(`音源取得でエラー: ${String(err)}`, 'error');
         setIsTestingSound(false);
         return;
       }
@@ -100,7 +102,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
           if (settled) return;
           settled = true;
           setTestResult(msg);
-          alert(msg);
+          showToast(msg, 'info');
           setIsTestingSound(false);
         };
 
@@ -127,14 +129,14 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
       } else {
         const msg = '再生開始に失敗（playTimerSoundからnullが返却）';
         setTestResult(msg);
-        alert(msg);
+        showToast(msg, 'error');
         setIsTestingSound(false);
       }
     } catch (error) {
       console.error('Failed to play test sound:', error);
       const msg = `再生に失敗: ${String(error)}`;
       setTestResult(msg);
-      alert(msg);
+      showToast(msg, 'error');
       setIsTestingSound(false);
     }
   };

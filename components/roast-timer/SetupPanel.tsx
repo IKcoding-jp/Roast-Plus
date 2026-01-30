@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { HiPlay } from 'react-icons/hi';
 import { MdTimer, MdLightbulb } from 'react-icons/md';
+import { useToastContext } from '@/components/Toast';
 import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
@@ -31,6 +32,7 @@ interface SetupPanelProps {
 export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
   const { user } = useAuth();
   const { data } = useAppData();
+  const { showToast } = useToastContext();
 
   // 入力状態
   const [inputMode, setInputMode] = useState<'manual' | 'recommended' | null>(null);
@@ -203,11 +205,11 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
   const handleStart = async () => {
     try {
       if (!user) {
-        alert('ログインが必要です');
+        showToast('ログインが必要です', 'warning');
         return;
       }
       if (isLoading) {
-        alert('データを読み込み中です。しばらくお待ちください。');
+        showToast('データを読み込み中です。しばらくお待ちください。', 'info');
         return;
       }
 
@@ -218,7 +220,7 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
         const hasSeconds = durationSeconds && durationSeconds.trim() !== '';
 
         if (!hasMinutes && !hasSeconds) {
-          alert('分または秒を入力してください');
+          showToast('分または秒を入力してください', 'warning');
           return;
         }
 
@@ -227,17 +229,17 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
         finalDuration = minutes * 60 + seconds;
       } else {
         if (weight === '') {
-          alert('重さを選択してください');
+          showToast('重さを選択してください', 'warning');
           return;
         }
 
         if (recommendedMode === 'history') {
           if (!beanName) {
-            alert('豆の名前を選択してください');
+            showToast('豆の名前を選択してください', 'warning');
             return;
           }
           if (!roastLevel) {
-            alert('焙煎度合いを選択してください');
+            showToast('焙煎度合いを選択してください', 'warning');
             return;
           }
 
@@ -258,7 +260,7 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
       }
 
       if (finalDuration <= 0) {
-        alert('有効な時間を入力してください');
+        showToast('有効な時間を入力してください', 'warning');
         return;
       }
 
@@ -270,7 +272,7 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
       );
     } catch (error) {
       console.error('Failed to start timer:', error);
-      alert('タイマーの開始に失敗しました。もう一度お試しください。');
+      showToast('タイマーの開始に失敗しました。もう一度お試しください。', 'error');
     }
   };
 
@@ -278,11 +280,11 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
   const handleManualStart = async () => {
     try {
       if (!user) {
-        alert('ログインが必要です');
+        showToast('ログインが必要です', 'warning');
         return;
       }
       if (isLoading) {
-        alert('データを読み込み中です。しばらくお待ちください。');
+        showToast('データを読み込み中です。しばらくお待ちください。', 'info');
         return;
       }
       const hasMinutes = durationMinutes && durationMinutes.trim() !== '';
@@ -298,13 +300,13 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
       const duration = minutes * 60 + seconds;
 
       if (duration <= 0) {
-        alert('有効な時間を入力してください');
+        showToast('有効な時間を入力してください', 'warning');
         return;
       }
       await onStart(duration);
     } catch (error) {
       console.error('Failed to start timer:', error);
-      alert('タイマーの開始に失敗しました。もう一度お試しください。');
+      showToast('タイマーの開始に失敗しました。もう一度お試しください。', 'error');
     }
   };
 

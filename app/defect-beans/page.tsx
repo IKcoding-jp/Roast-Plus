@@ -10,6 +10,7 @@ import LoginPage from '@/app/login/page';
 import { useDefectBeans } from '@/hooks/useDefectBeans';
 import { useDefectBeanSettings } from '@/hooks/useDefectBeanSettings';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { useToastContext } from '@/components/Toast';
 import { DefectBeanCard } from '@/components/DefectBeanCard';
 import { DefectBeanForm } from '@/components/DefectBeanForm';
 import { DefectBeanCompare } from '@/components/DefectBeanCompare';
@@ -24,6 +25,7 @@ export default function DefectBeansPage() {
   const { allDefectBeans, isLoading, addDefectBean, updateDefectBean, removeDefectBean } = useDefectBeans();
   const { settings, updateSetting } = useDefectBeanSettings();
   const { isEnabled: isDeveloperModeEnabled } = useDeveloperMode();
+  const { showToast } = useToastContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOption, setFilterOption] = useState<FilterOption>('all');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -200,7 +202,7 @@ export default function DefectBeansPage() {
       setEditingDefectBeanId(null);
     } catch (error) {
       console.error('Failed to update defect bean:', error);
-      alert('欠点豆の更新に失敗しました。');
+      showToast('欠点豆の更新に失敗しました。', 'error');
       throw error;
     }
   };
@@ -219,7 +221,7 @@ export default function DefectBeansPage() {
       setEditingDefectBeanId(null);
     } catch (error) {
       console.error('Failed to delete defect bean:', error);
-      alert('欠点豆の削除に失敗しました。');
+      showToast('欠点豆の削除に失敗しました。', 'error');
       throw error;
     }
   };
@@ -230,7 +232,7 @@ export default function DefectBeansPage() {
       await updateSetting(id, shouldRemove);
     } catch (error) {
       console.error('Failed to update setting:', error);
-      alert('設定の更新に失敗しました。');
+      showToast('設定の更新に失敗しました。', 'error');
     }
   };
 

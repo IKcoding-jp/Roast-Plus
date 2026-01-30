@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HiX, HiCheck } from 'react-icons/hi';
 import { WorkProgress } from '@/types';
+import { useToastContext } from '@/components/Toast';
 
 interface QuickAddModalProps {
     isOpen: boolean;
@@ -17,6 +18,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
     onAdd,
     unit,
 }) => {
+    const { showToast } = useToastContext();
     const [amount, setAmount] = useState<string>('');
     const [memo, setMemo] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,7 +57,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
             onClose();
         } catch (error) {
             console.error('Failed to add progress:', error);
-            alert('進捗の追加に失敗しました');
+            showToast('進捗の追加に失敗しました', 'error');
         } finally {
             setIsSubmitting(false);
         }

@@ -21,7 +21,7 @@ export function XPGainAnimation({ xp, show, onComplete }: XPGainAnimationProps) 
 
   useEffect(() => {
     if (show && xp > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- アニメーション表示制御
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(true);
       const timer = setTimeout(() => {
         setIsVisible(false);

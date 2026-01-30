@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type Flake = {
   id: number;
@@ -14,11 +14,9 @@ type Flake = {
 };
 
 export const Snowfall = () => {
-  const [snowflakes, setSnowflakes] = useState<Flake[]>([]);
-
-  useEffect(() => {
+  const [snowflakes] = useState<Flake[]>(() => {
     const flakeCount = 60;
-    const flakes: Flake[] = Array.from({ length: flakeCount }).map((_, i) => {
+    return Array.from({ length: flakeCount }).map((_, i) => {
       const depth = Math.floor(Math.random() * 3); // 0: back, 1: mid, 2: front
       let size = '2px';
       let duration = '15s';
@@ -53,9 +51,7 @@ export const Snowfall = () => {
         depth,
       };
     });
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- 初期化時の1回のみ実行
-    setSnowflakes(flakes);
-  }, []);
+  });
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">

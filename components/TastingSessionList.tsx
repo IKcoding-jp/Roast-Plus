@@ -96,7 +96,7 @@ export function TastingSessionList({ data, onUpdate, filterButtonContainerId, fi
   }>({ desktop: null, mobile: null });
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- ハイドレーション後の初期化
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const updateContainers = () => {
       const desktopEl = filterButtonContainerId ? document.getElementById(filterButtonContainerId) : null;

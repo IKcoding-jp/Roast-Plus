@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   isDebugMode,
@@ -51,19 +51,9 @@ interface DebugPanelProps {
 }
 
 export function DebugPanel({ onDateChange }: DebugPanelProps) {
-  const [debugEnabled, setDebugEnabled] = useState(false);
-  const [dateOffset, setDateOffsetState] = useState(0);
-  const [debugInfo, setDebugInfo] = useState<ReturnType<typeof getDebugInfo> | null>(null);
-
-  // 初期化時にデバッグ状態を読み込み
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- 初期化時の1回のみ実行
-    setDebugEnabled(isDebugMode());
-     
-    setDateOffsetState(getDebugDateOffset());
-     
-    setDebugInfo(getDebugInfo());
-  }, []);
+  const [debugEnabled, setDebugEnabled] = useState(() => isDebugMode());
+  const [dateOffset, setDateOffsetState] = useState(() => getDebugDateOffset());
+  const [debugInfo, setDebugInfo] = useState<ReturnType<typeof getDebugInfo> | null>(() => getDebugInfo());
 
   // デバッグモード切り替え
   const handleToggleDebug = () => {

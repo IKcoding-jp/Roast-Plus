@@ -57,11 +57,7 @@ export const Start46Dialog: React.FC<Start46DialogProps> = ({
 
     // 人前が変更された場合に更新
     useEffect(() => {
-        if (initialServings !== servings) {
-             
-            setServings(initialServings);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialServings変更時のみ実行
+        setServings(initialServings);
     }, [initialServings]);
 
     const handleKeyDown = useCallback(

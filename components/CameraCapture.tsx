@@ -31,7 +31,9 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   useEffect(() => {
     if (videoRef.current && streamRef.current) {
       videoRef.current.srcObject = streamRef.current;
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().catch((error) => {
+        console.warn('Video play failed:', error);
+      });
     }
   }, [capturedImage]);
 
@@ -288,7 +290,9 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     } else if (videoRef.current && streamRef.current) {
       // ストリームはあるがvideoに未反映の場合、再紐付けして再生を試みる
       videoRef.current.srcObject = streamRef.current;
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().catch((error) => {
+        console.warn('Video play failed:', error);
+      });
     }
   };
 

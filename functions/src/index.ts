@@ -63,7 +63,10 @@ function logDetailedError(
  */
 export const ocrScheduleFromImage = onCall(
   {
-    cors: true,
+    cors: [
+      'https://roastplus-72fa6.web.app',
+      'https://roastplus-72fa6.firebaseapp.com',
+    ],
     maxInstances: 10,
     timeoutSeconds: 300, // 5分
     memory: '512MiB',
@@ -132,7 +135,10 @@ export const ocrScheduleFromImage = onCall(
  */
 export const analyzeTastingSession = onCall(
   {
-    cors: true,
+    cors: [
+      'https://roastplus-72fa6.web.app',
+      'https://roastplus-72fa6.firebaseapp.com',
+    ],
     maxInstances: 10,
     timeoutSeconds: 60,
     memory: '256MiB',

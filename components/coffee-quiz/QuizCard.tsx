@@ -1,6 +1,6 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuizOption } from './QuizOption';
 import { QuizProgress } from './QuizProgress';
@@ -123,9 +123,11 @@ export function QuizCard({
             transition={{ delay: 0.1 }}
             className="mb-5 rounded-xl overflow-hidden"
           >
-            <img
+            <Image
               src={question.imageUrl}
               alt="問題画像"
+              width={600}
+              height={160}
               className="w-full h-40 object-cover"
             />
           </motion.div>

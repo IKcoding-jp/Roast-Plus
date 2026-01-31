@@ -1,8 +1,7 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
-
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { CameraCapture } from './CameraCapture';
 import { OCRConfirmModal } from './OCRConfirmModal';
 import { extractScheduleFromImage } from '@/lib/scheduleOCR';
@@ -236,10 +235,13 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
             {/* 画像プレビュー */}
             {imagePreview && (
               <div className="mb-6 rounded-lg overflow-hidden border-2 border-amber-200 bg-gray-50">
-                <img 
-                  src={imagePreview} 
-                  alt="解析中の画像" 
+                <Image
+                  src={imagePreview}
+                  alt="解析中の画像"
+                  width={400}
+                  height={256}
                   className="w-full max-h-64 object-contain"
+                  unoptimized
                 />
               </div>
             )}

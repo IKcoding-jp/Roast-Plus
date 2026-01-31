@@ -1,8 +1,7 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
-
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { HiX, HiCamera, HiTrash } from 'react-icons/hi';
 import { CameraCapture } from './CameraCapture';
 import type { DefectBean } from '@/types';
@@ -167,10 +166,13 @@ export function DefectBeanForm({
           {imagePreview ? (
             <div className="flex justify-center">
               <div className="relative w-full max-w-xs">
-                <img
+                <Image
                   src={imagePreview}
                   alt="Preview"
+                  width={320}
+                  height={320}
                   className="w-full aspect-square object-cover rounded-lg"
+                  unoptimized
                 />
                 <button
                   type="button"

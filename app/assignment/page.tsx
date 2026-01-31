@@ -493,7 +493,7 @@ export default function AssignmentPage() {
                         </div>
                     </div>
 
-                    {/* 右側: 設定ボタン + シャッフルボタン */}
+                    {/* 右側: 設定ボタン */}
                     <div className="absolute right-4 flex items-center gap-2 z-10">
                         {isDeveloperMode && (
                             <Button
@@ -506,16 +506,6 @@ export default function AssignmentPage() {
                                 <HiCog className="w-5 h-5" />
                             </Button>
                         )}
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={handleShuffle}
-                            disabled={isShuffleDisabled}
-                            className="!rounded-full !px-4 !py-2 shadow-md active:scale-95"
-                        >
-                            <PiShuffleBold className="mr-1" />
-                            <span className="hidden md:inline">シャッフル</span>
-                        </Button>
                     </div>
                 </div>
             </header>
@@ -535,6 +525,8 @@ export default function AssignmentPage() {
                     onUpdateMemberName={handleUpdateMemberName}
                     onUpdateMemberExclusion={handleUpdateMemberExclusion}
                     onSwapAssignments={handleSwapAssignments}
+                    onShuffle={handleShuffle}
+                    isShuffleDisabled={isShuffleDisabled}
                     onAddMember={async (member) => {
                         if (!userId) return;
                         await addMember(userId, member);

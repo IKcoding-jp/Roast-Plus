@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdAdd, MdDelete, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown, MdInfoOutline } from 'react-icons/md';
+import { PiShuffleBold } from 'react-icons/pi';
 import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
@@ -23,6 +24,8 @@ type Props = {
     onUpdateMemberName: (memberId: string, name: string) => Promise<void>;
     onUpdateMemberExclusion: (memberId: string, taskLabelId: string, isExcluded: boolean) => Promise<void>;
     onSwapAssignments: (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => Promise<void>;
+    onShuffle: () => Promise<void>;
+    isShuffleDisabled: boolean;
 };
 
 const DEFAULT_TABLE_SETTINGS: TableSettings = {
@@ -53,6 +56,8 @@ export const AssignmentTable: React.FC<Props> = ({
     onSwapAssignments,
     tableSettings,
     onUpdateTableSettings,
+    onShuffle,
+    isShuffleDisabled,
 }) => {
     // 新規ラベル入力用
     const [newLeftLabel, setNewLeftLabel] = useState('');
@@ -666,7 +671,7 @@ export const AssignmentTable: React.FC<Props> = ({
                     <div className="pr-2">
                         <input
                             className="w-full p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-sm text-gray-800 placeholder-gray-500"
-                            placeholder={headerLabels.left}
+                            placeholder=""
                             value={newLeftLabel}
                             onChange={e => setNewLeftLabel(e.target.value)}
                             onKeyDown={e => {
@@ -675,15 +680,22 @@ export const AssignmentTable: React.FC<Props> = ({
                         />
                     </div>
                     
-                    {/* チーム列の空白（結合） */}
-                    <div className="col-span-full px-2 text-center text-gray-600 text-xs font-bold flex items-center justify-center" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
-                        <span className="hidden md:inline">{headerLabels.left}と{headerLabels.right}を入力して追加</span>
+                    {/* シャッフルボタン（中央配置） */}
+                    <div className="col-span-full px-2 flex items-center justify-center" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
+                        <button
+                            onClick={onShuffle}
+                            disabled={isShuffleDisabled}
+                            className="bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center gap-2"
+                        >
+                            <PiShuffleBold className="w-5 h-5" />
+                            <span className="font-medium text-sm">シャッフル</span>
+                        </button>
                     </div>
 
                     <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
                         <input
                             className="w-full min-w-0 p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-right text-sm text-gray-800 placeholder-gray-500"
-                            placeholder={`${headerLabels.right}(任意)`}
+                            placeholder=""
                             value={newRightLabel}
                             onChange={e => setNewRightLabel(e.target.value)}
                             onKeyDown={e => {

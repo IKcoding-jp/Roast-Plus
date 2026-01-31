@@ -3,6 +3,7 @@ import {
   getDoc,
   onSnapshot,
   deleteField,
+  type FieldValue,
 } from 'firebase/firestore';
 import { getUserDocRef, removeUndefinedFields, normalizeAppData, defaultData } from './common';
 import type { AppData } from '@/types';
@@ -94,54 +95,37 @@ async function performWrite(userId: string, data: AppData): Promise<void> {
     // undefinedのフィールドを削除してから保存
     const cleanedData: Record<string, unknown> = removeUndefinedFields<AppData>(data) as unknown as Record<string, unknown>;
 
+    /**
+     * フィールド値がundefinedの場合はFirestoreのdeleteField()を返し、
+     * それ以外の場合は値をそのまま返すヘルパー関数
+     */
+    const setOrDelete = <T>(value: T | undefined): T | FieldValue => {
+      return value !== undefined ? value : deleteField();
+    };
+
     // userSettingsの各フィールドを個別に削除処理
     // merge: trueを使ってもundefinedは保存できないため、明示的に削除する必要がある。
     // FieldValue.delete()を使って個別に削除する方法が確実
     if (data.userSettings) {
       // 元のdataオブジェクトからuserSettingsの各フィールドを抽出
-      const userSettingsUpdate: Record<string, unknown> = {};
-      let hasAnyField = false;
-
-      // selectedMemberIdが存在する場合は設定、undefinedの場合は削除
-      if (data.userSettings.selectedMemberId !== undefined) {
-        userSettingsUpdate.selectedMemberId = data.userSettings.selectedMemberId;
-        hasAnyField = true;
-      } else {
-        userSettingsUpdate.selectedMemberId = deleteField();
-      }
-
-      // selectedManagerIdが存在する場合は設定、undefinedの場合は削除
-      if (data.userSettings.selectedManagerId !== undefined) {
-        userSettingsUpdate.selectedManagerId = data.userSettings.selectedManagerId;
-        hasAnyField = true;
-      } else {
-        userSettingsUpdate.selectedManagerId = deleteField();
-      }
-
-      // taskLabelHeaderTextLeftが存在する場合は設定、undefinedの場合は削除
-      if (data.userSettings.taskLabelHeaderTextLeft !== undefined) {
-        userSettingsUpdate.taskLabelHeaderTextLeft = data.userSettings.taskLabelHeaderTextLeft;
-        hasAnyField = true;
-      } else {
-        userSettingsUpdate.taskLabelHeaderTextLeft = deleteField();
-      }
-
-      // taskLabelHeaderTextRightが存在する場合は設定、undefinedの場合は削除
-      if (data.userSettings.taskLabelHeaderTextRight !== undefined) {
-        userSettingsUpdate.taskLabelHeaderTextRight = data.userSettings.taskLabelHeaderTextRight;
-        hasAnyField = true;
-      } else {
-        userSettingsUpdate.taskLabelHeaderTextRight = deleteField();
-      }
+      const userSettingsUpdate: Record<string, unknown> = {
+        selectedMemberId: setOrDelete(data.userSettings.selectedMemberId),
+        selectedManagerId: setOrDelete(data.userSettings.selectedManagerId),
+        taskLabelHeaderTextLeft: setOrDelete(data.userSettings.taskLabelHeaderTextLeft),
+        taskLabelHeaderTextRight: setOrDelete(data.userSettings.taskLabelHeaderTextRight),
+      };
 
       // roastTimerSettingsが存在する場合は設定
       if (data.userSettings.roastTimerSettings !== undefined) {
         userSettingsUpdate.roastTimerSettings = data.userSettings.roastTimerSettings;
-        hasAnyField = true;
       }
 
-      // どのフィールドも削除されていない場合はuserSettings全体を削除
-      if (!hasAnyField) {
+      // すべてのフィールドがdeleteField()の場合、userSettings全体を削除
+      const hasAnyValue = Object.values(userSettingsUpdate).some(
+        (value) => value !== deleteField()
+      );
+
+      if (!hasAnyValue) {
         cleanedData.userSettings = deleteField();
       } else {
         cleanedData.userSettings = userSettingsUpdate;

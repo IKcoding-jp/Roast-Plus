@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { HiCheckCircle } from 'react-icons/hi';
 import { MdLocalFireDepartment } from 'react-icons/md';
 import { formatTime } from '@/lib/roastTimerUtils';
+import { getSyncedTimestampSync } from '@/lib/timeSync';
 import type { RoastTimerState } from '@/types';
 
 interface TimerDisplayProps {
@@ -16,7 +17,7 @@ interface TimerDisplayProps {
 /**
  * タイマー表示コンポーネント
  * - タイトル（焙煎中/焙煎完了）
- * - 円形プログレスバー
+ * - 円形プログレスバー（rAFで60fps直接DOM操作）
  * - 残り時間/経過時間
  * - 実行中の情報（豆、重さ、焙煎度合い）
  */
@@ -24,6 +25,12 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted }: TimerD
   // 円形プログレスバーの設定（レスポンシブ対応）
   const [circleSize, setCircleSize] = useState(340);
   const strokeWidth = 16;
+
+  // rAF用のref（DOM直接操作で60fpsアニメーション）
+  const progressCircleRef = useRef<SVGCircleElement>(null);
+  const remainingTextRef = useRef<HTMLDivElement>(null);
+  const elapsedTextRef = useRef<HTMLSpanElement>(null);
+  const rafRef = useRef<number | null>(null);
 
   // 画面サイズに応じて円のサイズを調整
   useEffect(() => {
@@ -73,7 +80,57 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted }: TimerD
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // 円形プログレスバーの計算
+  const radius = (circleSize - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  // rAFベースのアニメーション（タイマー実行中のみ）
+  // React再レンダリングを経由せず、DOM直接操作で60fpsを実現
+  useEffect(() => {
+    if (!isRunning || !state?.startedAt) {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      return;
+    }
+
+    const startedAt = state.startedAt;
+    const duration = state.duration;
+    const pausedElapsed = state.pausedElapsed ?? 0;
+
+    const animate = () => {
+      const now = getSyncedTimestampSync();
+      const startTime = new Date(startedAt).getTime();
+      const elapsed = Math.max(0, (now - startTime) / 1000 - Math.max(0, pausedElapsed));
+      const remaining = Math.max(0, duration - elapsed);
+      const progress = duration > 0 ? Math.min(100, (elapsed / duration) * 100) : 0;
+      const offset = circumference - (progress / 100) * circumference;
+
+      // DOM直接操作（React再レンダリング不要）
+      if (progressCircleRef.current) {
+        progressCircleRef.current.setAttribute('stroke-dashoffset', String(offset));
+      }
+      if (remainingTextRef.current) {
+        remainingTextRef.current.textContent = formatTime(Math.floor(remaining));
+      }
+      if (elapsedTextRef.current) {
+        elapsedTextRef.current.textContent = formatTime(Math.floor(elapsed));
+      }
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [isRunning, state?.startedAt, state?.pausedElapsed, state?.duration, circumference]);
+
+  // 静的な値（非実行中のフォールバック表示用）
   const getProgress = () => {
     if (!state || state.duration === 0) return 0;
     const progress = (state.elapsed / state.duration) * 100;
@@ -82,8 +139,6 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted }: TimerD
 
   const progress = getProgress();
   const remaining = state ? Math.max(0, state.remaining) : 0;
-  const radius = (circleSize - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
   const offset = circumference - (progress / 100) * circumference;
 
   // 色の決定
@@ -140,6 +195,7 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted }: TimerD
             strokeWidth={strokeWidth}
           />
           <circle
+            ref={progressCircleRef}
             cx={circleSize / 2}
             cy={circleSize / 2}
             r={radius}
@@ -150,19 +206,22 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted }: TimerD
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             style={{
-              transition: isRunning
-                ? 'stroke-dashoffset 0.1s linear'
-                : 'stroke-dashoffset 0.3s ease-out, stroke 0.3s ease-out',
+              transition: !isRunning
+                ? 'stroke-dashoffset 0.3s ease-out, stroke 0.3s ease-out'
+                : undefined,
             }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-amber-600 font-sans">
+          <div
+            ref={remainingTextRef}
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-amber-600 font-sans"
+          >
             {formatTime(Math.floor(remaining))}
           </div>
           {state && (
             <div className="text-base sm:text-lg md:text-xl text-gray-500 mt-2 sm:mt-3">
-              {formatTime(Math.floor(state.elapsed))} / {formatTime(state.duration)}
+              <span ref={elapsedTextRef}>{formatTime(Math.floor(state.elapsed))}</span> / {formatTime(state.duration)}
             </div>
           )}
           {isCompleted && (

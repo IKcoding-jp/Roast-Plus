@@ -12,7 +12,7 @@ import type { UseTimerNotificationsReturn } from './useTimerNotifications';
 
 type UpdateAppDataFn = (newDataOrUpdater: AppData | ((currentData: AppData) => AppData)) => Promise<void>;
 
-const UPDATE_INTERVAL = 100; // 100msごとに更新
+const UPDATE_INTERVAL = 250; // 250msごとに更新（CSS transitionと同期）
 
 export interface UseTimerControlsArgs {
   user: { uid: string } | null;
@@ -169,19 +169,22 @@ export function useTimerControls({
         return;
       }
 
-      const updatedState: RoastTimerState = {
-        ...currentState,
-        pausedElapsed,
-        elapsed,
-        remaining,
-        lastUpdatedAt: getSyncedIsoString(),
-      };
-
-      // ローカル状態のみ更新(Firestoreには保存しない - 100msごとの更新はローカルのみ)
-      saveLocalState(updatedState);
-      setLocalState(updatedState);
+      // React状態更新は1秒ごとに制限（テキスト同期・完了判定用）
+      // プログレスバーのアニメーションはTimerDisplayのrAFで60fps処理
+      const now = Date.now();
+      if (!lastUpdateRef.current || now - lastUpdateRef.current >= 1000) {
+        const updatedState: RoastTimerState = {
+          ...currentState,
+          pausedElapsed,
+          elapsed,
+          remaining,
+          lastUpdatedAt: getSyncedIsoString(),
+        };
+        setLocalState(updatedState);
+        lastUpdateRef.current = now;
+      }
     }
-  }, [user, isLoading, completeTimer, localStateRef, pausedElapsedRef, setLocalState]);
+  }, [user, isLoading, completeTimer]);
 
   // タイマーの定期更新(UI表示用)
   useEffect(() => {
@@ -206,7 +209,7 @@ export function useTimerControls({
         intervalRef.current = null;
       }
     };
-  }, [localState?.status, updateTimer, intervalRef, lastUpdateRef]);
+  }, [localState?.status, updateTimer]);
 
   // ページの可視性変更を監視(バックグラウンドから復帰時に状態を更新)
   useEffect(() => {
@@ -239,7 +242,7 @@ export function useTimerControls({
           lastUpdatedAt: getSyncedIsoString(),
         };
 
-        saveLocalState(updatedState);
+        // LocalStorageへの保存は不要（重要イベント時のみ保存）
         setLocalState(updatedState);
       }
     };
@@ -248,7 +251,7 @@ export function useTimerControls({
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [localState, user, completeTimer, pausedElapsedRef, setLocalState]);
+  }, [localState, user, completeTimer]);
 
   // タイマーを開始
   const startTimer = useCallback(

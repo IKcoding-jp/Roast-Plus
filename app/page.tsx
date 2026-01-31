@@ -383,7 +383,7 @@ export default function HomePage(_props: HomePageProps = {}) {
                 onClick={() => router.push(href)}
                 className={`group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 shadow-2xl transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 animate-home-card ${isChristmasMode
                   ? 'bg-white/5 backdrop-blur-xl border border-[#d4af37]/40 hover:bg-white/10 hover:border-[#d4af37]/70 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] focus-visible:ring-[#d4af37] focus-visible:ring-offset-[#051a0e]'
-                  : 'bg-white/95 text-[#1F2A44] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-primary focus-visible:ring-offset-[#F5F2EB]'
+                  : 'bg-white text-[#1F2A44] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-primary focus-visible:ring-offset-[#F5F2EB]'
                   }`}
                 style={{
                   ...(cardHeight ? { height: `${cardHeight}px` } : {}),

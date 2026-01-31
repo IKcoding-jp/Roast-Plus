@@ -9,7 +9,7 @@ import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './Roa
 import { RoastTimerSettings } from './RoastTimerSettings';
 import { TimerDisplay, TimerControls, TimerHeader, SetupPanel } from './roast-timer';
 import type { BeanName } from '@/lib/beanConfig';
-import type { RoastLevel, Weight } from './roast-timer/constants';
+import type { RoastLevel, Weight } from '@/lib/constants';
 
 export function RoastTimer() {
   const { user } = useAuth();

@@ -19,6 +19,7 @@ import { TastingSessionCarousel } from './TastingSessionCarousel';
 import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/lib/auth';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ROAST_LEVELS } from '@/lib/constants';
 
 interface TastingSessionListProps {
   data: AppData;
@@ -28,13 +29,6 @@ interface TastingSessionListProps {
 }
 
 type SortOption = 'newest' | 'oldest' | 'beanName';
-
-const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
-  '浅煎り',
-  '中煎り',
-  '中深煎り',
-  '深煎り',
-];
 
 export function TastingSessionList({ data, onUpdate, filterButtonContainerId, filterButtonContainerIdMobile }: TastingSessionListProps) {
   const router = useRouter();

@@ -323,7 +323,7 @@ function TastingPageContent() {
                 <CaretLeft size={24} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               </Link>
               <div className="flex items-center gap-2 sm:hidden">
-                <div id="filter-button-container-mobile"></div>
+                <div id="filter-button-container-mobile" className="min-w-[1px]"></div>
                 {!isEmpty && (
                   <Link
                     href="/tasting/sessions/new"
@@ -341,7 +341,7 @@ function TastingPageContent() {
             </h1>
 
             <div className="hidden sm:flex justify-end items-center gap-2 sm:gap-3 w-full sm:w-auto sm:flex-1">
-              <div id="filter-button-container"></div>
+              <div id="filter-button-container" className="min-w-[1px]"></div>
               {!isEmpty && (
                 <Link
                   href="/tasting/sessions/new"

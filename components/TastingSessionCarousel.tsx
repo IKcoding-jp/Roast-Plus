@@ -142,14 +142,39 @@ export function TastingSessionCarousel({
     );
   }
 
-  // 焙煎度に応じたバッジスタイル
+  // 焙煎度に応じたバッジスタイル（焙煎色グラデーション）
   const getRoastBadgeStyle = (level: string) => {
     switch (level) {
-      case '深煎り': return { bg: '#2C1810', text: '#D7CCC8', label: '深煎り' };
-      case '中深煎り': return { bg: '#4E342E', text: '#EFEBE9', label: '中深煎り' };
-      case '中煎り': return { bg: '#795548', text: '#F5F5F5', label: '中煎り' };
-      case '浅煎り': return { bg: '#A1887F', text: '#FFFFFF', label: '浅煎り' };
-      default: return { bg: '#8D6E63', text: '#FFFFFF', label: level };
+      case '浅煎り':
+        return {
+          bg: '#C8A882', // ライトロースト（ライトブラウン）
+          text: '#3E2723', // ダークブラウン（コントラスト高）
+          label: level
+        };
+      case '中煎り':
+        return {
+          bg: '#A0826D', // ミディアムロースト（ミディアムブラウン）
+          text: '#FFFFFF', // 白（見やすい）
+          label: level
+        };
+      case '中深煎り':
+        return {
+          bg: '#6F4E37', // ミディアムダークロースト（ダークブラウン）
+          text: '#FFFFFF', // 白
+          label: level
+        };
+      case '深煎り':
+        return {
+          bg: '#3E2723', // ダークロースト（非常に濃い茶色）
+          text: '#FFFFFF', // 白
+          label: level
+        };
+      default:
+        return {
+          bg: '#8D6E63', // デフォルト（中間色）
+          text: '#FFFFFF',
+          label: level
+        };
     }
   };
 
@@ -175,38 +200,30 @@ export function TastingSessionCarousel({
                   href={`/tasting?sessionId=${session.id}`}
                   className="block group relative"
                 >
-                  {/* カード本体 */}
+                  {/* カード本体 (Stitchデザイン) */}
                   <div
-                    className="rounded-[4px] shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative border border-[#3E2723]/30"
-                    style={{
-                      backgroundImage: 'url("/images/backgrounds/wood-texture.png")',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
+                    className="rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative border border-gray-100 bg-white"
                   >
-                    <div className="absolute inset-0 bg-[#1a0f0a]/30 mix-blend-multiply pointer-events-none" />
+                    <div className="relative z-10">
+                      <div className="h-full flex flex-col">
 
-                    <div className="relative z-10 p-1">
-                      <div className="bg-[#FDFBF7] rounded-[2px] shadow-inner border border-[#D7CCC8]/50 h-full flex flex-col">
-
-                        {/* ヘッダー */}
-                        <div className="px-8 pt-7 pb-5 border-b border-dashed border-[#8D6E63]/30 flex items-center justify-between bg-[#FFF8E1]/30">
+                        {/* ヘッダー (Stitchデザイン) */}
+                        <div className="px-8 pt-8 pb-6 border-b border-dashed border-gray-200 flex items-center justify-between">
                           <div className="flex items-center gap-6 flex-1 min-w-0">
                             <div>
-                              <div className="flex items-center gap-3 mb-1">
-                                <h3 className="text-3xl font-serif font-black text-[#3E2723] tracking-tight leading-tight truncate drop-shadow-sm">
+                              <div className="flex items-center gap-4 mb-1">
+                                <h3 className="text-4xl font-serif font-bold text-[#4a3728] tracking-tight leading-tight truncate">
                                   {session.beanName}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                   <span
-                                    className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest border border-current rounded-full"
+                                    className="px-3 py-1 text-xs font-bold rounded-full shadow-sm"
                                     style={{
-                                      color: roastStyle.bg,
-                                      backgroundColor: 'transparent',
-                                      borderColor: roastStyle.bg
+                                      backgroundColor: getRoastBadgeStyle(session.roastLevel).bg,
+                                      color: getRoastBadgeStyle(session.roastLevel).text
                                     }}
                                   >
-                                    {roastStyle.label}
+                                    {getRoastBadgeStyle(session.roastLevel).label}
                                   </span>
                                 </div>
                               </div>
@@ -219,67 +236,65 @@ export function TastingSessionCarousel({
                               e.stopPropagation();
                               router.push(`/tasting?sessionId=${session.id}&edit=true`);
                             }}
-                            className="p-3 text-[#8D6E63] hover:text-[#3E2723] hover:bg-[#D7CCC8]/20 rounded-full transition-all"
+                            className="p-3 text-gray-400 hover:text-[#f5821f] transition-colors"
                           >
                             <PencilSimple size={22} weight="duotone" />
                           </button>
                         </div>
 
-                        {/* メインコンテンツ (Flex Row) */}
-                        <div className="flex items-stretch border-b border-dashed border-[#8D6E63]/30">
+                        {/* メインコンテンツ (Flex Row) - Stitchデザイン */}
+                        <div className="flex items-stretch border-b border-dashed border-gray-200">
                           {/* 感想 (左) */}
-                          <div className="flex-1 p-8 border-r border-dashed border-[#8D6E63]/30 relative bg-[#fffdf5]">
+                          <div className="flex-1 p-8 border-r border-dashed border-gray-200 relative bg-white">
                             <div className="relative z-10 flex flex-col h-full">
                               <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-2">
-                                  <Quotes size={24} weight="fill" className="text-[#8D6E63]" />
-                                  <h4 className="text-base font-serif font-bold text-[#5D4037] tracking-wider">感想</h4>
+                                <div className="flex items-center gap-2 text-[#4a3728]">
+                                  <Quotes size={20} weight="fill" />
+                                  <h4 className="text-base font-bold">感想</h4>
                                 </div>
-                                <div className="flex items-center gap-1.5 px-3 py-1 bg-[#EFEBE9] rounded-full text-[#5D4037] text-xs font-bold shadow-sm z-20">
+                                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-500">
                                   <Users size={14} weight="fill" />
                                   <span>{recordCount} / {activeMemberCount}</span>
                                 </div>
                               </div>
-                              <div className="flex-1 min-h-[160px] max-h-[300px] overflow-y-auto">
+                              <div className="flex-1 min-h-[160px] max-h-[300px] overflow-y-auto pr-2">
                                 {comments.length > 0 ? (
                                   <ul className="space-y-4">
                                     {comments.map((comment, commentIndex) => (
-                                      <li key={commentIndex} className="text-[#4E342E] font-medium leading-relaxed relative pl-4 border-l-2 border-[#D7CCC8]">
-                                        <span className="text-sm font-serif italic block">&ldquo;{comment}&rdquo;</span>
+                                      <li key={commentIndex} className="text-sm italic text-gray-600 leading-relaxed relative pl-4 border-l-2 border-gray-200">
+                                        &ldquo;{comment}&rdquo;
                                       </li>
                                     ))}
                                   </ul>
                                 ) : (
                                   <div className="flex flex-col items-center justify-center h-full opacity-40 py-4">
-                                    <p className="text-xs font-serif italic text-[#8D6E63]">まだ感想がありません...</p>
+                                    <Coffee size={40} weight="thin" className="text-gray-300 mb-2" />
+                                    <p className="text-xs text-gray-400 italic">まだ感想がありません...</p>
                                   </div>
                                 )}
                               </div>
                             </div>
                           </div>
 
-                          {/* チャート (右) */}
-                          <div className="w-[340px] flex-shrink-0 p-8 flex flex-col justify-center relative overflow-hidden bg-[#fffdf5]">
-                            {/* 紙の質感（粒状ノイズ） */}
-                            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-stone-900 mix-blend-overlay" />
-
+                          {/* チャート (右) - Stitchデザイン */}
+                          <div className="w-80 flex-shrink-0 p-8 flex flex-col justify-center relative overflow-hidden bg-white">
                             {recordCount > 0 ? (
-                              <div className="space-y-4 w-full relative z-10">
+                              <div className="space-y-5 w-full relative z-10">
                                 {[
-                                  { label: '苦味', value: averageScores.bitterness, color: '#44403C' },
-                                  { label: '酸味', value: averageScores.acidity, color: '#EA580C' },
-                                  { label: 'ボディ', value: averageScores.body, color: '#92400E' },
-                                  { label: '甘み', value: averageScores.sweetness, color: '#E11D48' },
-                                  { label: '香り', value: averageScores.aroma, color: '#059669' },
+                                  { label: '苦味', value: averageScores.bitterness, color: '#3e2723' },
+                                  { label: '酸味', value: averageScores.acidity, color: '#ff7043' },
+                                  { label: 'ボディ', value: averageScores.body, color: '#8d6e63' },
+                                  { label: '甘み', value: averageScores.sweetness, color: '#d81b60' },
+                                  { label: '香り', value: averageScores.aroma, color: '#00897b' },
                                 ].map((item) => (
-                                  <div key={item.label} className="group/bar">
-                                    <div className="flex justify-between items-center mb-1.5 px-0.5">
-                                      <span className="text-xs font-serif font-black text-[#5D4037] tracking-wider">{item.label}</span>
-                                      <span className="text-xs font-black text-[#8D6E63]">{item.value.toFixed(1)}</span>
+                                  <div key={item.label} className="space-y-1">
+                                    <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                                      <span>{item.label}</span>
+                                      <span>{item.value.toFixed(1)}</span>
                                     </div>
-                                    <div className="h-2.5 bg-[#EFEBE9] rounded-full overflow-hidden shadow-inner border border-[#D7CCC8]/30">
+                                    <div className="w-full bg-gray-200 h-1.5 rounded overflow-hidden">
                                       <div
-                                        className="h-full rounded-full shadow-sm transition-all duration-700"
+                                        className="h-full transition-all duration-700"
                                         style={{
                                           width: `${((item.value - 1) / 4) * 100}%`,
                                           backgroundColor: item.color
@@ -290,41 +305,37 @@ export function TastingSessionCarousel({
                                 ))}
                               </div>
                             ) : (
-                              <div className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-[#D7CCC8] rounded-xl p-8 opacity-60 bg-[#fffdf5]/50 backdrop-blur-sm">
-                                <Coffee size={40} weight="thin" className="text-[#8D6E63] mb-3" />
-                                <p className="text-xs font-serif font-bold text-[#8D6E63] tracking-widest text-center">データなし</p>
+                              <div className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-gray-200 rounded-xl p-8 opacity-60">
+                                <Coffee size={40} weight="thin" className="text-gray-300 mb-3" />
+                                <p className="text-xs font-bold text-gray-400 tracking-widest text-center">データなし</p>
                               </div>
                             )}
                           </div>
                         </div>
 
-                        {/* AI分析レポート (下) */}
-                        <div className="p-8 bg-[#FDFBF7] relative min-h-[120px] transition-all duration-500">
-                          {/* 和紙風のテクスチャ */}
-                          <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/rice-paper.png")' }}></div>
-
+                        {/* AI分析レポート (下) - Stitchデザイン */}
+                        <div className="p-8 relative min-h-[120px] transition-all duration-500">
                           <div className="relative z-10">
                             {!hasAnalysis && !analyzing && recordCount === 0 && (
                               <div className="flex items-center justify-center py-2">
-                                <p className="text-xs font-serif text-[#8D6E63] italic">記録が追加されるとAI分析が開始されます</p>
+                                <p className="text-xs text-gray-500 italic">記録が追加されるとAI分析が開始されます</p>
                               </div>
                             )}
 
                             {analyzing && (
                               <div className="flex flex-col items-center justify-center py-6 gap-3">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5D4037]"></div>
-                                <p className="text-xs font-serif text-[#8D6E63] animate-pulse">コーヒーの香りを分析中...</p>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f5821f]"></div>
+                                <p className="text-xs text-gray-500 animate-pulse">コーヒーの香りを分析中...</p>
                               </div>
                             )}
 
                             {hasAnalysis && (
-                              <div className="bg-white/60 p-6 rounded-sm border border-[#D7CCC8] shadow-sm relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-[#D7CCC8]/30"></div>
-                                <div className="flex items-center gap-2 mb-3">
-                                  <Notepad size={20} weight="duotone" className="text-[#8D6E63]" />
-                                  <h4 className="text-sm font-serif font-bold text-[#5D4037]">AIコーヒーマイスターのコメント</h4>
+                              <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                                <div className="flex items-center gap-2 mb-4">
+                                  <Notepad size={20} weight="fill" className="text-[#f5821f]" />
+                                  <h4 className="text-sm font-bold tracking-wide text-[#4a3728]">AIコーヒーマイスターのコメント</h4>
                                 </div>
-                                <p className="text-sm font-serif leading-loose text-[#4E342E] whitespace-pre-wrap">
+                                <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap">
                                   {session.aiAnalysis}
                                 </p>
                               </div>
@@ -332,14 +343,14 @@ export function TastingSessionCarousel({
                           </div>
                         </div>
 
-                        {/* フッター */}
-                        <div className="px-8 py-4 bg-[#F5F5F5] border-t border-dashed border-[#8D6E63]/30 flex justify-between items-center">
-                          <div className="flex items-center gap-2 text-[#A1887F] text-xs font-serif italic tracking-wider">
+                        {/* フッター - Stitchデザイン */}
+                        <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+                          <div className="flex items-center gap-1.5 text-xs text-gray-400">
                             <CalendarBlank size={14} weight="fill" />
                             <span>{formatDate(session.createdAt)}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs font-bold text-[#5D4037] uppercase tracking-widest group-hover:text-[#3E2723] group-hover:translate-x-1 transition-all duration-300 cursor-pointer">
-                            詳細を見る <CaretRight size={14} weight="bold" />
+                          <div className="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[#f5821f] transition-colors cursor-pointer">
+                            記録を追加する <CaretRight size={14} weight="bold" />
                           </div>
                         </div>
                       </div>
@@ -380,39 +391,29 @@ export function TastingSessionCarousel({
                   className="block h-full"
                 >
                   <div
-                    className="rounded-[4px] shadow-lg flex flex-col h-full overflow-hidden relative border border-[#3E2723]/20"
-                    style={{
-                      backgroundImage: 'url("/images/backgrounds/wood-texture.png")',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
+                    className="rounded-2xl shadow-lg flex flex-col h-full overflow-hidden relative border border-gray-100 bg-white"
                   >
-                    <div className="absolute inset-0 bg-[#1a0f0a]/30 mix-blend-multiply pointer-events-none" />
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex flex-col h-full">
 
-                    <div className="relative z-10 p-1 flex flex-col h-full">
-                      <div className="bg-[#FDFBF7] rounded-[2px] shadow-inner border border-[#D7CCC8]/50 flex flex-col h-full">
-
-                        {/* ヘッダー（タイトル） */}
-                        <div className="flex-shrink-0 p-5 pb-4 border-b border-dashed border-[#8D6E63]/30 bg-[#FFF8E1]/30">
+                        {/* ヘッダー（タイトル） - Stitchデザイン */}
+                        <div className="flex-shrink-0 p-5 pb-4 border-b border-dashed border-gray-200">
                           <div className="flex items-center gap-3">
-                            <div className="p-2 bg-amber-50 rounded-xl">
-                              <Coffee size={24} weight="fill" className="text-amber-700" />
-                            </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-lg font-serif font-black text-[#3E2723] tracking-tight leading-tight truncate">
+                              <h3 className="text-2xl font-serif font-bold text-[#4a3728] tracking-tight leading-tight truncate mb-2">
                                 {session.beanName}
                               </h3>
-                              <div className="flex items-center gap-2 mt-1">
+                              <div className="flex items-center gap-2">
                                 <span
-                                  className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest border border-current rounded-full"
+                                  className="px-2 py-0.5 text-[9px] font-bold rounded-full shadow-sm"
                                   style={{
-                                    color: getRoastBadgeStyle(session.roastLevel).bg,
-                                    borderColor: getRoastBadgeStyle(session.roastLevel).bg
+                                    backgroundColor: getRoastBadgeStyle(session.roastLevel).bg,
+                                    color: getRoastBadgeStyle(session.roastLevel).text
                                   }}
                                 >
                                   {session.roastLevel}
                                 </span>
-                                <span className="text-[10px] text-[#A1887F] font-medium">
+                                <span className="text-[10px] text-gray-400">
                                   {formatDate(session.createdAt)}
                                 </span>
                               </div>
@@ -420,72 +421,73 @@ export function TastingSessionCarousel({
                           </div>
                         </div>
 
-                        {/* 横バーチャート（スコア表示） */}
+                        {/* 横バーチャート（スコア表示） - Stitchデザイン */}
                         {recordCount > 0 && (
-                          <div className="flex-shrink-0 px-4 py-3 bg-[#fffdf5] border-b border-dashed border-[#8D6E63]/20">
-                            <div className="space-y-2">
+                          <div className="flex-shrink-0 px-4 py-3 bg-white border-b border-dashed border-gray-200">
+                            <div className="space-y-2.5">
                               {[
-                                { label: '苦味', value: averageScores.bitterness, color: '#44403C' },
-                                { label: '酸味', value: averageScores.acidity, color: '#EA580C' },
-                                { label: 'ボディ', value: averageScores.body, color: '#92400E' },
-                                { label: '甘み', value: averageScores.sweetness, color: '#E11D48' },
-                                { label: '香り', value: averageScores.aroma, color: '#059669' },
+                                { label: '苦味', value: averageScores.bitterness, color: '#3e2723' },
+                                { label: '酸味', value: averageScores.acidity, color: '#ff7043' },
+                                { label: 'ボディ', value: averageScores.body, color: '#8d6e63' },
+                                { label: '甘み', value: averageScores.sweetness, color: '#d81b60' },
+                                { label: '香り', value: averageScores.aroma, color: '#00897b' },
                               ].map((item) => (
                                 <div key={item.label} className="flex items-center gap-2">
-                                  <span className="text-[10px] font-bold text-[#5D4037] w-10 flex-shrink-0">{item.label}</span>
-                                  <div className="flex-1 h-2 bg-[#EFEBE9] rounded-full overflow-hidden">
+                                  <span className="text-[10px] font-bold text-gray-500 w-10 flex-shrink-0">{item.label}</span>
+                                  <div className="flex-1 h-1.5 bg-gray-200 rounded overflow-hidden">
                                     <div
-                                      className="h-full rounded-full transition-all duration-500"
+                                      className="h-full transition-all duration-500"
                                       style={{
                                         width: `${((item.value - 1) / 4) * 100}%`,
                                         backgroundColor: item.color
                                       }}
                                     />
                                   </div>
-                                  <span className="text-[10px] font-bold text-[#8D6E63] w-6 text-right">{item.value.toFixed(1)}</span>
+                                  <span className="text-[10px] font-bold text-gray-500 w-6 text-right">{item.value.toFixed(1)}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
                         )}
 
-                        {/* 感想 + AIコメント */}
-                        <div className="flex-1 flex flex-col min-h-0 p-4 bg-[#fffdf5]">
+                        {/* 感想 + AIコメント - Stitchデザイン */}
+                        <div className="flex-1 flex flex-col min-h-0 p-4 bg-white">
                           {/* 感想セクション */}
                           <div className="flex-1 min-h-0 overflow-hidden">
                             <div className="flex items-center gap-2 mb-3">
-                              <Quotes size={16} weight="fill" className="text-[#8D6E63]" />
-                              <h4 className="text-sm font-serif font-bold text-[#5D4037]">感想</h4>
-                              <span className="text-[10px] font-bold text-[#A1887F] ml-auto">{recordCount}件の記録</span>
+                              <Quotes size={16} weight="fill" className="text-[#4a3728]" />
+                              <h4 className="text-sm font-bold text-[#4a3728]">感想</h4>
+                              <span className="text-[10px] font-bold text-gray-400 ml-auto">{recordCount}件の記録</span>
                             </div>
 
-                            <div className="h-[calc(100%-28px)] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#D7CCC8] [&::-webkit-scrollbar-thumb]:rounded-full">
+                            <div className="h-[calc(100%-28px)] overflow-y-auto pr-1">
                               {comments.length > 0 ? (
                                 <ul className="space-y-3">
                                   {comments.map((comment, commentIndex) => (
-                                    <li key={commentIndex} className="text-sm text-[#4E342E] leading-relaxed pl-3 border-l-2 border-[#A1887F]/40 font-serif italic">
+                                    <li key={commentIndex} className="text-sm italic text-gray-600 leading-relaxed pl-3 border-l-2 border-gray-200">
                                       {comment}
                                     </li>
                                   ))}
                                 </ul>
                               ) : (
-                                <div className="flex items-center justify-center h-full opacity-40">
-                                  <p className="text-xs font-serif text-[#8D6E63]">まだ感想がありません</p>
+                                <div className="flex flex-col items-center justify-center h-full opacity-40">
+                                  <Coffee size={32} weight="thin" className="text-gray-300 mb-2" />
+                                  <p className="text-xs text-gray-400 italic">まだ感想がありません</p>
                                 </div>
                               )}
                             </div>
                           </div>
 
-                          {/* AI分析ボタン */}
-                          <div className="flex-shrink-0 border-t border-dashed border-[#D7CCC8] pt-3 mt-3">
+                          {/* AI分析ボタン - Stitchデザイン */}
+                          <div className="flex-shrink-0 border-t border-dashed border-gray-200 pt-3 mt-3">
                             {!hasAnalysis && !analyzing && recordCount === 0 && (
-                              <p className="text-center text-xs font-serif text-[#8D6E63] italic py-2">記録が追加されるとAI分析が開始されます</p>
+                              <p className="text-center text-xs text-gray-500 italic py-2">記録が追加されるとAI分析が開始されます</p>
                             )}
 
                             {analyzing && (
                               <div className="flex items-center justify-center gap-2 py-2">
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5D4037]"></div>
-                                <span className="text-xs font-serif text-[#8D6E63]">分析中...</span>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#f5821f]"></div>
+                                <span className="text-xs text-gray-500">分析中...</span>
                               </div>
                             )}
 
@@ -496,13 +498,13 @@ export function TastingSessionCarousel({
                                   e.stopPropagation();
                                   setAiModalSession(session);
                                 }}
-                                className="w-full flex items-center justify-between gap-2 bg-[#fffcf0] p-3 rounded border border-[#D7CCC8] hover:bg-[#FFF8E1] transition-colors active:scale-[0.98]"
+                                className="w-full flex items-center justify-between gap-2 bg-gray-50 p-3 rounded border border-gray-200 hover:bg-gray-100 transition-colors active:scale-[0.98]"
                               >
                                 <div className="flex items-center gap-2">
-                                  <Notepad size={16} weight="fill" className="text-[#8D6E63]" />
-                                  <span className="text-xs font-bold text-[#5D4037] font-serif">AIコーヒーマイスターのコメント</span>
+                                  <Notepad size={16} weight="fill" className="text-[#f5821f]" />
+                                  <span className="text-xs font-bold text-[#4a3728]">AIコーヒーマイスター</span>
                                 </div>
-                                <CaretRight size={16} weight="bold" className="text-[#A1887F]" />
+                                <CaretRight size={16} weight="bold" className="text-gray-400" />
                               </button>
                             )}
                           </div>
@@ -517,18 +519,18 @@ export function TastingSessionCarousel({
           })}
         </div>
 
-        {/* ページインジケーター */}
+        {/* ページインジケーター - Stitchデザイン */}
         <div className="flex-shrink-0 flex justify-center gap-1.5 py-4">
           {sessionData.map((_, index) => (
             <div
               key={index}
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === activeIndex ? 'bg-[#5D4037] scale-125' : 'bg-[#D7CCC8]'
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === activeIndex ? 'bg-gray-700 scale-125' : 'bg-gray-300'
                 }`}
             />
           ))}
         </div>
 
-        {/* AI分析モーダル */}
+        {/* AI分析モーダル - Stitchデザイン */}
         <AnimatePresence>
           {aiModalSession && (
             <div className="fixed inset-0 z-[100] flex items-end justify-center">
@@ -543,40 +545,38 @@ export function TastingSessionCarousel({
                 initial={{ opacity: 0, y: 100 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 100 }}
-                className="relative bg-[#FDFBF7] rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+                className="relative bg-white rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
               >
                 {/* ハンドル */}
                 <div className="flex justify-center pt-3 pb-2">
-                  <div className="w-10 h-1 bg-[#D7CCC8] rounded-full" />
+                  <div className="w-10 h-1 bg-gray-300 rounded-full" />
                 </div>
 
                 {/* ヘッダー */}
-                <div className="px-6 pb-4 border-b border-dashed border-[#D7CCC8]">
+                <div className="px-6 pb-4 border-b border-dashed border-gray-200">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-50 rounded-xl">
-                      <Notepad size={24} weight="fill" className="text-amber-700" />
-                    </div>
+                    <Notepad size={24} weight="fill" className="text-[#f5821f]" />
                     <div>
-                      <h3 className="text-lg font-serif font-black text-[#3E2723]">
+                      <h3 className="text-lg font-bold text-[#4a3728]">
                         AIコーヒーマイスター
                       </h3>
-                      <p className="text-xs text-[#8D6E63]">{aiModalSession.beanName}</p>
+                      <p className="text-xs text-gray-500">{aiModalSession.beanName}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* コンテンツ */}
                 <div className="flex-1 overflow-y-auto p-6">
-                  <p className="text-sm font-serif leading-loose text-[#4E342E] whitespace-pre-wrap">
+                  <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap">
                     {aiModalSession.aiAnalysis}
                   </p>
                 </div>
 
                 {/* 閉じるボタン */}
-                <div className="p-4 border-t border-[#D7CCC8] bg-[#F5F5F5]">
+                <div className="p-4 border-t border-gray-100 bg-gray-50">
                   <button
                     onClick={() => setAiModalSession(null)}
-                    className="w-full py-3 bg-[#5D4037] text-white rounded-2xl font-bold text-sm hover:bg-[#4E342E] transition-colors active:scale-[0.98]"
+                    className="w-full py-3 bg-[#f5821f] hover:bg-orange-600 text-white rounded-full font-bold text-sm transition-colors active:scale-[0.98] shadow-lg"
                   >
                     閉じる
                   </button>

@@ -1,8 +1,7 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
-
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { HiCamera, HiX, HiCheck } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
@@ -313,10 +312,12 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       {/* カメラプレビューまたは撮影した画像 */}
       <div ref={containerRef} className="flex-1 relative flex items-center justify-center overflow-hidden">
         {capturedImage ? (
-          <img
+          <Image
             src={capturedImage}
             alt="Captured"
-            className="max-w-full max-h-full object-contain"
+            fill
+            className="object-contain"
+            unoptimized
           />
         ) : (
           <>

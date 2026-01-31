@@ -1,7 +1,7 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 import { RiLightbulbFlashFill } from 'react-icons/ri';
@@ -35,24 +35,32 @@ export default function DevStoriesPage() {
             </div>
             {/* キャラクター画像 */}
             <div className="flex items-center gap-0.5 sm:gap-1">
-              <img
+              <Image
                 src="/avatars/header_characters.png"
                 alt="フカイリとアサイリ"
+                width={48}
+                height={48}
                 className="h-10 sm:h-12 w-auto object-contain animate-wobble-left"
               />
-              <img
+              <Image
                 src="/avatars/header_dori_server.png"
                 alt="ドリとサーバ"
+                width={48}
+                height={48}
                 className="h-10 sm:h-12 w-auto object-contain animate-wobble-right"
               />
-              <img
+              <Image
                 src="/avatars/header_mill_kettle.png"
                 alt="ミルとケトル"
+                width={48}
+                height={48}
                 className="h-10 sm:h-12 w-auto object-contain animate-wobble-left"
               />
-              <img
+              <Image
                 src="/avatars/header_press_siphon.png"
                 alt="プレスとサイフォン"
+                width={48}
+                height={48}
                 className="h-10 sm:h-12 w-auto object-contain animate-wobble-right"
               />
             </div>

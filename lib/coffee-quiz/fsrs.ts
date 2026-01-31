@@ -9,41 +9,7 @@ import {
 } from 'ts-fsrs';
 import type { QuizCard, QuizRating, QuizQuestion } from './types';
 import { getCurrentDate } from './debug';
-
-// Firestore Timestampの型定義
-interface FirestoreTimestamp {
-  seconds: number;
-  nanoseconds: number;
-  toDate?: () => Date;
-}
-
-/**
- * Firestore TimestampまたはISO文字列をDateに変換
- */
-function toDate(value: Date | FirestoreTimestamp | string | null | undefined): Date | undefined {
-  if (!value) return undefined;
-
-  // 既にDateの場合
-  if (value instanceof Date) return value;
-
-  // Firestore Timestampの場合（toDateメソッドがある場合）
-  if (typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
-    return value.toDate();
-  }
-
-  // Firestore Timestampの場合（seconds/nanosecondsがある場合）
-  if (typeof value === 'object' && 'seconds' in value && 'nanoseconds' in value) {
-    return new Date(value.seconds * 1000 + value.nanoseconds / 1000000);
-  }
-
-  // ISO文字列の場合
-  if (typeof value === 'string') {
-    const date = new Date(value);
-    return isNaN(date.getTime()) ? undefined : date;
-  }
-
-  return undefined;
-}
+import { toJSDate } from '@/lib/firestoreUtils';
 
 /**
  * QuizCardのTimestampフィールドをDateに正規化
@@ -51,8 +17,8 @@ function toDate(value: Date | FirestoreTimestamp | string | null | undefined): D
 function normalizeCard(card: QuizCard): QuizCard {
   return {
     ...card,
-    due: toDate(card.due as unknown as Date | FirestoreTimestamp | string) ?? new Date(),
-    last_review: toDate(card.last_review as unknown as Date | FirestoreTimestamp | string),
+    due: toJSDate(card.due) ?? new Date(),
+    last_review: toJSDate(card.last_review),
   } as QuizCard;
 }
 
@@ -183,7 +149,7 @@ export function determineRating(
 export function getDueCards(cards: QuizCard[], now: Date = getCurrentDate()): QuizCard[] {
   return cards.filter((card) => {
     if (!card.due) return true; // 未学習のカードも含める
-    const dueDate = toDate(card.due as unknown as Date | FirestoreTimestamp | string);
+    const dueDate = toJSDate(card.due);
     if (!dueDate) return true;
     return dueDate <= now;
   });
@@ -194,8 +160,8 @@ export function getDueCards(cards: QuizCard[], now: Date = getCurrentDate()): Qu
  */
 export function sortCardsByPriority(cards: QuizCard[]): QuizCard[] {
   return [...cards].sort((a, b) => {
-    const dueDateA = toDate(a.due as unknown as Date | FirestoreTimestamp | string);
-    const dueDateB = toDate(b.due as unknown as Date | FirestoreTimestamp | string);
+    const dueDateA = toJSDate(a.due);
+    const dueDateB = toJSDate(b.due);
 
     // 未学習カードを優先
     if (!dueDateA && dueDateB) return -1;
@@ -255,7 +221,7 @@ export function isCardMastered(card: QuizCard): boolean {
  */
 export function getNextReviewDate(card: QuizCard): Date | null {
   if (!card.due) return null;
-  return toDate(card.due as unknown as Date | FirestoreTimestamp | string) ?? null;
+  return toJSDate(card.due) ?? null;
 }
 
 /**
@@ -265,7 +231,7 @@ export function getCardStateLabel(card: QuizCard): string {
   if (!card.due) return '未学習';
 
   const now = getCurrentDate();
-  const due = toDate(card.due as unknown as Date | FirestoreTimestamp | string);
+  const due = toJSDate(card.due);
 
   if (!due) return '未学習';
 

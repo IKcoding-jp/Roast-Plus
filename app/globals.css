@@ -22,6 +22,10 @@
   --color-dark: var(--dark);
   --color-dark-light: var(--dark-light);
   --color-gold: var(--gold);
+  /* 背景色トークン */
+  --color-bg-global: #F7F7F5;
+  --color-bg-card: #FFFFFF;
+  --color-bg-section: #F5F5F5;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-nunito: var(--font-nunito);

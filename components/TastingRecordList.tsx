@@ -5,6 +5,7 @@ import type { AppData } from '@/types';
 import { TastingRadarChart } from './TastingRadarChart';
 import { StarRating } from './StarRating';
 import { HiTrash } from 'react-icons/hi';
+import { Card } from '@/components/ui';
 
 interface TastingRecordListProps {
   data: AppData;
@@ -61,9 +62,10 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
     <div className="space-y-4">
       {sortedRecords.map((record) => {
         return (
-          <div
+          <Card
             key={record.id}
-            className="bg-[#fdfbf7] rounded-xl shadow-md p-6 cursor-pointer hover:shadow-xl transition-all border-4 border-double border-stone-200"
+            variant="hoverable"
+            className="p-6"
             onClick={() => handleCardClick(record.id)}
           >
             <div className="flex flex-col md:flex-row gap-4">
@@ -124,7 +126,7 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                 <TastingRadarChart record={record} size={180} />
               </div>
             </div>
-          </div>
+          </Card>
         );
       })}
     </div>

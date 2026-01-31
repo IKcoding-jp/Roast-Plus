@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { DripRecipe } from '@/lib/drip-guide/types';
 import { Timer, Coffee, Drop, Trash, Pencil, Play, CaretDown } from 'phosphor-react';
 import { clsx } from 'clsx';
-import { ConfirmDialog } from './ConfirmDialog';
+import { Dialog, Card } from '@/components/ui';
 import { StartHintDialog } from './StartHintDialog';
 import { Start46Dialog } from './Start46Dialog';
 import { StartHoffmannDialog } from './StartHoffmannDialog';
@@ -105,9 +105,10 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                     const calculatedRecipe = calculateRecipeForServings(recipe, servings);
 
                     return (
-                        <div
+                        <Card
                             key={recipe.id}
-                            className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 hover:shadow-md transition-shadow flex flex-col"
+                            variant="hoverable"
+                            className="p-4 sm:p-5 flex flex-col"
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <h3 className="font-bold text-lg text-gray-800 line-clamp-1" title={recipe.name}>
@@ -200,19 +201,20 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                 <Play size={20} weight="fill" />
                                 ガイド開始
                             </button>
-                        </div>
+                        </Card>
                     );
                 })}
             </div>
 
-            <ConfirmDialog
+            <Dialog
                 isOpen={deleteTargetId !== null}
                 title="レシピを削除"
-                message="本当にこのレシピを削除しますか？この操作は取り消せません。"
+                description="本当にこのレシピを削除しますか？この操作は取り消せません。"
                 confirmText="削除"
                 cancelText="キャンセル"
                 onConfirm={handleConfirmDelete}
-                onCancel={handleCancelDelete}
+                onClose={handleCancelDelete}
+                variant="danger"
             />
 
             {startTargetRecipe?.id === 'recipe-046' ? (

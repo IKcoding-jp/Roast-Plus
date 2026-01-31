@@ -47,7 +47,7 @@ export default function CoffeeTriviaPage() {
   const dueCardsCount = getDueCardsForReview().length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
       <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between bg-white border-b border-[#211714]/5">
         <div className="flex items-center">
           <Link

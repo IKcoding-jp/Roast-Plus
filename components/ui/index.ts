@@ -58,3 +58,6 @@ export type { CardProps } from './Card';
 
 export { Modal } from './Modal';
 export type { ModalProps } from './Modal';
+
+export { Dialog } from './Dialog';
+export type { DialogProps } from './Dialog';

@@ -350,7 +350,7 @@ export function TastingSessionCarousel({
                             <span>{formatDate(session.createdAt)}</span>
                           </div>
                           <div className="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[#f5821f] transition-colors cursor-pointer">
-                            詳細を見る <CaretRight size={14} weight="bold" />
+                            記録を追加する <CaretRight size={14} weight="bold" />
                           </div>
                         </div>
                       </div>

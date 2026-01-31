@@ -144,13 +144,8 @@ export function TastingSessionCarousel({
 
   // 焙煎度に応じたバッジスタイル（Stitchデザイン対応）
   const getRoastBadgeStyle = (level: string) => {
-    switch (level) {
-      case '深煎り': return { bg: '#7C3A2D', text: '#FFFFFF', label: '深煎り' };
-      case '中深煎り': return { bg: '#A0522D', text: '#FFFFFF', label: '中深煎り' };
-      case '中煎り': return { bg: '#CD853F', text: '#1F2A44', label: '中煎り' };
-      case '浅煎り': return { bg: '#DEB887', text: '#1F2A44', label: '浅煎り' };
-      default: return { bg: '#d47311', text: '#FFFFFF', label: level };
-    }
+    // Stitchデザインに合わせたニュートラルな枠線スタイル
+    return { border: 'border-gray-300', text: 'text-gray-500', label: level };
   };
 
   // ========================================
@@ -177,32 +172,22 @@ export function TastingSessionCarousel({
                 >
                   {/* カード本体 (Stitchデザイン) */}
                   <div
-                    className="rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative border border-[#d47311]/20 bg-gradient-to-br from-white via-white to-amber-50/30"
+                    className="rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative border border-gray-100 bg-white"
                   >
-                    {/* グラデーションアクセント */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d47311]/60 via-amber-500/60 to-[#d47311]/60"></div>
-
                     <div className="relative z-10">
                       <div className="h-full flex flex-col">
 
                         {/* ヘッダー (Stitchデザイン) */}
-                        <div className="px-8 pt-7 pb-5 border-b border-stone-200 flex items-center justify-between bg-gradient-to-r from-amber-50/50 to-transparent">
+                        <div className="px-8 pt-8 pb-6 border-b border-dashed border-gray-200 flex items-center justify-between">
                           <div className="flex items-center gap-6 flex-1 min-w-0">
                             <div>
-                              <div className="flex items-center gap-3 mb-1">
-                                <h3 className="text-3xl font-bold text-[#1F2A44] tracking-tight leading-tight truncate" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                              <div className="flex items-center gap-4 mb-1">
+                                <h3 className="text-4xl font-serif font-bold text-[#4a3728] tracking-tight leading-tight truncate">
                                   {session.beanName}
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                  <span
-                                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-xl shadow-sm"
-                                    style={{
-                                      color: roastStyle.text,
-                                      backgroundColor: roastStyle.bg,
-                                      fontFamily: 'Epilogue, sans-serif'
-                                    }}
-                                  >
-                                    {roastStyle.label}
+                                  <span className={`px-3 py-1 text-xs border ${getRoastBadgeStyle(session.roastLevel).border} rounded-full ${getRoastBadgeStyle(session.roastLevel).text}`}>
+                                    {getRoastBadgeStyle(session.roastLevel).label}
                                   </span>
                                 </div>
                               </div>
@@ -215,42 +200,40 @@ export function TastingSessionCarousel({
                               e.stopPropagation();
                               router.push(`/tasting?sessionId=${session.id}&edit=true`);
                             }}
-                            className="p-3 text-stone-500 hover:text-[#d47311] hover:bg-amber-50 rounded-xl transition-all"
+                            className="p-3 text-gray-400 hover:text-[#f5821f] transition-colors"
                           >
                             <PencilSimple size={22} weight="duotone" />
                           </button>
                         </div>
 
                         {/* メインコンテンツ (Flex Row) - Stitchデザイン */}
-                        <div className="flex items-stretch border-b border-stone-200">
+                        <div className="flex items-stretch border-b border-dashed border-gray-200">
                           {/* 感想 (左) */}
-                          <div className="flex-1 p-8 border-r border-stone-200 relative bg-white">
+                          <div className="flex-1 p-8 border-r border-dashed border-gray-200 relative bg-white">
                             <div className="relative z-10 flex flex-col h-full">
                               <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-2">
-                                  <div className="p-2 bg-amber-100 rounded-xl">
-                                    <Quotes size={20} weight="fill" className="text-[#d47311]" />
-                                  </div>
-                                  <h4 className="text-base font-bold text-[#1F2A44] tracking-wide" style={{ fontFamily: 'Epilogue, sans-serif' }}>感想</h4>
+                                <div className="flex items-center gap-2 text-[#4a3728]">
+                                  <Quotes size={20} weight="fill" />
+                                  <h4 className="text-base font-bold">感想</h4>
                                 </div>
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-amber-50 rounded-xl text-[#d47311] text-xs font-bold shadow-sm z-20">
+                                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-500">
                                   <Users size={14} weight="fill" />
-                                  <span style={{ fontFamily: 'Epilogue, sans-serif' }}>{recordCount} / {activeMemberCount}</span>
+                                  <span>{recordCount} / {activeMemberCount}</span>
                                 </div>
                               </div>
-                              <div className="flex-1 min-h-[160px] max-h-[300px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-amber-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-stone-100 [&::-webkit-scrollbar-track]:rounded-full">
+                              <div className="flex-1 min-h-[160px] max-h-[300px] overflow-y-auto pr-2">
                                 {comments.length > 0 ? (
                                   <ul className="space-y-4">
                                     {comments.map((comment, commentIndex) => (
-                                      <li key={commentIndex} className="text-[#4a3728] font-medium leading-relaxed relative pl-4 border-l-3 border-l-[3px] border-amber-300 bg-gradient-to-r from-amber-50/30 to-transparent p-3 rounded-r-lg">
-                                        <span className="text-sm block" style={{ fontFamily: 'Epilogue, sans-serif' }}>&ldquo;{comment}&rdquo;</span>
+                                      <li key={commentIndex} className="text-sm italic text-gray-600 leading-relaxed relative pl-4 border-l-2 border-gray-200">
+                                        &ldquo;{comment}&rdquo;
                                       </li>
                                     ))}
                                   </ul>
                                 ) : (
                                   <div className="flex flex-col items-center justify-center h-full opacity-40 py-4">
-                                    <Coffee size={40} weight="thin" className="text-amber-300 mb-2" />
-                                    <p className="text-xs text-stone-400" style={{ fontFamily: 'Epilogue, sans-serif' }}>まだ感想がありません...</p>
+                                    <Coffee size={40} weight="thin" className="text-gray-300 mb-2" />
+                                    <p className="text-xs text-gray-400 italic">まだ感想がありません...</p>
                                   </div>
                                 )}
                               </div>
@@ -258,24 +241,24 @@ export function TastingSessionCarousel({
                           </div>
 
                           {/* チャート (右) - Stitchデザイン */}
-                          <div className="w-[340px] flex-shrink-0 p-8 flex flex-col justify-center relative overflow-hidden bg-gradient-to-br from-amber-50/30 to-white">
+                          <div className="w-80 flex-shrink-0 p-8 flex flex-col justify-center relative overflow-hidden bg-white">
                             {recordCount > 0 ? (
                               <div className="space-y-5 w-full relative z-10">
                                 {[
-                                  { label: '苦味', value: averageScores.bitterness, color: '#6B5B3E' },
-                                  { label: '酸味', value: averageScores.acidity, color: '#f5821f' },
-                                  { label: 'ボディ', value: averageScores.body, color: '#A0522D' },
-                                  { label: '甘み', value: averageScores.sweetness, color: '#d47311' },
-                                  { label: '香り', value: averageScores.aroma, color: '#CD853F' },
+                                  { label: '苦味', value: averageScores.bitterness, color: '#3e2723' },
+                                  { label: '酸味', value: averageScores.acidity, color: '#ff7043' },
+                                  { label: 'ボディ', value: averageScores.body, color: '#8d6e63' },
+                                  { label: '甘み', value: averageScores.sweetness, color: '#d81b60' },
+                                  { label: '香り', value: averageScores.aroma, color: '#00897b' },
                                 ].map((item) => (
-                                  <div key={item.label} className="group/bar">
-                                    <div className="flex justify-between items-center mb-2 px-0.5">
-                                      <span className="text-sm font-bold text-[#1F2A44] tracking-wide" style={{ fontFamily: 'Epilogue, sans-serif' }}>{item.label}</span>
-                                      <span className="text-sm font-black text-[#d47311]" style={{ fontFamily: 'Epilogue, sans-serif' }}>{item.value.toFixed(1)}</span>
+                                  <div key={item.label} className="space-y-1">
+                                    <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                                      <span>{item.label}</span>
+                                      <span>{item.value.toFixed(1)}</span>
                                     </div>
-                                    <div className="h-3 bg-stone-100 rounded-xl overflow-hidden shadow-sm border border-stone-200">
+                                    <div className="w-full bg-gray-200 h-1.5 rounded overflow-hidden">
                                       <div
-                                        className="h-full rounded-xl shadow-sm transition-all duration-700 group-hover/bar:brightness-110"
+                                        className="h-full transition-all duration-700"
                                         style={{
                                           width: `${((item.value - 1) / 4) * 100}%`,
                                           backgroundColor: item.color
@@ -286,40 +269,37 @@ export function TastingSessionCarousel({
                                 ))}
                               </div>
                             ) : (
-                              <div className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-amber-200 rounded-xl p-8 opacity-60 bg-white/50 backdrop-blur-sm">
-                                <Coffee size={40} weight="thin" className="text-amber-300 mb-3" />
-                                <p className="text-xs font-bold text-stone-400 tracking-widest text-center" style={{ fontFamily: 'Epilogue, sans-serif' }}>データなし</p>
+                              <div className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-gray-200 rounded-xl p-8 opacity-60">
+                                <Coffee size={40} weight="thin" className="text-gray-300 mb-3" />
+                                <p className="text-xs font-bold text-gray-400 tracking-widest text-center">データなし</p>
                               </div>
                             )}
                           </div>
                         </div>
 
                         {/* AI分析レポート (下) - Stitchデザイン */}
-                        <div className="p-8 bg-gradient-to-br from-white to-amber-50/20 relative min-h-[120px] transition-all duration-500">
+                        <div className="p-8 relative min-h-[120px] transition-all duration-500">
                           <div className="relative z-10">
                             {!hasAnalysis && !analyzing && recordCount === 0 && (
                               <div className="flex items-center justify-center py-2">
-                                <p className="text-xs text-stone-400" style={{ fontFamily: 'Epilogue, sans-serif' }}>記録が追加されるとAI分析が開始されます</p>
+                                <p className="text-xs text-gray-500 italic">記録が追加されるとAI分析が開始されます</p>
                               </div>
                             )}
 
                             {analyzing && (
                               <div className="flex flex-col items-center justify-center py-6 gap-3">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#d47311]"></div>
-                                <p className="text-xs text-stone-500 animate-pulse" style={{ fontFamily: 'Epilogue, sans-serif' }}>コーヒーの香りを分析中...</p>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f5821f]"></div>
+                                <p className="text-xs text-gray-500 animate-pulse">コーヒーの香りを分析中...</p>
                               </div>
                             )}
 
                             {hasAnalysis && (
-                              <div className="bg-white/80 p-6 rounded-xl border border-amber-200 shadow-sm relative overflow-hidden backdrop-blur-sm">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#d47311] to-amber-400"></div>
+                              <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
                                 <div className="flex items-center gap-2 mb-4">
-                                  <div className="p-2 bg-amber-100 rounded-lg">
-                                    <Notepad size={18} weight="fill" className="text-[#d47311]" />
-                                  </div>
-                                  <h4 className="text-sm font-bold text-[#1F2A44]" style={{ fontFamily: 'Epilogue, sans-serif' }}>AIコーヒーマイスターのコメント</h4>
+                                  <Notepad size={20} weight="fill" className="text-[#f5821f]" />
+                                  <h4 className="text-sm font-bold tracking-wide text-[#4a3728]">AIコーヒーマイスターのコメント</h4>
                                 </div>
-                                <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                                <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap">
                                   {session.aiAnalysis}
                                 </p>
                               </div>
@@ -328,12 +308,12 @@ export function TastingSessionCarousel({
                         </div>
 
                         {/* フッター - Stitchデザイン */}
-                        <div className="px-8 py-4 bg-stone-50/50 border-t border-stone-200 flex justify-between items-center">
-                          <div className="flex items-center gap-2 text-stone-400 text-xs tracking-wider" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                        <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+                          <div className="flex items-center gap-1.5 text-xs text-gray-400">
                             <CalendarBlank size={14} weight="fill" />
                             <span>{formatDate(session.createdAt)}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs font-bold text-[#d47311] uppercase tracking-widest group-hover:text-amber-600 group-hover:translate-x-1 transition-all duration-300 cursor-pointer" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                          <div className="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[#f5821f] transition-colors cursor-pointer">
                             詳細を見る <CaretRight size={14} weight="bold" />
                           </div>
                         </div>
@@ -375,36 +355,23 @@ export function TastingSessionCarousel({
                   className="block h-full"
                 >
                   <div
-                    className="rounded-xl shadow-lg flex flex-col h-full overflow-hidden relative border border-[#d47311]/20 bg-gradient-to-br from-white via-white to-amber-50/30"
+                    className="rounded-2xl shadow-lg flex flex-col h-full overflow-hidden relative border border-gray-100 bg-white"
                   >
-                    {/* グラデーションアクセント */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d47311]/60 via-amber-500/60 to-[#d47311]/60"></div>
-
                     <div className="relative z-10 flex flex-col h-full">
                       <div className="flex flex-col h-full">
 
                         {/* ヘッダー（タイトル） - Stitchデザイン */}
-                        <div className="flex-shrink-0 p-5 pb-4 border-b border-stone-200 bg-gradient-to-r from-amber-50/50 to-transparent">
+                        <div className="flex-shrink-0 p-5 pb-4 border-b border-dashed border-gray-200">
                           <div className="flex items-center gap-3">
-                            <div className="p-2 bg-amber-100 rounded-xl">
-                              <Coffee size={24} weight="fill" className="text-[#d47311]" />
-                            </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-lg font-bold text-[#1F2A44] tracking-tight leading-tight truncate" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                              <h3 className="text-2xl font-serif font-bold text-[#4a3728] tracking-tight leading-tight truncate mb-2">
                                 {session.beanName}
                               </h3>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span
-                                  className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-lg shadow-sm"
-                                  style={{
-                                    color: getRoastBadgeStyle(session.roastLevel).text,
-                                    backgroundColor: getRoastBadgeStyle(session.roastLevel).bg,
-                                    fontFamily: 'Epilogue, sans-serif'
-                                  }}
-                                >
+                              <div className="flex items-center gap-2">
+                                <span className={`px-2 py-0.5 text-[9px] border ${getRoastBadgeStyle(session.roastLevel).border} rounded-full ${getRoastBadgeStyle(session.roastLevel).text}`}>
                                   {session.roastLevel}
                                 </span>
-                                <span className="text-[10px] text-stone-400 font-medium" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                                <span className="text-[10px] text-gray-400">
                                   {formatDate(session.createdAt)}
                                 </span>
                               </div>
@@ -414,27 +381,27 @@ export function TastingSessionCarousel({
 
                         {/* 横バーチャート（スコア表示） - Stitchデザイン */}
                         {recordCount > 0 && (
-                          <div className="flex-shrink-0 px-4 py-3 bg-gradient-to-br from-amber-50/30 to-white border-b border-stone-200">
+                          <div className="flex-shrink-0 px-4 py-3 bg-white border-b border-dashed border-gray-200">
                             <div className="space-y-2.5">
                               {[
-                                { label: '苦味', value: averageScores.bitterness, color: '#6B5B3E' },
-                                { label: '酸味', value: averageScores.acidity, color: '#f5821f' },
-                                { label: 'ボディ', value: averageScores.body, color: '#A0522D' },
-                                { label: '甘み', value: averageScores.sweetness, color: '#d47311' },
-                                { label: '香り', value: averageScores.aroma, color: '#CD853F' },
+                                { label: '苦味', value: averageScores.bitterness, color: '#3e2723' },
+                                { label: '酸味', value: averageScores.acidity, color: '#ff7043' },
+                                { label: 'ボディ', value: averageScores.body, color: '#8d6e63' },
+                                { label: '甘み', value: averageScores.sweetness, color: '#d81b60' },
+                                { label: '香り', value: averageScores.aroma, color: '#00897b' },
                               ].map((item) => (
                                 <div key={item.label} className="flex items-center gap-2">
-                                  <span className="text-[10px] font-bold text-[#1F2A44] w-10 flex-shrink-0" style={{ fontFamily: 'Epilogue, sans-serif' }}>{item.label}</span>
-                                  <div className="flex-1 h-2.5 bg-stone-100 rounded-xl overflow-hidden border border-stone-200">
+                                  <span className="text-[10px] font-bold text-gray-500 w-10 flex-shrink-0">{item.label}</span>
+                                  <div className="flex-1 h-1.5 bg-gray-200 rounded overflow-hidden">
                                     <div
-                                      className="h-full rounded-xl transition-all duration-500"
+                                      className="h-full transition-all duration-500"
                                       style={{
                                         width: `${((item.value - 1) / 4) * 100}%`,
                                         backgroundColor: item.color
                                       }}
                                     />
                                   </div>
-                                  <span className="text-[10px] font-bold text-[#d47311] w-6 text-right" style={{ fontFamily: 'Epilogue, sans-serif' }}>{item.value.toFixed(1)}</span>
+                                  <span className="text-[10px] font-bold text-gray-500 w-6 text-right">{item.value.toFixed(1)}</span>
                                 </div>
                               ))}
                             </div>
@@ -446,41 +413,39 @@ export function TastingSessionCarousel({
                           {/* 感想セクション */}
                           <div className="flex-1 min-h-0 overflow-hidden">
                             <div className="flex items-center gap-2 mb-3">
-                              <div className="p-1.5 bg-amber-100 rounded-lg">
-                                <Quotes size={14} weight="fill" className="text-[#d47311]" />
-                              </div>
-                              <h4 className="text-sm font-bold text-[#1F2A44]" style={{ fontFamily: 'Epilogue, sans-serif' }}>感想</h4>
-                              <span className="text-[10px] font-bold text-stone-400 ml-auto" style={{ fontFamily: 'Epilogue, sans-serif' }}>{recordCount}件の記録</span>
+                              <Quotes size={16} weight="fill" className="text-[#4a3728]" />
+                              <h4 className="text-sm font-bold text-[#4a3728]">感想</h4>
+                              <span className="text-[10px] font-bold text-gray-400 ml-auto">{recordCount}件の記録</span>
                             </div>
 
-                            <div className="h-[calc(100%-28px)] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-amber-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-stone-100 [&::-webkit-scrollbar-track]:rounded-full">
+                            <div className="h-[calc(100%-28px)] overflow-y-auto pr-1">
                               {comments.length > 0 ? (
                                 <ul className="space-y-3">
                                   {comments.map((comment, commentIndex) => (
-                                    <li key={commentIndex} className="text-sm text-[#4a3728] leading-relaxed pl-3 border-l-[3px] border-amber-300 bg-gradient-to-r from-amber-50/30 to-transparent p-2 rounded-r-lg" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                                    <li key={commentIndex} className="text-sm italic text-gray-600 leading-relaxed pl-3 border-l-2 border-gray-200">
                                       {comment}
                                     </li>
                                   ))}
                                 </ul>
                               ) : (
                                 <div className="flex flex-col items-center justify-center h-full opacity-40">
-                                  <Coffee size={32} weight="thin" className="text-amber-300 mb-2" />
-                                  <p className="text-xs text-stone-400" style={{ fontFamily: 'Epilogue, sans-serif' }}>まだ感想がありません</p>
+                                  <Coffee size={32} weight="thin" className="text-gray-300 mb-2" />
+                                  <p className="text-xs text-gray-400 italic">まだ感想がありません</p>
                                 </div>
                               )}
                             </div>
                           </div>
 
                           {/* AI分析ボタン - Stitchデザイン */}
-                          <div className="flex-shrink-0 border-t border-stone-200 pt-3 mt-3">
+                          <div className="flex-shrink-0 border-t border-dashed border-gray-200 pt-3 mt-3">
                             {!hasAnalysis && !analyzing && recordCount === 0 && (
-                              <p className="text-center text-xs text-stone-400 py-2" style={{ fontFamily: 'Epilogue, sans-serif' }}>記録が追加されるとAI分析が開始されます</p>
+                              <p className="text-center text-xs text-gray-500 italic py-2">記録が追加されるとAI分析が開始されます</p>
                             )}
 
                             {analyzing && (
                               <div className="flex items-center justify-center gap-2 py-2">
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#d47311]"></div>
-                                <span className="text-xs text-stone-500" style={{ fontFamily: 'Epilogue, sans-serif' }}>分析中...</span>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#f5821f]"></div>
+                                <span className="text-xs text-gray-500">分析中...</span>
                               </div>
                             )}
 
@@ -491,15 +456,13 @@ export function TastingSessionCarousel({
                                   e.stopPropagation();
                                   setAiModalSession(session);
                                 }}
-                                className="w-full flex items-center justify-between gap-2 bg-gradient-to-r from-amber-50 to-white p-3 rounded-xl border border-amber-200 hover:from-amber-100 hover:to-amber-50 transition-all active:scale-[0.98] shadow-sm"
+                                className="w-full flex items-center justify-between gap-2 bg-gray-50 p-3 rounded border border-gray-200 hover:bg-gray-100 transition-colors active:scale-[0.98]"
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className="p-1.5 bg-amber-100 rounded-lg">
-                                    <Notepad size={14} weight="fill" className="text-[#d47311]" />
-                                  </div>
-                                  <span className="text-xs font-bold text-[#1F2A44]" style={{ fontFamily: 'Epilogue, sans-serif' }}>AIコーヒーマイスター</span>
+                                  <Notepad size={16} weight="fill" className="text-[#f5821f]" />
+                                  <span className="text-xs font-bold text-[#4a3728]">AIコーヒーマイスター</span>
                                 </div>
-                                <CaretRight size={16} weight="bold" className="text-[#d47311]" />
+                                <CaretRight size={16} weight="bold" className="text-gray-400" />
                               </button>
                             )}
                           </div>
@@ -515,11 +478,11 @@ export function TastingSessionCarousel({
         </div>
 
         {/* ページインジケーター - Stitchデザイン */}
-        <div className="flex-shrink-0 flex justify-center gap-2 py-4">
+        <div className="flex-shrink-0 flex justify-center gap-1.5 py-4">
           {sessionData.map((_, index) => (
             <div
               key={index}
-              className={`h-1.5 rounded-full transition-all duration-300 ${index === activeIndex ? 'bg-[#d47311] w-6 scale-110' : 'bg-stone-300 w-1.5'
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === activeIndex ? 'bg-gray-700 scale-125' : 'bg-gray-300'
                 }`}
             />
           ))}
@@ -540,41 +503,38 @@ export function TastingSessionCarousel({
                 initial={{ opacity: 0, y: 100 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 100 }}
-                className="relative bg-gradient-to-br from-white to-amber-50/30 rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col border-t-4 border-[#d47311]"
+                className="relative bg-white rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
               >
                 {/* ハンドル */}
                 <div className="flex justify-center pt-3 pb-2">
-                  <div className="w-10 h-1 bg-stone-300 rounded-full" />
+                  <div className="w-10 h-1 bg-gray-300 rounded-full" />
                 </div>
 
                 {/* ヘッダー */}
-                <div className="px-6 pb-4 border-b border-stone-200">
+                <div className="px-6 pb-4 border-b border-dashed border-gray-200">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-100 rounded-xl">
-                      <Notepad size={24} weight="fill" className="text-[#d47311]" />
-                    </div>
+                    <Notepad size={24} weight="fill" className="text-[#f5821f]" />
                     <div>
-                      <h3 className="text-lg font-bold text-[#1F2A44]" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                      <h3 className="text-lg font-bold text-[#4a3728]">
                         AIコーヒーマイスター
                       </h3>
-                      <p className="text-xs text-stone-500" style={{ fontFamily: 'Epilogue, sans-serif' }}>{aiModalSession.beanName}</p>
+                      <p className="text-xs text-gray-500">{aiModalSession.beanName}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* コンテンツ */}
-                <div className="flex-1 overflow-y-auto p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-amber-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-stone-100 [&::-webkit-scrollbar-track]:rounded-full">
-                  <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap" style={{ fontFamily: 'Epilogue, sans-serif' }}>
+                <div className="flex-1 overflow-y-auto p-6">
+                  <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap">
                     {aiModalSession.aiAnalysis}
                   </p>
                 </div>
 
                 {/* 閉じるボタン */}
-                <div className="p-4 border-t border-stone-200 bg-white/80">
+                <div className="p-4 border-t border-gray-100 bg-gray-50">
                   <button
                     onClick={() => setAiModalSession(null)}
-                    className="w-full py-3 bg-gradient-to-r from-[#d47311] to-amber-600 text-white rounded-xl font-bold text-sm hover:from-amber-600 hover:to-[#d47311] transition-all active:scale-[0.98] shadow-lg"
-                    style={{ fontFamily: 'Epilogue, sans-serif' }}
+                    className="w-full py-3 bg-[#f5821f] hover:bg-orange-600 text-white rounded-full font-bold text-sm transition-colors active:scale-[0.98] shadow-lg"
                   >
                     閉じる
                   </button>

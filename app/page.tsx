@@ -227,7 +227,7 @@ export default function HomePage(_props: HomePageProps = {}) {
   return (
     <div className={`min-h-screen text-slate-100 animate-home-page relative transition-colors duration-1000 ${isChristmasMode
       ? 'bg-[#051a0e] bg-[radial-gradient(circle_at_center,_#0a2f1a_0%,_#051a0e_100%)]'
-      : 'bg-gradient-to-b from-[#F7F2EB] to-[#F3F0EA] text-[#1F2A44]'
+      : 'bg-gray-50 text-[#1F2A44]'
       }`}>
       {isChristmasMode && <Snowfall />}
 

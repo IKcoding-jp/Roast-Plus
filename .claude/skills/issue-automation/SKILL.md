@@ -19,10 +19,10 @@ GitHub Issueの解決を自動化するスキルです。
 
 ---
 
-## ワークフロー概要（CLAUDE.md準拠: 探索→計画→コード→コミット型）
+## ワークフロー概要(CLAUDE.md準拠: 探索→計画→コード→コミット型)
 
 ```
-Phase 1: 探索（Issue理解）
+Phase 1: 探索(Issue理解)
    └─ gh issue view → Serena MCP でコード探索
 
 Phase 2: 計画
@@ -32,12 +32,12 @@ Phase 3: 実装
    └─ ブランチ作成 → Context7 MCP → コード修正
 
 Phase 4: 検証
-   └─ lint / build / test → Chrome DevTools MCP（UI変更時）
+   └─ lint / build / test → Chrome DevTools MCP(UI変更時)
 
 Phase 5: コミット＆PR
-   └─ git-workflow準拠コミット → --body-file でPR作成
+   └─ ユーザー確認 → コミット → プッシュ確認 → PR確認
 
-Phase 6: マージ（ユーザー確認後）
+Phase 6: マージ(ユーザー確認後)
 ```
 
 ---
@@ -46,7 +46,7 @@ Phase 6: マージ（ユーザー確認後）
 
 このスキルが呼び出されたら、以下の手順を**必ず順番に**実行してください。
 
-### Phase 1: 探索（Issue理解）
+### Phase 1: 探索(Issue理解)
 
 #### 1.1 Issue情報取得
 
@@ -56,7 +56,7 @@ gh issue view $ARGUMENTS --json title,body,labels,number
 
 Issue番号は `$ARGUMENTS` から取得します。
 
-#### 1.2 関連コード探索（Serena MCP使用）
+#### 1.2 関連コード探索(Serena MCP使用)
 
 1. `search_for_pattern` でIssueに関連するコードを検索
 2. `get_symbols_overview` でファイル構造を把握
@@ -86,7 +86,7 @@ Issue番号は `$ARGUMENTS` から取得します。
 
 #### 3.1 ブランチ作成
 
-**命名規則**（CLAUDE.md準拠）:
+**命名規則**(CLAUDE.md準拠):
 
 | ラベル | ブランチ名 |
 |--------|-----------|
@@ -98,7 +98,7 @@ Issue番号は `$ARGUMENTS` から取得します。
 git checkout -b "fix/#16-schedule-layout"
 ```
 
-#### 3.2 最新ドキュメント参照（Context7 MCP使用）
+#### 3.2 最新ドキュメント参照(Context7 MCP使用)
 
 使用するライブラリのAPIが不明な場合:
 
@@ -108,7 +108,7 @@ git checkout -b "fix/#16-schedule-layout"
 #### 3.3 コード修正
 
 - 最小限の変更で問題を解決
-- 既存のコードスタイルに従う（`docs/coding-standards.md` 参照）
+- 既存のコードスタイルに従う(`docs/coding-standards.md` 参照)
 
 ---
 
@@ -124,7 +124,7 @@ npm run test
 
 エラーがあれば修正してから次へ進む。
 
-#### 4.2 ビジュアル確認（UI変更時のみ）
+#### 4.2 ビジュアル確認(UI変更時のみ)
 
 Chrome DevTools MCPを使用:
 
@@ -145,7 +145,27 @@ Chrome DevTools MCPを使用:
 
 ### Phase 5: コミット＆PR
 
-#### 5.1 コミット（git-workflow スキル準拠）
+#### 5.1 コミット準備(git-workflow スキル準拠)
+
+変更内容とコミットメッセージを**ユーザーに提示**:
+
+```
+📝 コミット内容
+- 変更ファイル: [ファイル一覧を表示]
+- コミットメッセージ案:
+  fix(scope): 日本語で簡潔な説明
+
+  - 変更点1
+  - 変更点2
+
+  Closes #番号
+
+  Co-Authored-By: Claude <noreply@anthropic.com>
+
+このままコミットしますか?
+```
+
+**AskUserQuestionツールで確認を取る**。承認後にコミット実行:
 
 ```bash
 git add .
@@ -159,7 +179,7 @@ Closes #番号
 Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
-**コミットメッセージ規則**（git-workflow参照）:
+**コミットメッセージ規則**(git-workflow参照):
 
 | タイプ | 用途 |
 |--------|------|
@@ -168,13 +188,55 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 | `refactor` | リファクタリング |
 | `docs` | ドキュメント |
 
-#### 5.2 PR作成
+#### 5.2 プッシュ確認
+
+コミット完了後、プッシュ前に**確認**:
+
+```
+🚀 プッシュ準備
+- ブランチ: [ブランチ名]
+- コミット数: [コミット数]
+- リモート: origin
+
+このままプッシュしますか?
+```
+
+**AskUserQuestionツールで確認を取る**。承認後にプッシュ:
 
 ```bash
 git push -u origin $(git branch --show-current)
 ```
 
-**--body-file を使用**（CLAUDE.md推奨: バッククォート問題回避）:
+#### 5.3 PR作成確認
+
+PRタイトルと本文を**ユーザーに提示**:
+
+```
+📋 PR作成準備
+- タイトル: [Issue #番号] タイトル
+- 本文プレビュー:
+
+  ## 概要
+  このPRはIssue #番号 を解決します。
+
+  ## 変更内容
+  - 変更点1
+  - 変更点2
+
+  ## テスト
+  - [x] npm run lint が通ること
+  - [x] npm run build が通ること
+  - [x] npm run test が通ること
+  - [ ] 実機で動作確認
+
+  Closes #番号
+
+このままPRを作成しますか?
+```
+
+**AskUserQuestionツールで確認を取る**。承認後にPR作成:
+
+**--body-file を使用**(CLAUDE.md推奨: バッククォート問題回避):
 
 ```bash
 # 一時ファイルにPR本文を作成
@@ -197,7 +259,7 @@ cat > /tmp/pr-body.md << 'PREOF'
 
 ## スクリーンショット
 
-（UI変更の場合は添付）
+(UI変更の場合は添付)
 
 Closes #番号
 PREOF
@@ -208,9 +270,20 @@ gh pr create --base main --title "[Issue #番号] タイトル" --body-file /tmp
 
 ---
 
-### Phase 6: マージ（ユーザー確認後）
+### Phase 6: マージ(ユーザー確認後)
 
 **必ずユーザーに確認してから**マージを実行:
+
+```
+✅ マージ準備
+- PR: #123
+- CI: [ステータス]
+- レビュー: [ステータス]
+
+このままマージしますか?
+```
+
+**AskUserQuestionツールで確認を取る**。承認後にマージ:
 
 ```bash
 gh pr merge --merge --delete-branch
@@ -220,8 +293,8 @@ gh pr merge --merge --delete-branch
 
 ## 注意事項
 
-- **mainブランチでは直接作業しない**（CLAUDE.md: mainへの直接コミット禁止）
-- **マージは必ずユーザー承認後**に実行
+- **mainブランチでは直接作業しない**(CLAUDE.md: mainへの直接コミット禁止)
+- **コミット、プッシュ、PR作成、マージは必ずユーザー確認後**に実行
 - **CI/CDが通ることを確認**してからマージ
 - **複数Issueを並列処理**する場合はWorktreeを使用
 

@@ -10,8 +10,8 @@ import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { loadRoastTimerSettings } from '@/lib/roastTimerSettings';
 import { getAllRoastTimerRecords } from '@/lib/roastTimerRecords';
 import { formatTimeAsMinutesAndSeconds, calculateRecommendedTime } from '@/lib/roastTimerUtils';
-import { ROAST_LEVELS, WEIGHTS, DEFAULT_DURATION_BY_WEIGHT, type RoastLevel, type Weight } from './constants';
-import { convertToHalfWidth, removeNonNumeric } from './utils';
+import { ROAST_LEVELS, WEIGHTS, DEFAULT_DURATIONS as DEFAULT_DURATION_BY_WEIGHT, type RoastLevel, type Weight } from '@/lib/constants';
+import { convertToHalfWidth, removeNonNumeric } from '@/lib/utils';
 
 interface SetupPanelProps {
   onStart: (

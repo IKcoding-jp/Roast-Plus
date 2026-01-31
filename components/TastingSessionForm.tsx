@@ -14,6 +14,8 @@ import {
   Check
 } from 'phosphor-react';
 import { Input, Select, Button } from '@/components/ui';
+import { ROAST_LEVELS } from '@/lib/constants';
+import { formatDateString } from '@/lib/dateUtils';
 
 interface TastingSessionFormProps {
   session: TastingSession | null;
@@ -21,13 +23,6 @@ interface TastingSessionFormProps {
   onCancel: () => void;
   onDelete?: (id: string) => void;
 }
-
-const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
-  '浅煎り',
-  '中煎り',
-  '中深煎り',
-  '深煎り',
-];
 
 export function TastingSessionForm({
   session,
@@ -40,7 +35,7 @@ export function TastingSessionForm({
 
   const [beanName, setBeanName] = useState(session?.beanName || '');
   const [createdAt, setCreatedAt] = useState(
-    session?.createdAt ? session.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]
+    session?.createdAt ? session.createdAt.split('T')[0] : formatDateString()
   );
   const [roastLevel, setRoastLevel] = useState<
     '浅煎り' | '中煎り' | '中深煎り' | '深煎り'

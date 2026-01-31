@@ -23,6 +23,8 @@ import {
 } from 'phosphor-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input, Select, Textarea, Button } from '@/components/ui';
+import { ROAST_LEVELS } from '@/lib/constants';
+import { formatDateString } from '@/lib/dateUtils';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
@@ -34,13 +36,6 @@ interface TastingRecordFormProps {
   onCancel: () => void;
   readOnly?: boolean; // 読み取り専用モード
 }
-
-const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
-  '浅煎り',
-  '中煎り',
-  '中深煎り',
-  '深煎り',
-];
 
 const MIN_VALUE = 1.0;
 const MAX_VALUE = 5.0;
@@ -177,7 +172,7 @@ export function TastingRecordForm({
   );
   const [tastingDate, setTastingDate] = useState(
     record?.tastingDate ||
-    (sessionInfo ? sessionInfo.createdAt.split('T')[0] : new Date().toISOString().split('T')[0])
+    (sessionInfo ? sessionInfo.createdAt.split('T')[0] : formatDateString())
   );
   const [roastLevel, setRoastLevel] = useState<
     '浅煎り' | '中煎り' | '中深煎り' | '深煎り'

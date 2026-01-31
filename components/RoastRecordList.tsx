@@ -7,6 +7,7 @@ import { formatTime } from '@/lib/roastTimerUtils';
 import { HiTrash, HiCalendar } from 'react-icons/hi';
 import { MdTimer } from 'react-icons/md';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
+import { ROAST_LEVELS } from '@/lib/constants';
 
 interface RoastRecordListProps {
   data: AppData;
@@ -14,13 +15,6 @@ interface RoastRecordListProps {
 }
 
 type SortOption = 'newest' | 'oldest' | 'beanName' | 'date';
-
-const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
-  '浅煎り',
-  '中煎り',
-  '中深煎り',
-  '深煎り',
-];
 
 const WEIGHTS: Array<200 | 300 | 500> = [200, 300, 500];
 

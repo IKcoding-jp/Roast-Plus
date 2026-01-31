@@ -6,13 +6,9 @@ import { ALL_BEANS, type BeanName } from '@/lib/beanConfig';
 import { formatTime } from '@/lib/roastTimerUtils';
 import { useToastContext } from '@/components/Toast';
 import { Input, Select, Button } from '@/components/ui';
-
-const ROAST_LEVELS: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'> = [
-  '浅煎り',
-  '中煎り',
-  '中深煎り',
-  '深煎り',
-];
+import { ROAST_LEVELS } from '@/lib/constants';
+import { convertToHalfWidth, removeNonNumeric } from '@/lib/utils';
+import { formatDateString } from '@/lib/dateUtils';
 
 const WEIGHTS: Array<200 | 300 | 500> = [200, 300, 500];
 
@@ -74,18 +70,8 @@ function RoastRecordFormInner({
     return duration > 0 ? (duration % 60).toString().padStart(2, '0') : '';
   });
   const [roastDate, setRoastDate] = useState<string>(
-    record?.roastDate || new Date().toISOString().split('T')[0]
+    record?.roastDate || formatDateString()
   );
-
-  // 全角数字を半角数字に変換
-  const convertToHalfWidth = (str: string): string => {
-    return str.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
-  };
-
-  // 数字以外の文字を除去
-  const removeNonNumeric = (str: string): string => {
-    return str.replace(/[^0-9]/g, '');
-  };
 
   const handleDurationMinutesChange = (value: string) => {
     const halfWidth = convertToHalfWidth(value);
@@ -158,7 +144,7 @@ function RoastRecordFormInner({
       setRoastLevel('');
       setDurationMinutes('');
       setDurationSeconds('');
-      setRoastDate(new Date().toISOString().split('T')[0]);
+      setRoastDate(formatDateString());
     }
   };
 

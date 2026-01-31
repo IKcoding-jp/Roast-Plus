@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { Modal } from '@/components/ui';
 
 interface LevelUpModalProps {
   show: boolean;
@@ -25,24 +26,9 @@ const StarIcon = () => (
 
 export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-            transition={{ type: 'spring', damping: 20 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-sm w-full"
-          >
-            {/* ヘッダー - ローストプラスカラー */}
+    <Modal show={show} onClose={onClose}>
+      <>
+        {/* ヘッダー - ローストプラスカラー */}
             <div className="bg-gradient-to-r from-[#EF8A00] via-[#D67A00] to-[#EF8A00] px-6 py-8 text-center relative">
               <button
                 onClick={onClose}
@@ -110,9 +96,7 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
                 続ける
               </motion.button>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </>
+    </Modal>
   );
 }

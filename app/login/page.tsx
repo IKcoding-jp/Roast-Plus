@@ -85,7 +85,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#F7F7F5] px-4">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         <div className="mb-8 flex flex-col items-center bg-[#1a1412] py-6 rounded-xl shadow-inner">
           <h1 className="text-4xl font-bold text-white tracking-tight font-[var(--font-playfair)]">
@@ -300,7 +300,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F1EB] px-4">
+      <div className="flex min-h-screen items-center justify-center bg-[#F7F7F5] px-4">
         <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
           <h1 className="mb-8 text-center text-2xl font-bold text-gray-800">
             ローストプラス

@@ -8,7 +8,7 @@ import { useQuizData } from '@/hooks/useQuizData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { LevelDisplay } from '@/components/coffee-quiz/LevelDisplay';
 import { StreakCounter } from '@/components/coffee-quiz/StreakCounter';
-import { ResetConfirmDialog } from '@/components/coffee-quiz/ResetConfirmDialog';
+import { Dialog } from '@/components/ui';
 import { DebugPanel } from '@/components/coffee-quiz/DebugPanel';
 import { DataManagement } from '@/components/coffee-quiz/DataManagement';
 import { CATEGORY_LABELS, DIFFICULTY_LABELS } from '@/lib/coffee-quiz/types';
@@ -86,7 +86,7 @@ export default function StatsPage() {
   const stats = progress?.stats;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
       <header className="flex-none px-4 py-3 flex items-center bg-white border-b border-[#211714]/5">
         <Link
           href="/coffee-trivia"
@@ -317,10 +317,15 @@ export default function StatsPage() {
       </main>
 
       {/* リセット確認ダイアログ */}
-      <ResetConfirmDialog
-        show={showResetDialog}
+      <Dialog
+        isOpen={showResetDialog}
+        title="データのリセット"
+        description="本当にクイズデータをリセットしますか？学習履歴、レベル、バッジ、統計情報がすべて削除されます。この操作は取り消せません。"
+        confirmText="リセット"
+        cancelText="キャンセル"
         onConfirm={handleReset}
-        onCancel={() => setShowResetDialog(false)}
+        onClose={() => setShowResetDialog(false)}
+        variant="danger"
         isLoading={isResetting}
       />
     </div>

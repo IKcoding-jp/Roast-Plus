@@ -8,6 +8,7 @@ import { HiTrash, HiCalendar } from 'react-icons/hi';
 import { MdTimer } from 'react-icons/md';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { ROAST_LEVELS } from '@/lib/constants';
+import { Card } from '@/components/ui';
 
 interface RoastRecordListProps {
   data: AppData;
@@ -332,9 +333,10 @@ export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto space-y-3 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 md:items-start md:auto-rows-auto">
           {filteredAndSortedRecords.map((record) => (
-             <div
+             <Card
                key={record.id}
-               className="bg-white rounded-lg shadow-md p-3 md:p-4 cursor-pointer hover:shadow-lg transition-all border border-gray-100 relative h-auto"
+               variant="hoverable"
+               className="p-3 md:p-4 relative h-auto"
                onClick={() => handleCardClick(record.id)}
              >
                {/* 削除ボタン（右上） */}
@@ -401,7 +403,7 @@ export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
                    </div>
                  </div>
                </div>
-             </div>
+             </Card>
           ))}
         </div>
       )}

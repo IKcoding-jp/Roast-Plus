@@ -66,7 +66,7 @@ npm run test     # テスト（Vitest導入後）
 
 ## Development Flow
 1. **Issue作成** → 機能追加・修正の起点（Claudeが作成）
-2. **ブランチ作成** → `feature/#123-xxx` または `fix/#123-xxx`
+2. **ブランチ作成** → `feature/#123-xxx`（または `feat/#123-xxx`）、`fix/#123-xxx`
 3. **実装・動作確認**
 4. **コミット＆プッシュ**
 5. **PR作成** → `Closes #123` を含める

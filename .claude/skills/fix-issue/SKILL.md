@@ -70,7 +70,7 @@ gh issue view $ARGUMENTS --json title,body,labels,number
 | ラベル | ブランチ名 |
 |--------|-----------|
 | `bug` | `fix/#番号-簡潔な説明` |
-| `enhancement` | `feat/#番号-簡潔な説明` |
+| `enhancement` | `feature/#番号-簡潔な説明`（または `feat/#番号-簡潔な説明`） |
 
 ```bash
 git checkout -b "fix/#16-schedule-layout"

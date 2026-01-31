@@ -108,7 +108,7 @@ export function DataManagement({ onImportSuccess }: DataManagementProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-300 p-4">
+    <div className="bg-white rounded-xl border border-[#211714]/5 p-4">
       <h3 className="text-sm font-semibold text-[#211714] mb-3">
         データ管理
       </h3>

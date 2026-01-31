@@ -100,7 +100,7 @@ export function CategorySelector({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
             onClick={() => handleCategoryClick(category)}
-            className={`relative rounded-xl p-3.5 transition-all text-left ${config.bg} ${config.hoverBg} border border-gray-300 hover:border-gray-400 group`}
+            className={`relative rounded-xl p-3.5 transition-all text-left ${config.bg} ${config.hoverBg} border border-[#211714]/5 group`}
           >
             <div className="flex items-start gap-2.5">
               {/* アイコン */}

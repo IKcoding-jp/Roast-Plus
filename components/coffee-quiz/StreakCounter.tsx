@@ -32,7 +32,7 @@ export function StreakCounter({ streak, compact = false }: StreakCounterProps) {
   if (compact) {
     return (
       <div className={`bg-white rounded-xl p-3 border ${
-        isAtRisk ? 'border-[#EF8A00] bg-[#EF8A00]/5' : 'border-gray-300'
+        isAtRisk ? 'border-[#EF8A00]/30 bg-[#EF8A00]/5' : 'border-[#211714]/5'
       }`}>
         <div className="flex items-center gap-2.5">
           <div className={`w-9 h-9 rounded-full flex items-center justify-center ${

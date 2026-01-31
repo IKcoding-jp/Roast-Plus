@@ -16,7 +16,7 @@ export function LevelDisplay({ level, compact = false }: LevelDisplayProps) {
 
   if (compact) {
     return (
-      <div className="bg-white rounded-xl p-3 border border-gray-300">
+      <div className="bg-white rounded-xl p-3 border border-[#211714]/5">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-full bg-[#211714] flex items-center justify-center text-white font-bold text-sm">
             {level.level}
@@ -44,7 +44,7 @@ export function LevelDisplay({ level, compact = false }: LevelDisplayProps) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl p-4 border border-gray-300"
+      className="bg-white rounded-xl p-4 border border-[#211714]/5"
     >
       <div className="flex items-center gap-4">
         {/* レベルバッジ */}

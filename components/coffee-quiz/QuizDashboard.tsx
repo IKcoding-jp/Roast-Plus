@@ -159,7 +159,7 @@ export function QuizDashboard({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="bg-white rounded-xl p-4 border border-gray-300"
+        className="bg-white rounded-xl p-4 border border-[#211714]/5"
       >
         <h3 className="font-semibold text-[#211714] text-sm mb-3">
           カテゴリ別学習
@@ -178,7 +178,7 @@ export function QuizDashboard({
       >
         <Link
           href="/coffee-trivia/stats"
-          className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-gray-300 hover:border-gray-400 hover:shadow-sm transition-all"
+          className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-[#211714]/5 hover:border-[#211714]/10 hover:shadow-sm transition-all"
         >
           <div className="w-10 h-10 rounded-lg bg-[#211714]/5 group-hover:bg-[#211714]/10 flex items-center justify-center transition-colors text-[#3A2F2B]">
             <ChartIcon />
@@ -193,7 +193,7 @@ export function QuizDashboard({
 
         <Link
           href="/coffee-trivia/badges"
-          className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-gray-300 hover:border-[#EF8A00] hover:shadow-sm transition-all"
+          className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-[#211714]/5 hover:border-[#EF8A00]/20 hover:shadow-sm transition-all"
         >
           <div className="w-10 h-10 rounded-lg bg-[#EF8A00]/10 group-hover:bg-[#EF8A00]/15 flex items-center justify-center transition-colors text-[#EF8A00]">
             <TrophyIcon />

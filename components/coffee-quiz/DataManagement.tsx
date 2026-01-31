@@ -119,7 +119,7 @@ export function DataManagement({ onImportSuccess }: DataManagementProps) {
       <div className="flex gap-3">
         <button
           onClick={handleExport}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#FDF8F0] hover:bg-[#F5EFE6] text-[#3A2F2B] py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-[#211714]/10"
+          className="flex-1 flex items-center justify-center gap-2 bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-[#211714]/10"
         >
           <DownloadIcon />
           エクスポート
@@ -127,7 +127,7 @@ export function DataManagement({ onImportSuccess }: DataManagementProps) {
 
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#FDF8F0] hover:bg-[#F5EFE6] text-[#3A2F2B] py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-[#211714]/10"
+          className="flex-1 flex items-center justify-center gap-2 bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-[#211714]/10"
         >
           <UploadIcon />
           インポート

@@ -142,10 +142,40 @@ export function TastingSessionCarousel({
     );
   }
 
-  // 焙煎度に応じたバッジスタイル（Stitchデザイン対応）
+  // 焙煎度に応じたバッジスタイル（焙煎色グラデーション）
   const getRoastBadgeStyle = (level: string) => {
-    // Stitchデザインに合わせたニュートラルな枠線スタイル
-    return { border: 'border-gray-300', text: 'text-gray-500', label: level };
+    switch (level) {
+      case '浅煎り':
+        return {
+          bg: '#C8A882', // ライトロースト（ライトブラウン）
+          text: '#3E2723', // ダークブラウン（コントラスト高）
+          label: level
+        };
+      case '中煎り':
+        return {
+          bg: '#A0826D', // ミディアムロースト（ミディアムブラウン）
+          text: '#FFFFFF', // 白（見やすい）
+          label: level
+        };
+      case '中深煎り':
+        return {
+          bg: '#6F4E37', // ミディアムダークロースト（ダークブラウン）
+          text: '#FFFFFF', // 白
+          label: level
+        };
+      case '深煎り':
+        return {
+          bg: '#3E2723', // ダークロースト（非常に濃い茶色）
+          text: '#FFFFFF', // 白
+          label: level
+        };
+      default:
+        return {
+          bg: '#8D6E63', // デフォルト（中間色）
+          text: '#FFFFFF',
+          label: level
+        };
+    }
   };
 
   // ========================================
@@ -186,7 +216,13 @@ export function TastingSessionCarousel({
                                   {session.beanName}
                                 </h3>
                                 <div className="flex items-center gap-2">
-                                  <span className={`px-3 py-1 text-xs border ${getRoastBadgeStyle(session.roastLevel).border} rounded-full ${getRoastBadgeStyle(session.roastLevel).text}`}>
+                                  <span
+                                    className="px-3 py-1 text-xs font-bold rounded-full shadow-sm"
+                                    style={{
+                                      backgroundColor: getRoastBadgeStyle(session.roastLevel).bg,
+                                      color: getRoastBadgeStyle(session.roastLevel).text
+                                    }}
+                                  >
                                     {getRoastBadgeStyle(session.roastLevel).label}
                                   </span>
                                 </div>
@@ -368,7 +404,13 @@ export function TastingSessionCarousel({
                                 {session.beanName}
                               </h3>
                               <div className="flex items-center gap-2">
-                                <span className={`px-2 py-0.5 text-[9px] border ${getRoastBadgeStyle(session.roastLevel).border} rounded-full ${getRoastBadgeStyle(session.roastLevel).text}`}>
+                                <span
+                                  className="px-2 py-0.5 text-[9px] font-bold rounded-full shadow-sm"
+                                  style={{
+                                    backgroundColor: getRoastBadgeStyle(session.roastLevel).bg,
+                                    color: getRoastBadgeStyle(session.roastLevel).text
+                                  }}
+                                >
                                   {session.roastLevel}
                                 </span>
                                 <span className="text-[10px] text-gray-400">

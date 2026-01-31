@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.10.1',
+    date: '2026-01-31',
+    summary: 'Stitchデザインを使用した試飲記録一覧ページのUI改善',
+  },
+  {
     version: '0.10.0',
     date: '2026-01-30',
     summary: 'デジタル時計ページの追加とカスタマイズ設定 など 5件の更新',

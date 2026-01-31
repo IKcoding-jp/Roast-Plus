@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.10.1',
+    version: '0.10.1',
+    date: '2026-01-31',
+    type: 'update',
+    title: 'Stitchデザインを使用した試飲記録一覧ページのUI改善',
+    content: `
+- Stitchデザインを使用した試飲記録一覧ページのUI改善
+    `.trim(),
+    tags: [],
+    createdAt: '2026-01-31T11:54:47.483Z',
+    updatedAt: '2026-01-31T11:54:47.483Z',
+  },
+  {
     id: 'v0.10.0',
     version: '0.10.0',
     date: '2026-01-30',

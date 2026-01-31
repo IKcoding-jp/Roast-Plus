@@ -86,11 +86,11 @@ export default function StatsPage() {
   const stats = progress?.stats;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDF8F0]">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <header className="flex-none px-4 py-3 flex items-center bg-white border-b border-[#211714]/5">
         <Link
           href="/coffee-trivia"
-          className="p-2 -ml-2 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-full transition-colors"
+          className="p-2 -ml-2 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-gray-50 rounded-full transition-colors"
         >
           <ArrowLeftIcon />
         </Link>
@@ -123,13 +123,13 @@ export default function StatsPage() {
               </h2>
 
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-[#FDF8F0] rounded-xl p-4 text-center border border-[#211714]/5">
+                <div className="bg-gray-50 rounded-xl p-4 text-center border border-[#211714]/5">
                   <span className="text-3xl font-bold text-[#211714]">
                     {stats?.totalQuestions ?? 0}
                   </span>
                   <p className="text-[#3A2F2B]/60 text-sm mt-1">総回答数</p>
                 </div>
-                <div className="bg-[#FDF8F0] rounded-xl p-4 text-center border border-[#EF8A00]/20">
+                <div className="bg-gray-50 rounded-xl p-4 text-center border border-[#EF8A00]/20">
                   <span className="text-3xl font-bold text-[#EF8A00]">
                     {stats?.averageAccuracy ?? 0}%
                   </span>
@@ -178,7 +178,7 @@ export default function StatsPage() {
                     const progressPercent = totalQuestions > 0 ? Math.round((answeredCorrectlyCount / totalQuestions) * 100) : 0;
 
                     return (
-                      <div key={category} className="bg-[#FDF8F0] rounded-xl p-4 border border-[#211714]/5">
+                      <div key={category} className="bg-gray-50 rounded-xl p-4 border border-[#211714]/5">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-[#211714]">
                             {CATEGORY_LABELS[category]}
@@ -235,7 +235,7 @@ export default function StatsPage() {
                     return (
                       <div
                         key={difficulty}
-                        className="bg-[#FDF8F0] rounded-xl p-4 border border-[#211714]/5"
+                        className="bg-gray-50 rounded-xl p-4 border border-[#211714]/5"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-[#211714]">

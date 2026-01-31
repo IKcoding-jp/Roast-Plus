@@ -70,7 +70,7 @@ export function CategoryPageContent({ category }: CategoryPageContentProps) {
   // 無効なカテゴリ
   if (!isValidCategory) {
     return (
-      <div className="min-h-screen bg-[#FDF8F0] p-4">
+      <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-md mx-auto pt-20 text-center">
           <p className="text-[#3A2F2B]/60">カテゴリが見つかりません</p>
           <button
@@ -87,7 +87,7 @@ export function CategoryPageContent({ category }: CategoryPageContentProps) {
   // ローディング
   if (loading || progressLoading) {
     return (
-      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
       </div>
     );
@@ -96,7 +96,7 @@ export function CategoryPageContent({ category }: CategoryPageContentProps) {
   const cards = progress?.cards ?? [];
 
   return (
-    <div className="min-h-screen bg-[#FDF8F0]">
+    <div className="min-h-screen bg-gray-50">
       {/* ヘッダー */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-[#211714]/5">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">

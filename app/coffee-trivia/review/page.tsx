@@ -159,7 +159,7 @@ export default function ReviewPage() {
   // 復習する問題がない場合
   if (noReviewCards) {
     return (
-      <div className="min-h-screen bg-[#FDF8F0]">
+      <div className="min-h-screen bg-gray-50">
         <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
           <div className="flex items-center justify-between max-w-lg mx-auto">
             <Link
@@ -201,7 +201,7 @@ export default function ReviewPage() {
   // ローディング
   if (isLoading || !session) {
     return (
-      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin mx-auto mb-3" />
           <p className="text-[#3A2F2B]/70 text-sm">復習問題を準備中...</p>
@@ -211,7 +211,7 @@ export default function ReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDF8F0]">
+    <div className="min-h-screen bg-gray-50">
       {/* ヘッダー */}
       <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">

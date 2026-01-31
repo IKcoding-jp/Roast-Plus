@@ -94,11 +94,11 @@ export default function BadgesPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDF8F0]">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <header className="flex-none px-4 py-3 flex items-center bg-white border-b border-[#211714]/5">
         <Link
           href="/coffee-trivia"
-          className="p-2 -ml-2 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-full transition-colors"
+          className="p-2 -ml-2 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-gray-50 rounded-full transition-colors"
         >
           <LuArrowLeft size={24} />
         </Link>
@@ -224,7 +224,7 @@ function BadgeSection({
               whileHover={isEarned ? { scale: 1.02 } : {}}
               className={`rounded-xl p-4 transition-all ${
                 isEarned
-                  ? 'bg-[#FDF8F0] border border-[#EF8A00]/20'
+                  ? 'bg-gray-50 border border-[#EF8A00]/20'
                   : 'bg-[#211714]/5 border border-[#211714]/5 opacity-60'
               }`}
             >

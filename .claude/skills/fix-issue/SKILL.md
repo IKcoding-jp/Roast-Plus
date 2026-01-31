@@ -1,6 +1,6 @@
 ---
-name: issue-automation
-description: GitHub Issueを自動解決。ブランチ作成→実装→テスト→レビュー→PR→マージまで自動化。CLAUDE.md準拠の探索→計画→コード→コミット型ワークフロー。Issue #番号を引数に取る。バグ修正、機能追加、リファクタ時に使用。
+name: fix-issue
+description: GitHub Issueを自動解決。ブランチ作成→実装→テスト→レビュー→PR→マージまで自動化。CLAUDE.md準拠の探索→計画→コード→コミット型ワークフロー。Issue #番号を引数に取る。バグ修正、機能追加、リファクタ時に使用。「/fix-issue 123」のようにIssue番号を渡して使用。
 argument-hint: "[issue-number]"
 ---
 

@@ -52,25 +52,25 @@ const CATEGORY_CONFIG: Record<QuizCategory, {
 }> = {
   basics: {
     icon: CoffeeIcon,
-    bg: 'bg-[#FDF8F0]',
+    bg: 'bg-white',
     hoverBg: 'hover:bg-[#211714]/5',
-    iconBg: 'bg-[#FDF8F0]',
+    iconBg: 'bg-[#211714]/5',
   },
   roasting: {
     icon: BeanIcon,
-    bg: 'bg-[#FDF8F0]',
+    bg: 'bg-white',
     hoverBg: 'hover:bg-[#EF8A00]/10',
     iconBg: 'bg-[#EF8A00]/10',
   },
   brewing: {
     icon: DropletIcon,
-    bg: 'bg-[#FDF8F0]',
+    bg: 'bg-white',
     hoverBg: 'hover:bg-sky-50',
     iconBg: 'bg-sky-50',
   },
   history: {
     icon: BookIcon,
-    bg: 'bg-[#FDF8F0]',
+    bg: 'bg-white',
     hoverBg: 'hover:bg-[#211714]/5',
     iconBg: 'bg-[#211714]/5',
   },

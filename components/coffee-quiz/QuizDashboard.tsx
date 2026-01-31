@@ -180,7 +180,7 @@ export function QuizDashboard({
           href="/coffee-trivia/stats"
           className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-[#211714]/5 hover:border-[#211714]/10 hover:shadow-sm transition-all"
         >
-          <div className="w-10 h-10 rounded-lg bg-[#FDF8F0] group-hover:bg-[#211714]/5 flex items-center justify-center transition-colors text-[#3A2F2B]">
+          <div className="w-10 h-10 rounded-lg bg-[#211714]/5 group-hover:bg-[#211714]/10 flex items-center justify-center transition-colors text-[#3A2F2B]">
             <ChartIcon />
           </div>
           <div>
@@ -195,7 +195,7 @@ export function QuizDashboard({
           href="/coffee-trivia/badges"
           className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-[#211714]/5 hover:border-[#EF8A00]/20 hover:shadow-sm transition-all"
         >
-          <div className="w-10 h-10 rounded-lg bg-[#FDF8F0] group-hover:bg-[#EF8A00]/10 flex items-center justify-center transition-colors text-[#EF8A00]">
+          <div className="w-10 h-10 rounded-lg bg-[#EF8A00]/10 group-hover:bg-[#EF8A00]/15 flex items-center justify-center transition-colors text-[#EF8A00]">
             <TrophyIcon />
           </div>
           <div>

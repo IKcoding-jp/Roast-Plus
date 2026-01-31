@@ -21,10 +21,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
     title: 'Stitchデザインを使用した試飲記録一覧ページのUI改善',
     content: `
 - Stitchデザインを使用した試飲記録一覧ページのUI改善
+- [#44 #45] カード・ダイアログ統一と背景色・カラーシステム整理
     `.trim(),
     tags: [],
     createdAt: '2026-01-31T11:54:47.483Z',
-    updatedAt: '2026-01-31T11:54:47.483Z',
+    updatedAt: '2026-01-31T16:37:54.894Z',
   },
   {
     id: 'v0.10.0',

@@ -5,7 +5,7 @@ export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
     version: '0.10.1',
     date: '2026-01-31',
-    summary: 'Stitchデザインを使用した試飲記録一覧ページのUI改善',
+    summary: 'Stitchデザインを使用した試飲記録一覧ページのUI改善 など 2件の更新',
   },
   {
     version: '0.10.0',

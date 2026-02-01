@@ -13,7 +13,8 @@
     "generate:sound-list": "tsx scripts/generate-sound-list.ts",
     "prepare": "husky",
     "security": "npm audit",
-    "complexity": "lizard ./app ./components ./hooks ./lib ./types ./scripts -C 15 -L 50 -w"
+    "complexity": "lizard ./app ./components ./hooks ./lib ./types ./scripts -C 15 -L 50 -w",
+    "deadcode": "knip"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -51,6 +52,7 @@
     "eslint-config-next": "^16.0.8",
     "husky": "^9.1.7",
     "jsdom": "^27.4.0",
+    "knip": "^5.82.1",
     "lint-staged": "^16.2.7",
     "tailwindcss": "^4",
     "tsx": "^4.7.0",

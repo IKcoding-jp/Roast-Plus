@@ -1,0 +1,7 @@
+# Gitleaks ignore file
+# ビルドキャッシュや生成ファイル内のAPIキーを除外
+
+# Next.js ビルドキャッシュ（.gitignoreに含まれており、リポジトリにはコミットされない）
+D:/Dev/roastplus/.next/dev/cache/turbopack/da605e0c/00001821.sst:gcp-api-key:560818
+D:/Dev/roastplus/.next/dev/cache/turbopack/da605e0c/00001823.sst:gcp-api-key:580744
+D:/Dev/roastplus/.next/dev/cache/turbopack/da605e0c/00001821.sst:gcp-api-key:611805

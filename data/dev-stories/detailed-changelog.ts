@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.10.2',
+    version: '0.10.2',
+    date: '2026-02-01',
+    type: 'bugfix',
+    title: 'SplashScreenのHydrationミスマッチエラーを解消',
+    content: `
+- SplashScreenのHydrationミスマッチエラーを解消
+    `.trim(),
+    tags: [],
+    createdAt: '2026-02-01T01:09:28.615Z',
+    updatedAt: '2026-02-01T01:09:28.615Z',
+  },
+  {
     id: 'v0.10.1',
     version: '0.10.1',
     date: '2026-01-31',

@@ -86,5 +86,10 @@ npm run test     # テスト（Vitest導入後）
 | `/clear` | コンテキストリセット |
 | `/compact` | 長いセッションを圧縮 |
 
+## Project Memory
+- アーキテクチャ意思決定記録: `docs/memory.md`（ADR形式）
+- 重要な設計判断を行った際は、必ず `docs/memory.md` に ADR-XXX 形式で追記すること
+- 過去の設計理由を問われた場合は、まず `docs/memory.md` を参照すること
+
 ## Ignored Directories
 `node_modules/`, `.next/`, `out/`, `.git/`, `coverage/`, `public/sounds/`, `public/lottie/`

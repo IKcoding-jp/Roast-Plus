@@ -5,7 +5,7 @@ export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
     version: '0.10.2',
     date: '2026-02-01',
-    summary: 'SplashScreenのHydrationミスマッチエラーを解消',
+    summary: 'SplashScreenのHydrationミスマッチエラーを解消 など 2件の更新',
   },
   {
     version: '0.10.1',

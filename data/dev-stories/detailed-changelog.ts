@@ -21,10 +21,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
     title: 'SplashScreenのHydrationミスマッチエラーを解消',
     content: `
 - SplashScreenのHydrationミスマッチエラーを解消
+- 焙煎タイマー関連分割
     `.trim(),
     tags: [],
     createdAt: '2026-02-01T01:09:28.615Z',
-    updatedAt: '2026-02-01T01:09:28.615Z',
+    updatedAt: '2026-02-01T07:44:02.765Z',
   },
   {
     id: 'v0.10.1',

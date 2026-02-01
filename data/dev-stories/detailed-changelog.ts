@@ -22,10 +22,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
     content: `
 - SplashScreenのHydrationミスマッチエラーを解消
 - 焙煎タイマー関連分割
+- PostToolUseフックによるESLint自動整形を導入
     `.trim(),
     tags: [],
     createdAt: '2026-02-01T01:09:28.615Z',
-    updatedAt: '2026-02-01T07:44:02.765Z',
+    updatedAt: '2026-02-01T08:06:22.839Z',
   },
   {
     id: 'v0.10.1',

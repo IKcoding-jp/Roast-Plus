@@ -24,10 +24,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
 - 焙煎タイマー関連分割
 - PostToolUseフックによるESLint自動整形を導入
 - husky + lint-staged によるpre-commitフックを導入
+- セキュリティ監査スキルとGitleaksを導入
     `.trim(),
     tags: [],
     createdAt: '2026-02-01T01:09:28.615Z',
-    updatedAt: '2026-02-01T08:17:52.748Z',
+    updatedAt: '2026-02-01T08:31:19.437Z',
   },
   {
     id: 'v0.10.1',

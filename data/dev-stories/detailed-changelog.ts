@@ -25,10 +25,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
 - PostToolUseフックによるESLint自動整形を導入
 - husky + lint-staged によるpre-commitフックを導入
 - セキュリティ監査スキルとGitleaksを導入
+- dx: 複雑度監視スキル（Lizard）の導入
     `.trim(),
     tags: [],
     createdAt: '2026-02-01T01:09:28.615Z',
-    updatedAt: '2026-02-01T08:31:19.437Z',
+    updatedAt: '2026-02-01T08:41:25.621Z',
   },
   {
     id: 'v0.10.1',

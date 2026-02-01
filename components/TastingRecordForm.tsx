@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import type { TastingRecord, AppData, TastingSession } from '@/types';
-import { TastingRadarChart } from './TastingRadarChart';
+import dynamic from 'next/dynamic';
+
+const TastingRadarChart = dynamic(
+  () => import('./TastingRadarChart').then(mod => ({ default: mod.TastingRadarChart })),
+);
 import {
   getRecordsBySessionId,
 } from '@/lib/tastingUtils';

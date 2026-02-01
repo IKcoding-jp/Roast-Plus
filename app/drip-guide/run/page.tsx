@@ -2,7 +2,12 @@
 
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { DripGuideRunner } from '@/components/drip-guide/DripGuideRunner';
+import dynamic from 'next/dynamic';
+
+const DripGuideRunner = dynamic(
+  () => import('@/components/drip-guide/DripGuideRunner').then(mod => ({ default: mod.DripGuideRunner })),
+  { ssr: false },
+);
 import { useRecipes } from '@/lib/drip-guide/useRecipes';
 import { calculateRecipeForServings } from '@/lib/drip-guide/recipeCalculator';
 import { generateRecipe46, type Taste46, type Strength46 } from '@/lib/drip-guide/recipe46';

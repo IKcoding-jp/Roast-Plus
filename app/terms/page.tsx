@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 import { TERMS_SECTIONS, TERMS_LAST_UPDATED } from '@/data/legal/terms';

@@ -7,16 +7,19 @@ const SPLASH_DISPLAY_TIME = 3000; // 3秒
 const SPLASH_SHOWN_KEY = 'roastplus_splash_shown'; // セッション開始時のフラグ
 
 export function SplashScreen() {
-  const [isVisible, setIsVisible] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const splashShown = sessionStorage.getItem(SPLASH_SHOWN_KEY);
-    if (splashShown === 'true') {
-      return false;
-    }
-    sessionStorage.setItem(SPLASH_SHOWN_KEY, 'true');
-    return true;
-  });
+  const [isVisible, setIsVisible] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+
+  // クライアントマウント時にsessionStorageをチェックし、初回訪問時のみスプラッシュを表示
+  // サーバー/クライアント共にisVisible=falseで開始することでHydrationミスマッチを回避
+  useEffect(() => {
+    const splashShown = sessionStorage.getItem(SPLASH_SHOWN_KEY);
+    if (splashShown !== 'true') {
+      sessionStorage.setItem(SPLASH_SHOWN_KEY, 'true');
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorageとの初期同期のため必要
+      setIsVisible(true);
+    }
+  }, []);
   const [animationData, setAnimationData] = useState<object | null>(null);
   const [isTextVisible, setIsTextVisible] = useState(false);
 

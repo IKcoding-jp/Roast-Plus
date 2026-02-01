@@ -27,10 +27,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
 - セキュリティ監査スキルとGitleaksを導入
 - dx: 複雑度監視スキル（Lizard）の導入
 - dx: Stop Hookによるテスト強制ゲートの導入
+- dx: Security Reviewer & QA Agentサブエージェントの導入
     `.trim(),
     tags: [],
     createdAt: '2026-02-01T01:09:28.615Z',
-    updatedAt: '2026-02-01T08:44:37.472Z',
+    updatedAt: '2026-02-01T08:46:57.366Z',
   },
   {
     id: 'v0.10.1',

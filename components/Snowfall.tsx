@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 type Flake = {
   id: number;
@@ -13,7 +13,7 @@ type Flake = {
   depth: number;
 };
 
-export const Snowfall = () => {
+export const Snowfall = memo(function Snowfall() {
   const [snowflakes] = useState<Flake[]>(() => {
     const flakeCount = 60;
     return Array.from({ length: flakeCount }).map((_, i) => {
@@ -94,4 +94,4 @@ export const Snowfall = () => {
       ))}
     </div>
   );
-};
+});

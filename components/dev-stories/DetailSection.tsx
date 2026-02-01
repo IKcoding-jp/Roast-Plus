@@ -1,7 +1,11 @@
 'use client';
 
 import React from 'react';
-import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import dynamic from 'next/dynamic';
+
+const MarkdownRenderer = dynamic(
+  () => import('@/components/MarkdownRenderer').then(mod => ({ default: mod.MarkdownRenderer })),
+);
 
 interface DetailSectionProps {
   content: string;

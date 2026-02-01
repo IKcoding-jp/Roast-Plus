@@ -15,7 +15,11 @@ import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAuth } from '@/lib/auth';
 import { getUserData } from '@/lib/firestore';
 import { needsConsent } from '@/lib/consent';
-import { Snowfall } from '@/components/Snowfall';
+import dynamic from 'next/dynamic';
+
+const Snowfall = dynamic(() => import('@/components/Snowfall').then(mod => ({ default: mod.Snowfall })), {
+  ssr: false,
+});
 import { FaTree, FaGift, FaSnowflake, FaHollyBerry, FaStar } from 'react-icons/fa';
 import { PiBellFill } from 'react-icons/pi';
 import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
@@ -32,6 +36,20 @@ interface Action {
   icon: IconType;
   badge?: string;
 }
+
+/** クリスマスモード時のアイコンマッピング（モジュールレベルで定義し再生成を防止） */
+const CHRISTMAS_ICONS: Record<string, IconType> = {
+  assignment: FaGift,
+  schedule: BsStars,
+  tasting: FaTree,
+  'roast-timer': PiBellFill,
+  'defect-beans': GiGingerbreadMan,
+  progress: FaSnowflake,
+  'drip-guide': GiCandyCanes,
+  'coffee-trivia': FaStar,
+  'dev-stories': FaSnowflake,
+  settings: IoSettings,
+};
 
 const ACTIONS: Action[] = [
   {
@@ -82,7 +100,7 @@ const ACTIONS: Action[] = [
     description: '淹れ方の手順',
     href: '/drip-guide',
     icon: MdCoffeeMaker,
-    badge: '新レシピ登場',
+    
   },
   {
     key: 'coffee-trivia',
@@ -97,7 +115,7 @@ const ACTIONS: Action[] = [
     description: '開発の裏話を覗く',
     href: '/dev-stories',
     icon: RiLightbulbFlashFill,
-    badge: '新エピソード登場',
+    
   },
   {
     key: 'settings',
@@ -362,20 +380,7 @@ export default function HomePage(_props: HomePageProps = {}) {
           style={cardHeight ? { gridAutoRows: `${cardHeight}px` } : { gridAutoRows: '1fr' }}
         >
           {ACTIONS.map(({ key, title, description, href, icon: DefaultIcon, badge }, index) => {
-            // クリスマスアイコンのマッピング
-            const ChristmasIcons: Record<string, IconType> = {
-              assignment: FaGift,
-              schedule: BsStars,
-              tasting: FaTree,
-              'roast-timer': PiBellFill,
-              'defect-beans': GiGingerbreadMan,
-              progress: FaSnowflake,
-              'drip-guide': GiCandyCanes,
-              'coffee-trivia': FaStar,
-              'dev-stories': FaSnowflake,
-              settings: IoSettings,
-            };
-            const Icon = isChristmasMode ? (ChristmasIcons[key] || DefaultIcon) : DefaultIcon;
+            const Icon = isChristmasMode ? (CHRISTMAS_ICONS[key] || DefaultIcon) : DefaultIcon;
 
             return (
               <button

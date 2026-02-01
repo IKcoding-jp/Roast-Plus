@@ -2,7 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import type { AppData } from '@/types';
-import { TastingRadarChart } from './TastingRadarChart';
+import dynamic from 'next/dynamic';
+
+const TastingRadarChart = dynamic(
+  () => import('./TastingRadarChart').then(mod => ({ default: mod.TastingRadarChart })),
+);
 import { StarRating } from './StarRating';
 import { HiTrash } from 'react-icons/hi';
 import { Card } from '@/components/ui';

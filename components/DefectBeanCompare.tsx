@@ -1,7 +1,11 @@
 'use client';
 
 import { HiX } from 'react-icons/hi';
-import { DefectBeanDetail } from './DefectBeanDetail';
+import dynamic from 'next/dynamic';
+
+const DefectBeanDetail = dynamic(
+  () => import('./DefectBeanDetail').then(mod => ({ default: mod.DefectBeanDetail })),
+);
 import type { DefectBean } from '@/types';
 
 interface DefectBeanCompareProps {

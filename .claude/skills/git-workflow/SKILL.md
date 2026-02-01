@@ -1,170 +1,96 @@
 ---
 name: git-workflow
-description: Git操作の自動化とベストプラクティス。コンベンショナルコミット形式(日本語)でのコミットメッセージ生成、セマンティックバージョニング、変更履歴(changelog)生成。commit、version、changelog、git、コミットメッセージ時に使用。
+description: Git操作とリリースの自動化。コンベンショナルコミット形式(日本語)でのコミットメッセージ生成、セマンティックバージョニング、変更履歴生成、デプロイ手順。commit、version、changelog、git、コミットメッセージ、deploy、release、build時に使用。
 ---
 
 # Git Workflow スキル
 
-Git操作を効率化し、プロジェクトのコミット履歴を整理するためのスキル。
-コンベンショナルコミット形式に準拠した日本語コミットメッセージの生成を支援します。
-
-## コンベンショナルコミット形式
-
-### 基本構造
+## コミットメッセージ形式
 
 ```
-<type>(<scope>): <subject>
+<type>(<scope>): <日本語で50文字以内の説明>
 
-<body>
+<body: 変更点を箇条書き>
 
-<footer>
+<footer: Closes #番号 等>
+
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-### タイプ一覧
+**タイプ:**
 
-| タイプ | 説明 | 例 |
+| タイプ | 用途 | 例 |
 |--------|------|-----|
-| `feat` | 新機能追加 | feat(auth): ログイン機能を追加 |
-| `fix` | バグ修正 | fix(timer): タイマーが停止しない問題を修正 |
-| `docs` | ドキュメント変更 | docs(readme): セットアップ手順を追加 |
-| `style` | コードスタイル変更（動作に影響なし） | style: コードフォーマットを統一 |
+| `feat` | 新機能 | feat(auth): ログイン機能を追加 |
+| `fix` | バグ修正 | fix(timer): タイマー停止問題を修正 |
 | `refactor` | リファクタリング | refactor(utils): ヘルパー関数を整理 |
-| `test` | テスト追加・修正 | test(api): ユーザーAPIのテストを追加 |
-| `chore` | ビルド・設定変更 | chore(deps): 依存関係を更新 |
-| `perf` | パフォーマンス改善 | perf(render): 描画速度を最適化 |
-| `ci` | CI/CD設定変更 | ci(github): デプロイワークフローを追加 |
+| `docs` | ドキュメント | docs(readme): セットアップ手順を追加 |
+| `style` | コードスタイル | style: フォーマットを統一 |
+| `perf` | パフォーマンス | perf(render): 描画速度を最適化 |
+| `test` | テスト | test(api): APIテストを追加 |
+| `chore` | ビルド・設定 | chore(deps): 依存関係を更新 |
+| `ci` | CI/CD | ci(github): ワークフローを追加 |
 
-### スコープ例
+**スコープ例:** コンポーネント名(`header`, `modal`)、機能名(`auth`, `timer`)、レイヤー名(`api`, `ui`)
 
-プロジェクトに応じて適切なスコープを使用：
-
-- コンポーネント名: `header`, `sidebar`, `modal`
-- 機能名: `auth`, `timer`, `settings`
-- レイヤー名: `api`, `ui`, `db`
-
----
-
-## コミットメッセージ生成ワークフロー
-
-### 1. 変更内容の確認
+## コミット手順
 
 ```bash
-# ステージングされた変更を確認
-git diff --staged --stat
+# 1. 変更確認
+git diff --staged --stat && git diff --staged
 
-# 詳細な差分を確認
-git diff --staged
-```
-
-### 2. コミットメッセージの決定
-
-1. **変更の種類を特定**
-   - 新機能？ → `feat`
-   - バグ修正？ → `fix`
-   - ドキュメント？ → `docs`
-
-2. **スコープを特定**
-   - どのコンポーネント/機能に影響？
-
-3. **簡潔な説明を作成**
-   - 50文字以内
-   - 命令形で記述（「追加する」ではなく「追加」）
-   - 日本語で記述
-
-### 3. コミット実行
-
-```bash
-git commit -m "feat(timer): 抽出タイマー機能を追加"
-```
-
-複数行のメッセージ:
-
-```bash
+# 2. コミット（複数行はHEREDOC使用）
 git commit -m "$(cat <<'EOF'
-fix(auth): ログイン時のバリデーションを修正
+fix(auth): ログインバリデーションを修正
 
 - メールアドレスの正規表現を改善
-- エラーメッセージの表示ロジックを追加
+- エラーメッセージ表示を追加
 
 Closes #123
+
+Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
 ```
 
----
-
 ## セマンティックバージョニング
 
-`MAJOR.MINOR.PATCH` 形式：
+`MAJOR.MINOR.PATCH` — package.jsonの`version`フィールドを更新。
 
-- **MAJOR**: 後方互換性のない変更
-- **MINOR**: 後方互換性のある新機能
-- **PATCH**: 後方互換性のあるバグ修正
+| 変更種別 | バージョン | コマンド |
+|----------|-----------|---------|
+| 破壊的変更 | MAJOR | `npm version major` |
+| 新機能 | MINOR | `npm version minor` |
+| バグ修正 | PATCH | `npm version patch` |
 
-### バージョン更新
-
-#### Next.js (package.json)
-
-```json
-{
-  "version": "0.5.16"
-}
-```
-
-#### Flutter (pubspec.yaml)
-
-```yaml
-version: 1.3.1+42  # バージョン+ビルド番号
-```
-
-形式: `MAJOR.MINOR.PATCH+BUILD_NUMBER`
-
----
-
-## 変更履歴（Changelog）生成
-
-### 形式
+## リリースノート形式
 
 ```markdown
-## [0.5.16] - 2026-01-15
+# v0.6.0 (2026-02-01)
 
-### 追加
-- 抽出タイマー機能を追加
+## 追加
+- 新機能の説明
 
-### 修正
-- タイマーが停止しない問題を修正
+## 修正
+- バグ修正の説明
 
-### 変更
-- UIデザインを更新
+## 変更
+- 既存機能の変更
 ```
 
-### カテゴリ
+## デプロイ
 
-- **追加** (Added): 新機能
-- **修正** (Fixed): バグ修正
-- **変更** (Changed): 既存機能の変更
-- **削除** (Removed): 機能削除
-- **非推奨** (Deprecated): 将来削除予定
-- **セキュリティ** (Security): 脆弱性対応
+**デプロイ前チェック:**
+```bash
+npm run lint && npm run build && npm run test
+```
 
----
+**Vercel:** `git push origin main` で自動デプロイ
+**Firebase Hosting:** `npm run build && firebase deploy --only hosting`
 
-## AI アシスタント指示
+## ルール
 
-このスキルが有効な場合：
-
-1. **変更内容を確認**: `git status` と `git diff --staged` で変更を把握
-2. **適切なタイプを選択**: 変更の性質に基づいてコミットタイプを決定
-3. **日本語でメッセージ作成**: 50文字以内で簡潔に
-4. **バージョン更新が必要か確認**: リリース時はバージョン番号を更新
-
-### 必ず守ること
-
-- コミットメッセージは日本語で作成
-- コンベンショナルコミット形式に準拠
-- 1コミット = 1つの論理的な変更
-
-### 避けること
-
-- 複数の無関係な変更を1コミットにまとめない
-- 曖昧なメッセージ（「修正」「更新」のみ）は避ける
+- コミットメッセージは**日本語**
+- 1コミット = 1つの論理的変更
+- mainブランチへの直接コミット禁止
+- デプロイ前に必ずテスト実行

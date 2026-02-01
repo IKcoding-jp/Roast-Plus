@@ -23,10 +23,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
 - SplashScreenのHydrationミスマッチエラーを解消
 - 焙煎タイマー関連分割
 - PostToolUseフックによるESLint自動整形を導入
+- husky + lint-staged によるpre-commitフックを導入
     `.trim(),
     tags: [],
     createdAt: '2026-02-01T01:09:28.615Z',
-    updatedAt: '2026-02-01T08:06:22.839Z',
+    updatedAt: '2026-02-01T08:17:52.748Z',
   },
   {
     id: 'v0.10.1',

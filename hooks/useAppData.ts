@@ -96,6 +96,32 @@ export function useAppData() {
 
   const applyIncomingSnapshot = useCallback(
     (incomingData: AppData) => {
+      // データ消失防止: ローカルに実データがあるのに受信データが全て空の場合はスキップ
+      const localData = latestLocalDataRef.current;
+      const localHasData = localData.tastingSessions.length > 0
+        || localData.tastingRecords.length > 0
+        || localData.roastSchedules.length > 0
+        || localData.todaySchedules.length > 0
+        || localData.roastTimerRecords.length > 0
+        || localData.workProgresses.length > 0
+        || (localData.dripRecipes?.length ?? 0) > 0;
+
+      const incomingIsEmpty = incomingData.tastingSessions.length === 0
+        && incomingData.tastingRecords.length === 0
+        && incomingData.roastSchedules.length === 0
+        && incomingData.todaySchedules.length === 0
+        && incomingData.roastTimerRecords.length === 0
+        && incomingData.workProgresses.length === 0
+        && (incomingData.dripRecipes?.length ?? 0) === 0;
+
+      if (localHasData && incomingIsEmpty && !isUpdatingRef.current) {
+        console.warn(
+          'Data loss prevention: incoming snapshot has all empty arrays but local data exists. Skipping update.',
+          { localSessionCount: localData.tastingSessions.length, localRecordCount: localData.tastingRecords.length }
+        );
+        return;
+      }
+
       const lockedKeys = lockedKeysRef.current;
 
       if (!isUpdatingRef.current || lockedKeys.size === 0) {

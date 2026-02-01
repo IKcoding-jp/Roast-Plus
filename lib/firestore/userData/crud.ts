@@ -26,7 +26,7 @@ export async function getUserData(userId: string): Promise<AppData> {
     return defaultData;
   } catch (error) {
     console.error('Failed to load data from Firestore:', error);
-    return defaultData;
+    throw error;
   }
 }
 
@@ -98,7 +98,7 @@ export function subscribeUserData(
     },
     (error) => {
       console.error('Error in Firestore subscription:', error);
-      callback(defaultData);
+      // エラー時はcallbackを呼ばない（既存データを保持する）
     }
   );
 }

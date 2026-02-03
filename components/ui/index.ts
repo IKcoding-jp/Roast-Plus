@@ -70,3 +70,12 @@ export type { NumberInputProps } from './NumberInput';
 
 export { InlineInput } from './InlineInput';
 export type { InlineInputProps } from './InlineInput';
+
+export { Checkbox } from './Checkbox';
+export type { CheckboxProps } from './Checkbox';
+
+export { Switch } from './Switch';
+export type { SwitchProps } from './Switch';
+
+export { Badge } from './Badge';
+export type { BadgeProps } from './Badge';

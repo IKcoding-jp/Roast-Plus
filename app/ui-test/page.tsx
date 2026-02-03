@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Button, Input, Select, Textarea, Card, IconButton, NumberInput, InlineInput } from '@/components/ui';
+import { Button, Input, Select, Textarea, Card, IconButton, NumberInput, InlineInput, Checkbox, Switch, Badge } from '@/components/ui';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { HiArrowLeft, HiX, HiTrash, HiPlus, HiCheck, HiCog, HiPencil } from 'react-icons/hi';
 import { MdClose, MdAdd, MdDelete } from 'react-icons/md';
@@ -18,6 +18,10 @@ export default function UITestPage() {
   const [width, setWidth] = useState(160);
   const [height, setHeight] = useState(60);
   const [inlineValue, setInlineValue] = useState('テスト値');
+  // Checkbox/Switch用
+  const [checked1, setChecked1] = useState(false);
+  const [checked2, setChecked2] = useState(true);
+  const [switchOn, setSwitchOn] = useState(false);
 
   const handleSubmit = () => {
     setLoading(true);
@@ -343,6 +347,105 @@ export default function UITestPage() {
               isChristmasMode={isChristmasMode}
               readOnly
             />
+          </div>
+        </Card>
+
+        {/* Checkbox - NEW */}
+        <Card isChristmasMode={isChristmasMode}>
+          <h2 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            Checkbox <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
+          </h2>
+          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+            チェックボックス。設定画面やフィルターで使用。
+          </p>
+          <div className="space-y-4">
+            <Checkbox
+              label="基本的なチェックボックス"
+              checked={checked1}
+              onChange={(e) => setChecked1(e.target.checked)}
+              isChristmasMode={isChristmasMode}
+            />
+            <Checkbox
+              label="説明文付き"
+              description="このオプションを有効にすると、通知が送信されます。"
+              checked={checked2}
+              onChange={(e) => setChecked2(e.target.checked)}
+              isChristmasMode={isChristmasMode}
+            />
+            <Checkbox
+              label="無効状態"
+              disabled
+              isChristmasMode={isChristmasMode}
+            />
+          </div>
+        </Card>
+
+        {/* Switch - NEW */}
+        <Card isChristmasMode={isChristmasMode}>
+          <h2 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            Switch <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
+          </h2>
+          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+            ON/OFFトグルスイッチ。モード切替などに使用。
+          </p>
+
+          <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            基本
+          </h3>
+          <div className="space-y-4 mb-4">
+            <Switch
+              label="通知を有効にする"
+              checked={switchOn}
+              onChange={(e) => setSwitchOn(e.target.checked)}
+              isChristmasMode={isChristmasMode}
+            />
+            <Switch
+              label="無効状態"
+              checked={false}
+              disabled
+              isChristmasMode={isChristmasMode}
+            />
+          </div>
+
+          <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            サイズ
+          </h3>
+          <div className="flex flex-wrap items-center gap-6">
+            <Switch size="sm" checked={true} label="Small" isChristmasMode={isChristmasMode} />
+            <Switch size="md" checked={true} label="Medium" isChristmasMode={isChristmasMode} />
+            <Switch size="lg" checked={true} label="Large" isChristmasMode={isChristmasMode} />
+          </div>
+        </Card>
+
+        {/* Badge - NEW */}
+        <Card isChristmasMode={isChristmasMode}>
+          <h2 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            Badge <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
+          </h2>
+          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+            ラベル/タグ表示。ステータスやカテゴリ表示に使用。
+          </p>
+
+          <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            Variants
+          </h3>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Badge variant="default" isChristmasMode={isChristmasMode}>Default</Badge>
+            <Badge variant="primary" isChristmasMode={isChristmasMode}>Primary</Badge>
+            <Badge variant="secondary" isChristmasMode={isChristmasMode}>Secondary</Badge>
+            <Badge variant="success" isChristmasMode={isChristmasMode}>Success</Badge>
+            <Badge variant="warning" isChristmasMode={isChristmasMode}>Warning</Badge>
+            <Badge variant="danger" isChristmasMode={isChristmasMode}>Danger</Badge>
+            <Badge variant="coffee" isChristmasMode={isChristmasMode}>Coffee</Badge>
+          </div>
+
+          <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            Sizes
+          </h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge size="sm" variant="primary" isChristmasMode={isChristmasMode}>Small</Badge>
+            <Badge size="md" variant="primary" isChristmasMode={isChristmasMode}>Medium</Badge>
+            <Badge size="lg" variant="primary" isChristmasMode={isChristmasMode}>Large</Badge>
           </div>
         </Card>
       </div>

@@ -70,6 +70,7 @@ export default function UITestPage() {
             <Button variant="success" isChristmasMode={isChristmasMode}>Success</Button>
             <Button variant="outline" isChristmasMode={isChristmasMode}>Outline</Button>
             <Button variant="ghost" isChristmasMode={isChristmasMode}>Ghost</Button>
+            <Button variant="coffee" isChristmasMode={isChristmasMode}>Coffee</Button>
           </div>
         </Card>
 
@@ -168,6 +169,11 @@ export default function UITestPage() {
           <Card variant="action" isChristmasMode={isChristmasMode}>
             <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>
               Action Card - ホームページ用カード
+            </p>
+          </Card>
+          <Card variant="coffee" isChristmasMode={isChristmasMode}>
+            <p className="text-white">
+              Coffee Card - ダークブラウン背景（#211714）
             </p>
           </Card>
         </div>

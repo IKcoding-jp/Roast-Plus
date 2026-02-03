@@ -47,7 +47,7 @@ import { forwardRef } from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** ボタンのスタイルバリエーション */
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost' | 'coffee';
   /** ボタンのサイズ */
   size?: 'sm' | 'md' | 'lg';
   /** ローディング状態 */
@@ -91,6 +91,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       success: 'bg-green-600 text-white hover:bg-green-700',
       outline: 'border-2 border-amber-200 text-amber-700 bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200',
       ghost: 'text-amber-600 hover:text-amber-700 hover:bg-amber-50',
+      coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b]',
     };
 
     // クリスマスモードのバリアントスタイル
@@ -101,6 +102,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       success: 'bg-green-800 text-white hover:bg-green-900',
       outline: 'border-2 border-[#d4af37]/60 text-[#d4af37] bg-[#d4af37]/10 hover:bg-[#d4af37]/20',
       ghost: 'text-[#d4af37] hover:text-[#e8c65f] hover:bg-[#d4af37]/10',
+      coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b] border border-[#d4af37]/30',
     };
 
     const variantStyles = isChristmasMode ? christmasVariantStyles : normalVariantStyles;

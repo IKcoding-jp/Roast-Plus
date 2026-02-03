@@ -1,247 +1,44 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
+import { useScheduleDateNavigation } from '@/hooks/useScheduleDateNavigation';
+import { useScheduleOCR } from '@/hooks/useScheduleOCR';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
 import { Loading } from '@/components/Loading';
-import { useToastContext } from '@/components/Toast';
 import { HiArrowLeft, HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCamera } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
 import { ScheduleOCRModal } from '@/components/ScheduleOCRModal';
 import LoginPage from '@/app/login/page';
 import { Button } from '@/components/ui';
-import type { TimeLabel, RoastSchedule } from '@/types';
 
 type TabType = 'today' | 'roast';
 
 export default function SchedulePage() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
-  const { showToast } = useToastContext();
   const [activeTab, setActiveTab] = useState<TabType>('today');
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isOCROpen, setIsOCROpen] = useState(false);
-  
-  // 選択中の日付を管理（YYYY-MM-DD形式）
-  const getTodayString = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
-  // 翌日の日付を取得
-  const getTomorrowString = () => {
-    const now = new Date();
-    now.setDate(now.getDate() + 1);
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  const {
+    selectedDate,
+    setSelectedDate,
+    currentTime,
+    isToday,
+    isMaxDate,
+    isWeekend,
+    getTodayString,
+    formatDateString,
+    formatTime,
+    moveToPreviousDay,
+    moveToNextDay,
+  } = useScheduleDateNavigation();
 
-  // 土日判定関数（0=日曜、6=土曜）
-  const isWeekend = useCallback((dateString: string): boolean => {
-    const date = new Date(dateString + 'T00:00:00');
-    const dayOfWeek = date.getDay();
-    return dayOfWeek === 0 || dayOfWeek === 6; // 0=日曜、6=土曜
-  }, []);
-
-  // 前の平日を取得する関数
-  const getPreviousWeekday = useCallback((dateString: string): string => {
-    const date = new Date(dateString + 'T00:00:00');
-    date.setDate(date.getDate() - 1);
-    
-    // 土日をスキップ
-    while (date.getDay() === 0 || date.getDay() === 6) {
-      date.setDate(date.getDate() - 1);
-    }
-    
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }, []);
-
-  // 次の平日を取得する関数
-  const getNextWeekday = useCallback((dateString: string): string => {
-    const date = new Date(dateString + 'T00:00:00');
-    date.setDate(date.getDate() + 1);
-    
-    // 土日をスキップ
-    while (date.getDay() === 0 || date.getDay() === 6) {
-      date.setDate(date.getDate() + 1);
-    }
-    
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }, []);
-
-  // 初期日付を取得（今日が土日の場合は前の平日）
-  const getInitialDate = (): string => {
-    const today = getTodayString();
-    if (isWeekend(today)) {
-      return getPreviousWeekday(today);
-    }
-    return today;
-  };
-
-  const [selectedDate, setSelectedDate] = useState<string>(getInitialDate());
-
-  // 時刻・日付・曜日を1秒ごとに更新
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // 日付と時刻のフォーマット関数
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-    const weekday = weekdays[date.getDay()];
-
-    return `${year}年${month}月${day}日（${weekday}）`;
-  };
-
-  // モバイル用の短縮日付フォーマット関数
-  const formatDateString = (dateString: string): string => {
-    const date = new Date(dateString + 'T00:00:00');
-    return formatDate(date);
-  };
-
-  const formatTime = (date: Date): string => {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  // 日付移動関数
-  const moveToPreviousDay = () => {
-    const previousWeekday = getPreviousWeekday(selectedDate);
-    setSelectedDate(previousWeekday);
-  };
-
-  const moveToNextDay = useCallback(() => {
-    const today = getTodayString();
-    const tomorrow = getTomorrowString();
-    const nextWeekday = getNextWeekday(selectedDate);
-
-    // 翌日まで移動可能にする
-    // 翌日が土日の場合は、次の平日まで移動可能
-    const maxDate = isWeekend(tomorrow) ? getNextWeekday(today) : tomorrow;
-    if (nextWeekday <= maxDate) {
-      setSelectedDate(nextWeekday);
-    }
-  }, [selectedDate, getNextWeekday, isWeekend]);
-
-  // 選択日が今日かどうか（実際の今日の日付と比較）
-  const today = getTodayString();
-  const tomorrow = getTomorrowString();
-  const isToday = selectedDate === today; // 実際の今日の日付と比較
-  // 翌日（土日なら次の平日）が最大選択可能日
-  const maxSelectableDate = isWeekend(tomorrow) ? getNextWeekday(today) : tomorrow;
-  const isMaxDate = selectedDate >= maxSelectableDate;
-
-  // OCR結果を反映する処理
-  const handleOCRSuccess = useCallback(
-    (mode: 'replace' | 'add', timeLabels: TimeLabel[], roastSchedules: RoastSchedule[]) => {
-      if (!data) return;
-
-      // 既存のデータとマージするか確認
-      const existingTodaySchedule = data.todaySchedules?.find((s) => s.date === selectedDate);
-
-      if (mode === 'replace') {
-        // 置き換え
-        const updatedTodaySchedules = [...(data.todaySchedules || [])];
-        const existingTodayIndex = updatedTodaySchedules.findIndex((s) => s.date === selectedDate);
-        const newTodaySchedule = {
-          id: existingTodaySchedule?.id || `schedule-${selectedDate}`,
-          date: selectedDate,
-          timeLabels,
-        };
-
-        if (existingTodayIndex >= 0) {
-          updatedTodaySchedules[existingTodayIndex] = newTodaySchedule;
-        } else {
-          updatedTodaySchedules.push(newTodaySchedule);
-        }
-
-        // ローストスケジュールを置き換え
-        const updatedRoastSchedules = [
-          ...(data.roastSchedules || []).filter((s) => s.date !== selectedDate),
-          ...roastSchedules,
-        ];
-
-        updateData({
-          ...data,
-          todaySchedules: updatedTodaySchedules,
-          roastSchedules: updatedRoastSchedules,
-        });
-      } else {
-        // 追加（既存のスケジュールに追加）
-        const updatedTodaySchedules = [...(data.todaySchedules || [])];
-        const existingTodayIndex = updatedTodaySchedules.findIndex((s) => s.date === selectedDate);
-
-        if (existingTodayIndex >= 0) {
-          // 既存のスケジュールに追加（重複を避ける）
-          const existingTimeLabels = updatedTodaySchedules[existingTodayIndex].timeLabels || [];
-          const mergedTimeLabels = [...existingTimeLabels];
-          
-          timeLabels.forEach((newLabel) => {
-            // 同じ時間のラベルが既に存在するかチェック
-            const exists = existingTimeLabels.some((label) => label.time === newLabel.time);
-            if (!exists) {
-              mergedTimeLabels.push(newLabel);
-            }
-          });
-
-          // 時間順にソート
-          mergedTimeLabels.sort((a, b) => a.time.localeCompare(b.time));
-          mergedTimeLabels.forEach((label, index) => {
-            label.order = index;
-          });
-
-          updatedTodaySchedules[existingTodayIndex] = {
-            ...updatedTodaySchedules[existingTodayIndex],
-            timeLabels: mergedTimeLabels,
-          };
-        } else {
-          updatedTodaySchedules.push({
-            id: `schedule-${selectedDate}`,
-            date: selectedDate,
-            timeLabels,
-          });
-        }
-
-        // ローストスケジュールを追加
-        const updatedRoastSchedules = [...(data.roastSchedules || []), ...roastSchedules];
-
-        updateData({
-          ...data,
-          todaySchedules: updatedTodaySchedules,
-          roastSchedules: updatedRoastSchedules,
-        });
-      }
-
-      setIsOCROpen(false);
-      showToast('スケジュールを読み取りました。', 'success');
-    },
-    [data, selectedDate, updateData, showToast]
-  );
+  const { handleOCRSuccess } = useScheduleOCR({ data, selectedDate, updateData });
 
   if (authLoading) {
     return <Loading />;
@@ -453,7 +250,10 @@ export default function SchedulePage() {
       {isOCROpen && (
         <ScheduleOCRModal
           selectedDate={selectedDate}
-          onSuccess={handleOCRSuccess}
+          onSuccess={(mode, timeLabels, roastSchedules) => {
+            handleOCRSuccess(mode, timeLabels, roastSchedules);
+            setIsOCROpen(false);
+          }}
           onCancel={() => setIsOCROpen(false)}
         />
       )}

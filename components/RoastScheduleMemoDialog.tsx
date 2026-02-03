@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import type { RoastSchedule } from '@/types';
-import { ALL_BEANS, getRoastMachineModeForBlend, type BeanName } from '@/lib/beanConfig';
-import { HiX, HiFire } from 'react-icons/hi';
-import { FaSnowflake, FaBroom } from 'react-icons/fa';
-import { PiCoffeeBeanFill } from 'react-icons/pi';
+import { getRoastMachineModeForBlend, type BeanName } from '@/lib/beanConfig';
+import { HiX } from 'react-icons/hi';
+import { ScheduleTypeSelector } from './roast-scheduler/ScheduleTypeSelector';
+import { RoasterFields } from './roast-scheduler/RoasterFields';
+import { RoastFields } from './roast-scheduler/RoastFields';
+import { SchedulePreview } from './roast-scheduler/SchedulePreview';
 
 interface RoastScheduleMemoDialogProps {
   schedule: RoastSchedule | null;
@@ -167,70 +169,6 @@ function RoastScheduleMemoDialogInner({
     }
   };
 
-  // プレビューテキストの生成
-  const getPreviewText = () => {
-    if (isRoasterOn) {
-      const mode = getRoastMachineModeForBlend(
-        beanName as BeanName | undefined,
-        beanName2 as BeanName | undefined,
-        combineBlendRatio(blendRatio1, blendRatio2)
-      );
-      
-      let beanText = '';
-      const blendRatio = combineBlendRatio(blendRatio1, blendRatio2);
-      if (beanName2 && blendRatio) {
-        // ブレンドの場合
-        const [ratio1, ratio2] = blendRatio.split(':');
-        beanText = `${beanName}${ratio1}:${beanName2}${ratio2}`;
-      } else if (beanName) {
-        // 単体の場合
-        beanText = beanName;
-      }
-      
-      const weightText = weight ? `${weight}g` : '';
-      const levelText = roastLevel || '';
-      const modeText = mode ? `(${mode})` : '';
-      
-      // スマホでのレイアウト: 3行に分ける
-      const parts = [];
-      parts.push('焙煎機予熱');
-      if (beanText) {
-        parts.push(beanText);
-      }
-      const detailParts = [modeText, weightText, levelText].filter(Boolean);
-      if (detailParts.length > 0) {
-        parts.push(detailParts.join(' '));
-      }
-      
-      return parts.join('\n');
-    }
-    if (isRoast) {
-      const countText = roastCount ? `${roastCount}回目` : '?回目';
-      const bagText = bagCount ? `${bagCount}袋` : '';
-      if (bagText) {
-        return `ロースト${countText}・${bagText}`;
-      } else {
-        return `ロースト${countText}`;
-      }
-    }
-    if (isAfterPurge) {
-      return 'アフターパージ';
-    }
-    if (isChaffCleaning) {
-      return 'チャフのお掃除';
-    }
-    return '';
-  };
-
-  // プレビューの色
-  const getPreviewColor = () => {
-    if (isRoasterOn) return 'bg-orange-100 border-orange-300 text-orange-800';
-    if (isRoast) return 'bg-amber-100 border-amber-300 text-amber-800';
-    if (isAfterPurge) return 'bg-blue-100 border-blue-300 text-blue-800';
-    if (isChaffCleaning) return 'bg-gray-100 border-gray-300 text-gray-800';
-    return 'bg-gray-100 border-gray-300 text-gray-800';
-  };
-
   return (
     <div 
       className="fixed inset-0 bg-black/20 flex items-center justify-center z-[100] p-4"
@@ -300,275 +238,57 @@ function RoastScheduleMemoDialogInner({
             )}
 
             {/* スケジュールタイプ選択（排他的） */}
-            <div>
-              <label className="mb-3 md:mb-4 block text-base md:text-lg font-medium text-gray-700 text-center">
-                スケジュールタイプ <span className="text-red-500">*</span>
-              </label>
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <label className={`flex flex-col items-center justify-center gap-2 md:gap-3 p-4 md:p-5 rounded-lg border-2 cursor-pointer transition-all ${
-                  isRoasterOn 
-                    ? 'border-orange-500 bg-orange-50' 
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                }`}>
-                  <input
-                    type="checkbox"
-                    checked={isRoasterOn}
-                    onChange={() => handleMemoTypeChange('roasterOn')}
-                    className="sr-only"
-                  />
-                  <HiFire className={`text-3xl md:text-4xl ${isRoasterOn ? 'text-orange-500' : 'text-gray-400'}`} />
-                  <span className={`text-base md:text-lg font-medium ${isRoasterOn ? 'text-orange-700' : 'text-gray-700'}`}>
-                    焙煎機予熱
-                  </span>
-                </label>
-                <label className={`flex flex-col items-center justify-center gap-2 md:gap-3 p-4 md:p-5 rounded-lg border-2 cursor-pointer transition-all ${
-                  isRoast 
-                    ? 'border-amber-500 bg-amber-50' 
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                }`}>
-                  <input
-                    type="checkbox"
-                    checked={isRoast}
-                    onChange={() => handleMemoTypeChange('roast')}
-                    className="sr-only"
-                  />
-                  <PiCoffeeBeanFill className={`text-3xl md:text-4xl ${isRoast ? 'text-amber-700' : 'text-gray-400'}`} />
-                  <span className={`text-base md:text-lg font-medium ${isRoast ? 'text-amber-700' : 'text-gray-700'}`}>
-                    ロースト
-                  </span>
-                </label>
-                <label className={`flex flex-col items-center justify-center gap-2 md:gap-3 p-4 md:p-5 rounded-lg border-2 cursor-pointer transition-all ${
-                  isAfterPurge 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                }`}>
-                  <input
-                    type="checkbox"
-                    checked={isAfterPurge}
-                    onChange={() => handleMemoTypeChange('afterPurge')}
-                    className="sr-only"
-                  />
-                  <FaSnowflake className={`text-3xl md:text-4xl ${isAfterPurge ? 'text-blue-500' : 'text-gray-400'}`} />
-                  <span className={`text-base md:text-lg font-medium ${isAfterPurge ? 'text-blue-700' : 'text-gray-700'}`}>
-                    アフターパージ
-                  </span>
-                </label>
-                <label className={`flex flex-col items-center justify-center gap-2 md:gap-3 p-4 md:p-5 rounded-lg border-2 cursor-pointer transition-all ${
-                  isChaffCleaning 
-                    ? 'border-gray-500 bg-gray-50' 
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                }`}>
-                  <input
-                    type="checkbox"
-                    checked={isChaffCleaning}
-                    onChange={() => handleMemoTypeChange('chaffCleaning')}
-                    className="sr-only"
-                  />
-                  <FaBroom className={`text-3xl md:text-4xl ${isChaffCleaning ? 'text-gray-700' : 'text-gray-400'}`} />
-                  <span className={`text-base md:text-lg font-medium ${isChaffCleaning ? 'text-gray-700' : 'text-gray-700'}`}>
-                    チャフのお掃除
-                  </span>
-                </label>
-              </div>
-            </div>
+            <ScheduleTypeSelector
+              isRoasterOn={isRoasterOn}
+              isRoast={isRoast}
+              isAfterPurge={isAfterPurge}
+              isChaffCleaning={isChaffCleaning}
+              onTypeChange={handleMemoTypeChange}
+            />
 
             {/* 焙煎機予熱用フィールド */}
             {isRoasterOn && (
-              <div className="space-y-3 md:space-y-4 border-t border-gray-200 pt-3 md:pt-4">
-                <div>
-                  <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    豆の名前
-                  </label>
-                  <select
-                    value={beanName}
-                    onChange={(e) => {
-                      const value = e.target.value as BeanName;
-                      setBeanName(value);
-                      // 1種類目が変更されたとき、2種類目が同じ豆の場合はクリア
-                      if (beanName2 === value) {
-                        setBeanName2('');
-                        setBlendRatio1('');
-                        setBlendRatio2('');
-                      }
-                    }}
-                    className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="">選択してください</option>
-                    {ALL_BEANS.map((bean) => (
-                      <option key={bean} value={bean}>
-                        {bean}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    2種類目の豆の名前
-                  </label>
-                  <select
-                    value={beanName2}
-                    onChange={(e) => {
-                      const value = e.target.value as BeanName | '';
-                      setBeanName2(value);
-                      // 2種類目を「なし」にした場合は割合もクリア
-                      if (!value) {
-                        setBlendRatio1('');
-                        setBlendRatio2('');
-                      }
-                    }}
-                    className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="">なし</option>
-                    {ALL_BEANS.filter((bean) => bean !== beanName).map((bean) => (
-                      <option key={bean} value={bean}>
-                        {bean}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {beanName2 && (
-                  <div>
-                    <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                      ブレンド割合 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="grid grid-cols-2 gap-2 md:gap-3">
-                      <div>
-                        <label className="mb-1 md:mb-2 block text-sm md:text-base font-medium text-gray-600">
-                          {beanName}の割合
-                        </label>
-                        <input
-                          type="number"
-                          value={blendRatio1}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 10)) {
-                              setBlendRatio1(value);
-                            }
-                          }}
-                          min="0"
-                          max="10"
-                          required={!!beanName2}
-                          className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          placeholder="5"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 md:mb-2 block text-sm md:text-base font-medium text-gray-600">
-                          {beanName2}の割合
-                        </label>
-                        <input
-                          type="number"
-                          value={blendRatio2}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 10)) {
-                              setBlendRatio2(value);
-                            }
-                          }}
-                          min="0"
-                          max="10"
-                          required={!!beanName2}
-                          className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          placeholder="5"
-                        />
-                      </div>
-                    </div>
-                    <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-500">
-                      合計が10になるように入力してください（例：5と5、8と2）
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    重さ
-                  </label>
-                  <select
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')}
-                    className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="">選択してください</option>
-                    <option value="200">200g</option>
-                    <option value="300">300g</option>
-                    <option value="500">500g</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    焙煎度合い
-                  </label>
-                  <select
-                    value={roastLevel}
-                    onChange={(e) =>
-                      setRoastLevel(
-                        e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | ''
-                      )
-                    }
-                    className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="">選択してください</option>
-                    <option value="浅煎り">浅煎り</option>
-                    <option value="中煎り">中煎り</option>
-                    <option value="中深煎り">中深煎り</option>
-                    <option value="深煎り">深煎り</option>
-                  </select>
-                </div>
-              </div>
+              <RoasterFields
+                beanName={beanName}
+                beanName2={beanName2}
+                blendRatio1={blendRatio1}
+                blendRatio2={blendRatio2}
+                weight={weight}
+                roastLevel={roastLevel}
+                onBeanNameChange={setBeanName}
+                onBeanName2Change={setBeanName2}
+                onBlendRatio1Change={setBlendRatio1}
+                onBlendRatio2Change={setBlendRatio2}
+                onWeightChange={setWeight}
+                onRoastLevelChange={setRoastLevel}
+              />
             )}
 
             {/* ロースト用フィールド */}
             {isRoast && (
-              <div className="space-y-3 md:space-y-4 border-t border-gray-200 pt-3 md:pt-4">
-                <div>
-                  <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    何回目 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={roastCount}
-                    onChange={(e) => setRoastCount(e.target.value)}
-                    required={isRoast}
-                    min="1"
-                    className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    placeholder="回数を入力"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
-                    袋数
-                  </label>
-                  <select
-                    value={bagCount}
-                    onChange={(e) => setBagCount(e.target.value ? (parseInt(e.target.value, 10) as 1 | 2) : '')}
-                    className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="">選択してください</option>
-                    <option value="1">1袋</option>
-                    <option value="2">2袋</option>
-                  </select>
-                </div>
-              </div>
+              <RoastFields
+                roastCount={roastCount}
+                bagCount={bagCount}
+                onRoastCountChange={setRoastCount}
+                onBagCountChange={setBagCount}
+              />
             )}
 
             {/* プレビュー */}
-            {(isRoasterOn || isRoast || isAfterPurge || isChaffCleaning) && (
-              <div className={`rounded-md border-2 p-3 md:p-4 ${getPreviewColor()} flex justify-center`}>
-                <div className="flex items-center gap-2 md:gap-3">
-                  {isRoasterOn && <HiFire className="text-xl md:text-2xl text-orange-500" />}
-                  {isRoast && <PiCoffeeBeanFill className="text-xl md:text-2xl text-amber-700" />}
-                  {isAfterPurge && <FaSnowflake className="text-xl md:text-2xl text-blue-500" />}
-                  {isChaffCleaning && <FaBroom className="text-xl md:text-2xl text-gray-700" />}
-                  <div className="text-base md:text-lg font-medium whitespace-pre-line">
-                    {getPreviewText()}
-                  </div>
-                </div>
-              </div>
-            )}
+            <SchedulePreview
+              isRoasterOn={isRoasterOn}
+              isRoast={isRoast}
+              isAfterPurge={isAfterPurge}
+              isChaffCleaning={isChaffCleaning}
+              beanName={beanName}
+              beanName2={beanName2}
+              blendRatio1={blendRatio1}
+              blendRatio2={blendRatio2}
+              weight={weight}
+              roastLevel={roastLevel}
+              roastCount={roastCount}
+              bagCount={bagCount}
+            />
 
             {/* フッター */}
             <div className="flex gap-3 md:gap-4 pt-4 md:pt-5 border-t border-gray-200 justify-center">

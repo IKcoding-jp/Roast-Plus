@@ -79,3 +79,15 @@ export type { SwitchProps } from './Switch';
 
 export { Badge } from './Badge';
 export type { BadgeProps } from './Badge';
+
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
+export type { TabsProps, TabsListProps, TabsTriggerProps, TabsContentProps } from './Tabs';
+
+export { ProgressBar } from './ProgressBar';
+export type { ProgressBarProps } from './ProgressBar';
+
+export { EmptyState } from './EmptyState';
+export type { EmptyStateProps } from './EmptyState';
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion';
+export type { AccordionProps, AccordionItemProps, AccordionTriggerProps, AccordionContentProps } from './Accordion';

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Button, Input, Select, Textarea, Card, IconButton, NumberInput, InlineInput, Checkbox, Switch, Badge } from '@/components/ui';
+import { Button, Input, Select, Textarea, Card, IconButton, NumberInput, InlineInput, Checkbox, Switch, Badge, Tabs, TabsList, TabsTrigger, TabsContent, ProgressBar, EmptyState, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
-import { HiArrowLeft, HiX, HiTrash, HiPlus, HiCheck, HiCog, HiPencil } from 'react-icons/hi';
+import { HiArrowLeft, HiX, HiTrash, HiPlus, HiCheck, HiCog, HiPencil, HiInbox } from 'react-icons/hi';
 import { MdClose, MdAdd, MdDelete } from 'react-icons/md';
 
 export default function UITestPage() {
@@ -22,6 +22,8 @@ export default function UITestPage() {
   const [checked1, setChecked1] = useState(false);
   const [checked2, setChecked2] = useState(true);
   const [switchOn, setSwitchOn] = useState(false);
+  // Progress用
+  const [progress] = useState(65);
 
   const handleSubmit = () => {
     setLoading(true);
@@ -447,6 +449,125 @@ export default function UITestPage() {
             <Badge size="md" variant="primary" isChristmasMode={isChristmasMode}>Medium</Badge>
             <Badge size="lg" variant="primary" isChristmasMode={isChristmasMode}>Large</Badge>
           </div>
+        </Card>
+
+        {/* Tabs - NEW */}
+        <Card isChristmasMode={isChristmasMode}>
+          <h2 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            Tabs <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
+          </h2>
+          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+            タブ切り替えコンポーネント。ページ内の表示切り替えに使用。
+          </p>
+          <Tabs defaultValue="tab1" isChristmasMode={isChristmasMode}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="tab1">タブ1</TabsTrigger>
+              <TabsTrigger value="tab2">タブ2</TabsTrigger>
+              <TabsTrigger value="tab3">タブ3</TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1">
+              <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
+                <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>
+                  タブ1の内容です。
+                </p>
+              </div>
+            </TabsContent>
+            <TabsContent value="tab2">
+              <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
+                <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>
+                  タブ2の内容です。
+                </p>
+              </div>
+            </TabsContent>
+            <TabsContent value="tab3">
+              <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
+                <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>
+                  タブ3の内容です。
+                </p>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </Card>
+
+        {/* ProgressBar - NEW */}
+        <Card isChristmasMode={isChristmasMode}>
+          <h2 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            ProgressBar <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
+          </h2>
+          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+            進捗バー。タスク進捗やローディング表示に使用。
+          </p>
+
+          <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            Variants
+          </h3>
+          <div className="space-y-3 mb-4">
+            <ProgressBar value={progress} variant="primary" label="Primary" showValue isChristmasMode={isChristmasMode} />
+            <ProgressBar value={80} variant="success" label="Success" showValue isChristmasMode={isChristmasMode} />
+            <ProgressBar value={45} variant="warning" label="Warning" showValue isChristmasMode={isChristmasMode} />
+            <ProgressBar value={30} variant="danger" label="Danger" showValue isChristmasMode={isChristmasMode} />
+            <ProgressBar value={60} variant="coffee" label="Coffee" showValue isChristmasMode={isChristmasMode} />
+          </div>
+
+          <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            Sizes
+          </h3>
+          <div className="space-y-3">
+            <ProgressBar value={70} size="sm" isChristmasMode={isChristmasMode} />
+            <ProgressBar value={70} size="md" isChristmasMode={isChristmasMode} />
+            <ProgressBar value={70} size="lg" isChristmasMode={isChristmasMode} />
+          </div>
+        </Card>
+
+        {/* EmptyState - NEW */}
+        <Card isChristmasMode={isChristmasMode}>
+          <h2 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            EmptyState <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
+          </h2>
+          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+            空状態表示。データがない場合の表示に使用。
+          </p>
+
+          <div className={`border rounded-lg ${isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'}`}>
+            <EmptyState
+              icon={<HiInbox className="h-12 w-12" />}
+              title="データがありません"
+              description="新しいアイテムを追加して始めましょう。"
+              action={<Button size="sm" isChristmasMode={isChristmasMode}>追加する</Button>}
+              isChristmasMode={isChristmasMode}
+            />
+          </div>
+        </Card>
+
+        {/* Accordion - NEW */}
+        <Card isChristmasMode={isChristmasMode}>
+          <h2 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            Accordion <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
+          </h2>
+          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+            アコーディオン。折りたたみ可能なセクション表示に使用。
+          </p>
+
+          <Accordion isChristmasMode={isChristmasMode}>
+            <AccordionItem defaultOpen>
+              <AccordionTrigger>セクション1（デフォルトで開く）</AccordionTrigger>
+              <AccordionContent>
+                <p>このセクションはデフォルトで開いた状態です。追加の情報や詳細をここに表示できます。</p>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem>
+              <AccordionTrigger>セクション2</AccordionTrigger>
+              <AccordionContent>
+                <p>クリックすると開閉できます。履歴表示や詳細情報の表示に便利です。</p>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem>
+              <AccordionTrigger>セクション3</AccordionTrigger>
+              <AccordionContent>
+                <p>複数のアコーディオンを同時に開くことができます。</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </Card>
       </div>
     </div>

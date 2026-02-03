@@ -2,12 +2,14 @@
 
 import { IoCreateOutline, IoTrashOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import type { Notification } from '@/types';
+import { Card } from '@/components/ui/Card';
 
 interface NotificationCardProps {
   notification: Notification;
   isFirst: boolean;
   isLast: boolean;
   isDeveloperMode: boolean;
+  isChristmasMode?: boolean;
   onEdit: (notification: Notification) => void;
   onDelete: (id: string) => void;
   onMoveUp: (id: string) => void;
@@ -61,13 +63,14 @@ export function NotificationCard({
   isFirst,
   isLast,
   isDeveloperMode,
+  isChristmasMode = false,
   onEdit,
   onDelete,
   onMoveUp,
   onMoveDown,
 }: NotificationCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+    <Card variant="hoverable" isChristmasMode={isChristmasMode} className="p-6">
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
           {/* 開発者モード時のみ表示:上/下移動ボタン */}
@@ -98,7 +101,7 @@ export function NotificationCard({
           <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(notification.type)}`}>
             {getTypeLabel(notification.type)}
           </span>
-          <span className="text-sm text-gray-500">{formatDate(notification.date)}</span>
+          <span className={`text-sm ${isChristmasMode ? 'text-gray-400' : 'text-gray-500'}`}>{formatDate(notification.date)}</span>
         </div>
         {/* 開発者モード時のみ表示:編集・削除ボタン */}
         {isDeveloperMode && (
@@ -120,8 +123,8 @@ export function NotificationCard({
           </div>
         )}
       </div>
-      <h2 className="text-lg font-semibold text-gray-800 mb-2">{notification.title}</h2>
-      <p className="text-gray-600 whitespace-pre-wrap">{notification.content}</p>
-    </div>
+      <h2 className={`text-lg font-semibold mb-2 ${isChristmasMode ? 'text-white' : 'text-gray-800'}`}>{notification.title}</h2>
+      <p className={`whitespace-pre-wrap ${isChristmasMode ? 'text-gray-300' : 'text-gray-600'}`}>{notification.content}</p>
+    </Card>
   );
 }

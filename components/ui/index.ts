@@ -61,3 +61,12 @@ export type { ModalProps } from './Modal';
 
 export { Dialog } from './Dialog';
 export type { DialogProps } from './Dialog';
+
+export { IconButton } from './IconButton';
+export type { IconButtonProps } from './IconButton';
+
+export { NumberInput } from './NumberInput';
+export type { NumberInputProps } from './NumberInput';
+
+export { InlineInput } from './InlineInput';
+export type { InlineInputProps } from './InlineInput';

@@ -21,6 +21,7 @@ export type Props = {
     onSwapAssignments: (asg1: { teamId: string, taskLabelId: string }, asg2: { teamId: string, taskLabelId: string }) => Promise<void>;
     onShuffle: () => Promise<void>;
     isShuffleDisabled: boolean;
+    isChristmasMode?: boolean;
 };
 
 export const DEFAULT_TABLE_SETTINGS: TableSettings = {

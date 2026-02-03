@@ -29,6 +29,7 @@ export const AssignmentTable: React.FC<Props> = (props) => {
         onSwapAssignments,
         onShuffle,
         isShuffleDisabled,
+        isChristmasMode = false,
     } = props;
 
     const cellInteraction = useCellInteraction(members);
@@ -115,6 +116,7 @@ export const AssignmentTable: React.FC<Props> = (props) => {
                 handleCellClick={handleCellClick}
                 onShuffle={onShuffle}
                 isShuffleDisabled={isShuffleDisabled}
+                isChristmasMode={isChristmasMode}
             />
 
             <MobileListView
@@ -136,6 +138,7 @@ export const AssignmentTable: React.FC<Props> = (props) => {
                 handleCellTouchEnd={cellInteraction.handleCellTouchEnd}
                 handleCellTouchMove={cellInteraction.handleCellTouchMove}
                 handleCellClick={handleCellClick}
+                isChristmasMode={isChristmasMode}
             />
 
             <TableModals
@@ -173,6 +176,7 @@ export const AssignmentTable: React.FC<Props> = (props) => {
                 onDeleteMember={onDeleteMember}
                 onDeleteTaskLabel={onDeleteTaskLabel}
                 onUpdateTableSettings={onUpdateTableSettings}
+                isChristmasMode={isChristmasMode}
             />
         </div>
     );

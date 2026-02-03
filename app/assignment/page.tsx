@@ -15,12 +15,14 @@ import { IoArrowBack } from "react-icons/io5";
 import { FaUsers, FaUserTie } from "react-icons/fa";
 import { HiPlus, HiCog } from "react-icons/hi";
 import { Button } from '@/components/ui';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 export default function AssignmentPage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const userId = user?.uid ?? null;
     const { isEnabled: isDeveloperMode } = useDeveloperMode();
+    const { isChristmasMode } = useChristmasMode();
 
     // 管理者ダイアログ
     const [isManagerDialogOpen, setIsManagerDialogOpen] = useState(false);
@@ -123,6 +125,7 @@ export default function AssignmentPage() {
                     onAddTeam={handlers.handleAddTeam}
                     onDeleteTeam={handlers.handleDeleteTeam}
                     onUpdateTeam={handlers.handleUpdateTeam}
+                    isChristmasMode={isChristmasMode}
                 />
             </main>
 
@@ -133,19 +136,21 @@ export default function AssignmentPage() {
 
             {/* 管理者バッジ（右下固定） */}
             <div className="fixed bottom-6 right-6 z-20">
-                <button
+                <Button
+                    variant={data.manager ? 'outline' : 'primary'}
+                    size="md"
                     onClick={() => setIsManagerDialogOpen(true)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-all ${data.manager
-                        ? 'bg-white hover:bg-gray-50 border border-gray-200'
-                        : 'bg-primary text-white hover:bg-primary-dark'
-                        }`}
+                    isChristmasMode={isChristmasMode}
+                    className={`!flex !items-center !gap-2 !px-4 !py-3 !rounded-lg shadow-lg ${
+                        data.manager && !isChristmasMode ? '!bg-white hover:!bg-gray-50 !border-gray-200' : ''
+                    }`}
                 >
                     {data.manager ? (
                         <>
-                            <FaUserTie className="w-5 h-5 text-primary" />
+                            <FaUserTie className={`w-5 h-5 ${isChristmasMode ? 'text-[#d4af37]' : 'text-primary'}`} />
                             <div className="text-left">
-                                <div className="text-sm font-semibold text-gray-800">{data.manager.name}</div>
-                                <div className="text-xs text-gray-500">管理者</div>
+                                <div className={`text-sm font-semibold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>{data.manager.name}</div>
+                                <div className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>管理者</div>
                             </div>
                         </>
                     ) : (
@@ -154,7 +159,7 @@ export default function AssignmentPage() {
                             <span className="font-medium">管理者</span>
                         </>
                     )}
-                </button>
+                </Button>
             </div>
 
             {/* 管理者編集ダイアログ */}
@@ -172,6 +177,7 @@ export default function AssignmentPage() {
                     await deleteManager(userId);
                     data.setManagerState(null);
                 }}
+                isChristmasMode={isChristmasMode}
             />
 
             {/* ペア除外設定モーダル */}
@@ -188,6 +194,7 @@ export default function AssignmentPage() {
                     if (!userId) return;
                     await deletePairExclusion(userId, exclusionId);
                 }}
+                isChristmasMode={isChristmasMode}
             />
         </div>
     );

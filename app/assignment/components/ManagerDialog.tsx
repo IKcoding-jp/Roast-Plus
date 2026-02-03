@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { HiX } from 'react-icons/hi';
 import type { Manager } from '@/types';
+import { Button, Input } from '@/components/ui';
 
 interface ManagerDialogProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface ManagerDialogProps {
   onClose: () => void;
   onSave: (name: string) => Promise<void>;
   onDelete: () => Promise<void>;
+  isChristmasMode?: boolean;
 }
 
 export function ManagerDialog({
@@ -18,6 +20,7 @@ export function ManagerDialog({
   onClose,
   onSave,
   onDelete,
+  isChristmasMode = false,
 }: ManagerDialogProps) {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -74,58 +77,68 @@ export function ManagerDialog({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl"
+        className={`rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl ${
+          isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-800">
+          <h2 className={`text-lg font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
             {manager ? '管理者を編集' : '管理者を追加'}
           </h2>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onClose}
-            className="p-1 text-gray-500 hover:text-gray-700 rounded transition-colors"
+            isChristmasMode={isChristmasMode}
+            className="!p-1 !min-h-0"
             aria-label="閉じる"
           >
             <HiX className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         {/* 入力フォーム */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            名前
-          </label>
-          <input
+          <Input
+            label="名前"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="管理者の名前を入力"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900"
             autoFocus
             disabled={isLoading}
+            isChristmasMode={isChristmasMode}
           />
         </div>
 
         {/* ボタン */}
         <div className="flex gap-3">
           {manager && (
-            <button
+            <Button
+              variant="danger"
+              size="md"
               onClick={handleDelete}
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              isChristmasMode={isChristmasMode}
+              className="flex-1"
             >
               削除
-            </button>
+            </Button>
           )}
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={handleSave}
             disabled={isLoading || !name.trim()}
-            className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            loading={isLoading}
+            isChristmasMode={isChristmasMode}
+            className="flex-1"
           >
-            {isLoading ? '保存中...' : manager ? '更新' : '追加'}
-          </button>
+            {manager ? '更新' : '追加'}
+          </Button>
         </div>
       </div>
     </div>

@@ -7,9 +7,10 @@ import { MdHistory } from 'react-icons/md';
 
 interface ChangelogTimelineProps {
   entries: ChangelogEntry[];
+  isChristmasMode?: boolean;
 }
 
-export const ChangelogTimeline: React.FC<ChangelogTimelineProps> = ({ entries }) => {
+export const ChangelogTimeline: React.FC<ChangelogTimelineProps> = ({ entries, isChristmasMode = false }) => {
   if (entries.length === 0) {
     return (
       <div className="text-center py-12">
@@ -27,7 +28,7 @@ export const ChangelogTimeline: React.FC<ChangelogTimelineProps> = ({ entries })
   return (
     <div className="space-y-4">
       {entries.map((entry) => (
-        <VersionCard key={entry.id} entry={entry} />
+        <VersionCard key={entry.id} entry={entry} isChristmasMode={isChristmasMode} />
       ))}
     </div>
   );

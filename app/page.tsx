@@ -25,6 +25,7 @@ import { FaTree, FaGift, FaSnowflake, FaStar } from 'react-icons/fa';
 import { PiBellFill } from 'react-icons/pi';
 import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
 import { HiClock } from 'react-icons/hi';
+import { BsStars } from 'react-icons/bs';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
 

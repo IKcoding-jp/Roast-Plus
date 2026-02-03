@@ -34,10 +34,19 @@ Chrome DevTools MCPでスクショ確認しながらUI改善
 
 ## Tool Usage Policy
 
-### Serena MCP（コード探索）
-- `get_symbols_overview` / `find_symbol` - シンボル検索
-- `search_for_pattern` - パターン検索
-- Glob/Grep/Task(Explore)より優先
+### Serena MCP（探索専用）
+**探索のみ使用。編集にはClaude Code標準ツールを使う。**
+
+| 用途 | 使用可否 | ツール |
+|------|----------|--------|
+| シンボル構造の把握 | ✅ | `get_symbols_overview`, `find_symbol` |
+| 参照箇所の追跡 | ✅ | `find_referencing_symbols` |
+| パターン検索 | ✅ | `search_for_pattern` |
+| コード編集 | ❌ | `replace_symbol_body`, `insert_*`, `rename_symbol` |
+
+**理由**: 編集はClaude Codeのネイティブツール（Edit/Write）の方が安定・高速。MCP依存を減らすことでトラブルシューティングも容易。
+
+**例外**: 大規模リファクタリングでシンボル名の一括リネームが必要な場合のみ `rename_symbol` を検討可。
 
 ### Context7 MCP（実装時）
 `resolve-library-id` → `query-docs` で最新ドキュメント参照

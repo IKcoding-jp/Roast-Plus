@@ -47,9 +47,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ variant = 'default', isChristmasMode = false, className = '', children, ...props }, ref) => {
     // 通常モードのバリアントスタイル
     const normalVariantStyles = {
-      default: 'bg-white rounded-2xl shadow-md border border-gray-100 p-4',
-      hoverable: 'bg-white rounded-2xl shadow-md border border-gray-100 p-4 hover:shadow-lg hover:border-gray-300 transition-all cursor-pointer',
-      action: 'bg-white/95 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-5 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+      default: 'bg-white rounded-2xl shadow-md p-4',
+      hoverable: 'bg-white rounded-2xl shadow-md p-4 hover:shadow-lg transition-all cursor-pointer',
+      action: 'bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-5 hover:shadow-[0_16px_40px_rgba(0,0,0,0.1)] hover:-translate-y-2 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
     };
 
     // クリスマスモードのバリアントスタイル

@@ -53,7 +53,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
     const baseStyles = 'rounded-lg border-2 px-4 py-2 text-lg transition-all duration-200 min-h-[44px] text-center';
 
-    const normalStyles = 'border-gray-200 text-gray-900 bg-white placeholder:text-gray-400 hover:border-gray-300 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-100';
+    const normalStyles = 'border-gray-200 text-gray-900 bg-white placeholder:text-gray-400 hover:border-gray-300 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30';
 
     const christmasStyles = 'bg-white/10 border-[#d4af37]/40 text-[#f8f1e7] placeholder:text-[#f8f1e7]/50 focus:border-[#d4af37] focus:outline-none focus:ring-2 focus:ring-[#d4af37]/20';
 

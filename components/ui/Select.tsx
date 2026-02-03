@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 
 /**
  * 統一されたセレクトボックスコンポーネント
@@ -70,7 +70,8 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, options, placeholder, isChristmasMode = false, className = '', id, ...props }, ref) => {
-    const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = useId();
+    const selectId = id || generatedId;
 
     const baseStyles = 'w-full rounded-lg border-2 px-4 py-3 text-lg transition-all duration-200 min-h-[44px] appearance-none bg-no-repeat bg-right pr-10';
 
@@ -79,7 +80,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d4af37'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")"
       : "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")";
 
-    const normalStyles = 'border-gray-200 text-gray-900 bg-white hover:border-gray-300 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-100';
+    const normalStyles = 'border-gray-200 text-gray-900 bg-white hover:border-gray-300 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30';
 
     const christmasStyles = 'bg-white/10 border-[#d4af37]/40 text-[#f8f1e7] focus:border-[#d4af37] focus:outline-none focus:ring-2 focus:ring-[#d4af37]/20';
 

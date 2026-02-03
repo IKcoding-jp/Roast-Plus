@@ -77,7 +77,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     const variantStyles = isChristmasMode ? christmasVariantStyles : normalVariantStyles;
 
     const baseStyles = 'inline-flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-    const focusRingStyles = isChristmasMode ? 'focus:ring-[#d4af37]/50' : 'focus:ring-amber-500/50';
+    const focusRingStyles = isChristmasMode ? 'focus:ring-[#d4af37]/50' : 'focus:ring-amber-500/30';
     const borderRadiusStyles = rounded ? 'rounded-full' : 'rounded-lg';
     const disabledStyles = 'opacity-50 cursor-not-allowed';
 

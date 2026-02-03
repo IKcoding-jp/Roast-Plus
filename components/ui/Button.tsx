@@ -89,8 +89,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-gray-600 text-white hover:bg-gray-700',
       danger: 'bg-red-600 text-white hover:bg-red-700',
       success: 'bg-green-600 text-white hover:bg-green-700',
-      outline: 'border-2 border-amber-200 text-amber-700 bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200',
-      ghost: 'text-amber-600 hover:text-amber-700 hover:bg-amber-50',
+      outline: 'border-2 border-amber-500 text-amber-600 bg-transparent hover:bg-amber-50',
+      ghost: 'text-amber-600 hover:text-amber-700',
       coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b]',
     };
 
@@ -100,8 +100,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-[#3a3a3a] text-[#f8f1e7] hover:bg-[#4a4a4a]',
       danger: 'bg-red-800 text-white hover:bg-red-900',
       success: 'bg-green-800 text-white hover:bg-green-900',
-      outline: 'border-2 border-[#d4af37]/60 text-[#d4af37] bg-[#d4af37]/10 hover:bg-[#d4af37]/20',
-      ghost: 'text-[#d4af37] hover:text-[#e8c65f] hover:bg-[#d4af37]/10',
+      outline: 'border-2 border-[#d4af37] text-[#d4af37] bg-transparent hover:bg-[#d4af37]/10',
+      ghost: 'text-[#d4af37] hover:text-[#e8c65f]',
       coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b] border border-[#d4af37]/30',
     };
 

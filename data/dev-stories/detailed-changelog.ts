@@ -22,10 +22,11 @@ export const DETAILED_CHANGELOG: ChangelogEntry[] = [
     content: `
 - 開発者モード時にUIコンポーネントカタログへのリンク追加 [Issue #125]
 - NotificationCard・VersionCardをUI Cardに統一
+- 担当表ページの共通UI化とテーマ対応
     `.trim(),
     tags: [],
     createdAt: '2026-02-03T09:58:53.922Z',
-    updatedAt: '2026-02-03T10:29:34.968Z',
+    updatedAt: '2026-02-03T10:52:23.082Z',
   },
   {
     id: 'v0.10.2',

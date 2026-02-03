@@ -9,6 +9,8 @@ import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
 import { useToastContext } from '@/components/Toast';
+import { ToggleSwitch } from '@/components/settings/ToggleSwitch';
+import { PasswordModal } from '@/components/settings/PasswordModal';
 import { HiArrowLeft, HiDocumentText, HiShieldCheck, HiLogout, HiMail } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
@@ -25,8 +27,6 @@ export default function SettingsPage() {
     const { showToast } = useToastContext();
     const { version, isUpdateAvailable, isChecking, checkForUpdates, applyUpdate } = useAppVersion();
     const [showPasswordModal, setShowPasswordModal] = useState(false);
-    const [password, setPassword] = useState('');
-    const [passwordError, setPasswordError] = useState<string | null>(null);
     const [userConsent, setUserConsent] = useState<UserConsent | null>(null);
 
     const { isChristmasMode, setChristmasMode } = useChristmasMode();
@@ -60,30 +60,22 @@ export default function SettingsPage() {
         if (checked) {
             // ONにする場合はパスワード入力モーダルを表示
             setShowPasswordModal(true);
-            setPassword('');
-            setPasswordError(null);
         } else {
             // OFFにする場合は即座に無効化
             disableDeveloperMode();
         }
     };
 
-    const handlePasswordSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setPasswordError(null);
-
-        if (enableDeveloperMode(password)) {
+    const handlePasswordSubmit = (password: string): boolean => {
+        const success = enableDeveloperMode(password);
+        if (success) {
             setShowPasswordModal(false);
-            setPassword('');
-        } else {
-            setPasswordError('パスワードが正しくありません');
         }
+        return success;
     };
 
     const handleCancelPassword = () => {
         setShowPasswordModal(false);
-        setPassword('');
-        setPasswordError(null);
     };
 
     const handleLogout = async () => {
@@ -318,79 +310,13 @@ export default function SettingsPage() {
 
                 {/* パスワード入力モーダル */}
                 {showPasswordModal && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                                パスワードを入力
-                            </h3>
-                            <form onSubmit={handlePasswordSubmit}>
-                                <div className="mb-4">
-                                    <label
-                                        htmlFor="password"
-                                        className="block text-sm font-medium text-gray-700 mb-2"
-                                    >
-                                        パスワード
-                                    </label>
-                                    <input
-                                        type="password"
-                                        id="password"
-                                        value={password}
-                                        onChange={(e) => {
-                                            setPassword(e.target.value);
-                                            setPasswordError(null);
-                                        }}
-                                        className={`w-full px-4 py-2 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 ${passwordError ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                        placeholder="パスワードを入力"
-                                        autoFocus
-                                    />
-                                    {passwordError && (
-                                        <p className="mt-2 text-sm text-red-600">{passwordError}</p>
-                                    )}
-                                </div>
-                                <div className="flex gap-3 justify-end">
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="md"
-                                        onClick={handleCancelPassword}
-                                    >
-                                        キャンセル
-                                    </Button>
-                                    <Button type="submit" variant="primary" size="md">
-                                        確定
-                                    </Button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                    <PasswordModal
+                        onSubmit={handlePasswordSubmit}
+                        onCancel={handleCancelPassword}
+                    />
                 )}
 
             </div>
         </div>
-    );
-}
-
-// トグルスイッチコンポーネント
-interface ToggleSwitchProps {
-    checked: boolean;
-    onChange: (checked: boolean) => void;
-}
-
-function ToggleSwitch({ checked, onChange }: ToggleSwitchProps) {
-    return (
-        <button
-            type="button"
-            role="switch"
-            aria-checked={checked}
-            onClick={() => onChange(!checked)}
-            className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${checked ? 'bg-orange-500' : 'bg-gray-300'
-                }`}
-        >
-            <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${checked ? 'translate-x-7' : 'translate-x-1'
-                    }`}
-            />
-        </button>
     );
 }

@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { HiArrowLeft, HiMail, HiCheckCircle, HiExclamationCircle } from 'react-icons/hi';
+import { HiArrowLeft, HiMail, HiExclamationCircle } from 'react-icons/hi';
+import { ContactSuccessScreen } from '@/components/contact/ContactSuccessScreen';
+import { ContactFormFields } from '@/components/contact/ContactFormFields';
 import {
   sendContactEmail,
   isEmailJSConfigured,
-  CONTACT_TYPES,
   ContactFormData,
 } from '@/lib/emailjs';
 
@@ -91,31 +92,7 @@ export default function ContactPage() {
   };
 
   if (status === 'success') {
-    return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="mb-6">
-              <HiCheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
-              送信完了
-            </h1>
-            <p className="text-gray-600 mb-6">
-              お問い合わせありがとうございます。<br />
-              内容を確認のうえ、ご返信いたします。
-            </p>
-            <Link
-              href="/settings"
-              className="inline-flex items-center px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
-            >
-              <HiArrowLeft className="h-5 w-5 mr-2" />
-              設定に戻る
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    return <ContactSuccessScreen />;
   }
 
   return (
@@ -163,87 +140,11 @@ export default function ContactPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* お名前 */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  お名前
-                  <span className="text-gray-400 text-xs ml-2">（任意）</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="山田 太郎"
-                />
-              </div>
-
-              {/* メールアドレス */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  メールアドレス
-                  <span className="text-red-500 text-xs ml-2">（必須）</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    validationErrors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="example@email.com"
-                />
-                {validationErrors.email && (
-                  <p className="mt-2 text-sm text-red-600">{validationErrors.email}</p>
-                )}
-              </div>
-
-              {/* お問い合わせ種別 */}
-              <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                  お問い合わせ種別
-                  <span className="text-red-500 text-xs ml-2">（必須）</span>
-                </label>
-                <select
-                  id="type"
-                  name="type"
-                  value={formData.type}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-                >
-                  {CONTACT_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* お問い合わせ内容 */}
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  お問い合わせ内容
-                  <span className="text-red-500 text-xs ml-2">（必須）</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  rows={6}
-                  className={`w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none ${
-                    validationErrors.message ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="お問い合わせ内容をご記入ください"
-                />
-                {validationErrors.message && (
-                  <p className="mt-2 text-sm text-red-600">{validationErrors.message}</p>
-                )}
-              </div>
+              <ContactFormFields
+                formData={formData}
+                validationErrors={validationErrors}
+                onInputChange={handleInputChange}
+              />
 
               {/* 送信ボタン */}
               <div className="pt-4">

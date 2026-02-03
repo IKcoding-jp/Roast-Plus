@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft, HiSearch, HiPlus, HiCheckCircle, HiXCircle, HiCollection, HiOutlineCollection } from 'react-icons/hi';
+import { HiArrowLeft, HiPlus } from 'react-icons/hi';
 import { RiBookFill } from 'react-icons/ri';
-import { MdCompareArrows, MdSort, MdArrowUpward, MdArrowDownward } from 'react-icons/md';
+import { MdCompareArrows } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import { useDefectBeans } from '@/hooks/useDefectBeans';
 import { useDefectBeanSettings } from '@/hooks/useDefectBeanSettings';
@@ -15,6 +15,9 @@ import { DefectBeanCard } from '@/components/DefectBeanCard';
 import { DefectBeanForm } from '@/components/DefectBeanForm';
 import { DefectBeanCompare } from '@/components/DefectBeanCompare';
 import { Loading } from '@/components/Loading';
+import { SearchFilterSection } from '@/components/defect-beans/SearchFilterSection';
+import { SortMenu } from '@/components/defect-beans/SortMenu';
+import { EmptyState } from '@/components/defect-beans/EmptyState';
 import type { DefectBean } from '@/types';
 
 type FilterOption = 'all' | 'shouldRemove' | 'shouldNotRemove';
@@ -35,7 +38,6 @@ export default function DefectBeansPage() {
   const [compareMode, setCompareMode] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [showSortMenu, setShowSortMenu] = useState(false);
-  const sortMenuRef = useRef<HTMLDivElement>(null);
 
   // フィルタリングと検索（Hooksは早期リターンの前に呼び出す必要がある）
   const filteredDefectBeans = useMemo(() => {
@@ -99,23 +101,6 @@ export default function DefectBeansPage() {
 
     return filtered;
   }, [allDefectBeans, searchQuery, filterOption, settings, sortOption]);
-
-  // メニュー外クリックで閉じる処理
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
-        setShowSortMenu(false);
-      }
-    };
-
-    if (showSortMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showSortMenu]);
 
   // 2つ選択されたら自動的に比較を表示
   useEffect(() => {
@@ -240,33 +225,6 @@ export default function DefectBeansPage() {
     selectedIds.has(bean.id)
   );
 
-  // ソートアイコンの取得
-  const getSortIcon = () => {
-    if (sortOption === 'default') {
-      return <MdSort className="h-5 w-5" />;
-    } else if (sortOption === 'createdAtAsc' || sortOption === 'nameAsc') {
-      return <MdArrowUpward className="h-5 w-5" />;
-    } else {
-      return <MdArrowDownward className="h-5 w-5" />;
-    }
-  };
-
-  // ソートオプションのラベル
-  const getSortLabel = (option: SortOption) => {
-    switch (option) {
-      case 'default':
-        return 'デフォルト';
-      case 'createdAtDesc':
-        return '新しい順';
-      case 'createdAtAsc':
-        return '古い順';
-      case 'nameAsc':
-        return '名前昇順';
-      case 'nameDesc':
-        return '名前降順';
-    }
-  };
-
   return (
     <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
       <div className="max-w-7xl mx-auto">
@@ -300,44 +258,13 @@ export default function DefectBeansPage() {
                 <>
                   {/* ソートボタン */}
                   {!compareMode && (
-                    <div className="relative" ref={sortMenuRef}>
-                      <button
-                        onClick={() => setShowSortMenu(!showSortMenu)}
-                        className={`px-3 py-2 text-sm rounded-lg transition-colors min-h-[44px] flex items-center gap-1.5 ${showSortMenu
-                          ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-md'
-                          : 'bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50'
-                          }`}
-                        title="ソート"
-                      >
-                        {getSortIcon()}
-                        <span className="text-xs sm:text-sm">ソート</span>
-                      </button>
-                      {/* ドロップダウンメニュー */}
-                      {showSortMenu && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                          <div className="py-1">
-                            {(['default', 'createdAtDesc', 'createdAtAsc', 'nameAsc', 'nameDesc'] as SortOption[]).map((option) => (
-                              <button
-                                key={option}
-                                onClick={() => {
-                                  setSortOption(option);
-                                  setShowSortMenu(false);
-                                }}
-                                className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${sortOption === option
-                                  ? 'bg-amber-50 text-amber-700 font-medium'
-                                  : 'text-gray-700 hover:bg-gray-50'
-                                  }`}
-                              >
-                                {sortOption === option && (
-                                  <HiCheckCircle className="h-4 w-4 text-amber-600" />
-                                )}
-                                <span>{getSortLabel(option)}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <SortMenu
+                      sortOption={sortOption}
+                      onSortChange={setSortOption}
+                      showSortMenu={showSortMenu}
+                      onToggleMenu={() => setShowSortMenu(!showSortMenu)}
+                      onClose={() => setShowSortMenu(false)}
+                    />
                   )}
                   <button
                     onClick={toggleCompareMode}
@@ -379,104 +306,20 @@ export default function DefectBeansPage() {
 
         {/* 検索とフィルタ */}
         {allDefectBeans.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              {/* 検索 */}
-              <div className="flex-1">
-                <div className="relative">
-                  <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="名称や特徴で検索..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent min-h-[40px] text-sm text-gray-900 bg-white placeholder:text-gray-400"
-                  />
-                </div>
-              </div>
-
-              {/* フィルタ */}
-              <div className="flex gap-1.5">
-                <button
-                  onClick={() => setFilterOption('all')}
-                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${filterOption === 'all'
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  title="全て表示"
-                >
-                  <HiCollection className="h-4 w-4" />
-                  <span className="text-xs sm:text-sm">全て</span>
-                </button>
-                <button
-                  onClick={() => setFilterOption('shouldRemove')}
-                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${filterOption === 'shouldRemove'
-                    ? 'bg-red-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  title="省く設定のもの"
-                >
-                  <HiXCircle className="h-4 w-4" />
-                  <span className="text-xs sm:text-sm">省く</span>
-                </button>
-                <button
-                  onClick={() => setFilterOption('shouldNotRemove')}
-                  className={`px-3 py-1.5 rounded-lg transition-colors min-h-[36px] flex items-center gap-1.5 text-sm ${filterOption === 'shouldNotRemove'
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  title="省かない設定のもの"
-                >
-                  <HiCheckCircle className="h-4 w-4" />
-                  <span className="text-xs sm:text-sm">省かない</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <SearchFilterSection
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            filterOption={filterOption}
+            onFilterChange={setFilterOption}
+          />
         )}
 
         {/* グリッド表示 */}
         {filteredDefectBeans.length === 0 ? (
-          <div className="py-12 sm:py-16 text-center">
-            <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
-              {/* アイコン */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-amber-100 rounded-full blur-xl opacity-50"></div>
-                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-amber-50 flex items-center justify-center">
-                  {searchQuery || filterOption !== 'all' ? (
-                    <HiSearch className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
-                  ) : (
-                    <HiOutlineCollection className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
-                  )}
-                </div>
-              </div>
-
-              {/* メッセージ */}
-              <div className="space-y-2">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                  {searchQuery || filterOption !== 'all'
-                    ? '検索条件に一致する欠点豆がありません'
-                    : '欠点豆が登録されていません'}
-                </h3>
-                <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto">
-                  {searchQuery || filterOption !== 'all'
-                    ? '別のキーワードで検索するか、フィルタを変更してみてください。'
-                    : '最初の欠点豆を追加して、図鑑を始めましょう。'}
-                </p>
-              </div>
-
-              {/* アクションボタン（登録がない場合のみ表示） */}
-              {!searchQuery && filterOption === 'all' && (
-                <button
-                  onClick={() => setShowAddForm(true)}
-                  className="mt-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all min-h-[44px]"
-                >
-                  <HiPlus className="w-5 h-5" />
-                  <span className="font-medium">欠点豆を追加</span>
-                </button>
-              )}
-            </div>
-          </div>
+          <EmptyState
+            hasSearchOrFilter={!!(searchQuery || filterOption !== 'all')}
+            onAddClick={() => setShowAddForm(true)}
+          />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {filteredDefectBeans.map((defectBean) => {

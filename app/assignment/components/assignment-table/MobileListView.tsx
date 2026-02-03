@@ -60,7 +60,7 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
                 return (
                     <div key={label.id} className={`rounded-xl shadow-sm p-4 flex flex-col gap-3 ${
                         isChristmasMode
-                            ? 'bg-[#1a1a1a] border border-[#d4af37]/30'
+                            ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
                             : 'bg-white border border-gray-100'
                     }`}>
                         {/* Header: Label Names */}
@@ -134,7 +134,9 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
 
                         {/* Teams Grid */}
                         {teams.length === 0 ? (
-                            <div className="text-center py-4 bg-gray-50 rounded-lg text-sm text-gray-400">
+                            <div className={`text-center py-4 rounded-lg text-sm ${
+                                isChristmasMode ? 'bg-white/5 text-[#f8f1e7]/50' : 'bg-gray-50 text-gray-400'
+                            }`}>
                                 班を作成してください
                             </div>
                         ) : (
@@ -146,7 +148,9 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
 
                                     return (
                                         <div key={team.id} className="flex flex-col gap-1">
-                                            <div className="text-[10px] text-gray-400 font-bold px-1">{formatTeamTitle(team.name)}</div>
+                                            <div className={`text-[10px] font-bold px-1 ${
+                                                isChristmasMode ? 'text-[#d4af37]/70' : 'text-gray-400'
+                                            }`}>{formatTeamTitle(team.name)}</div>
                                             <button
                                                 onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                                 onMouseUp={handleCellTouchEnd}
@@ -158,13 +162,21 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
                                                 onClick={() => handleCellClick(team.id, label.id)}
                                                 className={`
                                                     w-full py-3 px-2 rounded-lg text-sm font-bold text-center transition-all truncate select-none
-                                                    ${member
-                                                        ? isSelected
-                                                            ? 'bg-primary text-white shadow-md scale-105'
-                                                            : 'text-gray-800 bg-gray-50 border border-gray-200 shadow-sm'
-                                                        : isSelected
-                                                            ? 'bg-primary/20 text-primary border border-primary'
-                                                            : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300'}
+                                                    ${isChristmasMode
+                                                        ? member
+                                                            ? isSelected
+                                                                ? 'bg-[#d4af37] text-[#051a0e] shadow-md scale-105'
+                                                                : 'text-[#f8f1e7] bg-white/10 border border-[#d4af37]/30 shadow-sm'
+                                                            : isSelected
+                                                                ? 'bg-[#d4af37]/30 text-[#d4af37] border border-[#d4af37]'
+                                                                : 'text-[#f8f1e7]/50 bg-white/5 border border-dashed border-[#d4af37]/30'
+                                                        : member
+                                                            ? isSelected
+                                                                ? 'bg-primary text-white shadow-md scale-105'
+                                                                : 'text-gray-800 bg-gray-50 border border-gray-200 shadow-sm'
+                                                            : isSelected
+                                                                ? 'bg-primary/20 text-primary border border-primary'
+                                                                : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300'}
                                                 `}
                                             >
                                                 {member ? member.name : '未割当'}

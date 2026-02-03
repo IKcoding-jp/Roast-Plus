@@ -60,6 +60,36 @@ Chrome DevTools MCPでスクショ確認しながらUI改善
 - 型定義: interface優先、ユニオン型はtype
 - 詳細は `docs/coding-standards.md` 参照
 
+## UI Component Rules（重要）
+
+**UI作成・編集時は必ず `@/components/ui` の共通コンポーネントを使用すること。**
+
+### 共通コンポーネント一覧
+```tsx
+import {
+  Button, IconButton,           // ボタン系
+  Input, NumberInput, InlineInput, Textarea, Select, Checkbox, Switch,  // フォーム系
+  Card, Modal, Dialog,          // コンテナ系
+  Badge, Tabs, Accordion, ProgressBar, EmptyState  // その他
+} from '@/components/ui';
+```
+
+### ルール
+1. **生のTailwindでボタン/カード/入力を作らない** → 共通コンポーネントを使用
+2. **クリスマスモード対応** → `isChristmasMode` propを渡す
+3. **配色** → `.claude/skills/roastplus-ui/references/color-schemes.md` 参照
+4. **既存で対応不可の場合** → `components/ui/` に新規共通コンポーネントを作成
+5. **共通コンポーネントの重複禁止** → 作成前に既存コンポーネントを必ず確認
+
+### クリスマスモード対応例
+```tsx
+const { isChristmasMode } = useChristmasMode();
+
+<Button variant="primary" isChristmasMode={isChristmasMode}>保存</Button>
+<Card variant="table" isChristmasMode={isChristmasMode}>...</Card>
+<Input label="名前" isChristmasMode={isChristmasMode} />
+```
+
 ## Testing
 - **推奨**: Vitest
 - テストファイル: `*.test.ts`, `*.test.tsx`

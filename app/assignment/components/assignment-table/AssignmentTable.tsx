@@ -6,6 +6,7 @@ import { useTableEditing } from './useTableEditing';
 import { DesktopTableView } from './DesktopTableView';
 import { MobileListView } from './MobileListView';
 import { TableModals } from './TableModals';
+import { Card } from '@/components/ui';
 
 export const AssignmentTable: React.FC<Props> = (props) => {
     const {
@@ -56,33 +57,49 @@ export const AssignmentTable: React.FC<Props> = (props) => {
         <div className="w-full max-w-full flex flex-col items-center gap-6">
             {/* データがない場合の初期ガイドメッセージ */}
             {teams.length === 0 && taskLabels.length === 0 && (
-                <div className="w-full max-w-md bg-white rounded-xl shadow-sm border border-orange-100 p-6 text-center">
+                <Card variant="guide" isChristmasMode={isChristmasMode} className="w-full max-w-md">
                     <div className="flex justify-center mb-4">
-                        <div className="p-3 bg-orange-50 rounded-full text-primary">
+                        <div className={`p-3 rounded-full ${
+                            isChristmasMode ? 'bg-[#d4af37]/20 text-[#d4af37]' : 'bg-orange-50 text-primary'
+                        }`}>
                             <MdInfoOutline size={32} />
                         </div>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-2">担当表をはじめましょう</h3>
-                    <p className="text-gray-600 text-sm mb-6">
+                    <h3 className={`text-lg font-bold mb-2 ${
+                        isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
+                    }`}>担当表をはじめましょう</h3>
+                    <p className={`text-sm mb-6 ${
+                        isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
+                    }`}>
                         まずは「班」と「作業」を追加して、<br />
                         日々の役割分担を管理する表を作成しましょう。
                     </p>
 
-                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-500">
-                        <div className="flex flex-col items-center gap-2 p-2 bg-gray-50 rounded border border-primary/20">
-                            <span className="font-bold text-primary">STEP 1</span>
+                    <div className={`grid grid-cols-3 gap-2 text-xs ${
+                        isChristmasMode ? 'text-[#f8f1e7]/60' : 'text-gray-500'
+                    }`}>
+                        <div className={`flex flex-col items-center gap-2 p-2 rounded border ${
+                            isChristmasMode
+                                ? 'bg-[#d4af37]/10 border-[#d4af37]/30'
+                                : 'bg-gray-50 border-primary/20'
+                        }`}>
+                            <span className={`font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-primary'}`}>STEP 1</span>
                             <span>班を追加</span>
                         </div>
-                        <div className="flex flex-col items-center gap-2 p-2 bg-gray-50 rounded">
+                        <div className={`flex flex-col items-center gap-2 p-2 rounded ${
+                            isChristmasMode ? 'bg-white/5' : 'bg-gray-50'
+                        }`}>
                             <span className="font-bold">STEP 2</span>
                             <span>作業を追加</span>
                         </div>
-                        <div className="flex flex-col items-center gap-2 p-2 bg-gray-50 rounded">
+                        <div className={`flex flex-col items-center gap-2 p-2 rounded ${
+                            isChristmasMode ? 'bg-white/5' : 'bg-gray-50'
+                        }`}>
                             <span className="font-bold">STEP 3</span>
                             <span>割当開始</span>
                         </div>
                     </div>
-                </div>
+                </Card>
             )}
 
             <DesktopTableView

@@ -60,9 +60,13 @@ export default function AssignmentPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#F7F7F5] flex flex-col">
+        <div className={`min-h-screen flex flex-col ${
+            isChristmasMode ? 'bg-[#051a0e]' : 'bg-[#F7F7F5]'
+        }`}>
             {/* ヘッダー */}
-            <header className="bg-white shadow-sm sticky top-0 z-30 flex-shrink-0">
+            <header className={`shadow-sm sticky top-0 z-30 flex-shrink-0 ${
+                isChristmasMode ? 'bg-[#0a2a14] border-b border-[#d4af37]/30' : 'bg-white'
+            }`}>
                 <div className="w-full px-4 h-16 relative flex items-center justify-center">
                     {/* 左側: 戻るボタン */}
                     <div className="absolute left-4 flex items-center z-10">
@@ -70,7 +74,12 @@ export default function AssignmentPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => router.back()}
-                            className="!text-gray-600 hover:!text-gray-900 !p-2 -ml-2"
+                            isChristmasMode={isChristmasMode}
+                            className={`!p-2 -ml-2 ${
+                                isChristmasMode
+                                    ? '!text-[#d4af37] hover:!text-[#e8c65f]'
+                                    : '!text-gray-600 hover:!text-gray-900'
+                            }`}
                         >
                             <IoArrowBack size={24} />
                         </Button>
@@ -79,8 +88,12 @@ export default function AssignmentPage() {
                     {/* 中央: 見出し */}
                     <div className="flex items-center justify-center z-0">
                         <div className="flex items-center gap-2">
-                            <FaUsers className="text-primary w-6 h-6 md:w-7 md:h-7" />
-                            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+                            <FaUsers className={`w-6 h-6 md:w-7 md:h-7 ${
+                                isChristmasMode ? 'text-[#d4af37]' : 'text-primary'
+                            }`} />
+                            <h1 className={`text-xl md:text-2xl font-bold ${
+                                isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
+                            }`}>
                                 担当表
                             </h1>
                         </div>
@@ -93,7 +106,12 @@ export default function AssignmentPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setIsPairExclusionModalOpen(true)}
-                                className="!rounded-full !px-3 !py-2 shadow-md !bg-white !text-gray-700 hover:!bg-gray-100 !border !border-gray-300"
+                                isChristmasMode={isChristmasMode}
+                                className={`!rounded-full !px-3 !py-2 shadow-md ${
+                                    isChristmasMode
+                                        ? '!bg-transparent !text-[#d4af37] hover:!bg-white/10 !border !border-[#d4af37]/50'
+                                        : '!bg-white !text-gray-700 hover:!bg-gray-100 !border !border-gray-300'
+                                }`}
                                 title="ペア除外設定"
                             >
                                 <HiCog className="w-5 h-5" />

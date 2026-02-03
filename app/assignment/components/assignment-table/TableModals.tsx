@@ -109,7 +109,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             className={`rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden ${
-                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
                             }`}
                         >
                             <div className={`px-4 py-3 flex items-center justify-between ${
@@ -232,7 +232,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                         initial={{ height: 0, opacity: 0 }}
                                                         animate={{ height: 'auto', opacity: 1 }}
                                                         exit={{ height: 0, opacity: 0 }}
-                                                        className={`overflow-hidden ${isChristmasMode ? 'bg-[#1a1a1a]' : 'bg-white'}`}
+                                                        className={`overflow-hidden ${isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white'}`}
                                                     >
                                                         <div className={`p-2 ${isChristmasMode ? 'border-t border-[#d4af37]/20' : 'border-t border-gray-200'}`}>
                                                             <div className={`text-xs mb-2 px-1 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
@@ -324,7 +324,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             className={`rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10 ${
-                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
                             }`}
                         >
                             <div className="flex justify-between items-center mb-4">
@@ -427,7 +427,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             className={`rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10 ${
-                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
                             }`}
                         >
                             <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
@@ -510,7 +510,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
                             className={`rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 ${
-                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
                             }`}
                         >
                             <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
@@ -575,7 +575,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
                             className={`rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 ${
-                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
                             }`}
                         >
                             <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>

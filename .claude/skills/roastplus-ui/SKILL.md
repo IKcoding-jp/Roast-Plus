@@ -63,30 +63,59 @@ export default function YourPage() {
 
 詳細は `references/color-schemes.md` を参照。
 
-## コアコンポーネント例
+## 共通コンポーネント（必須）
 
-### プライマリボタン
+**⚠️ UI作成時は必ず `@/components/ui` の共通コンポーネントを使用すること。生のTailwindでボタンやカードを作成しない。**
+
+### ルール
+1. **既存コンポーネントを優先使用** → 作成前に必ず確認
+2. **既存で対応不可の場合** → `components/ui/` に新規共通コンポーネントを作成
+3. **共通コンポーネントの重複禁止** → 類似機能のコンポーネントを作らない
+
+### インポート
 ```tsx
-<button className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px]">
-  アクション
-</button>
+import {
+  Button, IconButton,           // ボタン系
+  Input, NumberInput, InlineInput, Textarea, Select, Checkbox, Switch,  // フォーム系
+  Card, Modal, Dialog,          // コンテナ系
+  Badge, Tabs, Accordion, ProgressBar, EmptyState  // その他
+} from '@/components/ui';
 ```
 
-### 入力フィールド
+### 使用例
+
 ```tsx
-<input
-  type="text"
-  className="w-full rounded-lg border-2 border-gray-200 px-4 py-3.5 text-lg bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
-  placeholder="入力"
-/>
+// ❌ NG: 生のTailwindでボタンを作成
+<button className="px-6 py-3 bg-amber-600 text-white rounded-lg">保存</button>
+
+// ✅ OK: 共通コンポーネントを使用
+<Button variant="primary" isChristmasMode={isChristmasMode}>保存</Button>
 ```
 
-### カード
 ```tsx
-<div className="bg-white rounded-2xl shadow-md p-5 hover:shadow-lg hover:-translate-y-1 transition-all">
-  <h3 className="text-lg font-bold text-gray-800 mb-2">タイトル</h3>
-  <p className="text-gray-600">説明</p>
-</div>
+// ❌ NG: 生のTailwindでカードを作成
+<div className="bg-white rounded-2xl shadow-md p-5">...</div>
+
+// ✅ OK: 共通コンポーネントを使用
+<Card variant="hoverable" isChristmasMode={isChristmasMode}>...</Card>
+```
+
+```tsx
+// ❌ NG: 生のTailwindで入力を作成
+<input className="w-full rounded-lg border-2 border-gray-200 px-4 py-3.5" />
+
+// ✅ OK: 共通コンポーネントを使用
+<Input label="名前" placeholder="入力" isChristmasMode={isChristmasMode} />
+```
+
+### クリスマスモード対応
+すべての共通コンポーネントは `isChristmasMode` propをサポート：
+```tsx
+const { isChristmasMode } = useChristmasMode();
+
+<Button isChristmasMode={isChristmasMode}>...</Button>
+<Card isChristmasMode={isChristmasMode}>...</Card>
+<Input isChristmasMode={isChristmasMode} />
 ```
 
 ## リファレンスドキュメント

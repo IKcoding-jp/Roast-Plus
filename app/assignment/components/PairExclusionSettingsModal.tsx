@@ -106,7 +106,7 @@ export function PairExclusionSettingsModal({
         >
             <div
                 className={`rounded-lg p-6 max-w-md w-full mx-4 shadow-xl max-h-[80vh] flex flex-col ${
-                    isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                    isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
                 }`}
                 onClick={(e) => e.stopPropagation()}
             >

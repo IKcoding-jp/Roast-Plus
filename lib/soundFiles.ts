@@ -9,8 +9,6 @@ export interface SoundFile {
   label: string;
 }
 
-export const alarmSoundFiles: SoundFile[] = [];
-
 export const roastTimerSoundFiles: SoundFile[] = [
   {
     "value": "/sounds/roasttimer/alarm1.mp3",

@@ -4,7 +4,7 @@ interface UseRunnerTimerProps {
     isRunning: boolean;
     isManualMode: boolean;
     totalDurationSec: number;
-    onTick: (time: number) => void;
+    onTick: (updater: (prev: number) => number) => void;
     onComplete: () => void;
 }
 

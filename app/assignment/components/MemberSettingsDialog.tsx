@@ -32,7 +32,7 @@ export const MemberSettingsDialog: React.FC<Props> = ({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
             <div className={`rounded-xl shadow-2xl w-full max-w-md overflow-hidden ${
-                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
             }`}>
                 <div className={`px-6 py-4 flex justify-between items-center ${
                     isChristmasMode ? 'bg-[#6d1a1a]' : 'bg-primary'

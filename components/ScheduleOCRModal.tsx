@@ -201,9 +201,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
           <div className="flex gap-2">
             <button
               onClick={() => {
-                setError(null);
-                setCurrentFile(null);
-                setImagePreview(null);
+                resetState();
                 setShowCamera(false);
               }}
               className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors min-h-[44px]"
@@ -212,8 +210,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
             </button>
             <button
               onClick={() => {
-                setCurrentFile(null);
-                setImagePreview(null);
+                resetState();
                 onCancel();
               }}
               className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors min-h-[44px]"

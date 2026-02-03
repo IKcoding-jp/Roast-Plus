@@ -117,8 +117,8 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           type="checkbox"
           className="sr-only"
           checked={checked}
+          onChange={props.onChange || (() => {})}
           disabled={disabled}
-          {...props}
         />
         {label && (
           <label

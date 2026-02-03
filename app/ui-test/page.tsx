@@ -273,7 +273,8 @@ export default function UITestPage() {
             <NumberInput
               label="エラー表示テスト"
               suffix="px"
-              defaultValue={0}
+              value={0}
+              onChange={() => {}}
               error="0以上の値を入力してください"
               isChristmasMode={isChristmasMode}
             />

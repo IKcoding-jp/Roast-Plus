@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button, Input, Select, Textarea, Card } from '@/components/ui';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
+import { HiArrowLeft } from 'react-icons/hi';
 
 export default function UITestPage() {
   const { isChristmasMode, toggleChristmasMode } = useChristmasMode();
@@ -23,9 +25,23 @@ export default function UITestPage() {
     >
       <div className="max-w-2xl mx-auto space-y-6">
         <header className="flex items-center justify-between mb-8">
-          <h1 className={`text-2xl font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-gray-800'}`}>
-            UIコンポーネントテスト
-          </h1>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/settings"
+              className={`flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg transition-colors ${
+                isChristmasMode
+                  ? 'text-[#d4af37] hover:bg-white/10'
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+              }`}
+              title="設定に戻る"
+              aria-label="設定に戻る"
+            >
+              <HiArrowLeft className="h-6 w-6" />
+            </Link>
+            <h1 className={`text-2xl font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-gray-800'}`}>
+              UIコンポーネントテスト
+            </h1>
+          </div>
           <Button
             variant="outline"
             size="sm"

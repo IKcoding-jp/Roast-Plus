@@ -5,7 +5,7 @@ import Script from "next/script";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { ToastProvider } from "@/components/Toast";
-import { SplashScreen } from "@/components/SplashScreen";
+import { SplashScreenWrapper } from "@/components/SplashScreenWrapper";
 
 import { Zen_Old_Mincho, Inter, Roboto_Mono, Oswald, Orbitron, Noto_Sans_JP } from "next/font/google";
 
@@ -87,7 +87,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
         <ServiceWorkerRegistration />
-        <SplashScreen />
+        <SplashScreenWrapper />
         <ToastProvider>
           {children}
         </ToastProvider>

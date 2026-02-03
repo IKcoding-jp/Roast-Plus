@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.11.0',
+    date: '2026-02-03',
+    summary: '開発者モード時にUIコンポーネントカタログへのリンク追加 [Issue #125]',
+  },
+  {
     version: '0.10.2',
     date: '2026-02-01',
     summary: 'SplashScreenのHydrationミスマッチエラーを解消 など 9件の更新',

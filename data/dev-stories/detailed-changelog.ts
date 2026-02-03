@@ -14,6 +14,19 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.11.0',
+    version: '0.11.0',
+    date: '2026-02-03',
+    type: 'feature',
+    title: '開発者モード時にUIコンポーネントカタログへのリンク追加 [Issue #125]',
+    content: `
+- 開発者モード時にUIコンポーネントカタログへのリンク追加 [Issue #125]
+    `.trim(),
+    tags: [],
+    createdAt: '2026-02-03T09:58:53.922Z',
+    updatedAt: '2026-02-03T09:58:53.922Z',
+  },
+  {
     id: 'v0.10.2',
     version: '0.10.2',
     date: '2026-02-01',

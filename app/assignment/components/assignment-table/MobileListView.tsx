@@ -2,6 +2,7 @@ import React from 'react';
 import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { MdDelete, MdCheck } from 'react-icons/md';
 import { DEFAULT_TABLE_SETTINGS } from './types';
+import { Button, Input } from '@/components/ui';
 
 type MobileListViewProps = {
     teams: Team[];
@@ -22,6 +23,7 @@ type MobileListViewProps = {
     handleCellTouchEnd: () => void;
     handleCellTouchMove: (e: React.TouchEvent | React.MouseEvent) => void;
     handleCellClick: (teamId: string, taskLabelId: string) => void;
+    isChristmasMode?: boolean;
 };
 
 export const MobileListView: React.FC<MobileListViewProps> = ({
@@ -43,6 +45,7 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
     handleCellTouchEnd,
     handleCellTouchMove,
     handleCellClick,
+    isChristmasMode = false,
 }) => {
     const headerLabels = tableSettings?.headerLabels ?? DEFAULT_TABLE_SETTINGS.headerLabels;
     const formatTeamTitle = (teamName?: string) => {
@@ -55,49 +58,71 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
                 const isEditing = editingLabelId === label.id;
 
                 return (
-                    <div key={label.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-3">
+                    <div key={label.id} className={`rounded-xl shadow-sm p-4 flex flex-col gap-3 ${
+                        isChristmasMode
+                            ? 'bg-[#1a1a1a] border border-[#d4af37]/30'
+                            : 'bg-white border border-gray-100'
+                    }`}>
                         {/* Header: Label Names */}
-                        <div className="flex justify-between items-start border-b border-gray-50 pb-2 min-h-[40px]">
+                        <div className={`flex justify-between items-start pb-2 min-h-[40px] ${
+                            isChristmasMode ? 'border-b border-[#d4af37]/20' : 'border-b border-gray-50'
+                        }`}>
                             {isEditing ? (
                                 <div className="flex flex-col gap-2 w-full">
-                                    <input
-                                        className="w-full p-2 border rounded bg-white text-lg font-bold text-gray-800"
+                                    <Input
                                         value={editLeftLabel}
                                         onChange={e => setEditLeftLabel(e.target.value)}
                                         placeholder={headerLabels.left}
+                                        isChristmasMode={isChristmasMode}
+                                        className="!p-2 !text-lg !font-bold !min-h-0"
                                     />
                                     <div className="flex gap-2">
-                                        <input
-                                            className="flex-1 p-2 border rounded bg-white text-sm text-gray-600"
+                                        <Input
                                             value={editRightLabel}
                                             onChange={e => setEditRightLabel(e.target.value)}
                                             placeholder={headerLabels.right}
+                                            isChristmasMode={isChristmasMode}
+                                            className="flex-1 !p-2 !text-sm !min-h-0"
                                         />
-                                        <button
+                                        <Button
+                                            variant="success"
+                                            size="sm"
                                             onClick={() => saveLabel(label.id)}
-                                            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 shrink-0"
+                                            isChristmasMode={isChristmasMode}
+                                            className="!p-2 !min-h-0 shrink-0"
                                         >
                                             <MdCheck size={20} />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
                                             onClick={() => handleDeleteTaskLabel(label.id)}
-                                            className="bg-red-50 text-red-500 p-2 rounded hover:bg-red-100 border border-red-200 shrink-0"
+                                            isChristmasMode={isChristmasMode}
+                                            className="!p-2 !min-h-0 shrink-0"
                                         >
                                             <MdDelete size={20} />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 w-full flex-wrap">
                                     <div
-                                        className="text-sm text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 cursor-pointer font-bold"
+                                        className={`text-sm px-2 py-1 rounded cursor-pointer font-bold ${
+                                            isChristmasMode
+                                                ? 'text-[#f8f1e7] bg-white/10 border border-[#d4af37]/20'
+                                                : 'text-gray-700 bg-gray-50 border border-gray-100'
+                                        }`}
                                         onClick={() => startEditLabel(label)}
                                     >
                                         {label.leftLabel}
                                     </div>
                                     {label.rightLabel && (
                                         <div
-                                            className="text-sm text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 cursor-pointer font-bold"
+                                            className={`text-sm px-2 py-1 rounded cursor-pointer font-bold ${
+                                                isChristmasMode
+                                                    ? 'text-[#f8f1e7] bg-white/10 border border-[#d4af37]/20'
+                                                    : 'text-gray-700 bg-gray-50 border border-gray-100'
+                                            }`}
                                             onClick={() => startEditLabel(label)}
                                         >
                                             {label.rightLabel}

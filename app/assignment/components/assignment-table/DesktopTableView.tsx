@@ -3,6 +3,7 @@ import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { MdAdd } from 'react-icons/md';
 import { PiShuffleBold } from 'react-icons/pi';
 import { DEFAULT_TABLE_SETTINGS, WidthConfig, HeightConfig } from './types';
+import { Button, Input, InlineInput, IconButton } from '@/components/ui';
 
 type DesktopTableViewProps = {
     teams: Team[];
@@ -39,6 +40,7 @@ type DesktopTableViewProps = {
     handleCellClick: (teamId: string, taskLabelId: string) => void;
     onShuffle: () => Promise<void>;
     isShuffleDisabled: boolean;
+    isChristmasMode?: boolean;
 };
 
 export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
@@ -72,6 +74,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
     handleCellClick,
     onShuffle,
     isShuffleDisabled,
+    isChristmasMode = false,
 }) => {
     const headerLabels = tableSettings?.headerLabels ?? DEFAULT_TABLE_SETTINGS.headerLabels;
     const formatTeamTitle = (teamName?: string) => {
@@ -119,11 +122,14 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                 {/* チーム列 */}
                 {teams.length === 0 ? (
-                    <div className="py-2 px-2 border-r border-gray-700 text-center bg-dark flex flex-col items-center justify-center h-full min-h-[44px]">
+                    <div className={`py-2 px-2 border-r text-center flex flex-col items-center justify-center h-full min-h-[44px] ${
+                        isChristmasMode ? 'bg-[#1a1a1a] border-[#d4af37]/30' : 'bg-dark border-gray-700'
+                    }`}>
                         {isAddingTeam ? (
-                            <div className="relative z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32 md:w-40">
-                                <input
-                                    className="w-full px-1 md:p-2 md:text-base text-sm outline-none text-gray-900"
+                            <div className={`relative z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 ${
+                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]' : 'bg-white border border-primary'
+                            }`}>
+                                <InlineInput
                                     placeholder="班名(任意)"
                                     value={newTeamName}
                                     onChange={e => setNewTeamName(e.target.value)}
@@ -132,38 +138,57 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                         if (e.key === 'Enter') handleAddTeam();
                                         if (e.key === 'Escape') setIsAddingTeam(false);
                                     }}
+                                    variant="dark"
+                                    isChristmasMode={isChristmasMode}
+                                    className="!border-none !px-1 md:!p-2 md:!text-base !text-sm"
                                 />
-                                <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1 md:p-2">
+                                <IconButton
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={handleAddTeam}
+                                    isChristmasMode={isChristmasMode}
+                                >
                                     <MdAdd size={20} className="md:w-6 md:h-6" />
-                                </button>
+                                </IconButton>
                             </div>
                         ) : (
-                            <button
+                            <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => setIsAddingTeam(true)}
-                                className="text-primary text-sm md:text-base font-bold flex items-center gap-1 hover:underline py-1 px-3 rounded hover:bg-white/10 border border-primary/20 bg-transparent shadow-sm"
+                                isChristmasMode={isChristmasMode}
+                                className="!text-sm md:!text-base !gap-1 !bg-transparent"
                             >
                                 <MdAdd className="md:w-5 md:h-5" /> 最初の班を追加
-                            </button>
+                            </Button>
                         )}
                     </div>
                 ) : (
                     teams.map(team => (
                         <div
                             key={team.id}
-                            className="py-2 px-2 border-r border-gray-700 text-center relative group bg-dark flex items-center justify-center"
+                            className={`py-2 px-2 border-r text-center relative group flex items-center justify-center ${
+                                isChristmasMode ? 'bg-[#1a1a1a] border-[#d4af37]/30' : 'bg-dark border-gray-700'
+                            }`}
                         >
                             {editingTeamId === team.id ? (
-                                <input
-                                    className="w-full px-1 py-1 text-center border rounded bg-white text-gray-900 text-sm md:text-base"
+                                <InlineInput
                                     value={editTeamName}
                                     onChange={e => setEditTeamName(e.target.value)}
                                     autoFocus
                                     onKeyDown={e => e.key === 'Enter' && handleUpdateTeam(team.id)}
                                     onBlur={() => handleUpdateTeam(team.id)}
+                                    variant="light"
+                                    isChristmasMode={isChristmasMode}
+                                    className="!text-sm md:!text-base"
                                 />
                             ) : (
                                 <div
-                                    className="cursor-pointer hover:bg-gray-800 rounded px-2 py-1 truncate w-full select-none active:bg-gray-700"
+                                    className={`cursor-pointer rounded px-2 py-1 truncate w-full select-none ${
+                                        isChristmasMode
+                                            ? 'text-[#f8f1e7] hover:bg-white/10 active:bg-white/20'
+                                            : 'hover:bg-gray-800 active:bg-gray-700'
+                                    }`}
                                     onClick={() => {
                                         setActiveTeamActionId(team.id);
                                         setActiveTeamName(team.name);
@@ -178,7 +203,11 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                 {/* チーム追加 & 補足ヘッダー */}
                 <div
-                    className="py-2 px-2 sm:px-3 text-center flex items-center justify-between bg-dark relative cursor-pointer hover:bg-gray-800 transition-colors"
+                    className={`py-2 px-2 sm:px-3 text-center flex items-center justify-between relative cursor-pointer transition-colors ${
+                        isChristmasMode
+                            ? 'bg-[#1a1a1a] hover:bg-white/10'
+                            : 'bg-dark hover:bg-gray-800'
+                    }`}
                     onClick={(e) => {
                         if ((e.target as HTMLElement).closest('button, input')) return;
                         setWidthConfig({
@@ -201,9 +230,10 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                             setIsAddingTeam(false);
                                         }}
                                     />
-                                    <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center bg-white shadow-lg rounded border border-primary p-1 w-32 md:w-40">
-                                        <input
-                                            className="w-full px-1 md:p-2 text-sm md:text-base outline-none text-gray-900"
+                                    <div className={`absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 ${
+                                        isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]' : 'bg-white border border-primary'
+                                    }`}>
+                                        <InlineInput
                                             placeholder="班名(任意)"
                                             value={newTeamName}
                                             onChange={e => setNewTeamName(e.target.value)}
@@ -212,24 +242,36 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                                 if (e.key === 'Enter') handleAddTeam();
                                                 if (e.key === 'Escape') setIsAddingTeam(false);
                                             }}
+                                            variant="dark"
+                                            isChristmasMode={isChristmasMode}
+                                            className="!border-none !px-1 md:!p-2 !text-sm md:!text-base"
                                         />
-                                        <button onClick={handleAddTeam} className="text-primary hover:bg-primary/10 rounded p-1 md:p-2">
+                                        <IconButton
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={handleAddTeam}
+                                            isChristmasMode={isChristmasMode}
+                                        >
                                             <MdAdd size={20} className="md:w-6 md:h-6" />
-                                        </button>
+                                        </IconButton>
                                     </div>
                                 </>
                             ) : (
-                                <button
+                                <IconButton
+                                    variant={isChristmasMode ? 'primary' : 'ghost'}
+                                    size="sm"
+                                    rounded
                                     onClick={() => setIsAddingTeam(true)}
-                                    className="p-1 rounded-full bg-gray-700 text-gray-300 hover:bg-primary hover:text-white transition-colors shadow-sm"
+                                    isChristmasMode={isChristmasMode}
+                                    className={isChristmasMode ? '!bg-[#d4af37]/20' : '!bg-gray-700 !text-gray-300 hover:!bg-primary hover:!text-white'}
                                     title="班を追加"
                                 >
                                     <MdAdd size={16} className="md:w-5 md:h-5" />
-                                </button>
+                                </IconButton>
                             )
                         )}
                     </div>
-                    <span>{headerLabels.right}</span>
+                    <span className={isChristmasMode ? 'text-[#f8f1e7]' : ''}>{headerLabels.right}</span>
                     <span className="w-4"></span>
                 </div>
             </div>
@@ -331,46 +373,52 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                     style={{ gridTemplateColumns }}
                 >
                     <div className="pr-2">
-                        <input
-                            className="w-full p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-sm text-gray-800 placeholder-gray-500"
-                            placeholder=""
+                        <Input
                             value={newLeftLabel}
                             onChange={e => setNewLeftLabel(e.target.value)}
                             onKeyDown={e => {
                                 if (e.key === 'Enter') handleAddTaskLabel();
                             }}
+                            isChristmasMode={isChristmasMode}
+                            className="!p-2 !text-sm !min-h-0"
                         />
                     </div>
 
                     {/* シャッフルボタン（中央配置） */}
                     <div className="col-span-full px-2 flex items-center justify-center" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
-                        <button
+                        <Button
+                            variant="primary"
+                            size="sm"
                             onClick={onShuffle}
                             disabled={isShuffleDisabled}
-                            className="bg-primary text-white px-4 py-2 rounded-full hover:bg-primary-dark shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center gap-2"
+                            isChristmasMode={isChristmasMode}
+                            className="!rounded-full !px-4 shadow-md active:scale-95"
                         >
                             <PiShuffleBold className="w-5 h-5" />
                             <span className="font-medium text-sm">シャッフル</span>
-                        </button>
+                        </Button>
                     </div>
 
                     <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
-                        <input
-                            className="w-full min-w-0 p-2 border border-gray-300 rounded shadow-sm focus:ring-primary focus:border-primary text-right text-sm text-gray-800 placeholder-gray-500"
-                            placeholder=""
+                        <Input
                             value={newRightLabel}
                             onChange={e => setNewRightLabel(e.target.value)}
                             onKeyDown={e => {
                                 if (e.key === 'Enter') handleAddTaskLabel();
                             }}
+                            isChristmasMode={isChristmasMode}
+                            className="!min-w-0 !p-2 !text-right !text-sm !min-h-0"
                         />
-                        <button
+                        <Button
+                            variant="primary"
+                            size="sm"
                             onClick={handleAddTaskLabel}
                             disabled={!newLeftLabel.trim()}
-                            className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-dark shadow-sm disabled:opacity-50 disabled:shadow-none transition-all flex-shrink-0 flex items-center justify-center h-full max-h-[38px]"
+                            isChristmasMode={isChristmasMode}
+                            className="!px-2 !py-1 !min-h-0 !h-full max-h-[38px] flex-shrink-0"
                         >
                             <MdAdd size={20} />
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

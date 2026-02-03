@@ -3,6 +3,7 @@ import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdAdd, MdDelete, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md';
 import { DEFAULT_TABLE_SETTINGS, WidthConfig, HeightConfig } from './types';
+import { Button, Input, IconButton, NumberInput } from '@/components/ui';
 
 type TableModalsProps = {
     teams: Team[];
@@ -45,6 +46,7 @@ type TableModalsProps = {
     onDeleteMember: (memberId: string) => Promise<void>;
     onDeleteTaskLabel: (taskLabelId: string) => Promise<void>;
     onUpdateTableSettings: (settings: TableSettings) => Promise<void>;
+    isChristmasMode?: boolean;
 };
 
 export const TableModals: React.FC<TableModalsProps> = ({
@@ -82,6 +84,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
     onDeleteMember,
     onDeleteTaskLabel,
     onUpdateTableSettings,
+    isChristmasMode = false,
 }) => {
     const headerLabels = tableSettings?.headerLabels ?? DEFAULT_TABLE_SETTINGS.headerLabels;
     const formatTeamTitle = (teamName?: string) => {
@@ -105,10 +108,14 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden"
+                            className={`rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden ${
+                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                            }`}
                         >
-                            <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                                <h3 className="font-bold text-gray-800">
+                            <div className={`px-4 py-3 flex items-center justify-between ${
+                                isChristmasMode ? 'bg-white/5 border-b border-[#d4af37]/20' : 'bg-gray-50 border-b border-gray-100'
+                            }`}>
+                                <h3 className={`font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
                                     {(() => {
                                         const team = teams.find(t => t.id === contextMenu.teamId);
                                         const title = formatTeamTitle(team?.name);
@@ -116,78 +123,108 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                         return title ? `${title} - ${label}` : label;
                                     })()}
                                 </h3>
-                                <button onClick={() => setContextMenu(null)} className="text-gray-400 hover:text-gray-600">
+                                <IconButton
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setContextMenu(null)}
+                                    isChristmasMode={isChristmasMode}
+                                >
                                     <MdClose size={20} />
-                                </button>
+                                </IconButton>
                             </div>
 
                             <div className="p-4 space-y-4">
                                 {contextMenu.memberId ? (
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-500">メンバー名</label>
+                                        <label className={`text-xs font-bold ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
+                                            メンバー名
+                                        </label>
                                         <div className="flex gap-2">
-                                            <input
-                                                className="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900"
+                                            <Input
                                                 value={editingMemberName}
                                                 onChange={(e) => setEditingMemberName(e.target.value)}
+                                                isChristmasMode={isChristmasMode}
+                                                className="flex-1 !py-2"
                                             />
-                                            <button
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
                                                 onClick={async () => {
                                                     if (contextMenu.memberId && editingMemberName.trim()) {
                                                         await onUpdateMemberName(contextMenu.memberId, editingMemberName);
                                                         setContextMenu(null);
                                                     }
                                                 }}
-                                                className="bg-primary text-white px-3 py-2 rounded hover:bg-primary-dark flex items-center justify-center"
                                                 disabled={!editingMemberName.trim()}
+                                                isChristmasMode={isChristmasMode}
+                                                className="!px-3"
                                             >
                                                 <MdCheck size={20} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-2 text-gray-500">
+                                    <div className={`text-center py-2 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
                                         メンバーが割り当てられていません
                                     </div>
                                 )}
 
-                                <div className="border-t border-gray-100 pt-4 grid gap-2">
-                                    <button
+                                <div className={`pt-4 grid gap-2 ${isChristmasMode ? 'border-t border-[#d4af37]/20' : 'border-t border-gray-100'}`}>
+                                    <Button
+                                        variant="ghost"
+                                        size="md"
                                         onClick={() => {
                                             setShowMemberMenu({ taskLabelId: contextMenu.taskLabelId, teamId: contextMenu.teamId });
                                             setContextMenu(null);
                                         }}
-                                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                                        isChristmasMode={isChristmasMode}
+                                        className={`!justify-start !gap-3 !p-3 ${
+                                            isChristmasMode ? '!bg-white/5 hover:!bg-white/10' : '!bg-gray-50 hover:!bg-gray-100'
+                                        }`}
                                     >
                                         <MdPerson size={20} />
-                                        <div className="text-sm font-bold">メンバーを変更・追加</div>
-                                    </button>
+                                        <span className="text-sm font-bold">メンバーを変更・追加</span>
+                                    </Button>
 
                                     {contextMenu.memberId && (
-                                        <button
+                                        <Button
+                                            variant="ghost"
+                                            size="md"
                                             onClick={async () => {
                                                 await onUpdateMember({ teamId: contextMenu.teamId, taskLabelId: contextMenu.taskLabelId, memberId: null, assignedDate: '' }, null);
                                                 setContextMenu(null);
                                             }}
-                                            className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 text-red-600 hover:bg-red-50 transition-colors text-left"
+                                            isChristmasMode={isChristmasMode}
+                                            className={`!justify-start !gap-3 !p-3 ${
+                                                isChristmasMode
+                                                    ? '!bg-white/5 hover:!bg-red-500/10 !text-red-400'
+                                                    : '!bg-gray-50 hover:!bg-red-50 !text-red-600'
+                                            }`}
                                         >
                                             <MdPersonOff size={20} />
-                                            <div className="text-sm font-bold">未割り当てにする</div>
-                                        </button>
+                                            <span className="text-sm font-bold">未割り当てにする</span>
+                                        </Button>
                                     )}
 
                                     {contextMenu.memberId && (
-                                        <div className="border border-gray-200 rounded-lg overflow-hidden mt-2">
-                                            <button
+                                        <div className={`rounded-lg overflow-hidden mt-2 ${
+                                            isChristmasMode ? 'border border-[#d4af37]/20' : 'border border-gray-200'
+                                        }`}>
+                                            <Button
+                                                variant="ghost"
+                                                size="md"
                                                 onClick={() => setIsExclusionSettingsOpen(!isExclusionSettingsOpen)}
-                                                className="w-full flex items-center justify-between gap-3 p-3 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                                                isChristmasMode={isChristmasMode}
+                                                className={`!w-full !justify-between !gap-3 !p-3 !rounded-none ${
+                                                    isChristmasMode ? '!bg-white/5 hover:!bg-white/10' : '!bg-gray-50 hover:!bg-gray-100'
+                                                }`}
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <MdBlock size={20} className="text-gray-500" />
-                                                    <div className="text-sm font-bold">除外ラベル設定</div>
+                                                    <MdBlock size={20} className={isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'} />
+                                                    <span className="text-sm font-bold">除外ラベル設定</span>
                                                 </div>
                                                 {isExclusionSettingsOpen ? <MdKeyboardArrowDown size={20} /> : <MdKeyboardArrowRight size={20} />}
-                                            </button>
+                                            </Button>
 
                                             <AnimatePresence>
                                                 {isExclusionSettingsOpen && (
@@ -195,10 +232,10 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                         initial={{ height: 0, opacity: 0 }}
                                                         animate={{ height: 'auto', opacity: 1 }}
                                                         exit={{ height: 0, opacity: 0 }}
-                                                        className="overflow-hidden bg-white"
+                                                        className={`overflow-hidden ${isChristmasMode ? 'bg-[#1a1a1a]' : 'bg-white'}`}
                                                     >
-                                                        <div className="p-2 border-t border-gray-200">
-                                                            <div className="text-xs text-gray-500 mb-2 px-1">
+                                                        <div className={`p-2 ${isChristmasMode ? 'border-t border-[#d4af37]/20' : 'border-t border-gray-200'}`}>
+                                                            <div className={`text-xs mb-2 px-1 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
                                                                 チェックした作業には割り当てられません
                                                             </div>
                                                             <div className="max-h-40 overflow-y-auto space-y-1">
@@ -211,7 +248,10 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                                             key={label.id}
                                                                             className={`
                                                                                 flex items-center gap-3 p-2 rounded cursor-pointer transition-colors
-                                                                                ${isExcluded ? 'bg-red-50' : 'hover:bg-gray-50'}
+                                                                                ${isExcluded
+                                                                                    ? isChristmasMode ? 'bg-red-500/10' : 'bg-red-50'
+                                                                                    : isChristmasMode ? 'hover:bg-white/5' : 'hover:bg-gray-50'
+                                                                                }
                                                                             `}
                                                                         >
                                                                             <div className="relative flex items-center justify-center w-5 h-5">
@@ -223,18 +263,30 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                                                             await onUpdateMemberExclusion(contextMenu.memberId, label.id, e.target.checked);
                                                                                         }
                                                                                     }}
-                                                                                    className="appearance-none w-5 h-5 border border-gray-300 rounded checked:bg-red-500 checked:border-red-500 focus:ring-2 focus:ring-red-200 transition-colors cursor-pointer"
+                                                                                    className={`appearance-none w-5 h-5 border rounded checked:bg-red-500 checked:border-red-500 transition-colors cursor-pointer ${
+                                                                                        isChristmasMode
+                                                                                            ? 'border-[#d4af37]/40 focus:ring-2 focus:ring-red-400/20'
+                                                                                            : 'border-gray-300 focus:ring-2 focus:ring-red-200'
+                                                                                    }`}
                                                                                 />
                                                                                 {isExcluded && (
                                                                                     <MdClose className="absolute text-white pointer-events-none" size={14} />
                                                                                 )}
                                                                             </div>
                                                                             <div className="text-sm flex-1 truncate">
-                                                                                <span className={isExcluded ? 'text-red-700 font-medium' : 'text-gray-700'}>
+                                                                                <span className={
+                                                                                    isExcluded
+                                                                                        ? isChristmasMode ? 'text-red-400 font-medium' : 'text-red-700 font-medium'
+                                                                                        : isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
+                                                                                }>
                                                                                     {label.leftLabel}
                                                                                 </span>
                                                                                 {label.rightLabel && (
-                                                                                    <span className={`ml-1 text-xs ${isExcluded ? 'text-red-500' : 'text-gray-400'}`}>
+                                                                                    <span className={`ml-1 text-xs ${
+                                                                                        isExcluded
+                                                                                            ? isChristmasMode ? 'text-red-400/70' : 'text-red-500'
+                                                                                            : isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'
+                                                                                    }`}>
                                                                                         ({label.rightLabel})
                                                                                     </span>
                                                                                 )}
@@ -271,10 +323,12 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10"
+                            className={`rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10 ${
+                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                            }`}
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <div className="text-sm text-gray-500 font-bold">
+                                <div className={`text-sm font-bold ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
                                     {(() => {
                                         const team = teams.find(t => t.id === showMemberMenu.teamId);
                                         const title = formatTeamTitle(team?.name);
@@ -282,24 +336,35 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                         return title ? `${title} - ${label}` : label;
                                     })()}
                                 </div>
-                                <button onClick={() => setShowMemberMenu(null)}><MdClose /></button>
+                                <IconButton
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setShowMemberMenu(null)}
+                                    isChristmasMode={isChristmasMode}
+                                >
+                                    <MdClose />
+                                </IconButton>
                             </div>
 
                             {/* 新規追加 */}
-                            <div className="flex gap-2 mb-4 pb-4 border-b border-gray-100">
-                                <input
-                                    className="flex-1 border rounded px-3 py-2 text-sm text-gray-900"
+                            <div className={`flex gap-2 mb-4 pb-4 ${isChristmasMode ? 'border-b border-[#d4af37]/20' : 'border-b border-gray-100'}`}>
+                                <Input
                                     placeholder="新規メンバー名"
                                     value={newMemberName}
                                     onChange={e => setNewMemberName(e.target.value)}
+                                    isChristmasMode={isChristmasMode}
+                                    className="flex-1 !py-2 !text-sm"
                                 />
-                                <button
+                                <Button
+                                    variant="primary"
+                                    size="sm"
                                     onClick={() => handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId)}
                                     disabled={!newMemberName.trim()}
-                                    className="bg-primary text-white px-3 py-2 rounded hover:bg-primary-dark disabled:opacity-50"
+                                    isChristmasMode={isChristmasMode}
+                                    className="!px-3"
                                 >
                                     <MdAdd size={20} />
-                                </button>
+                                </Button>
                             </div>
 
                             <div className="max-h-60 overflow-y-auto space-y-2">
@@ -309,27 +374,34 @@ export const TableModals: React.FC<TableModalsProps> = ({
 
                                     return (
                                         <div key={m.id} className="flex items-center gap-2">
-                                            <button
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
                                                 onClick={() => {
                                                     onUpdateMember({ teamId: showMemberMenu.teamId, taskLabelId: showMemberMenu.taskLabelId, memberId: null, assignedDate: '' }, m.id);
                                                     setShowMemberMenu(null);
                                                 }}
-                                                className="flex-1 text-left px-3 py-2 hover:bg-gray-100 rounded text-gray-700"
+                                                isChristmasMode={isChristmasMode}
+                                                className={`flex-1 !justify-start !text-left ${
+                                                    isChristmasMode ? 'hover:!bg-white/10' : 'hover:!bg-gray-100'
+                                                }`}
                                             >
                                                 {m.name}
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <IconButton
+                                                variant="danger"
+                                                size="sm"
                                                 onClick={async (e) => {
                                                     e.stopPropagation();
                                                     if (confirm(`${m.name}を削除しますか？\n割り当てからも解除されます。`)) {
                                                         await onDeleteMember(m.id);
                                                     }
                                                 }}
-                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
+                                                isChristmasMode={isChristmasMode}
                                                 title="メンバーを削除"
                                             >
                                                 <MdDelete size={20} />
-                                            </button>
+                                            </IconButton>
                                         </div>
                                     );
                                 })}
@@ -354,24 +426,27 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10"
+                            className={`rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10 ${
+                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                            }`}
                         >
-                            <h3 className="text-lg font-bold text-gray-800 mb-4">班の編集</h3>
+                            <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                                班の編集
+                            </h3>
 
                             <div className="mb-6">
-                                <label className="block text-sm text-gray-500 mb-1">班名</label>
-                                <input
-                                    className="w-full p-2 border border-gray-300 rounded text-lg text-gray-800"
+                                <Input
+                                    label="班名"
                                     value={activeTeamName}
                                     onChange={e => setActiveTeamName(e.target.value)}
+                                    isChristmasMode={isChristmasMode}
                                 />
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-sm text-gray-500 mb-1">幅(px)</label>
-                                <input
-                                    type="number"
-                                    className="w-full p-2 border border-gray-300 rounded text-lg text-gray-800"
+                                <NumberInput
+                                    label="幅"
+                                    suffix="px"
                                     value={tableSettings?.colWidths?.teams?.[activeTeamActionId] ?? 100}
                                     onChange={async (e) => {
                                         if (!activeTeamActionId || !tableSettings) return;
@@ -381,29 +456,42 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                         newSettings.colWidths.teams[activeTeamActionId] = val;
                                         await onUpdateTableSettings(newSettings);
                                     }}
+                                    isChristmasMode={isChristmasMode}
                                 />
                             </div>
 
                             <div className="space-y-3">
-                                <button
+                                <Button
+                                    variant="primary"
+                                    size="md"
+                                    fullWidth
                                     onClick={handleUpdateTeamFromModal}
-                                    className="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark"
+                                    isChristmasMode={isChristmasMode}
                                 >
                                     更新する
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    size="md"
+                                    fullWidth
                                     onClick={handleDeleteTeamFromModal}
-                                    className="w-full py-3 bg-gray-100 text-red-500 rounded-lg font-bold hover:bg-red-50 flex items-center justify-center gap-2"
+                                    isChristmasMode={isChristmasMode}
+                                    className={`!flex !items-center !justify-center !gap-2 ${
+                                        isChristmasMode ? '!bg-red-500/10 !text-red-400 hover:!bg-red-500/20' : '!bg-gray-100 hover:!bg-red-50'
+                                    }`}
                                 >
                                     <MdDelete size={20} />
                                     この班を削除
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    fullWidth
                                     onClick={() => setActiveTeamActionId(null)}
-                                    className="w-full py-2 text-gray-500 hover:bg-gray-50 rounded-lg"
+                                    isChristmasMode={isChristmasMode}
                                 >
                                     キャンセル
-                                </button>
+                                </Button>
                             </div>
                         </motion.div>
                     </div>
@@ -421,37 +509,54 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10"
+                            className={`rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 ${
+                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                            }`}
                         >
-                            <h3 className="text-lg font-bold text-gray-800 mb-4">{widthConfig.label}</h3>
+                            <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                                {widthConfig.label}
+                            </h3>
                             {(widthConfig.type === 'taskLabel' || widthConfig.type === 'note') && (
                                 <div className="mb-4">
-                                    <label className="block text-sm text-gray-600 mb-1">
-                                        列の表示名
-                                    </label>
-                                    <input
-                                        className="w-full p-2 border border-gray-300 rounded text-base text-gray-900"
+                                    <Input
+                                        label="列の表示名"
                                         value={widthConfig.currentTitle ?? ''}
                                         onChange={e => setWidthConfig({ ...widthConfig, currentTitle: e.target.value })}
                                         placeholder={`${widthConfig.type === 'taskLabel' ? '左' : '右'}ラベル名`}
                                         onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
+                                        isChristmasMode={isChristmasMode}
                                     />
                                 </div>
                             )}
-                            <div className="flex items-center gap-2 mb-6">
-                                <input
-                                    type="number"
-                                    className="flex-1 p-2 border border-gray-300 rounded text-lg text-center text-gray-800"
+                            <div className="mb-6">
+                                <NumberInput
+                                    suffix="px"
                                     value={widthConfig.currentWidth}
                                     onChange={e => setWidthConfig({ ...widthConfig, currentWidth: parseInt(e.target.value) || 0 })}
                                     autoFocus
                                     onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
+                                    isChristmasMode={isChristmasMode}
                                 />
-                                <span className="text-gray-500 font-bold">px</span>
                             </div>
                             <div className="flex gap-2">
-                                <button onClick={() => setWidthConfig(null)} className="flex-1 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">キャンセル</button>
-                                <button onClick={() => handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
+                                <Button
+                                    variant="ghost"
+                                    size="md"
+                                    onClick={() => setWidthConfig(null)}
+                                    isChristmasMode={isChristmasMode}
+                                    className="flex-1"
+                                >
+                                    キャンセル
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    size="md"
+                                    onClick={() => handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
+                                    isChristmasMode={isChristmasMode}
+                                    className="flex-1"
+                                >
+                                    保存
+                                </Button>
                             </div>
                         </motion.div>
                     </div>
@@ -469,51 +574,76 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10"
+                            className={`rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 ${
+                                isChristmasMode ? 'bg-[#1a1a1a] border border-[#d4af37]/30' : 'bg-white'
+                            }`}
                         >
-                            <h3 className="text-lg font-bold text-gray-800 mb-4">{heightConfig.label}</h3>
+                            <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                                {heightConfig.label}
+                            </h3>
 
                             <div className="mb-4">
-                                <label className="block text-sm text-gray-500 mb-1">
-                                    {heightConfig.editMode === 'left' ? `${headerLabels.left}の名前` : `${headerLabels.right}の名前`}
-                                </label>
-                                <input
-                                    className="w-full p-2 border border-gray-300 rounded text-lg text-gray-900"
+                                <Input
+                                    label={heightConfig.editMode === 'left' ? `${headerLabels.left}の名前` : `${headerLabels.right}の名前`}
                                     value={heightConfig.currentName}
                                     onChange={e => setHeightConfig({ ...heightConfig, currentName: e.target.value })}
                                     placeholder={heightConfig.editMode === 'left' ? `${headerLabels.left}を入力` : `${headerLabels.right}を入力（任意）`}
+                                    isChristmasMode={isChristmasMode}
                                 />
                                 {heightConfig.editMode === 'right' && (
-                                    <p className="text-xs text-gray-500 mt-1">{headerLabels.right}は任意です。空欄にすると削除されます。</p>
+                                    <p className={`text-xs mt-1 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
+                                        {headerLabels.right}は任意です。空欄にすると削除されます。
+                                    </p>
                                 )}
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-sm text-gray-500 mb-1">高さ(px)</label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="number"
-                                        className="flex-1 p-2 border border-gray-300 rounded text-lg text-center text-gray-900"
-                                        value={heightConfig.currentHeight}
-                                        onChange={e => setHeightConfig({ ...heightConfig, currentHeight: parseInt(e.target.value) || 0 })}
-                                        onKeyDown={e => e.key === 'Enter' && handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
-                                    />
-                                    <span className="text-gray-500 font-bold">px</span>
-                                </div>
+                                <NumberInput
+                                    label="高さ"
+                                    suffix="px"
+                                    value={heightConfig.currentHeight}
+                                    onChange={e => setHeightConfig({ ...heightConfig, currentHeight: parseInt(e.target.value) || 0 })}
+                                    onKeyDown={e => e.key === 'Enter' && handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
+                                    isChristmasMode={isChristmasMode}
+                                />
                             </div>
 
                             <div className="flex gap-2">
-                                <button onClick={() => {
-                                    if (confirm('この作業ラベルを削除しますか？\n（全てのチームから削除されます）')) {
-                                        onDeleteTaskLabel(heightConfig.taskLabelId);
-                                        setHeightConfig(null);
-                                    }
-                                }} className="flex-1 py-2 bg-gray-100 text-red-500 rounded-lg font-bold hover:bg-red-50 flex items-center justify-center gap-2">
-                                    <MdDelete size={20} />
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() => {
+                                        if (confirm('この作業ラベルを削除しますか？\n（全てのチームから削除されます）')) {
+                                            onDeleteTaskLabel(heightConfig.taskLabelId);
+                                            setHeightConfig(null);
+                                        }
+                                    }}
+                                    isChristmasMode={isChristmasMode}
+                                    className={`flex-1 !flex !items-center !justify-center !gap-1 ${
+                                        isChristmasMode ? '!bg-red-500/10 hover:!bg-red-500/20' : '!bg-gray-100 hover:!bg-red-50'
+                                    }`}
+                                >
+                                    <MdDelete size={18} />
                                     削除
-                                </button>
-                                <button onClick={() => setHeightConfig(null)} className="flex-1 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">キャンセル</button>
-                                <button onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)} className="flex-1 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark">保存</button>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setHeightConfig(null)}
+                                    isChristmasMode={isChristmasMode}
+                                    className="flex-1"
+                                >
+                                    キャンセル
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
+                                    isChristmasMode={isChristmasMode}
+                                    className="flex-1"
+                                >
+                                    保存
+                                </Button>
                             </div>
                         </motion.div>
                     </div>

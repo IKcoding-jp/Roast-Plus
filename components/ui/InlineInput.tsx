@@ -54,10 +54,10 @@ export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
     };
 
     // 通常モード - ライト背景用
-    const normalLightStyles = 'bg-white border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30';
+    const normalLightStyles = 'bg-white border-gray-300 text-gray-900 focus:border-primary focus:ring-1 focus:ring-primary';
 
     // 通常モード - ダーク背景用
-    const normalDarkStyles = 'bg-white border-amber-500 text-gray-900 focus:ring-2 focus:ring-amber-500/30';
+    const normalDarkStyles = 'bg-white border-primary text-gray-900 focus:ring-2 focus:ring-primary/20';
 
     // クリスマスモード - ライト背景用
     const christmasLightStyles = 'bg-white/10 border-[#d4af37]/40 text-[#f8f1e7] focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/30';

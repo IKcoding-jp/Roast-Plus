@@ -85,11 +85,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     // 通常モードのバリアントスタイル
     const normalVariantStyles = {
-      primary: 'bg-gradient-to-b from-amber-500 to-amber-700 text-white shadow-sm hover:brightness-105',
-      secondary: 'bg-gray-600 text-white shadow-sm hover:brightness-105',
-      danger: 'bg-gradient-to-b from-red-500 to-red-700 text-white shadow-sm hover:brightness-105',
-      success: 'bg-gradient-to-b from-green-500 to-green-700 text-white shadow-sm hover:brightness-105',
-      outline: 'border-2 border-amber-400 text-amber-700 bg-white hover:bg-amber-50',
+      primary: 'bg-amber-600 text-white hover:bg-amber-700',
+      secondary: 'bg-gray-600 text-white hover:bg-gray-700',
+      danger: 'bg-red-600 text-white hover:bg-red-700',
+      success: 'bg-green-600 text-white hover:bg-green-700',
+      outline: 'border-2 border-amber-200 text-amber-700 bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200',
       ghost: 'text-amber-600 hover:text-amber-700 hover:bg-amber-50',
     };
 

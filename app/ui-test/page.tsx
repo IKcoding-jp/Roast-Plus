@@ -9,6 +9,7 @@ import { HiArrowLeft } from 'react-icons/hi';
 export default function UITestPage() {
   const { isChristmasMode, toggleChristmasMode } = useChristmasMode();
   const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [category, setCategory] = useState('');
   const [memo, setMemo] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,6 +62,7 @@ export default function UITestPage() {
             <Button variant="primary" isChristmasMode={isChristmasMode}>Primary</Button>
             <Button variant="secondary" isChristmasMode={isChristmasMode}>Secondary</Button>
             <Button variant="danger" isChristmasMode={isChristmasMode}>Danger</Button>
+            <Button variant="success" isChristmasMode={isChristmasMode}>Success</Button>
             <Button variant="outline" isChristmasMode={isChristmasMode}>Outline</Button>
             <Button variant="ghost" isChristmasMode={isChristmasMode}>Ghost</Button>
           </div>
@@ -103,6 +105,15 @@ export default function UITestPage() {
               placeholder="山田太郎"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              isChristmasMode={isChristmasMode}
+            />
+            <Input
+              label="パスワード（トグル付き）"
+              type="password"
+              placeholder="パスワードを入力"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              showPasswordToggle
               isChristmasMode={isChristmasMode}
             />
             <Input

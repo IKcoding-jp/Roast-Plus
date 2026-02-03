@@ -1,6 +1,7 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, useState, useId } from 'react';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 /**
  * 統一されたテキスト入力コンポーネント
@@ -42,11 +43,19 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   error?: string;
   /** クリスマスモードの有効/無効 */
   isChristmasMode?: boolean;
+  /** パスワード表示/非表示トグルを表示（type="password"時のみ有効） */
+  showPasswordToggle?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, isChristmasMode = false, className = '', id, ...props }, ref) => {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  ({ label, error, isChristmasMode = false, showPasswordToggle = false, className = '', id, type, ...props }, ref) => {
+    const generatedId = useId();
+    const inputId = id || generatedId;
+    const [showPassword, setShowPassword] = useState(false);
+
+    // パスワードトグルが有効で、元のtypeがpasswordの場合
+    const isPasswordField = type === 'password' && showPasswordToggle;
+    const inputType = isPasswordField && showPassword ? 'text' : type;
 
     const baseStyles = 'w-full rounded-lg border-2 px-4 py-3.5 text-lg transition-all duration-200 shadow-sm min-h-[44px]';
 
@@ -76,6 +85,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       ? 'text-red-400 text-sm mt-1'
       : 'text-red-500 text-sm mt-1';
 
+    const toggleButtonStyles = isChristmasMode
+      ? 'text-[#d4af37]/70 hover:text-[#d4af37]'
+      : 'text-gray-400 hover:text-gray-600';
+
     return (
       <div>
         {label && (
@@ -83,14 +96,31 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {label}
           </label>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={inputStyles}
-          aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={error ? `${inputId}-error` : undefined}
-          {...props}
-        />
+        <div className="relative">
+          <input
+            ref={ref}
+            id={inputId}
+            type={inputType}
+            className={`${inputStyles} ${isPasswordField ? 'pr-12' : ''}`}
+            aria-invalid={error ? 'true' : 'false'}
+            aria-describedby={error ? `${inputId}-error` : undefined}
+            {...props}
+          />
+          {isPasswordField && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 transition-colors ${toggleButtonStyles}`}
+              aria-label={showPassword ? 'パスワードを非表示' : 'パスワードを表示'}
+            >
+              {showPassword ? (
+                <HiEyeOff className="h-5 w-5" />
+              ) : (
+                <HiEye className="h-5 w-5" />
+              )}
+            </button>
+          )}
+        </div>
         {error && (
           <p id={`${inputId}-error`} className={errorTextStyles} role="alert">
             {error}

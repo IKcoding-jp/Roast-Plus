@@ -47,7 +47,7 @@ import { forwardRef } from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** ボタンのスタイルバリエーション */
-  variant?: 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost';
   /** ボタンのサイズ */
   size?: 'sm' | 'md' | 'lg';
   /** ローディング状態 */
@@ -88,6 +88,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 'bg-amber-600 text-white hover:bg-amber-700',
       secondary: 'bg-gray-600 text-white hover:bg-gray-700',
       danger: 'bg-red-600 text-white hover:bg-red-700',
+      success: 'bg-green-600 text-white hover:bg-green-700',
       outline: 'border-2 border-amber-200 text-amber-700 bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200',
       ghost: 'text-amber-600 hover:text-amber-700 hover:bg-amber-50',
     };
@@ -97,6 +98,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 'bg-[#6d1a1a] text-white hover:bg-[#8b2323] border border-[#d4af37]/40',
       secondary: 'bg-[#3a3a3a] text-[#f8f1e7] hover:bg-[#4a4a4a]',
       danger: 'bg-red-800 text-white hover:bg-red-900',
+      success: 'bg-green-800 text-white hover:bg-green-900',
       outline: 'border-2 border-[#d4af37]/60 text-[#d4af37] bg-[#d4af37]/10 hover:bg-[#d4af37]/20',
       ghost: 'text-[#d4af37] hover:text-[#e8c65f] hover:bg-[#d4af37]/10',
     };

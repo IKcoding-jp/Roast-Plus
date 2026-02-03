@@ -5,7 +5,7 @@ export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
     version: '0.11.0',
     date: '2026-02-03',
-    summary: '開発者モード時にUIコンポーネントカタログへのリンク追加 [Issue #125]',
+    summary: '開発者モード時にUIコンポーネントカタログへのリンク追加 [Issue #125] など 2件の更新',
   },
   {
     version: '0.10.2',

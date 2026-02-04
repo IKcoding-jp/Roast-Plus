@@ -55,7 +55,7 @@ import { forwardRef } from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** ボタンのスタイルバリエーション */
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost' | 'coffee' | 'surface';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'outline' | 'ghost' | 'coffee' | 'surface';
   /** ボタンのサイズ */
   size?: 'sm' | 'md' | 'lg';
   /** ローディング状態 */
@@ -100,6 +100,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-gray-600 text-white hover:bg-gray-700',
       danger: 'bg-red-600 text-white hover:bg-red-700',
       success: 'bg-green-600 text-white hover:bg-green-700',
+      warning: 'bg-yellow-500 text-white hover:bg-yellow-600',
+      info: 'bg-[#00b8d4] text-white hover:bg-[#00a0b8]',
       outline: 'border-2 border-amber-500 text-amber-600 bg-transparent hover:bg-amber-50',
       ghost: 'text-amber-600 hover:text-amber-700',
       coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b]',
@@ -112,6 +114,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-[#3a3a3a] text-[#f8f1e7] hover:bg-[#4a4a4a]',
       danger: 'bg-red-800 text-white hover:bg-red-900',
       success: 'bg-green-800 text-white hover:bg-green-900',
+      warning: 'bg-[#d4af37] text-[#1a1a1a] hover:bg-[#e8c65f]',
+      info: 'bg-[#0097a7] text-white hover:bg-[#00838f]',
       outline: 'border-2 border-[#d4af37] text-[#d4af37] bg-transparent hover:bg-[#d4af37]/10',
       ghost: 'text-[#d4af37] hover:text-[#e8c65f]',
       coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b] border border-[#d4af37]/30',

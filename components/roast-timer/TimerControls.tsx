@@ -34,10 +34,10 @@ export function TimerControls({
     return (
       <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-md flex-shrink-0">
         <Button
-          variant="secondary"
+          variant="warning"
           size="md"
           onClick={onPause}
-          className="flex items-center justify-center gap-1 flex-1 max-w-[200px] !bg-yellow-500 hover:!bg-yellow-600"
+          className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
           isChristmasMode={isChristmasMode}
         >
           <HiPause className="text-xl sm:text-2xl flex-shrink-0" />

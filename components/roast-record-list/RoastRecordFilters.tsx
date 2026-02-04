@@ -151,12 +151,14 @@ export function RoastRecordFilters({
             dateTo ||
             selectedRoastLevels.length > 0 ||
             selectedWeights.length > 0) && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onResetFilters}
-              className={`text-sm hover:underline ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'}`}
+              isChristmasMode={isChristmasMode}
             >
               フィルタをリセット
-            </button>
+            </Button>
           )}
         </div>
       )}

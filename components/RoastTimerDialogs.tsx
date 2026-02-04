@@ -93,10 +93,10 @@ export function ContinuousRoastDialog({
           続けて焙煎する
         </Button>
         <Button
-          variant="secondary"
+          variant="info"
           size="md"
           onClick={onNo}
-          className="flex-1 sm:flex-none order-2 sm:order-1 whitespace-nowrap !bg-[#00b8d4] hover:!bg-[#00a0b8]"
+          className="flex-1 sm:flex-none order-2 sm:order-1 whitespace-nowrap"
           isChristmasMode={isChristmasMode}
         >
           アフターパージ

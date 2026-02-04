@@ -1,7 +1,6 @@
 ---
 name: fix-issue
-description: GitHub Issueを自動解決するワークフロー。Issue確認→非エンジニア向け説明→コード探索→計画→実装→検証→レビュー→PR作成まで。Issue番号を引数に取る。「/fix-issue 123」のように使用。トピックブランチ必須、main直接コミット禁止。
-argument-hint: "[issue-number]"
+description: GitHub Issueを自動解決するワークフロー。Issue確認→非エンジニア向け説明→コード探索→計画→実装→要件確認→検証→レビュー→PR作成まで。Issue番号を引数に取る。「/fix-issue 123」のように使用。トピックブランチ必須、main直接コミット禁止。実装完了後、技術検証前にユーザー確認を実施。
 ---
 
 # Issue自動解決スキル
@@ -9,11 +8,11 @@ argument-hint: "[issue-number]"
 ## ワークフロー概要
 
 ```
-Issue確認 → 説明 → 探索 → 計画 → 実装 → 検証 → 動作確認 → レビュー → PR → マージ
-           🔹①           🔹②                                     🔹③
+Issue確認 → 説明 → 探索 → 計画 → 実装 → 要件確認 → 検証 → 動作確認 → レビュー → PR → マージ
+           🔹①           🔹②            🔹③                                🔹④
 ```
 
-🔹 = ユーザー確認ポイント（AskUserQuestionで確認後に次へ進む）
+🔹 = ユーザー確認ポイント(AskUserQuestionで確認後に次へ進む)
 
 ---
 
@@ -25,24 +24,24 @@ gh issue view $ARGUMENTS --json title,body,labels,number,assignees
 
 ## Phase 2: Issue説明 🔹確認ポイント①
 
-**非エンジニア向けに**以下を説明します：
+**非エンジニア向けに**以下を説明します:
 
 1. **問題の背景** - なぜこのIssueが作られたのか
 2. **解決したいこと** - 何を実現したいのか
-3. **根本原因** - 技術的に何が起きているのか（コードなしで）
+3. **根本原因** - 技術的に何が起きているのか(コードなしで)
 4. **修正の方針** - どのように直すのか
 5. **懸念点・リスク** - 考慮すべき影響や可能性
 
 **視覚的に説明する:**
 - 図解やダイアグラムを活用
 - 具体例を用いる
-- ⚠️ コードは提示しない（ユーザーは読めない）
+- ⚠️ コードは提示しない(ユーザーは読めない)
 
 **説明後、ユーザーの意見を確認して修正可能か判断を仰ぐ。**
 
 ## Phase 3: コード探索
 
-Serena MCPで関連コードを探索します：
+Serena MCPで関連コードを探索します:
 
 ```
 search_for_pattern → get_symbols_overview → find_symbol → find_referencing_symbols
@@ -52,7 +51,7 @@ search_for_pattern → get_symbols_overview → find_symbol → find_referencing
 
 ## Phase 4: 計画 🔹確認ポイント②
 
-**プランモード（EnterPlanMode）で実装計画を立案します。**
+**プランモード(EnterPlanMode)で実装計画を立案します。**
 
 - 「think hard」で計画を検討
 - 不明点があれば`AskUserQuestion`で確認
@@ -60,7 +59,7 @@ search_for_pattern → get_symbols_overview → find_symbol → find_referencing
 
 ## Phase 5: 実装
 
-### ブランチ作成（必須）
+### ブランチ作成(必須)
 
 ⚠️ **mainブランチへの直接コミット禁止**
 
@@ -72,7 +71,7 @@ git checkout -b feat/#番号-説明   # enhancement/featureラベル
 
 ### Context7 MCPでドキュメント確認
 
-実装前に必ず最新ドキュメントを参照します：
+実装前に必ず最新ドキュメントを参照します:
 
 ```
 resolve-library-id → query-docs
@@ -80,9 +79,29 @@ resolve-library-id → query-docs
 
 ### 実装実行
 
-Claude Code標準ツール（Edit/Write）で実装します。
+Claude Code標準ツール(Edit/Write)で実装します。
 
-## Phase 6: 検証
+## Phase 6: 要件確認 🔹確認ポイント③
+
+**実装が完了したら、技術検証の前にユーザーに確認します。**
+
+### 確認内容
+
+以下を簡潔に説明し、ユーザーに要件充足を確認します:
+
+1. **実装した変更の概要** - どのファイルに何を追加/修正したか
+2. **Issueの要件との対応** - 各要件をどのように満たしたか
+3. **動作の変化** - ユーザーから見てどう変わるか
+
+### ユーザーからのフィードバック対応
+
+- **OK**: Phase 7(検証)へ進む
+- **修正依頼**: 追加修正を実施 → 再度この Phase 6 へ戻る
+- **方針変更**: Phase 4(計画)へ戻る
+
+**⚠️ この確認をスキップしてはいけません。** 技術検証(lint/build)の前にユーザーが要件をチェックすることで、手戻りを最小化します。
+
+## Phase 7: 検証
 
 ```bash
 npm run lint && npm run build && npm run test
@@ -91,15 +110,15 @@ npm run lint && npm run build && npm run test
 - Lintエラーは完全解消するまでループ
 - ビルド・テストが通るまで修正を繰り返す
 
-## Phase 7: 動作確認
+## Phase 8: 動作確認
 
 **ユーザーがローカル環境で手動確認します。**
 
-ユーザーから依頼があった場合のみ、以下のツールを使用します：
+ユーザーから依頼があった場合のみ、以下のツールを使用します:
 - Chrome DevTools MCP
 - Playwright MCP
 
-## Phase 8: 自己レビュー
+## Phase 9: 自己レビュー
 
 **code-reviewスキルでしっかりレビューを実施します。**
 
@@ -107,7 +126,7 @@ npm run lint && npm run build && npm run test
 - 不要なコードがないか
 - 既存機能への影響がないか
 
-## Phase 9: コミット＆PR 🔹確認ポイント③
+## Phase 10: コミット&PR 🔹確認ポイント④
 
 **ユーザー確認後に実行します。**
 
@@ -142,11 +161,11 @@ PREOF
 gh pr create --base main --title "[Issue #番号] タイトル" --body-file /tmp/pr-body.md
 ```
 
-## Phase 10: 自動レビュー待ち
+## Phase 11: 自動レビュー待ち
 
 Issueにメンションすることで、Claude/Coldが自動レビューを実施します。
 
-## Phase 11: マージ
+## Phase 12: マージ
 
 **ユーザーが手動でマージします。**
 

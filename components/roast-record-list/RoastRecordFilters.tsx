@@ -1,7 +1,7 @@
 'use client';
 
 import { ROAST_LEVELS } from '@/lib/constants';
-import { Input, Select, Button, Card, Checkbox } from '@/components/ui';
+import { Input, Select, Button, Checkbox } from '@/components/ui';
 
 const WEIGHTS: Array<200 | 300 | 500> = [200, 300, 500];
 
@@ -44,8 +44,13 @@ export function RoastRecordFilters({
   onResetFilters,
   isChristmasMode = false,
 }: RoastRecordFiltersProps) {
+  // Surfaceスタイル(Buttonのsurface variantと同じ)
+  const surfaceStyles = isChristmasMode
+    ? 'bg-white/10 text-[#f8f1e7] shadow-md border border-[#d4af37]/20'
+    : 'bg-white text-gray-700 shadow-md';
+
   return (
-    <Card isChristmasMode={isChristmasMode} className="p-4 space-y-4 flex-shrink-0">
+    <div className={`rounded-lg p-4 space-y-4 flex-shrink-0 ${surfaceStyles}`}>
       {/* 検索バーとソート */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
@@ -71,7 +76,7 @@ export function RoastRecordFilters({
           />
         </div>
         <Button
-          variant="secondary"
+          variant="surface"
           size="md"
           onClick={onShowFiltersToggle}
           className="whitespace-nowrap"
@@ -151,15 +156,17 @@ export function RoastRecordFilters({
             dateTo ||
             selectedRoastLevels.length > 0 ||
             selectedWeights.length > 0) && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onResetFilters}
-              className={`text-sm hover:underline ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'}`}
+              isChristmasMode={isChristmasMode}
             >
               フィルタをリセット
-            </button>
+            </Button>
           )}
         </div>
       )}
-    </Card>
+    </div>
   );
 }

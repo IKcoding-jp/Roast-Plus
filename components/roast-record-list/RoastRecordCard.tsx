@@ -1,7 +1,7 @@
 'use client';
 
 import { formatTime } from '@/lib/roastTimerUtils';
-import { Card } from '@/components/ui';
+import { Card, IconButton } from '@/components/ui';
 import { HiTrash, HiCalendar } from 'react-icons/hi';
 import { MdTimer } from 'react-icons/md';
 import { PiCoffeeBeanFill } from 'react-icons/pi';
@@ -46,13 +46,21 @@ export function RoastRecordCard({ record, onDelete, onClick, isChristmasMode = f
       isChristmasMode={isChristmasMode}
     >
       {/* 削除ボタン（右上） */}
-      <button
-        onClick={(e) => onDelete(record.id, e)}
-        className={`absolute top-2 right-2 p-1.5 text-red-600 rounded-lg transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center z-10 ${isChristmasMode ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
-        aria-label="削除"
-      >
-        <HiTrash className="h-4 w-4" />
-      </button>
+      <div className="absolute top-2 right-2 z-10">
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(record.id, e);
+          }}
+          size="md"
+          title="削除"
+          aria-label="削除"
+          className="text-red-600 hover:bg-red-50"
+          isChristmasMode={isChristmasMode}
+        >
+          <HiTrash className="h-4 w-4" />
+        </IconButton>
+      </div>
 
       {/* 豆名と焙煎度合い */}
       <div className="flex items-center gap-2 mb-3 pr-8">

@@ -82,7 +82,7 @@ export function ModeSelectView({
       <div className="space-y-3 sm:space-y-4 max-w-md mx-auto w-full">
         {/* 手動スタートボタン */}
         <Button
-          variant="primary"
+          variant="secondary"
           size="lg"
           onClick={onManualStart}
           disabled={isStartDisabled}
@@ -95,7 +95,7 @@ export function ModeSelectView({
 
         {/* おすすめ焙煎ボタン */}
         <Button
-          variant="secondary"
+          variant="primary"
           size="lg"
           onClick={onRecommendedMode}
           className="w-full flex items-center justify-center gap-2"

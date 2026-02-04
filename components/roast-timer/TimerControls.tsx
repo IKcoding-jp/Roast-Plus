@@ -1,6 +1,7 @@
 'use client';
 
 import { HiPlay, HiPause, HiRefresh, HiFastForward } from 'react-icons/hi';
+import { Button } from '@/components/ui';
 
 interface TimerControlsProps {
   isRunning: boolean;
@@ -10,6 +11,7 @@ interface TimerControlsProps {
   onResume: () => void;
   onSkip: () => void;
   onReset: () => void;
+  isChristmasMode: boolean;
 }
 
 /**
@@ -26,24 +28,31 @@ export function TimerControls({
   onResume,
   onSkip,
   onReset,
+  isChristmasMode,
 }: TimerControlsProps) {
   if (isRunning) {
     return (
       <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-md flex-shrink-0">
-        <button
+        <Button
+          variant="secondary"
+          size="md"
           onClick={onPause}
-          className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-yellow-600 hover:to-yellow-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+          className="flex items-center justify-center gap-1 flex-1 max-w-[200px] !bg-yellow-500 hover:!bg-yellow-600"
+          isChristmasMode={isChristmasMode}
         >
           <HiPause className="text-xl sm:text-2xl flex-shrink-0" />
           <span>一時停止</span>
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
+          size="md"
           onClick={onSkip}
-          className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+          className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
+          isChristmasMode={isChristmasMode}
         >
           <HiFastForward className="text-xl sm:text-2xl flex-shrink-0" />
           <span>スキップ</span>
-        </button>
+        </Button>
       </div>
     );
   }
@@ -51,20 +60,26 @@ export function TimerControls({
   if (isPaused) {
     return (
       <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-md flex-shrink-0">
-        <button
+        <Button
+          variant="primary"
+          size="md"
           onClick={onResume}
-          className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+          className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
+          isChristmasMode={isChristmasMode}
         >
           <HiPlay className="text-xl sm:text-2xl flex-shrink-0" />
           <span>再開</span>
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
+          size="md"
           onClick={onSkip}
-          className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] flex-1 max-w-[200px]"
+          className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
+          isChristmasMode={isChristmasMode}
         >
           <HiFastForward className="text-xl sm:text-2xl flex-shrink-0" />
           <span>スキップ</span>
-        </button>
+        </Button>
       </div>
     );
   }
@@ -73,13 +88,16 @@ export function TimerControls({
     return (
       <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-md flex-shrink-0">
         <div></div>
-        <button
+        <Button
+          variant="secondary"
+          size="md"
           onClick={onReset}
-          className="flex items-center justify-center gap-1 px-2.5 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-gray-600 hover:to-gray-700 active:scale-[0.98] transition-all duration-200 text-xs sm:text-base min-h-[44px] min-w-[44px]"
+          className="flex items-center justify-center gap-1"
+          isChristmasMode={isChristmasMode}
         >
           <HiRefresh className="text-xl sm:text-2xl flex-shrink-0" />
           <span>リセット</span>
-        </button>
+        </Button>
         <div></div>
       </div>
     );

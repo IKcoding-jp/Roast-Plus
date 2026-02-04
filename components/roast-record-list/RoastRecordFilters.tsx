@@ -1,6 +1,7 @@
 'use client';
 
 import { ROAST_LEVELS } from '@/lib/constants';
+import { Input, Select, Button, Card, Checkbox } from '@/components/ui';
 
 const WEIGHTS: Array<200 | 300 | 500> = [200, 300, 500];
 
@@ -22,6 +23,7 @@ interface RoastRecordFiltersProps {
   onRoastLevelToggle: (level: '浅煎り' | '中煎り' | '中深煎り' | '深煎り') => void;
   onWeightToggle: (weight: 200 | 300 | 500) => void;
   onResetFilters: () => void;
+  isChristmasMode?: boolean;
 }
 
 export function RoastRecordFilters({
@@ -40,111 +42,106 @@ export function RoastRecordFilters({
   onRoastLevelToggle,
   onWeightToggle,
   onResetFilters,
+  isChristmasMode = false,
 }: RoastRecordFiltersProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 space-y-4 flex-shrink-0">
+    <Card isChristmasMode={isChristmasMode} className="p-4 space-y-4 flex-shrink-0">
       {/* 検索バーとソート */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
-          <input
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="豆の名前で検索"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
+            isChristmasMode={isChristmasMode}
           />
         </div>
         <div className="sm:w-48">
-          <select
+          <Select
             value={sortOption}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900"
-          >
-            <option value="newest">新しい順</option>
-            <option value="oldest">古い順</option>
-            <option value="beanName">豆の名前順</option>
-            <option value="date">焙煎日順</option>
-          </select>
+            options={[
+              { value: 'newest', label: '新しい順' },
+              { value: 'oldest', label: '古い順' },
+              { value: 'beanName', label: '豆の名前順' },
+              { value: 'date', label: '焙煎日順' },
+            ]}
+            isChristmasMode={isChristmasMode}
+          />
         </div>
-        <button
+        <Button
+          variant="secondary"
+          size="md"
           onClick={onShowFiltersToggle}
-          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap min-h-[44px]"
+          className="whitespace-nowrap"
+          isChristmasMode={isChristmasMode}
         >
           {showFilters ? 'フィルタを閉じる' : 'フィルタ'}
-        </button>
+        </Button>
       </div>
 
       {/* フィルタパネル */}
       {showFilters && (
-        <div className="border-t border-gray-200 pt-4 space-y-4">
+        <div className={`pt-4 space-y-4 ${isChristmasMode ? 'border-t border-[#f8f1e7]/20' : 'border-t border-gray-200'}`}>
           {/* 日付範囲 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className={`block text-sm font-medium mb-1 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
                 開始日
               </label>
-              <input
+              <Input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => onDateFromChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900 min-h-[44px]"
+                isChristmasMode={isChristmasMode}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className={`block text-sm font-medium mb-1 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
                 終了日
               </label>
-              <input
+              <Input
                 type="date"
                 value={dateTo}
                 onChange={(e) => onDateToChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-gray-900 min-h-[44px]"
+                isChristmasMode={isChristmasMode}
               />
             </div>
           </div>
 
           {/* 焙煎度合い */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
               焙煎度合い
             </label>
             <div className="flex flex-wrap gap-3">
               {ROAST_LEVELS.map((level) => (
-                <label
+                <Checkbox
                   key={level}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedRoastLevels.includes(level)}
-                    onChange={() => onRoastLevelToggle(level)}
-                    className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-600"
-                  />
-                  <span className="text-sm text-gray-700">{level}</span>
-                </label>
+                  checked={selectedRoastLevels.includes(level)}
+                  onChange={() => onRoastLevelToggle(level)}
+                  label={level}
+                  isChristmasMode={isChristmasMode}
+                />
               ))}
             </div>
           </div>
 
           {/* 重さ */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
               重さ
             </label>
             <div className="flex flex-wrap gap-3">
               {WEIGHTS.map((weight) => (
-                <label
+                <Checkbox
                   key={weight}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedWeights.includes(weight)}
-                    onChange={() => onWeightToggle(weight)}
-                    className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-600"
-                  />
-                  <span className="text-sm text-gray-700">{weight}g</span>
-                </label>
+                  checked={selectedWeights.includes(weight)}
+                  onChange={() => onWeightToggle(weight)}
+                  label={`${weight}g`}
+                  isChristmasMode={isChristmasMode}
+                />
               ))}
             </div>
           </div>
@@ -156,13 +153,13 @@ export function RoastRecordFilters({
             selectedWeights.length > 0) && (
             <button
               onClick={onResetFilters}
-              className="text-sm text-amber-600 hover:underline"
+              className={`text-sm hover:underline ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'}`}
             >
               フィルタをリセット
             </button>
           )}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

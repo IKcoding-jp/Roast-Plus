@@ -11,12 +11,15 @@ import { playTimerSound, stopTimerSound } from '@/lib/sounds';
 import { roastTimerSoundFiles } from '@/lib/soundFiles';
 import type { RoastTimerSettings } from '@/types';
 import { useToastContext } from '@/components/Toast';
+import { NumberInput, Checkbox, Select, Button } from '@/components/ui';
+import type { SelectOption } from '@/components/ui';
 
 interface RoastTimerSettingsProps {
   onClose: () => void;
+  isChristmasMode: boolean;
 }
 
-export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
+export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSettingsProps) {
   const { showToast } = useToastContext();
   const [settings, setSettings] = useState<RoastTimerSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -150,18 +153,15 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">タイマー設定</h2>
+    <div className={`rounded-lg shadow-md p-4 sm:p-6 ${isChristmasMode ? 'bg-[#0a2818]' : 'bg-white'}`}>
+      <h2 className={`text-xl sm:text-2xl font-bold mb-6 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>タイマー設定</h2>
 
       <div className="space-y-6">
         {/* 焙煎室に行くまでの時間 */}
         <div>
-          <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-            焙煎室に行くまでの時間（秒）
-          </label>
-          <input
-            type="number"
-            min="1"
+          <NumberInput
+            label="焙煎室に行くまでの時間（秒）"
+            min={1}
             value={settings.goToRoastRoomTimeSeconds}
             onChange={(e) =>
               setSettings({
@@ -169,76 +169,65 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
                 goToRoastRoomTimeSeconds: parseInt(e.target.value, 10) || 60,
               })
             }
-            className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
+            isChristmasMode={isChristmasMode}
           />
-          <p className="mt-1 text-xs sm:text-sm text-gray-500">
+          <p className={`mt-1 text-xs sm:text-sm ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
             おすすめ焙煎タイマーで使用される時間です。平均焙煎時間からこの秒数を引いた値がおすすめタイマー時間として提案されます。
           </p>
         </div>
 
         {/* タイマー音の設定 */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">タイマー音</h3>
+        <div className={`border-t pt-6 ${isChristmasMode ? 'border-[#f8f1e7]/20' : ''}`}>
+          <h3 className={`text-lg font-semibold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>タイマー音</h3>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={settings.timerSoundEnabled}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      timerSoundEnabled: e.target.checked,
-                    })
-                  }
-                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
-                />
-                <span className="text-sm sm:text-base text-gray-700">タイマー音を有効にする</span>
-              </label>
+              <Checkbox
+                label="タイマー音を有効にする"
+                checked={settings.timerSoundEnabled}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    timerSoundEnabled: e.target.checked,
+                  })
+                }
+                isChristmasMode={isChristmasMode}
+              />
               {settings.timerSoundEnabled && (
-                <button
-                  type="button"
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={handleTestSound}
                   disabled={isTestingSound}
-                  className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors text-sm sm:text-base min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  isChristmasMode={isChristmasMode}
                 >
                   {isTestingSound ? '再生中...' : 'テスト'}
-                </button>
+                </Button>
               )}
             </div>
 
             {settings.timerSoundEnabled && testResult && (
-              <p className="text-xs sm:text-sm text-gray-600">{testResult}</p>
+              <p className={`text-xs sm:text-sm ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>{testResult}</p>
             )}
 
             {settings.timerSoundEnabled && (
-              <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                  音源
-                </label>
-                <select
-                  value={settings.timerSoundFile}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      timerSoundFile: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-md border border-gray-300 px-3 sm:px-4 py-2 sm:py-2.5 text-base sm:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]"
-                >
-                  {roastTimerSoundFiles.map((f) => (
-                    <option key={f.value} value={f.value}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="音源"
+                value={settings.timerSoundFile}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    timerSoundFile: e.target.value,
+                  })
+                }
+                options={roastTimerSoundFiles as SelectOption[]}
+                isChristmasMode={isChristmasMode}
+              />
             )}
 
             {settings.timerSoundEnabled && (
               <div className="pt-2">
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                <label className={`block text-sm sm:text-base font-medium mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
                   音量: {Math.round(settings.timerSoundVolume * 100)}%
                 </label>
                 <input
@@ -253,7 +242,7 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
                       timerSoundVolume: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${isChristmasMode ? 'bg-[#f8f1e7]/20' : 'bg-gray-200'}`}
                 />
               </div>
             )}
@@ -261,20 +250,24 @@ export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
         </div>
       </div>
 
-      <div className="flex gap-3 sm:gap-4 justify-end mt-6 pt-6 border-t">
-        <button
+      <div className={`flex gap-3 sm:gap-4 justify-end mt-6 pt-6 border-t ${isChristmasMode ? 'border-[#f8f1e7]/20' : ''}`}>
+        <Button
+          variant="secondary"
+          size="md"
           onClick={onClose}
-          className="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors text-base sm:text-lg min-h-[44px]"
+          isChristmasMode={isChristmasMode}
         >
           キャンセル
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="primary"
+          size="md"
           onClick={handleSave}
           disabled={isSaving}
-          className="px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition-colors text-base sm:text-lg min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
+          isChristmasMode={isChristmasMode}
         >
           {isSaving ? '保存中...' : '保存'}
-        </button>
+        </Button>
       </div>
     </div>
   );

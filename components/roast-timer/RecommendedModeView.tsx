@@ -5,6 +5,8 @@ import { MdLightbulb } from 'react-icons/md';
 import { formatTimeAsMinutesAndSeconds } from '@/lib/roastTimerUtils';
 import { WEIGHTS, type RoastLevel, type Weight } from '@/lib/constants';
 import type { BeanName } from '@/lib/beanConfig';
+import { Select, Button, Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui';
+import type { SelectOption } from '@/components/ui';
 
 interface RecommendedModeViewProps {
   recommendedMode: 'weight' | 'history';
@@ -24,6 +26,7 @@ interface RecommendedModeViewProps {
   onRoastLevelChange: (value: RoastLevel | '') => void;
   onStart: () => Promise<void>;
   isStartDisabled: boolean;
+  isChristmasMode: boolean;
 }
 
 /**
@@ -46,12 +49,13 @@ export function RecommendedModeView({
   onRoastLevelChange,
   onStart,
   isStartDisabled,
+  isChristmasMode,
 }: RecommendedModeViewProps) {
   return (
     <div className="flex-1 flex flex-col px-4 sm:px-6">
       <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center py-8">
         <div className="flex items-center justify-center mb-6 flex-shrink-0">
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h3 className={`text-xl sm:text-2xl font-bold flex items-center gap-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
               <MdLightbulb className="text-white text-lg" />
             </div>
@@ -59,61 +63,53 @@ export function RecommendedModeView({
           </h3>
         </div>
 
-        {/* モード切り替えタブ */}
-        <div className="mb-6 flex-shrink-0">
-          <div className="flex gap-2 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => onRecommendedModeChange('weight')}
-              className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${
-                recommendedMode === 'weight'
-                  ? 'bg-white text-amber-700 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              重さで設定
-            </button>
-            <button
-              onClick={() => onRecommendedModeChange('history')}
-              className={`flex-1 px-4 py-2.5 rounded-md text-sm sm:text-base font-semibold transition-all duration-200 ${
-                recommendedMode === 'history'
-                  ? 'bg-white text-amber-700 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              過去の記録から設定
-            </button>
-          </div>
-        </div>
-
         <div className="space-y-5 flex-1">
-          {recommendedMode === 'weight' && (
-            <WeightModeSection weight={weight} onWeightChange={onWeightChange} />
-          )}
+          {/* モード切り替えタブ */}
+          <Tabs
+            defaultValue={recommendedMode}
+            value={recommendedMode}
+            onValueChange={(v) => onRecommendedModeChange(v as 'weight' | 'history')}
+            isChristmasMode={isChristmasMode}
+            className="mb-6 flex-shrink-0"
+          >
+            <TabsList>
+              <TabsTrigger value="weight">重さで設定</TabsTrigger>
+              <TabsTrigger value="history">過去の記録から設定</TabsTrigger>
+            </TabsList>
 
-          {recommendedMode === 'history' && (
-            <HistoryModeSection
-              beanName={beanName}
-              weight={weight}
-              roastLevel={roastLevel}
-              availableBeans={availableBeans}
-              availableWeights={availableWeights}
-              availableRoastLevels={availableRoastLevels}
-              recommendedTimeInfo={recommendedTimeInfo}
-              onBeanNameChange={onBeanNameChange}
-              onWeightChange={onWeightChange}
-              onRoastLevelChange={onRoastLevelChange}
-            />
-          )}
+            <TabsContent value="weight">
+              <WeightModeSection weight={weight} onWeightChange={onWeightChange} isChristmasMode={isChristmasMode} />
+            </TabsContent>
+
+            <TabsContent value="history">
+              <HistoryModeSection
+                beanName={beanName}
+                weight={weight}
+                roastLevel={roastLevel}
+                availableBeans={availableBeans}
+                availableWeights={availableWeights}
+                availableRoastLevels={availableRoastLevels}
+                recommendedTimeInfo={recommendedTimeInfo}
+                onBeanNameChange={onBeanNameChange}
+                onWeightChange={onWeightChange}
+                onRoastLevelChange={onRoastLevelChange}
+                isChristmasMode={isChristmasMode}
+              />
+            </TabsContent>
+          </Tabs>
 
           <div className="pt-2 flex-shrink-0">
-            <button
+            <Button
+              variant="primary"
+              size="lg"
               onClick={onStart}
               disabled={isStartDisabled}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
+              className="w-full flex items-center justify-center gap-3"
+              isChristmasMode={isChristmasMode}
             >
               <HiPlay className="text-2xl" />
               <span>スタート</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -126,44 +122,38 @@ export function RecommendedModeView({
 function WeightModeSection({
   weight,
   onWeightChange,
+  isChristmasMode,
 }: {
   weight: Weight | '';
   onWeightChange: (value: Weight | '') => void;
+  isChristmasMode: boolean;
 }) {
+  const weightOptions: SelectOption[] = WEIGHTS.map((w) => ({ value: String(w), label: `${w}g` }));
   return (
-    <>
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          重さ <span className="text-red-500">*</span>
-        </label>
-        <select
-          value={weight}
-          onChange={(e) =>
-            onWeightChange(e.target.value ? (parseInt(e.target.value, 10) as Weight) : '')
-          }
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
-        >
-          <option value="">選択してください</option>
-          {WEIGHTS.map((w) => (
-            <option key={w} value={w}>
-              {w}g
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="space-y-5">
+      <Select
+        label="重さ"
+        value={String(weight)}
+        onChange={(e) =>
+          onWeightChange(e.target.value ? (parseInt(e.target.value, 10) as Weight) : '')
+        }
+        options={[{ value: '', label: '選択してください' }, ...weightOptions]}
+        required
+        isChristmasMode={isChristmasMode}
+      />
 
       {weight !== '' && (
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-xl p-4 shadow-sm">
-          <p className="text-sm sm:text-base text-gray-700">
+        <div className={`rounded-xl p-4 shadow-sm border-2 ${isChristmasMode ? 'bg-[#0f3a1f]/50 border-[#d4af37]/30' : 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200'}`}>
+          <p className={`text-sm sm:text-base ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
             重さに応じたおすすめ時間は{' '}
-            <span className="font-bold text-amber-800">
+            <span className={`font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-800'}`}>
               {weight === 200 ? '8分' : weight === 300 ? '9分' : '10分'}
             </span>{' '}
             です
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -178,6 +168,7 @@ function HistoryModeSection({
   onBeanNameChange,
   onWeightChange,
   onRoastLevelChange,
+  isChristmasMode,
 }: {
   beanName: BeanName | '';
   weight: Weight | '';
@@ -189,98 +180,63 @@ function HistoryModeSection({
   onBeanNameChange: (value: BeanName | '') => void;
   onWeightChange: (value: Weight | '') => void;
   onRoastLevelChange: (value: RoastLevel | '') => void;
+  isChristmasMode: boolean;
 }) {
+  // オプションの生成
+  const beanOptions: SelectOption[] = availableBeans.map((bean) => ({ value: bean, label: bean }));
+  const roastLevelOptions: SelectOption[] = availableRoastLevels.map((level) => ({ value: level, label: level }));
+  const weightOptions: SelectOption[] = availableWeights.map((w) => ({ value: String(w), label: `${w}g` }));
   return (
-    <>
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          豆の名前 <span className="text-red-500">*</span>
-        </label>
-        <select
-          value={beanName}
-          onChange={(e) => {
-            onBeanNameChange(e.target.value as BeanName);
-          }}
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px]"
-        >
-          <option value="">選択してください</option>
-          {availableBeans.length > 0 ? (
-            availableBeans.map((bean) => (
-              <option key={bean} value={bean}>
-                {bean}
-              </option>
-            ))
-          ) : (
-            <option value="" disabled>
-              記録がありません（2件以上の記録が必要です）
-            </option>
-          )}
-        </select>
-      </div>
+    <div className="space-y-5">
+      <Select
+        label="豆の名前"
+        value={beanName}
+        onChange={(e) => onBeanNameChange(e.target.value as BeanName)}
+        options={[
+          { value: '', label: availableBeans.length > 0 ? '選択してください' : '記録がありません（2件以上の記録が必要です）' },
+          ...beanOptions
+        ]}
+        required
+        isChristmasMode={isChristmasMode}
+      />
 
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          焙煎度合い <span className="text-red-500">*</span>
-        </label>
-        <select
-          value={roastLevel}
-          onChange={(e) => onRoastLevelChange(e.target.value as RoastLevel | '')}
-          disabled={!beanName}
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
-        >
-          <option value="">選択してください</option>
-          {availableRoastLevels.length > 0 ? (
-            availableRoastLevels.map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))
-          ) : beanName ? (
-            <option value="" disabled>
-              記録がありません（2件以上の記録が必要です）
-            </option>
-          ) : (
-            <option value="" disabled>
-              豆を選択してください
-            </option>
-          )}
-        </select>
-      </div>
+      <Select
+        label="焙煎度合い"
+        value={roastLevel}
+        onChange={(e) => onRoastLevelChange(e.target.value as RoastLevel | '')}
+        disabled={!beanName}
+        options={[
+          {
+            value: '',
+            label: !beanName ? '豆を選択してください' : availableRoastLevels.length > 0 ? '選択してください' : '記録がありません（2件以上の記録が必要です）'
+          },
+          ...roastLevelOptions
+        ]}
+        required
+        isChristmasMode={isChristmasMode}
+      />
 
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          重さ <span className="text-red-500">*</span>
-        </label>
-        <select
-          value={weight}
-          onChange={(e) =>
-            onWeightChange(e.target.value ? (parseInt(e.target.value, 10) as Weight) : '')
-          }
-          disabled={!beanName}
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-base sm:text-lg text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 shadow-sm hover:border-gray-300 min-h-[52px] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400"
-        >
-          <option value="">選択してください</option>
-          {availableWeights.length > 0 ? (
-            availableWeights.map((w) => (
-              <option key={w} value={w}>
-                {w}g
-              </option>
-            ))
-          ) : beanName ? (
-            <option value="" disabled>
-              記録がありません（2件以上の記録が必要です）
-            </option>
-          ) : (
-            <option value="" disabled>
-              豆を選択してください
-            </option>
-          )}
-        </select>
-      </div>
+      <Select
+        label="重さ"
+        value={String(weight)}
+        onChange={(e) =>
+          onWeightChange(e.target.value ? (parseInt(e.target.value, 10) as Weight) : '')
+        }
+        disabled={!beanName}
+        options={[
+          {
+            value: '',
+            label: !beanName ? '豆を選択してください' : availableWeights.length > 0 ? '選択してください' : '記録がありません（2件以上の記録が必要です）'
+          },
+          ...weightOptions
+        ]}
+        required
+        isChristmasMode={isChristmasMode}
+      />
 
       {!recommendedTimeInfo && beanName && weight !== '' && roastLevel && (
-        <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 shadow-sm">
-          <p className="text-sm sm:text-base text-yellow-800">
+        <div className={`rounded-xl p-4 shadow-sm border-2 ${isChristmasMode ? 'bg-[#3d2a11]/50 border-[#d4af37]/30' : 'bg-yellow-50 border-yellow-200'}`}>
+          <p className={`text-sm sm:text-base ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-yellow-800'}`}>
             この組み合わせの記録が2件未満のため、平均焙煎時間を計算できません。重さに応じたデフォルト時間（
             {weight === 200 ? '8分' : weight === 300 ? '9分' : '10分'}）でタイマーを開始します。
           </p>
@@ -288,20 +244,20 @@ function HistoryModeSection({
       )}
 
       {recommendedTimeInfo && (
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-xl p-4 shadow-sm">
-          <p className="text-sm sm:text-base text-gray-700">
+        <div className={`rounded-xl p-4 shadow-sm border-2 ${isChristmasMode ? 'bg-[#0f3a1f]/50 border-[#d4af37]/30' : 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200'}`}>
+          <p className={`text-sm sm:text-base ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
             過去の記録から、平均焙煎時間は{' '}
-            <span className="font-bold text-amber-800">
+            <span className={`font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-800'}`}>
               {formatTimeAsMinutesAndSeconds(recommendedTimeInfo.averageDuration)}
             </span>
             、おすすめタイマー時間は{' '}
-            <span className="font-bold text-amber-800">
+            <span className={`font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-800'}`}>
               {formatTimeAsMinutesAndSeconds(recommendedTimeInfo.recommendedDuration)}
             </span>{' '}
             です
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 }

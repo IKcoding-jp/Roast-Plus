@@ -8,6 +8,8 @@ import { ScheduleTypeSelector } from './roast-scheduler/ScheduleTypeSelector';
 import { RoasterFields } from './roast-scheduler/RoasterFields';
 import { RoastFields } from './roast-scheduler/RoastFields';
 import { SchedulePreview } from './roast-scheduler/SchedulePreview';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
+import { Button, IconButton, NumberInput } from '@/components/ui';
 
 interface RoastScheduleMemoDialogProps {
   schedule: RoastSchedule | null;
@@ -37,6 +39,8 @@ function RoastScheduleMemoDialogInner({
   onDelete,
   onCancel,
 }: RoastScheduleMemoDialogProps) {
+  const { isChristmasMode } = useChristmasMode();
+
   // 時間を時・分に分割
   const parseTime = (timeStr: string) => {
     if (!timeStr) return { hour: '', minute: '' };
@@ -170,26 +174,39 @@ function RoastScheduleMemoDialogInner({
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/20 flex items-center justify-center z-[100] p-4"
       onClick={onCancel}
     >
-      <div 
-        className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto border-2 border-gray-300"
+      <div
+        className={`rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto border-2 ${
+          isChristmasMode
+            ? 'bg-[#0a2f1a] border-[#d4af37]/30'
+            : 'bg-white border-gray-300'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 md:px-8 py-4 md:py-5 flex items-center justify-between">
-          <h3 className="text-2xl md:text-2xl font-semibold text-gray-800">
+        <div className={`sticky top-0 border-b px-6 md:px-8 py-4 md:py-5 flex items-center justify-between ${
+          isChristmasMode
+            ? 'bg-[#0a2f1a] border-[#d4af37]/20'
+            : 'bg-white border-gray-200'
+        }`}>
+          <h3 className={`text-2xl md:text-2xl font-semibold ${
+            isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
+          }`}>
             {schedule ? 'スケジュールを編集' : 'スケジュールを追加'}
           </h3>
-          <button
+          <IconButton
+            variant="ghost"
+            size="md"
             onClick={onCancel}
-            className="rounded-md bg-gray-200 p-2 md:p-2.5 text-gray-700 transition-colors hover:bg-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            isChristmasMode={isChristmasMode}
+            rounded
             aria-label="閉じる"
           >
             <HiX className="h-6 w-6 md:h-7 md:w-7" />
-          </button>
+          </IconButton>
         </div>
 
         {/* フォーム */}
@@ -198,12 +215,13 @@ function RoastScheduleMemoDialogInner({
             {/* 時間選択 */}
             {!isAfterPurge && (
               <div>
-                <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700 text-center">
+                <label className={`mb-1 md:mb-2 block text-base md:text-lg font-medium text-center ${
+                  isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
+                }`}>
                   時間 <span className="text-red-500">*</span>
                 </label>
                 <div className="flex items-center justify-center gap-2 md:gap-3">
-                  <input
-                    type="number"
+                  <NumberInput
                     value={hour}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -211,15 +229,15 @@ function RoastScheduleMemoDialogInner({
                         setHour(value);
                       }
                     }}
-                    min="0"
-                    max="23"
+                    min={0}
+                    max={23}
                     required={!isAfterPurge}
-                    className="w-20 md:w-24 rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="時"
+                    isChristmasMode={isChristmasMode}
+                    className="w-20 md:w-24 text-center"
                   />
-                  <span className="text-gray-600 text-lg md:text-xl">:</span>
-                  <input
-                    type="number"
+                  <span className={`text-lg md:text-xl ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>:</span>
+                  <NumberInput
                     value={minute}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -227,11 +245,12 @@ function RoastScheduleMemoDialogInner({
                         setMinute(value);
                       }
                     }}
-                    min="0"
-                    max="59"
+                    min={0}
+                    max={59}
                     required={!isAfterPurge}
-                    className="w-20 md:w-24 rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="分"
+                    isChristmasMode={isChristmasMode}
+                    className="w-20 md:w-24 text-center"
                   />
                 </div>
               </div>
@@ -244,6 +263,7 @@ function RoastScheduleMemoDialogInner({
               isAfterPurge={isAfterPurge}
               isChaffCleaning={isChaffCleaning}
               onTypeChange={handleMemoTypeChange}
+              isChristmasMode={isChristmasMode}
             />
 
             {/* 焙煎機予熱用フィールド */}
@@ -261,6 +281,7 @@ function RoastScheduleMemoDialogInner({
                 onBlendRatio2Change={setBlendRatio2}
                 onWeightChange={setWeight}
                 onRoastLevelChange={setRoastLevel}
+                isChristmasMode={isChristmasMode}
               />
             )}
 
@@ -271,6 +292,7 @@ function RoastScheduleMemoDialogInner({
                 bagCount={bagCount}
                 onRoastCountChange={setRoastCount}
                 onBagCountChange={setBagCount}
+                isChristmasMode={isChristmasMode}
               />
             )}
 
@@ -288,25 +310,32 @@ function RoastScheduleMemoDialogInner({
               roastLevel={roastLevel}
               roastCount={roastCount}
               bagCount={bagCount}
+              isChristmasMode={isChristmasMode}
             />
 
             {/* フッター */}
-            <div className="flex gap-3 md:gap-4 pt-4 md:pt-5 border-t border-gray-200 justify-center">
+            <div className={`flex gap-3 md:gap-4 pt-4 md:pt-5 border-t justify-center ${
+              isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
+            }`}>
               {schedule && onDelete && (
-                <button
+                <Button
                   type="button"
+                  variant="danger"
+                  size="lg"
                   onClick={handleDelete}
-                  className="px-4 md:px-6 py-2 md:py-2.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors min-h-[44px] text-base md:text-lg"
+                  isChristmasMode={isChristmasMode}
                 >
                   削除
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 type="submit"
-                className="px-6 md:px-8 py-2 md:py-2.5 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px] text-base md:text-lg"
+                variant="primary"
+                size="lg"
+                isChristmasMode={isChristmasMode}
               >
                 保存
-              </button>
+              </Button>
             </div>
           </div>
         </form>

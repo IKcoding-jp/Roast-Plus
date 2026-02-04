@@ -14,6 +14,7 @@ import { ROAST_LEVELS, WEIGHTS, DEFAULT_DURATIONS as DEFAULT_DURATION_BY_WEIGHT,
 import { convertToHalfWidth, removeNonNumeric } from '@/lib/utils';
 import { ModeSelectView } from './ModeSelectView';
 import { RecommendedModeView } from './RecommendedModeView';
+import { Input, Button } from '@/components/ui';
 
 interface SetupPanelProps {
   onStart: (
@@ -23,6 +24,7 @@ interface SetupPanelProps {
     roastLevel?: RoastLevel
   ) => Promise<void>;
   isLoading: boolean;
+  isChristmasMode: boolean;
 }
 
 /**
@@ -31,7 +33,7 @@ interface SetupPanelProps {
  * - 手動入力モード
  * - おすすめモード
  */
-export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
+export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelProps) {
   const { user } = useAuth();
   const { data } = useAppData();
   const { showToast } = useToastContext();
@@ -350,6 +352,7 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
           !user ||
           isLoading
         }
+        isChristmasMode={isChristmasMode}
       />
     );
   }
@@ -359,7 +362,7 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
     return (
       <div className="flex-1 flex flex-col pt-16 px-4 sm:px-6">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h3 className={`text-xl sm:text-2xl font-bold flex items-center gap-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
               <MdTimer className="text-white text-lg" />
             </div>
@@ -369,39 +372,43 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
 
         <div className="space-y-6 flex-1">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
+            <label className={`block text-sm font-semibold uppercase tracking-wide mb-3 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
               時間設定
             </label>
             <div className="flex gap-4">
               <div className="flex-1">
-                <input
+                <Input
                   type="text"
                   inputMode="numeric"
                   value={durationMinutes}
                   onChange={(e) => handleDurationMinutesChange(e.target.value)}
                   placeholder="分"
-                  className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                  className="text-center font-semibold text-lg sm:text-xl"
+                  isChristmasMode={isChristmasMode}
                 />
               </div>
               <div className="flex items-end pb-2">
-                <span className="text-2xl font-bold text-gray-400">:</span>
+                <span className={`text-2xl font-bold ${isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'}`}>:</span>
               </div>
               <div className="flex-1">
-                <input
+                <Input
                   type="text"
                   inputMode="numeric"
                   value={durationSeconds}
                   onChange={(e) => handleDurationSecondsChange(e.target.value)}
                   placeholder="秒"
                   maxLength={2}
-                  className="w-full rounded-xl border-2 border-gray-200 px-4 py-3.5 text-lg sm:text-xl text-gray-900 bg-gray-50 focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-100 transition-all duration-200 font-semibold text-center min-h-[52px] shadow-sm hover:border-gray-300"
+                  className="text-center font-semibold text-lg sm:text-xl"
+                  isChristmasMode={isChristmasMode}
                 />
               </div>
             </div>
           </div>
 
           <div className="pt-2 flex-shrink-0">
-            <button
+            <Button
+              variant="primary"
+              size="lg"
               onClick={handleStart}
               disabled={
                 ((!durationMinutes || durationMinutes.trim() === '') &&
@@ -409,11 +416,12 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
                 !user ||
                 isLoading
               }
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-amber-700 active:scale-[0.98] transition-all duration-200 text-base sm:text-lg min-h-[56px] disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:active:scale-100 disabled:hover:from-gray-300 disabled:hover:to-gray-400"
+              className="w-full flex items-center justify-center gap-3"
+              isChristmasMode={isChristmasMode}
             >
               <HiPlay className="text-2xl" />
               <span>スタート</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -437,6 +445,7 @@ export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
       onRoastLevelChange={setRoastLevel}
       onStart={handleStart}
       isStartDisabled={!weight || (recommendedMode === 'history' && (!beanName || !roastLevel))}
+      isChristmasMode={isChristmasMode}
     />
   );
 }

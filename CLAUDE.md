@@ -81,6 +81,32 @@ import {
 4. **既存で対応不可の場合** → `components/ui/` に新規共通コンポーネントを作成
 5. **共通コンポーネントの重複禁止** → 作成前に既存コンポーネントを必ず確認
 
+### 新規コンポーネント追加時（レジストリ方式）
+新しい共通UIコンポーネントを作成した場合、**必ず以下の手順で登録すること**：
+
+1. `components/ui/NewComponent.tsx` を作成
+2. `components/ui/index.ts` にエクスポートを追加
+3. `components/ui/registry.tsx` に以下を追加：
+   - デモコンポーネント（`NewComponentDemo`関数）
+   - `componentRegistry`配列にエントリを追加（name, description, category, Demo）
+
+```tsx
+// registry.tsx への追加例
+function NewComponentDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+  return <NewComponent isChristmasMode={isChristmasMode} />;
+}
+
+// componentRegistry配列に追加
+{
+  name: 'NewComponent',
+  description: 'コンポーネントの説明',
+  category: 'button' | 'form' | 'container' | 'display' | 'feedback',
+  Demo: NewComponentDemo,
+}
+```
+
+→ UIテストページ（`/ui-test`）に自動表示される
+
 ### クリスマスモード対応例
 ```tsx
 const { isChristmasMode } = useChristmasMode();

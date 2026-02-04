@@ -76,7 +76,7 @@ export function RoastRecordFilters({
           />
         </div>
         <Button
-          variant="secondary"
+          variant="surface"
           size="md"
           onClick={onShowFiltersToggle}
           className="whitespace-nowrap"

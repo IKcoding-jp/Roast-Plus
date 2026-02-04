@@ -8,6 +8,8 @@ import { OCRRoastScheduleEditor } from '../OCRRoastScheduleEditor';
 import { useToastContext } from '../Toast';
 import { sortTimeLabels, sortRoastSchedules } from './OCRConfirmHelpers';
 import type { TabType } from './OCRConfirmHelpers';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
+import { Button, IconButton } from '@/components/ui';
 
 interface OCRConfirmModalProps {
   timeLabels: TimeLabel[];
@@ -31,6 +33,7 @@ export function OCRConfirmModal({
   onRetry,
 }: OCRConfirmModalProps) {
   const { showToast } = useToastContext();
+  const { isChristmasMode } = useChristmasMode();
   const [activeTab, setActiveTab] = useState<TabType>('timeLabels');
   const [mode, setMode] = useState<'replace' | 'add'>('replace');
   const [timeLabels, setTimeLabels] = useState<TimeLabel[]>(() =>
@@ -131,65 +134,84 @@ export function OCRConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 flex flex-col max-h-[90vh]">
+      <div className={`rounded-lg shadow-xl max-w-4xl w-full mx-4 flex flex-col max-h-[90vh] ${
+        isChristmasMode
+          ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
+          : 'bg-white'
+      }`}>
         {/* ヘッダー */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-800">
+        <div className={`flex items-center justify-between p-4 sm:p-6 border-b flex-shrink-0 ${
+          isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
+        }`}>
+          <h2 className={`text-lg sm:text-xl font-bold ${
+            isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
+          }`}>
             読み取り結果の確認
           </h2>
-          <button
+          <IconButton
+            variant="ghost"
+            size="md"
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            isChristmasMode={isChristmasMode}
+            rounded
             aria-label="閉じる"
           >
-            <HiX className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
-          </button>
+            <HiX className="h-5 w-5 sm:h-6 sm:w-6" />
+          </IconButton>
         </div>
 
         {/* モード選択 */}
         {hasExistingData && (
-          <div className="px-4 sm:px-6 py-3 border-b border-gray-200 flex-shrink-0">
+          <div className={`px-4 sm:px-6 py-3 border-b flex-shrink-0 ${
+            isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
+          }`}>
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-gray-700">適用方法:</span>
+              <span className={`text-sm font-medium ${
+                isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
+              }`}>適用方法:</span>
               <div className="flex gap-2">
-                <button
+                <Button
+                  variant={mode === 'replace' ? 'primary' : 'ghost'}
+                  size="sm"
                   onClick={() => setMode('replace')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
-                    mode === 'replace'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                  isChristmasMode={isChristmasMode}
                 >
                   置き換え
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant={mode === 'add' ? 'primary' : 'ghost'}
+                  size="sm"
                   onClick={() => setMode('add')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
-                    mode === 'add'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                  isChristmasMode={isChristmasMode}
                 >
                   追加
-                </button>
+                </Button>
               </div>
             </div>
           </div>
         )}
 
         {/* タブ */}
-        <div className="flex border-b border-gray-200 flex-shrink-0">
+        <div className={`flex border-b flex-shrink-0 ${
+          isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
+        }`}>
           <button
             onClick={() => setActiveTab('timeLabels')}
             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
               activeTab === 'timeLabels'
-                ? 'bg-amber-50 text-amber-700 border-b-2 border-amber-600'
-                : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? isChristmasMode
+                  ? 'bg-[#d4af37]/20 text-[#d4af37] border-b-2 border-[#d4af37]'
+                  : 'bg-amber-50 text-amber-700 border-b-2 border-amber-600'
+                : isChristmasMode
+                  ? 'bg-transparent text-[#f8f1e7]/70 hover:bg-white/5'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
             <HiClock className="h-5 w-5" />
             <span>本日のスケジュール</span>
-            <span className="bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs">
+            <span className={`rounded-full px-2 py-0.5 text-xs ${
+              isChristmasMode ? 'bg-[#d4af37]/30 text-[#f8f1e7]' : 'bg-gray-200 text-gray-700'
+            }`}>
               {timeLabels.length}
             </span>
           </button>
@@ -197,13 +219,19 @@ export function OCRConfirmModal({
             onClick={() => setActiveTab('roastSchedules')}
             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
               activeTab === 'roastSchedules'
-                ? 'bg-amber-50 text-amber-700 border-b-2 border-amber-600'
-                : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? isChristmasMode
+                  ? 'bg-[#d4af37]/20 text-[#d4af37] border-b-2 border-[#d4af37]'
+                  : 'bg-amber-50 text-amber-700 border-b-2 border-amber-600'
+                : isChristmasMode
+                  ? 'bg-transparent text-[#f8f1e7]/70 hover:bg-white/5'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
             <HiFire className="h-5 w-5" />
             <span>ローストスケジュール</span>
-            <span className="bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs">
+            <span className={`rounded-full px-2 py-0.5 text-xs ${
+              isChristmasMode ? 'bg-[#d4af37]/30 text-[#f8f1e7]' : 'bg-gray-200 text-gray-700'
+            }`}>
               {roastSchedules.length}
             </span>
           </button>
@@ -218,6 +246,7 @@ export function OCRConfirmModal({
               onDelete={(id) => {
                 setTimeLabels(timeLabels.filter((label) => label.id !== id));
               }}
+              isChristmasMode={isChristmasMode}
             />
           ) : (
             <OCRRoastScheduleEditor
@@ -227,32 +256,41 @@ export function OCRConfirmModal({
               onDelete={(id) => {
                 setRoastSchedules(roastSchedules.filter((schedule) => schedule.id !== id));
               }}
+              isChristmasMode={isChristmasMode}
             />
           )}
         </div>
 
         {/* フッター */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-t border-gray-200 gap-3 flex-shrink-0">
-          <button
+        <div className={`flex items-center justify-between p-4 sm:p-6 border-t gap-3 flex-shrink-0 ${
+          isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
+        }`}>
+          <Button
+            variant="ghost"
+            size="md"
             onClick={onRetry}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors min-h-[44px]"
+            isChristmasMode={isChristmasMode}
             aria-label="再解析"
           >
             再解析
-          </button>
+          </Button>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="secondary"
+              size="md"
               onClick={onCancel}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium min-h-[44px]"
+              isChristmasMode={isChristmasMode}
             >
               キャンセル
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
+              size="md"
               onClick={handleSave}
-              className="px-4 sm:px-6 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px]"
+              isChristmasMode={isChristmasMode}
             >
               保存
-            </button>
+            </Button>
           </div>
         </div>
       </div>

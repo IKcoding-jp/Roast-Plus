@@ -6,15 +6,17 @@ import type { AppData, RoastSchedule } from '@/types';
 import { HiPlus, HiCalendar } from 'react-icons/hi';
 import { RoastScheduleMemoDialog } from './RoastScheduleMemoDialog';
 import { ScheduleCard } from './roast-scheduler/ScheduleCard';
+import { Button } from '@/components/ui';
 
 interface RoastSchedulerTabProps {
   data: AppData | null;
   onUpdate: (data: AppData) => void;
   selectedDate: string; // YYYY-MM-DD形式
   isToday: boolean; // 選択日が今日かどうか
+  isChristmasMode?: boolean;
 }
 
-export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isToday }: RoastSchedulerTabProps) {
+export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isToday, isChristmasMode = false }: RoastSchedulerTabProps) {
   const [editingSchedule, setEditingSchedule] = useState<RoastSchedule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -260,40 +262,58 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
 
   if (!data) {
     return (
-      <div className="rounded-2xl bg-white p-6 shadow-xl border-2 border-gray-300">
-        <p className="text-center text-gray-500">データがありません</p>
+      <div className={`rounded-2xl p-6 shadow-xl ${
+        isChristmasMode
+          ? 'bg-[#0a2f1a] border-2 border-[#d4af37]/30'
+          : 'bg-white border-2 border-gray-300'
+      }`}>
+        <p className={`text-center ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>データがありません</p>
       </div>
     );
   }
 
   return (
     <div
-      className="relative rounded-2xl bg-white p-4 md:p-6 shadow-xl border-2 border-gray-300 h-full flex flex-col backdrop-blur-sm"
+      className={`relative rounded-2xl p-4 md:p-6 shadow-xl h-full flex flex-col backdrop-blur-sm ${
+        isChristmasMode
+          ? 'bg-[#0a2f1a] border-2 border-[#d4af37]/30'
+          : 'bg-white border-2 border-gray-300'
+      }`}
       data-is-today={_isToday}
     >
       {/* デスクトップ版：タイトルと追加ボタンを横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex items-center justify-between">
-        <h2 className="text-base md:text-lg font-semibold text-gray-800">
+        <h2 className={`text-base md:text-lg font-semibold ${
+          isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
+        }`}>
           ローストスケジュール
         </h2>
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           onClick={handleAdd}
-          className="flex items-center gap-1 md:gap-1.5 rounded-md bg-primary px-2.5 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white transition-colors hover:bg-primary-dark shadow-md"
+          isChristmasMode={isChristmasMode}
           aria-label="スケジュールを追加"
         >
-          <HiPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
+          <HiPlus className="h-4 w-4" />
           <span>追加</span>
-        </button>
+        </Button>
       </div>
 
       {sortedSchedules.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-center text-gray-500">
+        <div className={`flex-1 flex items-center justify-center text-center ${
+          isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'
+        }`}>
           <div>
             <div className="mb-3 md:mb-5 flex justify-center">
-              <HiCalendar className="h-12 w-12 md:h-20 md:w-20 text-gray-300" />
+              <HiCalendar className={`h-12 w-12 md:h-20 md:w-20 ${
+                isChristmasMode ? 'text-[#d4af37]/30' : 'text-gray-300'
+              }`} />
             </div>
             <p className="text-sm md:text-lg font-medium">スケジュールがありません</p>
-            <p className="mt-1.5 md:mt-3 text-xs md:text-base text-gray-400">ボタンから新しいスケジュールを作成してください</p>
+            <p className={`mt-1.5 md:mt-3 text-xs md:text-base ${
+              isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'
+            }`}>ボタンから新しいスケジュールを作成してください</p>
           </div>
         </div>
       ) : (
@@ -311,18 +331,21 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, schedule.id)}
                 onDragEnd={handleDragEnd}
+                isChristmasMode={isChristmasMode}
               />
             ))}
             {/* モバイル版：追加ボタンを一番下に表示 */}
             <div className="mt-4 flex lg:hidden items-center justify-center pb-2">
-              <button
+              <Button
+                variant="primary"
+                size="md"
                 onClick={handleAdd}
-                className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-3 md:px-4 py-2 md:py-2 text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark shadow-md min-w-[44px] min-h-[44px]"
+                isChristmasMode={isChristmasMode}
                 aria-label="スケジュールを追加"
               >
-                <HiPlus className="h-4 w-4 md:h-4 md:w-4" />
+                <HiPlus className="h-4 w-4" />
                 <span className="hidden sm:inline">追加</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -331,14 +354,16 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
       {/* モバイル版：追加ボタンを一番下に表示（空の場合） */}
       {sortedSchedules.length === 0 && (
         <div className="mt-4 flex lg:hidden items-center justify-center">
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={handleAdd}
-            className="flex items-center justify-center gap-1 md:gap-1.5 rounded-md bg-primary px-3 md:px-4 py-2 md:py-2 text-sm md:text-base font-medium text-white transition-colors hover:bg-primary-dark shadow-md min-w-[44px] min-h-[44px]"
+            isChristmasMode={isChristmasMode}
             aria-label="スケジュールを追加"
           >
-            <HiPlus className="h-4 w-4 md:h-4 md:w-4" />
+            <HiPlus className="h-4 w-4" />
             <span className="hidden sm:inline">追加</span>
-          </button>
+          </Button>
         </div>
       )}
 

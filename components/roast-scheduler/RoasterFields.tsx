@@ -15,6 +15,7 @@ interface RoasterFieldsProps {
   onBlendRatio2Change: (value: string) => void;
   onWeightChange: (value: 200 | 300 | 500 | '') => void;
   onRoastLevelChange: (value: '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | '') => void;
+  isChristmasMode?: boolean;
 }
 
 export function RoasterFields({
@@ -30,11 +31,31 @@ export function RoasterFields({
   onBlendRatio2Change,
   onWeightChange,
   onRoastLevelChange,
+  isChristmasMode = false,
 }: RoasterFieldsProps) {
+  const labelClass = `mb-1 md:mb-2 block text-base md:text-lg font-medium ${
+    isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
+  }`;
+  const subLabelClass = `mb-1 md:mb-2 block text-sm md:text-base font-medium ${
+    isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
+  }`;
+  const selectClass = `w-full rounded-md border px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg focus:outline-none focus:ring-2 ${
+    isChristmasMode
+      ? 'border-[#d4af37]/40 bg-[#0a2f1a] text-[#f8f1e7] focus:border-[#d4af37] focus:ring-[#d4af37]/50'
+      : 'border-gray-300 bg-white text-gray-900 focus:border-amber-500 focus:ring-amber-500'
+  }`;
+  const inputClass = `w-full rounded-md border px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-center focus:outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+    isChristmasMode
+      ? 'border-[#d4af37]/40 bg-white/10 text-[#f8f1e7] placeholder:text-[#f8f1e7]/40 focus:border-[#d4af37] focus:ring-[#d4af37]/50'
+      : 'border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-amber-500'
+  }`;
+
   return (
-    <div className="space-y-3 md:space-y-4 border-t border-gray-200 pt-3 md:pt-4">
+    <div className={`space-y-3 md:space-y-4 border-t pt-3 md:pt-4 ${
+      isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
+    }`}>
       <div>
-        <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">豆の名前</label>
+        <label className={labelClass}>豆の名前</label>
         <select
           value={beanName}
           onChange={(e) => {
@@ -47,7 +68,7 @@ export function RoasterFields({
               onBlendRatio2Change('');
             }
           }}
-          className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className={selectClass}
         >
           <option value="">選択してください</option>
           {ALL_BEANS.map((bean) => (
@@ -59,7 +80,7 @@ export function RoasterFields({
       </div>
 
       <div>
-        <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
+        <label className={labelClass}>
           2種類目の豆の名前
         </label>
         <select
@@ -73,7 +94,7 @@ export function RoasterFields({
               onBlendRatio2Change('');
             }
           }}
-          className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className={selectClass}
         >
           <option value="">なし</option>
           {ALL_BEANS.filter((bean) => bean !== beanName).map((bean) => (
@@ -86,12 +107,12 @@ export function RoasterFields({
 
       {beanName2 && (
         <div>
-          <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">
+          <label className={labelClass}>
             ブレンド割合 <span className="text-red-500">*</span>
           </label>
           <div className="grid grid-cols-2 gap-2 md:gap-3">
             <div>
-              <label className="mb-1 md:mb-2 block text-sm md:text-base font-medium text-gray-600">
+              <label className={subLabelClass}>
                 {beanName}の割合
               </label>
               <input
@@ -106,12 +127,12 @@ export function RoasterFields({
                 min="0"
                 max="10"
                 required={!!beanName2}
-                className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className={inputClass}
                 placeholder="5"
               />
             </div>
             <div>
-              <label className="mb-1 md:mb-2 block text-sm md:text-base font-medium text-gray-600">
+              <label className={subLabelClass}>
                 {beanName2}の割合
               </label>
               <input
@@ -126,23 +147,25 @@ export function RoasterFields({
                 min="0"
                 max="10"
                 required={!!beanName2}
-                className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 text-center focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className={inputClass}
                 placeholder="5"
               />
             </div>
           </div>
-          <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-500">
+          <p className={`mt-1 md:mt-2 text-sm md:text-base ${
+            isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'
+          }`}>
             合計が10になるように入力してください（例：5と5、8と2）
           </p>
         </div>
       )}
 
       <div>
-        <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">重さ</label>
+        <label className={labelClass}>重さ</label>
         <select
           value={weight}
           onChange={(e) => onWeightChange(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')}
-          className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className={selectClass}
         >
           <option value="">選択してください</option>
           <option value="200">200g</option>
@@ -152,13 +175,13 @@ export function RoasterFields({
       </div>
 
       <div>
-        <label className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-gray-700">焙煎度合い</label>
+        <label className={labelClass}>焙煎度合い</label>
         <select
           value={roastLevel}
           onChange={(e) =>
             onRoastLevelChange(e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | '')
           }
-          className="w-full rounded-md border border-gray-300 px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-gray-900 bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className={selectClass}
         >
           <option value="">選択してください</option>
           <option value="浅煎り">浅煎り</option>

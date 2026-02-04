@@ -43,6 +43,10 @@ import { forwardRef } from 'react';
  * // クリスマスモード
  * const { isChristmasMode } = useChristmasMode();
  * <Button isChristmasMode={isChristmasMode} onClick={handleAction}>アクション</Button>
+ *
+ * @example
+ * // バッジ付きボタン（通知やフィルター数表示に使用）
+ * <Button badge={3} onClick={handleFilter}>フィルター</Button>
  */
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -56,6 +60,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   fullWidth?: boolean;
   /** クリスマスモードの有効/無効 */
   isChristmasMode?: boolean;
+  /** バッジに表示する数値（0以下の場合は非表示） */
+  badge?: number;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -66,6 +72,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       loading = false,
       fullWidth = false,
       isChristmasMode = false,
+      badge,
       className = '',
       disabled,
       children,
@@ -113,6 +120,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // フル幅スタイル
     const fullWidthStyles = fullWidth ? 'w-full' : '';
 
+    // バッジスタイル
+    const badgeStyles = isChristmasMode
+      ? 'absolute -top-1.5 -right-1.5 bg-[#d4af37] text-[#1a1a1a] rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white'
+      : 'absolute -top-1.5 -right-1.5 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white';
+
     const buttonStyles = [
       baseStyles,
       sizeStyles[size],
@@ -122,10 +134,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className,
     ].filter(Boolean).join(' ');
 
+    const showBadge = badge !== undefined && badge > 0;
+
     return (
       <button
         ref={ref}
-        className={buttonStyles}
+        className={`${buttonStyles} ${showBadge ? 'relative' : ''}`}
         disabled={disabled || loading}
         aria-busy={loading}
         {...props}
@@ -154,6 +168,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         )}
         {children}
+        {showBadge && (
+          <span className={badgeStyles} aria-label={`${badge}件`}>
+            {badge}
+          </span>
+        )}
       </button>
     );
   }

@@ -4,6 +4,8 @@ import { Coffee, Quotes, Notepad, CaretRight } from 'phosphor-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TastingSession } from '@/types';
 import type { AverageScores } from '@/lib/tastingUtils';
+import { Button, Card } from '@/components/ui';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionCardMobileProps {
   session: TastingSession;
@@ -25,20 +27,30 @@ export function TastingSessionCardMobile({
   formatDate,
 }: TastingSessionCardMobileProps) {
   const [aiModalSession, setAiModalSession] = useState<TastingSession | null>(null);
+  const { isChristmasMode } = useChristmasMode();
   const hasAnalysis = !!session.aiAnalysis;
+
+  // クリスマスモード用のスタイル
+  const cardBorderClass = isChristmasMode ? 'border-[#d4af37]/30' : 'border-gray-200';
+  const textPrimaryClass = isChristmasMode ? 'text-[#f8f1e7]' : 'text-[#4a3728]';
+  const textSecondaryClass = isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500';
+  const textMutedClass = isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400';
+  const bgMutedClass = isChristmasMode ? 'bg-white/10' : 'bg-gray-200';
+  const iconAccentClass = isChristmasMode ? 'text-[#d4af37]' : 'text-[#f5821f]';
+  const spinnerClass = isChristmasMode ? 'border-[#d4af37]' : 'border-[#f5821f]';
 
   return (
     <>
       <div className="flex-shrink-0 w-[calc(100vw-2rem)] h-full snap-center">
         <Link href={`/tasting?sessionId=${session.id}`} className="block h-full">
-          <div className="rounded-2xl shadow-lg flex flex-col h-full overflow-hidden relative border border-gray-100 bg-white">
+          <Card variant="hoverable" isChristmasMode={isChristmasMode} className="p-0 flex flex-col h-full overflow-hidden shadow-lg">
             <div className="relative z-10 flex flex-col h-full">
               <div className="flex flex-col h-full">
                 {/* ヘッダー（タイトル） */}
-                <div className="flex-shrink-0 p-5 pb-4 border-b border-dashed border-gray-200">
+                <div className={`flex-shrink-0 p-5 pb-4 border-b border-dashed ${cardBorderClass}`}>
                   <div className="flex items-center gap-3">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-2xl font-serif font-bold text-[#4a3728] tracking-tight leading-tight truncate mb-2">
+                      <h3 className={`text-2xl font-serif font-bold ${textPrimaryClass} tracking-tight leading-tight truncate mb-2`}>
                         {session.beanName}
                       </h3>
                       <div className="flex items-center gap-2">
@@ -51,7 +63,7 @@ export function TastingSessionCardMobile({
                         >
                           {session.roastLevel}
                         </span>
-                        <span className="text-[10px] text-gray-400">
+                        <span className={`text-[10px] ${textMutedClass}`}>
                           {formatDate(session.createdAt)}
                         </span>
                       </div>
@@ -61,7 +73,7 @@ export function TastingSessionCardMobile({
 
                 {/* 横バーチャート（スコア表示） */}
                 {recordCount > 0 && (
-                  <div className="flex-shrink-0 px-4 py-3 bg-white border-b border-dashed border-gray-200">
+                  <div className={`flex-shrink-0 px-4 py-3 border-b border-dashed ${cardBorderClass}`}>
                     <div className="space-y-2.5">
                       {[
                         { label: '苦味', value: averageScores.bitterness, color: '#3e2723' },
@@ -71,10 +83,10 @@ export function TastingSessionCardMobile({
                         { label: '香り', value: averageScores.aroma, color: '#00897b' },
                       ].map((item) => (
                         <div key={item.label} className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-gray-500 w-10 flex-shrink-0">
+                          <span className={`text-[10px] font-bold ${textSecondaryClass} w-10 flex-shrink-0`}>
                             {item.label}
                           </span>
-                          <div className="flex-1 h-1.5 bg-gray-200 rounded overflow-hidden">
+                          <div className={`flex-1 h-1.5 ${bgMutedClass} rounded overflow-hidden`}>
                             <div
                               className="h-full transition-all duration-500"
                               style={{
@@ -83,7 +95,7 @@ export function TastingSessionCardMobile({
                               }}
                             />
                           </div>
-                          <span className="text-[10px] font-bold text-gray-500 w-6 text-right">
+                          <span className={`text-[10px] font-bold ${textSecondaryClass} w-6 text-right`}>
                             {item.value.toFixed(1)}
                           </span>
                         </div>
@@ -93,13 +105,13 @@ export function TastingSessionCardMobile({
                 )}
 
                 {/* 感想 + AIコメント */}
-                <div className="flex-1 flex flex-col min-h-0 p-4 bg-white">
+                <div className="flex-1 flex flex-col min-h-0 p-4">
                   {/* 感想セクション */}
                   <div className="flex-1 min-h-0 overflow-hidden">
                     <div className="flex items-center gap-2 mb-3">
-                      <Quotes size={16} weight="fill" className="text-[#4a3728]" />
-                      <h4 className="text-sm font-bold text-[#4a3728]">感想</h4>
-                      <span className="text-[10px] font-bold text-gray-400 ml-auto">
+                      <Quotes size={16} weight="fill" className={textPrimaryClass} />
+                      <h4 className={`text-sm font-bold ${textPrimaryClass}`}>感想</h4>
+                      <span className={`text-[10px] font-bold ${textMutedClass} ml-auto`}>
                         {recordCount}件の記録
                       </span>
                     </div>
@@ -110,7 +122,7 @@ export function TastingSessionCardMobile({
                           {comments.map((comment, commentIndex) => (
                             <li
                               key={commentIndex}
-                              className="text-sm italic text-gray-600 leading-relaxed pl-3 border-l-2 border-gray-200"
+                              className={`text-sm italic ${textSecondaryClass} leading-relaxed pl-3 border-l-2 ${cardBorderClass}`}
                             >
                               {comment}
                             </li>
@@ -118,51 +130,54 @@ export function TastingSessionCardMobile({
                         </ul>
                       ) : (
                         <div className="flex flex-col items-center justify-center h-full opacity-40">
-                          <Coffee size={32} weight="thin" className="text-gray-300 mb-2" />
-                          <p className="text-xs text-gray-400 italic">まだ感想がありません</p>
+                          <Coffee size={32} weight="thin" className={textMutedClass} />
+                          <p className={`text-xs ${textMutedClass} italic`}>まだ感想がありません</p>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* AI分析ボタン */}
-                  <div className="flex-shrink-0 border-t border-dashed border-gray-200 pt-3 mt-3">
+                  <div className={`flex-shrink-0 border-t border-dashed ${cardBorderClass} pt-3 mt-3`}>
                     {!hasAnalysis && !isAnalyzing && recordCount === 0 && (
-                      <p className="text-center text-xs text-gray-500 italic py-2">
+                      <p className={`text-center text-xs ${textSecondaryClass} italic py-2`}>
                         記録が追加されるとAI分析が開始されます
                       </p>
                     )}
 
                     {isAnalyzing && (
                       <div className="flex items-center justify-center gap-2 py-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#f5821f]"></div>
-                        <span className="text-xs text-gray-500">分析中...</span>
+                        <div className={`animate-spin rounded-full h-4 w-4 border-b-2 ${spinnerClass}`}></div>
+                        <span className={`text-xs ${textSecondaryClass}`}>分析中...</span>
                       </div>
                     )}
 
                     {hasAnalysis && (
-                      <button
+                      <Button
+                        variant="outline"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           setAiModalSession(session);
                         }}
-                        className="w-full flex items-center justify-between gap-2 bg-gray-50 p-3 rounded border border-gray-200 hover:bg-gray-100 transition-colors active:scale-[0.98]"
+                        fullWidth
+                        isChristmasMode={isChristmasMode}
+                        className="justify-between !p-3"
                       >
                         <div className="flex items-center gap-2">
-                          <Notepad size={16} weight="fill" className="text-[#f5821f]" />
-                          <span className="text-xs font-bold text-[#4a3728]">
+                          <Notepad size={16} weight="fill" className={iconAccentClass} />
+                          <span className={`text-xs font-bold ${textPrimaryClass}`}>
                             AIコーヒーマイスター
                           </span>
                         </div>
-                        <CaretRight size={16} weight="bold" className="text-gray-400" />
-                      </button>
+                        <CaretRight size={16} weight="bold" className={textMutedClass} />
+                      </Button>
                     )}
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </Link>
       </div>
 
@@ -181,39 +196,41 @@ export function TastingSessionCardMobile({
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
-              className="relative bg-white rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+              className={`relative ${isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white'} rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col`}
             >
               {/* ハンドル */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 bg-gray-300 rounded-full" />
+                <div className={`w-10 h-1 ${isChristmasMode ? 'bg-[#d4af37]/50' : 'bg-gray-300'} rounded-full`} />
               </div>
 
               {/* ヘッダー */}
-              <div className="px-6 pb-4 border-b border-dashed border-gray-200">
+              <div className={`px-6 pb-4 border-b border-dashed ${cardBorderClass}`}>
                 <div className="flex items-center gap-3">
-                  <Notepad size={24} weight="fill" className="text-[#f5821f]" />
+                  <Notepad size={24} weight="fill" className={iconAccentClass} />
                   <div>
-                    <h3 className="text-lg font-bold text-[#4a3728]">AIコーヒーマイスター</h3>
-                    <p className="text-xs text-gray-500">{aiModalSession.beanName}</p>
+                    <h3 className={`text-lg font-bold ${textPrimaryClass}`}>AIコーヒーマイスター</h3>
+                    <p className={`text-xs ${textSecondaryClass}`}>{aiModalSession.beanName}</p>
                   </div>
                 </div>
               </div>
 
               {/* コンテンツ */}
               <div className="flex-1 overflow-y-auto p-6">
-                <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap">
+                <p className={`text-sm leading-relaxed ${textPrimaryClass} whitespace-pre-wrap`}>
                   {aiModalSession.aiAnalysis}
                 </p>
               </div>
 
               {/* 閉じるボタン */}
-              <div className="p-4 border-t border-gray-100 bg-gray-50">
-                <button
+              <div className={`p-4 border-t ${isChristmasMode ? 'border-[#d4af37]/20 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
+                <Button
+                  variant="primary"
                   onClick={() => setAiModalSession(null)}
-                  className="w-full py-3 bg-[#f5821f] hover:bg-orange-600 text-white rounded-full font-bold text-sm transition-colors active:scale-[0.98] shadow-lg"
+                  fullWidth
+                  isChristmasMode={isChristmasMode}
                 >
                   閉じる
-                </button>
+                </Button>
               </div>
             </motion.div>
           </div>

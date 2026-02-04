@@ -14,6 +14,8 @@ import type { TastingSession, TastingRecord } from '@/types';
 import { CaretLeft, PencilCircle, Notebook, Coffee as CoffeeIcon, Plus } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
 import { motion } from 'framer-motion';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
+import { Button, IconButton } from '@/components/ui';
 
 function TastingPageContent() {
   const { user, loading: authLoading } = useAuth();
@@ -22,6 +24,20 @@ function TastingPageContent() {
   const searchParams = useSearchParams();
   const hasRedirected = useRef(false);
   const { showToast } = useToastContext();
+  const { isChristmasMode } = useChristmasMode();
+
+  // クリスマスモード用のスタイル
+  const bgPageClass = isChristmasMode ? 'bg-[#0f1f15]' : 'bg-[#F7F7F5]';
+  const textPrimaryClass = isChristmasMode ? 'text-[#f8f1e7]' : 'text-stone-800';
+  const textSecondaryClass = isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-stone-400';
+  const textLinkClass = isChristmasMode ? 'text-[#d4af37]/80 hover:text-[#d4af37]' : 'text-stone-400 hover:text-amber-600';
+  const iconBgClass = isChristmasMode ? 'bg-[#1a3d2a] border-[#d4af37]/30' : 'bg-white border-stone-100';
+  const iconGlowClass = isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50';
+  const iconColorClass = isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600';
+  const cardBgClass = isChristmasMode ? 'bg-[#1a3d2a] border-[#d4af37]/30' : 'bg-white border-stone-100';
+  const backButtonClass = isChristmasMode
+    ? 'text-[#d4af37]/70 hover:text-[#d4af37] bg-[#1a3d2a] border-[#d4af37]/30'
+    : 'text-stone-400 hover:text-amber-600 bg-white border-stone-100';
 
   // クエリパラメータからIDを取得
   const sessionId = searchParams?.get('sessionId');
@@ -57,11 +73,11 @@ function TastingPageContent() {
     const session = tastingSessions.find((s) => s.id === sessionId);
     if (!session) {
       return (
-        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className={`min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 ${bgPageClass}`}>
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-gray-600 mb-4">セッションが見つかりません</p>
-              <Link href="/tasting" className="text-[#8B4513] hover:underline">
+            <div className={`${cardBgClass} rounded-lg shadow-md p-6 text-center border`}>
+              <p className={`${textSecondaryClass} mb-4`}>セッションが見つかりません</p>
+              <Link href="/tasting" className={`${isChristmasMode ? 'text-[#d4af37]' : 'text-[#8B4513]'} hover:underline`}>
                 一覧に戻る
               </Link>
             </div>
@@ -112,7 +128,7 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+      <div className={`min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 ${bgPageClass}`}>
         <div className="max-w-2xl mx-auto space-y-10">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
@@ -121,21 +137,21 @@ function TastingPageContent() {
           >
             <Link
               href="/tasting"
-              className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+              className={`absolute left-0 top-0 group flex items-center gap-2 ${textLinkClass} transition-colors font-bold text-sm uppercase tracking-widest`}
             >
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
             </Link>
 
             <div className="flex flex-col items-center space-y-2">
-              <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
-                <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
-                <PencilCircle size={48} weight="duotone" className="text-amber-600" />
+              <div className={`p-5 ${iconBgClass} rounded-[2.5rem] shadow-sm border mb-4 relative`}>
+                <div className={`absolute inset-0 ${iconGlowClass} rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10`} />
+                <PencilCircle size={48} weight="duotone" className={iconColorClass} />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
+              <h1 className={`text-3xl sm:text-4xl font-black ${textPrimaryClass} tracking-tight`}>
                 セッションを編集
               </h1>
-              <p className="text-stone-400 font-medium">セッションの情報を更新します</p>
+              <p className={`${textSecondaryClass} font-medium`}>セッションの情報を更新します</p>
             </div>
           </motion.header>
 
@@ -157,11 +173,11 @@ function TastingPageContent() {
     const record = tastingRecords.find((r) => r.id === recordId);
     if (!record) {
       return (
-        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className={`min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 ${bgPageClass}`}>
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-gray-600 mb-4">記録が見つかりません</p>
-              <Link href="/tasting" className="text-[#8B4513] hover:underline">
+            <div className={`${cardBgClass} rounded-lg shadow-md p-6 text-center border`}>
+              <p className={`${textSecondaryClass} mb-4`}>記録が見つかりません</p>
+              <Link href="/tasting" className={`${isChristmasMode ? 'text-[#d4af37]' : 'text-[#8B4513]'} hover:underline`}>
                 一覧に戻る
               </Link>
             </div>
@@ -210,7 +226,7 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+      <div className={`min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 ${bgPageClass}`}>
         <div className="max-w-2xl mx-auto space-y-10">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
@@ -219,21 +235,21 @@ function TastingPageContent() {
           >
             <Link
               href="/tasting"
-              className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+              className={`absolute left-0 top-0 group flex items-center gap-2 ${textLinkClass} transition-colors font-bold text-sm uppercase tracking-widest`}
             >
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
             </Link>
 
             <div className="flex flex-col items-center space-y-3">
-              <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
-                <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
-                <Notebook size={48} weight="duotone" className="text-amber-600" />
+              <div className={`p-5 ${iconBgClass} rounded-[2.5rem] shadow-sm border mb-4 relative`}>
+                <div className={`absolute inset-0 ${iconGlowClass} rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10`} />
+                <Notebook size={48} weight="duotone" className={iconColorClass} />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
+              <h1 className={`text-3xl sm:text-4xl font-black ${textPrimaryClass} tracking-tight`}>
                 記録を編集
               </h1>
-              <p className="text-stone-400 font-medium">試飲の感想を更新します</p>
+              <p className={`${textSecondaryClass} font-medium`}>試飲の感想を更新します</p>
             </div>
           </motion.header>
 
@@ -256,11 +272,11 @@ function TastingPageContent() {
     const session = tastingSessions.find((s) => s.id === sessionId);
     if (!session) {
       return (
-        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className={`min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 ${bgPageClass}`}>
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-gray-600 mb-4">セッションが見つかりません</p>
-              <Link href="/tasting" className="text-[#8B4513] hover:underline">
+            <div className={`${cardBgClass} rounded-lg shadow-md p-6 text-center border`}>
+              <p className={`${textSecondaryClass} mb-4`}>セッションが見つかりません</p>
+              <Link href="/tasting" className={`${isChristmasMode ? 'text-[#d4af37]' : 'text-[#8B4513]'} hover:underline`}>
                 一覧に戻る
               </Link>
             </div>
@@ -270,7 +286,7 @@ function TastingPageContent() {
     }
 
     return (
-      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+      <div className={`min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 ${bgPageClass}`}>
         <div className="max-w-4xl mx-auto space-y-10">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
@@ -279,21 +295,21 @@ function TastingPageContent() {
           >
             <Link
               href="/tasting"
-              className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
+              className={`absolute left-0 top-0 group flex items-center gap-2 ${textLinkClass} transition-colors font-bold text-sm uppercase tracking-widest`}
             >
               <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
               一覧に戻る
             </Link>
 
             <div className="flex flex-col items-center space-y-3">
-              <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
-                <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
-                <CoffeeIcon size={48} weight="duotone" className="text-amber-600" />
+              <div className={`p-5 ${iconBgClass} rounded-[2.5rem] shadow-sm border mb-4 relative`}>
+                <div className={`absolute inset-0 ${iconGlowClass} rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10`} />
+                <CoffeeIcon size={48} weight="duotone" className={iconColorClass} />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
+              <h1 className={`text-3xl sm:text-4xl font-black ${textPrimaryClass} tracking-tight`}>
                 記録の追加・編集
               </h1>
-              <p className="text-stone-400 font-medium">セッションの試飲記録を管理します</p>
+              <p className={`${textSecondaryClass} font-medium`}>セッションの試飲記録を管理します</p>
             </div>
           </motion.header>
 
@@ -309,14 +325,14 @@ function TastingPageContent() {
   const isEmpty = tastingSessions.length === 0;
 
   return (
-    <div className="min-h-screen flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: '#F7F7F5' }}>
+    <div className={`min-h-screen flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4 ${bgPageClass}`}>
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="relative flex flex-col sm:flex-row items-center gap-4">
             <div className="flex justify-between items-center w-full sm:w-auto sm:flex-1">
               <Link
                 href="/"
-                className="group p-2 text-stone-400 hover:text-amber-600 transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] bg-white rounded-2xl border border-stone-100 shadow-sm"
+                className={`group p-2 ${backButtonClass} transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] rounded-2xl border shadow-sm`}
                 title="戻る"
                 aria-label="戻る"
               >
@@ -325,32 +341,35 @@ function TastingPageContent() {
               <div className="flex items-center gap-2 sm:hidden">
                 <div id="filter-button-container-mobile" className="min-w-[1px]"></div>
                 {!isEmpty && (
-                  <Link
-                    href="/tasting/sessions/new"
-                    className="p-2.5 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl shadow-md hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95 flex items-center justify-center min-h-[44px] min-w-[44px]"
+                  <IconButton
+                    variant="primary"
+                    onClick={() => router.push('/tasting/sessions/new')}
                     aria-label="新規セッション作成"
+                    isChristmasMode={isChristmasMode}
                   >
                     <Plus size={22} weight="bold" />
-                  </Link>
+                  </IconButton>
                 )}
               </div>
             </div>
 
-            <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-black text-stone-800 tracking-tight">
+            <h1 className={`hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-black ${textPrimaryClass} tracking-tight`}>
               試飲感想記録
             </h1>
 
             <div className="hidden sm:flex justify-end items-center gap-2 sm:gap-3 w-full sm:w-auto sm:flex-1">
               <div id="filter-button-container" className="min-w-[1px]"></div>
               {!isEmpty && (
-                <Link
-                  href="/tasting/sessions/new"
-                  className="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl font-black text-sm shadow-md hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95 flex items-center gap-2 min-h-[44px] flex-shrink-0"
+                <Button
+                  variant="primary"
+                  onClick={() => router.push('/tasting/sessions/new')}
                   aria-label="新規セッション作成"
+                  isChristmasMode={isChristmasMode}
+                  className="flex items-center gap-2"
                 >
                   <Plus size={20} weight="bold" />
                   <span className="whitespace-nowrap">セッションを作成</span>
-                </Link>
+                </Button>
               )}
             </div>
           </div>

@@ -12,6 +12,8 @@ import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/lib/auth';
 import { useTastingFilters } from '@/hooks/useTastingFilters';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionListProps {
   data: AppData;
@@ -29,6 +31,7 @@ export function TastingSessionList({
   const router = useRouter();
   const { user } = useAuth();
   const userId = user?.uid ?? null;
+  const { isChristmasMode } = useChristmasMode();
 
   const { members: allMembers, manager } = useMembers(userId);
 
@@ -129,28 +132,24 @@ export function TastingSessionList({
   };
 
   const filterButton = (
-    <button
+    <Button
+      variant="outline"
+      size="sm"
       onClick={() => setIsFilterModalOpen(true)}
-      className={`px-4 py-2 rounded-2xl bg-white shadow-sm border transition-all hover:shadow-md hover:border-amber-200 flex items-center justify-center gap-2 min-h-[44px] relative group ${
-        activeFilterCount > 0 ? 'text-amber-600 border-amber-200' : 'text-stone-500 border-stone-100'
-      }`}
+      badge={activeFilterCount}
+      isChristmasMode={isChristmasMode}
       title="フィルター"
       aria-label="フィルター"
+      className="gap-2"
     >
       <Faders
         size={20}
         weight={activeFilterCount > 0 ? 'fill' : 'bold'}
-        className="group-hover:scale-110 transition-transform"
       />
       <span className="hidden md:block text-[10px] font-black uppercase tracking-[0.15em]">
         フィルター
       </span>
-      {activeFilterCount > 0 && (
-        <span className="absolute -top-1.5 -right-1.5 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white">
-          {activeFilterCount}
-        </span>
-      )}
-    </button>
+    </Button>
   );
 
   if (tastingSessions.length === 0) {
@@ -208,6 +207,7 @@ export function TastingSessionList({
           dateTo={dateTo}
           selectedRoastLevels={selectedRoastLevels}
           onApply={handleApplyFilters}
+          isChristmasMode={isChristmasMode}
         />
 
         <div className="flex-1 min-h-0 overflow-y-hidden pt-4 pb-8">

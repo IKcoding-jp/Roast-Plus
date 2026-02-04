@@ -9,7 +9,8 @@ const TastingRadarChart = dynamic(
 );
 import { StarRating } from './StarRating';
 import { HiTrash } from 'react-icons/hi';
-import { Card } from '@/components/ui';
+import { Card, IconButton } from '@/components/ui';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingRecordListProps {
   data: AppData;
@@ -18,6 +19,7 @@ interface TastingRecordListProps {
 
 export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   const router = useRouter();
+  const { isChristmasMode } = useChristmasMode();
 
   // tastingRecordsが配列でない場合のフォールバック
   const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
@@ -99,16 +101,17 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                     <span className="text-sm text-gray-600">
                       {formatDate(record.tastingDate)}
                     </span>
-                    <button
+                    <IconButton
+                      variant="danger"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(record.id);
                       }}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
                       aria-label="削除"
+                      isChristmasMode={isChristmasMode}
                     >
                       <HiTrash className="w-5 h-5" />
-                    </button>
+                    </IconButton>
                   </div>
                 </div>
 

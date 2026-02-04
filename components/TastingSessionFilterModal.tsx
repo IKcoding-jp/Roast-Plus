@@ -9,6 +9,7 @@ import {
   Thermometer,
 } from 'phosphor-react';
 import { ROAST_LEVELS } from '@/lib/constants';
+import { Button, IconButton, Input } from '@/components/ui';
 
 type SortOption = 'newest' | 'oldest' | 'beanName';
 
@@ -27,6 +28,7 @@ interface TastingSessionFilterModalProps {
     dateTo: string;
     selectedRoastLevels: Array<'浅煎り' | '中煎り' | '中深煎り' | '深煎り'>;
   }) => void;
+  isChristmasMode?: boolean;
 }
 
 export function TastingSessionFilterModal({
@@ -38,6 +40,7 @@ export function TastingSessionFilterModal({
   dateTo,
   selectedRoastLevels,
   onApply,
+  isChristmasMode = false,
 }: TastingSessionFilterModalProps) {
   const [tempSearchQuery, setTempSearchQuery] = useState(searchQuery);
   const [tempSortOption, setTempSortOption] = useState(sortOption);
@@ -97,6 +100,15 @@ export function TastingSessionFilterModal({
   const hasActiveFilters =
     tempSearchQuery.trim() || tempDateFrom || tempDateTo || tempSelectedRoastLevels.length > 0;
 
+  // クリスマスモード用のスタイル
+  const modalBgClass = isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white';
+  const modalBorderClass = isChristmasMode ? 'border-[#d4af37]/30' : 'border-stone-100';
+  const textPrimaryClass = isChristmasMode ? 'text-[#f8f1e7]' : 'text-stone-800';
+  const textLabelClass = isChristmasMode ? 'text-[#d4af37]/80' : 'text-stone-400';
+  const iconBgClass = isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50';
+  const iconColorClass = isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600';
+  const footerBgClass = isChristmasMode ? 'bg-white/5' : 'bg-stone-50/50';
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -112,45 +124,46 @@ export function TastingSessionFilterModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative bg-white rounded-[3rem] shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col border border-stone-100"
+            className={`relative ${modalBgClass} rounded-[3rem] shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col border ${modalBorderClass}`}
           >
             {/* ヘッダー */}
             <div className="p-8 pb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-50 rounded-xl">
-                  <Faders size={24} weight="fill" className="text-amber-600" />
+                <div className={`p-2 ${iconBgClass} rounded-xl`}>
+                  <Faders size={24} weight="fill" className={iconColorClass} />
                 </div>
-                <h2 className="text-2xl font-black text-stone-800 tracking-tight">フィルター設定</h2>
+                <h2 className={`text-2xl font-black ${textPrimaryClass} tracking-tight`}>フィルター設定</h2>
               </div>
-              <button
+              <IconButton
+                variant="ghost"
                 onClick={onClose}
-                className="p-2 hover:bg-stone-50 rounded-full transition-colors text-stone-400"
                 aria-label="閉じる"
+                isChristmasMode={isChristmasMode}
               >
                 <X size={24} weight="bold" />
-              </button>
+              </IconButton>
             </div>
 
             {/* コンテンツ */}
             <div className="flex-1 overflow-y-auto px-8 py-4 space-y-8">
               {/* 検索バー */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
                   <MagnifyingGlass size={16} weight="bold" />
                   豆の名前で検索
                 </label>
-                <input
+                <Input
                   type="text"
                   value={tempSearchQuery}
                   onChange={(e) => setTempSearchQuery(e.target.value)}
                   placeholder="豆の名前を入力..."
-                  className="w-full px-5 py-4 bg-stone-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold placeholder:text-stone-300"
+                  isChristmasMode={isChristmasMode}
                 />
               </div>
 
               {/* ソート */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
                   <SortAscending size={16} weight="bold" />
                   並び替え
                 </label>
@@ -160,90 +173,93 @@ export function TastingSessionFilterModal({
                     { id: 'oldest', label: '古い順' },
                     { id: 'beanName', label: '豆の名前順' },
                   ].map((opt) => (
-                    <button
+                    <Button
                       key={opt.id}
+                      variant={tempSortOption === opt.id ? 'primary' : 'ghost'}
                       onClick={() => setTempSortOption(opt.id as SortOption)}
-                      className={`px-5 py-3.5 rounded-2xl text-left font-bold transition-all border-2 ${
-                        tempSortOption === opt.id
-                          ? 'bg-amber-50 border-amber-500 text-amber-700'
-                          : 'bg-stone-50 border-transparent text-stone-500 hover:bg-stone-100'
-                      }`}
+                      isChristmasMode={isChristmasMode}
+                      className="justify-start"
                     >
                       {opt.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
 
               {/* 日付範囲 */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
                   <CalendarBlank size={16} weight="bold" />
                   日付範囲
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  <input
+                  <Input
                     type="date"
                     value={tempDateFrom}
                     onChange={(e) => setTempDateFrom(e.target.value)}
-                    className="px-4 py-3.5 bg-stone-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold text-sm"
+                    isChristmasMode={isChristmasMode}
                   />
-                  <input
+                  <Input
                     type="date"
                     value={tempDateTo}
                     onChange={(e) => setTempDateTo(e.target.value)}
-                    className="px-4 py-3.5 bg-stone-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-amber-500 focus:outline-none transition-all text-stone-800 font-bold text-sm"
+                    isChristmasMode={isChristmasMode}
                   />
                 </div>
               </div>
 
               {/* 焙煎度合い */}
               <div className="space-y-3 pb-4">
-                <label className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest ml-1">
+                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
                   <Thermometer size={16} weight="bold" />
                   焙煎度合い
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {ROAST_LEVELS.map((level) => (
-                    <button
+                    <Button
                       key={level}
+                      variant={tempSelectedRoastLevels.includes(level) ? 'coffee' : 'ghost'}
+                      size="sm"
                       onClick={() => handleRoastLevelToggle(level)}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all border-2 ${
-                        tempSelectedRoastLevels.includes(level)
-                          ? 'bg-stone-800 border-stone-800 text-white'
-                          : 'bg-stone-50 border-transparent text-stone-500 hover:bg-stone-100'
-                      }`}
+                      isChristmasMode={isChristmasMode}
                     >
                       {level}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
             </div>
 
             {/* フッター */}
-            <div className="p-8 pt-4 bg-stone-50/50 flex flex-col gap-3">
+            <div className={`p-8 pt-4 ${footerBgClass} flex flex-col gap-3`}>
               {hasActiveFilters && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleReset}
-                  className="text-xs font-black text-amber-600 uppercase tracking-widest hover:underline mb-2 mx-auto"
+                  isChristmasMode={isChristmasMode}
+                  className="mx-auto"
                 >
                   フィルターをリセット
-                </button>
+                </Button>
               )}
               <div className="flex gap-3">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={onClose}
-                  className="flex-1 px-6 py-4 bg-white border-2 border-stone-100 text-stone-400 rounded-2xl font-black transition-all hover:bg-stone-100"
+                  isChristmasMode={isChristmasMode}
+                  className="flex-1"
                 >
                   キャンセル
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
                   onClick={handleApply}
-                  className="flex-1 px-6 py-4 bg-stone-800 text-white rounded-2xl font-black transition-all hover:bg-stone-900 shadow-xl shadow-stone-200"
+                  isChristmasMode={isChristmasMode}
+                  className="flex-1"
                 >
                   適用
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>

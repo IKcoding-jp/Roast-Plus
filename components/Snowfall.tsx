@@ -93,21 +93,21 @@ export const Snowfall = memo(function Snowfall() {
       if (depthRand < 0.3) {
         // 背景層(30%)
         depthValue = 0;
-        sizeMin = 12; sizeMax = 18;
+        sizeMin = 6; sizeMax = 10;
         duration = `${15 + Math.random() * 10}s`;
         blur = '2px';
         opacity = 0.3;
       } else if (depthRand < 0.7) {
         // 中間層(40%)
         depthValue = 1;
-        sizeMin = 18; sizeMax = 28;
+        sizeMin = 10; sizeMax = 16;
         duration = `${10 + Math.random() * 5}s`;
         blur = '1px';
         opacity = 0.5;
       } else {
         // 前景層(30%)
         depthValue = 2;
-        sizeMin = 28; sizeMax = 40;
+        sizeMin = 16; sizeMax = 24;
         duration = `${7 + Math.random() * 3}s`;
         blur = '0px';
         opacity = 0.7;

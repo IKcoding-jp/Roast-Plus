@@ -7,10 +7,11 @@ import { useAppData } from '@/hooks/useAppData';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import { Loading } from '@/components/Loading';
 import type { TastingSession } from '@/types';
-import Link from 'next/link';
-import { CaretLeft, PlusCircle } from 'phosphor-react';
+import { PlusCircle } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
 import { motion } from 'framer-motion';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
+import { BackLink } from '@/components/ui';
 
 export default function NewTastingSessionPage() {
   const { user, loading: authLoading } = useAuth();
@@ -18,6 +19,7 @@ export default function NewTastingSessionPage() {
   const router = useRouter();
   const { showToast } = useToastContext();
   const hasRedirected = useRef(false);
+  const { isChristmasMode } = useChristmasMode();
 
   // 未認証時にログインページにリダイレクト
   useEffect(() => {
@@ -69,30 +71,42 @@ export default function NewTastingSessionPage() {
   };
 
   return (
-    <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
-      <div className="max-w-2xl mx-auto space-y-10">
+    <div
+      className="min-h-screen py-6 sm:py-8 px-4 sm:px-6"
+      style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}
+    >
+      <div className="max-w-lg mx-auto space-y-6">
         <motion.header
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative flex flex-col items-center text-center pt-12"
+          className="relative flex flex-col items-center text-center pt-6"
         >
-          <Link
+          <BackLink
             href="/tasting"
-            className="absolute left-0 top-0 group flex items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors font-bold text-sm uppercase tracking-widest"
-          >
-            <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
-            一覧に戻る
-          </Link>
+            variant="icon-only"
+            isChristmasMode={isChristmasMode}
+            className="absolute left-0 top-0"
+          />
 
-          <div className="flex flex-col items-center space-y-3">
-            <div className="p-5 bg-white rounded-[2.5rem] shadow-sm border border-stone-100 mb-4 relative">
-              <div className="absolute inset-0 bg-amber-50 rounded-[2.5rem] scale-110 blur-2xl opacity-30 -z-10" />
-              <PlusCircle size={48} weight="duotone" className="text-amber-600" />
+          <div className="flex flex-col items-center space-y-2">
+            <div className={`p-3 rounded-2xl shadow-sm mb-2 relative ${
+              isChristmasMode
+                ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
+                : 'bg-white border border-stone-100'
+            }`}>
+              <div className={`absolute inset-0 rounded-2xl scale-110 blur-xl opacity-30 -z-10 ${
+                isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50'
+              }`} />
+              <PlusCircle size={32} weight="duotone" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-stone-800 tracking-tight">
+            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${
+              isChristmasMode ? 'text-[#f8f1e7]' : 'text-stone-800'
+            }`}>
               新規セッション作成
             </h1>
-            <p className="text-stone-400 font-medium">新しい試飲の記録を開始しましょう</p>
+            <p className={`text-sm font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-stone-400'}`}>
+              新しい試飲の記録を開始しましょう
+            </p>
           </div>
         </motion.header>
 

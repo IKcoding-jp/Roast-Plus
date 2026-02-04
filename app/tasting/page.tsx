@@ -11,11 +11,11 @@ import { TastingRecordForm } from '@/components/TastingRecordForm';
 import { TastingSessionForm } from '@/components/TastingSessionForm';
 import { Loading } from '@/components/Loading';
 import type { TastingSession, TastingRecord } from '@/types';
-import { CaretLeft, Plus } from 'phosphor-react';
+import { Plus } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
 import { motion } from 'framer-motion';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
-import { Button, IconButton, Card } from '@/components/ui';
+import { Button, IconButton, Card, BackLink } from '@/components/ui';
 
 function TastingPageContent() {
   const { user, loading: authLoading } = useAuth();
@@ -115,29 +115,24 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
-        <div className="max-w-2xl mx-auto space-y-10">
+      <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
+        <div className="max-w-lg mx-auto space-y-6">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative flex flex-col items-center text-center pt-12"
+            className="relative flex flex-col items-center text-center pt-6"
           >
-            <Link
+            <BackLink
               href="/tasting"
-              className={`absolute left-0 top-0 group flex items-center gap-2 transition-colors font-bold text-sm uppercase tracking-widest ${
-                isChristmasMode
-                  ? 'text-[#f8f1e7]/70 hover:text-[#f8f1e7]'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
-              一覧に戻る
-            </Link>
+              variant="icon-only"
+              isChristmasMode={isChristmasMode}
+              className="absolute left-0 top-0"
+            />
 
-            <h1 className={`text-3xl sm:text-4xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
               セッションを編集
             </h1>
-            <p className={`mt-2 font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>セッションの情報を更新します</p>
+            <p className={`mt-1 text-sm font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>セッションの情報を更新します</p>
           </motion.header>
 
           <main>
@@ -211,29 +206,24 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
-        <div className="max-w-2xl mx-auto space-y-10">
+      <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
+        <div className="max-w-lg mx-auto space-y-6">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative flex flex-col items-center text-center pt-12"
+            className="relative flex flex-col items-center text-center pt-6"
           >
-            <Link
+            <BackLink
               href="/tasting"
-              className={`absolute left-0 top-0 group flex items-center gap-2 transition-colors font-bold text-sm uppercase tracking-widest ${
-                isChristmasMode
-                  ? 'text-[#f8f1e7]/70 hover:text-[#f8f1e7]'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
-              一覧に戻る
-            </Link>
+              variant="icon-only"
+              isChristmasMode={isChristmasMode}
+              className="absolute left-0 top-0"
+            />
 
-            <h1 className={`text-3xl sm:text-4xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
               記録を編集
             </h1>
-            <p className={`mt-2 font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>試飲の感想を更新します</p>
+            <p className={`mt-1 text-sm font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>試飲の感想を更新します</p>
           </motion.header>
 
           <main>
@@ -269,29 +259,24 @@ function TastingPageContent() {
     }
 
     return (
-      <div className="min-h-screen py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
-        <div className="max-w-4xl mx-auto space-y-10">
+      <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
+        <div className="max-w-lg mx-auto space-y-6">
           <motion.header
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative flex flex-col items-center text-center pt-12"
+            className="relative flex flex-col items-center text-center pt-6"
           >
-            <Link
+            <BackLink
               href="/tasting"
-              className={`absolute left-0 top-0 group flex items-center gap-2 transition-colors font-bold text-sm uppercase tracking-widest ${
-                isChristmasMode
-                  ? 'text-[#f8f1e7]/70 hover:text-[#f8f1e7]'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <CaretLeft size={20} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
-              一覧に戻る
-            </Link>
+              variant="icon-only"
+              isChristmasMode={isChristmasMode}
+              className="absolute left-0 top-0"
+            />
 
-            <h1 className={`text-3xl sm:text-4xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
               記録の追加・編集
             </h1>
-            <p className={`mt-2 font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>セッションの試飲記録を管理します</p>
+            <p className={`mt-1 text-sm font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>セッションの試飲記録を管理します</p>
           </motion.header>
 
           <main>
@@ -311,18 +296,11 @@ function TastingPageContent() {
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="relative flex flex-col sm:flex-row items-center gap-4">
             <div className="flex justify-between items-center w-full sm:w-auto sm:flex-1">
-              <Link
+              <BackLink
                 href="/"
-                className={`px-3 py-2 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] ${
-                  isChristmasMode
-                    ? 'text-[#f8f1e7]/70 hover:text-[#f8f1e7] hover:bg-white/10'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                }`}
-                title="戻る"
-                aria-label="戻る"
-              >
-                <CaretLeft size={24} weight="bold" />
-              </Link>
+                variant="icon-only"
+                isChristmasMode={isChristmasMode}
+              />
               <div className="flex items-center gap-2 sm:hidden">
                 <div id="filter-button-container-mobile" className="min-w-[1px]"></div>
                 {!isEmpty && (

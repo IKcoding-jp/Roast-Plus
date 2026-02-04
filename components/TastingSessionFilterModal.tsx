@@ -49,12 +49,18 @@ export function TastingSessionFilterModal({
   const [tempSelectedRoastLevels, setTempSelectedRoastLevels] = useState(selectedRoastLevels);
 
   // モーダルが開かれたときに現在の値を設定
+  // NOTE: モーダルの一時状態を親のpropsと同期させる必要があるためeffect内でsetStateを使用
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- モーダルオープン時の状態同期に必要
       setTempSearchQuery(searchQuery);
+       
       setTempSortOption(sortOption);
+       
       setTempDateFrom(dateFrom);
+       
       setTempDateTo(dateTo);
+       
       setTempSelectedRoastLevels(selectedRoastLevels);
     }
   }, [isOpen, searchQuery, sortOption, dateFrom, dateTo, selectedRoastLevels]);
@@ -100,15 +106,6 @@ export function TastingSessionFilterModal({
   const hasActiveFilters =
     tempSearchQuery.trim() || tempDateFrom || tempDateTo || tempSelectedRoastLevels.length > 0;
 
-  // クリスマスモード用のスタイル
-  const modalBgClass = isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white';
-  const modalBorderClass = isChristmasMode ? 'border-[#d4af37]/30' : 'border-stone-100';
-  const textPrimaryClass = isChristmasMode ? 'text-[#f8f1e7]' : 'text-stone-800';
-  const textLabelClass = isChristmasMode ? 'text-[#d4af37]/80' : 'text-stone-400';
-  const iconBgClass = isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50';
-  const iconColorClass = isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600';
-  const footerBgClass = isChristmasMode ? 'bg-white/5' : 'bg-stone-50/50';
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -118,21 +115,27 @@ export function TastingSessionFilterModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/20"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className={`relative ${modalBgClass} rounded-[3rem] shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col border ${modalBorderClass}`}
+            className={`relative rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col ${
+              isChristmasMode
+                ? 'bg-[#0a2f1a] border-2 border-[#d4af37]/30'
+                : 'bg-white border-2 border-gray-300'
+            }`}
           >
             {/* ヘッダー */}
-            <div className="p-8 pb-4 flex items-center justify-between">
+            <div className={`p-6 pb-4 flex items-center justify-between border-b ${
+              isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
+            }`}>
               <div className="flex items-center gap-3">
-                <div className={`p-2 ${iconBgClass} rounded-xl`}>
-                  <Faders size={24} weight="fill" className={iconColorClass} />
+                <div className={`p-2 rounded-xl ${isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50'}`}>
+                  <Faders size={24} weight="fill" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
                 </div>
-                <h2 className={`text-2xl font-black ${textPrimaryClass} tracking-tight`}>フィルター設定</h2>
+                <h2 className={`text-xl font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>フィルター設定</h2>
               </div>
               <IconButton
                 variant="ghost"
@@ -145,10 +148,10 @@ export function TastingSessionFilterModal({
             </div>
 
             {/* コンテンツ */}
-            <div className="flex-1 overflow-y-auto px-8 py-4 space-y-8">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
               {/* 検索バー */}
-              <div className="space-y-3">
-                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
+              <div className="space-y-2">
+                <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
                   <MagnifyingGlass size={16} weight="bold" />
                   豆の名前で検索
                 </label>
@@ -162,8 +165,8 @@ export function TastingSessionFilterModal({
               </div>
 
               {/* ソート */}
-              <div className="space-y-3">
-                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
+              <div className="space-y-2">
+                <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
                   <SortAscending size={16} weight="bold" />
                   並び替え
                 </label>
@@ -187,8 +190,8 @@ export function TastingSessionFilterModal({
               </div>
 
               {/* 日付範囲 */}
-              <div className="space-y-3">
-                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
+              <div className="space-y-2">
+                <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
                   <CalendarBlank size={16} weight="bold" />
                   日付範囲
                 </label>
@@ -209,8 +212,8 @@ export function TastingSessionFilterModal({
               </div>
 
               {/* 焙煎度合い */}
-              <div className="space-y-3 pb-4">
-                <label className={`flex items-center gap-2 text-xs font-black ${textLabelClass} uppercase tracking-widest ml-1`}>
+              <div className="space-y-2 pb-2">
+                <label className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
                   <Thermometer size={16} weight="bold" />
                   焙煎度合い
                 </label>
@@ -231,7 +234,11 @@ export function TastingSessionFilterModal({
             </div>
 
             {/* フッター */}
-            <div className={`p-8 pt-4 ${footerBgClass} flex flex-col gap-3`}>
+            <div className={`p-6 pt-4 border-t flex flex-col gap-3 ${
+              isChristmasMode
+                ? 'bg-[#0a2f1a]/50 border-[#d4af37]/20'
+                : 'bg-gray-50 border-gray-200'
+            }`}>
               {hasActiveFilters && (
                 <Button
                   variant="ghost"

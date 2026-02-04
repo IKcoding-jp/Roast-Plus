@@ -154,7 +154,7 @@ export function TastingSessionCardDesktop({
                               className="h-full transition-all duration-700"
                               style={{
                                 width: `${((item.value - 1) / 4) * 100}%`,
-                                backgroundColor: item.color,
+                                backgroundColor: isChristmasMode ? '#d4af37' : item.color,
                               }}
                             />
                           </div>

@@ -91,3 +91,9 @@ export type { EmptyStateProps } from './EmptyState';
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion';
 export type { AccordionProps, AccordionItemProps, AccordionTriggerProps, AccordionContentProps } from './Accordion';
+
+export { BackLink } from './BackLink';
+export type { BackLinkProps } from './BackLink';
+
+export { RoastLevelBadge } from './RoastLevelBadge';
+export type { RoastLevelBadgeProps, RoastLevel } from './RoastLevelBadge';

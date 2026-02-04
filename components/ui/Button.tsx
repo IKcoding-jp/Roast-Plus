@@ -47,11 +47,15 @@ import { forwardRef } from 'react';
  * @example
  * // バッジ付きボタン（通知やフィルター数表示に使用）
  * <Button badge={3} onClick={handleFilter}>フィルター</Button>
+ *
+ * @example
+ * // サーフェスボタン（白背景+影、フィルターや比較ボタンに使用）
+ * <Button variant="surface" onClick={handleFilter}>フィルター</Button>
  */
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** ボタンのスタイルバリエーション */
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost' | 'coffee';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline' | 'ghost' | 'coffee' | 'surface';
   /** ボタンのサイズ */
   size?: 'sm' | 'md' | 'lg';
   /** ローディング状態 */
@@ -99,6 +103,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       outline: 'border-2 border-amber-500 text-amber-600 bg-transparent hover:bg-amber-50',
       ghost: 'text-amber-600 hover:text-amber-700',
       coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b]',
+      surface: 'bg-white text-gray-700 shadow-md hover:bg-gray-50',
     };
 
     // クリスマスモードのバリアントスタイル
@@ -110,6 +115,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       outline: 'border-2 border-[#d4af37] text-[#d4af37] bg-transparent hover:bg-[#d4af37]/10',
       ghost: 'text-[#d4af37] hover:text-[#e8c65f]',
       coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b] border border-[#d4af37]/30',
+      surface: 'bg-white/10 text-[#f8f1e7] shadow-md hover:bg-white/20 border border-[#d4af37]/20',
     };
 
     const variantStyles = isChristmasMode ? christmasVariantStyles : normalVariantStyles;

@@ -69,6 +69,7 @@ export function TastingSessionList({
   }>({ desktop: null, mobile: null });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- ハイドレーション後のポータル有効化に必要
     setMounted(true);
     const updateContainers = () => {
       const desktopEl = filterButtonContainerId
@@ -133,22 +134,19 @@ export function TastingSessionList({
 
   const filterButton = (
     <Button
-      variant="outline"
-      size="sm"
+      variant="surface"
       onClick={() => setIsFilterModalOpen(true)}
       badge={activeFilterCount}
       isChristmasMode={isChristmasMode}
       title="フィルター"
       aria-label="フィルター"
-      className="gap-2"
+      className="flex items-center gap-2"
     >
       <Faders
         size={20}
         weight={activeFilterCount > 0 ? 'fill' : 'bold'}
       />
-      <span className="hidden md:block text-[10px] font-black uppercase tracking-[0.15em]">
-        フィルター
-      </span>
+      <span className="whitespace-nowrap">フィルター</span>
     </Button>
   );
 
@@ -158,20 +156,34 @@ export function TastingSessionList({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full bg-white rounded-[3rem] p-10 border border-stone-100 shadow-sm text-center space-y-8"
+          className={`max-w-md w-full rounded-[3rem] p-10 border shadow-sm text-center space-y-8 ${
+            isChristmasMode
+              ? 'bg-[#0a2f1a] border-[#d4af37]/30'
+              : 'bg-white border-stone-100'
+          }`}
         >
           <div className="relative mx-auto w-32 h-32">
-            <div className="absolute inset-0 bg-amber-50 rounded-full scale-110 blur-2xl opacity-60"></div>
-            <div className="relative w-full h-full rounded-full bg-stone-50 flex items-center justify-center border-2 border-white shadow-inner">
-              <Coffee size={64} weight="duotone" className="text-amber-200" />
+            <div className={`absolute inset-0 rounded-full scale-110 blur-2xl opacity-60 ${
+              isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50'
+            }`}></div>
+            <div className={`relative w-full h-full rounded-full flex items-center justify-center border-2 shadow-inner ${
+              isChristmasMode
+                ? 'bg-[#0a2f1a] border-[#d4af37]/30'
+                : 'bg-stone-50 border-white'
+            }`}>
+              <Coffee size={64} weight="duotone" className={isChristmasMode ? 'text-[#d4af37]/50' : 'text-amber-200'} />
             </div>
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-2xl font-black text-stone-800 tracking-tight">
+            <h3 className={`text-2xl font-black tracking-tight ${
+              isChristmasMode ? 'text-[#f8f1e7]' : 'text-stone-800'
+            }`}>
               試飲セッションがありません
             </h3>
-            <p className="text-stone-400 text-sm font-medium leading-relaxed">
+            <p className={`text-sm font-medium leading-relaxed ${
+              isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-stone-400'
+            }`}>
               最初の試飲セッションを作成して、
               <br />
               コーヒーの奥深い世界を記録しましょう。
@@ -180,7 +192,11 @@ export function TastingSessionList({
 
           <Link
             href="/tasting/sessions/new"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-2xl font-black text-lg shadow-xl shadow-amber-200 hover:from-amber-700 hover:to-amber-600 transition-all active:scale-95"
+            className={`inline-flex items-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-lg transition-all active:scale-95 ${
+              isChristmasMode
+                ? 'bg-gradient-to-r from-[#d4af37] to-[#b8962e] shadow-xl shadow-[#d4af37]/20 hover:from-[#c9a633] hover:to-[#a8872a]'
+                : 'bg-gradient-to-r from-amber-600 to-amber-500 shadow-xl shadow-amber-200 hover:from-amber-700 hover:to-amber-600'
+            }`}
           >
             <Plus size={24} weight="bold" />
             <span>セッションを開始</span>

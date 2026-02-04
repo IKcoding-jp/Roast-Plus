@@ -9,7 +9,7 @@ const TastingRadarChart = dynamic(
 );
 import { StarRating } from './StarRating';
 import { HiTrash } from 'react-icons/hi';
-import { Card, IconButton } from '@/components/ui';
+import { Card, IconButton, RoastLevelBadge } from '@/components/ui';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingRecordListProps {
@@ -58,8 +58,8 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   if (sortedRecords.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">試飲記録がありません</p>
-        <p className="text-sm text-gray-500 mt-2">右下のボタンから新規作成できます</p>
+        <p className={isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}>試飲記録がありません</p>
+        <p className={`text-sm mt-2 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>右下のボタンから新規作成できます</p>
       </div>
     );
   }
@@ -73,32 +73,18 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
             variant="hoverable"
             className="p-6"
             onClick={() => handleCardClick(record.id)}
+            isChristmasMode={isChristmasMode}
           >
             <div className="flex flex-col md:flex-row gap-4">
               {/* 左側: 豆名と基本情報 */}
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-xl font-semibold text-gray-800">
+                  <h3 className={`text-xl font-semibold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
                     {record.beanName}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <span
-                      className="px-3 py-1 text-white text-sm rounded-full"
-                      style={
-                        record.roastLevel === '深煎り'
-                          ? { backgroundColor: '#120C0A' }
-                          : record.roastLevel === '中深煎り'
-                            ? { backgroundColor: '#4E3526' }
-                            : record.roastLevel === '中煎り'
-                              ? { backgroundColor: '#745138' }
-                              : record.roastLevel === '浅煎り'
-                                ? { backgroundColor: '#C78F5D' }
-                                : { backgroundColor: '#6B7280' }
-                      }
-                    >
-                      {record.roastLevel}
-                    </span>
-                    <span className="text-sm text-gray-600">
+                    <RoastLevelBadge level={record.roastLevel} size="sm" isChristmasMode={isChristmasMode} />
+                    <span className={`text-sm ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
                       {formatDate(record.tastingDate)}
                     </span>
                     <IconButton
@@ -122,7 +108,7 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
 
                 {/* コメント */}
                 {record.overallImpression && (
-                  <p className="text-sm text-gray-600 line-clamp-2">
+                  <p className={`text-sm line-clamp-2 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
                     {record.overallImpression}
                   </p>
                 )}

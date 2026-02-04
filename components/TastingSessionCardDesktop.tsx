@@ -11,6 +11,8 @@ import {
 } from 'phosphor-react';
 import type { TastingSession } from '@/types';
 import type { AverageScores } from '@/lib/tastingUtils';
+import { IconButton, Card } from '@/components/ui';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionCardDesktopProps {
   session: TastingSession;
@@ -34,21 +36,33 @@ export function TastingSessionCardDesktop({
   formatDate,
 }: TastingSessionCardDesktopProps) {
   const router = useRouter();
+  const { isChristmasMode } = useChristmasMode();
   const roastStyle = getRoastBadgeStyle(session.roastLevel);
   const hasAnalysis = !!session.aiAnalysis;
+
+  // クリスマスモード用のスタイル
+  const cardBorderClass = isChristmasMode ? 'border-[#d4af37]/30' : 'border-gray-200';
+  const textPrimaryClass = isChristmasMode ? 'text-[#f8f1e7]' : 'text-[#4a3728]';
+  const textSecondaryClass = isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500';
+  const textMutedClass = isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400';
+  const bgMutedClass = isChristmasMode ? 'bg-white/10' : 'bg-gray-100';
+  const bgSectionClass = isChristmasMode ? 'bg-white/5' : 'bg-gray-50';
+  const borderSectionClass = isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-100';
+  const iconAccentClass = isChristmasMode ? 'text-[#d4af37]' : 'text-[#f5821f]';
+  const spinnerClass = isChristmasMode ? 'border-[#d4af37]' : 'border-[#f5821f]';
 
   return (
     <div>
       <Link href={`/tasting?sessionId=${session.id}`} className="block group relative">
-        <div className="rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative border border-gray-100 bg-white">
+        <Card variant="hoverable" isChristmasMode={isChristmasMode} className="p-0 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500">
           <div className="relative z-10">
             <div className="h-full flex flex-col">
               {/* ヘッダー */}
-              <div className="px-8 pt-8 pb-6 border-b border-dashed border-gray-200 flex items-center justify-between">
+              <div className={`px-8 pt-8 pb-6 border-b border-dashed ${cardBorderClass} flex items-center justify-between`}>
                 <div className="flex items-center gap-6 flex-1 min-w-0">
                   <div>
                     <div className="flex items-center gap-4 mb-1">
-                      <h3 className="text-4xl font-serif font-bold text-[#4a3728] tracking-tight leading-tight truncate">
+                      <h3 className={`text-4xl font-serif font-bold ${textPrimaryClass} tracking-tight leading-tight truncate`}>
                         {session.beanName}
                       </h3>
                       <div className="flex items-center gap-2">
@@ -66,29 +80,31 @@ export function TastingSessionCardDesktop({
                   </div>
                 </div>
 
-                <button
+                <IconButton
+                  variant="ghost"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     router.push(`/tasting?sessionId=${session.id}&edit=true`);
                   }}
-                  className="p-3 text-gray-400 hover:text-[#f5821f] transition-colors"
+                  aria-label="編集"
+                  isChristmasMode={isChristmasMode}
                 >
                   <PencilSimple size={22} weight="duotone" />
-                </button>
+                </IconButton>
               </div>
 
               {/* メインコンテンツ */}
-              <div className="flex items-stretch border-b border-dashed border-gray-200">
+              <div className={`flex items-stretch border-b border-dashed ${cardBorderClass}`}>
                 {/* 感想 (左) */}
-                <div className="flex-1 p-8 border-r border-dashed border-gray-200 relative bg-white">
+                <div className={`flex-1 p-8 border-r border-dashed ${cardBorderClass} relative`}>
                   <div className="relative z-10 flex flex-col h-full">
                     <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-2 text-[#4a3728]">
+                      <div className={`flex items-center gap-2 ${textPrimaryClass}`}>
                         <Quotes size={20} weight="fill" />
                         <h4 className="text-base font-bold">感想</h4>
                       </div>
-                      <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-500">
+                      <div className={`flex items-center gap-1.5 px-2 py-1 ${bgMutedClass} rounded-md text-xs ${textSecondaryClass}`}>
                         <Users size={14} weight="fill" />
                         <span>
                           {recordCount} / {activeMemberCount}
@@ -101,7 +117,7 @@ export function TastingSessionCardDesktop({
                           {comments.map((comment, commentIndex) => (
                             <li
                               key={commentIndex}
-                              className="text-sm italic text-gray-600 leading-relaxed relative pl-4 border-l-2 border-gray-200"
+                              className={`text-sm italic ${textSecondaryClass} leading-relaxed relative pl-4 border-l-2 ${cardBorderClass}`}
                             >
                               &ldquo;{comment}&rdquo;
                             </li>
@@ -109,8 +125,8 @@ export function TastingSessionCardDesktop({
                         </ul>
                       ) : (
                         <div className="flex flex-col items-center justify-center h-full opacity-40 py-4">
-                          <Coffee size={40} weight="thin" className="text-gray-300 mb-2" />
-                          <p className="text-xs text-gray-400 italic">まだ感想がありません...</p>
+                          <Coffee size={40} weight="thin" className={textMutedClass} />
+                          <p className={`text-xs ${textMutedClass} italic`}>まだ感想がありません...</p>
                         </div>
                       )}
                     </div>
@@ -118,7 +134,7 @@ export function TastingSessionCardDesktop({
                 </div>
 
                 {/* チャート (右) */}
-                <div className="w-80 flex-shrink-0 p-8 flex flex-col justify-center relative overflow-hidden bg-white">
+                <div className="w-80 flex-shrink-0 p-8 flex flex-col justify-center relative overflow-hidden">
                   {recordCount > 0 ? (
                     <div className="space-y-5 w-full relative z-10">
                       {[
@@ -129,16 +145,16 @@ export function TastingSessionCardDesktop({
                         { label: '香り', value: averageScores.aroma, color: '#00897b' },
                       ].map((item) => (
                         <div key={item.label} className="space-y-1">
-                          <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                          <div className={`flex justify-between items-center text-xs font-bold ${textSecondaryClass}`}>
                             <span>{item.label}</span>
                             <span>{item.value.toFixed(1)}</span>
                           </div>
-                          <div className="w-full bg-gray-200 h-1.5 rounded overflow-hidden">
+                          <div className={`w-full ${bgMutedClass} h-1.5 rounded overflow-hidden`}>
                             <div
                               className="h-full transition-all duration-700"
                               style={{
                                 width: `${((item.value - 1) / 4) * 100}%`,
-                                backgroundColor: item.color,
+                                backgroundColor: isChristmasMode ? '#d4af37' : item.color,
                               }}
                             />
                           </div>
@@ -146,9 +162,9 @@ export function TastingSessionCardDesktop({
                       ))}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-gray-200 rounded-xl p-8 opacity-60">
-                      <Coffee size={40} weight="thin" className="text-gray-300 mb-3" />
-                      <p className="text-xs font-bold text-gray-400 tracking-widest text-center">
+                    <div className={`flex flex-col items-center justify-center w-full h-full border-2 border-dashed ${cardBorderClass} rounded-xl p-8 opacity-60`}>
+                      <Coffee size={40} weight="thin" className={textMutedClass} />
+                      <p className={`text-xs font-bold ${textMutedClass} tracking-widest text-center`}>
                         データなし
                       </p>
                     </div>
@@ -161,7 +177,7 @@ export function TastingSessionCardDesktop({
                 <div className="relative z-10">
                   {!hasAnalysis && !isAnalyzing && recordCount === 0 && (
                     <div className="flex items-center justify-center py-2">
-                      <p className="text-xs text-gray-500 italic">
+                      <p className={`text-xs ${textSecondaryClass} italic`}>
                         記録が追加されるとAI分析が開始されます
                       </p>
                     </div>
@@ -169,22 +185,22 @@ export function TastingSessionCardDesktop({
 
                   {isAnalyzing && (
                     <div className="flex flex-col items-center justify-center py-6 gap-3">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f5821f]"></div>
-                      <p className="text-xs text-gray-500 animate-pulse">
+                      <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${spinnerClass}`}></div>
+                      <p className={`text-xs ${textSecondaryClass} animate-pulse`}>
                         コーヒーの香りを分析中...
                       </p>
                     </div>
                   )}
 
                   {hasAnalysis && (
-                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <div className={`${bgSectionClass} rounded-xl p-6 border ${borderSectionClass}`}>
                       <div className="flex items-center gap-2 mb-4">
-                        <Notepad size={20} weight="fill" className="text-[#f5821f]" />
-                        <h4 className="text-sm font-bold tracking-wide text-[#4a3728]">
+                        <Notepad size={20} weight="fill" className={iconAccentClass} />
+                        <h4 className={`text-sm font-bold tracking-wide ${textPrimaryClass}`}>
                           AIコーヒーマイスターのコメント
                         </h4>
                       </div>
-                      <p className="text-sm leading-relaxed text-[#4a3728] whitespace-pre-wrap">
+                      <p className={`text-sm leading-relaxed ${textPrimaryClass} whitespace-pre-wrap`}>
                         {session.aiAnalysis}
                       </p>
                     </div>
@@ -193,18 +209,18 @@ export function TastingSessionCardDesktop({
               </div>
 
               {/* フッター */}
-              <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+              <div className={`px-8 py-4 ${bgSectionClass} border-t ${borderSectionClass} flex justify-between items-center`}>
+                <div className={`flex items-center gap-1.5 text-xs ${textMutedClass}`}>
                   <CalendarBlank size={14} weight="fill" />
                   <span>{formatDate(session.createdAt)}</span>
                 </div>
-                <div className="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[#f5821f] transition-colors cursor-pointer">
+                <div className={`flex items-center gap-1 text-xs font-bold ${textSecondaryClass} hover:${iconAccentClass} transition-colors cursor-pointer`}>
                   記録を追加する <CaretRight size={14} weight="bold" />
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       </Link>
     </div>
   );

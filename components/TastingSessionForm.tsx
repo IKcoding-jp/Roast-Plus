@@ -16,6 +16,7 @@ import {
 import { Input, Select, Button } from '@/components/ui';
 import { ROAST_LEVELS } from '@/lib/constants';
 import { formatDateString } from '@/lib/dateUtils';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionFormProps {
   session: TastingSession | null;
@@ -32,6 +33,7 @@ export function TastingSessionForm({
 }: TastingSessionFormProps) {
   const isNew = !session;
   const { showToast } = useToastContext();
+  const { isChristmasMode } = useChristmasMode();
 
   const [beanName, setBeanName] = useState(session?.beanName || '');
   const [createdAt, setCreatedAt] = useState(
@@ -70,17 +72,23 @@ export function TastingSessionForm({
   };
 
   return (
-    <motion.form 
+    <motion.form
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      onSubmit={handleSubmit} 
-      className="space-y-8"
+      onSubmit={handleSubmit}
+      className="space-y-5"
     >
-      <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm space-y-10">
+      <div className={`rounded-2xl p-5 sm:p-6 shadow-sm space-y-5 ${
+        isChristmasMode
+          ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
+          : 'bg-white border border-gray-100'
+      }`}>
         {/* 豆の名前（必須） */}
-        <div className="space-y-4">
-          <label className="flex items-center gap-2 text-base font-black text-stone-500 uppercase tracking-widest ml-1">
-            <Coffee size={20} weight="bold" className="text-amber-600" />
+        <div className="space-y-2">
+          <label className={`flex items-center gap-2 text-sm font-bold ml-1 ${
+            isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
+          }`}>
+            <Coffee size={18} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
             豆の名前 <span className="text-red-500">*</span>
           </label>
           <Input
@@ -89,14 +97,17 @@ export function TastingSessionForm({
             onChange={(e) => setBeanName(e.target.value)}
             required
             placeholder="例: コロンビア・エチオピアなど"
+            isChristmasMode={isChristmasMode}
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* 焙煎度合い（必須） */}
-          <div className="space-y-4">
-            <label className="flex items-center gap-2 text-base font-black text-stone-500 uppercase tracking-widest ml-1">
-              <Thermometer size={20} weight="bold" className="text-amber-600" />
+          <div className="space-y-2">
+            <label className={`flex items-center gap-2 text-sm font-bold ml-1 ${
+              isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
+            }`}>
+              <Thermometer size={18} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
               焙煎度合い <span className="text-red-500">*</span>
             </label>
             <Select
@@ -108,13 +119,16 @@ export function TastingSessionForm({
               }
               options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
               required
+              isChristmasMode={isChristmasMode}
             />
           </div>
 
           {/* 試飲日 */}
-          <div className="space-y-4">
-            <label className="flex items-center gap-2 text-base font-black text-stone-500 uppercase tracking-widest ml-1">
-              <CalendarBlank size={20} weight="bold" className="text-amber-600" />
+          <div className="space-y-2">
+            <label className={`flex items-center gap-2 text-sm font-bold ml-1 ${
+              isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
+            }`}>
+              <CalendarBlank size={18} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
               試飲日 <span className="text-red-500">*</span>
             </label>
             <Input
@@ -122,22 +136,23 @@ export function TastingSessionForm({
               value={createdAt}
               onChange={(e) => setCreatedAt(e.target.value)}
               required
+              isChristmasMode={isChristmasMode}
             />
           </div>
         </div>
       </div>
 
       {/* ボタン */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         {!isNew && onDelete && (
           <Button
             type="button"
             variant="danger"
             onClick={handleDelete}
-            size="lg"
             className="flex-1 order-3 sm:order-1"
+            isChristmasMode={isChristmasMode}
           >
-            <Trash size={24} weight="bold" />
+            <Trash size={20} weight="bold" />
             削除
           </Button>
         )}
@@ -145,26 +160,26 @@ export function TastingSessionForm({
           type="button"
           variant="secondary"
           onClick={onCancel}
-          size="lg"
           className="flex-1 order-2"
+          isChristmasMode={isChristmasMode}
         >
-          <X size={24} weight="bold" />
+          <X size={20} weight="bold" />
           キャンセル
         </Button>
         <Button
           type="submit"
           variant="primary"
-          size="lg"
           className="flex-[1.5] order-1 sm:order-3"
+          isChristmasMode={isChristmasMode}
         >
           {isNew ? (
             <>
-              <Plus size={24} weight="bold" />
+              <Plus size={20} weight="bold" />
               セッションを作成
             </>
           ) : (
             <>
-              <Check size={24} weight="bold" />
+              <Check size={20} weight="bold" />
               更新する
             </>
           )}

@@ -8,6 +8,8 @@ import { TastingRecordForm } from './TastingRecordForm';
 import { getRecordsBySessionId } from '@/lib/tastingUtils';
 import { Coffee } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
+import { Card, RoastLevelBadge } from '@/components/ui';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionDetailProps {
   session: TastingSession;
@@ -23,6 +25,7 @@ export function TastingSessionDetail({
   const router = useRouter();
   const { user } = useAuth();
   const { showToast } = useToastContext();
+  const { isChristmasMode } = useChristmasMode();
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
   const tastingRecords = Array.isArray(data.tastingRecords)
@@ -119,41 +122,26 @@ export function TastingSessionDetail({
   return (
     <div className="space-y-8 max-w-2xl mx-auto">
       {/* ヘッダーカード */}
-      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+      <Card isChristmasMode={isChristmasMode} className="p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-amber-50 rounded-2xl">
-              <Coffee size={32} weight="fill" className="text-amber-700" />
+            <div className={`p-3 rounded-2xl ${isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50'}`}>
+              <Coffee size={32} weight="fill" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-700'} />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-gray-800 tracking-tight">
+              <h2 className={`text-2xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
                 {session.beanName}
               </h2>
               <div className="flex items-center gap-2 mt-1">
-                <span 
-                  className="px-3 py-1 text-white text-xs font-bold rounded-full shadow-sm uppercase tracking-wider"
-                  style={
-                    session.roastLevel === '深煎り' 
-                      ? { backgroundColor: '#120C0A' }
-                      : session.roastLevel === '中深煎り'
-                      ? { backgroundColor: '#4E3526' }
-                      : session.roastLevel === '中煎り'
-                      ? { backgroundColor: '#745138' }
-                      : session.roastLevel === '浅煎り'
-                      ? { backgroundColor: '#C78F5D' }
-                      : { backgroundColor: '#6B7280' }
-                  }
-                >
-                  {session.roastLevel}
-                </span>
-                <span className="text-sm font-medium text-gray-400">
+                <RoastLevelBadge level={session.roastLevel} size="sm" isChristmasMode={isChristmasMode} />
+                <span className={`text-sm font-medium ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'}`}>
                   {new Date(session.createdAt).toLocaleDateString('ja-JP')}
                 </span>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* 記録編集フォーム（自分の記録がある場合、または編集モードの場合） */}
       {editingRecord ? (

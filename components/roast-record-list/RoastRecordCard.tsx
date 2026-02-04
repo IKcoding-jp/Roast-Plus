@@ -11,6 +11,7 @@ interface RoastRecordCardProps {
   record: RoastTimerRecord;
   onDelete: (id: string, e: React.MouseEvent) => void;
   onClick: (id: string) => void;
+  isChristmasMode?: boolean;
 }
 
 const formatDate = (dateStr: string) => {
@@ -36,17 +37,18 @@ const getRoastLevelColor = (
   }
 };
 
-export function RoastRecordCard({ record, onDelete, onClick }: RoastRecordCardProps) {
+export function RoastRecordCard({ record, onDelete, onClick, isChristmasMode = false }: RoastRecordCardProps) {
   return (
     <Card
       variant="hoverable"
       className="p-3 md:p-4 relative h-auto"
       onClick={() => onClick(record.id)}
+      isChristmasMode={isChristmasMode}
     >
       {/* 削除ボタン（右上） */}
       <button
         onClick={(e) => onDelete(record.id, e)}
-        className="absolute top-2 right-2 p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center z-10"
+        className={`absolute top-2 right-2 p-1.5 text-red-600 rounded-lg transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center z-10 ${isChristmasMode ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
         aria-label="削除"
       >
         <HiTrash className="h-4 w-4" />
@@ -55,10 +57,10 @@ export function RoastRecordCard({ record, onDelete, onClick }: RoastRecordCardPr
       {/* 豆名と焙煎度合い */}
       <div className="flex items-center gap-2 mb-3 pr-8">
         <div className="flex-shrink-0">
-          <PiCoffeeBeanFill className="h-4 w-4 md:h-5 md:w-5 text-amber-700" />
+          <PiCoffeeBeanFill className={`h-4 w-4 md:h-5 md:w-5 ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-700'}`} />
         </div>
         <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          <h3 className="text-base md:text-lg font-bold text-gray-900 truncate">
+          <h3 className={`text-base md:text-lg font-bold truncate ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
             {record.beanName}
           </h3>
           <span
@@ -73,35 +75,35 @@ export function RoastRecordCard({ record, onDelete, onClick }: RoastRecordCardPr
       {/* 詳細情報 */}
       <div className="space-y-2">
         {/* 焙煎時間 */}
-        <div className="flex items-center gap-2 text-gray-700">
-          <MdTimer className="h-4 w-4 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2">
+          <MdTimer className={`h-4 w-4 flex-shrink-0 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'}`} />
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">焙煎時間</span>
-            <span className="text-sm md:text-base font-medium text-gray-900 font-mono">
+            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>焙煎時間</span>
+            <span className={`text-sm md:text-base font-medium font-mono ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
               {formatTime(record.duration)}
             </span>
           </div>
         </div>
 
         {/* 重さ */}
-        <div className="flex items-center gap-2 text-gray-700">
+        <div className="flex items-center gap-2">
           <div className="h-4 w-4 flex items-center justify-center flex-shrink-0">
-            <span className="text-gray-400 text-base">⚖</span>
+            <span className={`text-base ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'}`}>⚖</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">重さ</span>
-            <span className="text-sm md:text-base font-medium text-gray-900 font-mono">
+            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>重さ</span>
+            <span className={`text-sm md:text-base font-medium font-mono ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
               {record.weight}g
             </span>
           </div>
         </div>
 
         {/* 焙煎日 */}
-        <div className="flex items-center gap-2 text-gray-700">
-          <HiCalendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2">
+          <HiCalendar className={`h-4 w-4 flex-shrink-0 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'}`} />
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">焙煎日</span>
-            <span className="text-sm md:text-base font-medium text-gray-900 font-mono">
+            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>焙煎日</span>
+            <span className={`text-sm md:text-base font-medium font-mono ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
               {formatDate(record.roastDate)}
             </span>
           </div>

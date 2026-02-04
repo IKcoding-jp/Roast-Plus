@@ -9,11 +9,12 @@ import { RoastRecordCard } from './RoastRecordCard';
 interface RoastRecordListProps {
   data: AppData;
   onUpdate: (data: AppData) => void;
+  isChristmasMode?: boolean;
 }
 
 type SortOption = 'newest' | 'oldest' | 'beanName' | 'date';
 
-export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
+export function RoastRecordList({ data, onUpdate, isChristmasMode = false }: RoastRecordListProps) {
   const router = useRouter();
 
   const roastTimerRecords = useMemo(
@@ -164,8 +165,8 @@ export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
   if (roastTimerRecords.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">ロースト記録がありません</p>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className={isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}>ロースト記録がありません</p>
+        <p className={`text-sm mt-2 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
           右上のボタンから新規記録を作成できます
         </p>
       </div>
@@ -191,12 +192,13 @@ export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
         onRoastLevelToggle={handleRoastLevelToggle}
         onWeightToggle={handleWeightToggle}
         onResetFilters={handleResetFilters}
+        isChristmasMode={isChristmasMode}
       />
 
       {/* 結果数表示 */}
       {filteredAndSortedRecords.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-md flex-shrink-0">
-          <p className="text-gray-600">検索条件に一致する記録がありません</p>
+        <div className={`text-center py-12 rounded-lg shadow-md flex-shrink-0 ${isChristmasMode ? 'bg-[#0a2818]' : 'bg-white'}`}>
+          <p className={isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}>検索条件に一致する記録がありません</p>
         </div>
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto space-y-3 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 md:items-start md:auto-rows-auto">
@@ -206,6 +208,7 @@ export function RoastRecordList({ data, onUpdate }: RoastRecordListProps) {
               record={record}
               onDelete={handleDelete}
               onClick={handleCardClick}
+              isChristmasMode={isChristmasMode}
             />
           ))}
         </div>

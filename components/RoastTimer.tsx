@@ -137,6 +137,7 @@ export function RoastTimer({ isChristmasMode }: RoastTimerProps) {
             isRunning={isRunning}
             isPaused={isPaused}
             isCompleted={isCompleted}
+            isChristmasMode={isChristmasMode}
           />
 
           <TimerControls

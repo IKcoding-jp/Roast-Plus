@@ -9,7 +9,7 @@ import { RoasterFields } from './roast-scheduler/RoasterFields';
 import { RoastFields } from './roast-scheduler/RoastFields';
 import { SchedulePreview } from './roast-scheduler/SchedulePreview';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
-import { Button, IconButton } from '@/components/ui';
+import { Button, IconButton, NumberInput } from '@/components/ui';
 
 interface RoastScheduleMemoDialogProps {
   schedule: RoastSchedule | null;
@@ -221,8 +221,7 @@ function RoastScheduleMemoDialogInner({
                   時間 <span className="text-red-500">*</span>
                 </label>
                 <div className="flex items-center justify-center gap-2 md:gap-3">
-                  <input
-                    type="number"
+                  <NumberInput
                     value={hour}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -230,19 +229,15 @@ function RoastScheduleMemoDialogInner({
                         setHour(value);
                       }
                     }}
-                    min="0"
-                    max="23"
+                    min={0}
+                    max={23}
                     required={!isAfterPurge}
-                    className={`w-20 md:w-24 rounded-md border px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-center focus:outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-                      isChristmasMode
-                        ? 'border-[#d4af37]/40 bg-white/10 text-[#f8f1e7] placeholder:text-[#f8f1e7]/40 focus:border-[#d4af37] focus:ring-[#d4af37]/50'
-                        : 'border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-amber-500'
-                    }`}
                     placeholder="時"
+                    isChristmasMode={isChristmasMode}
+                    className="w-20 md:w-24 text-center"
                   />
                   <span className={`text-lg md:text-xl ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>:</span>
-                  <input
-                    type="number"
+                  <NumberInput
                     value={minute}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -250,15 +245,12 @@ function RoastScheduleMemoDialogInner({
                         setMinute(value);
                       }
                     }}
-                    min="0"
-                    max="59"
+                    min={0}
+                    max={59}
                     required={!isAfterPurge}
-                    className={`w-20 md:w-24 rounded-md border px-3 md:px-4 py-2 md:py-2.5 text-base md:text-lg text-center focus:outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-                      isChristmasMode
-                        ? 'border-[#d4af37]/40 bg-white/10 text-[#f8f1e7] placeholder:text-[#f8f1e7]/40 focus:border-[#d4af37] focus:ring-[#d4af37]/50'
-                        : 'border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-amber-500'
-                    }`}
                     placeholder="分"
+                    isChristmasMode={isChristmasMode}
+                    className="w-20 md:w-24 text-center"
                   />
                 </div>
               </div>

@@ -3,7 +3,7 @@
 import type { TimeLabel } from '@/types';
 import { HiPlus, HiTrash, HiPencil, HiUser, HiArrowDown } from 'react-icons/hi';
 import type { useOCRTimeLabelEditor } from './useOCRTimeLabelEditor';
-import { Button, IconButton } from '@/components/ui';
+import { Button, IconButton, Input, NumberInput, Textarea } from '@/components/ui';
 
 interface TimeLabelRowProps {
   label: TimeLabel;
@@ -38,16 +38,6 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
   const labelClass = `block text-sm font-medium mb-1 ${
     isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
   }`;
-  const inputClass = `w-full rounded-md border px-3 py-2 text-base focus:outline-none focus:ring-2 ${
-    isChristmasMode
-      ? 'border-[#d4af37]/40 bg-white/10 text-[#f8f1e7] placeholder:text-[#f8f1e7]/40 focus:border-[#d4af37] focus:ring-[#d4af37]/50'
-      : 'border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-amber-500'
-  }`;
-  const timeInputClass = `w-20 rounded-md border px-3 py-2 text-base text-center focus:outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-    isChristmasMode
-      ? 'border-[#d4af37]/40 bg-white/10 text-[#f8f1e7] placeholder:text-[#f8f1e7]/40 focus:border-[#d4af37] focus:ring-[#d4af37]/50'
-      : 'border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-amber-500'
-  }`;
 
   return (
     <div
@@ -65,8 +55,7 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
               時間 <span className="text-red-500">*</span>
             </label>
             <div className="flex items-center gap-2">
-              <input
-                type="number"
+              <NumberInput
                 value={editingTime.hour}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -74,15 +63,15 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
                     setEditingTime({ ...editingTime, hour: value });
                   }
                 }}
-                min="0"
-                max="23"
+                min={0}
+                max={23}
                 required
-                className={timeInputClass}
                 placeholder="時"
+                isChristmasMode={isChristmasMode}
+                className="w-20 text-center"
               />
               <span className={isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}>:</span>
-              <input
-                type="number"
+              <NumberInput
                 value={editingTime.minute}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -90,35 +79,35 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
                     setEditingTime({ ...editingTime, minute: value });
                   }
                 }}
-                min="0"
-                max="59"
-                className={timeInputClass}
+                min={0}
+                max={59}
                 placeholder="分"
+                isChristmasMode={isChristmasMode}
+                className="w-20 text-center"
               />
             </div>
           </div>
 
           {/* 内容編集 */}
           <div>
-            <label className={labelClass}>内容</label>
-            <input
-              type="text"
+            <Input
+              label="内容"
               value={editingContent}
               onChange={(e) => setEditingContent(e.target.value)}
-              className={inputClass}
               placeholder="内容を入力"
+              isChristmasMode={isChristmasMode}
             />
           </div>
 
           {/* メモ編集 */}
           <div>
-            <label className={labelClass}>メモ</label>
-            <textarea
+            <Textarea
+              label="メモ"
               value={editingMemo}
               onChange={(e) => setEditingMemo(e.target.value)}
               rows={2}
-              className={`${inputClass} resize-none`}
               placeholder="メモを入力"
+              isChristmasMode={isChristmasMode}
             />
           </div>
 
@@ -130,12 +119,11 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
                 担当者
               </span>
             </label>
-            <input
-              type="text"
+            <Input
               value={editingAssignee}
               onChange={(e) => setEditingAssignee(e.target.value)}
-              className={inputClass}
               placeholder="例：浅田さん、小山さん"
+              isChristmasMode={isChristmasMode}
             />
           </div>
 
@@ -146,8 +134,7 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
             </label>
             <div className="flex items-center gap-2">
               <span className={`text-sm ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>〜</span>
-              <input
-                type="number"
+              <NumberInput
                 value={editingContinuesUntil.hour}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -155,14 +142,14 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
                     setEditingContinuesUntil({ ...editingContinuesUntil, hour: value });
                   }
                 }}
-                min="0"
-                max="23"
-                className={timeInputClass}
+                min={0}
+                max={23}
                 placeholder="時"
+                isChristmasMode={isChristmasMode}
+                className="w-20 text-center"
               />
               <span className={isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}>:</span>
-              <input
-                type="number"
+              <NumberInput
                 value={editingContinuesUntil.minute}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -170,10 +157,11 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
                     setEditingContinuesUntil({ ...editingContinuesUntil, minute: value });
                   }
                 }}
-                min="0"
-                max="59"
-                className={timeInputClass}
+                min={0}
+                max={59}
                 placeholder="分"
+                isChristmasMode={isChristmasMode}
+                className="w-20 text-center"
               />
               <span className={`text-sm ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>まで</span>
               {editingContinuesUntil.hour && (
@@ -205,27 +193,19 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete, isChristmasMo
                 }`}>
                   <span className={`text-sm mt-2 ${isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'}`}>↓</span>
                   <div className="flex-1 space-y-2">
-                    <input
-                      type="text"
+                    <Input
                       value={subTask.content}
                       onChange={(e) => handleUpdateSubTask(subTask.id, { content: e.target.value })}
-                      className={`w-full rounded-md border px-3 py-1.5 text-sm focus:outline-none focus:ring-2 ${
-                        isChristmasMode
-                          ? 'border-[#d4af37]/40 bg-white/10 text-[#f8f1e7] placeholder:text-[#f8f1e7]/40 focus:border-[#d4af37] focus:ring-[#d4af37]/50'
-                          : 'border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-amber-500'
-                      }`}
                       placeholder="タスク内容"
+                      isChristmasMode={isChristmasMode}
+                      className="!py-1.5 !text-sm"
                     />
-                    <input
-                      type="text"
+                    <Input
                       value={subTask.assignee || ''}
                       onChange={(e) => handleUpdateSubTask(subTask.id, { assignee: e.target.value || undefined })}
-                      className={`w-full rounded-md border px-3 py-1 text-xs focus:outline-none focus:ring-2 ${
-                        isChristmasMode
-                          ? 'border-[#d4af37]/30 bg-white/5 text-[#f8f1e7]/70 placeholder:text-[#f8f1e7]/30 focus:border-[#d4af37] focus:ring-[#d4af37]/50'
-                          : 'border-gray-200 text-gray-700 focus:border-amber-500 focus:ring-amber-500'
-                      }`}
                       placeholder="担当者（任意）"
+                      isChristmasMode={isChristmasMode}
+                      className="!py-1 !text-xs"
                     />
                   </div>
                   <IconButton

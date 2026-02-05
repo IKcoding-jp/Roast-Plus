@@ -1,14 +1,19 @@
 ---
 name: create-spec
-description: Issue番号から仕様ドキュメント（Working Documents）を自動生成するスキル。Steering Documents参照→Serena MCP調査→4ファイル生成（requirement.md, design.md, tasklist.md, testing.md）。fix-issueのPhase 1.5で自動実行、手動実行も可能。Issue番号を引数に取る。「/create-spec 123」のように使用。
+description: 【手動用】既存IssueからWorking Documentsを生成。通常は /issue-creator で自動生成されるため、手動実行が必要な場合（古いIssue、外部で作成されたIssue等）に使用。「/create-spec 123」のように使用。
 argument-hint: "[Issue番号]"
 ---
 
-# Working Documents自動生成スキル
+# Working Documents手動生成スキル
 
 ## 概要
 
-GitHub IssueからWorking Documentsを自動生成します。生成されたドキュメントは、実装中に逐次更新され、PR完了後にGit保管されます。
+**通常は `/issue-creator` でIssue作成と同時にWorking Documentsが生成されます。**
+
+このスキルは以下の場合に手動で使用します:
+- 古いIssue（Working Documentsがない）
+- 外部で作成されたIssue（GitHub Web等）
+- `/issue-creator` を使わずに作成されたIssue
 
 ## Working Documentsの役割
 

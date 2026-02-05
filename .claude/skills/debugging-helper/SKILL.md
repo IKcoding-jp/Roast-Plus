@@ -37,3 +37,11 @@ description: 自律的デバッグワークフロー。仮説→ログ挿入→�
 ## 完了後
 1. `[DEBUG]` ログをすべて削除
 2. 必要に応じてテストを追加
+
+---
+
+## 詳細パターン
+
+よくあるデバッグシナリオと解決方法は以下を参照:
+
+- **[debug-scenarios.md](references/debug-scenarios.md)** - React Hooks競合状態、Firestoreリアルタイムリスナー、localStorage/IndexedDB、オフライン復帰、タイマー競合、クリスマスモード切り替え等の典型的バグパターン、ログ挿入例、修正例、予防策

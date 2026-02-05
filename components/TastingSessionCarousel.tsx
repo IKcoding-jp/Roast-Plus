@@ -11,7 +11,8 @@ interface TastingSessionCarouselProps {
   sessions: TastingSession[];
   tastingRecords: TastingRecord[];
   activeMemberCount: number;
-  router: AppRouterInstance;
+  /** @deprecated router is no longer used internally, kept for backward compatibility */
+  router?: AppRouterInstance;
   onUpdateSession?: (sessionId: string, aiAnalysis: string, recordCount: number) => void;
 }
 
@@ -62,7 +63,8 @@ export function TastingSessionCarousel({
   sessions,
   tastingRecords,
   activeMemberCount,
-  router,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  router: _router,
   onUpdateSession,
 }: TastingSessionCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);

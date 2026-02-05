@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 
 /**
  * 統一されたテキストエリアコンポーネント
@@ -54,7 +54,8 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, isChristmasMode = false, className = '', id, rows = 4, ...props }, ref) => {
-    const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = useId();
+    const textareaId = id || generatedId;
 
     const baseStyles = 'w-full rounded-lg border-2 px-4 py-3 text-lg transition-all duration-200 resize-none';
 

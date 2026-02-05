@@ -10,7 +10,6 @@ import {
     subscribeManager,
     subscribePairExclusions,
 } from '../lib/firebase';
-import { toMillisSafe } from '../lib/firebase';
 
 export function useAssignmentData(userId: string | null, authLoading: boolean) {
     // マスタデータ
@@ -32,7 +31,6 @@ export function useAssignmentData(userId: string | null, authLoading: boolean) {
     const [activeDate, setActiveDate] = useState<string>("");
     const [assignmentDay, setAssignmentDay] = useState<AssignmentDay | null>(null);
     const [shuffleEvent, setShuffleEvent] = useState<ShuffleEvent | null>(null);
-    const [isRouletteVisible, setIsRouletteVisible] = useState(false);
     const [isLocalShuffling, setIsLocalShuffling] = useState(false);
 
     // シャッフル許可判定
@@ -146,25 +144,8 @@ export function useAssignmentData(userId: string | null, authLoading: boolean) {
         const unsubShuffle = subscribeShuffleEvent(userId, activeDate, (event) => {
             setShuffleEvent(event);
 
-            if (event && event.state === 'running') {
-                const now = Date.now();
-                if (!event.startedAt || typeof event.durationMs !== 'number') return;
-
-                const startTime = toMillisSafe(event.startedAt);
-                const endTime = startTime + event.durationMs;
-
-                if (now < endTime) {
-                    setIsRouletteVisible(true);
-                    const remaining = endTime - now;
-                    setTimeout(() => {
-                        if (!isLocalShuffling) {
-                            // overlay is controlled by event + local flag
-                        }
-                    }, remaining);
-                }
-            } else {
-                // setIsRouletteVisible(false);
-            }
+            // isRouletteVisible は派生状態として計算されるため、
+            // ここでのsetIsRouletteVisible呼び出しは不要
         });
 
         return () => {
@@ -172,15 +153,9 @@ export function useAssignmentData(userId: string | null, authLoading: boolean) {
         };
     }, [userId, authLoading, activeDate, isLocalShuffling]);
 
-    // アニメーション表示制御
-    useEffect(() => {
-        if (isLocalShuffling) {
-            setIsRouletteVisible(true);
-        } else {
-            if (shuffleEvent?.state !== 'running') {
-                setIsRouletteVisible(false);
-            }
-        }
+    // アニメーション表示制御（派生状態）
+    const isRouletteVisible = useMemo(() => {
+        return isLocalShuffling || shuffleEvent?.state === 'running';
     }, [isLocalShuffling, shuffleEvent]);
 
     // 表示用Assignments (データがない場合は空枠を表示)

@@ -135,7 +135,7 @@ describe('useAppData', () => {
 
   describe('リアルタイム購読', () => {
     it('Firestoreの変更を購読する', async () => {
-      const { result } = renderHook(() => useAppData());
+      renderHook(() => useAppData());
 
       await act(async () => {
         await vi.runAllTimersAsync();

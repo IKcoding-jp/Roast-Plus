@@ -89,7 +89,8 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
 
       loadAvailableBeans();
     } else {
-      setAvailableBeans([]);
+      // 非同期にリセットしてカスケードレンダリングを防止
+      queueMicrotask(() => setAvailableBeans([]));
     }
   }, [inputMode, recommendedMode, user, data]);
 
@@ -140,8 +141,11 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
 
       loadAvailableOptions();
     } else {
-      setAvailableWeights([]);
-      setAvailableRoastLevels([]);
+      // 非同期にリセットしてカスケードレンダリングを防止
+      queueMicrotask(() => {
+        setAvailableWeights([]);
+        setAvailableRoastLevels([]);
+      });
     }
   }, [inputMode, recommendedMode, beanName, user, data]);
 
@@ -151,8 +155,11 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
       const defaultMin = DEFAULT_DURATION_BY_WEIGHT[weight];
 
       if (prevWeightRef.current !== weight || !durationMinutes || durationMinutes === '0') {
-        setDurationMinutes(defaultMin.toString());
-        setDurationSeconds('0');
+        // 非同期に更新してカスケードレンダリングを防止
+        queueMicrotask(() => {
+          setDurationMinutes(defaultMin.toString());
+          setDurationSeconds('0');
+        });
       }
       prevWeightRef.current = weight;
     } else {
@@ -186,7 +193,8 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
       };
       calculateRecommended();
     } else {
-      setRecommendedTimeInfo(null);
+      // 非同期にリセットしてカスケードレンダリングを防止
+      queueMicrotask(() => setRecommendedTimeInfo(null));
     }
   }, [beanName, weight, roastLevel, inputMode, recommendedMode, user, data, durationMinutes]);
 

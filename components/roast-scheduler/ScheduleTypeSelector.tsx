@@ -21,18 +21,6 @@ export function ScheduleTypeSelector({
   onTypeChange,
   isChristmasMode = false,
 }: ScheduleTypeSelectorProps) {
-  // クリスマスモード用のスタイル
-  const getTypeStyle = (isSelected: boolean, selectedColor: string, selectedBg: string) => {
-    if (isChristmasMode) {
-      return isSelected
-        ? `border-[#d4af37] bg-[#d4af37]/20`
-        : `border-[#d4af37]/30 bg-white/5 hover:border-[#d4af37]/50`;
-    }
-    return isSelected
-      ? `border-${selectedColor}-500 bg-${selectedColor}-50`
-      : 'border-gray-200 bg-white hover:border-gray-300';
-  };
-
   return (
     <div>
       <label className={`mb-3 md:mb-4 block text-base md:text-lg font-medium text-center ${

@@ -121,25 +121,29 @@ const mockGetTodayGoal = vi.fn();
 const mockCheckNewBadges = vi.fn();
 const mockEarnBadges = vi.fn();
 
-// 定数モック
-const MOCK_INITIAL_STREAK_INFO = {
+// 定数モック（vi.mockのファクトリ関数内で直接使用するため、ここでは定義のみ）
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _MOCK_INITIAL_STREAK_INFO = {
   currentStreak: 0,
   longestStreak: 0,
   lastStudyDate: null,
 };
 
-const MOCK_INITIAL_LEVEL_INFO = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _MOCK_INITIAL_LEVEL_INFO = {
   currentLevel: 1,
   currentXP: 0,
   xpToNextLevel: 100,
 };
 
-const MOCK_DEFAULT_QUIZ_SETTINGS = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _MOCK_DEFAULT_QUIZ_SETTINGS = {
   dailyGoal: 10,
   notificationsEnabled: false,
 };
 
-const MOCK_INITIAL_QUIZ_STATS = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _MOCK_INITIAL_QUIZ_STATS = {
   totalAnswered: 0,
   totalCorrect: 0,
   totalIncorrect: 0,

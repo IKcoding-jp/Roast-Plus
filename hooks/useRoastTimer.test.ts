@@ -348,14 +348,14 @@ describe('useRoastTimer', () => {
 
     it('ユーザー変更時に時刻同期を再初期化する', async () => {
       const { rerender } = renderHook(
-        ({ user }) =>
+        () =>
           useRoastTimer({
             data: mockAppData,
             updateData: mockUpdateData,
             isLoading: false,
           }),
         {
-          initialProps: { user: mockUser },
+          initialProps: {},
         }
       );
 

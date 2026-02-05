@@ -1,6 +1,53 @@
 # RoastPlus コーディング規約
 
-## 命名規則
+> **このファイルは `docs/steering/GUIDELINES.md` に統合されました。**
+> 最新の規約は Steering Documents を参照してください。
+
+---
+
+## 移行先
+
+このファイルの内容は、以下のSteering Documentsに統合されています：
+
+### コーディング規約
+→ **`docs/steering/GUIDELINES.md`** のコーディング規約セクション
+
+- 命名規則
+- インポート順序
+- 型定義方針
+- コンポーネント構成
+- コメント
+- Tailwind CSS
+
+### ディレクトリ構成
+→ **`docs/steering/REPOSITORY.md`**
+
+- `/app`, `/components`, `/lib`, `/hooks`, `/types` の役割
+- ファイル命名規則
+- 依存方向
+
+### UI実装ルール
+→ **`docs/steering/GUIDELINES.md`** のUI実装ルールセクション
+
+- 共通UIコンポーネント使用必須
+- クリスマスモード対応
+- レスポンシブデザイン
+
+---
+
+## 参照
+
+- **実装ガイドライン**: `docs/steering/GUIDELINES.md`
+- **リポジトリ構造**: `docs/steering/REPOSITORY.md`
+- **Steering Documents一覧**: `docs/steering/`
+
+---
+
+## 過去の内容（参照用）
+
+以下は、過去のコーディング規約の内容です。最新の規約は上記のSteering Documentsを参照してください。
+
+### 命名規則
 
 | 種類 | 規則 | 例 |
 |-----|------|-----|
@@ -12,7 +59,7 @@
 | ファイル（コンポーネント） | PascalCase | `QuizCard.tsx` |
 | ファイル（ユーティリティ） | camelCase | `gamification.ts` |
 
-## インポート順序
+### インポート順序
 
 ```typescript
 // 1. 外部ライブラリ
@@ -30,39 +77,19 @@ import type { QuizQuestion } from '@/lib/coffee-quiz/types';
 import { CATEGORY_LABELS, DIFFICULTY_STYLES } from '@/lib/coffee-quiz/types';
 ```
 
-## 型定義方針
+### 型定義方針
 
-### interface を使う場合
+#### interface を使う場合
 - オブジェクトの構造定義
 - クラスが実装するコントラクト
 - 拡張（extends）が必要な場合
 
-```typescript
-interface QuizQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctIndex: number;
-}
-
-interface ExtendedQuestion extends QuizQuestion {
-  explanation: string;
-}
-```
-
-### type を使う場合
+#### type を使う場合
 - ユニオン型
 - マッピング型（Record, Pick, Omit等）
 - 関数型
 
-```typescript
-type QuizCategory = 'basics' | 'roasting' | 'extraction' | 'origin';
-type QuizDifficulty = 'easy' | 'medium' | 'hard';
-type CategoryLabels = Record<QuizCategory, string>;
-type OnSelectHandler = (index: number) => void;
-```
-
-## コンポーネント構成
+### コンポーネント構成
 
 ```typescript
 'use client';  // クライアントコンポーネントの場合のみ
@@ -97,7 +124,7 @@ export function ComponentName({ title, onAction }: ComponentProps) {
 }
 ```
 
-## ディレクトリ構成
+### ディレクトリ構成
 
 ```
 roastplus/
@@ -115,7 +142,7 @@ roastplus/
 └── styles/                 # グローバルスタイル
 ```
 
-## コメント
+### コメント
 
 ```typescript
 // 単行コメント（日本語可）
@@ -133,7 +160,7 @@ function calculateScore(value: number): number {
 // FIXME: 修正が必要な箇所
 ```
 
-## Tailwind CSS
+### Tailwind CSS
 
 - ユーティリティクラスを直接使用
 - 繰り返しパターンは変数化（`DIFFICULTY_STYLES`等）

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useQuizData } from './useQuizData';
+import type { AnswerResult } from './useQuizData';
 import type { QuizProgress, QuizCard, QuizQuestion } from '@/types';
 
 // モックデータを定義
@@ -192,16 +193,16 @@ vi.mock('@/lib/coffee-quiz/fsrs', () => ({
 }));
 
 vi.mock('@/lib/coffee-quiz/gamification', () => ({
-  calculateXP: (params: any) => mockCalculateXP(params),
-  addXP: (level: any, xp: number) => mockAddXP(level, xp),
-  updateStreak: (streak: any) => mockUpdateStreak(streak),
-  updateStats: (stats: any, isCorrect: boolean, category: string, difficulty: string, mastered: boolean) =>
+  calculateXP: (params: unknown) => mockCalculateXP(params),
+  addXP: (level: unknown, xp: number) => mockAddXP(level, xp),
+  updateStreak: (streak: unknown) => mockUpdateStreak(streak),
+  updateStats: (stats: unknown, isCorrect: boolean, category: string, difficulty: string, mastered: boolean) =>
     mockUpdateStats(stats, isCorrect, category, difficulty, mastered),
-  updateDailyGoal: (dailyGoals: any[], isCorrect: boolean, xp: number, goalTarget: number) =>
+  updateDailyGoal: (dailyGoals: unknown[], isCorrect: boolean, xp: number, goalTarget: number) =>
     mockUpdateDailyGoal(dailyGoals, isCorrect, xp, goalTarget),
-  getTodayGoal: (dailyGoals: any[]) => mockGetTodayGoal(dailyGoals),
-  checkNewBadges: (params: any) => mockCheckNewBadges(params),
-  earnBadges: (earnedBadges: any[], newBadgeTypes: string[]) =>
+  getTodayGoal: (dailyGoals: unknown[]) => mockGetTodayGoal(dailyGoals),
+  checkNewBadges: (params: unknown) => mockCheckNewBadges(params),
+  earnBadges: (earnedBadges: unknown[], newBadgeTypes: string[]) =>
     mockEarnBadges(earnedBadges, newBadgeTypes),
 }));
 
@@ -361,7 +362,7 @@ describe('useQuizData', () => {
         await vi.runAllTimersAsync();
       });
 
-      let recordResult: any;
+      let recordResult: AnswerResult;
       await act(async () => {
         recordResult = await result.current.recordAnswer('q1', 'opt1', 5000);
       });
@@ -379,7 +380,7 @@ describe('useQuizData', () => {
         await vi.runAllTimersAsync();
       });
 
-      let recordResult: any;
+      let recordResult: AnswerResult;
       await act(async () => {
         recordResult = await result.current.recordAnswer('q1', 'opt2', 3000);
       });
@@ -397,7 +398,7 @@ describe('useQuizData', () => {
 
       mockCalculateXP.mockReturnValue(15);
 
-      let recordResult: any;
+      let recordResult: AnswerResult;
       await act(async () => {
         recordResult = await result.current.recordAnswer('q1', 'opt1', 5000);
       });
@@ -425,7 +426,7 @@ describe('useQuizData', () => {
         newLevel: 2,
       });
 
-      let recordResult: any;
+      let recordResult: AnswerResult;
       await act(async () => {
         recordResult = await result.current.recordAnswer('q1', 'opt1', 5000);
       });
@@ -446,7 +447,7 @@ describe('useQuizData', () => {
         { type: 'first_correct', earnedAt: '2024-02-05T12:00:00.000Z' },
       ]);
 
-      let recordResult: any;
+      let recordResult: AnswerResult;
       await act(async () => {
         recordResult = await result.current.recordAnswer('q1', 'opt1', 5000);
       });
@@ -468,7 +469,7 @@ describe('useQuizData', () => {
         lastStudyDate: '2024-02-05',
       });
 
-      let recordResult: any;
+      let recordResult: AnswerResult;
       await act(async () => {
         recordResult = await result.current.recordAnswer('q1', 'opt1', 5000);
       });
@@ -816,7 +817,7 @@ describe('useQuizData', () => {
         newLevel: 2,
       });
 
-      let result2: any;
+      let result2: AnswerResult;
       await act(async () => {
         result2 = await result.current.recordAnswer('q2', 'opt3', 4000);
       });

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useRoastTimer } from './useRoastTimer';
+import type { UseTimerPersistenceArgs } from './roast-timer/useTimerPersistence';
+import type { UseTimerControlsArgs } from './roast-timer/useTimerControls';
 import type { AppData, User } from '@/types';
 
 // モック関数
@@ -93,11 +95,11 @@ vi.mock('./roast-timer/useTimerNotifications', () => ({
 }));
 
 vi.mock('./roast-timer/useTimerPersistence', () => ({
-  useTimerPersistence: (args: any) => mockUseTimerPersistence(args),
+  useTimerPersistence: (args: UseTimerPersistenceArgs) => mockUseTimerPersistence(args),
 }));
 
 vi.mock('./roast-timer/useTimerControls', () => ({
-  useTimerControls: (args: any) => mockUseTimerControls(args),
+  useTimerControls: (args: UseTimerControlsArgs) => mockUseTimerControls(args),
 }));
 
 describe('useRoastTimer', () => {

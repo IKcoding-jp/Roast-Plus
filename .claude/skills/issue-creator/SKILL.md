@@ -64,4 +64,47 @@ rm /tmp/issue_body.md
 
 ### 5. 完了後
 
-作成したIssue番号を案内: `/fix-issue [番号]` で実装開始可能。
+作成したIssue番号を案内し、Working Documentsを自動生成します:
+
+```bash
+# Issue作成後、Working Documents自動生成を提案
+echo "Issue #124 を作成しました。"
+echo ""
+echo "Working Documents（仕様書）を自動生成しますか？"
+echo "生成する場合: /create-spec 124"
+echo ""
+echo "実装を開始する場合: /fix-issue 124"
+```
+
+#### Working Documents自動生成の流れ
+
+1. **Issue作成完了** → Issue番号を取得（例: `#124`）
+2. **ユーザーに確認** → 「Working Documentsを生成しますか？」
+3. **承認後に実行** → `/create-spec 124`
+4. **Working生成完了** → `docs/working/20260205_124_タイトル/` に4ファイル生成
+5. **実装開始可能** → `/fix-issue 124` で実装フェーズへ
+
+#### Working Documents生成のメリット
+
+- **コンテキスト保持**: Issue作成時の調査結果を永続化
+- **設計の明確化**: requirement.md, design.md で仕様を整理
+- **タスク可視化**: tasklist.md で作業を分割
+- **テスト計画**: testing.md でテストケースを事前定義
+
+#### スキップ可能な場合
+
+以下のIssueでは Working Documents生成をスキップしてもOK:
+
+- 軽微なドキュメント修正（typo、リンク修正等）
+- 単純な依存関係更新（`npm update`のみ）
+- 緊急のホットフィックス（即座に修正が必要）
+
+その他のIssue（機能追加、バグ修正、リファクタリング）では、Working Documents生成を強く推奨。
+
+---
+
+## 詳細パターン
+
+実際のIssue作成例は以下を参照:
+
+- **[issue-examples.md](references/issue-examples.md)** - バグ報告（タイマー停止、共通UI不統一）、機能追加（CSVエクスポート）、リファクタリング（複雑度削減）、ドキュメント追加等の具体例。Serena MCP調査結果からIssue本文、ラベル、gh CLIコマンドまでの完全な流れ。

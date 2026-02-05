@@ -6,7 +6,6 @@ import {
   G2_BEANS,
   G3_BEANS,
   ALL_BEANS,
-  type BeanName,
 } from './beanConfig';
 
 describe('beanConfig', () => {

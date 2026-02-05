@@ -10,20 +10,62 @@
 
 ## Workflows
 
+3つの基本ワークフローがあります。詳細は「## 理想のワークフロー（SDD運用時）」を参照。
+
 ### 1. 探索→計画→コード→コミット型（標準）
-1. ファイルを読んで理解（コード作成は禁止）
-2. 「think hard」で計画立案
-3. 実装・検証
-4. PR作成、README更新
+ファイル読み込み → 計画立案 → 実装・検証 → PR作成
 
 ### 2. TDD型
-1. 入出力ペアからテスト作成
-2. テスト実行で失敗確認 → コミット
-3. 実装で全テスト合格まで反復
-4. コード確定後コミット
+テスト作成 → 実装 → テスト合格まで反復 → コミット
 
 ### 3. ビジュアル反復型
 Chrome DevTools MCPでスクショ確認しながらUI改善
+
+## Documentation Policy
+
+### Steering Documents（永続化ドキュメント）
+
+**場所**: `docs/steering/`
+
+プロジェクト全体の設計指針を定義する6種類のドキュメント:
+
+| ドキュメント | 内容 | 参照タイミング |
+|-------------|------|---------------|
+| **PRODUCT.md** | プロダクトビジョン、コアバリュー、スコープ | Issue理解時 |
+| **FEATURES.md** | 全機能の詳細仕様、UI実装ルール、禁止事項 | 機能実装時（最重要） |
+| **TECH_SPEC.md** | 技術スタック、アーキテクチャ、ADR参照 | 技術選定時 |
+| **REPOSITORY.md** | ディレクトリ構造、ファイル命名規則 | ファイル配置時 |
+| **GUIDELINES.md** | 実装ガイドライン、コーディング規約 | コード作成時 |
+| **UBIQUITOUS_LANGUAGE.md** | ドメイン用語定義、命名規則 | 命名時 |
+
+**重要**: AIは `/clear` 後もSteering Documentsを参照することで、プロジェクトの設計を完全に理解できる。
+
+### Working Documents（作業用ドキュメント）
+
+**場所**: `docs/working/{YYYYMMDD}_{Issue番号}_{タイトル}/`
+
+Issue単位の仕様書。4ファイル固定:
+
+| ファイル | 内容 |
+|---------|------|
+| **requirement.md** | 要件定義、ユーザーストーリー、受け入れ基準 |
+| **design.md** | 設計書、変更対象ファイル、禁止事項チェック |
+| **tasklist.md** | タスク分割、依存関係、見積もり |
+| **testing.md** | テスト計画、テストケース、カバレッジ目標 |
+
+**生成**: `/create-spec` スキルで自動生成（AIが80%ドラフト、ユーザーが確認・修正）
+**更新**: 実装中に逐次更新（設計変更、タスク完了時）
+**保管**: PR完了後もGit保管（削除しない、過去の設計判断の記録）
+
+### EnterPlanModeとの使い分け
+
+| 項目 | Working Documents | EnterPlanMode |
+|------|------------------|---------------|
+| 永続性 | ✅ Git保管 | ❌ 一時的 |
+| スコープ | Issue単位 | 実装の詳細計画 |
+| 用途 | 永続的な設計メモ | 複雑な実装の事前検討 |
+
+**併用推奨**: Working生成後、複雑な実装はEnterPlanModeで詳細計画を立案。
 
 ## Thinking Keywords
 | キーワード | 用途 |
@@ -53,6 +95,29 @@ Chrome DevTools MCPでスクショ確認しながらUI改善
 
 ### Chrome DevTools MCP（動作確認）
 `navigate_page` → `take_snapshot` → 操作 → `take_screenshot`
+
+## Steering Documents参照ルール
+
+実装前に必ず以下のSteering Documentsを参照すること:
+
+### Issue取得時（fix-issue Phase 1）
+- **FEATURES.md** - 関連機能の確認
+
+### Working Documents生成時（/create-spec）
+- **PRODUCT.md** - プロダクトビジョン
+- **FEATURES.md** - 関連機能の仕様
+- **UBIQUITOUS_LANGUAGE.md** - 用語統一
+- **GUIDELINES.md** - 実装パターン
+
+### 実装時（fix-issue Phase 5）
+- **TECH_SPEC.md** - 技術仕様
+- **REPOSITORY.md** - ファイル配置
+- **GUIDELINES.md** - コーディング規約
+
+### PR完了時（fix-issue Phase 11.5）
+- **全Steering Documents** - 更新が必要か判断
+
+**コンテキスト喪失防止**: `/clear` 実行後も、Steering Documentsを参照することでプロジェクトの全体像を理解できる。
 
 ## Code Style
 - ディレクトリ: `app/`, `components/`, `lib/`, `hooks/`, `types/`
@@ -129,6 +194,46 @@ npm run lint     # Lint
 npm run test     # テスト（Vitest導入後）
 ```
 
+## 理想のワークフロー（SDD運用時）
+
+### 新機能開発の流れ
+
+```
+1. /issue-creator
+   ↓
+2. Issue作成 + /create-spec 自動実行（Working生成）
+   ↓
+3. /fix-issue
+   - Phase 1.5: Working確認
+   - Phase 4: EnterPlanMode（複雑な実装のみ）
+   - Phase 5-10: 実装・検証・PR
+   - Phase 11.5: Steering更新ドラフト
+   ↓
+4. PR マージ
+   ↓
+5. Steering更新承認・コミット
+```
+
+### セッション途中の引き継ぎ
+
+新しいセッション開始時、以下を参照してコンテキストを回復:
+
+1. **`docs/steering/`** - プロジェクト全体の理解
+2. **`docs/working/{最新}/`** - 進行中のIssueの設計
+3. **`git log`** - 最新のコミット履歴
+
+**コンテキストを忘れない仕組み = SDD（仕様駆動開発）**
+
+### スキル連携フロー
+
+| スキル | タイミング | 役割 |
+|--------|-----------|------|
+| **/issue-creator** | 作業開始時 | Issue作成 + Working生成提案 |
+| **/create-spec** | Issue作成後 | Working Documents自動生成 |
+| **/fix-issue** | 実装開始時 | Phase 1.5でWorking確認、Phase 11.5でSteering更新 |
+| **/git-workflow** | コミット時 | Workingからスコープ自動抽出 |
+| **/project-maintenance** | 定期実行時 | リファクタリングIssue + Working自動生成 |
+
 ## Development Flow
 1. **Issue作成** → 機能追加・修正の起点（Claudeが作成）
 2. **ブランチ作成** → `feature/#123-xxx`（または `feat/#123-xxx`）、`fix/#123-xxx`
@@ -152,9 +257,31 @@ npm run test     # テスト（Vitest導入後）
 | `/compact` | 長いセッションを圧縮 |
 
 ## Project Memory
-- アーキテクチャ意思決定記録: `docs/memory.md`（ADR形式）
-- 重要な設計判断を行った際は、必ず `docs/memory.md` に ADR-XXX 形式で追記すること
-- 過去の設計理由を問われた場合は、まず `docs/memory.md` を参照すること
+
+### Steering Documents（最優先）
+
+プロジェクトの永続的な設計記録:
+
+- **`docs/steering/PRODUCT.md`** - プロダクトビジョン
+- **`docs/steering/FEATURES.md`** - 全機能の詳細仕様
+- **`docs/steering/TECH_SPEC.md`** - 技術仕様、ADR参照
+- **`docs/steering/REPOSITORY.md`** - リポジトリ構造
+- **`docs/steering/GUIDELINES.md`** - 実装ガイドライン
+- **`docs/steering/UBIQUITOUS_LANGUAGE.md`** - ドメイン用語定義
+
+### 過去の設計記録
+
+- **`docs/memory.md`** - ADR参照リンク（Steering Documentsへの移行済み）
+- **`docs/coding-standards.md`** - 参照リンク（GUIDELINES.mdへの移行済み）
+
+### Working Documents
+
+- **`docs/working/`** - 過去のIssue仕様書（Git保管、削除しない）
+
+**重要な設計判断を行った際**:
+1. 該当するSteering Documentを更新（FEATURES.md, TECH_SPEC.md等）
+2. PR完了後、fix-issue Phase 11.5で更新ドラフトを生成
+3. ユーザー承認後にコミット
 
 ## Ignored Directories
 `node_modules/`, `.next/`, `out/`, `.git/`, `coverage/`, `public/sounds/`, `public/lottie/`

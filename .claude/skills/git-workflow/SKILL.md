@@ -33,6 +33,35 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 **スコープ例:** コンポーネント名(`header`, `modal`)、機能名(`auth`, `timer`)、レイヤー名(`api`, `ui`)
 
+## Working Documents参照によるスコープ自動決定
+
+コミット作成時、Working Documentsが存在する場合は自動参照します。
+
+### スコープの自動抽出
+
+1. 現在のブランチからIssue番号を抽出（例: `fix/#123-xxx` → `123`）
+2. `docs/working/` ディレクトリで該当Issue番号のWorking Documentsを検索
+3. `design.md` の「変更対象ファイル」セクションから主要な変更箇所を抽出
+4. スコープを自動決定:
+   - 単一機能の場合: 機能名をスコープに使用（例: `auth`, `timer`）
+   - 複数機能の場合: 最も影響が大きい機能をスコープに使用
+   - 共通UIの場合: `ui` をスコープに使用
+
+### 動作例
+
+```bash
+# ブランチ: fix/#123-login-validation
+# Working: docs/working/20260205_123_ログインバリデーション修正/design.md
+# → design.mdから「app/auth/login/page.tsx」を検出
+# → スコープ: auth
+
+git commit -m "fix(auth): ログインバリデーションを修正"
+```
+
+### フォールバック
+
+Working Documentsが存在しない、またはスコープが自動決定できない場合は、従来通りファイルパスから判断します。
+
 ## コミット手順
 
 ```bash
@@ -77,6 +106,26 @@ EOF
 ## 変更
 - 既存機能の変更
 ```
+
+## リリースノート自動生成
+
+Git logからコンベンショナルコミット形式のコミットを抽出し、Markdown形式のリリースノートを自動生成します。
+
+```bash
+# 前回のタグから現在までの変更を抽出
+uv run scripts/generate-release-notes.py --from v0.10.0 --version v0.11.0 --output RELEASE_NOTES.md
+
+# package.jsonのversionも更新
+uv run scripts/generate-release-notes.py --from v0.10.0 --version v0.11.0 --update-package-json --output RELEASE_NOTES.md
+
+# 2つのタグ間の差分
+uv run scripts/generate-release-notes.py --from v0.9.0 --to v0.10.0 --output RELEASE_NOTES_0.10.0.md
+```
+
+**機能:**
+- コンベンショナルコミット形式の自動パース（`feat:`, `fix:`, `refactor:` 等）
+- カテゴリ別に分類（追加/修正/変更/その他）
+- package.jsonのversionフィールド自動更新（オプション）
 
 ## デプロイ
 

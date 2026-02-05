@@ -40,7 +40,7 @@ import type { QuizDifficulty } from '@/lib/coffee-quiz/types';
 
 const SAVE_DEBOUNCE_MS = 1000;
 
-interface AnswerResult {
+export interface AnswerResult {
   isCorrect: boolean;
   xpEarned: number;
   leveledUp: boolean;

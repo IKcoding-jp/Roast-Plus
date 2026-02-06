@@ -59,7 +59,6 @@ const buildPairHistory = (
     taskGroups.forEach(members => {
         for (let i = 0; i < members.length; i++) {
             for (let j = i + 1; j < members.length; j++) {
-                // ペアキーはソートして正規化
                 const pairKey = [members[i], members[j]].sort().join('__');
                 pairHistory.add(pairKey);
             }
@@ -77,9 +76,62 @@ const makePairKey = (id1: string, id2: string): string => {
 };
 
 /**
- * 新しいシャッフルアルゴリズム
- * - 行（タスク）単位で処理し、各行に複数のメンバーを同時に割り当てる
- * - 行の連続回避とペアの連続回避を確実にチェック
+ * Fisher-Yatesシャッフル（配列をランダムに並べ替え）
+ */
+const shuffleArray = <T>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
+/**
+ * 配列からk個を選ぶ全組み合わせを生成
+ */
+const getCombinations = (arr: string[], k: number): string[][] => {
+    if (k === 0) return [[]];
+    if (arr.length < k) return [];
+    const result: string[][] = [];
+    for (let i = 0; i <= arr.length - k; i++) {
+        const rest = getCombinations(arr.slice(i + 1), k - 1);
+        for (const combo of rest) {
+            result.push([arr[i], ...combo]);
+        }
+    }
+    return result;
+};
+
+/**
+ * 制約の厳しさレベル（段階的に緩和）
+ *
+ * ペア回避を行回避より優先し、行を先に緩和する。
+ * これにより「毎回違うペア」を最優先で保証する。
+ *
+ * - strict:        行(現在+1回前) + ペア(現在+1回前)
+ * - pair_strict:   行(現在のみ)   + ペア(現在+1回前)
+ * - pair_hard:     行(ソフト)     + ペア(現在+1回前)
+ * - balanced:      行(現在のみ)   + ペア(現在のみ)
+ * - pair_only:     行(ソフト)     + ペア(現在のみ)
+ * - minimal:       ペア除外設定のみ（緊急フォールバック）
+ */
+type ConstraintLevel = 'strict' | 'pair_strict' | 'pair_hard' | 'balanced' | 'pair_only' | 'minimal';
+
+type RowInfo = {
+    taskLabelId: string;
+    slots: { teamId: string }[];
+};
+
+/**
+ * 制約充足型シャッフルアルゴリズム
+ *
+ * バックトラッキングで行・ペアの連続を確実に回避する解を生成する。
+ * 制約レベルを段階的に緩和（strict → relaxed → minimal）することで
+ * 解が必ず見つかることを保証する。
+ *
+ * 8人規模では探索空間が非常に小さく（最大数千パス）、
+ * 枝刈りにより実際の探索は数十ステップで完了する。
  */
 export const calculateAssignment = (
     teams: Team[],
@@ -94,7 +146,7 @@ export const calculateAssignment = (
     const eligibleMembers = members.filter(m => m.active !== false);
 
     // 2. 固定枠（memberId === null）の特定
-    const lockedSlots = new Map<string, boolean>(); // "teamId-taskLabelId" -> true
+    const lockedSlots = new Map<string, boolean>();
     currentAssignments?.forEach(asg => {
         if (asg.memberId === null) {
             lockedSlots.set(`${asg.teamId}-${asg.taskLabelId}`, true);
@@ -102,7 +154,6 @@ export const calculateAssignment = (
     });
 
     // 3. 履歴データの構築
-    // 現在の状態を「0回前」として扱う
     const currentRowHistory = buildRowHistory(currentAssignments);
     const currentPairHistory = buildPairHistory(currentAssignments);
     const oneAgoRowHistory = buildRowHistory(history[0]);
@@ -110,192 +161,211 @@ export const calculateAssignment = (
     const twoAgoRowHistory = buildRowHistory(history[1]);
     const twoAgoPairHistory = buildPairHistory(history[1]);
 
-    // 4. 行（タスク）ごとにスロット数を計算
-    type RowInfo = {
-        taskLabelId: string;
-        slots: { teamId: string }[];
-        lockedSlotCount: number;
-    };
-
+    // 4. 行情報の構築
     const rows: RowInfo[] = taskLabels.map(task => {
         const slots: { teamId: string }[] = [];
-        let lockedSlotCount = 0;
         teams.forEach(team => {
-            if (lockedSlots.has(`${team.id}-${task.id}`)) {
-                lockedSlotCount++;
-            } else {
+            if (!lockedSlots.has(`${team.id}-${task.id}`)) {
                 slots.push({ teamId: team.id });
             }
         });
-        return { taskLabelId: task.id, slots, lockedSlotCount };
+        return { taskLabelId: task.id, slots };
     });
 
-    // 5. 最適な割り当てを探索（複数回試行）
-    let bestAssignments: Assignment[] = [];
-    let bestScore = Infinity;
-    const MAX_RETRIES = 500;
+    // 固定枠のAssignment
+    const lockedAssignments: Assignment[] = [];
+    currentAssignments?.forEach(asg => {
+        if (asg.memberId === null) {
+            lockedAssignments.push({
+                teamId: asg.teamId,
+                taskLabelId: asg.taskLabelId,
+                memberId: null,
+                assignedDate: targetDate
+            });
+        }
+    });
 
-    for (let retry = 0; retry < MAX_RETRIES; retry++) {
-        const assignedMemberIds = new Set<string>();
-        const loopAssignments: Assignment[] = [];
-        let loopScore = 0;
-
-        // 固定枠（null）を先に追加
-        currentAssignments?.forEach(asg => {
-            if (asg.memberId === null) {
-                loopAssignments.push({
-                    teamId: asg.teamId,
-                    taskLabelId: asg.taskLabelId,
-                    memberId: null,
-                    assignedDate: targetDate
-                });
-            }
-        });
-
-        // 行をシャッフル（候補者が少ない行を優先）
-        const shuffledRows = [...rows].sort((a, b) => {
-            const aCandidates = eligibleMembers.filter(m =>
+    // 制約の厳しい行を先に処理（MRVヒューリスティック）
+    const sortedRows = rows
+        .filter(row => row.slots.length > 0)
+        .sort((a, b) => {
+            const aCount = eligibleMembers.filter(m =>
                 !m.excludedTaskLabelIds.includes(a.taskLabelId)
             ).length;
-            const bCandidates = eligibleMembers.filter(m =>
+            const bCount = eligibleMembers.filter(m =>
                 !m.excludedTaskLabelIds.includes(b.taskLabelId)
             ).length;
-            if (aCandidates !== bCandidates) {
-                return aCandidates - bCandidates;
-            }
-            return Math.random() - 0.5;
+            return aCount - bCount;
         });
 
-        // 各行を処理
-        for (const row of shuffledRows) {
-            const neededCount = row.slots.length;
-            if (neededCount === 0) continue;
+    // エッジケース: 行やメンバーがない場合
+    if (sortedRows.length === 0 || eligibleMembers.length === 0) {
+        return lockedAssignments;
+    }
 
-            // この行に割り当て可能な候補者を取得
-            const candidates = eligibleMembers.filter(m => {
-                if (assignedMemberIds.has(m.id)) return false;
-                if (m.excludedTaskLabelIds.includes(row.taskLabelId)) return false;
-                return true;
-            });
+    // 5. 制約チェック関数群
 
-            // 各候補者のスコアを計算
-            type CandidateScore = { memberId: string; score: number };
-            const scoredCandidates: CandidateScore[] = candidates.map(member => {
-                let score = 0;
+    /** 行の連続チェック（ハード制約） */
+    const hasRowConflict = (
+        memberId: string, taskLabelId: string, level: ConstraintLevel
+    ): boolean => {
+        // pair_hard, pair_only, minimal では行をソフト制約に降格
+        if (level === 'pair_hard' || level === 'pair_only' || level === 'minimal') return false;
+        // 現在の行回避: strict, pair_strict, balanced でハード制約
+        if (currentRowHistory.get(taskLabelId)?.has(memberId)) return true;
+        // 1回前の行回避: strict のみハード制約
+        if (level === 'strict') {
+            if (oneAgoRowHistory.get(taskLabelId)?.has(memberId)) return true;
+        }
+        return false;
+    };
 
-                // 行の連続ペナルティ
-                if (currentRowHistory.get(row.taskLabelId)?.has(member.id)) {
-                    score += 100000; // 現在と同じ行 → 最大ペナルティ
-                }
-                if (oneAgoRowHistory.get(row.taskLabelId)?.has(member.id)) {
-                    score += 50000; // 1回前と同じ行
-                }
-                if (twoAgoRowHistory.get(row.taskLabelId)?.has(member.id)) {
-                    score += 20000; // 2回前と同じ行
-                }
-
-                // ランダム要素
-                score += Math.random();
-
-                return { memberId: member.id, score };
-            });
-
-            // スコア順にソート
-            scoredCandidates.sort((a, b) => a.score - b.score);
-
-            // neededCount人を選択（ペア回避も考慮）
-            const selectedMembers: string[] = [];
-
-            for (const candidate of scoredCandidates) {
-                if (selectedMembers.length >= neededCount) break;
-
-                // ペア回避チェック（既に選択されたメンバーとの組み合わせ）
-                let pairPenalty = 0;
-                let hasExcludedPair = false;
-
-                for (const selectedId of selectedMembers) {
-                    // ペア除外設定チェック
-                    if (isPairExcluded(candidate.memberId, selectedId, pairExclusions)) {
-                        hasExcludedPair = true;
-                        break;
-                    }
-
-                    const pairKey = makePairKey(candidate.memberId, selectedId);
-
-                    // ペアの連続ペナルティ
-                    if (currentPairHistory.has(pairKey)) {
-                        pairPenalty += 80000; // 現在と同じペア
-                    }
-                    if (oneAgoPairHistory.has(pairKey)) {
-                        pairPenalty += 40000; // 1回前と同じペア
-                    }
-                    if (twoAgoPairHistory.has(pairKey)) {
-                        pairPenalty += 15000; // 2回前と同じペア
-                    }
-                }
-
-                // ペア除外設定に該当する場合はスキップ（他のメンバーを探す）
-                if (hasExcludedPair) continue;
-
-                // ペナルティが高すぎる場合もスキップ（他のメンバーを探す）
-                // ただし候補が足りない場合は許容
-                const totalScore = candidate.score + pairPenalty;
-                if (totalScore >= 50000 && selectedMembers.length < neededCount - 1) {
-                    // 後続の候補が残っている可能性があるのでスキップ
-                    // ただし最後の1人は選ぶ必要があるので条件に注意
-                    continue;
-                }
-
-                selectedMembers.push(candidate.memberId);
-                loopScore += totalScore;
-            }
-
-            // 選択されたメンバーをスロットに割り当て
-            for (let i = 0; i < row.slots.length; i++) {
-                const memberId = selectedMembers[i] ?? null;
-                loopAssignments.push({
-                    teamId: row.slots[i].teamId,
-                    taskLabelId: row.taskLabelId,
-                    memberId,
-                    assignedDate: targetDate
-                });
-                if (memberId) {
-                    assignedMemberIds.add(memberId);
-                }
-                if (memberId === null) {
-                    loopScore += 500000; // 割り当て失敗ペナルティ
+    /** ペアの連続チェック（ハード制約） */
+    const hasPairConflict = (group: string[], level: ConstraintLevel): boolean => {
+        // minimal のみペアをソフト制約に降格
+        if (level === 'minimal') return false;
+        for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+                const pairKey = makePairKey(group[i], group[j]);
+                // 現在のペア回避: minimal以外で常にハード制約
+                if (currentPairHistory.has(pairKey)) return true;
+                // 1回前のペア回避: strict, pair_strict, pair_hard でハード制約
+                if (level === 'strict' || level === 'pair_strict' || level === 'pair_hard') {
+                    if (oneAgoPairHistory.has(pairKey)) return true;
                 }
             }
         }
+        return false;
+    };
 
-        // 最良結果を更新
-        if (loopScore < bestScore) {
-            bestScore = loopScore;
-            bestAssignments = loopAssignments;
+    /** ペア除外設定チェック（全レベルで強制） */
+    const hasAnyPairExclusion = (group: string[]): boolean => {
+        for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+                if (isPairExcluded(group[i], group[j], pairExclusions)) return true;
+            }
+        }
+        return false;
+    };
+
+    /** ソフトスコア（低いほど良い。ハード制約では対象外の履歴も考慮） */
+    const calcSoftScore = (group: string[], taskLabelId: string): number => {
+        let score = 0;
+        for (const memberId of group) {
+            if (currentRowHistory.get(taskLabelId)?.has(memberId)) score += 200;
+            if (oneAgoRowHistory.get(taskLabelId)?.has(memberId)) score += 100;
+            if (twoAgoRowHistory.get(taskLabelId)?.has(memberId)) score += 50;
+        }
+        for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+                const pairKey = makePairKey(group[i], group[j]);
+                if (currentPairHistory.has(pairKey)) score += 200;
+                if (oneAgoPairHistory.has(pairKey)) score += 100;
+                if (twoAgoPairHistory.has(pairKey)) score += 50;
+            }
+        }
+        // ランダムな微小値でタイブレイク（同スコア時のランダム性確保）
+        score += Math.random() * 0.01;
+        return score;
+    };
+
+    // 6. バックトラッキング探索
+    const backtrack = (
+        rowIdx: number,
+        assigned: Set<string>,
+        result: Map<string, string[]>,
+        level: ConstraintLevel
+    ): boolean => {
+        if (rowIdx >= sortedRows.length) return true;
+
+        const row = sortedRows[rowIdx];
+        const neededCount = row.slots.length;
+
+        // この行に割り当て可能な候補メンバー
+        const available = eligibleMembers
+            .filter(m => !assigned.has(m.id))
+            .filter(m => !m.excludedTaskLabelIds.includes(row.taskLabelId))
+            .map(m => m.id);
+
+        const fillCount = Math.min(neededCount, available.length);
+        if (fillCount === 0) {
+            // 候補なし → 空スロットのまま次の行へ
+            result.set(row.taskLabelId, []);
+            if (backtrack(rowIdx + 1, assigned, result, level)) return true;
+            result.delete(row.taskLabelId);
+            return false;
         }
 
-        // 完璧な結果（低ペナルティ）なら即終了
-        if (loopScore < eligibleMembers.length * 10) {
+        // 全組み合わせ生成（入力をシャッフルしてランダム性を確保）
+        const combos = getCombinations(shuffleArray(available), fillCount);
+
+        // ハード制約フィルタ → ソフトスコアでソート
+        const validCombos = combos
+            .filter(c => !hasAnyPairExclusion(c))
+            .filter(c => c.every(id => !hasRowConflict(id, row.taskLabelId, level)))
+            .filter(c => !hasPairConflict(c, level))
+            .map(c => ({ combo: c, score: calcSoftScore(c, row.taskLabelId) }))
+            .sort((a, b) => a.score - b.score);
+
+        for (const { combo } of validCombos) {
+            combo.forEach(id => assigned.add(id));
+            result.set(row.taskLabelId, combo);
+
+            if (backtrack(rowIdx + 1, assigned, result, level)) return true;
+
+            combo.forEach(id => assigned.delete(id));
+            result.delete(row.taskLabelId);
+        }
+
+        return false;
+    };
+
+    // 7. 制約レベルを段階的に緩和して解を探す
+    const levels: ConstraintLevel[] = ['strict', 'pair_strict', 'pair_hard', 'balanced', 'pair_only', 'minimal'];
+    let solution: Map<string, string[]> | null = null;
+
+    for (const level of levels) {
+        const result = new Map<string, string[]>();
+        if (backtrack(0, new Set(), result, level)) {
+            solution = result;
             break;
         }
     }
 
-    // 6. 重複チェック（安全装置）
-    const uniqueCheck = new Set<string>();
-    const validatedAssignments: Assignment[] = [];
+    // 8. 解をAssignment[]に変換
+    const finalAssignments: Assignment[] = [...lockedAssignments];
 
-    for (const asg of bestAssignments) {
-        if (asg.memberId) {
-            if (uniqueCheck.has(asg.memberId)) {
-                validatedAssignments.push({ ...asg, memberId: null });
-            } else {
-                uniqueCheck.add(asg.memberId);
-                validatedAssignments.push(asg);
+    if (solution) {
+        for (const row of rows) {
+            if (row.slots.length === 0) continue;
+            const memberIds = solution.get(row.taskLabelId) ?? [];
+            // チーム配置をランダム化（どのメンバーがどの班に入るかをシャッフル）
+            const shuffledIds = shuffleArray(memberIds);
+            for (let i = 0; i < row.slots.length; i++) {
+                finalAssignments.push({
+                    teamId: row.slots[i].teamId,
+                    taskLabelId: row.taskLabelId,
+                    memberId: shuffledIds[i] ?? null,
+                    assignedDate: targetDate
+                });
             }
-        } else {
-            validatedAssignments.push(asg);
+        }
+    } else {
+        // フォールバック: 制約なしでランダム割り当て（極端なエッジケース用）
+        const shuffledIds = shuffleArray(eligibleMembers.map(m => m.id));
+        let idx = 0;
+        for (const row of rows) {
+            for (const slot of row.slots) {
+                finalAssignments.push({
+                    teamId: slot.teamId,
+                    taskLabelId: row.taskLabelId,
+                    memberId: shuffledIds[idx] ?? null,
+                    assignedDate: targetDate
+                });
+                idx++;
+            }
         }
     }
 
-    return validatedAssignments;
+    return finalAssignments;
 };

@@ -12,6 +12,55 @@
   --gold: #FFC107;
 }
 
+/*
+ * テーマシステム: セマンティックトークン
+ * data-theme 属性で切り替わるCSS変数
+ * 新テーマ追加時はここにブロックを追加するだけ
+ */
+@layer theme {
+  :root {
+    /* 背景 */
+    --page: #F7F7F5;
+    --surface: #FFFFFF;
+    --overlay: #FFFFFF;
+    --ground: #F5F5F5;
+    --field: #FFFFFF;
+    /* テキスト */
+    --ink: #1f2937;
+    --ink-sub: #4b5563;
+    --ink-muted: #9ca3af;
+    /* ボーダー */
+    --edge: #e5e7eb;
+    --edge-strong: #d1d5db;
+    /* アクセント */
+    --spot: #d97706;
+    --spot-hover: #b45309;
+    --spot-subtle: #fef3c7;
+    --spot-surface: #fffbeb;
+  }
+
+  [data-theme="christmas"] {
+    /* 背景 */
+    --page: #051a0e;
+    --surface: rgba(255, 255, 255, 0.05);
+    --overlay: #0a2f1a;
+    --ground: rgba(255, 255, 255, 0.03);
+    --field: rgba(255, 255, 255, 0.08);
+    /* テキスト */
+    --ink: #f8f1e7;
+    --ink-sub: rgba(248, 241, 231, 0.7);
+    --ink-muted: rgba(248, 241, 231, 0.5);
+    /* ボーダー */
+    --edge: rgba(212, 175, 55, 0.2);
+    --edge-strong: rgba(212, 175, 55, 0.3);
+    /* アクセント */
+    --spot: #d4af37;
+    --spot-hover: #e8c65f;
+    --spot-subtle: rgba(212, 175, 55, 0.15);
+    --spot-surface: rgba(212, 175, 55, 0.05);
+  }
+}
+
 /* stylelint-disable-next-line at-rule-no-unknown */
 @theme inline {
   --color-background: var(--background);
@@ -22,10 +71,26 @@
   --color-dark: var(--dark);
   --color-dark-light: var(--dark-light);
   --color-gold: var(--gold);
-  /* 背景色トークン */
-  --color-bg-global: #F7F7F5;
-  --color-bg-card: #FFFFFF;
-  --color-bg-section: #F5F5F5;
+  /* 背景色トークン（テーマ対応） */
+  --color-bg-global: var(--page);
+  --color-bg-card: var(--surface);
+  --color-bg-section: var(--ground);
+  /* セマンティックテーマトークン */
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-overlay: var(--overlay);
+  --color-ground: var(--ground);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-ink-sub: var(--ink-sub);
+  --color-ink-muted: var(--ink-muted);
+  --color-edge: var(--edge);
+  --color-edge-strong: var(--edge-strong);
+  --color-spot: var(--spot);
+  --color-spot-hover: var(--spot-hover);
+  --color-spot-subtle: var(--spot-subtle);
+  --color-spot-surface: var(--spot-surface);
+  /* フォント */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-nunito: var(--font-nunito);

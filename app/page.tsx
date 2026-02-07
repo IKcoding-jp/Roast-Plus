@@ -25,6 +25,8 @@ import { FaTree, FaGift, FaSnowflake, FaStar } from 'react-icons/fa';
 import { PiBellFill } from 'react-icons/pi';
 import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
 import { HiClock } from 'react-icons/hi';
+import { HiSparkles } from 'react-icons/hi2';
+import { REPLAY_SPLASH_EVENT } from '@/components/SplashScreen';
 import { BsStars } from 'react-icons/bs';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
@@ -357,14 +359,25 @@ export default function HomePage(_props: HomePageProps = {}) {
             </button>
 
             {isDeveloperMode && (
-              <button
-                onClick={handleShowLoadingDebugModal}
-                className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner' : 'text-white hover:bg-white/10'
-                  }`}
-                aria-label="Lottieアニメーション確認モーダルを開く"
-              >
-                <PiCoffeeBeanFill className="h-6 w-6" />
-              </button>
+              <>
+                <button
+                  onClick={() => window.dispatchEvent(new Event(REPLAY_SPLASH_EVENT))}
+                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner' : 'text-white hover:bg-white/10'
+                    }`}
+                  aria-label="スプラッシュ画面を再生"
+                  title="スプラッシュ再生"
+                >
+                  <HiSparkles className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={handleShowLoadingDebugModal}
+                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner' : 'text-white hover:bg-white/10'
+                    }`}
+                  aria-label="Lottieアニメーション確認モーダルを開く"
+                >
+                  <PiCoffeeBeanFill className="h-6 w-6" />
+                </button>
+              </>
             )}
 
           </div>

@@ -1,134 +1,83 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useChristmasMode } from './useChristmasMode';
 
-// localStorageのモック
-const createLocalStorageMock = () => {
-  const store: Record<string, string> = {};
+// next-themes のモック
+const mockSetTheme = vi.fn();
+let mockResolvedTheme = 'default';
 
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      Object.keys(store).forEach((key) => delete store[key]);
-    }),
-  };
-};
+vi.mock('next-themes', () => ({
+  useTheme: () => ({
+    resolvedTheme: mockResolvedTheme,
+    setTheme: mockSetTheme,
+  }),
+}));
 
 describe('useChristmasMode', () => {
-  let localStorageMock: ReturnType<typeof createLocalStorageMock>;
-
   beforeEach(() => {
-    localStorageMock = createLocalStorageMock();
-    vi.stubGlobal('localStorage', localStorageMock);
+    mockResolvedTheme = 'default';
+    mockSetTheme.mockClear();
   });
 
-  it('初期状態でクリスマスモードはオフ（マイグレーション未実施）', () => {
+  it('初期状態でクリスマスモードはオフ', () => {
     const { result } = renderHook(() => useChristmasMode());
     expect(result.current.isChristmasMode).toBe(false);
   });
 
-  it('マイグレーション時に既存のlocalStorageキーを削除する', () => {
-    // 既存のキーを設定
-    localStorageMock.setItem('roastplus_christmas_mode', 'true');
-
-    renderHook(() => useChristmasMode());
-
-    // マイグレーション後に削除されている
-    expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-      'roastplus_christmas_mode'
-    );
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'roastplus_christmas_mode_migrated',
-      'true'
-    );
-  });
-
-  it('マイグレーション済みの場合はlocalStorageから読み込む', () => {
-    // マイグレーション済みフラグを設定
-    localStorageMock.setItem('roastplus_christmas_mode_migrated', 'true');
-    localStorageMock.setItem('roastplus_christmas_mode', 'true');
-
+  it('resolvedTheme が christmas の場合、isChristmasMode は true', () => {
+    mockResolvedTheme = 'christmas';
     const { result } = renderHook(() => useChristmasMode());
     expect(result.current.isChristmasMode).toBe(true);
   });
 
-  it('setChristmasModeで状態を変更できる', () => {
+  it('setChristmasMode(true) で christmas テーマに切り替え', () => {
     const { result } = renderHook(() => useChristmasMode());
 
     act(() => {
       result.current.setChristmasMode(true);
     });
 
-    expect(result.current.isChristmasMode).toBe(true);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'roastplus_christmas_mode',
-      'true'
-    );
+    expect(mockSetTheme).toHaveBeenCalledWith('christmas');
   });
 
-  it('toggleChristmasModeで状態を反転できる', () => {
+  it('setChristmasMode(false) で default テーマに切り替え', () => {
+    mockResolvedTheme = 'christmas';
     const { result } = renderHook(() => useChristmasMode());
-
-    // 初期状態はfalse
-    expect(result.current.isChristmasMode).toBe(false);
-
-    // トグル
-    act(() => {
-      result.current.toggleChristmasMode();
-    });
-
-    expect(result.current.isChristmasMode).toBe(true);
-
-    // もう一度トグル
-    act(() => {
-      result.current.toggleChristmasMode();
-    });
-
-    expect(result.current.isChristmasMode).toBe(false);
-  });
-
-  it('マイグレーション済みでstored=nullの場合falseを返す', () => {
-    // マイグレーション済みフラグを設定、Christmas modeキーは未設定
-    localStorageMock.setItem('roastplus_christmas_mode_migrated', 'true');
-    // roastplus_christmas_modeは設定しない（null）
-
-    const { result } = renderHook(() => useChristmasMode());
-    expect(result.current.isChristmasMode).toBe(false);
-  });
-
-  it('マイグレーション済みでstored=falseの場合falseを返す', () => {
-    localStorageMock.setItem('roastplus_christmas_mode_migrated', 'true');
-    localStorageMock.setItem('roastplus_christmas_mode', 'false');
-
-    const { result } = renderHook(() => useChristmasMode());
-    expect(result.current.isChristmasMode).toBe(false);
-  });
-
-  it('localStorageへの保存を確認できる', () => {
-    const { result } = renderHook(() => useChristmasMode());
-
-    act(() => {
-      result.current.setChristmasMode(true);
-    });
-
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'roastplus_christmas_mode',
-      'true'
-    );
 
     act(() => {
       result.current.setChristmasMode(false);
     });
 
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'roastplus_christmas_mode',
-      'false'
-    );
+    expect(mockSetTheme).toHaveBeenCalledWith('default');
+  });
+
+  it('toggleChristmasMode でテーマを反転（default → christmas）', () => {
+    mockResolvedTheme = 'default';
+    const { result } = renderHook(() => useChristmasMode());
+
+    act(() => {
+      result.current.toggleChristmasMode();
+    });
+
+    expect(mockSetTheme).toHaveBeenCalledWith('christmas');
+  });
+
+  it('toggleChristmasMode でテーマを反転（christmas → default）', () => {
+    mockResolvedTheme = 'christmas';
+    const { result } = renderHook(() => useChristmasMode());
+
+    act(() => {
+      result.current.toggleChristmasMode();
+    });
+
+    expect(mockSetTheme).toHaveBeenCalledWith('default');
+  });
+
+  it('返り値の型が正しい', () => {
+    const { result } = renderHook(() => useChristmasMode());
+
+    expect(typeof result.current.isChristmasMode).toBe('boolean');
+    expect(typeof result.current.setChristmasMode).toBe('function');
+    expect(typeof result.current.toggleChristmasMode).toBe('function');
   });
 });

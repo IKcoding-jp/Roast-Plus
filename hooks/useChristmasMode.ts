@@ -1,43 +1,29 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useTheme } from 'next-themes';
 
-const STORAGE_KEY = 'roastplus_christmas_mode';
-const MIGRATION_FLAG_KEY = 'roastplus_christmas_mode_migrated';
-
+/**
+ * クリスマスモードの切り替えフック（後方互換性ラッパー）
+ *
+ * 内部で next-themes の useTheme を使用し、
+ * data-theme 属性の切り替え + CSS変数によるテーマ適用を行う。
+ *
+ * 既存の isChristmasMode API はそのまま維持するため、
+ * 既存コードを修正せずにテーマシステムに移行可能。
+ */
 export function useChristmasMode() {
-    const [isChristmasMode, setIsChristmasMode] = useState<boolean>(() => {
-        if (typeof window === 'undefined') return false;
+    const { resolvedTheme, setTheme } = useTheme();
 
-        // マイグレーション処理（一度だけ実行）
-        const migrationDone = localStorage.getItem(MIGRATION_FLAG_KEY) === 'true';
+    const isChristmasMode = resolvedTheme === 'christmas';
 
-        if (!migrationDone) {
-            // 既存のlocalStorageキーを削除して、新しいデフォルト（オフ）を適用
-            // これにより、デプロイ後に既存端末でもオフになる
-            if (localStorage.getItem(STORAGE_KEY) !== null) {
-                localStorage.removeItem(STORAGE_KEY);
-            }
-            localStorage.setItem(MIGRATION_FLAG_KEY, 'true');
-            return false;
-        }
-
-        // マイグレーション済みの場合は、localStorageから読み込む
-        const stored = localStorage.getItem(STORAGE_KEY);
-        return stored === null ? false : stored === 'true';
-    });
-
-    // 切り替え
     const setChristmasMode = useCallback((enabled: boolean) => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem(STORAGE_KEY, String(enabled));
-            setIsChristmasMode(enabled);
-        }
-    }, []);
+        setTheme(enabled ? 'christmas' : 'default');
+    }, [setTheme]);
 
     const toggleChristmasMode = useCallback(() => {
-        setChristmasMode(!isChristmasMode);
-    }, [isChristmasMode, setChristmasMode]);
+        setTheme(isChristmasMode ? 'default' : 'christmas');
+    }, [isChristmasMode, setTheme]);
 
     return {
         isChristmasMode,

@@ -6,6 +6,7 @@ import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { ToastProvider } from "@/components/Toast";
 import { SplashScreenWrapper } from "@/components/SplashScreenWrapper";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 import { Zen_Old_Mincho, Inter, Roboto_Mono, Oswald, Orbitron, Noto_Sans_JP } from "next/font/google";
 
@@ -88,9 +89,11 @@ export default function RootLayout({
         />
         <ServiceWorkerRegistration />
         <SplashScreenWrapper />
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

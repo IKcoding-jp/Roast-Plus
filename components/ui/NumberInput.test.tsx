@@ -36,15 +36,9 @@ describe('NumberInput', () => {
     });
 
     it('suffix指定時はスタイルが適用される', () => {
-      render(<NumberInput suffix="cm" isChristmasMode={false} />);
+      render(<NumberInput suffix="cm" />);
       const suffix = screen.getByText('cm');
-      expect(suffix.className).toContain('text-gray-500');
-    });
-
-    it('クリスマスモード時のsuffixスタイルが適用される', () => {
-      render(<NumberInput suffix="cm" isChristmasMode />);
-      const suffix = screen.getByText('cm');
-      expect(suffix.className).toContain('text-[#f8f1e7]');
+      expect(suffix.className).toContain('text-ink-sub');
     });
   });
 
@@ -91,24 +85,7 @@ describe('NumberInput', () => {
 
     it('エラー時はエラースタイルが適用される', () => {
       render(<NumberInput error="エラー" />);
-      expect(screen.getByRole('spinbutton').className).toContain('border-red-500');
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモード時はクリスマススタイルが適用される', () => {
-      render(<NumberInput isChristmasMode />);
-      expect(screen.getByRole('spinbutton').className).toContain('border-[#d4af37]');
-    });
-
-    it('通常モード時は通常スタイルが適用される', () => {
-      render(<NumberInput isChristmasMode={false} />);
-      expect(screen.getByRole('spinbutton').className).toContain('border-gray-200');
-    });
-
-    it('クリスマスモード時のエラースタイルが適用される', () => {
-      render(<NumberInput error="エラー" isChristmasMode />);
-      expect(screen.getByRole('spinbutton').className).toContain('border-red-400');
+      expect(screen.getByRole('spinbutton').className).toContain('border-error');
     });
   });
 

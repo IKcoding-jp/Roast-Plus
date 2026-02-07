@@ -7,20 +7,19 @@ import { MdHistory } from 'react-icons/md';
 
 interface ChangelogTimelineProps {
   entries: ChangelogEntry[];
-  isChristmasMode?: boolean;
 }
 
-export const ChangelogTimeline: React.FC<ChangelogTimelineProps> = ({ entries, isChristmasMode = false }) => {
+export const ChangelogTimeline: React.FC<ChangelogTimelineProps> = ({ entries }) => {
   if (entries.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="flex justify-center mb-4">
-          <div className="p-4 bg-gray-100 rounded-full">
-            <MdHistory className="h-12 w-12 text-gray-400" />
+          <div className="p-4 bg-ground rounded-full">
+            <MdHistory className="h-12 w-12 text-ink-muted" />
           </div>
         </div>
-        <p className="text-gray-500">該当する更新履歴がありません</p>
-        <p className="text-sm text-gray-400 mt-2">フィルターを変更してみてください</p>
+        <p className="text-ink-muted">該当する更新履歴がありません</p>
+        <p className="text-sm text-ink-muted mt-2">フィルターを変更してみてください</p>
       </div>
     );
   }
@@ -28,7 +27,7 @@ export const ChangelogTimeline: React.FC<ChangelogTimelineProps> = ({ entries, i
   return (
     <div className="space-y-4">
       {entries.map((entry) => (
-        <VersionCard key={entry.id} entry={entry} isChristmasMode={isChristmasMode} />
+        <VersionCard key={entry.id} entry={entry} />
       ))}
     </div>
   );

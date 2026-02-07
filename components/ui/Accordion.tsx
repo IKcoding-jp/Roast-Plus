@@ -18,21 +18,7 @@ import { HiChevronDown } from 'react-icons/hi';
  *     <AccordionContent>コンテンツ2</AccordionContent>
  *   </AccordionItem>
  * </Accordion>
- *
- * @example
- * // クリスマスモード
- * const { isChristmasMode } = useChristmasMode();
- * <Accordion isChristmasMode={isChristmasMode}>
- *   ...
- * </Accordion>
  */
-
-// Context for Accordion
-interface AccordionContextValue {
-  isChristmasMode: boolean;
-}
-
-const AccordionContext = createContext<AccordionContextValue>({ isChristmasMode: false });
 
 // Context for AccordionItem
 interface AccordionItemContextValue {
@@ -51,19 +37,14 @@ function useAccordionItemContext() {
 }
 
 // Accordion Root
-export interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
-}
+export type AccordionProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
-  ({ isChristmasMode = false, children, className = '', ...props }, ref) => {
+  ({ children, className = '', ...props }, ref) => {
     return (
-      <AccordionContext.Provider value={{ isChristmasMode }}>
-        <div ref={ref} className={`divide-y ${isChristmasMode ? 'divide-[#d4af37]/20' : 'divide-gray-200'} ${className}`} {...props}>
-          {children}
-        </div>
-      </AccordionContext.Provider>
+      <div ref={ref} className={`divide-y divide-edge ${className}`} {...props}>
+        {children}
+      </div>
     );
   }
 );
@@ -96,11 +77,6 @@ export type AccordionTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement
 export const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
   ({ children, className = '', ...props }, ref) => {
     const { isOpen, toggle } = useAccordionItemContext();
-    const { isChristmasMode } = useContext(AccordionContext);
-
-    const triggerStyles = isChristmasMode
-      ? 'text-[#f8f1e7] hover:bg-white/5'
-      : 'text-gray-900 hover:bg-gray-50';
 
     return (
       <button
@@ -108,12 +84,12 @@ export const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerPr
         type="button"
         onClick={toggle}
         aria-expanded={isOpen}
-        className={`flex w-full items-center justify-between py-4 px-1 font-medium transition-colors ${triggerStyles} ${className}`}
+        className={`flex w-full items-center justify-between py-4 px-1 font-medium transition-colors text-ink hover:bg-ground ${className}`}
         {...props}
       >
         <span>{children}</span>
         <HiChevronDown
-          className={`h-5 w-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${isChristmasMode ? 'text-[#d4af37]' : 'text-gray-500'}`}
+          className={`h-5 w-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} text-spot`}
         />
       </button>
     );
@@ -127,20 +103,15 @@ export type AccordionContentProps = React.HTMLAttributes<HTMLDivElement>;
 export const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
   ({ children, className = '', ...props }, ref) => {
     const { isOpen } = useAccordionItemContext();
-    const { isChristmasMode } = useContext(AccordionContext);
 
     if (!isOpen) {
       return null;
     }
 
-    const contentStyles = isChristmasMode
-      ? 'text-[#f8f1e7]/80'
-      : 'text-gray-600';
-
     return (
       <div
         ref={ref}
-        className={`pb-4 ${contentStyles} ${className}`}
+        className={`pb-4 text-ink-sub ${className}`}
         {...props}
       >
         {children}

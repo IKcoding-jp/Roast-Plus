@@ -10,6 +10,11 @@
  * 1. 状態管理（isOpen, onClose）を提供
  * 2. テンプレートをコピー
  * 3. 必要なパターンを選択して実装
+ *
+ * テーマ対応:
+ * CSS変数ベースのテーマシステムを使用。
+ * text-ink, bg-surface, border-edge 等のクラスは
+ * 親要素の .christmas クラスにより自動的に配色が切り替わる。
  */
 
 import { useEffect } from 'react';
@@ -51,14 +56,14 @@ export function BasicModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       {/* モーダル */}
-      <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4">
+      <div className="bg-surface rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 border border-edge">
         {/* タイトル */}
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-ink mb-4">
           {title}
         </h2>
 
         {/* メッセージ */}
-        <p className="text-base sm:text-lg text-gray-600 mb-6">
+        <p className="text-base sm:text-lg text-ink-sub mb-6">
           {message}
         </p>
 
@@ -128,14 +133,14 @@ export function ConfirmDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full mx-4">
+      <div className="bg-surface rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full mx-4 border border-edge">
         {/* タイトル */}
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-ink mb-4">
           {title}
         </h2>
 
         {/* メッセージ */}
-        <p className="text-base sm:text-lg text-gray-600 mb-6 whitespace-pre-line">
+        <p className="text-base sm:text-lg text-ink-sub mb-6 whitespace-pre-line">
           {message}
         </p>
 
@@ -203,7 +208,7 @@ export function WarningDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 border-t-4 border-red-500">
+      <div className="bg-surface rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 border-t-4 border-red-500">
         {/* 警告アイコン */}
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-shrink-0">
@@ -215,7 +220,7 @@ export function WarningDialog({
         </div>
 
         {/* メッセージ */}
-        <p className="text-base text-gray-600 mb-6">
+        <p className="text-base text-ink-sub mb-6">
           {message}
         </p>
 
@@ -293,15 +298,15 @@ export function InputDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4">
+      <div className="bg-surface rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 border border-edge">
         {/* タイトル */}
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-ink mb-4">
           {title}
         </h2>
 
         {/* 入力フィールド */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-ink mb-2">
             {label}
           </label>
           <input
@@ -309,7 +314,7 @@ export function InputDialog({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={placeholder}
-            className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all"
+            className="w-full rounded-lg border-2 border-edge px-4 py-3 text-ink focus:border-spot focus:outline-none focus:ring-2 focus:ring-spot-subtle transition-all"
             autoFocus
           />
         </div>
@@ -365,15 +370,17 @@ export function InputDialog({
  *   );
  * }
  *
- * ========== クリスマスモード対応 ==========
+ * ========== テーマ対応 ==========
  *
- * クリスマスモード対応が必要な場合、className を条件分岐:
+ * CSS変数ベースのテーマシステム:
+ * - text-ink: メインテキスト色
+ * - text-ink-sub: サブテキスト色
+ * - bg-surface: モーダル背景色
+ * - border-edge: ボーダー色
  *
- * <div className={`${
- *   isChristmasMode
- *     ? 'bg-[#0a2f1a] border-[#d4af37]/40'
- *     : 'bg-white'
- * }`}>
+ * data-theme="christmas" 属性がhtml要素にある場合、
+ * CSS変数が自動的にクリスマスカラーに切り替わる。
+ * コンポーネント側でのテーマ判定は不要。
  *
  * ========== キーボード操作 ==========
  *

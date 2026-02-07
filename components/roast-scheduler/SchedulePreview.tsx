@@ -18,7 +18,6 @@ interface SchedulePreviewProps {
   roastLevel: '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | '';
   roastCount: string;
   bagCount: 1 | 2 | '';
-  isChristmasMode?: boolean;
 }
 
 export function SchedulePreview({
@@ -34,7 +33,6 @@ export function SchedulePreview({
   roastLevel,
   roastCount,
   bagCount,
-  isChristmasMode = false,
 }: SchedulePreviewProps) {
   // ブレンド割合を結合する関数
   const combineBlendRatio = (ratio1: string, ratio2: string): string | undefined => {
@@ -99,9 +97,6 @@ export function SchedulePreview({
 
   // プレビューの色
   const getPreviewColor = () => {
-    if (isChristmasMode) {
-      return 'bg-[#d4af37]/20 border-[#d4af37]/50 text-[#f8f1e7]';
-    }
     if (isRoasterOn) return 'bg-orange-100 border-orange-300 text-orange-800';
     if (isRoast) return 'bg-amber-100 border-amber-300 text-amber-800';
     if (isAfterPurge) return 'bg-blue-100 border-blue-300 text-blue-800';
@@ -110,7 +105,6 @@ export function SchedulePreview({
   };
 
   const getIconColor = () => {
-    if (isChristmasMode) return 'text-[#d4af37]';
     if (isRoasterOn) return 'text-orange-500';
     if (isRoast) return 'text-amber-700';
     if (isAfterPurge) return 'text-blue-500';

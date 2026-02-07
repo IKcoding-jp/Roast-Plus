@@ -24,7 +24,6 @@ interface SetupPanelProps {
     roastLevel?: RoastLevel
   ) => Promise<void>;
   isLoading: boolean;
-  isChristmasMode: boolean;
 }
 
 /**
@@ -33,7 +32,7 @@ interface SetupPanelProps {
  * - 手動入力モード
  * - おすすめモード
  */
-export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelProps) {
+export function SetupPanel({ onStart, isLoading }: SetupPanelProps) {
   const { user } = useAuth();
   const { data } = useAppData();
   const { showToast } = useToastContext();
@@ -360,7 +359,7 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
           !user ||
           isLoading
         }
-        isChristmasMode={isChristmasMode}
+
       />
     );
   }
@@ -370,7 +369,7 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
     return (
       <div className="flex-1 flex flex-col pt-16 px-4 sm:px-6">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
-          <h3 className={`text-xl sm:text-2xl font-bold flex items-center gap-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
+          <h3 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-ink">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
               <MdTimer className="text-white text-lg" />
             </div>
@@ -380,7 +379,7 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
 
         <div className="space-y-6 flex-1">
           <div>
-            <label className={`block text-sm font-semibold uppercase tracking-wide mb-3 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            <label className="block text-sm font-semibold uppercase tracking-wide mb-3 text-ink-sub">
               時間設定
             </label>
             <div className="flex gap-4">
@@ -392,11 +391,11 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
                   onChange={(e) => handleDurationMinutesChange(e.target.value)}
                   placeholder="分"
                   className="text-center font-semibold text-lg sm:text-xl"
-                  isChristmasMode={isChristmasMode}
+  
                 />
               </div>
               <div className="flex items-end pb-2">
-                <span className={`text-2xl font-bold ${isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'}`}>:</span>
+                <span className="text-2xl font-bold text-ink-muted">:</span>
               </div>
               <div className="flex-1">
                 <Input
@@ -407,7 +406,7 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
                   placeholder="秒"
                   maxLength={2}
                   className="text-center font-semibold text-lg sm:text-xl"
-                  isChristmasMode={isChristmasMode}
+  
                 />
               </div>
             </div>
@@ -425,7 +424,7 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
                 isLoading
               }
               className="w-full flex items-center justify-center gap-3"
-              isChristmasMode={isChristmasMode}
+      
             >
               <HiPlay className="text-2xl" />
               <span>スタート</span>
@@ -453,7 +452,6 @@ export function SetupPanel({ onStart, isLoading, isChristmasMode }: SetupPanelPr
       onRoastLevelChange={setRoastLevel}
       onStart={handleStart}
       isStartDisabled={!weight || (recommendedMode === 'history' && (!beanName || !roastLevel))}
-      isChristmasMode={isChristmasMode}
     />
   );
 }

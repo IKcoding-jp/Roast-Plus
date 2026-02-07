@@ -45,7 +45,7 @@ export interface ComponentRegistryItem {
   /** 新規追加フラグ */
   isNew?: boolean;
   /** デモコンポーネント */
-  Demo: React.ComponentType<{ isChristmasMode: boolean }>;
+  Demo: React.ComponentType;
 }
 
 /**
@@ -63,7 +63,7 @@ export const categoryLabels: Record<ComponentRegistryItem['category'], string> =
 // デモコンポーネント定義
 // ============================================
 
-function ButtonDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function ButtonDemo() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
@@ -75,97 +75,97 @@ function ButtonDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
     <div className="space-y-6">
       {/* Variants */}
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Variants
         </h3>
         <div className="flex flex-wrap gap-3">
-          <Button variant="primary" isChristmasMode={isChristmasMode}>Primary</Button>
-          <Button variant="secondary" isChristmasMode={isChristmasMode}>Secondary</Button>
-          <Button variant="danger" isChristmasMode={isChristmasMode}>Danger</Button>
-          <Button variant="success" isChristmasMode={isChristmasMode}>Success</Button>
-          <Button variant="outline" isChristmasMode={isChristmasMode}>Outline</Button>
-          <Button variant="ghost" isChristmasMode={isChristmasMode}>Ghost</Button>
-          <Button variant="coffee" isChristmasMode={isChristmasMode}>Coffee</Button>
-          <Button variant="surface" isChristmasMode={isChristmasMode}>Surface</Button>
+          <Button variant="primary">Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="danger">Danger</Button>
+          <Button variant="success">Success</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="coffee">Coffee</Button>
+          <Button variant="surface">Surface</Button>
         </div>
       </div>
 
       {/* Sizes */}
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Sizes
         </h3>
         <div className="flex flex-wrap items-center gap-3">
-          <Button size="sm" isChristmasMode={isChristmasMode}>Small</Button>
-          <Button size="md" isChristmasMode={isChristmasMode}>Medium</Button>
-          <Button size="lg" isChristmasMode={isChristmasMode}>Large</Button>
+          <Button size="sm">Small</Button>
+          <Button size="md">Medium</Button>
+          <Button size="lg">Large</Button>
         </div>
       </div>
 
       {/* States */}
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           States
         </h3>
         <div className="flex flex-wrap gap-3">
-          <Button disabled isChristmasMode={isChristmasMode}>Disabled</Button>
-          <Button loading={loading} onClick={handleSubmit} isChristmasMode={isChristmasMode}>
+          <Button disabled>Disabled</Button>
+          <Button loading={loading} onClick={handleSubmit}>
             {loading ? '処理中...' : 'Loading Test'}
           </Button>
-          <Button badge={3} isChristmasMode={isChristmasMode}>Badge</Button>
+          <Button badge={3}>Badge</Button>
         </div>
       </div>
     </div>
   );
 }
 
-function IconButtonDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function IconButtonDemo() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Variants
         </h3>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex flex-col items-center gap-1">
-            <IconButton variant="default" isChristmasMode={isChristmasMode}><HiX size={20} /></IconButton>
-            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>default</span>
+            <IconButton variant="default"><HiX size={20} /></IconButton>
+            <span className="text-xs text-ink-muted">default</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <IconButton variant="primary" isChristmasMode={isChristmasMode}><HiPlus size={20} /></IconButton>
-            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>primary</span>
+            <IconButton variant="primary"><HiPlus size={20} /></IconButton>
+            <span className="text-xs text-ink-muted">primary</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <IconButton variant="danger" isChristmasMode={isChristmasMode}><HiTrash size={20} /></IconButton>
-            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>danger</span>
+            <IconButton variant="danger"><HiTrash size={20} /></IconButton>
+            <span className="text-xs text-ink-muted">danger</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <IconButton variant="success" isChristmasMode={isChristmasMode}><HiCheck size={20} /></IconButton>
-            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>success</span>
+            <IconButton variant="success"><HiCheck size={20} /></IconButton>
+            <span className="text-xs text-ink-muted">success</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <IconButton variant="ghost" isChristmasMode={isChristmasMode}><HiCog size={20} /></IconButton>
-            <span className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>ghost</span>
+            <IconButton variant="ghost"><HiCog size={20} /></IconButton>
+            <span className="text-xs text-ink-muted">ghost</span>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Sizes & Rounded
         </h3>
         <div className="flex flex-wrap items-center gap-3">
-          <IconButton size="sm" isChristmasMode={isChristmasMode}><MdClose size={16} /></IconButton>
-          <IconButton size="md" isChristmasMode={isChristmasMode}><MdClose size={20} /></IconButton>
-          <IconButton size="lg" isChristmasMode={isChristmasMode}><MdClose size={24} /></IconButton>
-          <IconButton rounded variant="primary" isChristmasMode={isChristmasMode}><MdAdd size={20} /></IconButton>
+          <IconButton size="sm"><MdClose size={16} /></IconButton>
+          <IconButton size="md"><MdClose size={20} /></IconButton>
+          <IconButton size="lg"><MdClose size={24} /></IconButton>
+          <IconButton rounded variant="primary"><MdAdd size={20} /></IconButton>
         </div>
       </div>
     </div>
   );
 }
 
-function InputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function InputDemo() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
 
@@ -176,7 +176,6 @@ function InputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         placeholder="山田太郎"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        isChristmasMode={isChristmasMode}
       />
       <Input
         label="パスワード（トグル付き）"
@@ -185,19 +184,17 @@ function InputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         showPasswordToggle
-        isChristmasMode={isChristmasMode}
       />
       <Input
         label="エラー表示テスト"
         placeholder="入力してください"
         error="このフィールドは必須です"
-        isChristmasMode={isChristmasMode}
       />
     </div>
   );
 }
 
-function NumberInputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function NumberInputDemo() {
   const [width, setWidth] = useState(160);
 
   return (
@@ -207,7 +204,6 @@ function NumberInputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         suffix="px"
         value={width}
         onChange={(e) => setWidth(parseInt(e.target.value) || 0)}
-        isChristmasMode={isChristmasMode}
       />
       <NumberInput
         label="エラー表示テスト"
@@ -215,40 +211,37 @@ function NumberInputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         value={0}
         onChange={() => {}}
         error="0以上の値を入力してください"
-        isChristmasMode={isChristmasMode}
       />
     </div>
   );
 }
 
-function InlineInputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function InlineInputDemo() {
   const [value, setValue] = useState('テスト値');
 
   return (
     <div className="space-y-4">
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Light Background
         </h3>
-        <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
+        <div className="p-4 rounded-lg bg-ground">
           <InlineInput
             value={value}
             onChange={(e) => setValue(e.target.value)}
             variant="light"
-            isChristmasMode={isChristmasMode}
           />
         </div>
       </div>
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Dark Background
         </h3>
-        <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-[#0a1f12]' : 'bg-gray-800'}`}>
+        <div className="p-4 rounded-lg bg-ground">
           <InlineInput
             value={value}
             onChange={(e) => setValue(e.target.value)}
             variant="dark"
-            isChristmasMode={isChristmasMode}
           />
         </div>
       </div>
@@ -256,7 +249,7 @@ function InlineInputDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
   );
 }
 
-function SelectDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function SelectDemo() {
   const [category, setCategory] = useState('');
 
   return (
@@ -270,12 +263,11 @@ function SelectDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
       ]}
       value={category}
       onChange={(e) => setCategory(e.target.value)}
-      isChristmasMode={isChristmasMode}
     />
   );
 }
 
-function TextareaDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function TextareaDemo() {
   const [memo, setMemo] = useState('');
 
   return (
@@ -285,12 +277,11 @@ function TextareaDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
       rows={4}
       value={memo}
       onChange={(e) => setMemo(e.target.value)}
-      isChristmasMode={isChristmasMode}
     />
   );
 }
 
-function CheckboxDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function CheckboxDemo() {
   const [checked1, setChecked1] = useState(false);
   const [checked2, setChecked2] = useState(true);
 
@@ -300,25 +291,22 @@ function CheckboxDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         label="基本的なチェックボックス"
         checked={checked1}
         onChange={(e) => setChecked1(e.target.checked)}
-        isChristmasMode={isChristmasMode}
       />
       <Checkbox
         label="説明文付き"
         description="このオプションを有効にすると、通知が送信されます。"
         checked={checked2}
         onChange={(e) => setChecked2(e.target.checked)}
-        isChristmasMode={isChristmasMode}
       />
       <Checkbox
         label="無効状態"
         disabled
-        isChristmasMode={isChristmasMode}
       />
     </div>
   );
 }
 
-function SwitchDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function SwitchDemo() {
   const [switchOn, setSwitchOn] = useState(false);
 
   return (
@@ -327,62 +315,58 @@ function SwitchDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         label="通知を有効にする"
         checked={switchOn}
         onChange={(e) => setSwitchOn(e.target.checked)}
-        isChristmasMode={isChristmasMode}
       />
       <div className="flex flex-wrap items-center gap-6">
-        <Switch size="sm" checked={true} label="Small" isChristmasMode={isChristmasMode} />
-        <Switch size="md" checked={true} label="Medium" isChristmasMode={isChristmasMode} />
-        <Switch size="lg" checked={true} label="Large" isChristmasMode={isChristmasMode} />
+        <Switch size="sm" checked={true} label="Small" />
+        <Switch size="md" checked={true} label="Medium" />
+        <Switch size="lg" checked={true} label="Large" />
       </div>
     </div>
   );
 }
 
-function CardDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function CardDemo() {
   return (
     <div className="space-y-4">
-      <Card variant="default" isChristmasMode={isChristmasMode}>
-        <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>
+      <Card variant="default">
+        <p className="text-ink">
           Default Card - 基本的なカード
         </p>
       </Card>
-      <Card variant="hoverable" isChristmasMode={isChristmasMode}>
-        <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>
+      <Card variant="hoverable">
+        <p className="text-ink">
           Hoverable Card - ホバーでシャドウ変化
         </p>
       </Card>
-      <Card variant="coffee" isChristmasMode={isChristmasMode}>
+      <Card variant="coffee">
         <p className="text-white">Coffee Card - ダークブラウン背景</p>
       </Card>
     </div>
   );
 }
 
-function ModalDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function ModalDemo() {
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
-      <Button variant="primary" onClick={() => setShowModal(true)} isChristmasMode={isChristmasMode}>
+      <Button variant="primary" onClick={() => setShowModal(true)}>
         モーダルを開く
       </Button>
       <Modal
         show={showModal}
         onClose={() => setShowModal(false)}
-        contentClassName={isChristmasMode
-          ? 'bg-[#0a2618] rounded-2xl shadow-xl overflow-hidden max-w-sm w-full border border-[#d4af37]/40'
-          : 'bg-white rounded-2xl shadow-xl overflow-hidden max-w-sm w-full'
-        }
+        contentClassName="bg-overlay rounded-2xl shadow-xl overflow-hidden max-w-sm w-full border border-edge"
       >
         <div className="p-6">
-          <h3 className={`text-lg font-bold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
+          <h3 className="text-lg font-bold mb-2 text-ink">
             モーダルタイトル
           </h3>
-          <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+          <p className="text-sm mb-4 text-ink-sub">
             これはモーダルの内容です。
           </p>
           <div className="flex justify-end">
-            <Button variant="primary" onClick={() => setShowModal(false)} isChristmasMode={isChristmasMode}>
+            <Button variant="primary" onClick={() => setShowModal(false)}>
               閉じる
             </Button>
           </div>
@@ -392,17 +376,17 @@ function ModalDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
   );
 }
 
-function DialogDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function DialogDemo() {
   const [showDialog, setShowDialog] = useState(false);
   const [showDangerDialog, setShowDangerDialog] = useState(false);
 
   return (
     <>
       <div className="flex flex-wrap gap-3">
-        <Button variant="primary" onClick={() => setShowDialog(true)} isChristmasMode={isChristmasMode}>
+        <Button variant="primary" onClick={() => setShowDialog(true)}>
           通常ダイアログ
         </Button>
-        <Button variant="danger" onClick={() => setShowDangerDialog(true)} isChristmasMode={isChristmasMode}>
+        <Button variant="danger" onClick={() => setShowDangerDialog(true)}>
           危険アクション
         </Button>
       </div>
@@ -413,7 +397,6 @@ function DialogDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         description="この操作を実行してもよろしいですか？"
         confirmText="実行する"
         onConfirm={() => setShowDialog(false)}
-        isChristmasMode={isChristmasMode}
       />
       <Dialog
         isOpen={showDangerDialog}
@@ -423,127 +406,125 @@ function DialogDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
         confirmText="削除する"
         onConfirm={() => setShowDangerDialog(false)}
         variant="danger"
-        isChristmasMode={isChristmasMode}
       />
     </>
   );
 }
 
-function BadgeDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function BadgeDemo() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Variants
         </h3>
         <div className="flex flex-wrap gap-2">
-          <Badge variant="default" isChristmasMode={isChristmasMode}>Default</Badge>
-          <Badge variant="primary" isChristmasMode={isChristmasMode}>Primary</Badge>
-          <Badge variant="secondary" isChristmasMode={isChristmasMode}>Secondary</Badge>
-          <Badge variant="success" isChristmasMode={isChristmasMode}>Success</Badge>
-          <Badge variant="warning" isChristmasMode={isChristmasMode}>Warning</Badge>
-          <Badge variant="danger" isChristmasMode={isChristmasMode}>Danger</Badge>
-          <Badge variant="coffee" isChristmasMode={isChristmasMode}>Coffee</Badge>
+          <Badge variant="default">Default</Badge>
+          <Badge variant="primary">Primary</Badge>
+          <Badge variant="secondary">Secondary</Badge>
+          <Badge variant="success">Success</Badge>
+          <Badge variant="warning">Warning</Badge>
+          <Badge variant="danger">Danger</Badge>
+          <Badge variant="coffee">Coffee</Badge>
         </div>
       </div>
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Sizes
         </h3>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge size="sm" variant="primary" isChristmasMode={isChristmasMode}>Small</Badge>
-          <Badge size="md" variant="primary" isChristmasMode={isChristmasMode}>Medium</Badge>
-          <Badge size="lg" variant="primary" isChristmasMode={isChristmasMode}>Large</Badge>
+          <Badge size="sm" variant="primary">Small</Badge>
+          <Badge size="md" variant="primary">Medium</Badge>
+          <Badge size="lg" variant="primary">Large</Badge>
         </div>
       </div>
     </div>
   );
 }
 
-function RoastLevelBadgeDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function RoastLevelBadgeDemo() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           焙煎度レベル
         </h3>
         <div className="flex flex-wrap gap-3">
-          <RoastLevelBadge level="浅煎り" isChristmasMode={isChristmasMode} />
-          <RoastLevelBadge level="中煎り" isChristmasMode={isChristmasMode} />
-          <RoastLevelBadge level="中深煎り" isChristmasMode={isChristmasMode} />
-          <RoastLevelBadge level="深煎り" isChristmasMode={isChristmasMode} />
+          <RoastLevelBadge level="浅煎り" />
+          <RoastLevelBadge level="中煎り" />
+          <RoastLevelBadge level="中深煎り" />
+          <RoastLevelBadge level="深煎り" />
         </div>
       </div>
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           サイズ
         </h3>
         <div className="flex flex-wrap items-center gap-3">
-          <RoastLevelBadge level="中深煎り" size="sm" isChristmasMode={isChristmasMode} />
-          <RoastLevelBadge level="中深煎り" size="md" isChristmasMode={isChristmasMode} />
-          <RoastLevelBadge level="中深煎り" size="lg" isChristmasMode={isChristmasMode} />
+          <RoastLevelBadge level="中深煎り" size="sm" />
+          <RoastLevelBadge level="中深煎り" size="md" />
+          <RoastLevelBadge level="中深煎り" size="lg" />
         </div>
       </div>
     </div>
   );
 }
 
-function TabsDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function TabsDemo() {
   return (
-    <Tabs defaultValue="tab1" isChristmasMode={isChristmasMode}>
+    <Tabs defaultValue="tab1">
       <TabsList className="mb-4">
         <TabsTrigger value="tab1">タブ1</TabsTrigger>
         <TabsTrigger value="tab2">タブ2</TabsTrigger>
         <TabsTrigger value="tab3">タブ3</TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
-        <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
-          <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>タブ1の内容です。</p>
+        <div className="p-4 rounded-lg bg-ground">
+          <p className="text-ink">タブ1の内容です。</p>
         </div>
       </TabsContent>
       <TabsContent value="tab2">
-        <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
-          <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>タブ2の内容です。</p>
+        <div className="p-4 rounded-lg bg-ground">
+          <p className="text-ink">タブ2の内容です。</p>
         </div>
       </TabsContent>
       <TabsContent value="tab3">
-        <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
-          <p className={isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}>タブ3の内容です。</p>
+        <div className="p-4 rounded-lg bg-ground">
+          <p className="text-ink">タブ3の内容です。</p>
         </div>
       </TabsContent>
     </Tabs>
   );
 }
 
-function ProgressBarDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function ProgressBarDemo() {
   return (
     <div className="space-y-3">
-      <ProgressBar value={65} variant="primary" label="Primary" showValue isChristmasMode={isChristmasMode} />
-      <ProgressBar value={80} variant="success" label="Success" showValue isChristmasMode={isChristmasMode} />
-      <ProgressBar value={45} variant="warning" label="Warning" showValue isChristmasMode={isChristmasMode} />
-      <ProgressBar value={30} variant="danger" label="Danger" showValue isChristmasMode={isChristmasMode} />
-      <ProgressBar value={60} variant="coffee" label="Coffee" showValue isChristmasMode={isChristmasMode} />
+      <ProgressBar value={65} variant="primary" label="Primary" showValue />
+      <ProgressBar value={80} variant="success" label="Success" showValue />
+      <ProgressBar value={45} variant="warning" label="Warning" showValue />
+      <ProgressBar value={30} variant="danger" label="Danger" showValue />
+      <ProgressBar value={60} variant="coffee" label="Coffee" showValue />
     </div>
   );
 }
 
-function EmptyStateDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function EmptyStateDemo() {
   return (
-    <div className={`border rounded-lg ${isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'}`}>
+    <div className="border rounded-lg border-edge">
       <EmptyState
         icon={<HiInbox className="h-12 w-12" />}
         title="データがありません"
         description="新しいアイテムを追加して始めましょう。"
-        action={<Button size="sm" isChristmasMode={isChristmasMode}>追加する</Button>}
-        isChristmasMode={isChristmasMode}
+        action={<Button size="sm">追加する</Button>}
       />
     </div>
   );
 }
 
-function AccordionDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function AccordionDemo() {
   return (
-    <Accordion isChristmasMode={isChristmasMode}>
+    <Accordion>
       <AccordionItem defaultOpen>
         <AccordionTrigger>セクション1（デフォルトで開く）</AccordionTrigger>
         <AccordionContent>
@@ -560,22 +541,22 @@ function AccordionDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
   );
 }
 
-function BackLinkDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
+function BackLinkDemo() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Default（テキスト付き）
         </h3>
-        <BackLink href="#" isChristmasMode={isChristmasMode}>
+        <BackLink href="#">
           一覧に戻る
         </BackLink>
       </div>
       <div>
-        <h3 className={`text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
           Icon Only（アイコンのみ）
         </h3>
-        <BackLink href="#" variant="icon-only" isChristmasMode={isChristmasMode} />
+        <BackLink href="#" variant="icon-only" />
       </div>
     </div>
   );

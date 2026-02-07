@@ -40,7 +40,6 @@ type DesktopTableViewProps = {
     handleCellClick: (teamId: string, taskLabelId: string) => void;
     onShuffle: () => Promise<void>;
     isShuffleDisabled: boolean;
-    isChristmasMode?: boolean;
 };
 
 export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
@@ -74,7 +73,6 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
     handleCellClick,
     onShuffle,
     isShuffleDisabled,
-    isChristmasMode = false,
 }) => {
     const headerLabels = tableSettings?.headerLabels ?? DEFAULT_TABLE_SETTINGS.headerLabels;
     const formatTeamTitle = (teamName?: string) => {
@@ -101,18 +99,14 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
     const gridTemplateColumns = generateGridTemplateColumns();
 
     return (
-        <Card variant="table" isChristmasMode={isChristmasMode} className="hidden md:block w-fit mx-auto max-w-full overflow-x-auto relative">
+        <Card variant="table" className="hidden md:block w-fit mx-auto max-w-full overflow-x-auto relative">
             {/* ヘッダー */}
             <div
-                className={`grid border-b md:text-base font-semibold text-white sticky top-0 z-20 ${
-                    isChristmasMode ? 'bg-[#0a2f1a] border-[#d4af37]/30' : 'bg-dark border-gray-700'
-                }`}
+                className="grid border-b md:text-base font-semibold text-white sticky top-0 z-20 bg-dark border-gray-700"
                 style={{ gridTemplateColumns, minWidth: 'max-content' }}
             >
                 <div
-                    className={`py-2 px-2 sm:px-3 border-r flex items-center justify-center cursor-pointer transition-colors ${
-                        isChristmasMode ? 'bg-[#0a2f1a] border-[#d4af37]/30 hover:bg-[#0d3d22]' : 'bg-dark border-gray-700 hover:bg-gray-800'
-                    }`}
+                    className="py-2 px-2 sm:px-3 border-r flex items-center justify-center cursor-pointer transition-colors bg-dark border-gray-700 hover:bg-gray-800"
                     onClick={() => setWidthConfig({
                         type: 'taskLabel',
                         currentWidth: tableSettings?.colWidths?.taskLabel ?? 160,
@@ -126,13 +120,9 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                 {/* チーム列 */}
                 {teams.length === 0 ? (
-                    <div className={`py-2 px-2 border-r text-center flex flex-col items-center justify-center h-full min-h-[44px] ${
-                        isChristmasMode ? 'bg-[#0a2f1a] border-[#d4af37]/30' : 'bg-dark border-gray-700'
-                    }`}>
+                    <div className="py-2 px-2 border-r text-center flex flex-col items-center justify-center h-full min-h-[44px] bg-dark border-gray-700">
                         {isAddingTeam ? (
-                            <div className={`relative z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 ${
-                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]' : 'bg-white border border-primary'
-                            }`}>
+                            <div className="relative z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 bg-white border border-primary">
                                 <InlineInput
                                     placeholder="班名(任意)"
                                     value={newTeamName}
@@ -143,14 +133,12 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                         if (e.key === 'Escape') setIsAddingTeam(false);
                                     }}
                                     variant="dark"
-                                    isChristmasMode={isChristmasMode}
                                     className="!border-none !px-1 md:!p-2 md:!text-base !text-sm"
                                 />
                                 <IconButton
                                     variant="primary"
                                     size="sm"
                                     onClick={handleAddTeam}
-                                    isChristmasMode={isChristmasMode}
                                 >
                                     <MdAdd size={20} className="md:w-6 md:h-6" />
                                 </IconButton>
@@ -160,7 +148,6 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setIsAddingTeam(true)}
-                                isChristmasMode={isChristmasMode}
                                 className="!text-sm md:!text-base !gap-1 !bg-transparent"
                             >
                                 <MdAdd className="md:w-5 md:h-5" /> 最初の班を追加
@@ -171,9 +158,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                     teams.map(team => (
                         <div
                             key={team.id}
-                            className={`py-2 px-2 border-r text-center relative group flex items-center justify-center ${
-                                isChristmasMode ? 'bg-[#0a2f1a] border-[#d4af37]/30' : 'bg-dark border-gray-700'
-                            }`}
+                            className="py-2 px-2 border-r text-center relative group flex items-center justify-center bg-dark border-gray-700"
                         >
                             {editingTeamId === team.id ? (
                                 <InlineInput
@@ -183,16 +168,11 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                     onKeyDown={e => e.key === 'Enter' && handleUpdateTeam(team.id)}
                                     onBlur={() => handleUpdateTeam(team.id)}
                                     variant="light"
-                                    isChristmasMode={isChristmasMode}
                                     className="!text-sm md:!text-base"
                                 />
                             ) : (
                                 <div
-                                    className={`cursor-pointer rounded px-2 py-1 truncate w-full select-none ${
-                                        isChristmasMode
-                                            ? 'text-[#f8f1e7] hover:bg-white/10 active:bg-white/20'
-                                            : 'hover:bg-gray-800 active:bg-gray-700'
-                                    }`}
+                                    className="cursor-pointer rounded px-2 py-1 truncate w-full select-none hover:bg-gray-800 active:bg-gray-700"
                                     onClick={() => {
                                         setActiveTeamActionId(team.id);
                                         setActiveTeamName(team.name);
@@ -207,11 +187,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                 {/* チーム追加 & 補足ヘッダー */}
                 <div
-                    className={`py-2 px-2 sm:px-3 text-center flex items-center justify-between relative cursor-pointer transition-colors ${
-                        isChristmasMode
-                            ? 'bg-[#0a2f1a] hover:bg-white/10'
-                            : 'bg-dark hover:bg-gray-800'
-                    }`}
+                    className="py-2 px-2 sm:px-3 text-center flex items-center justify-between relative cursor-pointer transition-colors bg-dark hover:bg-gray-800"
                     onClick={(e) => {
                         if ((e.target as HTMLElement).closest('button, input')) return;
                         setWidthConfig({
@@ -234,9 +210,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                             setIsAddingTeam(false);
                                         }}
                                     />
-                                    <div className={`absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 ${
-                                        isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]' : 'bg-white border border-primary'
-                                    }`}>
+                                    <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 bg-white border border-primary">
                                         <InlineInput
                                             placeholder="班名(任意)"
                                             value={newTeamName}
@@ -247,14 +221,12 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                                 if (e.key === 'Escape') setIsAddingTeam(false);
                                             }}
                                             variant="dark"
-                                            isChristmasMode={isChristmasMode}
                                             className="!border-none !px-1 md:!p-2 !text-sm md:!text-base"
                                         />
                                         <IconButton
                                             variant="primary"
                                             size="sm"
                                             onClick={handleAddTeam}
-                                            isChristmasMode={isChristmasMode}
                                         >
                                             <MdAdd size={20} className="md:w-6 md:h-6" />
                                         </IconButton>
@@ -262,12 +234,11 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                 </>
                             ) : (
                                 <IconButton
-                                    variant={isChristmasMode ? 'primary' : 'ghost'}
+                                    variant="ghost"
                                     size="sm"
                                     rounded
                                     onClick={() => setIsAddingTeam(true)}
-                                    isChristmasMode={isChristmasMode}
-                                    className={isChristmasMode ? '!bg-[#d4af37]/20' : '!bg-gray-700 !text-gray-300 hover:!bg-primary hover:!text-white'}
+                                    className="!bg-gray-700 !text-gray-300 hover:!bg-primary hover:!text-white"
                                     title="班を追加"
                                 >
                                     <MdAdd size={16} className="md:w-5 md:h-5" />
@@ -275,32 +246,26 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                             )
                         )}
                     </div>
-                    <span className={isChristmasMode ? 'text-[#f8f1e7]' : ''}>{headerLabels.right}</span>
+                    <span>{headerLabels.right}</span>
                     <span className="w-4"></span>
                 </div>
             </div>
 
             {/* ボディ */}
-            <div className={`divide-y ${isChristmasMode ? 'divide-[#d4af37]/20 bg-[#0a2f1a]' : 'divide-gray-100 bg-white'}`} style={{ minWidth: 'max-content' }}>
+            <div className="divide-y divide-gray-100 bg-white" style={{ minWidth: 'max-content' }}>
                 {taskLabels.map(label => (
                     <div
                         key={label.id}
-                        className={`grid items-center transition-colors group ${
-                            isChristmasMode ? 'hover:bg-white/5' : 'hover:bg-orange-50/30'
-                        }`}
+                        className="grid items-center transition-colors group hover:bg-orange-50/30"
                         style={{
                             gridTemplateColumns,
                             minHeight: `${tableSettings?.rowHeights?.[label.id] ?? 60}px`
                         }}
                     >
                         {/* 左ラベル列 */}
-                        <div className={`p-3 md:p-4 py-2 border-r h-full flex items-center justify-center ${
-                            isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-100'
-                        }`}>
+                        <div className="p-3 md:p-4 py-2 border-r h-full flex items-center justify-center border-gray-100">
                             <div
-                                className={`w-full p-1 cursor-pointer font-medium text-sm md:text-base whitespace-nowrap text-center rounded transition-colors overflow-visible ${
-                                    isChristmasMode ? 'text-[#f8f1e7] hover:bg-white/10' : 'text-gray-800 hover:bg-gray-100'
-                                }`}
+                                className="w-full p-1 cursor-pointer font-medium text-sm md:text-base whitespace-nowrap text-center rounded transition-colors overflow-visible text-ink hover:bg-ground"
                                 onClick={() => {
                                     setHeightConfig({
                                         taskLabelId: label.id,
@@ -318,10 +283,8 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                         {/* 各チームの担当者列 */}
                         {teams.length === 0 ? (
-                            <div className={`p-2 md:p-4 border-r h-full flex items-center justify-center ${
-                                isChristmasMode ? 'border-[#d4af37]/20 bg-white/5' : 'border-gray-100 bg-gray-50/30'
-                            }`}>
-                                <span className={`text-xs md:text-sm ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-300'}`}>班を作成してください</span>
+                            <div className="p-2 md:p-4 border-r h-full flex items-center justify-center border-gray-100 bg-gray-50/30">
+                                <span className="text-xs md:text-sm text-ink-muted">班を作成してください</span>
                             </div>
                         ) : (
                             teams.map(team => {
@@ -330,9 +293,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                 const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === label.id;
 
                                 return (
-                                    <div key={team.id} className={`p-2 md:p-4 py-2 border-r h-full flex items-center justify-center relative ${
-                                        isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-100'
-                                    }`}>
+                                    <div key={team.id} className="p-2 md:p-4 py-2 border-r h-full flex items-center justify-center relative border-gray-100">
                                         <button
                                             onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                             onMouseUp={handleCellTouchEnd}
@@ -344,21 +305,13 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                             onClick={() => handleCellClick(team.id, label.id)}
                                             className={`
                                                 w-full py-2 md:py-3 px-1 rounded-lg text-sm md:text-base font-bold text-center transition-all truncate select-none
-                                                ${isChristmasMode
-                                                    ? member
-                                                        ? isSelected
-                                                            ? 'bg-[#d4af37] text-[#051a0e] shadow-md scale-105'
-                                                            : 'text-[#f8f1e7] bg-white/10 border border-[#d4af37]/30 shadow-sm hover:bg-white/15'
-                                                        : isSelected
-                                                            ? 'bg-[#d4af37]/30 text-[#d4af37] border border-[#d4af37]'
-                                                            : 'text-[#f8f1e7]/50 bg-white/5 border border-dashed border-[#d4af37]/30 hover:bg-white/10'
-                                                    : member
-                                                        ? isSelected
-                                                            ? 'bg-primary text-white shadow-md scale-105'
-                                                            : 'text-gray-800 bg-white border border-gray-200 shadow-sm hover:shadow'
-                                                        : isSelected
-                                                            ? 'bg-primary/20 text-primary border border-primary'
-                                                            : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100'}
+                                                ${member
+                                                    ? isSelected
+                                                        ? 'bg-primary text-white shadow-md scale-105'
+                                                        : 'text-gray-800 bg-white border border-gray-200 shadow-sm hover:shadow'
+                                                    : isSelected
+                                                        ? 'bg-primary/20 text-primary border border-primary'
+                                                        : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100'}
                                             `}
                                         >
                                             {member ? member.name : '未割当'}
@@ -371,9 +324,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                         {/* 右ラベル列 */}
                         <div className="p-3 md:p-4 py-2 h-full flex items-center relative">
                             <div
-                                className={`w-full p-1 cursor-pointer font-medium text-sm md:text-base whitespace-nowrap text-center rounded transition-colors overflow-visible ${
-                                    isChristmasMode ? 'text-[#f8f1e7] hover:bg-white/10' : 'text-gray-800 hover:bg-gray-100'
-                                }`}
+                                className="w-full p-1 cursor-pointer font-medium text-sm md:text-base whitespace-nowrap text-center rounded transition-colors overflow-visible text-ink hover:bg-ground"
                                 onClick={() => {
                                     setHeightConfig({
                                         taskLabelId: label.id,
@@ -393,9 +344,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                 {/* 新規ラベル追加行 */}
                 <div
-                    className={`grid items-center p-2 py-2 border-t min-h-[60px] ${
-                        isChristmasMode ? 'bg-[#0a2f1a] border-[#d4af37]/30' : 'bg-gray-50 border-gray-200'
-                    }`}
+                    className="grid items-center p-2 py-2 border-t min-h-[60px] bg-ground border-edge"
                     style={{ gridTemplateColumns }}
                 >
                     <div className="pr-2">
@@ -405,7 +354,6 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                             onKeyDown={e => {
                                 if (e.key === 'Enter') handleAddTaskLabel();
                             }}
-                            isChristmasMode={isChristmasMode}
                             className="!p-2 !text-sm !min-h-0"
                         />
                     </div>
@@ -417,7 +365,6 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                             size="sm"
                             onClick={onShuffle}
                             disabled={isShuffleDisabled}
-                            isChristmasMode={isChristmasMode}
                             className="!rounded-full !px-4 shadow-md active:scale-95"
                         >
                             <PiShuffleBold className="w-5 h-5" />
@@ -432,7 +379,6 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                             onKeyDown={e => {
                                 if (e.key === 'Enter') handleAddTaskLabel();
                             }}
-                            isChristmasMode={isChristmasMode}
                             className="!min-w-0 !p-2 !text-right !text-sm !min-h-0"
                         />
                         <Button
@@ -440,7 +386,6 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                             size="sm"
                             onClick={handleAddTaskLabel}
                             disabled={!newLeftLabel.trim()}
-                            isChristmasMode={isChristmasMode}
                             className="!px-2 !py-1 !min-h-0 !h-full max-h-[38px] flex-shrink-0"
                         >
                             <MdAdd size={20} />

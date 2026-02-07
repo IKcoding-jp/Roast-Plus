@@ -26,7 +26,6 @@ interface RecommendedModeViewProps {
   onRoastLevelChange: (value: RoastLevel | '') => void;
   onStart: () => Promise<void>;
   isStartDisabled: boolean;
-  isChristmasMode: boolean;
 }
 
 /**
@@ -49,13 +48,12 @@ export function RecommendedModeView({
   onRoastLevelChange,
   onStart,
   isStartDisabled,
-  isChristmasMode,
 }: RecommendedModeViewProps) {
   return (
     <div className="flex-1 flex flex-col px-4 sm:px-6">
       <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center py-8">
         <div className="flex items-center justify-center mb-6 flex-shrink-0">
-          <h3 className={`text-xl sm:text-2xl font-bold flex items-center gap-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
+          <h3 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-ink">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
               <MdLightbulb className="text-white text-lg" />
             </div>
@@ -69,7 +67,6 @@ export function RecommendedModeView({
             defaultValue={recommendedMode}
             value={recommendedMode}
             onValueChange={(v) => onRecommendedModeChange(v as 'weight' | 'history')}
-            isChristmasMode={isChristmasMode}
             className="mb-6 flex-shrink-0"
           >
             <TabsList>
@@ -78,7 +75,7 @@ export function RecommendedModeView({
             </TabsList>
 
             <TabsContent value="weight">
-              <WeightModeSection weight={weight} onWeightChange={onWeightChange} isChristmasMode={isChristmasMode} />
+              <WeightModeSection weight={weight} onWeightChange={onWeightChange} />
             </TabsContent>
 
             <TabsContent value="history">
@@ -93,7 +90,6 @@ export function RecommendedModeView({
                 onBeanNameChange={onBeanNameChange}
                 onWeightChange={onWeightChange}
                 onRoastLevelChange={onRoastLevelChange}
-                isChristmasMode={isChristmasMode}
               />
             </TabsContent>
           </Tabs>
@@ -105,7 +101,6 @@ export function RecommendedModeView({
               onClick={onStart}
               disabled={isStartDisabled}
               className="w-full flex items-center justify-center gap-3"
-              isChristmasMode={isChristmasMode}
             >
               <HiPlay className="text-2xl" />
               <span>スタート</span>
@@ -122,11 +117,9 @@ export function RecommendedModeView({
 function WeightModeSection({
   weight,
   onWeightChange,
-  isChristmasMode,
 }: {
   weight: Weight | '';
   onWeightChange: (value: Weight | '') => void;
-  isChristmasMode: boolean;
 }) {
   const weightOptions: SelectOption[] = WEIGHTS.map((w) => ({ value: String(w), label: `${w}g` }));
   return (
@@ -139,14 +132,13 @@ function WeightModeSection({
         }
         options={[{ value: '', label: '選択してください' }, ...weightOptions]}
         required
-        isChristmasMode={isChristmasMode}
       />
 
       {weight !== '' && (
-        <div className={`rounded-xl p-4 shadow-sm border-2 ${isChristmasMode ? 'bg-[#0f3a1f]/50 border-[#d4af37]/30' : 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200'}`}>
-          <p className={`text-sm sm:text-base ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <div className="rounded-xl p-4 shadow-sm border-2 bg-spot-subtle border-edge">
+          <p className="text-sm sm:text-base text-ink-sub">
             重さに応じたおすすめ時間は{' '}
-            <span className={`font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-800'}`}>
+            <span className="font-bold text-spot">
               {weight === 200 ? '8分' : weight === 300 ? '9分' : '10分'}
             </span>{' '}
             です
@@ -168,7 +160,6 @@ function HistoryModeSection({
   onBeanNameChange,
   onWeightChange,
   onRoastLevelChange,
-  isChristmasMode,
 }: {
   beanName: BeanName | '';
   weight: Weight | '';
@@ -180,7 +171,6 @@ function HistoryModeSection({
   onBeanNameChange: (value: BeanName | '') => void;
   onWeightChange: (value: Weight | '') => void;
   onRoastLevelChange: (value: RoastLevel | '') => void;
-  isChristmasMode: boolean;
 }) {
   // オプションの生成
   const beanOptions: SelectOption[] = availableBeans.map((bean) => ({ value: bean, label: bean }));
@@ -197,7 +187,6 @@ function HistoryModeSection({
           ...beanOptions
         ]}
         required
-        isChristmasMode={isChristmasMode}
       />
 
       <Select
@@ -213,7 +202,6 @@ function HistoryModeSection({
           ...roastLevelOptions
         ]}
         required
-        isChristmasMode={isChristmasMode}
       />
 
       <Select
@@ -231,12 +219,11 @@ function HistoryModeSection({
           ...weightOptions
         ]}
         required
-        isChristmasMode={isChristmasMode}
       />
 
       {!recommendedTimeInfo && beanName && weight !== '' && roastLevel && (
-        <div className={`rounded-xl p-4 shadow-sm border-2 ${isChristmasMode ? 'bg-[#3d2a11]/50 border-[#d4af37]/30' : 'bg-yellow-50 border-yellow-200'}`}>
-          <p className={`text-sm sm:text-base ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-yellow-800'}`}>
+        <div className="rounded-xl p-4 shadow-sm border-2 bg-yellow-50 border-yellow-200">
+          <p className="text-sm sm:text-base text-yellow-800">
             この組み合わせの記録が2件未満のため、平均焙煎時間を計算できません。重さに応じたデフォルト時間（
             {weight === 200 ? '8分' : weight === 300 ? '9分' : '10分'}）でタイマーを開始します。
           </p>
@@ -244,14 +231,14 @@ function HistoryModeSection({
       )}
 
       {recommendedTimeInfo && (
-        <div className={`rounded-xl p-4 shadow-sm border-2 ${isChristmasMode ? 'bg-[#0f3a1f]/50 border-[#d4af37]/30' : 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200'}`}>
-          <p className={`text-sm sm:text-base ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <div className="rounded-xl p-4 shadow-sm border-2 bg-spot-subtle border-edge">
+          <p className="text-sm sm:text-base text-ink-sub">
             過去の記録から、平均焙煎時間は{' '}
-            <span className={`font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-800'}`}>
+            <span className="font-bold text-spot">
               {formatTimeAsMinutesAndSeconds(recommendedTimeInfo.averageDuration)}
             </span>
             、おすすめタイマー時間は{' '}
-            <span className={`font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-800'}`}>
+            <span className="font-bold text-spot">
               {formatTimeAsMinutesAndSeconds(recommendedTimeInfo.recommendedDuration)}
             </span>{' '}
             です

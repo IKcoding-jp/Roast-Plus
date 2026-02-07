@@ -10,7 +10,11 @@
  * 1. このテンプレートをコピーして新規ページファイルを作成
  * 2. コンポーネント名、タイトル、コンテンツを置き換え
  * 3. 不要なセクションは削除
- * 4. クリスマスモード対応が必要な場合は、色の切り替えロジックを追加
+ *
+ * テーマ対応:
+ * CSS変数ベースのテーマシステムを使用。
+ * text-ink, bg-surface, border-edge 等のクラスは
+ * 親要素の .christmas クラスにより自動的に配色が切り替わる。
  */
 
 import Link from 'next/link';
@@ -20,18 +24,12 @@ import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
 
-// 必要に応じてインポート
-// import { useChristmasMode } from '@/hooks/useChristmasMode';
-
 /**
  * ページコンポーネント
  */
 export default function YourPageName() {
   const { user, loading: authLoading } = useAuth();
   useAppLifecycle();
-
-  // クリスマスモード対応が必要な場合
-  // const { isChristmasMode } = useChristmasMode();
 
   // ローディング表示
   if (authLoading) return <Loading />;
@@ -50,7 +48,7 @@ export default function YourPageName() {
             {/* 戻るボタン */}
             <Link
               href="/"
-              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+              className="px-3 py-2 text-ink-sub hover:text-ink hover:bg-ground rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
               title="戻る"
               aria-label="戻る"
             >
@@ -58,63 +56,63 @@ export default function YourPageName() {
             </Link>
 
             {/* タイトル */}
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-ink">
               ページタイトル
             </h1>
           </div>
 
           {/* オプション: サブタイトルや説明文 */}
-          {/* <p className="text-gray-600 text-sm mt-2">ページの説明文</p> */}
+          {/* <p className="text-ink-sub text-sm mt-2">ページの説明文</p> */}
         </header>
 
         {/* ========== メインコンテンツセクション ========== */}
         <main className="space-y-6">
           {/* パターン1: 基本カード */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">セクションタイトル</h2>
-            <p className="text-gray-600 mb-4">
+          <div className="bg-surface rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-lg font-bold text-ink mb-4">セクションタイトル</h2>
+            <p className="text-ink-sub mb-4">
               ここにコンテンツを配置します。説明文、リスト、フォームなど。
             </p>
 
             {/* リスト例 */}
             <ul className="space-y-2">
-              <li className="flex items-center gap-2 text-gray-700">
-                <span className="w-2 h-2 bg-amber-600 rounded-full" />
+              <li className="flex items-center gap-2 text-ink">
+                <span className="w-2 h-2 bg-spot rounded-full" />
                 リスト項目1
               </li>
-              <li className="flex items-center gap-2 text-gray-700">
-                <span className="w-2 h-2 bg-amber-600 rounded-full" />
+              <li className="flex items-center gap-2 text-ink">
+                <span className="w-2 h-2 bg-spot rounded-full" />
                 リスト項目2
               </li>
-              <li className="flex items-center gap-2 text-gray-700">
-                <span className="w-2 h-2 bg-amber-600 rounded-full" />
+              <li className="flex items-center gap-2 text-ink">
+                <span className="w-2 h-2 bg-spot rounded-full" />
                 リスト項目3
               </li>
             </ul>
           </div>
 
           {/* パターン2: フォームセクション */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">フォームセクション</h2>
+          <div className="bg-surface rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-lg font-bold text-ink mb-4">フォームセクション</h2>
             <form className="space-y-4">
               {/* テキスト入力 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-ink mb-2">
                   テキスト入力
                 </label>
                 <input
                   type="text"
-                  className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all"
+                  className="w-full rounded-lg border-2 border-edge px-4 py-3 text-ink focus:border-spot focus:outline-none focus:ring-2 focus:ring-spot-subtle transition-all"
                   placeholder="入力してください"
                 />
               </div>
 
               {/* セレクトボックス */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-ink mb-2">
                   選択肢を選ぶ
                 </label>
-                <select className="w-full rounded-md border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[44px]">
+                <select className="w-full rounded-md border border-edge px-4 py-2.5 text-ink focus:border-spot focus:outline-none focus:ring-2 focus:ring-spot min-h-[44px]">
                   <option value="">選択してください</option>
                   <option value="1">オプション1</option>
                   <option value="2">オプション2</option>
@@ -123,11 +121,11 @@ export default function YourPageName() {
 
               {/* テキストエリア */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-ink mb-2">
                   複数行入力
                 </label>
                 <textarea
-                  className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-100 transition-all"
+                  className="w-full rounded-lg border-2 border-edge px-4 py-3 text-ink focus:border-spot focus:outline-none focus:ring-2 focus:ring-spot-subtle transition-all"
                   rows={4}
                   placeholder="複数行入力できます"
                 />
@@ -152,16 +150,16 @@ export default function YourPageName() {
           </div>
 
           {/* パターン3: 情報ブロック */}
-          <div className="bg-amber-50 rounded-lg border-2 border-amber-200 p-4 sm:p-6">
-            <h3 className="text-lg font-bold text-amber-900 mb-2">情報ブロック</h3>
-            <p className="text-amber-800">
+          <div className="bg-spot-subtle rounded-lg border-2 border-spot/30 p-4 sm:p-6">
+            <h3 className="text-lg font-bold text-spot mb-2">情報ブロック</h3>
+            <p className="text-ink-sub">
               重要な情報やお知らせなどを目立たせるブロック。
             </p>
           </div>
         </main>
 
         {/* ========== フッター（オプション） ========== */}
-        <footer className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
+        <footer className="mt-8 pt-6 border-t border-edge text-center text-sm text-ink-muted">
           <p>© 2026 Roast Plus. All rights reserved.</p>
         </footer>
       </div>
@@ -189,20 +187,18 @@ export default function YourPageName() {
  * - max-w-4xl: 幅を変更する場合は max-w-2xl, max-w-6xl などに変更
  * - amber-600: ブランドカラーを変更する場合は color-schemes.md を参照
  *
- * ========== クリスマスモード対応 ==========
+ * ========== テーマ対応 ==========
  *
- * クリスマスモード対応が必要な場合:
+ * CSS変数ベースのテーマシステム:
+ * - text-ink, text-ink-sub, text-ink-muted: テキスト色
+ * - text-spot: アクセント色
+ * - bg-surface, bg-ground: 背景色
+ * - bg-spot-subtle: アクセント薄背景色
+ * - border-edge, border-edge-strong: ボーダー色
  *
- * 1. useChristmasMode をインポート
- * 2. const { isChristmasMode } = useChristmasMode();
- * 3. 背景色とテキスト色を条件分岐
- *
- * 例:
- * <div className={`${
- *   isChristmasMode
- *     ? 'bg-[#051a0e] text-[#f8f1e7]'
- *     : 'bg-white text-gray-900'
- * }`}>
+ * data-theme="christmas" 属性がhtml要素にある場合、
+ * CSS変数が自動的にクリスマスカラーに切り替わる。
+ * コンポーネント側でのテーマ判定は不要。
  *
  * ========== レスポンシブデザイン確認 ==========
  *

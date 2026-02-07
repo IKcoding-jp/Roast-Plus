@@ -18,7 +18,6 @@ interface ScheduleCardProps {
   onDragLeave: () => void;
   onDrop: (e: React.DragEvent) => void;
   onDragEnd: () => void;
-  isChristmasMode?: boolean;
 }
 
 export function ScheduleCard({
@@ -31,7 +30,6 @@ export function ScheduleCard({
   onDragLeave,
   onDrop,
   onDragEnd,
-  isChristmasMode = false,
 }: ScheduleCardProps) {
   // メモタイプの判定
   const isRoasterOn = schedule.isRoasterOn;
@@ -41,11 +39,10 @@ export function ScheduleCard({
 
   // アイコンの取得
   const getIcon = () => {
-    const iconColorClass = isChristmasMode ? 'text-[#d4af37]' : '';
-    if (isRoasterOn) return <HiFire className={`text-xl md:text-xl flex-shrink-0 ${iconColorClass || 'text-orange-500'}`} />;
-    if (isRoast) return <PiCoffeeBeanFill className={`text-xl md:text-xl flex-shrink-0 ${iconColorClass || 'text-amber-700'}`} />;
-    if (isAfterPurge) return <FaSnowflake className={`text-xl md:text-xl flex-shrink-0 ${iconColorClass || 'text-blue-500'}`} />;
-    if (isChaffCleaning) return <FaBroom className={`text-xl md:text-xl flex-shrink-0 ${iconColorClass || 'text-gray-600'}`} />;
+    if (isRoasterOn) return <HiFire className="text-xl md:text-xl flex-shrink-0 text-orange-500" />;
+    if (isRoast) return <PiCoffeeBeanFill className="text-xl md:text-xl flex-shrink-0 text-amber-700" />;
+    if (isAfterPurge) return <FaSnowflake className="text-xl md:text-xl flex-shrink-0 text-blue-500" />;
+    if (isChaffCleaning) return <FaBroom className="text-xl md:text-xl flex-shrink-0 text-gray-600" />;
     return null;
   };
 
@@ -180,27 +177,15 @@ export function ScheduleCard({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onClick={handleCardClick}
-      className={`rounded-md border p-3 md:p-2.5 cursor-move hover:shadow-sm transition-all select-none touch-none ${
-        isChristmasMode
-          ? `border-[#d4af37]/20 bg-white/5 hover:bg-[#d4af37]/10 hover:border-[#d4af37]/40`
-          : `border-gray-200 bg-gray-50 hover:bg-amber-50 hover:border-amber-300`
-      } ${isDragging ? 'opacity-50' : ''} ${
-        isDragOver
-          ? isChristmasMode
-            ? 'border-[#d4af37] border-2 bg-[#d4af37]/20'
-            : 'border-amber-500 border-2 bg-amber-50'
-          : ''
+      className={`rounded-md border p-3 md:p-2.5 cursor-move hover:shadow-sm transition-all select-none touch-none border-edge bg-ground hover:bg-amber-50 hover:border-amber-300 ${isDragging ? 'opacity-50' : ''} ${
+        isDragOver ? 'border-amber-500 border-2 bg-amber-50' : ''
       }`}
     >
       <div className="flex items-center gap-2 md:gap-2.5">
         {/* 左側：時間バッジまたはアイコン */}
         <div className="flex items-center gap-1.5 md:gap-1.5 flex-shrink-0">
           {schedule.time ? (
-            <div className={`flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-md text-sm md:text-base font-semibold tabular-nums shadow-sm ${
-              isChristmasMode
-                ? 'bg-[#d4af37]/20 text-[#d4af37]'
-                : 'bg-white text-gray-800'
-            }`}>
+            <div className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-md text-sm md:text-base font-semibold tabular-nums shadow-sm bg-surface text-ink">
               {schedule.time}
             </div>
           ) : (
@@ -211,22 +196,16 @@ export function ScheduleCard({
 
         {/* 中央：メモ内容 */}
         <div className="flex-1 min-w-0 flex flex-col gap-1 md:gap-0.5">
-          <div className={`text-base md:text-base font-medium flex items-center gap-1.5 md:gap-1.5 flex-wrap ${
-            isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-          }`}>
+          <div className="text-base md:text-base font-medium flex items-center gap-1.5 md:gap-1.5 flex-wrap text-ink">
             <span className="whitespace-nowrap">{memoContent.firstLine}</span>
             {memoContent.beanName && (
-              <span className={`inline-flex items-center rounded px-1.5 md:px-2 py-0.5 md:py-1 text-sm md:text-xs font-medium border whitespace-nowrap ${
-                isChristmasMode
-                  ? 'bg-white/10 text-[#f8f1e7]/80 border-[#d4af37]/30'
-                  : 'bg-gray-50 text-gray-700 border-gray-200'
-              }`}>
+              <span className="inline-flex items-center rounded px-1.5 md:px-2 py-0.5 md:py-1 text-sm md:text-xs font-medium border whitespace-nowrap bg-ground text-ink-sub border-edge">
                 {memoContent.beanName2 && memoContent.blendRatio ? (
                   <>
                     <span className="whitespace-nowrap">{memoContent.beanName}</span>
                     {' '}
                     <CountryFlagEmoji countryName={memoContent.beanName} />
-                    <span className={`mx-0.5 md:mx-1 ${isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'}`}>×</span>
+                    <span className="mx-0.5 md:mx-1 text-ink-muted">×</span>
                     <span className="whitespace-nowrap">{memoContent.beanName2}</span>
                     {' '}
                     <CountryFlagEmoji countryName={memoContent.beanName2} />

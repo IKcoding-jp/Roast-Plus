@@ -83,46 +83,20 @@ describe('Dialog', () => {
     it('defaultバリアントのスタイルが適用される', () => {
       render(<Dialog {...defaultProps} variant="default" />);
       const confirmBtn = screen.getByRole('button', { name: 'OK' });
-      expect(confirmBtn.className).toContain('bg-primary');
+      expect(confirmBtn.className).toContain('bg-spot');
     });
 
     it('dangerバリアントのスタイルが適用される', () => {
       render(<Dialog {...defaultProps} variant="danger" />);
       const confirmBtn = screen.getByRole('button', { name: 'OK' });
-      expect(confirmBtn.className).toContain('bg-red-600');
+      expect(confirmBtn.className).toContain('bg-danger');
     });
 
     it('dangerバリアントで警告アイコンが表示される', () => {
       const { container } = render(<Dialog {...defaultProps} variant="danger" />);
       // Warning アイコンのコンテナが存在することを確認
-      const iconContainer = container.querySelector('.rounded-full.bg-red-100');
+      const iconContainer = container.querySelector('.rounded-full.bg-danger-subtle');
       expect(iconContainer).toBeInTheDocument();
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモード時のタイトルスタイルが適用される', () => {
-      render(<Dialog {...defaultProps} isChristmasMode />);
-      const title = screen.getByText('テストダイアログ');
-      expect(title.className).toContain('text-white');
-    });
-
-    it('クリスマスモード + defaultバリアントのボタンスタイル', () => {
-      render(<Dialog {...defaultProps} isChristmasMode variant="default" />);
-      const confirmBtn = screen.getByRole('button', { name: 'OK' });
-      expect(confirmBtn.className).toContain('bg-[#d4af37]');
-    });
-
-    it('クリスマスモード + dangerバリアントのボタンスタイル', () => {
-      render(<Dialog {...defaultProps} isChristmasMode variant="danger" />);
-      const confirmBtn = screen.getByRole('button', { name: 'OK' });
-      expect(confirmBtn.className).toContain('bg-red-700');
-    });
-
-    it('クリスマスモード時のキャンセルボタンスタイル', () => {
-      render(<Dialog {...defaultProps} isChristmasMode />);
-      const cancelBtn = screen.getByRole('button', { name: 'キャンセル' });
-      expect(cancelBtn.className).toContain('bg-white/10');
     });
   });
 

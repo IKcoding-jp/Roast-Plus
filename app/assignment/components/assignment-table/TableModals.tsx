@@ -46,7 +46,6 @@ type TableModalsProps = {
     onDeleteMember: (memberId: string) => Promise<void>;
     onDeleteTaskLabel: (taskLabelId: string) => Promise<void>;
     onUpdateTableSettings: (settings: TableSettings) => Promise<void>;
-    isChristmasMode?: boolean;
 };
 
 export const TableModals: React.FC<TableModalsProps> = ({
@@ -84,7 +83,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
     onDeleteMember,
     onDeleteTaskLabel,
     onUpdateTableSettings,
-    isChristmasMode = false,
 }) => {
     const headerLabels = tableSettings?.headerLabels ?? DEFAULT_TABLE_SETTINGS.headerLabels;
     const formatTeamTitle = (teamName?: string) => {
@@ -108,14 +106,10 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className={`rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden ${
-                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-                            }`}
+                            className="rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden bg-surface border border-edge"
                         >
-                            <div className={`px-4 py-3 flex items-center justify-between ${
-                                isChristmasMode ? 'bg-white/5 border-b border-[#d4af37]/20' : 'bg-gray-50 border-b border-gray-100'
-                            }`}>
-                                <h3 className={`font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                            <div className="px-4 py-3 flex items-center justify-between bg-ground border-b border-edge">
+                                <h3 className="font-bold text-ink">
                                     {(() => {
                                         const team = teams.find(t => t.id === contextMenu.teamId);
                                         const title = formatTeamTitle(team?.name);
@@ -127,7 +121,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setContextMenu(null)}
-                                    isChristmasMode={isChristmasMode}
                                 >
                                     <MdClose size={20} />
                                 </IconButton>
@@ -136,14 +129,13 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             <div className="p-4 space-y-4">
                                 {contextMenu.memberId ? (
                                     <div className="space-y-2">
-                                        <label className={`text-xs font-bold ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
+                                        <label className="text-xs font-bold text-ink-sub">
                                             メンバー名
                                         </label>
                                         <div className="flex gap-2">
                                             <Input
                                                 value={editingMemberName}
                                                 onChange={(e) => setEditingMemberName(e.target.value)}
-                                                isChristmasMode={isChristmasMode}
                                                 className="flex-1 !py-2"
                                             />
                                             <Button
@@ -156,7 +148,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                     }
                                                 }}
                                                 disabled={!editingMemberName.trim()}
-                                                isChristmasMode={isChristmasMode}
                                                 className="!px-3"
                                             >
                                                 <MdCheck size={20} />
@@ -164,12 +155,12 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className={`text-center py-2 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
+                                    <div className="text-center py-2 text-ink-muted">
                                         メンバーが割り当てられていません
                                     </div>
                                 )}
 
-                                <div className={`pt-4 grid gap-2 ${isChristmasMode ? 'border-t border-[#d4af37]/20' : 'border-t border-gray-100'}`}>
+                                <div className="pt-4 grid gap-2 border-t border-edge">
                                     <Button
                                         variant="ghost"
                                         size="md"
@@ -177,10 +168,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                             setShowMemberMenu({ taskLabelId: contextMenu.taskLabelId, teamId: contextMenu.teamId });
                                             setContextMenu(null);
                                         }}
-                                        isChristmasMode={isChristmasMode}
-                                        className={`!justify-start !gap-3 !p-3 ${
-                                            isChristmasMode ? '!bg-white/5 hover:!bg-white/10' : '!bg-gray-50 hover:!bg-gray-100'
-                                        }`}
+                                        className="!justify-start !gap-3 !p-3 !bg-ground hover:!bg-ground/80"
                                     >
                                         <MdPerson size={20} />
                                         <span className="text-sm font-bold">メンバーを変更・追加</span>
@@ -194,12 +182,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                 await onUpdateMember({ teamId: contextMenu.teamId, taskLabelId: contextMenu.taskLabelId, memberId: null, assignedDate: '' }, null);
                                                 setContextMenu(null);
                                             }}
-                                            isChristmasMode={isChristmasMode}
-                                            className={`!justify-start !gap-3 !p-3 ${
-                                                isChristmasMode
-                                                    ? '!bg-white/5 hover:!bg-red-500/10 !text-red-400'
-                                                    : '!bg-gray-50 hover:!bg-red-50 !text-red-600'
-                                            }`}
+                                            className="!justify-start !gap-3 !p-3 !bg-ground hover:!bg-red-50 !text-red-600"
                                         >
                                             <MdPersonOff size={20} />
                                             <span className="text-sm font-bold">未割り当てにする</span>
@@ -207,20 +190,15 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     )}
 
                                     {contextMenu.memberId && (
-                                        <div className={`rounded-lg overflow-hidden mt-2 ${
-                                            isChristmasMode ? 'border border-[#d4af37]/20' : 'border border-gray-200'
-                                        }`}>
+                                        <div className="rounded-lg overflow-hidden mt-2 border border-edge">
                                             <Button
                                                 variant="ghost"
                                                 size="md"
                                                 onClick={() => setIsExclusionSettingsOpen(!isExclusionSettingsOpen)}
-                                                isChristmasMode={isChristmasMode}
-                                                className={`!w-full !justify-between !gap-3 !p-3 !rounded-none ${
-                                                    isChristmasMode ? '!bg-white/5 hover:!bg-white/10' : '!bg-gray-50 hover:!bg-gray-100'
-                                                }`}
+                                                className="!w-full !justify-between !gap-3 !p-3 !rounded-none !bg-ground hover:!bg-ground/80"
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <MdBlock size={20} className={isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'} />
+                                                    <MdBlock size={20} className="text-ink-muted" />
                                                     <span className="text-sm font-bold">除外ラベル設定</span>
                                                 </div>
                                                 {isExclusionSettingsOpen ? <MdKeyboardArrowDown size={20} /> : <MdKeyboardArrowRight size={20} />}
@@ -232,10 +210,10 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                         initial={{ height: 0, opacity: 0 }}
                                                         animate={{ height: 'auto', opacity: 1 }}
                                                         exit={{ height: 0, opacity: 0 }}
-                                                        className={`overflow-hidden ${isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white'}`}
+                                                        className="overflow-hidden bg-surface"
                                                     >
-                                                        <div className={`p-2 ${isChristmasMode ? 'border-t border-[#d4af37]/20' : 'border-t border-gray-200'}`}>
-                                                            <div className={`text-xs mb-2 px-1 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
+                                                        <div className="p-2 border-t border-edge">
+                                                            <div className="text-xs mb-2 px-1 text-ink-muted">
                                                                 チェックした作業には割り当てられません
                                                             </div>
                                                             <div className="max-h-40 overflow-y-auto space-y-1">
@@ -249,8 +227,8 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                                             className={`
                                                                                 flex items-center gap-3 p-2 rounded cursor-pointer transition-colors
                                                                                 ${isExcluded
-                                                                                    ? isChristmasMode ? 'bg-red-500/10' : 'bg-red-50'
-                                                                                    : isChristmasMode ? 'hover:bg-white/5' : 'hover:bg-gray-50'
+                                                                                    ? 'bg-red-50'
+                                                                                    : 'hover:bg-ground'
                                                                                 }
                                                                             `}
                                                                         >
@@ -263,11 +241,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                                                             await onUpdateMemberExclusion(contextMenu.memberId, label.id, e.target.checked);
                                                                                         }
                                                                                     }}
-                                                                                    className={`appearance-none w-5 h-5 border rounded checked:bg-red-500 checked:border-red-500 transition-colors cursor-pointer ${
-                                                                                        isChristmasMode
-                                                                                            ? 'border-[#d4af37]/40 focus:ring-2 focus:ring-red-400/20'
-                                                                                            : 'border-gray-300 focus:ring-2 focus:ring-red-200'
-                                                                                    }`}
+                                                                                    className="appearance-none w-5 h-5 border rounded checked:bg-red-500 checked:border-red-500 transition-colors cursor-pointer border-edge-strong focus:ring-2 focus:ring-red-200"
                                                                                 />
                                                                                 {isExcluded && (
                                                                                     <MdClose className="absolute text-white pointer-events-none" size={14} />
@@ -276,16 +250,16 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                                             <div className="text-sm flex-1 truncate">
                                                                                 <span className={
                                                                                     isExcluded
-                                                                                        ? isChristmasMode ? 'text-red-400 font-medium' : 'text-red-700 font-medium'
-                                                                                        : isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
+                                                                                        ? 'text-red-700 font-medium'
+                                                                                        : 'text-ink'
                                                                                 }>
                                                                                     {label.leftLabel}
                                                                                 </span>
                                                                                 {label.rightLabel && (
                                                                                     <span className={`ml-1 text-xs ${
                                                                                         isExcluded
-                                                                                            ? isChristmasMode ? 'text-red-400/70' : 'text-red-500'
-                                                                                            : isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'
+                                                                                            ? 'text-red-500'
+                                                                                            : 'text-ink-muted'
                                                                                     }`}>
                                                                                         ({label.rightLabel})
                                                                                     </span>
@@ -323,12 +297,10 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className={`rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10 ${
-                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-                            }`}
+                            className="rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10 bg-surface border border-edge"
                         >
                             <div className="flex justify-between items-center mb-4">
-                                <div className={`text-sm font-bold ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
+                                <div className="text-sm font-bold text-ink-sub">
                                     {(() => {
                                         const team = teams.find(t => t.id === showMemberMenu.teamId);
                                         const title = formatTeamTitle(team?.name);
@@ -340,19 +312,17 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setShowMemberMenu(null)}
-                                    isChristmasMode={isChristmasMode}
                                 >
                                     <MdClose />
                                 </IconButton>
                             </div>
 
                             {/* 新規追加 */}
-                            <div className={`flex gap-2 mb-4 pb-4 ${isChristmasMode ? 'border-b border-[#d4af37]/20' : 'border-b border-gray-100'}`}>
+                            <div className="flex gap-2 mb-4 pb-4 border-b border-edge">
                                 <Input
                                     placeholder="新規メンバー名"
                                     value={newMemberName}
                                     onChange={e => setNewMemberName(e.target.value)}
-                                    isChristmasMode={isChristmasMode}
                                     className="flex-1 !py-2 !text-sm"
                                 />
                                 <Button
@@ -360,7 +330,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     size="sm"
                                     onClick={() => handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId)}
                                     disabled={!newMemberName.trim()}
-                                    isChristmasMode={isChristmasMode}
                                     className="!px-3"
                                 >
                                     <MdAdd size={20} />
@@ -381,10 +350,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                     onUpdateMember({ teamId: showMemberMenu.teamId, taskLabelId: showMemberMenu.taskLabelId, memberId: null, assignedDate: '' }, m.id);
                                                     setShowMemberMenu(null);
                                                 }}
-                                                isChristmasMode={isChristmasMode}
-                                                className={`flex-1 !justify-start !text-left ${
-                                                    isChristmasMode ? 'hover:!bg-white/10' : 'hover:!bg-gray-100'
-                                                }`}
+                                                className="flex-1 !justify-start !text-left hover:!bg-ground"
                                             >
                                                 {m.name}
                                             </Button>
@@ -397,7 +363,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                         await onDeleteMember(m.id);
                                                     }
                                                 }}
-                                                isChristmasMode={isChristmasMode}
                                                 title="メンバーを削除"
                                             >
                                                 <MdDelete size={20} />
@@ -426,11 +391,9 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className={`rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10 ${
-                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-                            }`}
+                            className="rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10 bg-surface border border-edge"
                         >
-                            <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                            <h3 className="text-lg font-bold mb-4 text-ink">
                                 班の編集
                             </h3>
 
@@ -439,7 +402,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     label="班名"
                                     value={activeTeamName}
                                     onChange={e => setActiveTeamName(e.target.value)}
-                                    isChristmasMode={isChristmasMode}
                                 />
                             </div>
 
@@ -456,7 +418,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                         newSettings.colWidths.teams[activeTeamActionId] = val;
                                         await onUpdateTableSettings(newSettings);
                                     }}
-                                    isChristmasMode={isChristmasMode}
                                 />
                             </div>
 
@@ -466,7 +427,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     size="md"
                                     fullWidth
                                     onClick={handleUpdateTeamFromModal}
-                                    isChristmasMode={isChristmasMode}
                                 >
                                     更新する
                                 </Button>
@@ -475,10 +435,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     size="md"
                                     fullWidth
                                     onClick={handleDeleteTeamFromModal}
-                                    isChristmasMode={isChristmasMode}
-                                    className={`!flex !items-center !justify-center !gap-2 ${
-                                        isChristmasMode ? '!bg-red-500/10 !text-red-400 hover:!bg-red-500/20' : '!bg-gray-100 hover:!bg-red-50'
-                                    }`}
+                                    className="!flex !items-center !justify-center !gap-2 !bg-ground hover:!bg-red-50"
                                 >
                                     <MdDelete size={20} />
                                     この班を削除
@@ -488,7 +445,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     size="sm"
                                     fullWidth
                                     onClick={() => setActiveTeamActionId(null)}
-                                    isChristmasMode={isChristmasMode}
                                 >
                                     キャンセル
                                 </Button>
@@ -509,11 +465,9 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className={`rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 ${
-                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-                            }`}
+                            className="rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 bg-surface border border-edge"
                         >
-                            <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                            <h3 className="text-lg font-bold mb-4 text-ink">
                                 {widthConfig.label}
                             </h3>
                             {(widthConfig.type === 'taskLabel' || widthConfig.type === 'note') && (
@@ -524,7 +478,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                         onChange={e => setWidthConfig({ ...widthConfig, currentTitle: e.target.value })}
                                         placeholder={`${widthConfig.type === 'taskLabel' ? '左' : '右'}ラベル名`}
                                         onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
-                                        isChristmasMode={isChristmasMode}
                                     />
                                 </div>
                             )}
@@ -535,7 +488,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     onChange={e => setWidthConfig({ ...widthConfig, currentWidth: parseInt(e.target.value) || 0 })}
                                     autoFocus
                                     onKeyDown={e => e.key === 'Enter' && handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
-                                    isChristmasMode={isChristmasMode}
                                 />
                             </div>
                             <div className="flex gap-2">
@@ -543,7 +495,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     variant="ghost"
                                     size="md"
                                     onClick={() => setWidthConfig(null)}
-                                    isChristmasMode={isChristmasMode}
                                     className="flex-1"
                                 >
                                     キャンセル
@@ -552,7 +503,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     variant="primary"
                                     size="md"
                                     onClick={() => handleSaveWidth(widthConfig.currentWidth, widthConfig.currentTitle)}
-                                    isChristmasMode={isChristmasMode}
                                     className="flex-1"
                                 >
                                     保存
@@ -574,11 +524,9 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className={`rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 ${
-                                isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-                            }`}
+                            className="rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 bg-surface border border-edge"
                         >
-                            <h3 className={`text-lg font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                            <h3 className="text-lg font-bold mb-4 text-ink">
                                 {heightConfig.label}
                             </h3>
 
@@ -588,10 +536,9 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     value={heightConfig.currentName}
                                     onChange={e => setHeightConfig({ ...heightConfig, currentName: e.target.value })}
                                     placeholder={heightConfig.editMode === 'left' ? `${headerLabels.left}を入力` : `${headerLabels.right}を入力（任意）`}
-                                    isChristmasMode={isChristmasMode}
                                 />
                                 {heightConfig.editMode === 'right' && (
-                                    <p className={`text-xs mt-1 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
+                                    <p className="text-xs mt-1 text-ink-muted">
                                         {headerLabels.right}は任意です。空欄にすると削除されます。
                                     </p>
                                 )}
@@ -604,7 +551,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     value={heightConfig.currentHeight}
                                     onChange={e => setHeightConfig({ ...heightConfig, currentHeight: parseInt(e.target.value) || 0 })}
                                     onKeyDown={e => e.key === 'Enter' && handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
-                                    isChristmasMode={isChristmasMode}
                                 />
                             </div>
 
@@ -618,10 +564,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                             setHeightConfig(null);
                                         }
                                     }}
-                                    isChristmasMode={isChristmasMode}
-                                    className={`flex-1 !flex !items-center !justify-center !gap-1 ${
-                                        isChristmasMode ? '!bg-red-500/10 hover:!bg-red-500/20' : '!bg-gray-100 hover:!bg-red-50'
-                                    }`}
+                                    className="flex-1 !flex !items-center !justify-center !gap-1 !bg-ground hover:!bg-red-50"
                                 >
                                     <MdDelete size={18} />
                                     削除
@@ -630,7 +573,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setHeightConfig(null)}
-                                    isChristmasMode={isChristmasMode}
                                     className="flex-1"
                                 >
                                     キャンセル
@@ -639,7 +581,6 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     variant="primary"
                                     size="sm"
                                     onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
-                                    isChristmasMode={isChristmasMode}
                                     className="flex-1"
                                 >
                                     保存

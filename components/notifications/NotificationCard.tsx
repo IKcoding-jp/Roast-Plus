@@ -9,7 +9,6 @@ interface NotificationCardProps {
   isFirst: boolean;
   isLast: boolean;
   isDeveloperMode: boolean;
-  isChristmasMode?: boolean;
   onEdit: (notification: Notification) => void;
   onDelete: (id: string) => void;
   onMoveUp: (id: string) => void;
@@ -63,14 +62,13 @@ export function NotificationCard({
   isFirst,
   isLast,
   isDeveloperMode,
-  isChristmasMode = false,
   onEdit,
   onDelete,
   onMoveUp,
   onMoveDown,
 }: NotificationCardProps) {
   return (
-    <Card variant="hoverable" isChristmasMode={isChristmasMode} className="p-6">
+    <Card variant="hoverable" className="p-6">
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
           {/* 開発者モード時のみ表示:上/下移動ボタン */}
@@ -79,7 +77,7 @@ export function NotificationCard({
               <button
                 onClick={() => onMoveUp(notification.id)}
                 disabled={isFirst}
-                className={`p-1 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
+                className={`p-1 text-ink-muted hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
                   isFirst ? 'opacity-30 cursor-not-allowed' : ''
                 }`}
                 aria-label="上に移動"
@@ -89,7 +87,7 @@ export function NotificationCard({
               <button
                 onClick={() => onMoveDown(notification.id)}
                 disabled={isLast}
-                className={`p-1 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
+                className={`p-1 text-ink-muted hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
                   isLast ? 'opacity-30 cursor-not-allowed' : ''
                 }`}
                 aria-label="下に移動"
@@ -101,21 +99,21 @@ export function NotificationCard({
           <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(notification.type)}`}>
             {getTypeLabel(notification.type)}
           </span>
-          <span className={`text-sm ${isChristmasMode ? 'text-gray-400' : 'text-gray-500'}`}>{formatDate(notification.date)}</span>
+          <span className="text-sm text-ink-muted">{formatDate(notification.date)}</span>
         </div>
         {/* 開発者モード時のみ表示:編集・削除ボタン */}
         {isDeveloperMode && (
           <div className="flex items-center gap-2">
             <button
               onClick={() => onEdit(notification)}
-              className="p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded transition-colors"
+              className="p-2 text-ink-sub hover:text-orange-500 hover:bg-orange-50 rounded transition-colors"
               aria-label="編集"
             >
               <IoCreateOutline className="h-5 w-5" />
             </button>
             <button
               onClick={() => onDelete(notification.id)}
-              className="p-2 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+              className="p-2 text-ink-sub hover:text-red-500 hover:bg-red-50 rounded transition-colors"
               aria-label="削除"
             >
               <IoTrashOutline className="h-5 w-5" />
@@ -123,8 +121,8 @@ export function NotificationCard({
           </div>
         )}
       </div>
-      <h2 className={`text-lg font-semibold mb-2 ${isChristmasMode ? 'text-white' : 'text-gray-800'}`}>{notification.title}</h2>
-      <p className={`whitespace-pre-wrap ${isChristmasMode ? 'text-gray-300' : 'text-gray-600'}`}>{notification.content}</p>
+      <h2 className="text-lg font-semibold mb-2 text-ink">{notification.title}</h2>
+      <p className="whitespace-pre-wrap text-ink-sub">{notification.content}</p>
     </Card>
   );
 }

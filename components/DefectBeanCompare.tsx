@@ -13,14 +13,12 @@ interface DefectBeanCompareProps {
   defectBeans: DefectBean[];
   settings: { [id: string]: { shouldRemove: boolean } };
   onClose: () => void;
-  isChristmasMode?: boolean;
 }
 
 export function DefectBeanCompare({
   defectBeans,
   settings,
   onClose,
-  isChristmasMode = false,
 }: DefectBeanCompareProps) {
   if (defectBeans.length === 0) {
     return null;
@@ -31,22 +29,15 @@ export function DefectBeanCompare({
       show={true}
       onClose={onClose}
       closeOnBackdropClick={true}
-      contentClassName={`rounded-lg max-w-7xl w-full max-h-[90vh] overflow-y-auto ${
-        isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white'
-      }`}
+      contentClassName="rounded-lg max-w-7xl w-full max-h-[90vh] overflow-y-auto bg-surface"
     >
       {/* ヘッダー */}
-      <div className={`sticky top-0 p-4 flex items-center justify-between z-10 border-b ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border-[#d4af37]/20'
-          : 'bg-white border-gray-200'
-      }`}>
-        <h2 className={`text-xl font-semibold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+      <div className="sticky top-0 p-4 flex items-center justify-between z-10 border-b bg-surface border-edge">
+        <h2 className="text-xl font-semibold text-ink">
           比較 ({defectBeans.length}件)
         </h2>
         <IconButton
           onClick={onClose}
-          isChristmasMode={isChristmasMode}
           rounded
           aria-label="閉じる"
         >
@@ -68,11 +59,7 @@ export function DefectBeanCompare({
           {defectBeans.map((defectBean) => (
             <div
               key={defectBean.id}
-              className={`rounded-lg p-4 sm:p-5 border max-h-[85vh] overflow-y-auto overflow-x-hidden flex flex-col ${
-                isChristmasMode
-                  ? 'bg-white/5 border-[#d4af37]/20'
-                  : 'bg-gray-50 border-gray-200'
-              }`}
+              className="rounded-lg p-4 sm:p-5 border max-h-[85vh] overflow-y-auto overflow-x-hidden flex flex-col bg-ground border-edge"
             >
               <DefectBeanDetail
                 defectBean={defectBean}

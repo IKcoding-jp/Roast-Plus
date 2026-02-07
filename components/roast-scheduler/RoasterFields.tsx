@@ -17,7 +17,6 @@ interface RoasterFieldsProps {
   onBlendRatio2Change: (value: string) => void;
   onWeightChange: (value: 200 | 300 | 500 | '') => void;
   onRoastLevelChange: (value: '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | '') => void;
-  isChristmasMode?: boolean;
 }
 
 const WEIGHT_OPTIONS = [
@@ -46,7 +45,6 @@ export function RoasterFields({
   onBlendRatio2Change,
   onWeightChange,
   onRoastLevelChange,
-  isChristmasMode = false,
 }: RoasterFieldsProps) {
   // 豆の選択肢を生成
   const beanOptions = useMemo(
@@ -96,16 +94,14 @@ export function RoasterFields({
   };
 
   return (
-    <div className={`space-y-3 md:space-y-4 border-t pt-3 md:pt-4 ${
-      isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
-    }`}>
+    <div className="space-y-3 md:space-y-4 border-t pt-3 md:pt-4 border-edge">
       <Select
         label="豆の名前"
         value={beanName}
         onChange={handleBeanNameChange}
         options={beanOptions}
         placeholder="選択してください"
-        isChristmasMode={isChristmasMode}
+
       />
 
       <Select
@@ -114,14 +110,12 @@ export function RoasterFields({
         onChange={handleBeanName2Change}
         options={bean2Options}
         placeholder="なし"
-        isChristmasMode={isChristmasMode}
+
       />
 
       {beanName2 && (
         <div>
-          <div className={`mb-1 md:mb-2 block text-base md:text-lg font-medium ${
-            isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
-          }`}>
+          <div className="mb-1 md:mb-2 block text-base md:text-lg font-medium text-ink-sub">
             ブレンド割合 <span className="text-red-500">*</span>
           </div>
           <div className="grid grid-cols-2 gap-2 md:gap-3">
@@ -132,7 +126,7 @@ export function RoasterFields({
               min={0}
               max={10}
               placeholder="5"
-              isChristmasMode={isChristmasMode}
+      
             />
             <NumberInput
               label={`${beanName2}の割合`}
@@ -141,12 +135,10 @@ export function RoasterFields({
               min={0}
               max={10}
               placeholder="5"
-              isChristmasMode={isChristmasMode}
+      
             />
           </div>
-          <p className={`mt-1 md:mt-2 text-sm md:text-base ${
-            isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'
-          }`}>
+          <p className="mt-1 md:mt-2 text-sm md:text-base text-ink-muted">
             合計が10になるように入力してください（例：5と5、8と2）
           </p>
         </div>
@@ -158,7 +150,7 @@ export function RoasterFields({
         onChange={(e) => onWeightChange(e.target.value ? (parseInt(e.target.value, 10) as 200 | 300 | 500) : '')}
         options={WEIGHT_OPTIONS}
         placeholder="選択してください"
-        isChristmasMode={isChristmasMode}
+
       />
 
       <Select
@@ -167,7 +159,7 @@ export function RoasterFields({
         onChange={(e) => onRoastLevelChange(e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り' | '')}
         options={ROAST_LEVEL_OPTIONS}
         placeholder="選択してください"
-        isChristmasMode={isChristmasMode}
+
       />
     </div>
   );

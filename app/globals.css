@@ -37,6 +37,25 @@
     --spot-hover: #b45309;
     --spot-subtle: #fef3c7;
     --spot-surface: #fffbeb;
+    /* ボタン */
+    --btn-primary: #d97706;
+    --btn-primary-hover: #b45309;
+    /* ステータスカラー */
+    --danger: #dc2626;
+    --danger-subtle: #fee2e2;
+    --success: #16a34a;
+    --success-subtle: #dcfce7;
+    --warning: #eab308;
+    --warning-subtle: #fef9c3;
+    --info: #00b8d4;
+    --info-hover: #00a0b8;
+    /* エラー */
+    --error: #ef4444;
+    --error-ring: #fee2e2;
+    /* シャドウ */
+    --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+    --card-glow: 0 10px 30px rgba(0,0,0,0.04);
   }
 
   [data-theme="christmas"] {
@@ -52,12 +71,31 @@
     --ink-muted: rgba(248, 241, 231, 0.5);
     /* ボーダー */
     --edge: rgba(212, 175, 55, 0.2);
-    --edge-strong: rgba(212, 175, 55, 0.3);
+    --edge-strong: rgba(212, 175, 55, 0.4);
     /* アクセント */
     --spot: #d4af37;
     --spot-hover: #e8c65f;
     --spot-subtle: rgba(212, 175, 55, 0.15);
     --spot-surface: rgba(212, 175, 55, 0.05);
+    /* ボタン */
+    --btn-primary: #6d1a1a;
+    --btn-primary-hover: #8b2323;
+    /* ステータスカラー */
+    --danger: #991b1b;
+    --danger-subtle: rgba(127,29,29,0.5);
+    --success: #166534;
+    --success-subtle: rgba(20,83,45,0.5);
+    --warning: #d4af37;
+    --warning-subtle: rgba(113,63,18,0.5);
+    --info: #0097a7;
+    --info-hover: #00838f;
+    /* エラー */
+    --error: #f87171;
+    --error-ring: rgba(248,113,113,0.2);
+    /* シャドウ */
+    --card-shadow: 0 0 15px rgba(212,175,55,0.1);
+    --card-shadow-hover: 0 0 20px rgba(212,175,55,0.15);
+    --card-glow: 0 20px 50px rgba(0,0,0,0.3);
   }
 }
 
@@ -90,6 +128,21 @@
   --color-spot-hover: var(--spot-hover);
   --color-spot-subtle: var(--spot-subtle);
   --color-spot-surface: var(--spot-surface);
+  /* ボタン */
+  --color-btn-primary: var(--btn-primary);
+  --color-btn-primary-hover: var(--btn-primary-hover);
+  /* ステータスカラー */
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-info: var(--info);
+  --color-info-hover: var(--info-hover);
+  /* エラー */
+  --color-error: var(--error);
+  --color-error-ring: var(--error-ring);
   /* フォント */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -97,6 +150,17 @@
 }
 
 /* stylelint-enable at-rule-no-unknown */
+
+/* テーマ対応カスタムユーティリティ */
+@layer utilities {
+  .shadow-card { box-shadow: var(--card-shadow); }
+  .shadow-card-hover { box-shadow: var(--card-shadow-hover); }
+  .shadow-card-glow { box-shadow: var(--card-glow); }
+  .tab-active { background-color: var(--surface); color: var(--ink); }
+  [data-theme="christmas"] .tab-active { background-color: var(--spot-subtle); color: var(--spot); }
+  .select-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); }
+  [data-theme="christmas"] .select-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d4af37'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); }
+}
 
 @media (prefers-color-scheme: dark) {
   :root {

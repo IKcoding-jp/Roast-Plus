@@ -11,29 +11,23 @@
  * @example
  * // フォームでの使用例
  * import { Button, Input, Select, Textarea } from '@/components/ui';
- * import { useChristmasMode } from '@/hooks/useChristmasMode';
  *
  * function MyForm() {
- *   const { isChristmasMode } = useChristmasMode();
- *
  *   return (
  *     <form>
  *       <Input
  *         label="名前"
  *         placeholder="入力してください"
- *         isChristmasMode={isChristmasMode}
  *       />
  *       <Select
  *         label="カテゴリ"
  *         options={[{ value: '1', label: 'オプション1' }]}
- *         isChristmasMode={isChristmasMode}
  *       />
  *       <Textarea
  *         label="メモ"
  *         rows={4}
- *         isChristmasMode={isChristmasMode}
  *       />
- *       <Button type="submit" isChristmasMode={isChristmasMode}>
+ *       <Button type="submit">
  *         送信
  *       </Button>
  *     </form>

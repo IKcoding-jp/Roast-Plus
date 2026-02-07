@@ -72,13 +72,13 @@ describe('ProgressBar', () => {
     it('defaultバリアントのスタイルが適用される', () => {
       const { container } = render(<ProgressBar value={50} variant="default" />);
       const bar = container.querySelector('[style*="width"]');
-      expect(bar).toHaveClass('bg-gray-500');
+      expect(bar).toHaveClass('bg-ink-muted');
     });
 
     it('primaryバリアントのスタイルが適用される', () => {
       const { container } = render(<ProgressBar value={50} variant="primary" />);
       const bar = container.querySelector('[style*="width"]');
-      expect(bar).toHaveClass('bg-amber-500');
+      expect(bar).toHaveClass('bg-spot');
     });
 
     it('successバリアントのスタイルが適用される', () => {
@@ -134,29 +134,6 @@ describe('ProgressBar', () => {
       const { container } = render(<ProgressBar value={50} animated={false} />);
       const bar = container.querySelector('[style*="width"]');
       expect(bar).not.toHaveClass('transition-all');
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモードのトラックスタイルが適用される', () => {
-      render(<ProgressBar value={50} isChristmasMode />);
-      expect(screen.getByRole('progressbar')).toHaveClass('bg-white/10');
-    });
-
-    it('クリスマスモード + primaryバリアントのバースタイルが適用される', () => {
-      const { container } = render(<ProgressBar value={50} variant="primary" isChristmasMode />);
-      const bar = container.querySelector('[style*="width"]');
-      expect(bar).toHaveClass('bg-[#d4af37]');
-    });
-
-    it('クリスマスモードのラベルスタイルが適用される', () => {
-      render(<ProgressBar value={50} label="進捗" isChristmasMode />);
-      expect(screen.getByText('進捗').className).toContain('text-[#f8f1e7]');
-    });
-
-    it('クリスマスモードの値スタイルが適用される', () => {
-      render(<ProgressBar value={50} showValue isChristmasMode />);
-      expect(screen.getByText('50%').className).toContain('text-[#f8f1e7]/70');
     });
   });
 

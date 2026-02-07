@@ -132,48 +132,7 @@ describe('Accordion', () => {
         </Accordion>
       );
 
-      expect(screen.getByRole('button').className).toContain('text-gray-900');
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモードのAccordionスタイルが適用される', () => {
-      const { container } = render(
-        <Accordion isChristmasMode>
-          <AccordionItem>
-            <AccordionTrigger>セクション1</AccordionTrigger>
-            <AccordionContent>コンテンツ1</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      );
-
-      expect(container.firstChild).toHaveClass('divide-[#d4af37]/20');
-    });
-
-    it('クリスマスモードのトリガースタイルが適用される', () => {
-      render(
-        <Accordion isChristmasMode>
-          <AccordionItem>
-            <AccordionTrigger>セクション1</AccordionTrigger>
-            <AccordionContent>コンテンツ1</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      );
-
-      expect(screen.getByRole('button').className).toContain('text-[#f8f1e7]');
-    });
-
-    it('クリスマスモードのコンテンツスタイルが適用される', () => {
-      render(
-        <Accordion isChristmasMode>
-          <AccordionItem defaultOpen>
-            <AccordionTrigger>セクション1</AccordionTrigger>
-            <AccordionContent>コンテンツ1</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      );
-
-      expect(screen.getByText('コンテンツ1').className).toContain('text-[#f8f1e7]/80');
+      expect(screen.getByRole('button').className).toContain('text-ink');
     });
   });
 

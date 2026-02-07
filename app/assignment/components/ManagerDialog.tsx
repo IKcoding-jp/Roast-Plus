@@ -11,7 +11,6 @@ interface ManagerDialogProps {
   onClose: () => void;
   onSave: (name: string) => Promise<void>;
   onDelete: () => Promise<void>;
-  isChristmasMode?: boolean;
 }
 
 export function ManagerDialog({
@@ -20,7 +19,6 @@ export function ManagerDialog({
   onClose,
   onSave,
   onDelete,
-  isChristmasMode = false,
 }: ManagerDialogProps) {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +34,7 @@ export function ManagerDialog({
 
   const handleSave = async () => {
     if (!name.trim()) return;
-    
+
     setIsLoading(true);
     try {
       await onSave(name.trim());
@@ -50,7 +48,7 @@ export function ManagerDialog({
 
   const handleDelete = async () => {
     if (!manager) return;
-    
+
     const confirmed = window.confirm('管理者を削除しますか？');
     if (!confirmed) return;
 
@@ -77,21 +75,18 @@ export function ManagerDialog({
       onClick={onClose}
     >
       <div
-        className={`rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl ${
-          isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-        }`}
+        className="rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl bg-surface border border-edge"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className={`text-lg font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+          <h2 className="text-lg font-bold text-ink">
             {manager ? '管理者を編集' : '管理者を追加'}
           </h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            isChristmasMode={isChristmasMode}
             className="!p-1 !min-h-0"
             aria-label="閉じる"
           >
@@ -110,7 +105,6 @@ export function ManagerDialog({
             placeholder="管理者の名前を入力"
             autoFocus
             disabled={isLoading}
-            isChristmasMode={isChristmasMode}
           />
         </div>
 
@@ -122,7 +116,6 @@ export function ManagerDialog({
               size="md"
               onClick={handleDelete}
               disabled={isLoading}
-              isChristmasMode={isChristmasMode}
               className="flex-1"
             >
               削除
@@ -134,7 +127,6 @@ export function ManagerDialog({
             onClick={handleSave}
             disabled={isLoading || !name.trim()}
             loading={isLoading}
-            isChristmasMode={isChristmasMode}
             className="flex-1"
           >
             {manager ? '更新' : '追加'}
@@ -144,4 +136,3 @@ export function ManagerDialog({
     </div>
   );
 }
-

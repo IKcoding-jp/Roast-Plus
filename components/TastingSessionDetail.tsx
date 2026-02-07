@@ -9,7 +9,6 @@ import { getRecordsBySessionId } from '@/lib/tastingUtils';
 import { Coffee } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
 import { Card, RoastLevelBadge } from '@/components/ui';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionDetailProps {
   session: TastingSession;
@@ -25,7 +24,6 @@ export function TastingSessionDetail({
   const router = useRouter();
   const { user } = useAuth();
   const { showToast } = useToastContext();
-  const { isChristmasMode } = useChristmasMode();
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
   const tastingRecords = Array.isArray(data.tastingRecords)
@@ -122,19 +120,19 @@ export function TastingSessionDetail({
   return (
     <div className="space-y-8 max-w-2xl mx-auto">
       {/* ヘッダーカード */}
-      <Card isChristmasMode={isChristmasMode} className="p-6">
+      <Card className="p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-2xl ${isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50'}`}>
-              <Coffee size={32} weight="fill" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-700'} />
+            <div className="p-3 rounded-2xl bg-spot-subtle">
+              <Coffee size={32} weight="fill" className="text-spot" />
             </div>
             <div>
-              <h2 className={`text-2xl font-black tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+              <h2 className="text-2xl font-black tracking-tight text-ink">
                 {session.beanName}
               </h2>
               <div className="flex items-center gap-2 mt-1">
-                <RoastLevelBadge level={session.roastLevel} size="sm" isChristmasMode={isChristmasMode} />
-                <span className={`text-sm font-medium ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'}`}>
+                <RoastLevelBadge level={session.roastLevel} size="sm" />
+                <span className="text-sm font-medium text-ink-muted">
                   {new Date(session.createdAt).toLocaleDateString('ja-JP')}
                 </span>
               </div>

@@ -115,8 +115,8 @@ describe('Tabs', () => {
         </Tabs>
       );
 
-      expect(screen.getByRole('tab', { name: 'タブ1' }).className).toContain('bg-white');
-      expect(screen.getByRole('tab', { name: 'タブ2' }).className).toContain('text-gray-600');
+      expect(screen.getByRole('tab', { name: 'タブ1' }).className).toContain('tab-active');
+      expect(screen.getByRole('tab', { name: 'タブ2' }).className).toContain('text-ink-sub');
     });
   });
 
@@ -147,47 +147,6 @@ describe('Tabs', () => {
       );
 
       expect(screen.getAllByRole('tabpanel')).toHaveLength(1);
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモードのTabsListスタイルが適用される', () => {
-      render(
-        <Tabs defaultValue="tab1" isChristmasMode>
-          <TabsList>
-            <TabsTrigger value="tab1">タブ1</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      );
-
-      expect(screen.getByRole('tablist').className).toContain('bg-white/10');
-    });
-
-    it('クリスマスモードの選択タブスタイルが適用される', () => {
-      render(
-        <Tabs defaultValue="tab1" isChristmasMode>
-          <TabsList>
-            <TabsTrigger value="tab1">タブ1</TabsTrigger>
-            <TabsTrigger value="tab2">タブ2</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      );
-
-      expect(screen.getByRole('tab', { name: 'タブ1' }).className).toContain('bg-[#d4af37]/20');
-      expect(screen.getByRole('tab', { name: 'タブ1' }).className).toContain('text-[#d4af37]');
-    });
-
-    it('クリスマスモードの非選択タブスタイルが適用される', () => {
-      render(
-        <Tabs defaultValue="tab1" isChristmasMode>
-          <TabsList>
-            <TabsTrigger value="tab1">タブ1</TabsTrigger>
-            <TabsTrigger value="tab2">タブ2</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      );
-
-      expect(screen.getByRole('tab', { name: 'タブ2' }).className).toContain('text-[#f8f1e7]/70');
     });
   });
 

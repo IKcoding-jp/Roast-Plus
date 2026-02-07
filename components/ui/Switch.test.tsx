@@ -84,33 +84,6 @@ describe('Switch', () => {
     });
   });
 
-  describe('クリスマスモード', () => {
-    it('クリスマスモードON + checked=trueのスタイルが適用される', () => {
-      render(<Switch isChristmasMode checked onChange={() => {}} />);
-      expect(screen.getByRole('switch').className).toContain('bg-[#d4af37]');
-    });
-
-    it('クリスマスモードON + checked=falseのスタイルが適用される', () => {
-      render(<Switch isChristmasMode checked={false} onChange={() => {}} />);
-      expect(screen.getByRole('switch').className).toContain('bg-white/20');
-    });
-
-    it('通常モード + checked=trueのスタイルが適用される', () => {
-      render(<Switch isChristmasMode={false} checked onChange={() => {}} />);
-      expect(screen.getByRole('switch').className).toContain('bg-amber-600');
-    });
-
-    it('通常モード + checked=falseのスタイルが適用される', () => {
-      render(<Switch isChristmasMode={false} checked={false} onChange={() => {}} />);
-      expect(screen.getByRole('switch').className).toContain('bg-gray-300');
-    });
-
-    it('クリスマスモード時のラベルスタイルが適用される', () => {
-      render(<Switch label="テスト" isChristmasMode />);
-      expect(screen.getByText('テスト').className).toContain('text-[#f8f1e7]');
-    });
-  });
-
   describe('カスタムクラス', () => {
     it('classNameでコンテナに追加のスタイルを指定できる', () => {
       const { container } = render(<Switch className="custom-class" />);

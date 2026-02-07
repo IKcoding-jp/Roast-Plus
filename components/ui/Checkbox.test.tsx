@@ -45,11 +45,6 @@ describe('Checkbox', () => {
       expect(description.className).toContain('text-sm');
     });
 
-    it('クリスマスモード時のdescriptionスタイルが適用される', () => {
-      render(<Checkbox label="通知" description="説明文" isChristmasMode />);
-      const description = screen.getByText('説明文');
-      expect(description.className).toContain('text-[#f8f1e7]');
-    });
   });
 
   describe('disabled状態', () => {
@@ -61,23 +56,6 @@ describe('Checkbox', () => {
     it('disabled時はスタイルが適用される', () => {
       render(<Checkbox disabled />);
       expect(screen.getByRole('checkbox').className).toContain('opacity-50');
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモード時はクリスマススタイルが適用される', () => {
-      render(<Checkbox isChristmasMode />);
-      expect(screen.getByRole('checkbox').className).toContain('border-[#d4af37]');
-    });
-
-    it('通常モード時は通常スタイルが適用される', () => {
-      render(<Checkbox isChristmasMode={false} />);
-      expect(screen.getByRole('checkbox').className).toContain('border-gray-300');
-    });
-
-    it('クリスマスモード時のラベルスタイルが適用される', () => {
-      render(<Checkbox label="テスト" isChristmasMode />);
-      expect(screen.getByText('テスト').className).toContain('text-[#f8f1e7]');
     });
   });
 

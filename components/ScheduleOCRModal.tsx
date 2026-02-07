@@ -9,7 +9,6 @@ import { HiX, HiPhotograph, HiCamera } from 'react-icons/hi';
 import { useToastContext } from './Toast';
 import { useAppData } from '@/hooks/useAppData';
 import { useScheduleImageProcessing } from '@/hooks/useScheduleImageProcessing';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { Button, IconButton } from '@/components/ui';
 
 interface ScheduleOCRModalProps {
@@ -19,7 +18,6 @@ interface ScheduleOCRModalProps {
 }
 
 export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: ScheduleOCRModalProps) {
-  const { isChristmasMode } = useChristmasMode();
   const { showToast } = useToastContext();
   const { data } = useAppData();
   const [showCamera, setShowCamera] = useState(false);
@@ -93,15 +91,9 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   if (!showCamera && !isProcessing && !error && !showConfirm) {
     return (
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-        <div className={`rounded-lg p-6 max-w-sm w-full mx-4 ${
-          isChristmasMode
-            ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-            : 'bg-white'
-        }`}>
+        <div className="rounded-lg p-6 max-w-sm w-full mx-4 bg-surface border border-edge">
           <div className="flex items-center justify-between mb-4">
-            <h2 className={`text-lg font-semibold ${
-              isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-            }`}>画像を選択</h2>
+            <h2 className="text-lg font-semibold text-ink">画像を選択</h2>
             <IconButton
               variant="ghost"
               size="md"
@@ -109,7 +101,6 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
                 handleReset();
                 onCancel();
               }}
-              isChristmasMode={isChristmasMode}
               rounded
             >
               <HiX className="h-5 w-5" />
@@ -120,7 +111,6 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
               variant="primary"
               size="lg"
               onClick={() => setShowCamera(true)}
-              isChristmasMode={isChristmasMode}
               className="w-full"
             >
               <HiCamera className="h-5 w-5 mr-2" />
@@ -130,7 +120,6 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
               variant="secondary"
               size="lg"
               onClick={() => fileInputRef.current?.click()}
-              isChristmasMode={isChristmasMode}
               className="w-full"
             >
               <HiPhotograph className="h-5 w-5 mr-2" />
@@ -163,17 +152,11 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   if (isProcessing) {
     return (
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className={`rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl ${
-          isChristmasMode
-            ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-            : 'bg-white'
-        }`}>
+        <div className="rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl bg-surface border border-edge">
           <div className="text-center">
             {/* 画像プレビュー */}
             {imagePreview && (
-              <div className={`mb-6 rounded-lg overflow-hidden border-2 ${
-                isChristmasMode ? 'border-[#d4af37]/30 bg-white/5' : 'border-amber-200 bg-gray-50'
-              }`}>
+              <div className="mb-6 rounded-lg overflow-hidden border-2 border-edge bg-ground">
                 <Image
                   src={imagePreview}
                   alt="解析中の画像"
@@ -188,23 +171,15 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
             {/* スピナー */}
             <div className="flex justify-center mb-4">
               <div className="relative">
-                <div className={`w-12 h-12 border-4 rounded-full animate-spin ${
-                  isChristmasMode
-                    ? 'border-[#d4af37]/20 border-t-[#d4af37]'
-                    : 'border-amber-200 border-t-amber-600'
-                }`}></div>
+                <div className="w-12 h-12 border-4 rounded-full animate-spin border-spot/20 border-t-spot"></div>
               </div>
             </div>
 
             {/* メッセージ */}
-            <p className={`text-lg font-medium mb-1 ${
-              isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-            }`}>
+            <p className="text-lg font-medium mb-1 text-ink">
               画像を解析中...
             </p>
-            <p className={`text-sm ${
-              isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'
-            }`}>
+            <p className="text-sm text-ink-muted">
               しばらくお待ちください
             </p>
           </div>
@@ -216,15 +191,9 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   if (error) {
     return (
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-        <div className={`rounded-lg p-6 max-w-sm w-full mx-4 ${
-          isChristmasMode
-            ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-            : 'bg-white'
-        }`}>
+        <div className="rounded-lg p-6 max-w-sm w-full mx-4 bg-surface border border-edge">
           <div className="flex items-center justify-between mb-4">
-            <h2 className={`text-lg font-semibold ${
-              isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-            }`}>エラー</h2>
+            <h2 className="text-lg font-semibold text-ink">エラー</h2>
             <IconButton
               variant="ghost"
               size="md"
@@ -232,15 +201,12 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
                 handleReset();
                 onCancel();
               }}
-              isChristmasMode={isChristmasMode}
               rounded
             >
               <HiX className="h-5 w-5" />
             </IconButton>
           </div>
-          <div className={`mb-4 whitespace-pre-wrap break-words ${
-            isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-700'
-          }`}>{error}</div>
+          <div className="mb-4 whitespace-pre-wrap break-words text-ink">{error}</div>
           <div className="flex gap-2">
             <Button
               variant="primary"
@@ -249,7 +215,6 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
                 resetState();
                 setShowCamera(false);
               }}
-              isChristmasMode={isChristmasMode}
               className="flex-1"
             >
               再試行
@@ -261,7 +226,6 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
                 resetState();
                 onCancel();
               }}
-              isChristmasMode={isChristmasMode}
               className="flex-1"
             >
               キャンセル

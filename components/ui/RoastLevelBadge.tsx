@@ -17,10 +17,6 @@ import { forwardRef } from 'react';
  * <RoastLevelBadge level="深煎り" size="sm" />
  * <RoastLevelBadge level="深煎り" size="md" />
  * <RoastLevelBadge level="深煎り" size="lg" />
- *
- * @example
- * // クリスマスモード（通常と同じ色を使用するがshadowが追加される）
- * <RoastLevelBadge level="深煎り" isChristmasMode={isChristmasMode} />
  */
 
 export type RoastLevel = '深煎り' | '中深煎り' | '中煎り' | '浅煎り';
@@ -30,8 +26,6 @@ export interface RoastLevelBadgeProps extends Omit<React.HTMLAttributes<HTMLSpan
   level: RoastLevel | string;
   /** サイズ */
   size?: 'sm' | 'md' | 'lg';
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 // 焙煎度ごとの背景色（コーヒー豆の色を再現）
@@ -46,7 +40,7 @@ const ROAST_COLORS: Record<string, { bg: string; text: string }> = {
 const DEFAULT_COLOR = { bg: '#6B7280', text: '#FFFFFF' };
 
 export const RoastLevelBadge = forwardRef<HTMLSpanElement, RoastLevelBadgeProps>(
-  ({ level, size = 'md', isChristmasMode = false, className = '', ...props }, ref) => {
+  ({ level, size = 'md', className = '', ...props }, ref) => {
     // サイズスタイル
     const sizeStyles = {
       sm: 'px-2 py-0.5 text-[9px]',
@@ -57,13 +51,10 @@ export const RoastLevelBadge = forwardRef<HTMLSpanElement, RoastLevelBadgeProps>
     // 焙煎度の色を取得
     const colors = ROAST_COLORS[level] || DEFAULT_COLOR;
 
-    // クリスマスモードでは少し光沢感を追加
-    const christmasShadow = isChristmasMode ? 'shadow-md ring-1 ring-[#d4af37]/20' : 'shadow-sm';
-
     const badgeStyles = [
       'inline-flex items-center font-bold rounded-full uppercase tracking-wider',
       sizeStyles[size],
-      christmasShadow,
+      'shadow-sm',
       className,
     ].filter(Boolean).join(' ');
 

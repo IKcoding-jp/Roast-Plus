@@ -7,10 +7,9 @@ interface CompletionDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onContinue: () => void;
-  isChristmasMode: boolean;
 }
 
-export function CompletionDialog({ isOpen, onClose, onContinue, isChristmasMode }: CompletionDialogProps) {
+export function CompletionDialog({ isOpen, onClose, onContinue }: CompletionDialogProps) {
   useEffect(() => {
     if (isOpen) {
       // ダイアログが開いた時にフォーカスを管理
@@ -29,15 +28,15 @@ export function CompletionDialog({ isOpen, onClose, onContinue, isChristmasMode 
   if (!isOpen) return null;
 
   return (
-    <Modal show={isOpen} onClose={onClose} contentClassName={`rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 ${isChristmasMode ? 'bg-[#0a2818]' : 'bg-white'}`}>
-      <h2 className={`text-xl sm:text-2xl font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 bg-surface">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-ink">
         もうすぐ焙煎が完了します。
       </h2>
-      <p className={`text-base sm:text-lg mb-6 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+      <p className="text-base sm:text-lg mb-6 text-ink-sub">
         タッパーと木べらを持って焙煎室に行きましょう。
       </p>
       <div className="flex gap-3 sm:gap-4 justify-end">
-        <Button variant="primary" size="md" onClick={onContinue} isChristmasMode={isChristmasMode}>
+        <Button variant="primary" size="md" onClick={onContinue}>
           OK
         </Button>
       </div>
@@ -50,7 +49,6 @@ interface ContinuousRoastDialogProps {
   onClose: () => void;
   onYes: () => void;
   onNo: () => void;
-  isChristmasMode: boolean;
 }
 
 export function ContinuousRoastDialog({
@@ -58,7 +56,6 @@ export function ContinuousRoastDialog({
   onClose,
   onYes,
   onNo,
-  isChristmasMode,
 }: ContinuousRoastDialogProps) {
   useEffect(() => {
     if (isOpen) {
@@ -75,11 +72,11 @@ export function ContinuousRoastDialog({
   if (!isOpen) return null;
 
   return (
-    <Modal show={isOpen} onClose={onClose} contentClassName={`rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full mx-4 ${isChristmasMode ? 'bg-[#0a2818]' : 'bg-white'}`}>
-      <h2 className={`text-xl sm:text-2xl font-bold mb-4 whitespace-nowrap ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full mx-4 bg-surface">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 whitespace-nowrap text-ink">
         続けて焙煎しますか？
       </h2>
-      <p className={`text-base sm:text-lg mb-6 whitespace-nowrap ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+      <p className="text-base sm:text-lg mb-6 whitespace-nowrap text-ink-sub">
         焙煎機が温かいうちに次の焙煎が可能です。
       </p>
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -88,7 +85,6 @@ export function ContinuousRoastDialog({
           size="md"
           onClick={onYes}
           className="flex-1 sm:flex-none order-1 sm:order-2 whitespace-nowrap"
-          isChristmasMode={isChristmasMode}
         >
           続けて焙煎する
         </Button>
@@ -97,7 +93,6 @@ export function ContinuousRoastDialog({
           size="md"
           onClick={onNo}
           className="flex-1 sm:flex-none order-2 sm:order-1 whitespace-nowrap"
-          isChristmasMode={isChristmasMode}
         >
           アフターパージ
         </Button>
@@ -110,10 +105,9 @@ interface AfterPurgeDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onRecord: () => void;
-  isChristmasMode: boolean;
 }
 
-export function AfterPurgeDialog({ isOpen, onClose, onRecord, isChristmasMode }: AfterPurgeDialogProps) {
+export function AfterPurgeDialog({ isOpen, onClose, onRecord }: AfterPurgeDialogProps) {
   useEffect(() => {
     if (isOpen) {
       const handleEscape = (e: KeyboardEvent) => {
@@ -129,18 +123,18 @@ export function AfterPurgeDialog({ isOpen, onClose, onRecord, isChristmasMode }:
   if (!isOpen) return null;
 
   return (
-    <Modal show={isOpen} onClose={onClose} contentClassName={`rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 ${isChristmasMode ? 'bg-[#0a2818]' : 'bg-white'}`}>
-      <h2 className={`text-xl sm:text-2xl font-bold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 bg-surface">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-ink">
         お疲れ様でした！
       </h2>
-      <p className={`text-base sm:text-lg mb-6 whitespace-pre-line ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+      <p className="text-base sm:text-lg mb-6 whitespace-pre-line text-ink-sub">
         機械をアフターパージに設定してください。{'\n'}焙煎時間の記録ができます。
       </p>
       <div className="flex gap-3 sm:gap-4 justify-end">
-        <Button variant="secondary" size="md" onClick={onClose} isChristmasMode={isChristmasMode}>
+        <Button variant="secondary" size="md" onClick={onClose}>
           閉じる
         </Button>
-        <Button variant="primary" size="md" onClick={onRecord} isChristmasMode={isChristmasMode}>
+        <Button variant="primary" size="md" onClick={onRecord}>
           記録に進む
         </Button>
       </div>

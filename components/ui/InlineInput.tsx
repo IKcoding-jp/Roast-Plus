@@ -16,11 +16,10 @@ import { forwardRef } from 'react';
  * />
  *
  * @example
- * // クリスマスモード
+ * // ダークバリアント
  * <InlineInput
  *   value={value}
  *   onChange={handleChange}
- *   isChristmasMode={isChristmasMode}
  *   variant="dark"
  * />
  */
@@ -30,8 +29,6 @@ export interface InlineInputProps extends React.InputHTMLAttributes<HTMLInputEle
   variant?: 'light' | 'dark';
   /** テキストの配置 */
   textAlign?: 'left' | 'center' | 'right';
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
@@ -39,7 +36,6 @@ export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
     {
       variant = 'light',
       textAlign = 'center',
-      isChristmasMode = false,
       className = '',
       ...props
     },
@@ -53,29 +49,15 @@ export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
       right: 'text-right',
     };
 
-    // 通常モード - ライト背景用
-    const normalLightStyles = 'bg-white border-gray-300 text-gray-900 focus:border-primary focus:ring-1 focus:ring-primary';
-
-    // 通常モード - ダーク背景用
-    const normalDarkStyles = 'bg-white border-primary text-gray-900 focus:ring-2 focus:ring-primary/20';
-
-    // クリスマスモード - ライト背景用
-    const christmasLightStyles = 'bg-white/10 border-[#d4af37]/40 text-[#f8f1e7] focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/30';
-
-    // クリスマスモード - ダーク背景用
-    const christmasDarkStyles = 'bg-[#1a1a1a] border-[#d4af37] text-[#f8f1e7] focus:ring-2 focus:ring-[#d4af37]/30';
-
-    const getVariantStyles = () => {
-      if (isChristmasMode) {
-        return variant === 'dark' ? christmasDarkStyles : christmasLightStyles;
-      }
-      return variant === 'dark' ? normalDarkStyles : normalLightStyles;
+    const variantStyles = {
+      light: 'bg-field border-edge-strong text-ink focus:border-spot focus:ring-1 focus:ring-spot',
+      dark: 'bg-field border-spot text-ink focus:ring-2 focus:ring-spot/20',
     };
 
     const inputStyles = [
       baseStyles,
       textAlignStyles[textAlign],
-      getVariantStyles(),
+      variantStyles[variant],
       className,
     ].filter(Boolean).join(' ');
 

@@ -65,7 +65,7 @@ describe('Input', () => {
 
     it('エラー時はエラースタイルが適用される', () => {
       render(<Input error="エラー" />);
-      expect(screen.getByRole('textbox').className).toContain('border-red-500');
+      expect(screen.getByRole('textbox').className).toContain('border-error');
     });
   });
 
@@ -92,28 +92,6 @@ describe('Input', () => {
     it('type=passwordでshowPasswordToggle=falseの場合はトグルボタンが表示されない', () => {
       render(<Input type="password" showPasswordToggle={false} />);
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモード時はクリスマススタイルが適用される', () => {
-      render(<Input isChristmasMode />);
-      expect(screen.getByRole('textbox').className).toContain('border-[#d4af37]');
-    });
-
-    it('通常モード時は通常スタイルが適用される', () => {
-      render(<Input isChristmasMode={false} />);
-      expect(screen.getByRole('textbox').className).toContain('border-gray-200');
-    });
-
-    it('クリスマスモード時のラベルスタイルが適用される', () => {
-      render(<Input label="テスト" isChristmasMode />);
-      expect(screen.getByText('テスト').className).toContain('text-[#f8f1e7]');
-    });
-
-    it('クリスマスモード時のエラースタイルが適用される', () => {
-      render(<Input error="エラー" isChristmasMode />);
-      expect(screen.getByRole('textbox').className).toContain('border-red-400');
     });
   });
 

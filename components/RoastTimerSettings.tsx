@@ -16,10 +16,9 @@ import type { SelectOption } from '@/components/ui';
 
 interface RoastTimerSettingsProps {
   onClose: () => void;
-  isChristmasMode: boolean;
 }
 
-export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSettingsProps) {
+export function RoastTimerSettings({ onClose }: RoastTimerSettingsProps) {
   const { showToast } = useToastContext();
   const [settings, setSettings] = useState<RoastTimerSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -153,8 +152,8 @@ export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSetti
   }
 
   return (
-    <div className={`rounded-lg shadow-md p-4 sm:p-6 ${isChristmasMode ? 'bg-[#0a2818]' : 'bg-white'}`}>
-      <h2 className={`text-xl sm:text-2xl font-bold mb-6 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>タイマー設定</h2>
+    <div className="rounded-lg shadow-md p-4 sm:p-6 bg-surface">
+      <h2 className="text-xl sm:text-2xl font-bold mb-6 text-ink">タイマー設定</h2>
 
       <div className="space-y-6">
         {/* 焙煎室に行くまでの時間 */}
@@ -169,16 +168,15 @@ export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSetti
                 goToRoastRoomTimeSeconds: parseInt(e.target.value, 10) || 60,
               })
             }
-            isChristmasMode={isChristmasMode}
           />
-          <p className={`mt-1 text-xs sm:text-sm ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
+          <p className="mt-1 text-xs sm:text-sm text-ink-muted">
             おすすめ焙煎タイマーで使用される時間です。平均焙煎時間からこの秒数を引いた値がおすすめタイマー時間として提案されます。
           </p>
         </div>
 
         {/* タイマー音の設定 */}
-        <div className={`border-t pt-6 ${isChristmasMode ? 'border-[#f8f1e7]/20' : ''}`}>
-          <h3 className={`text-lg font-semibold mb-4 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>タイマー音</h3>
+        <div className="border-t pt-6 border-edge">
+          <h3 className="text-lg font-semibold mb-4 text-ink">タイマー音</h3>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -191,23 +189,21 @@ export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSetti
                     timerSoundEnabled: e.target.checked,
                   })
                 }
-                isChristmasMode={isChristmasMode}
-              />
+                  />
               {settings.timerSoundEnabled && (
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={handleTestSound}
                   disabled={isTestingSound}
-                  isChristmasMode={isChristmasMode}
-                >
+                      >
                   {isTestingSound ? '再生中...' : 'テスト'}
                 </Button>
               )}
             </div>
 
             {settings.timerSoundEnabled && testResult && (
-              <p className={`text-xs sm:text-sm ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>{testResult}</p>
+              <p className="text-xs sm:text-sm text-ink-sub">{testResult}</p>
             )}
 
             {settings.timerSoundEnabled && (
@@ -221,13 +217,12 @@ export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSetti
                   })
                 }
                 options={roastTimerSoundFiles as SelectOption[]}
-                isChristmasMode={isChristmasMode}
-              />
+                  />
             )}
 
             {settings.timerSoundEnabled && (
               <div className="pt-2">
-                <label className={`block text-sm sm:text-base font-medium mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+                <label className="block text-sm sm:text-base font-medium mb-2 text-ink">
                   音量: {Math.round(settings.timerSoundVolume * 100)}%
                 </label>
                 <input
@@ -242,7 +237,7 @@ export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSetti
                       timerSoundVolume: parseFloat(e.target.value),
                     })
                   }
-                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${isChristmasMode ? 'bg-[#f8f1e7]/20' : 'bg-gray-200'}`}
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-ground"
                 />
               </div>
             )}
@@ -250,12 +245,11 @@ export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSetti
         </div>
       </div>
 
-      <div className={`flex gap-3 sm:gap-4 justify-end mt-6 pt-6 border-t ${isChristmasMode ? 'border-[#f8f1e7]/20' : ''}`}>
+      <div className="flex gap-3 sm:gap-4 justify-end mt-6 pt-6 border-t border-edge">
         <Button
           variant="secondary"
           size="md"
           onClick={onClose}
-          isChristmasMode={isChristmasMode}
         >
           キャンセル
         </Button>
@@ -264,7 +258,6 @@ export function RoastTimerSettings({ onClose, isChristmasMode }: RoastTimerSetti
           size="md"
           onClick={handleSave}
           disabled={isSaving}
-          isChristmasMode={isChristmasMode}
         >
           {isSaving ? '保存中...' : '保存'}
         </Button>

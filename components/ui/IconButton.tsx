@@ -18,8 +18,8 @@ import { forwardRef } from 'react';
  * <IconButton size="lg"><MdAdd /></IconButton>
  *
  * @example
- * // バリアントとクリスマスモード
- * <IconButton variant="danger" isChristmasMode={isChristmasMode}>
+ * // バリアント
+ * <IconButton variant="danger">
  *   <MdDelete />
  * </IconButton>
  */
@@ -31,8 +31,6 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   size?: 'sm' | 'md' | 'lg';
   /** 丸いボタン（完全な円形） */
   rounded?: boolean;
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
@@ -41,7 +39,6 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       variant = 'default',
       size = 'md',
       rounded = false,
-      isChristmasMode = false,
       className = '',
       disabled,
       children,
@@ -56,28 +53,17 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       lg: 'p-3',
     };
 
-    // 通常モードのバリアントスタイル
-    const normalVariantStyles = {
-      default: 'text-gray-500 hover:text-gray-700 hover:bg-gray-100',
-      primary: 'text-primary hover:text-primary-dark hover:bg-primary/10',
-      danger: 'text-red-500 hover:text-red-700 hover:bg-red-50',
-      success: 'text-green-500 hover:text-green-700 hover:bg-green-50',
-      ghost: 'text-gray-400 hover:text-gray-600 hover:bg-gray-50',
+    // バリアントスタイル（CSS変数ベース）
+    const variantStyles = {
+      default: 'text-ink-sub hover:text-ink hover:bg-ground',
+      primary: 'text-spot hover:text-spot-hover hover:bg-spot-surface',
+      danger: 'text-danger hover:text-danger/80 hover:bg-danger-subtle',
+      success: 'text-success hover:text-success/80 hover:bg-success-subtle',
+      ghost: 'text-ink-muted hover:text-ink-sub hover:bg-ground',
     };
-
-    // クリスマスモードのバリアントスタイル
-    const christmasVariantStyles = {
-      default: 'text-[#f8f1e7]/70 hover:text-[#f8f1e7] hover:bg-white/10',
-      primary: 'text-[#d4af37] hover:text-[#e8c65f] hover:bg-[#d4af37]/10',
-      danger: 'text-red-400 hover:text-red-300 hover:bg-red-500/10',
-      success: 'text-green-400 hover:text-green-300 hover:bg-green-500/10',
-      ghost: 'text-[#f8f1e7]/50 hover:text-[#f8f1e7]/70 hover:bg-white/5',
-    };
-
-    const variantStyles = isChristmasMode ? christmasVariantStyles : normalVariantStyles;
 
     const baseStyles = 'inline-flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-    const focusRingStyles = isChristmasMode ? 'focus:ring-[#d4af37]/50' : 'focus:ring-amber-500/50';
+    const focusRingStyles = 'focus:ring-spot/50';
     const borderRadiusStyles = rounded ? 'rounded-full' : 'rounded-lg';
     const disabledStyles = 'opacity-50 cursor-not-allowed';
 

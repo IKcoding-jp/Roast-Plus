@@ -7,10 +7,8 @@ import { MdHistory } from 'react-icons/md';
 import type { ChangelogEntryType } from '@/types';
 import { ChangeTypeFilter, ChangelogTimeline } from '@/components/changelog';
 import { DETAILED_CHANGELOG } from '@/data/dev-stories/detailed-changelog';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 export default function ChangelogPage() {
-  const { isChristmasMode } = useChristmasMode();
   const [selectedTypes, setSelectedTypes] = useState<ChangelogEntryType[]>([]);
 
   const handleToggleType = (type: ChangelogEntryType) => {
@@ -36,8 +34,7 @@ export default function ChangelogPage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-20 sm:pb-8"
-      style={{ backgroundColor: '#F7F7F5' }}
+      className="min-h-screen flex flex-col px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-20 sm:pb-8 bg-page"
     >
       <div className="max-w-3xl mx-auto w-full flex flex-col flex-1">
         {/* ヘッダー */}
@@ -74,7 +71,7 @@ export default function ChangelogPage() {
 
         {/* メインコンテンツ */}
         <main className="flex-1">
-          <ChangelogTimeline entries={filteredEntries} isChristmasMode={isChristmasMode} />
+          <ChangelogTimeline entries={filteredEntries} />
         </main>
 
         {/* フッター */}

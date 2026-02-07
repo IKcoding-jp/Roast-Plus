@@ -199,19 +199,21 @@ npm run test     # テスト（Vitest導入後）
 ### 新機能開発の流れ
 
 ```
-1. /issue-creator
+1. /issue-creator（ハイブリッド型）
+   - 規模判定 → 規模に応じた調査 → Issue作成
+   - AIが規模に応じてWorking Documents生成を判断
    ↓
-2. Issue作成 + /create-spec 自動実行（Working生成）
-   ↓
-3. /fix-issue
-   - Phase 1.5: Working確認
-   - Phase 4: EnterPlanMode（複雑な実装のみ）
-   - Phase 5-10: 実装・検証・PR
-   - Phase 11.5: Steering更新ドラフト
-   ↓
-4. PR マージ
-   ↓
-5. Steering更新承認・コミット
+2. /fix-issue（11フェーズ・確認ポイント3つ）
+   - Phase 1: Working読み込み
+   - Phase 3: Issue説明（エンジニア初心者向け、コードなし）🔹①
+   - Phase 4: 計画（毎回ユーザー承認）🔹②
+   - Phase 5: 実装
+   - Phase 6: 要件確認（承認ループ）🔹③
+   - Phase 7: 検証（自動）
+   - Phase 8: 動作確認（手動/自動選択）
+   - Phase 9: 独立レビュー（別AIエージェント）
+   - Phase 10: Steering更新
+   - Phase 11: コミット→PR→自動マージ（全自動）
 ```
 
 ### セッション途中の引き継ぎ
@@ -228,19 +230,18 @@ npm run test     # テスト（Vitest導入後）
 
 | スキル | タイミング | 役割 |
 |--------|-----------|------|
-| **/issue-creator** | 作業開始時 | Issue作成 + Working生成提案 |
-| **/create-spec** | Issue作成後 | Working Documents自動生成 |
-| **/fix-issue** | 実装開始時 | Phase 1.5でWorking確認、Phase 11.5でSteering更新 |
+| **/issue-creator** | 作業開始時 | Issue作成 + 規模に応じてWorking生成 |
+| **/create-spec** | 手動実行時 | 既存IssueへのWorking Documents生成 |
+| **/fix-issue** | 実装開始時 | Working読込→実装→独立レビュー→PR→自動マージ |
 | **/git-workflow** | コミット時 | Workingからスコープ自動抽出 |
 | **/project-maintenance** | 定期実行時 | リファクタリングIssue + Working自動生成 |
 
 ## Development Flow
 1. **Issue作成** → 機能追加・修正の起点（Claudeが作成）
-2. **ブランチ作成** → `feature/#123-xxx`（または `feat/#123-xxx`）、`fix/#123-xxx`
-3. **実装・動作確認**
-4. **コミット＆プッシュ**
-5. **PR作成** → `Closes #123` を含める
-6. **mainにマージ**
+2. **ブランチ作成** → `feat/#123-xxx`、`fix/#123-xxx`
+3. **実装 → 要件確認（承認ループ）**
+4. **検証（自動） → 動作確認（選択式） → 独立レビュー**
+5. **コミット → PR作成 → 自動マージ（CI通過後）**
 
 ⚠️ **mainブランチへの直接コミット禁止**
 
@@ -280,7 +281,7 @@ npm run test     # テスト（Vitest導入後）
 
 **重要な設計判断を行った際**:
 1. 該当するSteering Documentを更新（FEATURES.md, TECH_SPEC.md等）
-2. PR完了後、fix-issue Phase 11.5で更新ドラフトを生成
+2. PR作成前、fix-issue Phase 10で更新ドラフトを生成
 3. ユーザー承認後にコミット
 
 ## Ignored Directories

@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft, HiPlus } from 'react-icons/hi';
+import { HiPlus } from 'react-icons/hi';
 import { RiBookFill } from 'react-icons/ri';
 import { MdCompareArrows } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import { useDefectBeans } from '@/hooks/useDefectBeans';
 import { useDefectBeanSettings } from '@/hooks/useDefectBeanSettings';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useToastContext } from '@/components/Toast';
+import { Button, BackLink } from '@/components/ui';
 import { DefectBeanCard } from '@/components/DefectBeanCard';
 import { DefectBeanForm } from '@/components/DefectBeanForm';
 import { DefectBeanCompare } from '@/components/DefectBeanCompare';
@@ -28,6 +29,7 @@ export default function DefectBeansPage() {
   const { allDefectBeans, isLoading, addDefectBean, updateDefectBean, removeDefectBean } = useDefectBeans();
   const { settings, updateSetting } = useDefectBeanSettings();
   const { isEnabled: isDeveloperModeEnabled } = useDeveloperMode();
+  const { isChristmasMode } = useChristmasMode();
   const { showToast } = useToastContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOption, setFilterOption] = useState<FilterOption>('all');
@@ -226,7 +228,7 @@ export default function DefectBeansPage() {
   );
 
   return (
-    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8 transition-colors duration-1000" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
       <div className="max-w-7xl mx-auto">
         {/* ヘッダー */}
         <header className="mb-4">
@@ -234,20 +236,17 @@ export default function DefectBeansPage() {
           <div className="flex sm:grid sm:grid-cols-3 items-center justify-between mb-3">
             {/* 左側: 戻る */}
             <div className="flex justify-start">
-              <Link
+              <BackLink
                 href="/"
-                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                title="戻る"
-                aria-label="戻る"
-              >
-                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-              </Link>
+                variant="icon-only"
+                isChristmasMode={isChristmasMode}
+              />
             </div>
 
             {/* 中央: タイトル */}
             <div className="flex justify-center items-center gap-2 sm:gap-3 min-w-0">
-              <RiBookFill className="hidden sm:block h-7 w-7 sm:h-8 sm:w-8 text-amber-600 flex-shrink-0" />
-              <h1 className="hidden sm:block text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 whitespace-nowrap">
+              <RiBookFill className={`hidden sm:block h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0 ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'}`} />
+              <h1 className={`hidden sm:block text-lg sm:text-xl lg:text-2xl font-bold whitespace-nowrap ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
                 コーヒー豆図鑑
               </h1>
             </div>
@@ -264,39 +263,46 @@ export default function DefectBeansPage() {
                       showSortMenu={showSortMenu}
                       onToggleMenu={() => setShowSortMenu(!showSortMenu)}
                       onClose={() => setShowSortMenu(false)}
+                      isChristmasMode={isChristmasMode}
                     />
                   )}
-                  <button
+                  <Button
+                    variant={compareMode ? 'primary' : 'surface'}
+                    size="sm"
                     onClick={toggleCompareMode}
-                    className={`px-3 py-2 text-sm rounded-lg transition-colors min-h-[44px] flex items-center gap-1.5 ${compareMode
-                      ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-md'
-                      : 'bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50'
-                      }`}
+                    isChristmasMode={isChristmasMode}
                     title={compareMode ? '選択モード' : '比較モード'}
+                    className="!px-3 !py-2 gap-1.5"
                   >
                     <MdCompareArrows className="h-5 w-5" />
                     <span className="text-xs sm:text-sm">
                       {compareMode ? '選択モード' : '比較'}
                     </span>
-                  </button>
+                  </Button>
                   {compareMode && selectedIds.size > 0 && (
-                    <button
+                    <Button
+                      variant="primary"
+                      size="sm"
                       onClick={handleShowCompare}
-                      className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center gap-1.5 shadow-md"
+                      isChristmasMode={isChristmasMode}
                       title="比較を表示"
+                      className="!px-3 !py-2 gap-1.5"
                     >
                       比較 ({selectedIds.size})
-                    </button>
+                    </Button>
                   )}
                   {!compareMode && (
-                    <button
+                    <Button
+                      variant="primary"
+                      size="sm"
                       onClick={() => setShowAddForm(true)}
-                      className="px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors min-h-[44px] flex items-center gap-1.5 shadow-md"
+                      isChristmasMode={isChristmasMode}
                       title="欠点豆を追加"
+                      className="!px-3 !py-2 gap-1.5"
                     >
                       <HiPlus className="h-5 w-5" />
                       <span className="text-xs sm:text-sm">追加</span>
-                    </button>
+                    </Button>
                   )}
                 </>
               )}
@@ -311,6 +317,7 @@ export default function DefectBeansPage() {
             onSearchChange={setSearchQuery}
             filterOption={filterOption}
             onFilterChange={setFilterOption}
+            isChristmasMode={isChristmasMode}
           />
         )}
 
@@ -319,6 +326,7 @@ export default function DefectBeansPage() {
           <EmptyState
             hasSearchOrFilter={!!(searchQuery || filterOption !== 'all')}
             onAddClick={() => setShowAddForm(true)}
+            isChristmasMode={isChristmasMode}
           />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -333,6 +341,7 @@ export default function DefectBeansPage() {
                   onToggleSetting={handleToggleSetting}
                   onEdit={!compareMode ? handleEditDefectBean : undefined}
                   compareMode={compareMode}
+                  isChristmasMode={isChristmasMode}
                 />
               );
             })}
@@ -345,6 +354,7 @@ export default function DefectBeansPage() {
             mode="add"
             onSubmit={handleAddDefectBean}
             onCancel={() => setShowAddForm(false)}
+            isChristmasMode={isChristmasMode}
           />
         )}
 
@@ -361,6 +371,7 @@ export default function DefectBeansPage() {
               onUpdate={handleUpdateDefectBean}
               onDelete={isDeveloperModeEnabled ? handleDeleteDefectBeanFromEdit : undefined}
               onCancel={() => setEditingDefectBeanId(null)}
+              isChristmasMode={isChristmasMode}
             />
           );
         })()}
@@ -375,6 +386,7 @@ export default function DefectBeansPage() {
               setSelectedIds(new Set());
               setCompareMode(false);
             }}
+            isChristmasMode={isChristmasMode}
           />
         )}
       </div>

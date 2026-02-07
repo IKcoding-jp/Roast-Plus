@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react';
 import { HiCheckCircle } from 'react-icons/hi';
 import { MdSort, MdArrowUpward, MdArrowDownward } from 'react-icons/md';
+import { Button } from '@/components/ui';
 
 type SortOption = 'default' | 'createdAtDesc' | 'createdAtAsc' | 'nameAsc' | 'nameDesc';
 
@@ -12,6 +13,7 @@ interface SortMenuProps {
   showSortMenu: boolean;
   onToggleMenu: () => void;
   onClose: () => void;
+  isChristmasMode?: boolean;
 }
 
 const SORT_OPTIONS: SortOption[] = ['default', 'createdAtDesc', 'createdAtAsc', 'nameAsc', 'nameDesc'];
@@ -47,6 +49,7 @@ export function SortMenu({
   showSortMenu,
   onToggleMenu,
   onClose,
+  isChristmasMode = false,
 }: SortMenuProps) {
   const sortMenuRef = useRef<HTMLDivElement>(null);
 
@@ -69,21 +72,24 @@ export function SortMenu({
 
   return (
     <div className="relative" ref={sortMenuRef}>
-      <button
+      <Button
+        variant={showSortMenu ? 'primary' : 'surface'}
+        size="sm"
         onClick={onToggleMenu}
-        className={`px-3 py-2 text-sm rounded-lg transition-colors min-h-[44px] flex items-center gap-1.5 ${
-          showSortMenu
-            ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-md'
-            : 'bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50'
-        }`}
+        isChristmasMode={isChristmasMode}
         title="ソート"
+        className="!px-3 !py-2 gap-1.5"
       >
         {getSortIcon(sortOption)}
         <span className="text-xs sm:text-sm">ソート</span>
-      </button>
+      </Button>
       {/* ドロップダウンメニュー */}
       {showSortMenu && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 ${
+          isChristmasMode
+            ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
+            : 'bg-white border border-gray-200'
+        }`}>
           <div className="py-1">
             {SORT_OPTIONS.map((option) => (
               <button
@@ -94,11 +100,15 @@ export function SortMenu({
                 }}
                 className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${
                   sortOption === option
-                    ? 'bg-amber-50 text-amber-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? isChristmasMode
+                      ? 'bg-[#d4af37]/10 text-[#d4af37] font-medium'
+                      : 'bg-amber-50 text-amber-700 font-medium'
+                    : isChristmasMode
+                      ? 'text-[#f8f1e7]/70 hover:bg-white/10'
+                      : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                {sortOption === option && <HiCheckCircle className="h-4 w-4 text-amber-600" />}
+                {sortOption === option && <HiCheckCircle className={`h-4 w-4 ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'}`} />}
                 <span>{getSortLabel(option)}</span>
               </button>
             ))}

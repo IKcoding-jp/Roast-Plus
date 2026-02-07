@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { HiX, HiCamera, HiTrash } from 'react-icons/hi';
-import { Input, Textarea, Button } from '@/components/ui';
+import { Input, Textarea, Button, IconButton } from '@/components/ui';
+
 interface DefectBeanFormFieldsProps {
   mode: 'add' | 'edit';
   imagePreview: string | null;
@@ -22,6 +23,7 @@ interface DefectBeanFormFieldsProps {
   onSubmit: (e: React.FormEvent) => void;
   onDelete?: () => void;
   onCancel: () => void;
+  isChristmasMode?: boolean;
 }
 
 export function DefectBeanFormFields({
@@ -43,12 +45,23 @@ export function DefectBeanFormFields({
   onSubmit,
   onDelete,
   onCancel,
+  isChristmasMode = false,
 }: DefectBeanFormFieldsProps) {
+  const labelClass = `block text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-700'}`;
+  const borderColor = isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200';
+  const dashedBorder = isChristmasMode
+    ? '!border-[#d4af37]/30 hover:!border-[#d4af37] hover:!bg-white/5'
+    : '!border-gray-300 hover:!border-amber-500 hover:!bg-amber-50';
+  const fileLabelClass = isChristmasMode
+    ? 'border-[#d4af37]/30 hover:border-[#d4af37] hover:bg-white/5 text-[#f8f1e7]/70'
+    : 'border-gray-300 hover:border-amber-500 hover:bg-amber-50';
+  const textMuted = isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500';
+
   return (
     <>
       {/* 画像選択 */}
       <div className="px-6 pt-6">
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label className={labelClass}>
           画像 {mode === 'add' && <span className="text-red-500">*</span>}
         </label>
         {imagePreview ? (
@@ -62,31 +75,33 @@ export function DefectBeanFormFields({
                 className="w-full aspect-square object-cover rounded-lg"
                 unoptimized
               />
-              <button
-                type="button"
+              <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
                   onClearImage();
                 }}
-                className="absolute top-2 right-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center z-10"
+                className="absolute top-2 right-2 !bg-black !bg-opacity-50 !text-white hover:!bg-opacity-70 z-10"
+                rounded
+                aria-label="画像をクリア"
               >
                 <HiX className="h-5 w-5" />
-              </button>
+              </IconButton>
             </div>
           </div>
         ) : (
           <div className="space-y-2">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={onShowCamera}
-              className="w-full px-4 py-12 border-2 border-dashed border-gray-300 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-colors flex flex-col items-center justify-center gap-2 min-h-[200px]"
+              isChristmasMode={isChristmasMode}
+              className={`!w-full !px-4 !py-12 !border-2 !border-dashed !rounded-lg flex-col !min-h-[200px] ${dashedBorder}`}
             >
-              <HiCamera className="h-12 w-12 text-gray-400" />
-              <span className="text-gray-600 font-medium">カメラで撮影</span>
-            </button>
-            <div className="text-center text-sm text-gray-500">または</div>
-            <label className="block w-full px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center">
-              <span className="text-gray-700 font-medium">ファイルを選択</span>
+              <HiCamera className={`h-12 w-12 ${isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'}`} />
+              <span className={`font-medium ${isChristmasMode ? 'text-[#f8f1e7]/60' : 'text-gray-600'}`}>カメラで撮影</span>
+            </Button>
+            <div className={`text-center text-sm ${textMuted}`}>または</div>
+            <label className={`block w-full px-4 py-3 border-2 rounded-lg transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center ${fileLabelClass}`}>
+              <span className="font-medium">ファイルを選択</span>
               <input
                 type="file"
                 accept="image/*"
@@ -103,7 +118,7 @@ export function DefectBeanFormFields({
 
         {/* 名称 */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className={labelClass}>
             名称 <span className="text-red-500">*</span>
           </label>
           <Input
@@ -111,57 +126,62 @@ export function DefectBeanFormFields({
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
             placeholder="例: カビ豆"
+            isChristmasMode={isChristmasMode}
             required
           />
         </div>
 
         {/* 特徴 */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className={labelClass}>
             特徴（見た目の説明）
           </label>
           <Textarea
             value={characteristics}
             onChange={(e) => onCharacteristicsChange(e.target.value)}
             placeholder="例: 黒いカビが生えている。表面が黒ずんでいる。"
+            isChristmasMode={isChristmasMode}
             rows={4}
           />
         </div>
 
         {/* 味への影響 */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className={labelClass}>
             味への影響
           </label>
           <Textarea
             value={tasteImpact}
             onChange={(e) => onTasteImpactChange(e.target.value)}
             placeholder="例: カビ臭さがコーヒーの風味を損なう。"
+            isChristmasMode={isChristmasMode}
             rows={4}
           />
         </div>
 
         {/* 省く理由 */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className={labelClass}>
             省く理由
           </label>
           <Textarea
             value={removalReason}
             onChange={(e) => onRemovalReasonChange(e.target.value)}
             placeholder="例: 品質を保つため、カビ豆は必ず除去する。"
+            isChristmasMode={isChristmasMode}
             rows={4}
           />
         </div>
 
         {/* ボタン */}
-        <div className={`flex gap-3 pt-4 border-t border-gray-200 ${mode === 'edit' && onDelete ? 'justify-between' : 'justify-end'}`}>
+        <div className={`flex gap-3 pt-4 border-t ${borderColor} ${mode === 'edit' && onDelete ? 'justify-between' : 'justify-end'}`}>
           {mode === 'edit' && onDelete && (
             <Button
               type="button"
               variant="danger"
               onClick={onDelete}
               disabled={isSubmitting || isDeleting}
+              isChristmasMode={isChristmasMode}
             >
               <HiTrash className="h-5 w-5" />
               {isDeleting ? '削除中...' : '削除'}
@@ -173,6 +193,7 @@ export function DefectBeanFormFields({
               variant="secondary"
               onClick={onCancel}
               disabled={isSubmitting || isDeleting}
+              isChristmasMode={isChristmasMode}
             >
               キャンセル
             </Button>
@@ -181,6 +202,7 @@ export function DefectBeanFormFields({
               variant="primary"
               disabled={isSubmitting || isDeleting}
               loading={isSubmitting}
+              isChristmasMode={isChristmasMode}
             >
               {isSubmitting
                 ? mode === 'edit'

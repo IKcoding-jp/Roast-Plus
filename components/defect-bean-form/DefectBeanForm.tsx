@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { HiX } from 'react-icons/hi';
 import { CameraCapture } from '../CameraCapture';
 import { DefectBeanFormFields } from './DefectBeanFormFields';
+import { Modal, IconButton } from '@/components/ui';
 import type { DefectBean } from '@/types';
 import { useToastContext } from '@/components/Toast';
 
@@ -20,6 +21,7 @@ interface DefectBeanFormProps {
   ) => Promise<void>;
   onDelete?: () => Promise<void>;
   onCancel: () => void;
+  isChristmasMode?: boolean;
 }
 
 export function DefectBeanForm({
@@ -29,6 +31,7 @@ export function DefectBeanForm({
   onUpdate,
   onDelete,
   onCancel,
+  isChristmasMode = false,
 }: DefectBeanFormProps) {
   const { showToast } = useToastContext();
   const [showCamera, setShowCamera] = useState(false);
@@ -154,42 +157,54 @@ export function DefectBeanForm({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* ヘッダー */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-20">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {mode === 'edit' ? '欠点豆を編集' : '欠点豆を追加'}
-          </h2>
-          <button
-            onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-          >
-            <HiX className="h-6 w-6 text-gray-600" />
-          </button>
-        </div>
-
-        <DefectBeanFormFields
-          mode={mode}
-          imagePreview={imagePreview}
-          name={name}
-          characteristics={characteristics}
-          tasteImpact={tasteImpact}
-          removalReason={removalReason}
-          isSubmitting={isSubmitting}
-          isDeleting={isDeleting}
-          onNameChange={setName}
-          onCharacteristicsChange={setCharacteristics}
-          onTasteImpactChange={setTasteImpact}
-          onRemovalReasonChange={setRemovalReason}
-          onShowCamera={() => setShowCamera(true)}
-          onFileSelect={handleFileSelect}
-          onClearImage={handleClearImage}
-          onSubmit={handleSubmit}
-          onDelete={onDelete ? handleDelete : undefined}
-          onCancel={onCancel}
-        />
+    <Modal
+      show={true}
+      onClose={onCancel}
+      closeOnBackdropClick={false}
+      contentClassName={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto ${
+        isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white'
+      }`}
+    >
+      {/* ヘッダー */}
+      <div className={`sticky top-0 p-4 flex items-center justify-between z-20 border-b ${
+        isChristmasMode
+          ? 'bg-[#0a2f1a] border-[#d4af37]/20'
+          : 'bg-white border-gray-200'
+      }`}>
+        <h2 className={`text-xl font-semibold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+          {mode === 'edit' ? '欠点豆を編集' : '欠点豆を追加'}
+        </h2>
+        <IconButton
+          onClick={onCancel}
+          isChristmasMode={isChristmasMode}
+          rounded
+          aria-label="閉じる"
+        >
+          <HiX className="h-6 w-6" />
+        </IconButton>
       </div>
-    </div>
+
+      <DefectBeanFormFields
+        mode={mode}
+        imagePreview={imagePreview}
+        name={name}
+        characteristics={characteristics}
+        tasteImpact={tasteImpact}
+        removalReason={removalReason}
+        isSubmitting={isSubmitting}
+        isDeleting={isDeleting}
+        onNameChange={setName}
+        onCharacteristicsChange={setCharacteristics}
+        onTasteImpactChange={setTasteImpact}
+        onRemovalReasonChange={setRemovalReason}
+        onShowCamera={() => setShowCamera(true)}
+        onFileSelect={handleFileSelect}
+        onClearImage={handleClearImage}
+        onSubmit={handleSubmit}
+        onDelete={onDelete ? handleDelete : undefined}
+        onCancel={onCancel}
+        isChristmasMode={isChristmasMode}
+      />
+    </Modal>
   );
 }

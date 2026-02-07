@@ -122,7 +122,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                 {teams.length === 0 ? (
                     <div className="py-2 px-2 border-r text-center flex flex-col items-center justify-center h-full min-h-[44px] bg-dark border-gray-700">
                         {isAddingTeam ? (
-                            <div className="relative z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 bg-white border border-primary">
+                            <div className="relative z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 bg-surface border border-spot">
                                 <InlineInput
                                     placeholder="班名(任意)"
                                     value={newTeamName}
@@ -210,7 +210,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                             setIsAddingTeam(false);
                                         }}
                                     />
-                                    <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 bg-white border border-primary">
+                                    <div className="absolute top-1/2 -translate-y-1/2 right-0 z-20 flex items-center shadow-lg rounded p-1 w-32 md:w-40 bg-surface border border-spot">
                                         <InlineInput
                                             placeholder="班名(任意)"
                                             value={newTeamName}
@@ -252,18 +252,18 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
             </div>
 
             {/* ボディ */}
-            <div className="divide-y divide-gray-100 bg-white" style={{ minWidth: 'max-content' }}>
+            <div className="divide-y divide-edge bg-surface" style={{ minWidth: 'max-content' }}>
                 {taskLabels.map(label => (
                     <div
                         key={label.id}
-                        className="grid items-center transition-colors group hover:bg-orange-50/30"
+                        className="grid items-center transition-colors group hover:bg-spot-subtle/30"
                         style={{
                             gridTemplateColumns,
                             minHeight: `${tableSettings?.rowHeights?.[label.id] ?? 60}px`
                         }}
                     >
                         {/* 左ラベル列 */}
-                        <div className="p-3 md:p-4 py-2 border-r h-full flex items-center justify-center border-gray-100">
+                        <div className="p-3 md:p-4 py-2 border-r h-full flex items-center justify-center border-edge">
                             <div
                                 className="w-full p-1 cursor-pointer font-medium text-sm md:text-base whitespace-nowrap text-center rounded transition-colors overflow-visible text-ink hover:bg-ground"
                                 onClick={() => {
@@ -283,7 +283,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                         {/* 各チームの担当者列 */}
                         {teams.length === 0 ? (
-                            <div className="p-2 md:p-4 border-r h-full flex items-center justify-center border-gray-100 bg-gray-50/30">
+                            <div className="p-2 md:p-4 border-r h-full flex items-center justify-center border-edge bg-ground/30">
                                 <span className="text-xs md:text-sm text-ink-muted">班を作成してください</span>
                             </div>
                         ) : (
@@ -293,7 +293,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                 const isSelected = selectedCell?.teamId === team.id && selectedCell?.taskLabelId === label.id;
 
                                 return (
-                                    <div key={team.id} className="p-2 md:p-4 py-2 border-r h-full flex items-center justify-center relative border-gray-100">
+                                    <div key={team.id} className="p-2 md:p-4 py-2 border-r h-full flex items-center justify-center relative border-edge">
                                         <button
                                             onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                             onMouseUp={handleCellTouchEnd}
@@ -308,10 +308,10 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                                 ${member
                                                     ? isSelected
                                                         ? 'bg-primary text-white shadow-md scale-105'
-                                                        : 'text-gray-800 bg-white border border-gray-200 shadow-sm hover:shadow'
+                                                        : 'text-ink bg-surface border border-edge shadow-sm hover:shadow'
                                                     : isSelected
-                                                        ? 'bg-primary/20 text-primary border border-primary'
-                                                        : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100'}
+                                                        ? 'bg-spot/20 text-spot border border-spot'
+                                                        : 'text-ink-muted bg-ground border border-dashed border-edge-strong hover:bg-ground/80'}
                                             `}
                                         >
                                             {member ? member.name : '未割当'}

@@ -141,10 +141,10 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
                                                     ${member
                                                         ? isSelected
                                                             ? 'bg-primary text-white shadow-md scale-105'
-                                                            : 'text-gray-800 bg-gray-50 border border-gray-200 shadow-sm'
+                                                            : 'text-ink bg-ground border border-edge shadow-sm'
                                                         : isSelected
-                                                            ? 'bg-primary/20 text-primary border border-primary'
-                                                            : 'text-gray-400 bg-gray-50 border border-dashed border-gray-300'}
+                                                            ? 'bg-spot/20 text-spot border border-spot'
+                                                            : 'text-ink-muted bg-ground border border-dashed border-edge-strong'}
                                                 `}
                                             >
                                                 {member ? member.name : '未割当'}

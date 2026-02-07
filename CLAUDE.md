@@ -141,10 +141,11 @@ import {
 
 ### ルール
 1. **生のTailwindでボタン/カード/入力を作らない** → 共通コンポーネントを使用
-2. **クリスマスモード対応** → `isChristmasMode` propを渡す
+2. **テーマ対応はCSS変数で自動** → `isChristmasMode` propは不要（`data-theme`属性で自動切替）
 3. **配色** → `.claude/skills/roastplus-ui/references/color-schemes.md` 参照
 4. **既存で対応不可の場合** → `components/ui/` に新規共通コンポーネントを作成
 5. **共通コンポーネントの重複禁止** → 作成前に既存コンポーネントを必ず確認
+6. **モーダル背景は `bg-overlay`** → `bg-surface` はクリスマスモードで透過するため使用禁止
 
 ### 新規コンポーネント追加時（レジストリ方式）
 新しい共通UIコンポーネントを作成した場合、**必ず以下の手順で登録すること**：
@@ -157,8 +158,8 @@ import {
 
 ```tsx
 // registry.tsx への追加例
-function NewComponentDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
-  return <NewComponent isChristmasMode={isChristmasMode} />;
+function NewComponentDemo() {
+  return <NewComponent />;
 }
 
 // componentRegistry配列に追加
@@ -172,14 +173,21 @@ function NewComponentDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
 
 → UIテストページ（`/ui-test`）に自動表示される
 
-### クリスマスモード対応例
+### テーマ対応（CSS変数方式）
+テーマ切替は `data-theme` 属性 + CSS変数で自動適用。コンポーネント側でのテーマ判定は不要。
 ```tsx
-const { isChristmasMode } = useChristmasMode();
-
-<Button variant="primary" isChristmasMode={isChristmasMode}>保存</Button>
-<Card variant="table" isChristmasMode={isChristmasMode}>...</Card>
-<Input label="名前" isChristmasMode={isChristmasMode} />
+// テーマは自動適用。propは不要
+<Button variant="primary">保存</Button>
+<Card variant="table">...</Card>
+<Input label="名前" />
 ```
+
+### CSS変数の使い分け（重要）
+| 変数 | 通常モード | クリスマスモード | 用途 |
+|------|-----------|----------------|------|
+| `bg-surface` | `#FFFFFF` | `rgba(255,255,255,0.05)` | カード・セクション（半透明OK） |
+| `bg-overlay` | `#FFFFFF` | `#0a2f1a` | モーダル・ダイアログ（不透明必須） |
+| `bg-ground` | `#F3F4F6` | `rgba(255,255,255,0.08)` | ページ背景・テーブルヘッダー |
 
 ## Testing
 - **推奨**: Vitest

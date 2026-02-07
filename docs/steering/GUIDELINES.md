@@ -1,6 +1,6 @@
 # Implementation Guidelines
 
-**最終更新**: 2026-02-05
+**最終更新**: 2026-02-07
 
 ---
 
@@ -249,6 +249,36 @@ const DIFFICULTY_STYLES = {
   hard: 'bg-red-100 text-red-800',
 } as const;
 ```
+
+### テーマ対応CSS変数ユーティリティ（推奨）
+
+テーマ自動対応が必要な箇所では、ハードコード色の代わりにセマンティックユーティリティを使用:
+
+```tsx
+// ✅ 推奨: テーマ自動対応
+<div className="bg-page text-ink border-edge">
+  <p className="text-ink-sub">補足テキスト</p>
+</div>
+
+// ❌ 非推奨: ハードコード色（テーマ切替で色が変わらない）
+<div className="bg-white text-gray-800 border-gray-200">
+  <p className="text-gray-500">補足テキスト</p>
+</div>
+```
+
+| ユーティリティ | 用途 |
+|--------------|------|
+| `bg-page` | ページ背景 |
+| `bg-surface` | カード/パネル背景 |
+| `bg-overlay` | モーダル背景 |
+| `bg-ground` | セクション背景 |
+| `bg-field` | 入力フィールド背景 |
+| `text-ink` | 本文テキスト |
+| `text-ink-sub` | 補足テキスト |
+| `text-ink-muted` | 薄いテキスト |
+| `border-edge` | 通常ボーダー |
+| `border-edge-strong` | 強調ボーダー |
+| `bg-spot` / `text-spot` | アクセントカラー |
 
 ---
 

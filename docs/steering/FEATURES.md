@@ -1,6 +1,6 @@
 # Features
 
-**最終更新**: 2026-02-05
+**最終更新**: 2026-02-07
 
 ---
 
@@ -464,15 +464,27 @@ const { isChristmasMode } = useChristmasMode();
 <Input label="名前" isChristmasMode={isChristmasMode} />
 ```
 
-### クリスマスモード仕様
+### テーマシステム
 
-#### 視覚効果
+#### アーキテクチャ
+- **テーマ管理**: `next-themes` ライブラリ（SSR対応、フラッシュ防止、タブ間同期）
+- **テーマ定義**: CSS変数（`@layer theme` in `globals.css`）
+- **テーマプロバイダー**: `components/ThemeProvider.tsx`（アプリ全体をラップ）
+- **利用可能テーマ**: `default`（通常）, `christmas`（クリスマス）
+
+#### 後方互換API
+- **`useChristmasMode()`**: 既存APIを維持（内部で `next-themes` の `useTheme` に委譲）
+- **返り値**: `{ isChristmasMode, setChristmasMode, toggleChristmasMode }`
+
+#### クリスマスモード仕様
+
+##### 視覚効果
 - **雪の結晶アニメーション**: SVG、Framer Motion
-- **配色変更**: 赤・緑・金（`.claude/skills/roastplus-ui/references/color-schemes.md` 参照）
+- **配色変更**: CSS変数で自動切替（`.claude/skills/roastplus-ui/references/color-schemes.md` 参照）
 
-#### 技術要素
-- **状態管理**: `useChristmasMode` フック
-- **切り替え**: 設定画面からON/OFF可能
+##### テーマ対応の2つの方式（移行期間中は併存）
+1. **CSS変数方式（推奨・新方式）**: `bg-page`, `text-ink` 等のセマンティックユーティリティ使用 → テーマ自動対応
+2. **`isChristmasMode` prop方式（旧方式）**: 共通UIコンポーネント経由で手動切替 → 段階的にCSS変数方式へ移行
 
 ### 禁止事項
 1. ❌ 共通コンポーネントの重複作成（既存コンポーネントを必ず確認）

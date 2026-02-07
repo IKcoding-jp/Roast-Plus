@@ -1,6 +1,6 @@
 # Technical Specification
 
-**最終更新**: 2026-02-05
+**最終更新**: 2026-02-07
 
 ---
 
@@ -63,6 +63,31 @@ RoastPlusは、**PWA（Progressive Web App）** として設計されたモバ�
 - **方針**: ユーティリティファーストCSS、CSS Modules不使用
 - **ブランドカラー**: `#211714`（深茶色）
 - **繰り返しパターン**: 定数化（例: `DIFFICULTY_STYLES`）
+
+### テーマシステム（next-themes + CSS変数）
+
+- **ライブラリ**: `next-themes`（テーマ切替、SSR対応、タブ間同期、フラッシュ防止）
+- **テーマ定義**: `@layer theme` + CSS変数（`globals.css`）
+- **テーマ切替属性**: `data-theme` 属性（`<html>` 要素）
+- **利用可能テーマ**: `default`（通常モード）, `christmas`（クリスマスモード）
+- **ストレージキー**: `roastplus_theme`（localStorage）
+
+#### セマンティックCSS変数トークン
+
+| カテゴリ | トークン | 用途 |
+|---------|---------|------|
+| 背景 | `page`, `surface`, `overlay`, `ground`, `field` | ページ/カード/モーダル/セクション/入力 |
+| テキスト | `ink`, `ink-sub`, `ink-muted` | 本文/補足/ヒント |
+| ボーダー | `edge`, `edge-strong` | 通常/強調 |
+| アクセント | `spot`, `spot-hover`, `spot-subtle`, `spot-surface` | ハイライト/ホバー |
+
+#### Tailwindユーティリティ
+
+CSS変数は `@theme inline` で Tailwind ユーティリティとして自動登録される:
+- `bg-page`, `bg-surface`, `text-ink`, `border-edge`, `bg-spot` 等
+
+#### 関連ADR
+- [ADR-011] next-themes + Tailwind v4 CSS変数によるテーマシステム（Issue #170, PR #171）
 
 ### Framer Motion
 - **バージョン**: Framer Motion 11.x

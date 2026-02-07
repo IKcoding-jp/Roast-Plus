@@ -338,6 +338,170 @@ describe('useAppData', () => {
     });
   });
 
+  describe('applyIncomingSnapshot - ackタイムアウトとマージロジック', () => {
+    it('ackタイムアウト時にlockedKeysをクリアしてサーバーデータを適用', async () => {
+      let subscriptionCallback: ((data: AppData) => void) | null = null;
+
+      mockSubscribeUserData.mockImplementation((_userId: string, callback: (data: AppData) => void) => {
+        subscriptionCallback = callback;
+        return unsubscribeCallback;
+      });
+
+      const { result } = renderHook(() => useAppData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      // ローカルデータを更新してロックを作成
+      await act(async () => {
+        await result.current.updateData((current) => ({
+          ...current,
+          encouragementCount: 99,
+        }));
+      });
+
+      // FIRESTORE_ACK_TIMEOUT_MS(1300ms = 500 + 800)以上経過させる
+      await act(async () => {
+        vi.advanceTimersByTime(2000);
+        await vi.runAllTimersAsync();
+      });
+
+      // サーバーから異なるデータが到着（ackタイムアウト発動）
+      const serverData: AppData = {
+        ...mockUserData,
+        encouragementCount: 50,
+      };
+
+      act(() => {
+        subscriptionCallback?.(serverData);
+      });
+
+      // タイムアウト後はサーバーデータが適用される
+      expect(result.current.data.encouragementCount).toBe(50);
+    });
+
+    it('更新中にサーバーデータとローカルロックキーをマージする', async () => {
+      let subscriptionCallback: ((data: AppData) => void) | null = null;
+
+      mockSubscribeUserData.mockImplementation((_userId: string, callback: (data: AppData) => void) => {
+        subscriptionCallback = callback;
+        return unsubscribeCallback;
+      });
+
+      // saveUserDataを遅延させてpendingSaveCountを保持
+      mockSaveUserData.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 5000)));
+
+      const { result } = renderHook(() => useAppData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      // ローカルデータを更新（保存中の状態を維持）
+      act(() => {
+        result.current.updateData((current) => ({
+          ...current,
+          encouragementCount: 42,
+        }));
+      });
+
+      // サーバーから部分的に異なるデータが到着（lockedKeysの一部が不一致）
+      const serverData: AppData = {
+        ...mockUserData,
+        encouragementCount: 10, // ローカルと異なる
+        roastSchedules: [
+          {
+            id: 'schedule-new-from-server',
+            beanName: 'サーバー豆',
+            targetDate: '2024-02-10',
+            status: 'pending',
+            createdAt: '2024-02-05T12:00:00.000Z',
+            updatedAt: '2024-02-05T12:00:00.000Z',
+          },
+        ],
+      };
+
+      act(() => {
+        subscriptionCallback?.(serverData);
+      });
+
+      // ロックされたキー（encouragementCount）はローカル値を維持
+      expect(result.current.data.encouragementCount).toBe(42);
+      // ロックされていないキー（roastSchedules）はサーバー値を適用
+      expect(result.current.data.roastSchedules[0].id).toBe('schedule-new-from-server');
+    });
+
+    it('lockedKeys全てがサーバーと一致する場合ロックをクリア', async () => {
+      let subscriptionCallback: ((data: AppData) => void) | null = null;
+
+      mockSubscribeUserData.mockImplementation((_userId: string, callback: (data: AppData) => void) => {
+        subscriptionCallback = callback;
+        return unsubscribeCallback;
+      });
+
+      // saveUserDataを遅延させる
+      mockSaveUserData.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 5000)));
+
+      const { result } = renderHook(() => useAppData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      // ローカルデータを更新
+      act(() => {
+        result.current.updateData((current) => ({
+          ...current,
+          encouragementCount: 42,
+        }));
+      });
+
+      // サーバーからlockedKeyと一致するデータが到着（ack成功のシミュレーション）
+      const serverData: AppData = {
+        ...mockUserData,
+        encouragementCount: 42, // ローカルと一致
+      };
+
+      act(() => {
+        subscriptionCallback?.(serverData);
+      });
+
+      // サーバーデータがそのまま適用される（ロックが解除されたため）
+      expect(result.current.data.encouragementCount).toBe(42);
+    });
+  });
+
+  describe('updateData - リカバリエラーハンドリング', () => {
+    it('保存エラー後のデータ再取得も失敗した場合のエラーハンドリング', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const saveError = new Error('Save failed');
+      const recoveryError = new Error('Recovery also failed');
+
+      mockSaveUserData.mockRejectedValue(saveError);
+
+      const { result } = renderHook(() => useAppData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      // 再取得も失敗するように設定
+      mockGetUserData.mockRejectedValue(recoveryError);
+
+      await act(async () => {
+        await result.current.updateData({ ...mockUserData, encouragementCount: 10 });
+        await vi.runAllTimersAsync();
+      });
+
+      // 保存エラーとリカバリエラーの両方がログされる
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to save data:', saveError);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to recover data:', recoveryError);
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
   describe('実際のユースケース', () => {
     it('完全なCRUDフロー', async () => {
       const { result } = renderHook(() => useAppData());

@@ -91,7 +91,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   if (!showCamera && !isProcessing && !error && !showConfirm) {
     return (
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-        <div className="rounded-lg p-6 max-w-sm w-full mx-4 bg-surface border border-edge">
+        <div className="rounded-lg p-6 max-w-sm w-full mx-4 bg-overlay border border-edge">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-ink">画像を選択</h2>
             <IconButton
@@ -152,7 +152,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   if (isProcessing) {
     return (
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-        <div className="rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl bg-surface border border-edge">
+        <div className="rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl bg-overlay border border-edge">
           <div className="text-center">
             {/* 画像プレビュー */}
             {imagePreview && (
@@ -191,7 +191,7 @@ export function ScheduleOCRModal({ selectedDate, onSuccess, onCancel }: Schedule
   if (error) {
     return (
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-        <div className="rounded-lg p-6 max-w-sm w-full mx-4 bg-surface border border-edge">
+        <div className="rounded-lg p-6 max-w-sm w-full mx-4 bg-overlay border border-edge">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-ink">エラー</h2>
             <IconButton

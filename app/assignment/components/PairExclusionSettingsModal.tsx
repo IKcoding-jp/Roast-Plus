@@ -103,7 +103,7 @@ export function PairExclusionSettingsModal({
             onClick={onClose}
         >
             <div
-                className="rounded-lg p-6 max-w-md w-full mx-4 shadow-xl max-h-[80vh] flex flex-col bg-surface border border-edge"
+                className="rounded-lg p-6 max-w-md w-full mx-4 shadow-xl max-h-[80vh] flex flex-col bg-overlay border border-edge"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* ヘッダー */}

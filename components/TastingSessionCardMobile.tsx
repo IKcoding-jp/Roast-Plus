@@ -192,7 +192,7 @@ export function TastingSessionCardMobile({
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
-              className="relative bg-surface rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+              className="relative bg-overlay rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
             >
               {/* ハンドル */}
               <div className="flex justify-center pt-3 pb-2">

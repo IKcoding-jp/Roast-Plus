@@ -75,7 +75,7 @@ export function ManagerDialog({
       onClick={onClose}
     >
       <div
-        className="rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl bg-surface border border-edge"
+        className="rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl bg-overlay border border-edge"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}

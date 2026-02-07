@@ -106,7 +106,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden bg-surface border border-edge"
+                            className="rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden bg-overlay border border-edge"
                         >
                             <div className="px-4 py-3 flex items-center justify-between bg-ground border-b border-edge">
                                 <h3 className="font-bold text-ink">
@@ -297,7 +297,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10 bg-surface border border-edge"
+                            className="rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10 bg-overlay border border-edge"
                         >
                             <div className="flex justify-between items-center mb-4">
                                 <div className="text-sm font-bold text-ink-sub">
@@ -391,7 +391,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10 bg-surface border border-edge"
+                            className="rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10 bg-overlay border border-edge"
                         >
                             <h3 className="text-lg font-bold mb-4 text-ink">
                                 班の編集
@@ -465,7 +465,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className="rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 bg-surface border border-edge"
+                            className="rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 bg-overlay border border-edge"
                         >
                             <h3 className="text-lg font-bold mb-4 text-ink">
                                 {widthConfig.label}
@@ -524,7 +524,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className="rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 bg-surface border border-edge"
+                            className="rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 bg-overlay border border-edge"
                         >
                             <h3 className="text-lg font-bold mb-4 text-ink">
                                 {heightConfig.label}

@@ -119,7 +119,7 @@ export function TastingSessionFilterModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col bg-surface border-2 border-edge-strong"
+            className="relative rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col bg-overlay border-2 border-edge-strong"
           >
             {/* ヘッダー */}
             <div className="p-6 pb-4 flex items-center justify-between border-b border-edge">

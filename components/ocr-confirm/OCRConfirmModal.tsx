@@ -132,7 +132,7 @@ export function OCRConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="rounded-lg shadow-xl max-w-4xl w-full mx-4 flex flex-col max-h-[90vh] bg-surface border border-edge">
+      <div className="rounded-lg shadow-xl max-w-4xl w-full mx-4 flex flex-col max-h-[90vh] bg-overlay border border-edge">
         {/* ヘッダー */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b flex-shrink-0 border-edge">
           <h2 className="text-lg sm:text-xl font-bold text-ink">

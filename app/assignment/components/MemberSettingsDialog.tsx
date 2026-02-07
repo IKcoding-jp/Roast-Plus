@@ -29,7 +29,7 @@ export const MemberSettingsDialog: React.FC<Props> = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="rounded-xl shadow-2xl w-full max-w-md overflow-hidden bg-surface border border-edge">
+            <div className="rounded-xl shadow-2xl w-full max-w-md overflow-hidden bg-overlay border border-edge">
                 <div className="px-6 py-4 flex justify-between items-center bg-primary">
                     <h3 className="font-bold text-lg text-white">
                         {member.name} さんの設定

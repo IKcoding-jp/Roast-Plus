@@ -28,7 +28,7 @@ export function CompletionDialog({ isOpen, onClose, onContinue }: CompletionDial
   if (!isOpen) return null;
 
   return (
-    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 bg-surface">
+    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 bg-overlay border border-edge">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 text-ink">
         もうすぐ焙煎が完了します。
       </h2>
@@ -72,7 +72,7 @@ export function ContinuousRoastDialog({
   if (!isOpen) return null;
 
   return (
-    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full mx-4 bg-surface">
+    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full mx-4 bg-overlay border border-edge">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 whitespace-nowrap text-ink">
         続けて焙煎しますか？
       </h2>
@@ -123,7 +123,7 @@ export function AfterPurgeDialog({ isOpen, onClose, onRecord }: AfterPurgeDialog
   if (!isOpen) return null;
 
   return (
-    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 bg-surface">
+    <Modal show={isOpen} onClose={onClose} contentClassName="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 bg-overlay border border-edge">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 text-ink">
         お疲れ様でした！
       </h2>

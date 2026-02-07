@@ -159,7 +159,7 @@ export function DefectBeanForm({
       show={true}
       onClose={onCancel}
       closeOnBackdropClick={false}
-      contentClassName="rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-surface"
+      contentClassName="rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-overlay border border-edge"
     >
       {/* ヘッダー */}
       <div className="sticky top-0 p-4 flex items-center justify-between z-20 border-b bg-surface border-edge">

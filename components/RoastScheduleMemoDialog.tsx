@@ -177,11 +177,11 @@ function RoastScheduleMemoDialogInner({
       onClick={onCancel}
     >
       <div
-        className="rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto border-2 bg-surface border-edge-strong"
+        className="rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto border-2 bg-overlay border-edge-strong"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
-        <div className="sticky top-0 border-b px-6 md:px-8 py-4 md:py-5 flex items-center justify-between bg-surface border-edge">
+        <div className="sticky top-0 border-b px-6 md:px-8 py-4 md:py-5 flex items-center justify-between bg-overlay border-edge">
           <h3 className="text-2xl md:text-2xl font-semibold text-ink">
             {schedule ? 'スケジュールを編集' : 'スケジュールを追加'}
           </h3>

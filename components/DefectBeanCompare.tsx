@@ -29,7 +29,7 @@ export function DefectBeanCompare({
       show={true}
       onClose={onClose}
       closeOnBackdropClick={true}
-      contentClassName="rounded-lg max-w-7xl w-full max-h-[90vh] overflow-y-auto bg-surface"
+      contentClassName="rounded-lg max-w-7xl w-full max-h-[90vh] overflow-y-auto bg-overlay border border-edge"
     >
       {/* ヘッダー */}
       <div className="sticky top-0 p-4 flex items-center justify-between z-10 border-b bg-surface border-edge">

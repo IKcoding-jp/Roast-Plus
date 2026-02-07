@@ -151,32 +151,25 @@ export default function SettingsPage() {
                         </div>
                     </div>
 
-                    {/* 開発ツールセクション（開発者モード有効時のみ表示） */}
+                    {/* Developer Design Lab（開発者モード有効時のみ表示） */}
                     {isEnabled && (
-                        <div className="bg-white rounded-lg shadow-md p-6 border-2 border-dashed border-amber-300">
-                            <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                                <HiColorSwatch className="h-5 w-5 text-amber-500" />
-                                開発ツール
-                            </h2>
-                            <p className="text-sm text-gray-500 mb-4">
-                                開発者モード有効時のみ表示
-                            </p>
-                            <div className="space-y-3">
-                                <Link
-                                    href="/ui-test"
-                                    className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-amber-50 transition-colors"
-                                >
-                                    <div className="flex items-center gap-3">
+                        <Link
+                            href="/dev/design-lab"
+                            className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                    <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
                                         <HiColorSwatch className="h-5 w-5 text-amber-500" />
-                                        <div>
-                                            <span className="text-gray-800 font-medium block">UIコンポーネントカタログ</span>
-                                            <span className="text-xs text-gray-500">Button, Card, Input等のUI統一性を確認</span>
-                                        </div>
-                                    </div>
-                                    <span className="text-gray-400">&gt;</span>
-                                </Link>
+                                        Developer Design Lab
+                                    </h2>
+                                    <p className="text-sm text-gray-600">
+                                        UIカタログ、アニメーション、カラーパレット
+                                    </p>
+                                </div>
+                                <span className="text-gray-400 text-xl">&gt;</span>
                             </div>
-                        </div>
+                        </Link>
                     )}
 
                     {/* アプリバージョンセクション */}

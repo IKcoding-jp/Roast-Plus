@@ -415,7 +415,7 @@ interface TastingSession {
 | **ディレクトリ** | `components/ui/` |
 | **コンポーネント数** | 27個 |
 | **レジストリ** | `components/ui/registry.tsx`（UIカタログ） |
-| **テストページ** | `/ui-test`（開発者モードで表示） |
+| **テストページ** | `/dev/design-lab`（Developer Design Lab、開発者モードで表示） |
 
 ### UI実装ルール（重要：全機能共通）
 
@@ -508,6 +508,13 @@ const { isChristmasMode } = useChristmasMode();
 ### 設定（Settings）
 - **目的**: 開発者モード、テーマ切替
 - **技術**: localStorage
+
+### Developer Design Lab
+- **目的**: 開発者向けデザインモック検証ツール
+- **パス**: `/dev/design-lab`（開発者モード有効時のみアクセス可）
+- **セクション**: コンポーネントギャラリー、アニメーション、ページモック、カラーパレット、タイポグラフィ、バリエーション、パターン比較、レスポンシブプレビュー
+- **技術**: タブ切替式サイドナビ、既存registry.tsx/splashPatterns連携
+- **統合元**: `/ui-test`（リダイレクト）、`/dev/splash-preview`（リダイレクト）
 
 ### 変更履歴（Changelog）
 - **目的**: リリースノート表示

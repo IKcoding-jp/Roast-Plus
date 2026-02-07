@@ -444,6 +444,102 @@ describe('useQuizSession', () => {
     });
   });
 
+  describe('startSession - 追加モード', () => {
+    it('singleモードでquestionIdsを指定してセッションを開始できる', async () => {
+      const { result } = renderHook(() =>
+        useQuizSession({ mode: 'single', questionIds: ['q1', 'q2'] })
+      );
+
+      await act(async () => {
+        await result.current.startSession();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.session).not.toBeNull();
+      expect(result.current.totalQuestions).toBe(2);
+    });
+
+    it('shuffleモードでquestionIdsを指定してセッションを開始できる', async () => {
+      const { result } = renderHook(() =>
+        useQuizSession({ mode: 'shuffle', questionIds: ['q1'] })
+      );
+
+      await act(async () => {
+        await result.current.startSession();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.session).not.toBeNull();
+    });
+
+    it('sequentialモードでquestionIdsを指定してセッションを開始できる', async () => {
+      const { result } = renderHook(() =>
+        useQuizSession({ mode: 'sequential', questionIds: ['q1', 'q2'] })
+      );
+
+      await act(async () => {
+        await result.current.startSession();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.session).not.toBeNull();
+      expect(result.current.totalQuestions).toBe(2);
+    });
+
+    it('single/shuffle/sequentialモードでquestionIdsが空の場合はセッションが空で開始', async () => {
+      const { result } = renderHook(() =>
+        useQuizSession({ mode: 'single', questionIds: [] })
+      );
+
+      await act(async () => {
+        await result.current.startSession();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.session).not.toBeNull();
+      expect(result.current.totalQuestions).toBe(0);
+      expect(result.current.isComplete).toBe(true);
+    });
+
+    it('セッション開始時にエラーが発生した場合isLoadingがfalseに戻る', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      // getDailyQuestionsでエラーを投げる
+      const { getDailyQuestions } = await import('@/lib/coffee-quiz/questions');
+      vi.mocked(getDailyQuestions).mockRejectedValueOnce(new Error('Network error'));
+
+      const { result } = renderHook(() => useQuizSession({ mode: 'daily' }));
+
+      await act(async () => {
+        await result.current.startSession();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.session).toBeNull();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to start quiz session:',
+        expect.any(Error)
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
   describe('統計計算', () => {
     it('正解率が正しく計算される', async () => {
       const { result } = renderHook(() => useQuizSession());

@@ -801,6 +801,158 @@ describe('useQuizData', () => {
     });
   });
 
+  describe('エラーハンドリング', () => {
+    it('localStorageからの読み込みエラー時にerror stateを設定する', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const loadError = new Error('localStorage is corrupted');
+
+      mockGetQuizProgress.mockImplementation(() => {
+        throw loadError;
+      });
+
+      const { result } = renderHook(() => useQuizData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      expect(result.current.error).toBe(loadError);
+      expect(result.current.loading).toBe(false);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to load quiz progress:',
+        loadError
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('デバウンス付き保存でエラーが発生した場合にerrorを設定する', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const saveError = new Error('Save failed');
+
+      mockSetQuizProgress.mockImplementation(() => {
+        throw saveError;
+      });
+
+      const { result } = renderHook(() => useQuizData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      // 設定更新でsaveProgressをトリガー
+      await act(async () => {
+        await result.current.updateSettings({ dailyGoal: 20 });
+      });
+
+      // デバウンス時間を経過させて保存をトリガー
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+        await vi.runAllTimersAsync();
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to save quiz progress:',
+        saveError
+      );
+      expect(result.current.error).toBe(saveError);
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('recordAnswer - hasAnsweredCorrectlyフラグ', () => {
+    it('不正解でも既存のhasAnsweredCorrectly=trueフラグを維持する', async () => {
+      // 既に正解済みのカードを含むプログレス
+      const cardWithCorrectFlag: QuizCard = {
+        ...mockCard,
+        questionId: 'q1',
+        hasAnsweredCorrectly: true,
+      };
+      const progressWithCorrectCard: QuizProgress = {
+        ...mockInitialProgress,
+        cards: [cardWithCorrectFlag],
+      };
+      mockGetQuizProgress.mockReturnValue(progressWithCorrectCard);
+
+      // reviewCardモックでhasAnsweredCorrectlyをfalseにする（フック内で上書きされるべき）
+      mockReviewCard.mockReturnValue({
+        card: { ...cardWithCorrectFlag, hasAnsweredCorrectly: false, state: { stability: 2, difficulty: 4 } },
+      });
+
+      const { result } = renderHook(() => useQuizData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      // 不正解を送信
+      let recordResult: AnswerResult;
+      await act(async () => {
+        recordResult = await result.current.recordAnswer('q1', 'opt2', 3000);
+      });
+
+      expect(recordResult.isCorrect).toBe(false);
+
+      // progressのカードを確認: hasAnsweredCorrectlyはtrueのまま維持されるべき
+      const updatedCard = result.current.progress?.cards.find(c => c.questionId === 'q1');
+      expect(updatedCard?.hasAnsweredCorrectly).toBe(true);
+    });
+
+    it('正解時にhasAnsweredCorrectly=falseからtrueに更新する', async () => {
+      // hasAnsweredCorrectly=falseのカードを含むプログレス
+      const cardWithoutCorrectFlag: QuizCard = {
+        ...mockCard,
+        questionId: 'q1',
+        hasAnsweredCorrectly: false,
+      };
+      const progressWithCard: QuizProgress = {
+        ...mockInitialProgress,
+        cards: [cardWithoutCorrectFlag],
+      };
+      mockGetQuizProgress.mockReturnValue(progressWithCard);
+
+      mockReviewCard.mockReturnValue({
+        card: { ...cardWithoutCorrectFlag, hasAnsweredCorrectly: false, state: { stability: 2, difficulty: 4 } },
+      });
+
+      const { result } = renderHook(() => useQuizData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      // 正解を送信
+      let recordResult: AnswerResult;
+      await act(async () => {
+        recordResult = await result.current.recordAnswer('q1', 'opt1', 5000);
+      });
+
+      expect(recordResult.isCorrect).toBe(true);
+
+      // progressのカードを確認: hasAnsweredCorrectlyがtrueに更新される
+      const updatedCard = result.current.progress?.cards.find(c => c.questionId === 'q1');
+      expect(updatedCard?.hasAnsweredCorrectly).toBe(true);
+    });
+
+    it('存在しない問題IDの場合recordAnswerはnullを返す', async () => {
+      mockGetQuestionById.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => useQuizData());
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      let recordResult: AnswerResult | null;
+      await act(async () => {
+        recordResult = await result.current.recordAnswer('nonexistent', 'opt1', 5000);
+      });
+
+      expect(recordResult).toBeNull();
+    });
+  });
+
   describe('実際のユースケース', () => {
     it('クイズセッション: 連続回答とゲーミフィケーション', async () => {
       const { result } = renderHook(() => useQuizData());

@@ -93,6 +93,23 @@ describe('useChristmasMode', () => {
     expect(result.current.isChristmasMode).toBe(false);
   });
 
+  it('マイグレーション済みでstored=nullの場合falseを返す', () => {
+    // マイグレーション済みフラグを設定、Christmas modeキーは未設定
+    localStorageMock.setItem('roastplus_christmas_mode_migrated', 'true');
+    // roastplus_christmas_modeは設定しない（null）
+
+    const { result } = renderHook(() => useChristmasMode());
+    expect(result.current.isChristmasMode).toBe(false);
+  });
+
+  it('マイグレーション済みでstored=falseの場合falseを返す', () => {
+    localStorageMock.setItem('roastplus_christmas_mode_migrated', 'true');
+    localStorageMock.setItem('roastplus_christmas_mode', 'false');
+
+    const { result } = renderHook(() => useChristmasMode());
+    expect(result.current.isChristmasMode).toBe(false);
+  });
+
   it('localStorageへの保存を確認できる', () => {
     const { result } = renderHook(() => useChristmasMode());
 

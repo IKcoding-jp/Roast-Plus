@@ -10,7 +10,6 @@ import type { TastingSession } from '@/types';
 import { PlusCircle } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
 import { motion } from 'framer-motion';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { BackLink } from '@/components/ui';
 
 export default function NewTastingSessionPage() {
@@ -19,7 +18,6 @@ export default function NewTastingSessionPage() {
   const router = useRouter();
   const { showToast } = useToastContext();
   const hasRedirected = useRef(false);
-  const { isChristmasMode } = useChristmasMode();
 
   // 未認証時にログインページにリダイレクト
   useEffect(() => {
@@ -72,8 +70,7 @@ export default function NewTastingSessionPage() {
 
   return (
     <div
-      className="min-h-screen py-6 sm:py-8 px-4 sm:px-6"
-      style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}
+      className="min-h-screen py-6 sm:py-8 px-4 sm:px-6 bg-page"
     >
       <div className="max-w-lg mx-auto space-y-6">
         <motion.header
@@ -84,27 +81,18 @@ export default function NewTastingSessionPage() {
           <BackLink
             href="/tasting"
             variant="icon-only"
-            isChristmasMode={isChristmasMode}
             className="absolute left-0 top-0"
           />
 
           <div className="flex flex-col items-center space-y-2">
-            <div className={`p-3 rounded-2xl shadow-sm mb-2 relative ${
-              isChristmasMode
-                ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-                : 'bg-white border border-stone-100'
-            }`}>
-              <div className={`absolute inset-0 rounded-2xl scale-110 blur-xl opacity-30 -z-10 ${
-                isChristmasMode ? 'bg-[#d4af37]/20' : 'bg-amber-50'
-              }`} />
-              <PlusCircle size={32} weight="duotone" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
+            <div className="p-3 rounded-2xl shadow-sm mb-2 relative bg-surface border border-edge">
+              <div className="absolute inset-0 rounded-2xl scale-110 blur-xl opacity-30 -z-10 bg-spot-surface" />
+              <PlusCircle size={32} weight="duotone" className="text-spot" />
             </div>
-            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${
-              isChristmasMode ? 'text-[#f8f1e7]' : 'text-stone-800'
-            }`}>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink">
               新規セッション作成
             </h1>
-            <p className={`text-sm font-medium ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-stone-400'}`}>
+            <p className="text-sm font-medium text-ink-muted">
               新しい試飲の記録を開始しましょう
             </p>
           </div>

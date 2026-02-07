@@ -42,7 +42,7 @@ export function Modal({
   show,
   onClose,
   children,
-  contentClassName = 'bg-white rounded-2xl shadow-xl overflow-hidden max-w-sm w-full',
+  contentClassName = 'bg-overlay rounded-2xl shadow-xl overflow-hidden max-w-sm w-full border border-edge',
   closeOnBackdropClick = true,
 }: ModalProps) {
   const handleBackdropClick = () => {

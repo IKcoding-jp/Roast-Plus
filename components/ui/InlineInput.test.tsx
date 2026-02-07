@@ -45,15 +45,15 @@ describe('InlineInput', () => {
     it('lightバリアントのスタイルが適用される（デフォルト）', () => {
       render(<InlineInput />);
       const input = screen.getByRole('textbox');
-      expect(input.className).toContain('bg-white');
-      expect(input.className).toContain('border-gray-300');
+      expect(input.className).toContain('bg-field');
+      expect(input.className).toContain('border-edge-strong');
     });
 
     it('darkバリアントのスタイルが適用される', () => {
       render(<InlineInput variant="dark" />);
       const input = screen.getByRole('textbox');
-      expect(input.className).toContain('bg-white');
-      expect(input.className).toContain('border-primary');
+      expect(input.className).toContain('bg-field');
+      expect(input.className).toContain('border-spot');
     });
   });
 
@@ -78,38 +78,6 @@ describe('InlineInput', () => {
     it('disabled時は入力できない', () => {
       render(<InlineInput disabled />);
       expect(screen.getByRole('textbox')).toBeDisabled();
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモード + lightバリアントのスタイルが適用される', () => {
-      render(<InlineInput isChristmasMode />);
-      const input = screen.getByRole('textbox');
-      expect(input.className).toContain('bg-white/10');
-      expect(input.className).toContain('border-[#d4af37]/40');
-      expect(input.className).toContain('text-[#f8f1e7]');
-    });
-
-    it('クリスマスモード + darkバリアントのスタイルが適用される', () => {
-      render(<InlineInput isChristmasMode variant="dark" />);
-      const input = screen.getByRole('textbox');
-      expect(input.className).toContain('bg-[#1a1a1a]');
-      expect(input.className).toContain('border-[#d4af37]');
-      expect(input.className).toContain('text-[#f8f1e7]');
-    });
-
-    it('通常モード + lightバリアントのスタイルが適用される', () => {
-      render(<InlineInput isChristmasMode={false} />);
-      const input = screen.getByRole('textbox');
-      expect(input.className).toContain('bg-white');
-      expect(input.className).toContain('border-gray-300');
-    });
-
-    it('通常モード + darkバリアントのスタイルが適用される', () => {
-      render(<InlineInput isChristmasMode={false} variant="dark" />);
-      const input = screen.getByRole('textbox');
-      expect(input.className).toContain('bg-white');
-      expect(input.className).toContain('border-primary');
     });
   });
 

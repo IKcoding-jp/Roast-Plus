@@ -23,7 +23,6 @@ interface RoastRecordFiltersProps {
   onRoastLevelToggle: (level: '浅煎り' | '中煎り' | '中深煎り' | '深煎り') => void;
   onWeightToggle: (weight: 200 | 300 | 500) => void;
   onResetFilters: () => void;
-  isChristmasMode?: boolean;
 }
 
 export function RoastRecordFilters({
@@ -42,15 +41,9 @@ export function RoastRecordFilters({
   onRoastLevelToggle,
   onWeightToggle,
   onResetFilters,
-  isChristmasMode = false,
 }: RoastRecordFiltersProps) {
-  // Surfaceスタイル(Buttonのsurface variantと同じ)
-  const surfaceStyles = isChristmasMode
-    ? 'bg-white/10 text-[#f8f1e7] shadow-md border border-[#d4af37]/20'
-    : 'bg-white text-gray-700 shadow-md';
-
   return (
-    <div className={`rounded-lg p-4 space-y-4 flex-shrink-0 ${surfaceStyles}`}>
+    <div className="rounded-lg p-4 space-y-4 flex-shrink-0 bg-surface text-ink-sub shadow-md">
       {/* 検索バーとソート */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
@@ -59,7 +52,6 @@ export function RoastRecordFilters({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="豆の名前で検索"
-            isChristmasMode={isChristmasMode}
           />
         </div>
         <div className="sm:w-48">
@@ -72,7 +64,6 @@ export function RoastRecordFilters({
               { value: 'beanName', label: '豆の名前順' },
               { value: 'date', label: '焙煎日順' },
             ]}
-            isChristmasMode={isChristmasMode}
           />
         </div>
         <Button
@@ -80,7 +71,6 @@ export function RoastRecordFilters({
           size="md"
           onClick={onShowFiltersToggle}
           className="whitespace-nowrap"
-          isChristmasMode={isChristmasMode}
         >
           {showFilters ? 'フィルタを閉じる' : 'フィルタ'}
         </Button>
@@ -88,36 +78,34 @@ export function RoastRecordFilters({
 
       {/* フィルタパネル */}
       {showFilters && (
-        <div className={`pt-4 space-y-4 ${isChristmasMode ? 'border-t border-[#f8f1e7]/20' : 'border-t border-gray-200'}`}>
+        <div className="pt-4 space-y-4 border-t border-edge">
           {/* 日付範囲 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className={`block text-sm font-medium mb-1 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+              <label className="block text-sm font-medium mb-1 text-ink-sub">
                 開始日
               </label>
               <Input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => onDateFromChange(e.target.value)}
-                isChristmasMode={isChristmasMode}
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium mb-1 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+              <label className="block text-sm font-medium mb-1 text-ink-sub">
                 終了日
               </label>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={(e) => onDateToChange(e.target.value)}
-                isChristmasMode={isChristmasMode}
               />
             </div>
           </div>
 
           {/* 焙煎度合い */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            <label className="block text-sm font-medium mb-2 text-ink-sub">
               焙煎度合い
             </label>
             <div className="flex flex-wrap gap-3">
@@ -127,7 +115,6 @@ export function RoastRecordFilters({
                   checked={selectedRoastLevels.includes(level)}
                   onChange={() => onRoastLevelToggle(level)}
                   label={level}
-                  isChristmasMode={isChristmasMode}
                 />
               ))}
             </div>
@@ -135,7 +122,7 @@ export function RoastRecordFilters({
 
           {/* 重さ */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+            <label className="block text-sm font-medium mb-2 text-ink-sub">
               重さ
             </label>
             <div className="flex flex-wrap gap-3">
@@ -145,7 +132,6 @@ export function RoastRecordFilters({
                   checked={selectedWeights.includes(weight)}
                   onChange={() => onWeightToggle(weight)}
                   label={`${weight}g`}
-                  isChristmasMode={isChristmasMode}
                 />
               ))}
             </div>
@@ -160,7 +146,6 @@ export function RoastRecordFilters({
               variant="ghost"
               size="sm"
               onClick={onResetFilters}
-              isChristmasMode={isChristmasMode}
             >
               フィルタをリセット
             </Button>

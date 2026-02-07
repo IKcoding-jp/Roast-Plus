@@ -10,23 +10,19 @@ interface OCRTimeLabelEditorProps {
   timeLabels: TimeLabel[];
   onUpdate: (timeLabels: TimeLabel[]) => void;
   onDelete: (id: string) => void;
-  isChristmasMode?: boolean;
 }
 
 export function OCRTimeLabelEditor({
   timeLabels,
   onUpdate,
   onDelete,
-  isChristmasMode = false,
 }: OCRTimeLabelEditorProps) {
   const editor = useOCRTimeLabelEditor({ timeLabels, onUpdate });
 
   return (
     <div className="space-y-3">
       {editor.sortedLabels.length === 0 ? (
-        <div className={`text-center py-8 ${
-          isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'
-        }`}>
+        <div className="text-center py-8 text-ink-muted">
           <p>スケジュールがありません</p>
         </div>
       ) : (
@@ -37,7 +33,6 @@ export function OCRTimeLabelEditor({
             isEditing={editor.editingId === label.id}
             editor={editor}
             onDelete={onDelete}
-            isChristmasMode={isChristmasMode}
           />
         ))
       )}
@@ -48,7 +43,6 @@ export function OCRTimeLabelEditor({
         variant="primary"
         size="lg"
         className="w-full"
-        isChristmasMode={isChristmasMode}
       >
         <HiPlus className="h-5 w-5" />
         <span>スケジュールを追加</span>

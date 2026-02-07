@@ -12,7 +12,6 @@ import { Input, Select, Textarea, Button } from '@/components/ui';
 import { ROAST_LEVELS } from '@/lib/constants';
 import { formatDateString } from '@/lib/dateUtils';
 import { TastingRecordFormScores } from './TastingRecordFormScores';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingRecordFormProps {
   record: TastingRecord | null;
@@ -38,7 +37,6 @@ export function TastingRecordForm({
   const { showToast } = useToastContext();
   const { user } = useAuth();
   const userId = user?.uid ?? null;
-  const { isChristmasMode } = useChristmasMode();
 
   const { members: allMembers, manager } = useMembers(userId);
 
@@ -186,23 +184,17 @@ export function TastingRecordForm({
       className="space-y-5 pb-8"
     >
       {/* 基本情報カード */}
-      <div className={`rounded-2xl p-5 shadow-sm space-y-4 ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-          : 'bg-white border border-gray-100'
-      }`}>
+      <div className="rounded-2xl p-5 shadow-sm space-y-4 bg-surface border border-edge">
         <div className="flex items-center gap-2">
-          <div className={`w-1 h-5 rounded-full ${isChristmasMode ? 'bg-[#d4af37]' : 'bg-amber-500'}`} />
-          <h3 className={`text-base font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>基本情報</h3>
+          <div className="w-1 h-5 rounded-full bg-spot" />
+          <h3 className="text-base font-bold text-ink">基本情報</h3>
         </div>
 
         <div className="grid grid-cols-1 gap-4">
           {/* メンバー選択 */}
           <div>
-            <label className={`flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 ${
-              isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-            }`}>
-              <User size={16} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-500'} />
+            <label className="flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 text-ink-sub">
+              <User size={16} weight="bold" className="text-spot" />
               メンバー <span className="text-red-500">*</span>
             </label>
             <Select
@@ -212,17 +204,14 @@ export function TastingRecordForm({
               placeholder="選択してください"
               required
               disabled={readOnly}
-              isChristmasMode={isChristmasMode}
             />
           </div>
 
           {/* 豆の名前（セッションモードでは非表示） */}
           {!isSessionMode && (
             <div>
-              <label className={`flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 ${
-                isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-              }`}>
-                <Coffee size={16} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-500'} />
+              <label className="flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 text-ink-sub">
+                <Coffee size={16} weight="bold" className="text-spot" />
                 豆の名前 <span className="text-red-500">*</span>
               </label>
               <Input
@@ -232,7 +221,6 @@ export function TastingRecordForm({
                 placeholder="例: エチオピア イルガチェフェ"
                 required
                 disabled={readOnly}
-                isChristmasMode={isChristmasMode}
               />
             </div>
           )}
@@ -241,10 +229,8 @@ export function TastingRecordForm({
             {/* 試飲日（セッションモードでは非表示） */}
             {!isSessionMode && (
               <div>
-                <label className={`flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 ${
-                  isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-                }`}>
-                  <Calendar size={16} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-500'} />
+                <label className="flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 text-ink-sub">
+                  <Calendar size={16} weight="bold" className="text-spot" />
                   試飲日 <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -253,18 +239,15 @@ export function TastingRecordForm({
                   onChange={(e) => setTastingDate(e.target.value)}
                   required
                   disabled={readOnly}
-                  isChristmasMode={isChristmasMode}
-                />
+                                 />
               </div>
             )}
 
             {/* 焙煎度合い（セッションモードでは非表示） */}
             {!isSessionMode && (
               <div>
-                <label className={`flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 ${
-                  isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-                }`}>
-                  <Thermometer size={16} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-500'} />
+                <label className="flex items-center gap-2 text-sm font-bold mb-1.5 ml-1 text-ink-sub">
+                  <Thermometer size={16} weight="bold" className="text-spot" />
                   焙煎度合い <span className="text-red-500">*</span>
                 </label>
                 <Select
@@ -275,8 +258,7 @@ export function TastingRecordForm({
                   options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
                   required
                   disabled={readOnly}
-                  isChristmasMode={isChristmasMode}
-                />
+                                 />
               </div>
             )}
           </div>
@@ -296,18 +278,13 @@ export function TastingRecordForm({
         onSweetnessChange={setSweetness}
         onAromaChange={setAroma}
         readOnly={readOnly}
-        isChristmasMode={isChristmasMode}
       />
 
       {/* コメント */}
-      <div className={`rounded-2xl p-5 shadow-sm space-y-4 ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-          : 'bg-white border border-gray-100'
-      }`}>
+      <div className="rounded-2xl p-5 shadow-sm space-y-4 bg-surface border border-edge">
         <div className="w-full flex items-center gap-2">
-          <div className={`w-1 h-5 rounded-full ${isChristmasMode ? 'bg-[#d4af37]' : 'bg-amber-500'}`} />
-          <h3 className={`text-base font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>全体的な印象</h3>
+          <div className="w-1 h-5 rounded-full bg-spot" />
+          <h3 className="text-base font-bold text-ink">全体的な印象</h3>
         </div>
         <Textarea
           value={overallImpression}
@@ -315,7 +292,6 @@ export function TastingRecordForm({
           rows={4}
           placeholder="コーヒーの全体的な印象、味の深み、後味などを自由に記録してください..."
           disabled={readOnly}
-          isChristmasMode={isChristmasMode}
         />
       </div>
 
@@ -325,18 +301,14 @@ export function TastingRecordForm({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`sticky bottom-6 flex gap-4 backdrop-blur-md p-4 rounded-3xl shadow-xl z-20 ${
-              isChristmasMode
-                ? 'bg-[#0a2f1a]/80 border border-[#d4af37]/20'
-                : 'bg-white/80 border border-white/20'
-            }`}
+            className="sticky bottom-6 flex gap-4 backdrop-blur-md p-4 rounded-3xl shadow-xl z-20 bg-surface/80 border border-edge"
           >
             {onDelete && record && (
-              <Button type="button" variant="outline" onClick={handleDelete} className="flex-1" isChristmasMode={isChristmasMode}>
+              <Button type="button" variant="outline" onClick={handleDelete} className="flex-1">
                 削除
               </Button>
             )}
-            <Button type="submit" variant="primary" size="lg" className="flex-[2]" isChristmasMode={isChristmasMode}>
+            <Button type="submit" variant="primary" size="lg" className="flex-[2]">
               <Smiley size={24} weight="bold" />
               {existingRecordId || record ? '記録を更新する' : '記録を保存する'}
             </Button>
@@ -346,7 +318,7 @@ export function TastingRecordForm({
 
       {readOnly && (
         <div className="flex gap-4">
-          <Button type="button" variant="secondary" onClick={onCancel} fullWidth size="lg" isChristmasMode={isChristmasMode}>
+          <Button type="button" variant="secondary" onClick={onCancel} fullWidth size="lg">
             戻る
           </Button>
         </div>

@@ -12,7 +12,6 @@ import {
 import type { TastingSession } from '@/types';
 import type { AverageScores } from '@/lib/tastingUtils';
 import { IconButton, Card } from '@/components/ui';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionCardDesktopProps {
   session: TastingSession;
@@ -36,25 +35,23 @@ export function TastingSessionCardDesktop({
   formatDate,
 }: TastingSessionCardDesktopProps) {
   const router = useRouter();
-  const { isChristmasMode } = useChristmasMode();
   const roastStyle = getRoastBadgeStyle(session.roastLevel);
   const hasAnalysis = !!session.aiAnalysis;
 
-  // クリスマスモード用のスタイル
-  const cardBorderClass = isChristmasMode ? 'border-[#d4af37]/30' : 'border-gray-200';
-  const textPrimaryClass = isChristmasMode ? 'text-[#f8f1e7]' : 'text-[#4a3728]';
-  const textSecondaryClass = isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500';
-  const textMutedClass = isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400';
-  const bgMutedClass = isChristmasMode ? 'bg-white/10' : 'bg-gray-100';
-  const bgSectionClass = isChristmasMode ? 'bg-white/5' : 'bg-gray-50';
-  const borderSectionClass = isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-100';
-  const iconAccentClass = isChristmasMode ? 'text-[#d4af37]' : 'text-[#f5821f]';
-  const spinnerClass = isChristmasMode ? 'border-[#d4af37]' : 'border-[#f5821f]';
+  const cardBorderClass = 'border-edge';
+  const textPrimaryClass = 'text-ink';
+  const textSecondaryClass = 'text-ink-sub';
+  const textMutedClass = 'text-ink-muted';
+  const bgMutedClass = 'bg-ground';
+  const bgSectionClass = 'bg-ground';
+  const borderSectionClass = 'border-edge';
+  const iconAccentClass = 'text-spot';
+  const spinnerClass = 'border-spot';
 
   return (
     <div>
       <Link href={`/tasting?sessionId=${session.id}`} className="block group relative">
-        <Card variant="hoverable" isChristmasMode={isChristmasMode} className="p-0 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500">
+        <Card variant="hoverable" className="p-0 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500">
           <div className="relative z-10">
             <div className="h-full flex flex-col">
               {/* ヘッダー */}
@@ -88,7 +85,6 @@ export function TastingSessionCardDesktop({
                     router.push(`/tasting?sessionId=${session.id}&edit=true`);
                   }}
                   aria-label="編集"
-                  isChristmasMode={isChristmasMode}
                 >
                   <PencilSimple size={22} weight="duotone" />
                 </IconButton>
@@ -154,7 +150,7 @@ export function TastingSessionCardDesktop({
                               className="h-full transition-all duration-700"
                               style={{
                                 width: `${((item.value - 1) / 4) * 100}%`,
-                                backgroundColor: isChristmasMode ? '#d4af37' : item.color,
+                                backgroundColor: item.color,
                               }}
                             />
                           </div>

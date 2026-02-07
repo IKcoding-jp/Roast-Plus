@@ -106,41 +106,6 @@ describe('EmptyState', () => {
     });
   });
 
-  describe('クリスマスモード', () => {
-    it('クリスマスモードのタイトルスタイルが適用される', () => {
-      render(<EmptyState title="テスト" isChristmasMode />);
-      expect(screen.getByRole('heading').className).toContain('text-[#f8f1e7]');
-    });
-
-    it('クリスマスモードのdescriptionスタイルが適用される', () => {
-      render(
-        <EmptyState
-          title="テスト"
-          description="説明文"
-          isChristmasMode
-        />
-      );
-      expect(screen.getByText('説明文').className).toContain('text-[#f8f1e7]/60');
-    });
-
-    it('クリスマスモードのアイコンスタイルが適用される', () => {
-      const { container } = render(
-        <EmptyState
-          title="テスト"
-          icon={<span>📁</span>}
-          isChristmasMode
-        />
-      );
-      const iconContainer = container.querySelector('[class*="text-[#d4af37]/50"]');
-      expect(iconContainer).toBeInTheDocument();
-    });
-
-    it('通常モードのタイトルスタイルが適用される', () => {
-      render(<EmptyState title="テスト" isChristmasMode={false} />);
-      expect(screen.getByRole('heading').className).toContain('text-gray-700');
-    });
-  });
-
   describe('カスタムクラス', () => {
     it('classNameで追加のスタイルを指定できる', () => {
       const { container } = render(

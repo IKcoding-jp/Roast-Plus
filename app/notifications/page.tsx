@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { Loading } from '@/components/Loading';
 import { NotificationModal } from '@/components/notifications/NotificationModal';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
@@ -19,7 +18,6 @@ export default function NotificationsPage() {
   const { user, loading: authLoading } = useAuth();
   const { notifications, readIds, markAllAsRead, addNotification, updateNotification, deleteNotification, isLoading } = useNotifications();
   const { isEnabled: isDeveloperMode, isLoading: isDeveloperModeLoading } = useDeveloperMode();
-  const { isChristmasMode } = useChristmasMode();
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [editingNotification, setEditingNotification] = useState<Notification | null>(null);
@@ -150,7 +148,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+    <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
       <div className="max-w-4xl mx-auto">
         <header className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -202,7 +200,6 @@ export default function NotificationsPage() {
                     isFirst={isFirst}
                     isLast={isLast}
                     isDeveloperMode={isDeveloperMode}
-                    isChristmasMode={isChristmasMode}
                     onEdit={handleEditClick}
                     onDelete={handleDeleteClick}
                     onMoveUp={handleMoveUp}

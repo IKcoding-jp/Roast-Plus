@@ -62,7 +62,7 @@ describe('Button', () => {
       render(<Button variant="primary">プライマリ</Button>);
       const button = screen.getByText('プライマリ');
 
-      expect(button.className).toContain('bg-amber-600');
+      expect(button.className).toContain('bg-btn-primary');
     });
 
     it('secondaryバリアントのスタイルが適用される', () => {
@@ -76,7 +76,7 @@ describe('Button', () => {
       render(<Button variant="danger">削除</Button>);
       const button = screen.getByText('削除');
 
-      expect(button.className).toContain('bg-red-600');
+      expect(button.className).toContain('bg-danger');
     });
 
     it('outlineバリアントのスタイルが適用される', () => {
@@ -84,7 +84,7 @@ describe('Button', () => {
       const button = screen.getByText('アウトライン');
 
       expect(button.className).toContain('border-2');
-      expect(button.className).toContain('border-amber-500');
+      expect(button.className).toContain('border-spot');
     });
   });
 
@@ -123,32 +123,6 @@ describe('Button', () => {
     });
   });
 
-  describe('クリスマスモード', () => {
-    it('クリスマスモード時はクリスマススタイルが適用される', () => {
-      render(
-        <Button variant="primary" isChristmasMode>
-          クリスマス
-        </Button>
-      );
-      const button = screen.getByText('クリスマス');
-
-      // クリスマスモードの色
-      expect(button.className).toContain('bg-[#6d1a1a]');
-    });
-
-    it('通常モード時は通常スタイルが適用される', () => {
-      render(
-        <Button variant="primary" isChristmasMode={false}>
-          通常
-        </Button>
-      );
-      const button = screen.getByText('通常');
-
-      // 通常モードの色
-      expect(button.className).toContain('bg-amber-600');
-    });
-  });
-
   describe('バッジ', () => {
     it('badge指定時はバッジが表示される', () => {
       render(<Button badge={3}>フィルター</Button>);
@@ -171,16 +145,6 @@ describe('Button', () => {
       expect(button.querySelector('span[aria-label*="件"]')).not.toBeInTheDocument();
     });
 
-    it('クリスマスモード時のバッジスタイルが適用される', () => {
-      render(
-        <Button badge={5} isChristmasMode>
-          通知
-        </Button>
-      );
-
-      const badge = screen.getByLabelText('5件');
-      expect(badge.className).toContain('bg-[#d4af37]');
-    });
   });
 
   describe('カスタムクラス', () => {

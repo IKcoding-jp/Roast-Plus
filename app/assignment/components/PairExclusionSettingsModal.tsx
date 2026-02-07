@@ -12,7 +12,6 @@ interface PairExclusionSettingsModalProps {
     onClose: () => void;
     onAdd: (memberId1: string, memberId2: string) => Promise<void>;
     onDelete: (exclusionId: string) => Promise<void>;
-    isChristmasMode?: boolean;
 }
 
 export function PairExclusionSettingsModal({
@@ -22,7 +21,6 @@ export function PairExclusionSettingsModal({
     onClose,
     onAdd,
     onDelete,
-    isChristmasMode = false,
 }: PairExclusionSettingsModalProps) {
     const [memberId1, setMemberId1] = useState('');
     const [memberId2, setMemberId2] = useState('');
@@ -105,21 +103,18 @@ export function PairExclusionSettingsModal({
             onClick={onClose}
         >
             <div
-                className={`rounded-lg p-6 max-w-md w-full mx-4 shadow-xl max-h-[80vh] flex flex-col ${
-                    isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-                }`}
+                className="rounded-lg p-6 max-w-md w-full mx-4 shadow-xl max-h-[80vh] flex flex-col bg-overlay border border-edge"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* ヘッダー */}
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className={`text-lg font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                    <h2 className="text-lg font-bold text-ink">
                         ペア除外設定
                     </h2>
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={onClose}
-                        isChristmasMode={isChristmasMode}
                         className="!p-1 !min-h-0"
                         aria-label="閉じる"
                     >
@@ -128,12 +123,12 @@ export function PairExclusionSettingsModal({
                 </div>
 
                 {/* 説明文 */}
-                <p className={`text-sm mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+                <p className="text-sm mb-4 text-ink-sub">
                     シャッフル時に同じ行（タスク）に配置しないメンバーの組み合わせを設定します。
                 </p>
 
                 {/* 追加フォーム */}
-                <div className={`mb-6 p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-gray-50'}`}>
+                <div className="mb-6 p-4 rounded-lg bg-ground">
                     <div className="grid grid-cols-2 gap-3 mb-3">
                         <Select
                             label="メンバー1"
@@ -142,7 +137,6 @@ export function PairExclusionSettingsModal({
                             options={memberOptions}
                             placeholder="選択..."
                             disabled={isLoading}
-                            isChristmasMode={isChristmasMode}
                             className="!text-sm !py-2"
                         />
                         <Select
@@ -152,13 +146,12 @@ export function PairExclusionSettingsModal({
                             options={memberOptions}
                             placeholder="選択..."
                             disabled={isLoading}
-                            isChristmasMode={isChristmasMode}
                             className="!text-sm !py-2"
                         />
                     </div>
 
                     {error && (
-                        <p className={`text-sm mb-3 ${isChristmasMode ? 'text-red-400' : 'text-red-600'}`}>{error}</p>
+                        <p className="text-sm mb-3 text-red-600">{error}</p>
                     )}
 
                     <Button
@@ -168,7 +161,6 @@ export function PairExclusionSettingsModal({
                         disabled={isLoading || !memberId1 || !memberId2}
                         loading={isLoading}
                         fullWidth
-                        isChristmasMode={isChristmasMode}
                     >
                         追加
                     </Button>
@@ -176,12 +168,12 @@ export function PairExclusionSettingsModal({
 
                 {/* 既存の設定リスト */}
                 <div className="flex-1 overflow-y-auto">
-                    <h3 className={`text-sm font-medium mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+                    <h3 className="text-sm font-medium mb-2 text-ink">
                         設定済みのペア ({pairExclusions.length}件)
                     </h3>
 
                     {pairExclusions.length === 0 ? (
-                        <p className={`text-sm text-center py-4 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
+                        <p className="text-sm text-center py-4 text-ink-muted">
                             設定がありません
                         </p>
                     ) : (
@@ -189,16 +181,14 @@ export function PairExclusionSettingsModal({
                             {pairExclusions.map(exclusion => (
                                 <li
                                     key={exclusion.id}
-                                    className={`flex items-center justify-between p-3 rounded-lg ${
-                                        isChristmasMode ? 'bg-white/5' : 'bg-gray-50'
-                                    }`}
+                                    className="flex items-center justify-between p-3 rounded-lg bg-ground"
                                 >
                                     <div className="flex items-center gap-2 text-sm">
-                                        <span className={`font-medium ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                                        <span className="font-medium text-ink">
                                             {memberNameMap.get(exclusion.memberId1) || '(削除済み)'}
                                         </span>
-                                        <span className={isChristmasMode ? 'text-[#d4af37]/60' : 'text-gray-400'}>×</span>
-                                        <span className={`font-medium ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                                        <span className="text-ink-muted">×</span>
+                                        <span className="font-medium text-ink">
                                             {memberNameMap.get(exclusion.memberId2) || '(削除済み)'}
                                         </span>
                                     </div>
@@ -207,12 +197,7 @@ export function PairExclusionSettingsModal({
                                         size="sm"
                                         onClick={() => handleDelete(exclusion.id)}
                                         disabled={isLoading}
-                                        isChristmasMode={isChristmasMode}
-                                        className={`!p-1.5 !min-h-0 ${
-                                            isChristmasMode
-                                                ? '!text-red-400 hover:!text-red-300 hover:!bg-red-500/10'
-                                                : '!text-red-500 hover:!text-red-700 hover:!bg-red-50'
-                                        }`}
+                                        className="!p-1.5 !min-h-0 !text-red-500 hover:!text-red-700 hover:!bg-red-50"
                                         aria-label="削除"
                                     >
                                         <HiTrash className="w-4 h-4" />

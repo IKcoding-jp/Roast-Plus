@@ -23,7 +23,6 @@ interface DefectBeanFormFieldsProps {
   onSubmit: (e: React.FormEvent) => void;
   onDelete?: () => void;
   onCancel: () => void;
-  isChristmasMode?: boolean;
 }
 
 export function DefectBeanFormFields({
@@ -45,17 +44,8 @@ export function DefectBeanFormFields({
   onSubmit,
   onDelete,
   onCancel,
-  isChristmasMode = false,
 }: DefectBeanFormFieldsProps) {
-  const labelClass = `block text-sm font-semibold mb-2 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-700'}`;
-  const borderColor = isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200';
-  const dashedBorder = isChristmasMode
-    ? '!border-[#d4af37]/30 hover:!border-[#d4af37] hover:!bg-white/5'
-    : '!border-gray-300 hover:!border-amber-500 hover:!bg-amber-50';
-  const fileLabelClass = isChristmasMode
-    ? 'border-[#d4af37]/30 hover:border-[#d4af37] hover:bg-white/5 text-[#f8f1e7]/70'
-    : 'border-gray-300 hover:border-amber-500 hover:bg-amber-50';
-  const textMuted = isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500';
+  const labelClass = 'block text-sm font-semibold mb-2 text-ink-sub';
 
   return (
     <>
@@ -93,14 +83,13 @@ export function DefectBeanFormFields({
             <Button
               variant="ghost"
               onClick={onShowCamera}
-              isChristmasMode={isChristmasMode}
-              className={`!w-full !px-4 !py-12 !border-2 !border-dashed !rounded-lg flex-col !min-h-[200px] ${dashedBorder}`}
+              className="!w-full !px-4 !py-12 !border-2 !border-dashed !rounded-lg flex-col !min-h-[200px] !border-edge-strong hover:!border-spot hover:!bg-spot-subtle"
             >
-              <HiCamera className={`h-12 w-12 ${isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'}`} />
-              <span className={`font-medium ${isChristmasMode ? 'text-[#f8f1e7]/60' : 'text-gray-600'}`}>カメラで撮影</span>
+              <HiCamera className="h-12 w-12 text-ink-muted" />
+              <span className="font-medium text-ink-sub">カメラで撮影</span>
             </Button>
-            <div className={`text-center text-sm ${textMuted}`}>または</div>
-            <label className={`block w-full px-4 py-3 border-2 rounded-lg transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center ${fileLabelClass}`}>
+            <div className="text-center text-sm text-ink-muted">または</div>
+            <label className="block w-full px-4 py-3 border-2 rounded-lg transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center border-edge-strong hover:border-spot hover:bg-spot-subtle text-ink-sub">
               <span className="font-medium">ファイルを選択</span>
               <input
                 type="file"
@@ -126,7 +115,6 @@ export function DefectBeanFormFields({
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
             placeholder="例: カビ豆"
-            isChristmasMode={isChristmasMode}
             required
           />
         </div>
@@ -140,7 +128,6 @@ export function DefectBeanFormFields({
             value={characteristics}
             onChange={(e) => onCharacteristicsChange(e.target.value)}
             placeholder="例: 黒いカビが生えている。表面が黒ずんでいる。"
-            isChristmasMode={isChristmasMode}
             rows={4}
           />
         </div>
@@ -154,7 +141,6 @@ export function DefectBeanFormFields({
             value={tasteImpact}
             onChange={(e) => onTasteImpactChange(e.target.value)}
             placeholder="例: カビ臭さがコーヒーの風味を損なう。"
-            isChristmasMode={isChristmasMode}
             rows={4}
           />
         </div>
@@ -168,20 +154,18 @@ export function DefectBeanFormFields({
             value={removalReason}
             onChange={(e) => onRemovalReasonChange(e.target.value)}
             placeholder="例: 品質を保つため、カビ豆は必ず除去する。"
-            isChristmasMode={isChristmasMode}
             rows={4}
           />
         </div>
 
         {/* ボタン */}
-        <div className={`flex gap-3 pt-4 border-t ${borderColor} ${mode === 'edit' && onDelete ? 'justify-between' : 'justify-end'}`}>
+        <div className={`flex gap-3 pt-4 border-t border-edge ${mode === 'edit' && onDelete ? 'justify-between' : 'justify-end'}`}>
           {mode === 'edit' && onDelete && (
             <Button
               type="button"
               variant="danger"
               onClick={onDelete}
               disabled={isSubmitting || isDeleting}
-              isChristmasMode={isChristmasMode}
             >
               <HiTrash className="h-5 w-5" />
               {isDeleting ? '削除中...' : '削除'}
@@ -193,7 +177,6 @@ export function DefectBeanFormFields({
               variant="secondary"
               onClick={onCancel}
               disabled={isSubmitting || isDeleting}
-              isChristmasMode={isChristmasMode}
             >
               キャンセル
             </Button>
@@ -202,7 +185,6 @@ export function DefectBeanFormFields({
               variant="primary"
               disabled={isSubmitting || isDeleting}
               loading={isSubmitting}
-              isChristmasMode={isChristmasMode}
             >
               {isSubmitting
                 ? mode === 'edit'

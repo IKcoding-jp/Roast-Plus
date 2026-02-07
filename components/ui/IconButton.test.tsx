@@ -27,31 +27,31 @@ describe('IconButton', () => {
     it('defaultバリアントのスタイルが適用される', () => {
       render(<IconButton variant="default">X</IconButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('text-gray-500');
+      expect(button.className).toContain('text-ink-sub');
     });
 
     it('primaryバリアントのスタイルが適用される', () => {
       render(<IconButton variant="primary">X</IconButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('text-primary');
+      expect(button.className).toContain('text-spot');
     });
 
     it('dangerバリアントのスタイルが適用される', () => {
       render(<IconButton variant="danger">X</IconButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('text-red-500');
+      expect(button.className).toContain('text-danger');
     });
 
     it('successバリアントのスタイルが適用される', () => {
       render(<IconButton variant="success">X</IconButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('text-green-500');
+      expect(button.className).toContain('text-success');
     });
 
     it('ghostバリアントのスタイルが適用される', () => {
       render(<IconButton variant="ghost">X</IconButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('text-gray-400');
+      expect(button.className).toContain('text-ink-muted');
     });
   });
 
@@ -102,32 +102,6 @@ describe('IconButton', () => {
       render(<IconButton disabled>X</IconButton>);
       expect(screen.getByRole('button').className).toContain('opacity-50');
       expect(screen.getByRole('button').className).toContain('cursor-not-allowed');
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモード + defaultバリアントのスタイルが適用される', () => {
-      render(<IconButton isChristmasMode variant="default">X</IconButton>);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('text-[#f8f1e7]/70');
-    });
-
-    it('クリスマスモード + primaryバリアントのスタイルが適用される', () => {
-      render(<IconButton isChristmasMode variant="primary">X</IconButton>);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('text-[#d4af37]');
-    });
-
-    it('クリスマスモード + dangerバリアントのスタイルが適用される', () => {
-      render(<IconButton isChristmasMode variant="danger">X</IconButton>);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('text-red-400');
-    });
-
-    it('クリスマスモードのフォーカスリングスタイルが適用される', () => {
-      render(<IconButton isChristmasMode>X</IconButton>);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('focus:ring-[#d4af37]/50');
     });
   });
 

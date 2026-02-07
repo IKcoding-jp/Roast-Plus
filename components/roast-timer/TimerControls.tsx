@@ -11,7 +11,6 @@ interface TimerControlsProps {
   onResume: () => void;
   onSkip: () => void;
   onReset: () => void;
-  isChristmasMode: boolean;
 }
 
 /**
@@ -28,7 +27,6 @@ export function TimerControls({
   onResume,
   onSkip,
   onReset,
-  isChristmasMode,
 }: TimerControlsProps) {
   if (isRunning) {
     return (
@@ -38,7 +36,6 @@ export function TimerControls({
           size="md"
           onClick={onPause}
           className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
-          isChristmasMode={isChristmasMode}
         >
           <HiPause className="text-xl sm:text-2xl flex-shrink-0" />
           <span>一時停止</span>
@@ -48,7 +45,6 @@ export function TimerControls({
           size="md"
           onClick={onSkip}
           className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
-          isChristmasMode={isChristmasMode}
         >
           <HiFastForward className="text-xl sm:text-2xl flex-shrink-0" />
           <span>スキップ</span>
@@ -65,7 +61,6 @@ export function TimerControls({
           size="md"
           onClick={onResume}
           className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
-          isChristmasMode={isChristmasMode}
         >
           <HiPlay className="text-xl sm:text-2xl flex-shrink-0" />
           <span>再開</span>
@@ -75,7 +70,6 @@ export function TimerControls({
           size="md"
           onClick={onSkip}
           className="flex items-center justify-center gap-1 flex-1 max-w-[200px]"
-          isChristmasMode={isChristmasMode}
         >
           <HiFastForward className="text-xl sm:text-2xl flex-shrink-0" />
           <span>スキップ</span>
@@ -93,7 +87,6 @@ export function TimerControls({
           size="md"
           onClick={onReset}
           className="flex items-center justify-center gap-1"
-          isChristmasMode={isChristmasMode}
         >
           <HiRefresh className="text-xl sm:text-2xl flex-shrink-0" />
           <span>リセット</span>

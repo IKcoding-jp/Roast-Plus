@@ -7,7 +7,6 @@ interface RoastFieldsProps {
   bagCount: 1 | 2 | '';
   onRoastCountChange: (value: string) => void;
   onBagCountChange: (value: 1 | 2 | '') => void;
-  isChristmasMode?: boolean;
 }
 
 const BAG_COUNT_OPTIONS = [
@@ -20,19 +19,15 @@ export function RoastFields({
   bagCount,
   onRoastCountChange,
   onBagCountChange,
-  isChristmasMode = false,
 }: RoastFieldsProps) {
   return (
-    <div className={`space-y-3 md:space-y-4 border-t pt-3 md:pt-4 ${
-      isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
-    }`}>
+    <div className="space-y-3 md:space-y-4 border-t pt-3 md:pt-4 border-edge">
       <NumberInput
         label="何回目 *"
         value={roastCount}
         onChange={(e) => onRoastCountChange(e.target.value)}
         min={1}
         placeholder="回数を入力"
-        isChristmasMode={isChristmasMode}
       />
 
       <Select
@@ -41,7 +36,6 @@ export function RoastFields({
         onChange={(e) => onBagCountChange(e.target.value ? (parseInt(e.target.value, 10) as 1 | 2) : '')}
         options={BAG_COUNT_OPTIONS}
         placeholder="選択してください"
-        isChristmasMode={isChristmasMode}
       />
     </div>
   );

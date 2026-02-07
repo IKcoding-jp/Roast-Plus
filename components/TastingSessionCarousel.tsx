@@ -5,7 +5,6 @@ import { calculateAverageScores, getRecordsBySessionId } from '@/lib/tastingUtil
 import { useTastingAIAnalysis } from '@/hooks/useTastingAIAnalysis';
 import { TastingSessionCardDesktop } from './TastingSessionCardDesktop';
 import { TastingSessionCardMobile } from './TastingSessionCardMobile';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionCarouselProps {
   sessions: TastingSession[];
@@ -69,7 +68,6 @@ export function TastingSessionCarousel({
 }: TastingSessionCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const { isChristmasMode } = useChristmasMode();
 
   // セッションカードの共通データを準備
   const sessionData = useMemo(
@@ -128,7 +126,7 @@ export function TastingSessionCarousel({
   if (sessions.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className={`font-serif italic ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-stone-500'}`}>
+        <p className="font-serif italic text-ink-muted">
           試飲セッションがありません
         </p>
       </div>
@@ -161,13 +159,9 @@ export function TastingSessionCarousel({
         {/* 横スクロールコンテナ */}
         <div
           ref={scrollContainerRef}
-          className={`flex flex-row gap-4 px-4 h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory
+          className="flex flex-row gap-4 px-4 h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory
                      [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:mx-8 [&::-webkit-scrollbar-track]:rounded-full
-                     [&::-webkit-scrollbar-thumb]:rounded-full ${
-                       isChristmasMode
-                         ? '[&::-webkit-scrollbar-track]:bg-[#d4af37]/20 [&::-webkit-scrollbar-thumb]:bg-[#d4af37]'
-                         : '[&::-webkit-scrollbar-track]:bg-stone-200/50 [&::-webkit-scrollbar-thumb]:bg-[#8D6E63]'
-                     }`}
+                     [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-ground [&::-webkit-scrollbar-thumb]:bg-spot"
           style={{
             WebkitOverflowScrolling: 'touch',
           }}
@@ -193,8 +187,8 @@ export function TastingSessionCarousel({
               key={index}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                 index === activeIndex
-                  ? isChristmasMode ? 'bg-[#d4af37] scale-125' : 'bg-gray-700 scale-125'
-                  : isChristmasMode ? 'bg-[#d4af37]/30' : 'bg-gray-300'
+                  ? 'bg-spot scale-125'
+                  : 'bg-spot/30'
               }`}
             />
           ))}

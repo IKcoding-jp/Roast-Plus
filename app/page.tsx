@@ -246,9 +246,9 @@ export default function HomePage(_props: HomePageProps = {}) {
   }
 
   return (
-    <div className={`min-h-screen text-slate-100 animate-home-page relative transition-colors duration-1000 ${isChristmasMode
-      ? 'bg-[#051a0e] bg-[radial-gradient(circle_at_center,_#0a2f1a_0%,_#051a0e_100%)]'
-      : 'bg-gray-50 text-[#1F2A44]'
+    <div className={`min-h-screen animate-home-page relative transition-colors duration-1000 bg-page text-ink ${isChristmasMode
+      ? 'bg-[radial-gradient(circle_at_center,_#0a2f1a_0%,_#051a0e_100%)]'
+      : ''
       }`}>
       {isChristmasMode && <Snowfall />}
 
@@ -349,7 +349,7 @@ export default function HomePage(_props: HomePageProps = {}) {
               onClick={() => router.push('/clock')}
               className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${
                 isChristmasMode
-                  ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner'
+                  ? 'text-spot bg-white/5 hover:bg-spot/20 border border-spot/20 shadow-inner'
                   : 'text-white hover:bg-white/10'
               }`}
               aria-label="デジタル時計を表示"
@@ -362,7 +362,7 @@ export default function HomePage(_props: HomePageProps = {}) {
               <>
                 <button
                   onClick={() => window.dispatchEvent(new Event(REPLAY_SPLASH_EVENT))}
-                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner' : 'text-white hover:bg-white/10'
+                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-spot bg-white/5 hover:bg-spot/20 border border-spot/20 shadow-inner' : 'text-white hover:bg-white/10'
                     }`}
                   aria-label="スプラッシュ画面を再生"
                   title="スプラッシュ再生"
@@ -371,7 +371,7 @@ export default function HomePage(_props: HomePageProps = {}) {
                 </button>
                 <button
                   onClick={handleShowLoadingDebugModal}
-                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-[#d4af37] bg-white/5 hover:bg-[#d4af37]/20 border border-[#d4af37]/20 shadow-inner' : 'text-white hover:bg-white/10'
+                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-spot bg-white/5 hover:bg-spot/20 border border-spot/20 shadow-inner' : 'text-white hover:bg-white/10'
                     }`}
                   aria-label="Lottieアニメーション確認モーダルを開く"
                 >
@@ -406,7 +406,6 @@ export default function HomePage(_props: HomePageProps = {}) {
                 badge={badge}
                 index={index}
                 cardHeight={cardHeight}
-                isChristmasMode={isChristmasMode}
               />
             );
           })}

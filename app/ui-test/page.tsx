@@ -28,8 +28,7 @@ export default function UITestPage() {
 
   return (
     <div
-      className="min-h-screen p-6"
-      style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}
+      className="min-h-screen p-6 bg-page"
     >
       <div className="max-w-2xl mx-auto space-y-6">
         {/* ヘッダー */}
@@ -37,17 +36,13 @@ export default function UITestPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/settings"
-              className={`flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg transition-colors ${
-                isChristmasMode
-                  ? 'text-[#d4af37] hover:bg-white/10'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-              }`}
+              className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg transition-colors text-ink-sub hover:text-ink hover:bg-ground"
               title="設定に戻る"
               aria-label="設定に戻る"
             >
               <HiArrowLeft className="h-6 w-6" />
             </Link>
-            <h1 className={`text-2xl font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-gray-800'}`}>
+            <h1 className="text-2xl font-bold text-spot">
               UIコンポーネントテスト
             </h1>
           </div>
@@ -55,15 +50,14 @@ export default function UITestPage() {
             variant="outline"
             size="sm"
             onClick={toggleChristmasMode}
-            isChristmasMode={isChristmasMode}
           >
             {isChristmasMode ? '通常モード' : 'クリスマスモード'}
           </Button>
         </header>
 
         {/* 統計情報 */}
-        <div className={`p-4 rounded-lg ${isChristmasMode ? 'bg-white/5' : 'bg-amber-50'}`}>
-          <p className={`text-sm ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-amber-800'}`}>
+        <div className="p-4 rounded-lg bg-spot-surface">
+          <p className="text-sm text-spot">
             <span className="font-bold">{componentRegistry.length}</span> 個の共通コンポーネントが登録されています
           </p>
         </div>
@@ -76,30 +70,30 @@ export default function UITestPage() {
           return (
             <div key={category} className="space-y-4">
               {/* カテゴリヘッダー */}
-              <h2 className={`text-lg font-bold ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-700'}`}>
+              <h2 className="text-lg font-bold text-spot">
                 {categoryLabels[category]}
-                <span className={`ml-2 text-sm font-normal ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>
+                <span className="ml-2 text-sm font-normal text-ink-muted">
                   ({components.length})
                 </span>
               </h2>
 
               {/* コンポーネントカード */}
               {components.map((item) => (
-                <Card key={item.name} isChristmasMode={isChristmasMode}>
+                <Card key={item.name}>
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className={`text-lg font-bold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                      <h3 className="text-lg font-bold text-ink">
                         {item.name}
                         {item.isNew && (
                           <span className="text-xs font-normal text-amber-500 ml-2">NEW</span>
                         )}
                       </h3>
-                      <p className={`text-sm mt-1 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+                      <p className="text-sm mt-1 text-ink-sub">
                         {item.description}
                       </p>
                     </div>
                   </div>
-                  <item.Demo isChristmasMode={isChristmasMode} />
+                  <item.Demo />
                 </Card>
               ))}
             </div>
@@ -107,10 +101,10 @@ export default function UITestPage() {
         })}
 
         {/* フッター */}
-        <div className={`text-center py-8 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'}`}>
+        <div className="text-center py-8 text-ink-muted">
           <p className="text-sm">
             新しいコンポーネントを追加するには<br />
-            <code className={`px-2 py-1 rounded ${isChristmasMode ? 'bg-white/10' : 'bg-gray-100'}`}>
+            <code className="px-2 py-1 rounded bg-ground">
               components/ui/registry.tsx
             </code>
             <br />

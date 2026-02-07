@@ -16,7 +16,6 @@ import {
 import { Input, Select, Button } from '@/components/ui';
 import { ROAST_LEVELS } from '@/lib/constants';
 import { formatDateString } from '@/lib/dateUtils';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionFormProps {
   session: TastingSession | null;
@@ -33,7 +32,6 @@ export function TastingSessionForm({
 }: TastingSessionFormProps) {
   const isNew = !session;
   const { showToast } = useToastContext();
-  const { isChristmasMode } = useChristmasMode();
 
   const [beanName, setBeanName] = useState(session?.beanName || '');
   const [createdAt, setCreatedAt] = useState(
@@ -78,17 +76,11 @@ export function TastingSessionForm({
       onSubmit={handleSubmit}
       className="space-y-5"
     >
-      <div className={`rounded-2xl p-5 sm:p-6 shadow-sm space-y-5 ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-          : 'bg-white border border-gray-100'
-      }`}>
+      <div className="rounded-2xl p-5 sm:p-6 shadow-sm space-y-5 bg-surface border border-edge">
         {/* 豆の名前（必須） */}
         <div className="space-y-2">
-          <label className={`flex items-center gap-2 text-sm font-bold ml-1 ${
-            isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-          }`}>
-            <Coffee size={18} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
+          <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
+            <Coffee size={18} weight="bold" className="text-spot" />
             豆の名前 <span className="text-red-500">*</span>
           </label>
           <Input
@@ -97,17 +89,14 @@ export function TastingSessionForm({
             onChange={(e) => setBeanName(e.target.value)}
             required
             placeholder="例: コロンビア・エチオピアなど"
-            isChristmasMode={isChristmasMode}
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* 焙煎度合い（必須） */}
           <div className="space-y-2">
-            <label className={`flex items-center gap-2 text-sm font-bold ml-1 ${
-              isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-            }`}>
-              <Thermometer size={18} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
+            <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
+              <Thermometer size={18} weight="bold" className="text-spot" />
               焙煎度合い <span className="text-red-500">*</span>
             </label>
             <Select
@@ -119,16 +108,13 @@ export function TastingSessionForm({
               }
               options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
               required
-              isChristmasMode={isChristmasMode}
             />
           </div>
 
           {/* 試飲日 */}
           <div className="space-y-2">
-            <label className={`flex items-center gap-2 text-sm font-bold ml-1 ${
-              isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-            }`}>
-              <CalendarBlank size={18} weight="bold" className={isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} />
+            <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
+              <CalendarBlank size={18} weight="bold" className="text-spot" />
               試飲日 <span className="text-red-500">*</span>
             </label>
             <Input
@@ -136,7 +122,6 @@ export function TastingSessionForm({
               value={createdAt}
               onChange={(e) => setCreatedAt(e.target.value)}
               required
-              isChristmasMode={isChristmasMode}
             />
           </div>
         </div>
@@ -150,7 +135,6 @@ export function TastingSessionForm({
             variant="danger"
             onClick={handleDelete}
             className="flex-1 order-3 sm:order-1"
-            isChristmasMode={isChristmasMode}
           >
             <Trash size={20} weight="bold" />
             削除
@@ -161,7 +145,6 @@ export function TastingSessionForm({
           variant="secondary"
           onClick={onCancel}
           className="flex-1 order-2"
-          isChristmasMode={isChristmasMode}
         >
           <X size={20} weight="bold" />
           キャンセル
@@ -170,7 +153,6 @@ export function TastingSessionForm({
           type="submit"
           variant="primary"
           className="flex-[1.5] order-1 sm:order-3"
-          isChristmasMode={isChristmasMode}
         >
           {isNew ? (
             <>

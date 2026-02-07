@@ -8,7 +8,6 @@ import { OCRRoastScheduleEditor } from '../OCRRoastScheduleEditor';
 import { useToastContext } from '../Toast';
 import { sortTimeLabels, sortRoastSchedules } from './OCRConfirmHelpers';
 import type { TabType } from './OCRConfirmHelpers';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { Button, IconButton } from '@/components/ui';
 
 interface OCRConfirmModalProps {
@@ -33,7 +32,6 @@ export function OCRConfirmModal({
   onRetry,
 }: OCRConfirmModalProps) {
   const { showToast } = useToastContext();
-  const { isChristmasMode } = useChristmasMode();
   const [activeTab, setActiveTab] = useState<TabType>('timeLabels');
   const [mode, setMode] = useState<'replace' | 'add'>('replace');
   const [timeLabels, setTimeLabels] = useState<TimeLabel[]>(() =>
@@ -134,25 +132,16 @@ export function OCRConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className={`rounded-lg shadow-xl max-w-4xl w-full mx-4 flex flex-col max-h-[90vh] ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-          : 'bg-white'
-      }`}>
+      <div className="rounded-lg shadow-xl max-w-4xl w-full mx-4 flex flex-col max-h-[90vh] bg-overlay border border-edge">
         {/* ヘッダー */}
-        <div className={`flex items-center justify-between p-4 sm:p-6 border-b flex-shrink-0 ${
-          isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
-        }`}>
-          <h2 className={`text-lg sm:text-xl font-bold ${
-            isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-          }`}>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b flex-shrink-0 border-edge">
+          <h2 className="text-lg sm:text-xl font-bold text-ink">
             読み取り結果の確認
           </h2>
           <IconButton
             variant="ghost"
             size="md"
             onClick={onCancel}
-            isChristmasMode={isChristmasMode}
             rounded
             aria-label="閉じる"
           >
@@ -162,19 +151,14 @@ export function OCRConfirmModal({
 
         {/* モード選択 */}
         {hasExistingData && (
-          <div className={`px-4 sm:px-6 py-3 border-b flex-shrink-0 ${
-            isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
-          }`}>
+          <div className="px-4 sm:px-6 py-3 border-b flex-shrink-0 border-edge">
             <div className="flex items-center gap-4">
-              <span className={`text-sm font-medium ${
-                isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'
-              }`}>適用方法:</span>
+              <span className="text-sm font-medium text-ink">適用方法:</span>
               <div className="flex gap-2">
                 <Button
                   variant={mode === 'replace' ? 'primary' : 'ghost'}
                   size="sm"
                   onClick={() => setMode('replace')}
-                  isChristmasMode={isChristmasMode}
                 >
                   置き換え
                 </Button>
@@ -182,7 +166,6 @@ export function OCRConfirmModal({
                   variant={mode === 'add' ? 'primary' : 'ghost'}
                   size="sm"
                   onClick={() => setMode('add')}
-                  isChristmasMode={isChristmasMode}
                 >
                   追加
                 </Button>
@@ -192,26 +175,18 @@ export function OCRConfirmModal({
         )}
 
         {/* タブ */}
-        <div className={`flex border-b flex-shrink-0 ${
-          isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
-        }`}>
+        <div className="flex border-b flex-shrink-0 border-edge">
           <button
             onClick={() => setActiveTab('timeLabels')}
             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
               activeTab === 'timeLabels'
-                ? isChristmasMode
-                  ? 'bg-[#d4af37]/20 text-[#d4af37] border-b-2 border-[#d4af37]'
-                  : 'bg-amber-50 text-amber-700 border-b-2 border-amber-600'
-                : isChristmasMode
-                  ? 'bg-transparent text-[#f8f1e7]/70 hover:bg-white/5'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? 'bg-spot-subtle text-spot border-b-2 border-spot'
+                : 'bg-surface text-ink-sub hover:bg-ground'
             }`}
           >
             <HiClock className="h-5 w-5" />
             <span>本日のスケジュール</span>
-            <span className={`rounded-full px-2 py-0.5 text-xs ${
-              isChristmasMode ? 'bg-[#d4af37]/30 text-[#f8f1e7]' : 'bg-gray-200 text-gray-700'
-            }`}>
+            <span className="rounded-full px-2 py-0.5 text-xs bg-ground text-ink">
               {timeLabels.length}
             </span>
           </button>
@@ -219,19 +194,13 @@ export function OCRConfirmModal({
             onClick={() => setActiveTab('roastSchedules')}
             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
               activeTab === 'roastSchedules'
-                ? isChristmasMode
-                  ? 'bg-[#d4af37]/20 text-[#d4af37] border-b-2 border-[#d4af37]'
-                  : 'bg-amber-50 text-amber-700 border-b-2 border-amber-600'
-                : isChristmasMode
-                  ? 'bg-transparent text-[#f8f1e7]/70 hover:bg-white/5'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? 'bg-spot-subtle text-spot border-b-2 border-spot'
+                : 'bg-surface text-ink-sub hover:bg-ground'
             }`}
           >
             <HiFire className="h-5 w-5" />
             <span>ローストスケジュール</span>
-            <span className={`rounded-full px-2 py-0.5 text-xs ${
-              isChristmasMode ? 'bg-[#d4af37]/30 text-[#f8f1e7]' : 'bg-gray-200 text-gray-700'
-            }`}>
+            <span className="rounded-full px-2 py-0.5 text-xs bg-ground text-ink">
               {roastSchedules.length}
             </span>
           </button>
@@ -246,7 +215,6 @@ export function OCRConfirmModal({
               onDelete={(id) => {
                 setTimeLabels(timeLabels.filter((label) => label.id !== id));
               }}
-              isChristmasMode={isChristmasMode}
             />
           ) : (
             <OCRRoastScheduleEditor
@@ -256,20 +224,16 @@ export function OCRConfirmModal({
               onDelete={(id) => {
                 setRoastSchedules(roastSchedules.filter((schedule) => schedule.id !== id));
               }}
-              isChristmasMode={isChristmasMode}
             />
           )}
         </div>
 
         {/* フッター */}
-        <div className={`flex items-center justify-between p-4 sm:p-6 border-t gap-3 flex-shrink-0 ${
-          isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200'
-        }`}>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-t gap-3 flex-shrink-0 border-edge">
           <Button
             variant="ghost"
             size="md"
             onClick={onRetry}
-            isChristmasMode={isChristmasMode}
             aria-label="再解析"
           >
             再解析
@@ -279,7 +243,6 @@ export function OCRConfirmModal({
               variant="secondary"
               size="md"
               onClick={onCancel}
-              isChristmasMode={isChristmasMode}
             >
               キャンセル
             </Button>
@@ -287,7 +250,6 @@ export function OCRConfirmModal({
               variant="primary"
               size="md"
               onClick={handleSave}
-              isChristmasMode={isChristmasMode}
             >
               保存
             </Button>

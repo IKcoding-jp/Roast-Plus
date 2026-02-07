@@ -60,7 +60,7 @@ export function HelpGuideModal({ show, onClose }: HelpGuideModalProps) {
     <Modal
       show={show}
       onClose={onClose}
-      contentClassName="bg-white rounded-2xl shadow-xl overflow-hidden max-w-sm w-full max-h-[85vh] flex flex-col"
+      contentClassName="bg-overlay rounded-2xl shadow-xl overflow-hidden max-w-sm w-full max-h-[85vh] flex flex-col border border-edge"
     >
       <>
         {/* ヘッダー - オレンジグラデーション */}

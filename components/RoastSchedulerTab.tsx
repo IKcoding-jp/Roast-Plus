@@ -13,10 +13,9 @@ interface RoastSchedulerTabProps {
   onUpdate: (data: AppData) => void;
   selectedDate: string; // YYYY-MM-DD形式
   isToday: boolean; // 選択日が今日かどうか
-  isChristmasMode?: boolean;
 }
 
-export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isToday, isChristmasMode = false }: RoastSchedulerTabProps) {
+export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isToday }: RoastSchedulerTabProps) {
   const [editingSchedule, setEditingSchedule] = useState<RoastSchedule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -262,37 +261,26 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
 
   if (!data) {
     return (
-      <div className={`rounded-2xl p-6 shadow-xl ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border-2 border-[#d4af37]/30'
-          : 'bg-white border-2 border-gray-300'
-      }`}>
-        <p className={`text-center ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>データがありません</p>
+      <div className="rounded-2xl p-6 shadow-xl bg-surface border-2 border-edge-strong">
+        <p className="text-center text-ink-sub">データがありません</p>
       </div>
     );
   }
 
   return (
     <div
-      className={`relative rounded-2xl p-4 md:p-6 shadow-xl h-full flex flex-col backdrop-blur-sm ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border-2 border-[#d4af37]/30'
-          : 'bg-white border-2 border-gray-300'
-      }`}
+      className="relative rounded-2xl p-4 md:p-6 shadow-xl h-full flex flex-col backdrop-blur-sm bg-surface border-2 border-edge-strong"
       data-is-today={_isToday}
     >
       {/* デスクトップ版：タイトルと追加ボタンを横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex items-center justify-between">
-        <h2 className={`text-base md:text-lg font-semibold ${
-          isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-        }`}>
+        <h2 className="text-base md:text-lg font-semibold text-ink">
           ローストスケジュール
         </h2>
         <Button
           variant="primary"
           size="sm"
           onClick={handleAdd}
-          isChristmasMode={isChristmasMode}
           aria-label="スケジュールを追加"
         >
           <HiPlus className="h-4 w-4" />
@@ -301,19 +289,13 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
       </div>
 
       {sortedSchedules.length === 0 ? (
-        <div className={`flex-1 flex items-center justify-center text-center ${
-          isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'
-        }`}>
+        <div className="flex-1 flex items-center justify-center text-center text-ink-sub">
           <div>
             <div className="mb-3 md:mb-5 flex justify-center">
-              <HiCalendar className={`h-12 w-12 md:h-20 md:w-20 ${
-                isChristmasMode ? 'text-[#d4af37]/30' : 'text-gray-300'
-              }`} />
+              <HiCalendar className="h-12 w-12 md:h-20 md:w-20 text-ink-muted" />
             </div>
             <p className="text-sm md:text-lg font-medium">スケジュールがありません</p>
-            <p className={`mt-1.5 md:mt-3 text-xs md:text-base ${
-              isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'
-            }`}>ボタンから新しいスケジュールを作成してください</p>
+            <p className="mt-1.5 md:mt-3 text-xs md:text-base text-ink-muted">ボタンから新しいスケジュールを作成してください</p>
           </div>
         </div>
       ) : (
@@ -331,7 +313,6 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, schedule.id)}
                 onDragEnd={handleDragEnd}
-                isChristmasMode={isChristmasMode}
               />
             ))}
             {/* モバイル版：追加ボタンを一番下に表示 */}
@@ -340,7 +321,6 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
                 variant="primary"
                 size="md"
                 onClick={handleAdd}
-                isChristmasMode={isChristmasMode}
                 aria-label="スケジュールを追加"
               >
                 <HiPlus className="h-4 w-4" />
@@ -358,7 +338,6 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
             variant="primary"
             size="md"
             onClick={handleAdd}
-            isChristmasMode={isChristmasMode}
             aria-label="スケジュールを追加"
           >
             <HiPlus className="h-4 w-4" />

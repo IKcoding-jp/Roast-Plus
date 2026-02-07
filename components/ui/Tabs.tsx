@@ -15,23 +15,11 @@ import { forwardRef, createContext, useContext, useState } from 'react';
  *   <TabsContent value="tab1">タブ1の内容</TabsContent>
  *   <TabsContent value="tab2">タブ2の内容</TabsContent>
  * </Tabs>
- *
- * @example
- * // クリスマスモード
- * const { isChristmasMode } = useChristmasMode();
- * <Tabs defaultValue="today" isChristmasMode={isChristmasMode}>
- *   <TabsList>
- *     <TabsTrigger value="today">本日</TabsTrigger>
- *     <TabsTrigger value="all">すべて</TabsTrigger>
- *   </TabsList>
- *   ...
- * </Tabs>
  */
 
 interface TabsContextValue {
   value: string;
   setValue: (value: string) => void;
-  isChristmasMode: boolean;
 }
 
 const TabsContext = createContext<TabsContextValue | undefined>(undefined);
@@ -52,12 +40,10 @@ export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string;
   /** 値が変更されたときのコールバック */
   onValueChange?: (value: string) => void;
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
-  ({ defaultValue, value: controlledValue, onValueChange, isChristmasMode = false, children, className = '', ...props }, ref) => {
+  ({ defaultValue, value: controlledValue, onValueChange, children, className = '', ...props }, ref) => {
     const [internalValue, setInternalValue] = useState(defaultValue);
     const value = controlledValue ?? internalValue;
 
@@ -67,7 +53,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
     };
 
     return (
-      <TabsContext.Provider value={{ value, setValue, isChristmasMode }}>
+      <TabsContext.Provider value={{ value, setValue }}>
         <div ref={ref} className={className} {...props}>
           {children}
         </div>
@@ -82,14 +68,8 @@ export type TabsListProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
   ({ children, className = '', ...props }, ref) => {
-    const { isChristmasMode } = useTabsContext();
-
-    const listStyles = isChristmasMode
-      ? 'flex rounded-lg bg-white/10 p-1'
-      : 'flex rounded-lg bg-gray-100 p-1';
-
     return (
-      <div ref={ref} className={`${listStyles} ${className}`} role="tablist" {...props}>
+      <div ref={ref} className={`flex rounded-lg bg-ground p-1 ${className}`} role="tablist" {...props}>
         {children}
       </div>
     );
@@ -105,20 +85,14 @@ export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonE
 
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ value, children, className = '', ...props }, ref) => {
-    const { value: selectedValue, setValue, isChristmasMode } = useTabsContext();
+    const { value: selectedValue, setValue } = useTabsContext();
     const isSelected = value === selectedValue;
 
     const baseStyles = 'flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 min-h-[40px]';
 
-    const normalStyles = isSelected
-      ? 'bg-white text-gray-900 shadow-sm'
-      : 'text-gray-600 hover:text-gray-900 hover:bg-white/50';
-
-    const christmasStyles = isSelected
-      ? 'bg-[#d4af37]/20 text-[#d4af37] shadow-sm'
-      : 'text-[#f8f1e7]/70 hover:text-[#f8f1e7] hover:bg-white/5';
-
-    const variantStyles = isChristmasMode ? christmasStyles : normalStyles;
+    const variantStyles = isSelected
+      ? 'tab-active shadow-sm'
+      : 'text-ink-sub hover:text-ink hover:bg-ground';
 
     return (
       <button

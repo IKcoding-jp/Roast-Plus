@@ -81,24 +81,7 @@ describe('Select', () => {
 
     it('エラー時はエラースタイルが適用される', () => {
       render(<Select options={mockOptions} error="エラー" />);
-      expect(screen.getByRole('combobox').className).toContain('border-red-500');
-    });
-  });
-
-  describe('クリスマスモード', () => {
-    it('クリスマスモード時はクリスマススタイルが適用される', () => {
-      render(<Select options={mockOptions} isChristmasMode />);
-      expect(screen.getByRole('combobox').className).toContain('border-[#d4af37]');
-    });
-
-    it('通常モード時は通常スタイルが適用される', () => {
-      render(<Select options={mockOptions} isChristmasMode={false} />);
-      expect(screen.getByRole('combobox').className).toContain('border-gray-200');
-    });
-
-    it('クリスマスモード時のエラースタイルが適用される', () => {
-      render(<Select options={mockOptions} error="エラー" isChristmasMode />);
-      expect(screen.getByRole('combobox').className).toContain('border-red-400');
+      expect(screen.getByRole('combobox').className).toContain('border-error');
     });
   });
 

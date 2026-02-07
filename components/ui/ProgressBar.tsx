@@ -16,11 +16,6 @@ import { forwardRef } from 'react';
  * @example
  * // バリアントとサイズ
  * <ProgressBar value={50} variant="success" size="lg" />
- *
- * @example
- * // クリスマスモード
- * const { isChristmasMode } = useChristmasMode();
- * <ProgressBar value={80} isChristmasMode={isChristmasMode} />
  */
 
 export interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -38,8 +33,6 @@ export interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
   showValue?: boolean;
   /** アニメーション有効 */
   animated?: boolean;
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 export const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
@@ -52,7 +45,6 @@ export const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
       label,
       showValue = false,
       animated = true,
-      isChristmasMode = false,
       className = '',
       ...props
     },
@@ -67,56 +59,30 @@ export const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
       lg: 'h-4',
     };
 
-    // 通常モードのバリアントスタイル（バーの色）
-    const normalBarStyles = {
-      default: 'bg-gray-500',
-      primary: 'bg-amber-500',
+    // バリアントスタイル（バーの色）
+    const barStyles = {
+      default: 'bg-ink-muted',
+      primary: 'bg-spot',
       success: 'bg-green-500',
       warning: 'bg-yellow-500',
       danger: 'bg-red-500',
       coffee: 'bg-[#211714]',
     };
-
-    // クリスマスモードのバリアントスタイル
-    const christmasBarStyles = {
-      default: 'bg-[#f8f1e7]/50',
-      primary: 'bg-[#d4af37]',
-      success: 'bg-green-500',
-      warning: 'bg-yellow-500',
-      danger: 'bg-red-500',
-      coffee: 'bg-[#211714]',
-    };
-
-    const barStyles = isChristmasMode ? christmasBarStyles : normalBarStyles;
-
-    // トラック（背景）スタイル
-    const trackStyles = isChristmasMode
-      ? 'bg-white/10'
-      : 'bg-gray-200';
-
-    // ラベルスタイル
-    const labelStyles = isChristmasMode
-      ? 'text-[#f8f1e7]'
-      : 'text-gray-700';
-
-    const valueStyles = isChristmasMode
-      ? 'text-[#f8f1e7]/70'
-      : 'text-gray-500';
 
     return (
       <div ref={ref} className={className} {...props}>
         {(label || showValue) && (
           <div className="flex justify-between items-center mb-1">
             {label && (
-              <span className={`text-sm font-medium ${labelStyles}`}>{label}</span>
+              <span className="text-sm font-medium text-ink">{label}</span>
             )}
             {showValue && (
-              <span className={`text-sm ${valueStyles}`}>{Math.round(percentage)}%</span>
+              <span className="text-sm text-ink-sub">{Math.round(percentage)}%</span>
             )}
           </div>
         )}
         <div
-          className={`w-full rounded-full overflow-hidden ${trackStyles} ${sizeStyles[size]}`}
+          className={`w-full rounded-full overflow-hidden bg-ground ${sizeStyles[size]}`}
           role="progressbar"
           aria-valuenow={value}
           aria-valuemin={0}

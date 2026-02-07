@@ -4,12 +4,17 @@
  * ローストプラス カードコンポーネントテンプレート
  *
  * 用途: グリッド表示、リスト表示、ダッシュボードなどで使用
- * パターン: 基本カード、ボタンカード（ホームページ）、二重ボーダーカード
+ * パターン: 基本カード、ボタンカード、二重ボーダーカード
  *
  * 使用方法:
  * 1. 必要なパターンを選択
  * 2. props を定義
  * 3. JSX を追加
+ *
+ * テーマ対応:
+ * CSS変数ベースのテーマシステムを使用。
+ * text-ink, text-ink-sub, bg-surface, bg-ground, border-edge 等のクラスは
+ * 親要素の .christmas クラスにより自動的に配色が切り替わる。
  */
 
 import React from 'react';
@@ -35,9 +40,9 @@ export function BasicCard({
 }: BasicCardProps) {
   return (
     <div
-      className={`bg-white rounded-2xl shadow-md border border-gray-100 p-4 sm:p-6 transition-all ${
+      className={`bg-surface rounded-2xl shadow-md border border-edge p-4 sm:p-6 transition-all ${
         isClickable || onClick
-          ? 'hover:shadow-lg hover:border-gray-300 hover:-translate-y-1 cursor-pointer'
+          ? 'hover:shadow-lg hover:border-edge-strong hover:-translate-y-1 cursor-pointer'
           : ''
       }`}
       onClick={onClick}
@@ -45,13 +50,13 @@ export function BasicCard({
       tabIndex={isClickable || onClick ? 0 : undefined}
     >
       {/* タイトル */}
-      <h3 className="text-lg font-bold text-gray-800 mb-2">
+      <h3 className="text-lg font-bold text-ink mb-2">
         {title}
       </h3>
 
       {/* 説明文 */}
       {description && (
-        <p className="text-gray-600 text-sm mb-4">
+        <p className="text-ink-sub text-sm mb-4">
           {description}
         </p>
       )}
@@ -84,7 +89,7 @@ export function ButtonCard({
   return (
     <button
       onClick={onClick}
-      className="group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 shadow-2xl transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-white/95 text-[#1F2A44] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-amber-600 focus-visible:ring-offset-[#F5F2EB]"
+      className="group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 shadow-2xl transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-surface text-ink shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-spot"
     >
       {/* バッジ */}
       {badge && (
@@ -96,7 +101,7 @@ export function ButtonCard({
       )}
 
       {/* アイコン */}
-      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-amber-600/10 text-amber-600 group-hover:bg-amber-600/15 transition-all">
+      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-spot-subtle text-spot group-hover:scale-110 transition-all">
         <div className="h-8 w-8 relative z-10">
           {icon}
         </div>
@@ -104,10 +109,10 @@ export function ButtonCard({
 
       {/* テキスト */}
       <div className="space-y-1 text-center relative z-10">
-        <p className="font-bold text-base md:text-lg text-slate-900">
+        <p className="font-bold text-base md:text-lg text-ink">
           {title}
         </p>
-        <p className="text-xs md:text-sm text-slate-500">
+        <p className="text-xs md:text-sm text-ink-muted">
           {description}
         </p>
       </div>
@@ -116,14 +121,13 @@ export function ButtonCard({
 }
 
 /**
- * ========== パターン3: カード（クリスマスモード対応） ==========
- * 通常モード・クリスマスモード両対応カード
+ * ========== パターン3: カード（テーマ対応） ==========
+ * CSS変数によるテーマ自動切り替え対応カード
  */
 interface ThemableCardProps {
   title: string;
   description?: string;
   children?: React.ReactNode;
-  isChristmasMode: boolean;
   onClick?: () => void;
 }
 
@@ -131,30 +135,21 @@ export function ThemableCard({
   title,
   description,
   children,
-  isChristmasMode,
   onClick,
 }: ThemableCardProps) {
   return (
     <div
-      className={`rounded-2xl border p-4 sm:p-6 transition-all cursor-pointer ${
-        isChristmasMode
-          ? 'bg-white/5 border-[#d4af37]/40 hover:bg-white/10 hover:border-[#d4af37]/70 shadow-[0_0_15px_rgba(212,175,55,0.1)]'
-          : 'bg-white border-gray-100 shadow-md hover:shadow-lg hover:border-gray-300'
-      }`}
+      className="rounded-2xl border p-4 sm:p-6 transition-all cursor-pointer bg-surface border-edge shadow-md hover:shadow-lg hover:border-edge-strong"
       onClick={onClick}
     >
       {/* タイトル */}
-      <h3 className={`text-lg font-bold mb-2 ${
-        isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-      }`}>
+      <h3 className="text-lg font-bold mb-2 text-ink">
         {title}
       </h3>
 
       {/* 説明文 */}
       {description && (
-        <p className={`text-sm ${
-          isChristmasMode ? 'text-[#f8f1e7]/60' : 'text-gray-600'
-        }`}>
+        <p className="text-sm text-ink-muted">
           {description}
         </p>
       )}
@@ -205,15 +200,14 @@ export function DoubleCard({
 }
 
 /**
- * ========== パターン5: ボタンカード（クリスマスモード対応） ==========
- * ホームページボタンカードのクリスマスモード対応版
+ * ========== パターン5: ボタンカード（テーマ対応） ==========
+ * ホームページボタンカードのテーマ対応版
  */
 interface ThemableButtonCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
   onClick: () => void;
-  isChristmasMode: boolean;
   badge?: string;
 }
 
@@ -222,64 +216,38 @@ export function ThemableButtonCard({
   title,
   description,
   onClick,
-  isChristmasMode,
   badge,
 }: ThemableButtonCardProps) {
   return (
     <button
       onClick={onClick}
-      className={`group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
-        isChristmasMode
-          ? 'bg-white/5 border border-[#d4af37]/40 hover:bg-white/10 hover:border-[#d4af37]/70 shadow-[0_20px_50px_rgba(0,0,0,0.3)] focus-visible:ring-[#d4af37] focus-visible:ring-offset-[#051a0e]'
-          : 'bg-white/95 shadow-2xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-amber-600 focus-visible:ring-offset-[#F5F2EB]'
-      }`}
+      className="group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-surface border border-edge shadow-2xl hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-spot"
     >
       {/* バッジ */}
       {badge && (
         <div className="absolute -top-1 -right-1 z-20 animate-pulse-scale">
-          <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] whitespace-nowrap font-bold shadow-lg ring-2 ${
-            isChristmasMode
-              ? 'text-[#051a0e] bg-[#d4af37]'
-              : 'text-white bg-gradient-to-r from-yellow-400 to-amber-600'
-          } ring-white/20`}>
+          <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] whitespace-nowrap font-bold shadow-lg text-white bg-gradient-to-r from-yellow-400 to-amber-600 ring-2 ring-white/20">
             {badge}
           </span>
         </div>
       )}
 
       {/* アイコン */}
-      <span className={`relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 ${
-        isChristmasMode
-          ? 'bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/30 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]'
-          : 'bg-amber-600/10 text-amber-600 group-hover:bg-amber-600/15'
-      }`}>
+      <span className="relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 bg-spot-subtle text-spot border border-spot/30 group-hover:scale-110">
         <div className="h-8 w-8 relative z-10">
           {icon}
         </div>
       </span>
 
       {/* テキスト */}
-      <div className={`space-y-1 text-center relative z-10 ${
-        isChristmasMode ? 'text-[#f8f1e7]' : 'text-[#1F2A44]'
-      }`}>
-        <p className={`font-bold text-base md:text-lg ${
-          isChristmasMode ? 'group-hover:text-[#d4af37]' : 'text-slate-900'
-        }`}>
+      <div className="space-y-1 text-center relative z-10">
+        <p className="font-bold text-base md:text-lg text-ink group-hover:text-spot">
           {title}
         </p>
-        <p className={`text-xs md:text-sm ${
-          isChristmasMode
-            ? 'text-[#f8f1e7]/60 group-hover:text-[#f8f1e7]/90'
-            : 'text-slate-500'
-        }`}>
+        <p className="text-xs md:text-sm text-ink-muted">
           {description}
         </p>
       </div>
-
-      {/* クリスマスモード: カード下部のゴールドライン */}
-      {isChristmasMode && (
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-      )}
     </button>
   );
 }
@@ -306,11 +274,8 @@ export function ThemableButtonCard({
  *   badge="New!"
  * />
  *
- * クリスマスモード対応:
- * <ThemableCard
- *   title="タイトル"
- *   isChristmasMode={isChristmasMode}
- * >
+ * テーマ対応カード:
+ * <ThemableCard title="タイトル">
  *   {/* コンテンツ */}
  * </ThemableCard>
  *
@@ -327,8 +292,8 @@ export function ThemableButtonCard({
  * - アイコン + テキスト
  *
  * ThemableCard:
- * - 通常モード・クリスマスモード両対応
- * - 配色の切り替えが必要
+ * - テーマ対応カード
+ * - CSS変数による自動配色切り替え
  *
  * DoubleCard:
  * - 特集情報の強調表示
@@ -336,8 +301,24 @@ export function ThemableButtonCard({
  * - 視覚的な強調が必要
  *
  * ThemableButtonCard:
- * - ホームページの両モード対応
- * - 複雑な配色切り替えが必要
+ * - ホームページのテーマ対応版
+ * - CSS変数による自動配色切り替え
+ *
+ * ========== テーマシステム ==========
+ *
+ * CSS変数ベースのテーマを使用:
+ * - text-ink: メインテキスト色
+ * - text-ink-sub: サブテキスト色
+ * - text-ink-muted: 淡いテキスト色
+ * - text-spot: アクセント色
+ * - bg-surface: カード背景色
+ * - bg-ground: セクション背景色
+ * - bg-spot-subtle: アクセント薄背景色
+ * - border-edge: ボーダー色
+ * - border-edge-strong: 強調ボーダー色
+ *
+ * .christmas クラスが親要素にある場合、
+ * これらのCSS変数が自動的にクリスマスカラーに切り替わる。
  *
  * ========== アクセシビリティ ==========
  *

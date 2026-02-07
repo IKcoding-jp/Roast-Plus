@@ -40,11 +40,6 @@ import { forwardRef } from 'react';
  * <Button fullWidth>フル幅ボタン</Button>
  *
  * @example
- * // クリスマスモード
- * const { isChristmasMode } = useChristmasMode();
- * <Button isChristmasMode={isChristmasMode} onClick={handleAction}>アクション</Button>
- *
- * @example
  * // バッジ付きボタン（通知やフィルター数表示に使用）
  * <Button badge={3} onClick={handleFilter}>フィルター</Button>
  *
@@ -62,8 +57,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean;
   /** フル幅表示 */
   fullWidth?: boolean;
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
   /** バッジに表示する数値（0以下の場合は非表示） */
   badge?: number;
 }
@@ -75,7 +68,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size = 'md',
       loading = false,
       fullWidth = false,
-      isChristmasMode = false,
       badge,
       className = '',
       disabled,
@@ -94,35 +86,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'px-8 py-4 text-lg',
     };
 
-    // 通常モードのバリアントスタイル
-    const normalVariantStyles = {
-      primary: 'bg-amber-600 text-white hover:bg-amber-700',
+    // バリアントスタイル（CSS変数ベース）
+    const variantStyles = {
+      primary: 'bg-btn-primary text-white hover:bg-btn-primary-hover',
       secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-      danger: 'bg-red-600 text-white hover:bg-red-700',
-      success: 'bg-green-600 text-white hover:bg-green-700',
-      warning: 'bg-yellow-500 text-white hover:bg-yellow-600',
-      info: 'bg-[#00b8d4] text-white hover:bg-[#00a0b8]',
-      outline: 'border-2 border-amber-500 text-amber-600 bg-transparent hover:bg-amber-50',
-      ghost: 'text-amber-600 hover:text-amber-700',
+      danger: 'bg-danger text-white hover:bg-danger/90',
+      success: 'bg-success text-white hover:bg-success/90',
+      warning: 'bg-warning text-page hover:bg-warning/90',
+      info: 'bg-info text-white hover:bg-info-hover',
+      outline: 'border-2 border-spot text-spot bg-transparent hover:bg-spot-surface',
+      ghost: 'text-spot hover:text-spot-hover',
       coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b]',
-      surface: 'bg-white text-gray-700 shadow-md hover:bg-gray-50',
+      surface: 'bg-surface text-ink shadow-card hover:bg-ground border border-edge',
     };
-
-    // クリスマスモードのバリアントスタイル
-    const christmasVariantStyles = {
-      primary: 'bg-[#6d1a1a] text-white hover:bg-[#8b2323] border border-[#d4af37]/40',
-      secondary: 'bg-[#3a3a3a] text-[#f8f1e7] hover:bg-[#4a4a4a]',
-      danger: 'bg-red-800 text-white hover:bg-red-900',
-      success: 'bg-green-800 text-white hover:bg-green-900',
-      warning: 'bg-[#d4af37] text-[#1a1a1a] hover:bg-[#e8c65f]',
-      info: 'bg-[#0097a7] text-white hover:bg-[#00838f]',
-      outline: 'border-2 border-[#d4af37] text-[#d4af37] bg-transparent hover:bg-[#d4af37]/10',
-      ghost: 'text-[#d4af37] hover:text-[#e8c65f]',
-      coffee: 'bg-[#211714] text-white hover:bg-[#2d1f1b] border border-[#d4af37]/30',
-      surface: 'bg-white/10 text-[#f8f1e7] shadow-md hover:bg-white/20 border border-[#d4af37]/20',
-    };
-
-    const variantStyles = isChristmasMode ? christmasVariantStyles : normalVariantStyles;
 
     // 無効・ローディング状態のスタイル
     const disabledStyles = 'opacity-50 cursor-not-allowed';
@@ -131,9 +107,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const fullWidthStyles = fullWidth ? 'w-full' : '';
 
     // バッジスタイル
-    const badgeStyles = isChristmasMode
-      ? 'absolute -top-1.5 -right-1.5 bg-[#d4af37] text-[#1a1a1a] rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white'
-      : 'absolute -top-1.5 -right-1.5 bg-amber-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white';
+    const badgeStyles = 'absolute -top-1.5 -right-1.5 bg-spot text-page rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm ring-2 ring-white';
 
     const buttonStyles = [
       baseStyles,

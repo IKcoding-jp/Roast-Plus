@@ -37,17 +37,6 @@ import { forwardRef, useId } from 'react';
  *   value={category}
  *   onChange={(e) => setCategory(e.target.value)}
  * />
- *
- * @example
- * // クリスマスモード
- * const { isChristmasMode } = useChristmasMode();
- * <Select
- *   label="抽出方法"
- *   options={brewingMethods}
- *   isChristmasMode={isChristmasMode}
- *   value={method}
- *   onChange={(e) => setMethod(e.target.value)}
- * />
  */
 
 export interface SelectOption {
@@ -64,51 +53,35 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
   options: SelectOption[];
   /** プレースホルダー（最初の空の選択肢） */
   placeholder?: string;
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, placeholder, isChristmasMode = false, className = '', id, ...props }, ref) => {
+  ({ label, error, options, placeholder, className = '', id, ...props }, ref) => {
     const generatedId = useId();
     const selectId = id || generatedId;
 
     const baseStyles = 'w-full rounded-lg border-2 px-4 py-3 text-lg transition-all duration-200 min-h-[44px] appearance-none bg-no-repeat bg-right pr-10';
 
-    // ドロップダウン矢印のSVG（data URI）
-    const arrowIcon = isChristmasMode
-      ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d4af37'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")"
-      : "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")";
+    const themeStyles = 'border-edge text-ink bg-field hover:border-edge-strong focus:border-spot focus:outline-none focus:ring-2 focus:ring-spot-subtle';
 
-    const normalStyles = 'border-gray-200 text-gray-900 bg-white hover:border-gray-300 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-100';
-
-    const christmasStyles = 'bg-white/10 border-[#d4af37]/40 text-[#f8f1e7] focus:border-[#d4af37] focus:outline-none focus:ring-2 focus:ring-[#d4af37]/20';
-
-    const errorStyles = isChristmasMode
-      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-      : 'border-red-500 focus:border-red-500 focus:ring-red-100';
+    const errorStyles = 'border-error focus:border-error focus:ring-error-ring';
 
     const disabledStyles = 'opacity-50 cursor-not-allowed';
 
     const selectStyles = [
       baseStyles,
-      isChristmasMode ? christmasStyles : normalStyles,
+      themeStyles,
+      'select-icon',
       error ? errorStyles : '',
       props.disabled ? disabledStyles : '',
       className,
     ].filter(Boolean).join(' ');
 
-    const labelStyles = isChristmasMode
-      ? 'block text-sm font-medium text-[#f8f1e7] mb-2'
-      : 'block text-sm font-medium text-gray-700 mb-2';
+    const labelStyles = 'block text-sm font-medium text-ink mb-2';
 
-    const errorTextStyles = isChristmasMode
-      ? 'text-red-400 text-sm mt-1'
-      : 'text-red-500 text-sm mt-1';
+    const errorTextStyles = 'text-error text-sm mt-1';
 
-    const optionStyles = isChristmasMode
-      ? 'bg-[#0a2f1a] text-[#f8f1e7]'
-      : 'bg-white text-gray-900';
+    const optionStyles = 'bg-overlay text-ink';
 
     return (
       <div>
@@ -122,7 +95,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={selectId}
             className={selectStyles}
-            style={{ backgroundImage: arrowIcon, backgroundPosition: 'right 0.75rem center', backgroundSize: '1.25rem' }}
+            style={{ backgroundPosition: 'right 0.75rem center', backgroundSize: '1.25rem' }}
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? `${selectId}-error` : undefined}
             {...props}

@@ -14,7 +14,6 @@ interface DefectBeanCardProps {
   onToggleSetting?: (id: string, shouldRemove: boolean) => void;
   onEdit?: (id: string) => void;
   compareMode?: boolean;
-  isChristmasMode?: boolean;
 }
 
 export function DefectBeanCard({
@@ -25,7 +24,6 @@ export function DefectBeanCard({
   onToggleSetting,
   onEdit,
   compareMode = false,
-  isChristmasMode = false,
 }: DefectBeanCardProps) {
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -45,29 +43,17 @@ export function DefectBeanCard({
     }
   };
 
-  // クリスマスモード用スタイル定数
-  const cardBg = isChristmasMode ? 'bg-white/5 border border-[#d4af37]/30' : 'bg-white';
-  const textPrimary = isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800';
-  const textSecondary = isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-700';
-  const textBody = isChristmasMode ? 'text-[#f8f1e7]/60' : 'text-gray-600';
-  const textMuted = isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400';
-  const borderColor = isChristmasMode ? 'border-[#d4af37]/20' : 'border-gray-200';
-
   return (
     <>
       <div
-        className={`${cardBg} rounded-lg shadow-md overflow-hidden transition-all flex flex-col ${
+        className={`bg-surface border border-edge rounded-lg shadow-card overflow-hidden transition-all flex flex-col ${
           isSelected ? 'ring-2 ring-amber-500' : ''
         } hover:shadow-lg ${!compareMode && onEdit ? 'cursor-pointer' : ''}`}
         onClick={handleCardClick}
       >
         {/* 画像 */}
         <div
-          className={`relative w-full aspect-square cursor-pointer flex-shrink-0 p-2.5 ${
-            isChristmasMode
-              ? 'bg-gradient-to-br from-[#1a1a1a] via-[#0a2f1a]/30 to-[#1a1a1a]'
-              : 'bg-gradient-to-br from-stone-50 via-amber-50/30 to-stone-100'
-          }`}
+          className="relative w-full aspect-square cursor-pointer flex-shrink-0 p-2.5 bg-gradient-to-br from-stone-50 via-amber-50/30 to-stone-100"
           onClick={(e) => {
             e.stopPropagation(); // カードクリックを防ぐ
             setShowImageModal(true);
@@ -90,8 +76,8 @@ export function DefectBeanCard({
           </div>
           {/* 選択バッジ */}
           {isSelected && (
-            <div className={`absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center z-10 shadow-lg ${isChristmasMode ? 'bg-[#d4af37]' : 'bg-amber-500'}`}>
-              <span className={`text-[10px] font-bold ${isChristmasMode ? 'text-[#051a0e]' : 'text-white'}`}>✓</span>
+            <div className="absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center z-10 shadow-lg bg-amber-500">
+              <span className="text-[10px] font-bold text-white">&#10003;</span>
             </div>
           )}
         </div>
@@ -101,7 +87,7 @@ export function DefectBeanCard({
           {/* 名称 */}
           <div className="flex-shrink-0">
             <div className="flex items-start justify-between gap-2">
-              <h3 className={`text-sm font-semibold ${textPrimary} mb-1`}>
+              <h3 className="text-sm font-semibold text-ink mb-1">
                 {defectBean.name}
               </h3>
             </div>
@@ -110,35 +96,34 @@ export function DefectBeanCard({
           {/* 詳細情報 */}
           <div className="space-y-1.5 flex-1 min-h-0">
             <div>
-              <h4 className={`text-xs font-semibold ${textSecondary} mb-0.5`}>特徴</h4>
-              <p className={`text-xs ${textBody} whitespace-pre-wrap line-clamp-3 min-h-[2.5rem]`}>
-                {defectBean.characteristics || <span className={textMuted}>未入力</span>}
+              <h4 className="text-xs font-semibold text-ink-sub mb-0.5">特徴</h4>
+              <p className="text-xs text-ink-sub whitespace-pre-wrap line-clamp-3 min-h-[2.5rem]">
+                {defectBean.characteristics || <span className="text-ink-muted">未入力</span>}
               </p>
             </div>
 
             <div>
-              <h4 className={`text-xs font-semibold ${textSecondary} mb-0.5`}>味への影響</h4>
-              <p className={`text-xs ${textBody} whitespace-pre-wrap line-clamp-3 min-h-[2.5rem]`}>
-                {defectBean.tasteImpact || <span className={textMuted}>未入力</span>}
+              <h4 className="text-xs font-semibold text-ink-sub mb-0.5">味への影響</h4>
+              <p className="text-xs text-ink-sub whitespace-pre-wrap line-clamp-3 min-h-[2.5rem]">
+                {defectBean.tasteImpact || <span className="text-ink-muted">未入力</span>}
               </p>
             </div>
 
             <div>
-              <h4 className={`text-xs font-semibold ${textSecondary} mb-0.5`}>省く理由</h4>
-              <p className={`text-xs ${textBody} whitespace-pre-wrap line-clamp-3 min-h-[2.5rem]`}>
-                {defectBean.removalReason || <span className={textMuted}>未入力</span>}
+              <h4 className="text-xs font-semibold text-ink-sub mb-0.5">省く理由</h4>
+              <p className="text-xs text-ink-sub whitespace-pre-wrap line-clamp-3 min-h-[2.5rem]">
+                {defectBean.removalReason || <span className="text-ink-muted">未入力</span>}
               </p>
             </div>
           </div>
 
           {/* 設定切り替え */}
           {onToggleSetting && (
-            <div className={`flex gap-1.5 pt-1.5 border-t ${borderColor} mt-auto flex-shrink-0`} onClick={(e) => e.stopPropagation()}>
+            <div className="flex gap-1.5 pt-1.5 border-t border-edge mt-auto flex-shrink-0" onClick={(e) => e.stopPropagation()}>
               <Button
                 variant="danger"
                 size="sm"
                 onClick={() => handleToggleSetting(true)}
-                isChristmasMode={isChristmasMode}
                 className={`flex-1 !px-1.5 sm:!px-2 !py-1.5 !text-[10px] sm:!text-xs !min-h-[36px] gap-0.5 sm:gap-1 whitespace-nowrap ${
                   shouldRemove === true
                     ? ''
@@ -152,7 +137,6 @@ export function DefectBeanCard({
                 variant="success"
                 size="sm"
                 onClick={() => handleToggleSetting(false)}
-                isChristmasMode={isChristmasMode}
                 className={`flex-1 !px-1.5 sm:!px-2 !py-1.5 !text-[10px] sm:!text-xs !min-h-[36px] gap-0.5 sm:gap-1 whitespace-nowrap ${
                   shouldRemove === false
                     ? ''

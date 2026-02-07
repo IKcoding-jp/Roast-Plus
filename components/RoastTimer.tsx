@@ -12,11 +12,7 @@ import { Modal } from '@/components/ui';
 import type { BeanName } from '@/lib/beanConfig';
 import type { RoastLevel, Weight } from '@/lib/constants';
 
-interface RoastTimerProps {
-  isChristmasMode: boolean;
-}
-
-export function RoastTimer({ isChristmasMode }: RoastTimerProps) {
+export function RoastTimer() {
   const { data, updateData, isLoading } = useAppData();
   const router = useRouter();
   const {
@@ -106,20 +102,17 @@ export function RoastTimer({ isChristmasMode }: RoastTimerProps) {
         isOpen={showCompletionDialog}
         onClose={handleCompletionClose}
         onContinue={handleCompletionOk}
-        isChristmasMode={isChristmasMode}
       />
       <ContinuousRoastDialog
         isOpen={showContinuousRoastDialog}
         onClose={handleContinuousRoastClose}
         onYes={handleContinuousRoastYes}
         onNo={handleContinuousRoastNo}
-        isChristmasMode={isChristmasMode}
       />
       <AfterPurgeDialog
         isOpen={showAfterPurgeDialog}
         onClose={handleAfterPurgeClose}
         onRecord={handleAfterPurgeRecord}
-        isChristmasMode={isChristmasMode}
       />
 
       {/* タイマー表示（実行中・一時停止中・完了時のみ表示） */}
@@ -129,16 +122,14 @@ export function RoastTimer({ isChristmasMode }: RoastTimerProps) {
             onBack={() => router.push('/')}
             onSettingsClick={() => setShowSettings(true)}
             isOverlay
-            isChristmasMode={isChristmasMode}
-          />
+              />
 
           <TimerDisplay
             state={state}
             isRunning={isRunning}
             isPaused={isPaused}
             isCompleted={isCompleted}
-            isChristmasMode={isChristmasMode}
-          />
+              />
 
           <TimerControls
             isRunning={isRunning}
@@ -148,8 +139,7 @@ export function RoastTimer({ isChristmasMode }: RoastTimerProps) {
             onResume={handleResume}
             onSkip={handleSkip}
             onReset={handleReset}
-            isChristmasMode={isChristmasMode}
-          />
+              />
         </div>
       )}
 
@@ -159,15 +149,14 @@ export function RoastTimer({ isChristmasMode }: RoastTimerProps) {
           <TimerHeader
             onBack={() => router.back()}
             onSettingsClick={() => setShowSettings(true)}
-            isChristmasMode={isChristmasMode}
-          />
-          <SetupPanel onStart={handleStart} isLoading={isLoading} isChristmasMode={isChristmasMode} />
+              />
+          <SetupPanel onStart={handleStart} isLoading={isLoading} />
         </div>
       )}
 
       {/* 設定モーダル */}
       <Modal show={showSettings} onClose={() => setShowSettings(false)}>
-        <RoastTimerSettings onClose={() => setShowSettings(false)} isChristmasMode={isChristmasMode} />
+        <RoastTimerSettings onClose={() => setShowSettings(false)} />
       </Modal>
     </div>
   );

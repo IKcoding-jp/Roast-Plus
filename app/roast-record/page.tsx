@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { RoastRecordForm } from '@/components/RoastRecordForm';
 import { RoastRecordList } from '@/components/RoastRecordList';
 import { Loading } from '@/components/Loading';
@@ -17,7 +16,6 @@ import { useToastContext } from '@/components/Toast';
 function RoastRecordPageContent() {
   const { user, loading: authLoading } = useAuth();
   const { data, updateData, isLoading } = useAppData();
-  const { isChristmasMode } = useChristmasMode();
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasRedirected = useRef(false);
@@ -68,11 +66,11 @@ function RoastRecordPageContent() {
     const record = roastTimerRecords.find((r) => r.id === recordId);
     if (!record) {
       return (
-        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
+        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
           <div className="max-w-2xl mx-auto">
-            <Card isChristmasMode={isChristmasMode} className="p-6 text-center">
-              <p className={`mb-4 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>記録が見つかりません</p>
-              <Link href="/roast-record" className={`${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'} hover:underline`}>
+            <Card className="p-6 text-center">
+              <p className="mb-4 text-ink-sub">記録が見つかりません</p>
+              <Link href="/roast-record" className="text-spot hover:underline">
                 一覧に戻る
               </Link>
             </Card>
@@ -121,7 +119,7 @@ function RoastRecordPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
+      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
         <div className="max-w-2xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -131,26 +129,24 @@ function RoastRecordPageContent() {
                   size="lg"
                   title="一覧に戻る"
                   aria-label="一覧に戻る"
-                  isChristmasMode={isChristmasMode}
                 >
                   <HiArrowLeft className="h-6 w-6" />
                 </IconButton>
               </div>
-              <h1 className={`w-full sm:w-auto text-2xl sm:text-3xl font-bold sm:flex-1 text-center ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+              <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold sm:flex-1 text-center text-ink">
                 記録を編集
               </h1>
               <div className="hidden sm:block flex-1 flex-shrink-0"></div>
             </div>
           </header>
           <main>
-            <Card isChristmasMode={isChristmasMode} className="p-4 sm:p-6">
+            <Card className="p-4 sm:p-6">
               <RoastRecordForm
                 data={data}
                 record={record}
                 onSave={handleSave}
                 onDelete={handleDelete}
                 onCancel={handleCancel}
-                isChristmasMode={isChristmasMode}
               />
             </Card>
           </main>
@@ -194,7 +190,7 @@ function RoastRecordPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
+      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
         <div className="max-w-2xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -204,25 +200,23 @@ function RoastRecordPageContent() {
                   size="lg"
                   title="一覧に戻る"
                   aria-label="一覧に戻る"
-                  isChristmasMode={isChristmasMode}
                 >
                   <HiArrowLeft className="h-6 w-6" />
                 </IconButton>
               </div>
-              <h1 className={`w-full sm:w-auto text-2xl sm:text-3xl font-bold sm:flex-1 text-center ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+              <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold sm:flex-1 text-center text-ink">
                 新規記録を作成
               </h1>
               <div className="hidden sm:block flex-1 flex-shrink-0"></div>
             </div>
           </header>
           <main>
-            <Card isChristmasMode={isChristmasMode} className="p-4 sm:p-6">
+            <Card className="p-4 sm:p-6">
               <RoastRecordForm
                 data={data}
                 onSave={handleSave}
                 initialValues={initialValues}
                 onCancel={handleCancel}
-                isChristmasMode={isChristmasMode}
               />
             </Card>
           </main>
@@ -233,7 +227,7 @@ function RoastRecordPageContent() {
 
   // 一覧表示（デフォルト）
   return (
-    <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4" style={{ backgroundColor: isChristmasMode ? '#051a0e' : '#F7F7F5' }}>
+    <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4 bg-page">
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-3 sm:mb-6 flex-shrink-0">
           <div className="flex items-center justify-between gap-2 sm:gap-4">
@@ -243,15 +237,14 @@ function RoastRecordPageContent() {
                 size="lg"
                 title="戻る"
                 aria-label="戻る"
-                isChristmasMode={isChristmasMode}
               >
                 <HiArrowLeft className="h-6 w-6" />
               </IconButton>
-              <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold sm:hidden ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold sm:hidden text-ink">
                 ロースト記録
               </h1>
             </div>
-            <h1 className={`hidden sm:block text-2xl sm:text-3xl font-bold sm:flex-1 text-center ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+            <h1 className="hidden sm:block text-2xl sm:text-3xl font-bold sm:flex-1 text-center text-ink">
               ロースト記録
             </h1>
             <div className="flex justify-end sm:flex-1">
@@ -261,7 +254,6 @@ function RoastRecordPageContent() {
                 onClick={() => router.push('/roast-record?new=true')}
                 className="flex items-center gap-2"
                 aria-label="新規記録作成"
-                isChristmasMode={isChristmasMode}
               >
                 <HiPlus className="text-base sm:text-lg flex-shrink-0" />
                 <span className="whitespace-nowrap">新規記録を作成</span>
@@ -271,7 +263,7 @@ function RoastRecordPageContent() {
         </header>
 
         <main className="flex-1 min-h-0 overflow-hidden">
-          <RoastRecordList data={data} onUpdate={updateData} isChristmasMode={isChristmasMode} />
+          <RoastRecordList data={data} onUpdate={updateData} />
         </main>
       </div>
     </div>

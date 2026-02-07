@@ -24,7 +24,6 @@ interface RoastRecordFormProps {
   };
   onDelete?: (id: string) => void; // 削除機能（編集時のみ）
   onCancel?: () => void; // キャンセル機能
-  isChristmasMode?: boolean;
 }
 
 export function RoastRecordForm(props: RoastRecordFormProps) {
@@ -46,7 +45,6 @@ function RoastRecordFormInner({
   initialValues,
   onDelete,
   onCancel,
-  isChristmasMode = false,
 }: RoastRecordFormProps) {
   const { showToast } = useToastContext();
   void _data;
@@ -154,7 +152,7 @@ function RoastRecordFormInner({
     <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
       {/* 豆の名前 */}
       <div>
-        <label className={`block text-sm sm:text-base font-medium mb-1 sm:mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2 text-ink">
           豆の名前 <span className="text-red-500">*</span>
         </label>
         <Select
@@ -163,13 +161,12 @@ function RoastRecordFormInner({
           options={ALL_BEANS.map((bean) => ({ value: bean, label: bean }))}
           placeholder="選択してください"
           required
-          isChristmasMode={isChristmasMode}
         />
       </div>
 
       {/* 重さ */}
       <div>
-        <label className={`block text-sm sm:text-base font-medium mb-1 sm:mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2 text-ink">
           重さ <span className="text-red-500">*</span>
         </label>
         <Select
@@ -180,13 +177,12 @@ function RoastRecordFormInner({
           options={WEIGHTS.map((w) => ({ value: w.toString(), label: `${w}g` }))}
           placeholder="選択してください"
           required
-          isChristmasMode={isChristmasMode}
         />
       </div>
 
       {/* 焙煎度合い */}
       <div>
-        <label className={`block text-sm sm:text-base font-medium mb-1 sm:mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2 text-ink">
           焙煎度合い <span className="text-red-500">*</span>
         </label>
         <Select
@@ -199,13 +195,12 @@ function RoastRecordFormInner({
           options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
           placeholder="選択してください"
           required
-          isChristmasMode={isChristmasMode}
         />
       </div>
 
       {/* 実際のロースト時間 */}
       <div>
-        <label className={`block text-sm sm:text-base font-medium mb-1 sm:mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2 text-ink">
           実際のロースト時間 <span className="text-red-500">*</span>
         </label>
         <div className="flex gap-3 sm:gap-4">
@@ -217,8 +212,7 @@ function RoastRecordFormInner({
               onChange={(e) => handleDurationMinutesChange(e.target.value)}
               placeholder="分"
               required
-              isChristmasMode={isChristmasMode}
-            />
+                />
           </div>
           <div className="flex-1">
             <Input
@@ -228,12 +222,11 @@ function RoastRecordFormInner({
               onChange={(e) => handleDurationSecondsChange(e.target.value)}
               placeholder="秒"
               maxLength={2}
-              isChristmasMode={isChristmasMode}
-            />
+                />
           </div>
         </div>
         {durationMinutes && (
-          <p className={`mt-1 text-xs sm:text-sm ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
+          <p className="mt-1 text-xs sm:text-sm text-ink-muted">
             合計: {formatTime((parseInt(durationMinutes, 10) || 0) * 60 + (parseInt(durationSeconds, 10) || 0))}
           </p>
         )}
@@ -241,7 +234,7 @@ function RoastRecordFormInner({
 
       {/* 焙煎日 */}
       <div>
-        <label className={`block text-sm sm:text-base font-medium mb-1 sm:mb-2 ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-700'}`}>
+        <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2 text-ink">
           焙煎日 <span className="text-red-500">*</span>
         </label>
         <Input
@@ -249,7 +242,6 @@ function RoastRecordFormInner({
           value={roastDate}
           onChange={(e) => setRoastDate(e.target.value)}
           required
-          isChristmasMode={isChristmasMode}
         />
       </div>
 
@@ -265,8 +257,7 @@ function RoastRecordFormInner({
               }
             }}
             className="w-full sm:w-auto"
-            isChristmasMode={isChristmasMode}
-          >
+            >
             削除
           </Button>
         )}
@@ -276,8 +267,7 @@ function RoastRecordFormInner({
               type="button"
               variant="secondary"
               onClick={onCancel}
-              isChristmasMode={isChristmasMode}
-            >
+                >
               キャンセル
             </Button>
           )}
@@ -285,8 +275,7 @@ function RoastRecordFormInner({
             type="submit"
             variant="primary"
             className="flex-1"
-            isChristmasMode={isChristmasMode}
-          >
+            >
             {isEditMode ? '更新' : '保存'}
           </Button>
         </div>

@@ -21,7 +21,6 @@ interface DefectBeanFormProps {
   ) => Promise<void>;
   onDelete?: () => Promise<void>;
   onCancel: () => void;
-  isChristmasMode?: boolean;
 }
 
 export function DefectBeanForm({
@@ -31,7 +30,6 @@ export function DefectBeanForm({
   onUpdate,
   onDelete,
   onCancel,
-  isChristmasMode = false,
 }: DefectBeanFormProps) {
   const { showToast } = useToastContext();
   const [showCamera, setShowCamera] = useState(false);
@@ -161,22 +159,15 @@ export function DefectBeanForm({
       show={true}
       onClose={onCancel}
       closeOnBackdropClick={false}
-      contentClassName={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto ${
-        isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white'
-      }`}
+      contentClassName="rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-overlay border border-edge"
     >
       {/* ヘッダー */}
-      <div className={`sticky top-0 p-4 flex items-center justify-between z-20 border-b ${
-        isChristmasMode
-          ? 'bg-[#0a2f1a] border-[#d4af37]/20'
-          : 'bg-white border-gray-200'
-      }`}>
-        <h2 className={`text-xl font-semibold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+      <div className="sticky top-0 p-4 flex items-center justify-between z-20 border-b bg-surface border-edge">
+        <h2 className="text-xl font-semibold text-ink">
           {mode === 'edit' ? '欠点豆を編集' : '欠点豆を追加'}
         </h2>
         <IconButton
           onClick={onCancel}
-          isChristmasMode={isChristmasMode}
           rounded
           aria-label="閉じる"
         >
@@ -203,7 +194,6 @@ export function DefectBeanForm({
         onSubmit={handleSubmit}
         onDelete={onDelete ? handleDelete : undefined}
         onCancel={onCancel}
-        isChristmasMode={isChristmasMode}
       />
     </Modal>
   );

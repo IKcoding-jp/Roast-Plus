@@ -12,7 +12,6 @@ interface TimerDisplayProps {
   isRunning: boolean;
   isPaused: boolean;
   isCompleted: boolean;
-  isChristmasMode?: boolean;
 }
 
 /**
@@ -22,7 +21,7 @@ interface TimerDisplayProps {
  * - 残り時間/経過時間
  * - 実行中の情報（豆、重さ、焙煎度合い）
  */
-export function TimerDisplay({ state, isRunning, isPaused, isCompleted, isChristmasMode = false }: TimerDisplayProps) {
+export function TimerDisplay({ state, isRunning, isPaused, isCompleted }: TimerDisplayProps) {
   // 円形プログレスバーの設定（レスポンシブ対応）
   const [circleSize, setCircleSize] = useState(340);
   const strokeWidth = 16;
@@ -142,15 +141,8 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted, isChrist
   const remaining = state ? Math.max(0, state.remaining) : 0;
   const offset = circumference - (progress / 100) * circumference;
 
-  // 色の決定（クリスマスモード対応）
+  // 色の決定
   const getProgressColor = () => {
-    if (isChristmasMode) {
-      if (isCompleted) return '#0f5132'; // 深緑
-      if (isPaused) return '#c41e3a'; // クリスマスレッド
-      if (isRunning) return '#d4af37'; // ゴールド
-      return '#d1d5db';
-    }
-    // 通常モード
     if (isCompleted) return '#10b981';
     if (isPaused) return '#f59e0b';
     if (isRunning) return '#d97706';
@@ -164,28 +156,20 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted, isChrist
       {/* タイトル */}
       {(isRunning || isPaused) && (
         <div className="text-center space-y-2 flex-shrink-0 mb-4 sm:mb-6">
-          <div className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full shadow-lg mb-2 ${
-            isChristmasMode
-              ? 'bg-gradient-to-br from-red-600 to-red-400'
-              : 'bg-gradient-to-br from-orange-400 to-red-500'
-          }`}>
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full shadow-lg mb-2 bg-gradient-to-br from-orange-400 to-red-500">
             <MdLocalFireDepartment className="text-3xl sm:text-4xl md:text-5xl text-white" />
           </div>
-          <h2 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-ink">
             焙煎中
           </h2>
         </div>
       )}
       {isCompleted && (
         <div className="text-center space-y-2 flex-shrink-0 mb-4 sm:mb-6">
-          <div className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full shadow-lg mb-2 ${
-            isChristmasMode
-              ? 'bg-gradient-to-br from-green-600 to-green-800'
-              : 'bg-gradient-to-br from-green-400 to-green-600'
-          }`}>
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full shadow-lg mb-2 bg-gradient-to-br from-green-400 to-green-600">
             <HiCheckCircle className="text-3xl sm:text-4xl md:text-5xl text-white" />
           </div>
-          <h2 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'}`}>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-ink">
             焙煎完了
           </h2>
         </div>
@@ -231,24 +215,22 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted, isChrist
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div
             ref={remainingTextRef}
-            className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-sans ${
-              isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'
-            }`}
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-sans text-spot"
           >
             {formatTime(Math.floor(remaining))}
           </div>
           {state && (
-            <div className={`text-base sm:text-lg md:text-xl mt-2 sm:mt-3 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>
+            <div className="text-base sm:text-lg md:text-xl mt-2 sm:mt-3 text-ink-muted">
               <span ref={elapsedTextRef}>{formatTime(Math.floor(state.elapsed))}</span> / {formatTime(state.duration)}
             </div>
           )}
           {isCompleted && (
-            <div className={`text-sm sm:text-base md:text-lg font-semibold mt-2 sm:mt-3 ${isChristmasMode ? 'text-[#d4af37]' : 'text-green-600'}`}>
+            <div className="text-sm sm:text-base md:text-lg font-semibold mt-2 sm:mt-3 text-green-600">
               ロースト完了！
             </div>
           )}
           {isPaused && (
-            <div className={`text-xs sm:text-sm md:text-base mt-2 sm:mt-3 font-medium ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'}`}>
+            <div className="text-xs sm:text-sm md:text-base mt-2 sm:mt-3 font-medium text-spot">
               一時停止中
             </div>
           )}
@@ -257,7 +239,7 @@ export function TimerDisplay({ state, isRunning, isPaused, isCompleted, isChrist
 
       {/* 実行中の情報表示 */}
       {state && (isRunning || isPaused || isCompleted) && (
-        <div className={`text-center space-y-0.5 text-sm sm:text-base flex-shrink-0 mb-4 sm:mb-6 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+        <div className="text-center space-y-0.5 text-sm sm:text-base flex-shrink-0 mb-4 sm:mb-6 text-ink-sub">
           {state.beanName && <div>豆の名前: {state.beanName}</div>}
           {state.weight && <div>重さ: {state.weight}g</div>}
           {state.roastLevel && <div>焙煎度合い: {state.roastLevel}</div>}

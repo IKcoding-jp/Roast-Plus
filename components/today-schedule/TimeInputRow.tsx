@@ -11,7 +11,6 @@ export interface TimeInputRowProps {
   onMinuteChange: (value: string) => void;
   onAdd: () => void;
   wrapperClassName: string;
-  isChristmasMode?: boolean;
 }
 
 export function TimeInputRow({
@@ -22,7 +21,6 @@ export function TimeInputRow({
   onMinuteChange,
   onAdd,
   wrapperClassName,
-  isChristmasMode = false,
 }: TimeInputRowProps) {
   return (
     <div className={wrapperClassName}>
@@ -33,18 +31,16 @@ export function TimeInputRow({
           min={0}
           max={23}
           placeholder="時"
-          isChristmasMode={isChristmasMode}
           error={addError ? ' ' : undefined}
           className="w-12 md:w-14 !px-1.5 !py-1 !text-base !min-h-0"
         />
-        <span className={`text-base ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>:</span>
+        <span className="text-base text-ink-sub">:</span>
         <NumberInput
           value={newMinute}
           onChange={(e) => onMinuteChange(e.target.value)}
           min={0}
           max={59}
           placeholder="分"
-          isChristmasMode={isChristmasMode}
           className="w-12 md:w-14 !px-1.5 !py-1 !text-base !min-h-0"
         />
       </div>
@@ -52,7 +48,6 @@ export function TimeInputRow({
         variant="primary"
         size="sm"
         onClick={onAdd}
-        isChristmasMode={isChristmasMode}
         aria-label="時間ラベルを追加"
       >
         <HiPlus className="h-4 w-4" />

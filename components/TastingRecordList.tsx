@@ -10,7 +10,6 @@ const TastingRadarChart = dynamic(
 import { StarRating } from './StarRating';
 import { HiTrash } from 'react-icons/hi';
 import { Card, IconButton, RoastLevelBadge } from '@/components/ui';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingRecordListProps {
   data: AppData;
@@ -19,7 +18,6 @@ interface TastingRecordListProps {
 
 export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   const router = useRouter();
-  const { isChristmasMode } = useChristmasMode();
 
   // tastingRecordsが配列でない場合のフォールバック
   const tastingRecords = Array.isArray(data.tastingRecords) ? data.tastingRecords : [];
@@ -58,8 +56,8 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
   if (sortedRecords.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className={isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}>試飲記録がありません</p>
-        <p className={`text-sm mt-2 ${isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'}`}>右下のボタンから新規作成できます</p>
+        <p className="text-ink-sub">試飲記録がありません</p>
+        <p className="text-sm mt-2 text-ink-muted">右下のボタンから新規作成できます</p>
       </div>
     );
   }
@@ -73,18 +71,17 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
             variant="hoverable"
             className="p-6"
             onClick={() => handleCardClick(record.id)}
-            isChristmasMode={isChristmasMode}
           >
             <div className="flex flex-col md:flex-row gap-4">
               {/* 左側: 豆名と基本情報 */}
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className={`text-xl font-semibold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>
+                  <h3 className="text-xl font-semibold text-ink">
                     {record.beanName}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <RoastLevelBadge level={record.roastLevel} size="sm" isChristmasMode={isChristmasMode} />
-                    <span className={`text-sm ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+                    <RoastLevelBadge level={record.roastLevel} size="sm" />
+                    <span className="text-sm text-ink-sub">
                       {formatDate(record.tastingDate)}
                     </span>
                     <IconButton
@@ -94,7 +91,6 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
                         handleDelete(record.id);
                       }}
                       aria-label="削除"
-                      isChristmasMode={isChristmasMode}
                     >
                       <HiTrash className="w-5 h-5" />
                     </IconButton>
@@ -108,7 +104,7 @@ export function TastingRecordList({ data, onUpdate }: TastingRecordListProps) {
 
                 {/* コメント */}
                 {record.overallImpression && (
-                  <p className={`text-sm line-clamp-2 ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'}`}>
+                  <p className="text-sm line-clamp-2 text-ink-sub">
                     {record.overallImpression}
                   </p>
                 )}

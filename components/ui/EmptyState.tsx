@@ -27,14 +27,6 @@ import { forwardRef } from 'react';
  *   description="最初の記録を追加しましょう。"
  *   action={<Button onClick={handleAdd}>追加する</Button>}
  * />
- *
- * @example
- * // クリスマスモード
- * const { isChristmasMode } = useChristmasMode();
- * <EmptyState
- *   title="データがありません"
- *   isChristmasMode={isChristmasMode}
- * />
  */
 
 export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -48,8 +40,6 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   action?: React.ReactNode;
   /** サイズ */
   size?: 'sm' | 'md' | 'lg';
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
@@ -60,7 +50,6 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
       description,
       action,
       size = 'md',
-      isChristmasMode = false,
       className = '',
       ...props
     },
@@ -90,19 +79,6 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
 
     const currentSize = sizeStyles[size];
 
-    // カラースタイル
-    const iconStyles = isChristmasMode
-      ? 'text-[#d4af37]/50'
-      : 'text-gray-300';
-
-    const titleStyles = isChristmasMode
-      ? 'text-[#f8f1e7]'
-      : 'text-gray-700';
-
-    const descriptionStyles = isChristmasMode
-      ? 'text-[#f8f1e7]/60'
-      : 'text-gray-500';
-
     return (
       <div
         ref={ref}
@@ -110,15 +86,15 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
         {...props}
       >
         {icon && (
-          <div className={`${iconStyles} ${currentSize.icon}`}>
+          <div className={`text-ink-muted ${currentSize.icon}`}>
             {icon}
           </div>
         )}
-        <h3 className={`font-semibold ${titleStyles} ${currentSize.title}`}>
+        <h3 className={`font-semibold text-ink ${currentSize.title}`}>
           {title}
         </h3>
         {description && (
-          <p className={`mt-1 ${descriptionStyles} ${currentSize.description} max-w-sm`}>
+          <p className={`mt-1 text-ink-muted ${currentSize.description} max-w-sm`}>
             {description}
           </p>
         )}

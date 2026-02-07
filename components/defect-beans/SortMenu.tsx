@@ -13,7 +13,6 @@ interface SortMenuProps {
   showSortMenu: boolean;
   onToggleMenu: () => void;
   onClose: () => void;
-  isChristmasMode?: boolean;
 }
 
 const SORT_OPTIONS: SortOption[] = ['default', 'createdAtDesc', 'createdAtAsc', 'nameAsc', 'nameDesc'];
@@ -49,7 +48,6 @@ export function SortMenu({
   showSortMenu,
   onToggleMenu,
   onClose,
-  isChristmasMode = false,
 }: SortMenuProps) {
   const sortMenuRef = useRef<HTMLDivElement>(null);
 
@@ -76,7 +74,6 @@ export function SortMenu({
         variant={showSortMenu ? 'primary' : 'surface'}
         size="sm"
         onClick={onToggleMenu}
-        isChristmasMode={isChristmasMode}
         title="ソート"
         className="!px-3 !py-2 gap-1.5"
       >
@@ -85,11 +82,7 @@ export function SortMenu({
       </Button>
       {/* ドロップダウンメニュー */}
       {showSortMenu && (
-        <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 ${
-          isChristmasMode
-            ? 'bg-[#0a2f1a] border border-[#d4af37]/30'
-            : 'bg-white border border-gray-200'
-        }`}>
+        <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-card z-50 bg-surface border border-edge">
           <div className="py-1">
             {SORT_OPTIONS.map((option) => (
               <button
@@ -100,15 +93,11 @@ export function SortMenu({
                 }}
                 className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2 ${
                   sortOption === option
-                    ? isChristmasMode
-                      ? 'bg-[#d4af37]/10 text-[#d4af37] font-medium'
-                      : 'bg-amber-50 text-amber-700 font-medium'
-                    : isChristmasMode
-                      ? 'text-[#f8f1e7]/70 hover:bg-white/10'
-                      : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-spot-subtle text-spot font-medium'
+                    : 'text-ink-sub hover:bg-ground'
                 }`}
               >
-                {sortOption === option && <HiCheckCircle className={`h-4 w-4 ${isChristmasMode ? 'text-[#d4af37]' : 'text-amber-600'}`} />}
+                {sortOption === option && <HiCheckCircle className="h-4 w-4 text-spot" />}
                 <span>{getSortLabel(option)}</span>
               </button>
             ))}

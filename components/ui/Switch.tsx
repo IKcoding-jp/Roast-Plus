@@ -20,16 +20,6 @@ import { forwardRef, useId } from 'react';
  *   onChange={(e) => setDarkMode(e.target.checked)}
  *   aria-label="ダークモード切替"
  * />
- *
- * @example
- * // クリスマスモード
- * const { isChristmasMode } = useChristmasMode();
- * <Switch
- *   label="クリスマスモード"
- *   checked={isChristmasMode}
- *   onChange={toggleChristmasMode}
- *   isChristmasMode={isChristmasMode}
- * />
  */
 
 export interface SwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
@@ -37,12 +27,10 @@ export interface SwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputEle
   label?: string;
   /** サイズ */
   size?: 'sm' | 'md' | 'lg';
-  /** クリスマスモードの有効/無効 */
-  isChristmasMode?: boolean;
 }
 
 export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
-  ({ label, size = 'md', isChristmasMode = false, className = '', id, disabled, checked, ...props }, ref) => {
+  ({ label, size = 'md', className = '', id, disabled, checked, ...props }, ref) => {
     const generatedId = useId();
     const switchId = id || generatedId;
 
@@ -56,22 +44,9 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
     const currentSize = sizeStyles[size];
 
     // トラック（背景）スタイル
-    const trackStyles = isChristmasMode
-      ? checked
-        ? 'bg-[#d4af37]'
-        : 'bg-white/20'
-      : checked
-        ? 'bg-amber-600'
-        : 'bg-gray-300';
-
-    // つまみスタイル
-    const thumbStyles = isChristmasMode
-      ? 'bg-white shadow-md'
-      : 'bg-white shadow-md';
-
-    const labelStyles = isChristmasMode
-      ? 'text-[#f8f1e7] font-medium'
-      : 'text-gray-900 font-medium';
+    const trackStyles = checked
+      ? 'bg-spot'
+      : 'bg-edge-strong';
 
     const disabledStyles = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
 
@@ -94,7 +69,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             relative inline-flex shrink-0 items-center rounded-full
             transition-colors duration-200 ease-in-out
             focus:outline-none focus:ring-2 focus:ring-offset-2
-            ${isChristmasMode ? 'focus:ring-[#d4af37]/50' : 'focus:ring-amber-500/50'}
+            focus:ring-spot/50
             ${currentSize.track}
             ${trackStyles}
             ${disabledStyles}
@@ -105,7 +80,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             className={`
               inline-block rounded-full transition-transform duration-200 ease-in-out
               ${currentSize.thumb}
-              ${thumbStyles}
+              bg-white shadow-md
               ${checked ? currentSize.translate : 'translate-x-0.5'}
             `}
           />
@@ -124,7 +99,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           <label
             id={`${switchId}-label`}
             htmlFor={switchId}
-            className={`${labelStyles} ${disabledStyles}`}
+            className={`text-ink font-medium ${disabledStyles}`}
           >
             {label}
           </label>

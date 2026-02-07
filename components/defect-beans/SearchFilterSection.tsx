@@ -10,7 +10,6 @@ interface SearchFilterSectionProps {
   onSearchChange: (query: string) => void;
   filterOption: FilterOption;
   onFilterChange: (option: FilterOption) => void;
-  isChristmasMode?: boolean;
 }
 
 export function SearchFilterSection({
@@ -18,25 +17,19 @@ export function SearchFilterSection({
   onSearchChange,
   filterOption,
   onFilterChange,
-  isChristmasMode = false,
 }: SearchFilterSectionProps) {
   return (
-    <div className={`rounded-lg shadow-md p-3 sm:p-4 mb-4 ${
-      isChristmasMode ? 'bg-white/5 border border-[#d4af37]/20' : 'bg-white'
-    }`}>
+    <div className="rounded-lg shadow-card p-3 sm:p-4 mb-4 bg-surface border border-edge">
       <div className="flex flex-col sm:flex-row gap-3">
         {/* 検索 */}
         <div className="flex-1">
           <div className="relative">
-            <HiSearch className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 z-10 ${
-              isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'
-            }`} />
+            <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 z-10 text-ink-muted" />
             <Input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="名称や特徴で検索..."
-              isChristmasMode={isChristmasMode}
               className="pl-10 !py-2 !text-sm !min-h-[40px]"
             />
           </div>
@@ -48,7 +41,6 @@ export function SearchFilterSection({
             variant={filterOption === 'all' ? 'primary' : 'secondary'}
             size="sm"
             onClick={() => onFilterChange('all')}
-            isChristmasMode={isChristmasMode}
             className={`!px-3 !py-1.5 !min-h-[36px] ${filterOption !== 'all' ? '!bg-gray-200 !text-gray-700 hover:!bg-gray-300' : ''}`}
             title="全て表示"
           >
@@ -59,7 +51,6 @@ export function SearchFilterSection({
             variant={filterOption === 'shouldRemove' ? 'danger' : 'secondary'}
             size="sm"
             onClick={() => onFilterChange('shouldRemove')}
-            isChristmasMode={isChristmasMode}
             className={`!px-3 !py-1.5 !min-h-[36px] ${filterOption !== 'shouldRemove' ? '!bg-gray-200 !text-gray-700 hover:!bg-gray-300' : ''}`}
             title="省く設定のもの"
           >
@@ -70,7 +61,6 @@ export function SearchFilterSection({
             variant={filterOption === 'shouldNotRemove' ? 'success' : 'secondary'}
             size="sm"
             onClick={() => onFilterChange('shouldNotRemove')}
-            isChristmasMode={isChristmasMode}
             className={`!px-3 !py-1.5 !min-h-[36px] ${filterOption !== 'shouldNotRemove' ? '!bg-gray-200 !text-gray-700 hover:!bg-gray-300' : ''}`}
             title="省かない設定のもの"
           >

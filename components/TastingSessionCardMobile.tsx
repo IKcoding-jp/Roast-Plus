@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { TastingSession } from '@/types';
 import type { AverageScores } from '@/lib/tastingUtils';
 import { Button, Card } from '@/components/ui';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 interface TastingSessionCardMobileProps {
   session: TastingSession;
@@ -27,23 +26,21 @@ export function TastingSessionCardMobile({
   formatDate,
 }: TastingSessionCardMobileProps) {
   const [aiModalSession, setAiModalSession] = useState<TastingSession | null>(null);
-  const { isChristmasMode } = useChristmasMode();
   const hasAnalysis = !!session.aiAnalysis;
 
-  // クリスマスモード用のスタイル
-  const cardBorderClass = isChristmasMode ? 'border-[#d4af37]/30' : 'border-gray-200';
-  const textPrimaryClass = isChristmasMode ? 'text-[#f8f1e7]' : 'text-[#4a3728]';
-  const textSecondaryClass = isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500';
-  const textMutedClass = isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400';
-  const bgMutedClass = isChristmasMode ? 'bg-white/10' : 'bg-gray-200';
-  const iconAccentClass = isChristmasMode ? 'text-[#d4af37]' : 'text-[#f5821f]';
-  const spinnerClass = isChristmasMode ? 'border-[#d4af37]' : 'border-[#f5821f]';
+  const cardBorderClass = 'border-edge';
+  const textPrimaryClass = 'text-ink';
+  const textSecondaryClass = 'text-ink-sub';
+  const textMutedClass = 'text-ink-muted';
+  const bgMutedClass = 'bg-ground';
+  const iconAccentClass = 'text-spot';
+  const spinnerClass = 'border-spot';
 
   return (
     <>
       <div className="flex-shrink-0 w-[calc(100vw-2rem)] h-full snap-center">
         <Link href={`/tasting?sessionId=${session.id}`} className="block h-full">
-          <Card variant="hoverable" isChristmasMode={isChristmasMode} className="p-0 flex flex-col h-full overflow-hidden shadow-lg">
+          <Card variant="hoverable" className="p-0 flex flex-col h-full overflow-hidden shadow-lg">
             <div className="relative z-10 flex flex-col h-full">
               <div className="flex flex-col h-full">
                 {/* ヘッダー（タイトル） */}
@@ -91,7 +88,7 @@ export function TastingSessionCardMobile({
                               className="h-full transition-all duration-500"
                               style={{
                                 width: `${((item.value - 1) / 4) * 100}%`,
-                                backgroundColor: isChristmasMode ? '#d4af37' : item.color,
+                                backgroundColor: item.color,
                               }}
                             />
                           </div>
@@ -161,7 +158,6 @@ export function TastingSessionCardMobile({
                           setAiModalSession(session);
                         }}
                         fullWidth
-                        isChristmasMode={isChristmasMode}
                         className="justify-between !p-3"
                       >
                         <div className="flex items-center gap-2">
@@ -196,11 +192,11 @@ export function TastingSessionCardMobile({
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
-              className={`relative ${isChristmasMode ? 'bg-[#0a2f1a]' : 'bg-white'} rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col`}
+              className="relative bg-overlay rounded-t-[2rem] shadow-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
             >
               {/* ハンドル */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className={`w-10 h-1 ${isChristmasMode ? 'bg-[#d4af37]/50' : 'bg-gray-300'} rounded-full`} />
+                <div className="w-10 h-1 bg-edge-strong rounded-full" />
               </div>
 
               {/* ヘッダー */}
@@ -222,12 +218,11 @@ export function TastingSessionCardMobile({
               </div>
 
               {/* 閉じるボタン */}
-              <div className={`p-4 border-t ${isChristmasMode ? 'border-[#d4af37]/20 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
+              <div className="p-4 border-t border-edge bg-ground">
                 <Button
                   variant="primary"
                   onClick={() => setAiModalSession(null)}
                   fullWidth
-                  isChristmasMode={isChristmasMode}
                 >
                   閉じる
                 </Button>

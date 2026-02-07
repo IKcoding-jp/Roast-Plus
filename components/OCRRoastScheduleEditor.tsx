@@ -13,7 +13,6 @@ interface OCRRoastScheduleEditorProps {
   selectedDate: string;
   onUpdate: (roastSchedules: RoastSchedule[]) => void;
   onDelete: (id: string) => void;
-  isChristmasMode?: boolean;
 }
 
 export function OCRRoastScheduleEditor({
@@ -21,7 +20,6 @@ export function OCRRoastScheduleEditor({
   selectedDate,
   onUpdate,
   onDelete,
-  isChristmasMode = false,
 }: OCRRoastScheduleEditorProps) {
   const [editingSchedule, setEditingSchedule] = useState<RoastSchedule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -103,11 +101,10 @@ export function OCRRoastScheduleEditor({
   };
 
   const getScheduleTypeIcon = (schedule: RoastSchedule) => {
-    const iconColor = isChristmasMode ? 'text-[#d4af37]' : '';
-    if (schedule.isRoasterOn) return <HiFire className={`h-5 w-5 ${iconColor || 'text-orange-600'}`} />;
-    if (schedule.isRoast) return <PiCoffeeBeanFill className={`h-5 w-5 ${iconColor || 'text-amber-600'}`} />;
-    if (schedule.isAfterPurge) return <FaSnowflake className={`h-5 w-5 ${iconColor || 'text-blue-600'}`} />;
-    if (schedule.isChaffCleaning) return <FaBroom className={`h-5 w-5 ${iconColor || 'text-gray-600'}`} />;
+    if (schedule.isRoasterOn) return <HiFire className="h-5 w-5 text-orange-600" />;
+    if (schedule.isRoast) return <PiCoffeeBeanFill className="h-5 w-5 text-amber-600" />;
+    if (schedule.isAfterPurge) return <FaSnowflake className="h-5 w-5 text-blue-600" />;
+    if (schedule.isChaffCleaning) return <FaBroom className="h-5 w-5 text-gray-600" />;
     return null;
   };
 
@@ -115,34 +112,24 @@ export function OCRRoastScheduleEditor({
     <>
       <div className="space-y-3">
         {sortedSchedules.length === 0 ? (
-          <div className={`text-center py-8 ${
-            isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-500'
-          }`}>
+          <div className="text-center py-8 text-ink-muted">
             <p>ローストスケジュールがありません</p>
           </div>
         ) : (
           sortedSchedules.map((schedule) => (
             <div
               key={schedule.id}
-              className={`border rounded-lg p-4 transition-colors ${
-                isChristmasMode
-                  ? 'border-[#d4af37]/30 bg-[#0a2f1a] hover:bg-[#0a2f1a]/80'
-                  : 'border-gray-200 bg-white hover:bg-gray-50'
-              }`}
+              className="border rounded-lg p-4 transition-colors border-edge bg-surface hover:bg-ground"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     {getScheduleTypeIcon(schedule)}
-                    <span className={`text-sm font-medium ${
-                      isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-600'
-                    }`}>
+                    <span className="text-sm font-medium text-ink-sub">
                       {getScheduleTypeLabel(schedule)}
                     </span>
                     {schedule.time && (
-                      <span className={`text-lg font-semibold ${
-                        isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-900'
-                      }`}>
+                      <span className="text-lg font-semibold text-ink">
                         {schedule.time}
                       </span>
                     )}
@@ -150,9 +137,7 @@ export function OCRRoastScheduleEditor({
 
                   {/* 豆の情報 */}
                   {schedule.beanName && (
-                    <div className={`text-sm mb-1 ${
-                      isChristmasMode ? 'text-[#f8f1e7]/80' : 'text-gray-700'
-                    }`}>
+                    <div className="text-sm mb-1 text-ink">
                       <span className="font-medium">豆:</span> {schedule.beanName}
                       {schedule.beanName2 && schedule.blendRatio && (
                         <span> + {schedule.beanName2} ({schedule.blendRatio})</span>
@@ -162,9 +147,7 @@ export function OCRRoastScheduleEditor({
 
                   {/* 重さと焙煎度合い */}
                   {(schedule.weight || schedule.roastLevel) && (
-                    <div className={`text-sm mb-1 ${
-                      isChristmasMode ? 'text-[#f8f1e7]/80' : 'text-gray-700'
-                    }`}>
+                    <div className="text-sm mb-1 text-ink">
                       {schedule.weight && <span>{schedule.weight}g</span>}
                       {schedule.weight && schedule.roastLevel && <span> / </span>}
                       {schedule.roastLevel && <span>{schedule.roastLevel}</span>}
@@ -173,9 +156,7 @@ export function OCRRoastScheduleEditor({
 
                   {/* ロースト回数と袋数 */}
                   {schedule.isRoast && (schedule.roastCount || schedule.bagCount) && (
-                    <div className={`text-sm ${
-                      isChristmasMode ? 'text-[#f8f1e7]/80' : 'text-gray-700'
-                    }`}>
+                    <div className="text-sm text-ink">
                       {schedule.roastCount && <span>{schedule.roastCount}回目</span>}
                       {schedule.roastCount && schedule.bagCount && <span> / </span>}
                       {schedule.bagCount && <span>{schedule.bagCount}袋</span>}
@@ -188,7 +169,6 @@ export function OCRRoastScheduleEditor({
                     variant="ghost"
                     size="md"
                     onClick={() => handleEdit(schedule)}
-                    isChristmasMode={isChristmasMode}
                     aria-label="編集"
                   >
                     <HiPencil className="h-5 w-5" />
@@ -197,7 +177,6 @@ export function OCRRoastScheduleEditor({
                     variant="ghost"
                     size="md"
                     onClick={() => handleDelete(schedule.id)}
-                    isChristmasMode={isChristmasMode}
                     className="text-red-500"
                     aria-label="削除"
                   >
@@ -215,7 +194,6 @@ export function OCRRoastScheduleEditor({
           variant="primary"
           size="lg"
           className="w-full"
-          isChristmasMode={isChristmasMode}
         >
           <HiPlus className="h-5 w-5" />
           <span>ローストスケジュールを追加</span>

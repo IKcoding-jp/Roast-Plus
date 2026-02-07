@@ -13,16 +13,14 @@ interface TodayScheduleProps {
   onUpdate: (data: AppData) => void;
   selectedDate: string;
   isToday: boolean;
-  isChristmasMode?: boolean;
 }
 
 interface TodayScheduleInnerProps extends TodayScheduleProps {
   currentSchedule: TodayScheduleType;
-  isChristmasMode: boolean;
 }
 
 export function TodaySchedule(props: TodayScheduleProps) {
-  const { data, selectedDate, isChristmasMode = false } = props;
+  const { data, selectedDate } = props;
   const todaySchedules = data?.todaySchedules ?? [];
   const currentSchedule =
     todaySchedules.find((s) => s.date === selectedDate) || {
@@ -34,10 +32,10 @@ export function TodaySchedule(props: TodayScheduleProps) {
     .map((s) => `${s.id}:${s.timeLabels?.length ?? 0}`)
     .join('|')}`;
 
-  return <TodayScheduleInner key={scheduleKey} {...props} currentSchedule={currentSchedule} isChristmasMode={isChristmasMode} />;
+  return <TodayScheduleInner key={scheduleKey} {...props} currentSchedule={currentSchedule} />;
 }
 
-function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isChristmasMode }: TodayScheduleInnerProps) {
+function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: TodayScheduleInnerProps) {
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
 
   const {
@@ -106,25 +104,17 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
 
   if (!data) {
     return (
-      <div className={`rounded-lg p-6 shadow-md ${
-        isChristmasMode ? 'bg-[#0a2f1a] border border-[#d4af37]/30' : 'bg-white'
-      }`}>
-        <p className={`text-center ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>データがありません</p>
+      <div className="rounded-lg p-6 shadow-card bg-surface border border-edge">
+        <p className="text-center text-ink-sub">データがありません</p>
       </div>
     );
   }
 
   return (
-    <div className={`rounded-2xl p-4 md:p-6 shadow-xl h-full flex flex-col backdrop-blur-sm ${
-      isChristmasMode
-        ? 'bg-[#0a2f1a] border-2 border-[#d4af37]/30'
-        : 'bg-white border-2 border-gray-300'
-    }`}>
+    <div className="rounded-2xl p-4 md:p-6 shadow-xl h-full flex flex-col backdrop-blur-sm bg-surface border-2 border-edge-strong">
       {/* デスクトップ版：タイトルと時間入力欄を横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex flex-row items-center justify-between gap-2">
-        <h2 className={`hidden lg:block text-base md:text-lg font-semibold whitespace-nowrap ${
-          isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-        }`}>本日のスケジュール</h2>
+        <h2 className="hidden lg:block text-base md:text-lg font-semibold whitespace-nowrap text-ink">本日のスケジュール</h2>
         <TimeInputRow
           newHour={newHour}
           newMinute={newMinute}
@@ -133,24 +123,17 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
           onMinuteChange={handleMinuteInputChange}
           onAdd={addTimeLabel}
           wrapperClassName="flex items-center gap-1.5 md:gap-2 flex-shrink-0"
-          isChristmasMode={isChristmasMode}
         />
       </div>
 
       {localTimeLabels.length === 0 ? (
-        <div className={`flex-1 flex items-center justify-center text-center ${
-          isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'
-        }`}>
+        <div className="flex-1 flex items-center justify-center text-center text-ink-sub">
           <div>
             <div className="mb-3 md:mb-5 flex justify-center">
-              <HiClock className={`h-12 w-12 md:h-20 md:w-20 ${
-                isChristmasMode ? 'text-[#d4af37]/30' : 'text-gray-300'
-              }`} />
+              <HiClock className="h-12 w-12 md:h-20 md:w-20 text-ink-muted" />
             </div>
             <p className="text-base md:text-lg font-medium">時間ラベルがありません</p>
-            <p className={`mt-1.5 md:mt-3 text-base md:text-base ${
-              isChristmasMode ? 'text-[#f8f1e7]/50' : 'text-gray-400'
-            }`}>時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
+            <p className="mt-1.5 md:mt-3 text-base md:text-base text-ink-muted">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
           </div>
         </div>
       ) : (
@@ -159,20 +142,12 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
             {groupedTimeLabels.map((group) => (
               <div
                 key={group.time}
-                className={`group flex items-baseline gap-3 md:gap-4 py-2.5 md:py-2 px-3 md:px-2.5 rounded-lg border transition-all duration-200 ${
-                  isChristmasMode
-                    ? 'bg-white/5 hover:bg-[#d4af37]/10 border-[#d4af37]/20 hover:border-[#d4af37]/40'
-                    : 'bg-gray-50 hover:bg-amber-50 border-gray-200 hover:border-amber-300'
-                }`}
+                className="group flex items-baseline gap-3 md:gap-4 py-2.5 md:py-2 px-3 md:px-2.5 rounded-lg border transition-all duration-200 bg-ground hover:bg-spot-subtle border-edge hover:border-spot"
               >
                 {/* 時間表示 */}
                 <div
                   onClick={() => handleEditGroup(group.time)}
-                  className={`flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-md text-sm md:text-base font-semibold cursor-pointer transition-colors tabular-nums shadow-sm ${
-                    isChristmasMode
-                      ? 'bg-[#d4af37]/20 text-[#d4af37] group-hover:bg-[#d4af37]/30'
-                      : 'bg-white text-gray-800 group-hover:text-amber-700 group-hover:bg-amber-100'
-                  }`}
+                  className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-md text-sm md:text-base font-semibold cursor-pointer transition-colors tabular-nums shadow-sm bg-surface text-ink group-hover:text-spot group-hover:bg-spot-subtle"
                 >
                   {group.time || '--:--'}
                 </div>
@@ -188,19 +163,11 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
                           onChange={(e) => updateTimeLabel(label.id, { content: e.target.value })}
                           onCompositionStart={handleCompositionStart}
                           onCompositionEnd={handleCompositionEnd}
-                          className={`flex-1 min-w-0 bg-transparent border-0 border-b border-transparent focus:outline-none transition-colors py-1 text-base md:text-base ${
-                            isChristmasMode
-                              ? 'text-[#f8f1e7] focus:border-[#d4af37] placeholder:text-[#f8f1e7]/40'
-                              : 'text-gray-900 focus:border-amber-400 placeholder:text-gray-400'
-                          }`}
+                          className="flex-1 min-w-0 bg-transparent border-0 border-b border-transparent focus:outline-none transition-colors py-1 text-base md:text-base text-ink focus:border-spot placeholder:text-ink-muted"
                           placeholder="内容を入力"
                         />
                         {label.continuesUntil && (
-                          <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
-                            isChristmasMode
-                              ? 'text-[#d4af37] bg-[#d4af37]/20'
-                              : 'text-amber-600 bg-amber-50'
-                          }`}>
+                          <span className="text-xs px-2 py-0.5 rounded-full whitespace-nowrap text-spot bg-spot-subtle">
                             〜{label.continuesUntil}まで
                           </span>
                         )}
@@ -208,14 +175,8 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
 
                       {label.assignee && (
                         <div className="flex items-center gap-1.5 mt-1 ml-1">
-                          <HiUser className={`h-3.5 w-3.5 flex-shrink-0 ${
-                            isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'
-                          }`} />
-                          <span className={`text-sm px-2 py-0.5 rounded-full ${
-                            isChristmasMode
-                              ? 'text-[#f8f1e7]/70 bg-white/10'
-                              : 'text-gray-500 bg-gray-100'
-                          }`}>
+                          <HiUser className="h-3.5 w-3.5 flex-shrink-0 text-ink-muted" />
+                          <span className="text-sm px-2 py-0.5 rounded-full text-ink-muted bg-ground">
                             {label.assignee}
                           </span>
                         </div>
@@ -227,19 +188,11 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
                             .sort((a, b) => a.order - b.order)
                             .map((subTask) => (
                               <div key={subTask.id} className="flex items-start gap-2">
-                                <HiArrowDown className={`h-4 w-4 flex-shrink-0 mt-0.5 ${
-                                  isChristmasMode ? 'text-[#f8f1e7]/40' : 'text-gray-400'
-                                }`} />
+                                <HiArrowDown className="h-4 w-4 flex-shrink-0 mt-0.5 text-ink-muted" />
                                 <div className="flex-1">
-                                  <span className={`text-sm ${
-                                    isChristmasMode ? 'text-[#f8f1e7]/80' : 'text-gray-700'
-                                  }`}>{subTask.content}</span>
+                                  <span className="text-sm text-ink-sub">{subTask.content}</span>
                                   {subTask.assignee && (
-                                    <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                                      isChristmasMode
-                                        ? 'text-[#f8f1e7]/60 bg-white/10'
-                                        : 'text-gray-500 bg-gray-100'
-                                    }`}>
+                                    <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full text-ink-muted bg-ground">
                                       {subTask.assignee}
                                     </span>
                                   )}
@@ -262,7 +215,6 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
               onMinuteChange={handleMinuteInputChange}
               onAdd={addTimeLabel}
               wrapperClassName="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2 pb-2"
-              isChristmasMode={isChristmasMode}
             />
           </div>
         </div>
@@ -278,7 +230,6 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule, isC
           onMinuteChange={handleMinuteInputChange}
           onAdd={addTimeLabel}
           wrapperClassName="mt-3 md:mt-4 flex lg:hidden items-center justify-center gap-1.5 md:gap-2"
-          isChristmasMode={isChristmasMode}
         />
       )}
 

@@ -15,15 +15,12 @@ import { IoArrowBack } from "react-icons/io5";
 import { FaUsers, FaUserTie } from "react-icons/fa";
 import { HiPlus, HiCog } from "react-icons/hi";
 import { Button } from '@/components/ui';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
 
 export default function AssignmentPage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const userId = user?.uid ?? null;
     const { isEnabled: isDeveloperMode } = useDeveloperMode();
-    const { isChristmasMode } = useChristmasMode();
-
     // 管理者ダイアログ
     const [isManagerDialogOpen, setIsManagerDialogOpen] = useState(false);
     // ペア除外設定
@@ -60,13 +57,9 @@ export default function AssignmentPage() {
     }
 
     return (
-        <div className={`min-h-screen flex flex-col ${
-            isChristmasMode ? 'bg-[#051a0e]' : 'bg-[#F7F7F5]'
-        }`}>
+        <div className="min-h-screen flex flex-col bg-page">
             {/* ヘッダー */}
-            <header className={`shadow-sm sticky top-0 z-30 flex-shrink-0 ${
-                isChristmasMode ? 'bg-[#0a2a14] border-b border-[#d4af37]/30' : 'bg-white'
-            }`}>
+            <header className="shadow-sm sticky top-0 z-30 flex-shrink-0 bg-surface border-b border-edge">
                 <div className="w-full px-4 h-16 relative flex items-center justify-center">
                     {/* 左側: 戻るボタン */}
                     <div className="absolute left-4 flex items-center z-10">
@@ -74,12 +67,7 @@ export default function AssignmentPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => router.back()}
-                            isChristmasMode={isChristmasMode}
-                            className={`!p-2 -ml-2 ${
-                                isChristmasMode
-                                    ? '!text-[#d4af37] hover:!text-[#e8c65f]'
-                                    : '!text-gray-600 hover:!text-gray-900'
-                            }`}
+                            className="!p-2 -ml-2 !text-ink-sub hover:!text-ink"
                         >
                             <IoArrowBack size={24} />
                         </Button>
@@ -88,12 +76,8 @@ export default function AssignmentPage() {
                     {/* 中央: 見出し */}
                     <div className="flex items-center justify-center z-0">
                         <div className="flex items-center gap-2">
-                            <FaUsers className={`w-6 h-6 md:w-7 md:h-7 ${
-                                isChristmasMode ? 'text-[#d4af37]' : 'text-primary'
-                            }`} />
-                            <h1 className={`text-xl md:text-2xl font-bold ${
-                                isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'
-                            }`}>
+                            <FaUsers className="w-6 h-6 md:w-7 md:h-7 text-spot" />
+                            <h1 className="text-xl md:text-2xl font-bold text-ink">
                                 担当表
                             </h1>
                         </div>
@@ -106,12 +90,7 @@ export default function AssignmentPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setIsPairExclusionModalOpen(true)}
-                                isChristmasMode={isChristmasMode}
-                                className={`!rounded-full !px-3 !py-2 shadow-md ${
-                                    isChristmasMode
-                                        ? '!bg-transparent !text-[#d4af37] hover:!bg-white/10 !border !border-[#d4af37]/50'
-                                        : '!bg-white !text-gray-700 hover:!bg-gray-100 !border !border-gray-300'
-                                }`}
+                                className="!rounded-full !px-3 !py-2 shadow-md !bg-surface !text-ink-sub hover:!bg-ground !border !border-edge-strong"
                                 title="ペア除外設定"
                             >
                                 <HiCog className="w-5 h-5" />
@@ -143,7 +122,6 @@ export default function AssignmentPage() {
                     onAddTeam={handlers.handleAddTeam}
                     onDeleteTeam={handlers.handleDeleteTeam}
                     onUpdateTeam={handlers.handleUpdateTeam}
-                    isChristmasMode={isChristmasMode}
                 />
             </main>
 
@@ -158,17 +136,16 @@ export default function AssignmentPage() {
                     variant={data.manager ? 'outline' : 'primary'}
                     size="md"
                     onClick={() => setIsManagerDialogOpen(true)}
-                    isChristmasMode={isChristmasMode}
                     className={`!flex !items-center !gap-2 !px-4 !py-3 !rounded-lg shadow-lg ${
-                        data.manager && !isChristmasMode ? '!bg-white hover:!bg-gray-50 !border-gray-200' : ''
+                        data.manager ? '!bg-surface hover:!bg-ground !border-edge' : ''
                     }`}
                 >
                     {data.manager ? (
                         <>
-                            <FaUserTie className={`w-5 h-5 ${isChristmasMode ? 'text-[#d4af37]' : 'text-primary'}`} />
+                            <FaUserTie className="w-5 h-5 text-spot" />
                             <div className="text-left">
-                                <div className={`text-sm font-semibold ${isChristmasMode ? 'text-[#f8f1e7]' : 'text-gray-800'}`}>{data.manager.name}</div>
-                                <div className={`text-xs ${isChristmasMode ? 'text-[#f8f1e7]/70' : 'text-gray-500'}`}>管理者</div>
+                                <div className="text-sm font-semibold text-ink">{data.manager.name}</div>
+                                <div className="text-xs text-ink-sub">管理者</div>
                             </div>
                         </>
                     ) : (
@@ -195,7 +172,6 @@ export default function AssignmentPage() {
                     await deleteManager(userId);
                     data.setManagerState(null);
                 }}
-                isChristmasMode={isChristmasMode}
             />
 
             {/* ペア除外設定モーダル */}
@@ -212,7 +188,6 @@ export default function AssignmentPage() {
                     if (!userId) return;
                     await deletePairExclusion(userId, exclusionId);
                 }}
-                isChristmasMode={isChristmasMode}
             />
         </div>
     );

@@ -1,6 +1,6 @@
 ---
 name: issue-creator
-description: GitHub Issue作成スキル。Serena MCPでコードベース調査→影響範囲特定→gh issue create→Working Documents生成まで一気通貫。バグ、機能追加、リファクタ、ドキュメント等あらゆる作業に対応。「〜のIssueを作って」「〜を実装したい」時に使用。
+description: GitHub Issue作成スキル。コードベース調査→影響範囲特定→gh issue create→Working Documents生成まで一気通貫。タスク規模に応じて調査深度とWorking生成を自動調整。「〜のIssueを作って」「〜を実装したい」時に使用。
 argument-hint: "[作業内容]"
 ---
 
@@ -9,29 +9,53 @@ argument-hint: "[作業内容]"
 ## ワークフロー
 
 ```
-1. 作業内容理解 → 2. コード調査(Serena MCP) → 3. Issue内容整理 → 4. ユーザー確認 → 5. Issue作成 → 6. Working Documents生成
+1. 作業内容理解+規模判定 → 2. コード調査(規模に応じて) → 3. Issue内容整理 → 4. ユーザー確認 → 5. Issue作成 → 6. Working Documents生成(規模に応じて)
 ```
 
 ⚠️ **このスキルではコード修正を行わない。調査とIssue作成とWorking生成のみ。**
 
 ---
 
-## Phase 1: 作業内容理解
+## Phase 1: 作業内容理解 + 規模判定
+
+### タイプ判定
 
 Issueタイプを判定: `bug` / `feat` / `refactor` / `docs` / `style` / `perf` / `chore` / `test`
 不明点はユーザーに質問。
 
+### 規模判定
+
+タスクの規模を3段階で判定:
+
+| 規模 | 基準 | 例 |
+|------|------|-----|
+| **小** | 1-2ファイル変更、単純な修正 | typo修正、設定変更、1関数の修正 |
+| **中** | 3-5ファイル変更、機能の追加・修正 | コンポーネント追加、既存機能の改善 |
+| **大** | 6ファイル以上、新機能、複雑なリファクタ | 新ページ作成、アーキテクチャ変更 |
+
+⚠️ **規模判定に迷ったら「中」として扱う。**
+
 ---
 
-## Phase 2: コード調査（Serena MCP）
+## Phase 2: コード調査（規模に応じて調整）
+
+### 大規模タスク → 詳細調査
 
 - `find_symbol` / `search_for_pattern` で関連コード特定
 - `get_symbols_overview` で構造把握
 - `find_referencing_symbols` で影響範囲確認
 
-**調査深度**: バグ修正・リファクタは詳細調査。UI変更・ドキュメントは軽微でOK。
-
 ⚠️ **この調査結果はWorking Documents生成に流用されるため、しっかり行う。**
+
+### 中規模タスク → 標準調査
+
+- `search_for_pattern` で関連コード特定
+- `get_symbols_overview` で変更対象ファイルの構造把握
+
+### 小規模タスク → 軽微調査 or 省略
+
+- 対象ファイルが明確な場合は調査省略可
+- 不明な場合のみ `search_for_pattern` で軽く確認
 
 ---
 
@@ -55,11 +79,16 @@ Issueタイプを判定: `bug` / `feat` / `refactor` / `docs` / `style` / `perf`
 - 関連コンポーネント・依存関係
 ```
 
+⚠️ **小規模タスクでは「対象箇所」「影響範囲」は省略可。**
+
 ---
 
 ## Phase 4: ユーザー確認 🔹確認ポイント
 
-Issue本文とWorking Documents生成の有無を確認。
+Issue本文を提示し、以下を確認:
+- 内容が正しいか
+- 規模判定が妥当か
+- Working Documents生成の有無（AIの判断を提示）
 
 ---
 
@@ -78,9 +107,28 @@ rm /tmp/issue_body.md
 
 ---
 
-## Phase 6: Working Documents生成
+## Phase 6: Working Documents生成（AIが規模に応じて判断）
 
-**Issue作成後、Working Documentsを自動生成します。**
+### 生成判断基準
+
+| 規模 | Working生成 | 理由 |
+|------|:----------:|------|
+| **大** | ✅ 必ず生成 | コンテキスト保持が必須 |
+| **中** | ✅ 生成推奨 | /fix-issueでの作業効率化 |
+| **小** | △ AIが判断 | 内容に応じて生成/スキップ |
+
+### 小規模タスクでの判断基準
+
+以下に該当する場合は**スキップ可**:
+- 軽微なドキュメント修正（typo、リンク修正等）
+- 単純な依存関係更新（`npm update`のみ）
+- 緊急のホットフィックス（即座に修正が必要）
+- 1ファイルの軽微な修正
+
+以下に該当する場合は**生成する**:
+- バグ修正（原因調査の記録が重要）
+- テスト追加（テスト計画が必要）
+- 複数セッションにまたがる可能性がある作業
 
 ### タスクタイプ別の生成内容
 
@@ -93,13 +141,6 @@ rm /tmp/issue_body.md
 | docs   | △ 軽量 | ✅ | - | - |
 | style  | △ 軽量 | ✅ | △ 軽量 | - |
 | chore  | - | ✅ | - | - |
-
-### 生成スキップ可能な場合
-
-以下のIssueではWorking Documents生成をスキップしてもOK:
-- 軽微なドキュメント修正（typo、リンク修正等）
-- 単純な依存関係更新（`npm update`のみ）
-- 緊急のホットフィックス（即座に修正が必要）
 
 ### ディレクトリ構成
 
@@ -205,7 +246,7 @@ docs/working/{YYYYMMDD}_{Issue番号}_{タイトル}/
 
 ```
 ✅ Issue #124 を作成しました
-✅ Working Documents を生成しました
+✅ Working Documents を生成しました（or スキップしました）
    └── docs/working/20260206_124_タイトル/
 
 次のステップ:

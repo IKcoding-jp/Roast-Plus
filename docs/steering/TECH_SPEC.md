@@ -197,7 +197,14 @@ CSS変数は `@theme inline` で Tailwind ユーティリティとして自動�
 - **全体**: 76.19%
 - **lib/**: 89.44%
 - **hooks/**: 87.9%
-- **総テスト数**: 342テスト（100%合格）
+- **ユニットテスト数**: 750テスト（100%合格）
+
+### Playwright（E2Eテスト）
+- **バージョン**: @playwright/test 1.x
+- **ブラウザ**: Chromium
+- **設定**: `playwright.config.ts`
+- **テストカテゴリ**: ページ統合、ユーザーフロー、レスポンシブ、アクセシビリティ（axe-core）、パフォーマンス
+- **テスト数**: 93テスト
 
 ### 関連ADR
 - [ADR-003] Vitest 採用（Jest → Vitest）（`docs/memory.md` 参照）

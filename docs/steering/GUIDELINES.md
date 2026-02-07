@@ -378,7 +378,8 @@ function NewComponentDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
 | ユニットテスト | ロジック関数（`lib/`） | Vitest |
 | 統合テスト | カスタムフック（`hooks/`） | Vitest + @testing-library/react |
 | コンポーネントテスト | UIコンポーネント（`components/`） | Vitest + @testing-library/react |
-| E2Eテスト（手動） | ユーザーフロー | Chrome DevTools MCP |
+| E2Eテスト（自動） | ユーザーフロー・レスポンシブ・a11y・パフォーマンス | Playwright + @axe-core/playwright |
+| E2Eテスト（手動） | ビジュアル確認 | Chrome DevTools MCP |
 
 ---
 
@@ -471,6 +472,48 @@ test('should call onSelect when option clicked', () => {
 
   expect(onSelect).toHaveBeenCalledWith(0);
 });
+```
+
+---
+
+### E2Eテスト（Playwright）
+
+#### ディレクトリ構成
+
+```
+e2e/
+├── fixtures/          # カスタムフィクスチャ・テストデータ
+│   ├── test-base.ts   # mockFirebase, isRedirectedToLogin
+│   └── test-data.ts   # viewports, performanceThresholds
+├── pages/             # ページ単位テスト
+├── flows/             # ユーザーフロー（複数ページ横断）
+├── responsive/        # レスポンシブテスト（mobile/tablet/desktop）
+├── accessibility/     # axe-core自動スキャン + キーボードナビゲーション
+└── performance/       # ページロード時間・CLS・メモリリーク
+```
+
+#### 認証が必要なページのテストパターン
+
+```typescript
+import { isRedirectedToLogin } from '../fixtures/test-base';
+
+test('認証済みの場合のみ動作する機能', async ({ page }) => {
+  await page.goto('/schedule');
+  await page.waitForLoadState('domcontentloaded');
+
+  const isLogin = await isRedirectedToLogin(page);
+  test.skip(isLogin, '認証が必要なためスキップ');
+
+  // 認証済みの場合のテスト
+});
+```
+
+#### コマンド
+
+```bash
+npm run test:e2e          # E2Eテスト実行
+npm run test:e2e:ui       # UIモードで実行
+npm run test:e2e:report   # レポート表示
 ```
 
 ---

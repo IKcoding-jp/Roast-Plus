@@ -18,6 +18,10 @@ const eslintConfig = defineConfig([
     // Ignore Claude/Codex skill examples
     ".claude/**",
     ".codex/**",
+    // Ignore coverage reports
+    "coverage/**",
+    // Ignore E2E tests (Playwright, not React)
+    "e2e/**",
   ]),
 ]);
 

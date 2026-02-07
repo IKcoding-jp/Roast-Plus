@@ -14,7 +14,10 @@
     "prepare": "husky",
     "security": "npm audit",
     "complexity": "lizard ./app ./components ./hooks ./lib ./types ./scripts -C 15 -L 50 -w",
-    "deadcode": "knip"
+    "deadcode": "knip",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -42,6 +45,8 @@
     ]
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

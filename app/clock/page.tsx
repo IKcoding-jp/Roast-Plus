@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useCallback, useSyncExternalStore } from 'react';
-import Link from 'next/link';
-import { HiArrowLeft, HiCog6Tooth } from 'react-icons/hi2';
+import { HiCog6Tooth } from 'react-icons/hi2';
+import { BackLink, IconButton } from '@/components/ui';
 import { useClockSettings } from '@/hooks/useClockSettings';
 import { ClockSettingsModal } from '@/components/clock/ClockSettingsModal';
 import { getThemeColors, getFontFamily, getFontWidthFactor, getScaledClamp } from '@/lib/clockSettings';
@@ -83,25 +83,18 @@ export default function ClockPage() {
     >
       {/* ヘッダー：戻るボタン＋設定ボタン */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
-        <Link
-          href="/"
-          className="flex items-center justify-center min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg transition-colors"
-          style={{ color: colors.uiText }}
-          aria-label="ホームに戻る"
-        >
-          <HiArrowLeft className="h-6 w-6" />
-        </Link>
+        <BackLink href="/" variant="icon-only" aria-label="ホームに戻る" />
       </div>
 
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
-        <button
+        <IconButton
+          variant="ghost"
+          rounded
           onClick={() => setShowSettings(true)}
-          className="flex items-center justify-center min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg transition-colors"
-          style={{ color: colors.uiText }}
           aria-label="時計の設定"
         >
-          <HiCog6Tooth className="h-6 w-6" />
-        </button>
+          <HiCog6Tooth className="h-6 w-6" style={{ color: colors.uiText }} />
+        </IconButton>
       </div>
 
       {/* 時計表示エリア */}
@@ -178,14 +171,13 @@ export default function ClockPage() {
       </div>
 
       {/* 設定モーダル */}
-      {showSettings && (
-        <ClockSettingsModal
-          settings={settings}
-          onUpdate={updateSettings}
-          onReset={resetSettings}
-          onClose={() => setShowSettings(false)}
-        />
-      )}
+      <ClockSettingsModal
+        show={showSettings}
+        settings={settings}
+        onUpdate={updateSettings}
+        onReset={resetSettings}
+        onClose={() => setShowSettings(false)}
+      />
     </div>
   );
 }

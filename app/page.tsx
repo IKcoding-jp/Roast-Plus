@@ -204,8 +204,8 @@ export default function HomePage(_props: HomePageProps = {}) {
       const viewportHeight = window.innerHeight;
       const headerHeight = 72; // ヘッダーの高さ目安
       const paddingTop = 8; // pt-2 = 8px
-      const paddingBottom = 24; // pb-6 = 24px
-      const gridGap = 60; // 5行  gap-3 (12px)
+      const paddingBottom = 8; // pb-2 = 8px
+      const gridGap = 48; // 4つのgap × 12px (5行で4つのgap)
 
       const availableHeight = viewportHeight - headerHeight - paddingTop - paddingBottom;
       const cardHeightPerRow = (availableHeight - gridGap) / 5; // 10カードを5行に配置
@@ -246,7 +246,7 @@ export default function HomePage(_props: HomePageProps = {}) {
   }
 
   return (
-    <div className={`min-h-screen animate-home-page relative transition-colors duration-1000 bg-page text-ink ${isChristmasMode
+    <div className={`h-dvh flex flex-col overflow-hidden animate-home-page relative transition-colors duration-1000 bg-page text-ink ${isChristmasMode
       ? 'bg-[radial-gradient(circle_at_center,_#0a2f1a_0%,_#051a0e_100%)]'
       : ''
       }`}>
@@ -294,7 +294,7 @@ export default function HomePage(_props: HomePageProps = {}) {
       )}
 
       {/* ヘッダー */}
-      <header className={`relative z-50 shadow-2xl transition-all duration-1000 ${isChristmasMode
+      <header className={`shrink-0 relative z-50 shadow-2xl transition-all duration-1000 ${isChristmasMode
         ? 'bg-gradient-to-r from-[#4a0e0e] via-[#5d1212] to-[#2d0a0a] backdrop-blur-xl border-b-[0.5px] border-[#d4af37]/40'
         : 'bg-[#261a14]/98'
         }`}>
@@ -385,9 +385,7 @@ export default function HomePage(_props: HomePageProps = {}) {
       </header>
 
       {/* メインコンテンツ */}
-      <main className="relative z-10 mx-auto max-w-6xl px-4 pt-4 pb-10 sm:px-6 sm:pt-6">
-        <div className="mb-4 flex items-center justify-between">
-        </div>
+      <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-2 pb-2 sm:px-6 sm:pt-3 sm:pb-3 flex-1 min-h-0">
 
         <div
           className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"

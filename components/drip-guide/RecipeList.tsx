@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { DripRecipe } from '@/lib/drip-guide/types';
 import { Timer, Coffee, Drop, Trash, Pencil, Play, CaretDown } from 'phosphor-react';
 import { clsx } from 'clsx';
-import { Dialog, Card } from '@/components/ui';
+import { Dialog, Card, Button, IconButton } from '@/components/ui';
 import { StartHintDialog } from './StartHintDialog';
 import { Start46Dialog } from './Start46Dialog';
 import { StartHoffmannDialog } from './StartHoffmannDialog';
@@ -90,7 +90,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
 
     if (recipes.length === 0) {
         return (
-            <div className="text-center py-10 text-gray-500">
+            <div className="text-center py-10 text-ink-muted">
                 <p>レシピがまだありません。</p>
                 <p className="text-sm mt-2">新しいレシピを作成して、ドリップガイドを始めましょう。</p>
             </div>
@@ -111,55 +111,56 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                             className="p-4 sm:p-5 flex flex-col"
                         >
                             <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-bold text-lg text-gray-800 line-clamp-1" title={recipe.name}>
+                                <h3 className="font-bold text-lg text-ink line-clamp-1" title={recipe.name}>
                                     {recipe.name}
                                 </h3>
                                 <div className="flex gap-1">
                                     {recipe.id !== 'recipe-046' && recipe.id !== 'recipe-hoffmann' && (
                                         <Link
                                             href={`/drip-guide/edit?id=${recipe.id}`}
-                                            className="p-3 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                            className="p-3 sm:p-2 text-ink-muted hover:text-info hover:bg-info/10 rounded-full transition-colors"
                                             title="編集"
                                         >
                                             <Pencil size={18} />
                                         </Link>
                                     )}
                                     {!recipe.isDefault && (
-                                        <button
-                                            type="button"
+                                        <IconButton
+                                            variant="ghost"
+                                            size="sm"
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
                                                 handleDeleteClick(recipe.id);
                                             }}
-                                            className="p-3 sm:p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                            className="text-ink-muted hover:text-danger hover:bg-danger-subtle"
                                             title="削除"
                                         >
                                             <Trash size={18} />
-                                        </button>
+                                        </IconButton>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="space-y-2 text-sm text-gray-600 mb-4 flex-grow">
+                            <div className="space-y-2 text-sm text-ink-sub mb-4 flex-grow">
                                 <div className="flex items-center gap-2">
-                                    <Coffee size={16} className="text-amber-700" />
+                                    <Coffee size={16} className="text-spot" />
                                     <span className="font-medium">{calculatedRecipe.beanName}</span>
-                                    <span className="text-gray-400">({calculatedRecipe.beanAmountGram}g)</span>
+                                    <span className="text-ink-muted">({calculatedRecipe.beanAmountGram}g)</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Drop size={16} className="text-blue-500" />
+                                    <Drop size={16} className="text-info" />
                                     <span>{calculatedRecipe.totalWaterGram}g</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Timer size={16} className="text-gray-500" />
+                                    <Timer size={16} className="text-ink-muted" />
                                     <span>
                                         {Math.floor(calculatedRecipe.totalDurationSec / 60)}分
                                         {calculatedRecipe.totalDurationSec % 60}秒
                                     </span>
                                 </div>
                                 {recipe.purpose && (
-                                    <div className="mt-2 inline-block px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-md">
+                                    <div className="mt-2 inline-block px-2 py-0.5 bg-ground text-ink-sub text-xs rounded-md">
                                         {recipe.purpose}
                                     </div>
                                 )}
@@ -175,7 +176,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                         id={`servings-${recipe.id}`}
                                         value={servings}
                                         onChange={(e) => handleServingsChange(recipe.id, parseInt(e.target.value, 10))}
-                                        className="w-full py-2 px-3 pr-10 rounded-lg text-sm font-medium transition-colors min-h-[44px] bg-white border border-gray-300 text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none cursor-pointer"
+                                        className="w-full py-2 px-3 pr-10 rounded-lg text-sm font-medium transition-colors min-h-[44px] bg-field border border-edge text-ink hover:border-edge-strong focus:outline-none focus:ring-2 focus:ring-spot focus:border-spot appearance-none cursor-pointer"
                                         aria-label="人前を選択"
                                     >
                                         {[1, 2, 3, 4, 5, 6, 7, 8].map((serving) => (
@@ -185,22 +186,22 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                                         ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                        <CaretDown size={16} className="text-gray-500" />
+                                        <CaretDown size={16} className="text-ink-muted" />
                                     </div>
                                 </div>
                             </div>
 
-                            <button
-                                type="button"
+                            <Button
+                                variant="primary"
+                                fullWidth
                                 onClick={() => handleOpenStart(recipe.id)}
                                 className={clsx(
-                                    "mt-auto flex items-center justify-center gap-2 w-full py-3 sm:py-2.5 rounded-lg font-bold transition-all",
-                                    "bg-primary text-white hover:bg-primary-dark active:scale-[0.98] touch-manipulation"
+                                    "mt-auto gap-2 !rounded-lg active:scale-[0.98] touch-manipulation"
                                 )}
                             >
                                 <Play size={20} weight="fill" />
                                 ガイド開始
-                            </button>
+                            </Button>
                         </Card>
                     );
                 })}

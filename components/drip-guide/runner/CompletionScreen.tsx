@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
+import { Button } from '@/components/ui';
 
 interface CompletionScreenProps {
     onReset: () => void;
@@ -37,7 +38,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({ onReset }) =
     }, [animationData]);
 
     return (
-        <div className="flex flex-col items-center justify-center h-[100dvh] text-center p-6">
+        <div className="flex flex-col items-center justify-center h-[100dvh] text-center p-6 bg-surface">
             <div className="mb-6 flex items-center justify-center">
                 {animationData ? (
                     <Lottie
@@ -51,25 +52,28 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({ onReset }) =
                     />
                 ) : (
                     <div className="w-40 h-40 flex items-center justify-center">
-                        <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-4 border-spot border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 )}
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">抽出完了！</h2>
-            <p className="text-gray-600 mb-8">お疲れ様でした。美味しいコーヒーを楽しみましょう。</p>
+            <h2 className="text-3xl font-bold text-ink mb-2">抽出完了！</h2>
+            <p className="text-ink-sub mb-8">お疲れ様でした。美味しいコーヒーを楽しみましょう。</p>
 
             <div className="flex gap-4">
-                <button
+                <Button
+                    variant="outline"
                     onClick={onReset}
-                    className="px-6 py-2 border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="!rounded-full"
                 >
                     もう一度淹れる
-                </button>
-                <Link
-                    href="/drip-guide"
-                    className="px-6 py-2 bg-amber-600 text-white rounded-full hover:bg-amber-700 transition-colors"
-                >
-                    一覧に戻る
+                </Button>
+                <Link href="/drip-guide">
+                    <Button
+                        variant="primary"
+                        className="!rounded-full"
+                    >
+                        一覧に戻る
+                    </Button>
                 </Link>
             </div>
         </div>

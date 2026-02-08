@@ -7,6 +7,7 @@ import { calculateRecipeForServings } from '@/lib/drip-guide/recipeCalculator';
 import { MOCK_RECIPES } from '@/lib/drip-guide/mockData';
 import { RECIPE_HOFFMANN_STEP_DETAILS } from '@/lib/drip-guide/recipeHoffmannContent';
 import { useDialogKeyboard } from '@/hooks/drip-guide/useDialogKeyboard';
+import { Button } from '@/components/ui';
 import { DialogOverlay } from './dialogs/shared/DialogOverlay';
 import { HoffmannDialogHeader } from './dialogs/hoffmann/HoffmannDialogHeader';
 import { HoffmannDialogForm } from './dialogs/hoffmann/HoffmannDialogForm';
@@ -84,7 +85,7 @@ export const StartHoffmannDialog: React.FC<StartHoffmannDialogProps> = ({
                         onClick={onClose}
                     >
                         <div
-                            className="w-full max-w-2xl rounded-2xl border border-amber-100 bg-white shadow-2xl my-8"
+                            className="w-full max-w-2xl rounded-2xl border border-edge bg-overlay shadow-2xl my-8"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <HoffmannDialogHeader />
@@ -101,21 +102,22 @@ export const StartHoffmannDialog: React.FC<StartHoffmannDialogProps> = ({
                             />
 
                             <div className="flex items-center justify-between px-5 pb-5 pt-1">
-                                <button
-                                    type="button"
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={onClose}
-                                    className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors"
+                                    className="gap-2"
                                 >
                                     <span className="text-base">×</span>
-                                    <span className="text-sm font-medium">閉じる</span>
-                                </button>
-                                <button
-                                    type="button"
+                                    閉じる
+                                </Button>
+                                <Button
+                                    variant="primary"
                                     onClick={handleStartGuide}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-semibold text-white shadow-sm transition-all hover:bg-primary-dark active:scale-[0.99] touch-manipulation"
+                                    className="!rounded-full !px-5 !py-3 active:scale-[0.99] touch-manipulation"
                                 >
                                     ガイド開始
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </motion.div>

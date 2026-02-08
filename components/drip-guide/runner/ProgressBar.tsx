@@ -9,9 +9,9 @@ interface ProgressBarProps {
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({ progressPercent }) => {
     return (
-        <div className="flex-none h-1 bg-gray-100 w-full">
+        <div className="flex-none h-1 bg-ground w-full">
             <motion.div
-                className="h-full bg-amber-500"
+                className="h-full bg-spot"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 1, ease: 'linear' }}

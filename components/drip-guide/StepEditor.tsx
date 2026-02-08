@@ -3,6 +3,7 @@
 import React from 'react';
 import { DripStep } from '@/lib/drip-guide/types';
 import { Trash, Plus, ListNumbers } from 'phosphor-react';
+import { Button, IconButton } from '@/components/ui';
 
 interface StepEditorProps {
     steps: DripStep[];
@@ -27,8 +28,6 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManua
     const updateStep = (index: number, field: keyof DripStep, value: DripStep[keyof DripStep]) => {
         const newSteps = [...steps];
         newSteps[index] = { ...newSteps[index], [field]: value };
-        // Sort by startTimeSec automatically? Maybe better to let user control or sort on save.
-        // For now, let's just update.
         onChange(newSteps);
     };
 
@@ -40,7 +39,7 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManua
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h3 className="font-bold text-gray-700 flex items-center gap-2">
+                <h3 className="font-bold text-ink-sub flex items-center gap-2">
                     <ListNumbers size={20} />
                     手順ステップ
                 </h3>
@@ -48,17 +47,17 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManua
 
             <div className="space-y-3">
                 {steps.map((step, index) => (
-                    <div key={step.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200 relative group">
+                    <div key={step.id} className="bg-ground p-4 rounded-lg border border-edge relative group">
                         <div className="grid grid-cols-12 gap-3">
                             {/* Time Input */}
                             {!isManualMode && (
                                 <div className="col-span-3 sm:col-span-2">
-                                    <label className="block text-xs font-medium text-gray-500 mb-1">開始(秒)</label>
+                                    <label className="block text-xs font-medium text-ink-muted mb-1">開始(秒)</label>
                                     <input
                                         type="number"
                                         value={step.startTimeSec}
                                         onChange={(e) => updateStep(index, 'startTimeSec', parseInt(e.target.value) || 0)}
-                                        className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                        className="w-full p-3 sm:p-2 border border-edge rounded bg-field text-ink focus:ring-2 focus:ring-spot outline-none text-base"
                                         min={0}
                                     />
                                 </div>
@@ -66,60 +65,62 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManua
 
                             {/* Title Input */}
                             <div className={isManualMode ? "col-span-6 sm:col-span-5" : "col-span-9 sm:col-span-4"}>
-                                <label className="block text-xs font-medium text-gray-500 mb-1">タイトル</label>
+                                <label className="block text-xs font-medium text-ink-muted mb-1">タイトル</label>
                                 <input
                                     type="text"
                                     value={step.title}
                                     onChange={(e) => updateStep(index, 'title', e.target.value)}
                                     placeholder="例: 蒸らし"
-                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                    className="w-full p-3 sm:p-2 border border-edge rounded bg-field text-ink placeholder:text-ink-muted focus:ring-2 focus:ring-spot outline-none text-base"
                                 />
                             </div>
 
                             {/* Target Water Input */}
                             <div className="col-span-6 sm:col-span-3">
-                                <label className="block text-xs font-medium text-gray-500 mb-1">目標湯量(g)</label>
+                                <label className="block text-xs font-medium text-ink-muted mb-1">目標湯量(g)</label>
                                 <input
                                     type="number"
                                     value={step.targetTotalWater || ''}
                                     onChange={(e) => updateStep(index, 'targetTotalWater', e.target.value ? parseInt(e.target.value) : undefined)}
                                     placeholder="任意"
-                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                    className="w-full p-3 sm:p-2 border border-edge rounded bg-field text-ink placeholder:text-ink-muted focus:ring-2 focus:ring-spot outline-none text-base"
                                 />
                             </div>
 
-                            {/* Delete Button (Desktop: right aligned, Mobile: absolute top-right) */}
+                            {/* Delete Button */}
                             <div className={isManualMode ? "col-span-6 sm:col-span-4 flex items-end justify-end" : "col-span-6 sm:col-span-3 flex items-end justify-end"}>
-                                <button
+                                <IconButton
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={() => removeStep(index)}
-                                    className="text-gray-400 hover:text-red-500 p-3 sm:p-2 rounded-full hover:bg-red-50 transition-colors touch-manipulation"
+                                    className="text-ink-muted hover:text-danger hover:bg-danger-subtle"
                                     title="ステップを削除"
                                 >
                                     <Trash size={20} />
-                                </button>
+                                </IconButton>
                             </div>
 
                             {/* Description Input (Full width) */}
                             <div className="col-span-12">
-                                <label className="block text-xs font-medium text-gray-500 mb-1">説明・詳細</label>
+                                <label className="block text-xs font-medium text-ink-muted mb-1">説明・詳細</label>
                                 <textarea
                                     value={step.description}
                                     onChange={(e) => updateStep(index, 'description', e.target.value)}
                                     placeholder="例: 全体にお湯を行き渡らせます"
-                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                    className="w-full p-3 sm:p-2 border border-edge rounded bg-field text-ink placeholder:text-ink-muted focus:ring-2 focus:ring-spot outline-none text-base"
                                     rows={2}
                                 />
                             </div>
 
                             {/* Note/Hint Input (Full width) */}
                             <div className="col-span-12">
-                                <label className="block text-xs font-medium text-gray-500 mb-1">ヒント</label>
+                                <label className="block text-xs font-medium text-ink-muted mb-1">ヒント</label>
                                 <input
                                     type="text"
                                     value={step.note || ''}
                                     onChange={(e) => updateStep(index, 'note', e.target.value || undefined)}
                                     placeholder="例: 粉全体が均一に膨らむのを確認"
-                                    className="w-full p-3 sm:p-2 border rounded focus:ring-2 focus:ring-amber-500 outline-none text-base"
+                                    className="w-full p-3 sm:p-2 border border-edge rounded bg-field text-ink placeholder:text-ink-muted focus:ring-2 focus:ring-spot outline-none text-base"
                                 />
                             </div>
                         </div>
@@ -127,14 +128,16 @@ export const StepEditor: React.FC<StepEditorProps> = ({ steps, onChange, isManua
                 ))}
             </div>
 
-            <button
-                type="button"
+            <Button
+                variant="outline"
+                fullWidth
                 onClick={addStep}
-                className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 font-medium hover:border-amber-500 hover:text-amber-600 transition-colors flex items-center justify-center gap-2"
+                type="button"
+                className="!border-2 !border-dashed !border-edge gap-2"
             >
                 <Plus size={20} />
                 ステップを追加
-            </button>
+            </Button>
         </div>
     );
 };

@@ -4,6 +4,7 @@ import React from 'react';
 import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import { Coffee, Timer, Drop, Spiral } from 'phosphor-react';
 import { RECIPE_HOFFMANN_DESCRIPTION_SECTIONS } from '@/lib/drip-guide/recipeHoffmannContent';
+import { Button } from '@/components/ui';
 
 const overlayMotion = {
     initial: { opacity: 0 },
@@ -57,18 +58,18 @@ export const HoffmannDescriptionModal: React.FC<HoffmannDescriptionModalProps> =
                         onClick={onClose}
                     >
                         <div
-                            className="w-full max-w-xl rounded-2xl bg-white shadow-xl relative overflow-hidden flex flex-col"
+                            className="w-full max-w-xl rounded-2xl bg-overlay shadow-xl relative overflow-hidden flex flex-col"
                             style={{ maxHeight: '90vh' }}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                                <h3 className="text-xl font-bold text-gray-900">
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
+                                <h3 className="text-xl font-bold text-ink">
                                     Hoffmann V60のポイント
                                 </h3>
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                                    className="p-2 text-ink-muted hover:text-ink hover:bg-ground rounded-full transition-colors"
                                 >
                                     <span className="text-2xl leading-none">×</span>
                                 </button>
@@ -77,14 +78,14 @@ export const HoffmannDescriptionModal: React.FC<HoffmannDescriptionModalProps> =
                             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
                                 {RECIPE_HOFFMANN_DESCRIPTION_SECTIONS.map((section, idx) => (
                                     <div key={idx} className="flex gap-4">
-                                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-spot-subtle text-spot flex items-center justify-center">
                                             {getIcon(section.icon)}
                                         </div>
-                                        <div className="flex-1 border-b border-gray-50 pb-4">
-                                            <h4 className="font-bold text-gray-900 mb-1 text-base">
+                                        <div className="flex-1 border-b border-edge/30 pb-4">
+                                            <h4 className="font-bold text-ink mb-1 text-base">
                                                 {section.title}
                                             </h4>
-                                            <p className="text-[15px] leading-relaxed text-gray-600 whitespace-pre-wrap">
+                                            <p className="text-[15px] leading-relaxed text-ink-sub whitespace-pre-wrap">
                                                 {section.content}
                                             </p>
                                         </div>
@@ -92,14 +93,14 @@ export const HoffmannDescriptionModal: React.FC<HoffmannDescriptionModalProps> =
                                 ))}
                             </div>
 
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-                                <button
-                                    type="button"
+                            <div className="px-6 py-4 bg-ground border-t border-edge flex justify-end">
+                                <Button
+                                    variant="coffee"
+                                    size="sm"
                                     onClick={onClose}
-                                    className="bg-gray-900 text-white px-8 py-2.5 rounded-lg font-bold text-sm hover:bg-black transition-colors"
                                 >
                                     閉じる
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </motion.div>

@@ -4,6 +4,7 @@ import React, { useEffect, useCallback } from 'react';
 import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import { Coffee, Timer } from 'phosphor-react';
 import { GiCoffeePot } from 'react-icons/gi';
+import { Button } from '@/components/ui';
 
 interface StartHintDialogProps {
     isOpen: boolean;
@@ -71,49 +72,49 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
                         onClick={onClose}
                     >
                         <div
-                            className="w-full max-w-md rounded-2xl border border-amber-100 bg-white shadow-2xl"
+                            className="w-full max-w-md rounded-2xl border border-edge bg-overlay shadow-2xl"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-start gap-3 px-5 pt-5">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-spot-subtle text-spot">
                                     <Coffee size={24} weight="duotone" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-spot">
                                         ドリップ前のヒント
                                     </p>
-                                    <h3 className="mt-1 text-lg font-bold text-gray-900">
+                                    <h3 className="mt-1 text-lg font-bold text-ink">
                                         一杯をおいしく淹れるために
                                     </h3>
                                     {recipeName && (
-                                        <p className="mt-1 text-sm text-gray-500">レシピ: {recipeName}</p>
+                                        <p className="mt-1 text-sm text-ink-muted">レシピ: {recipeName}</p>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="px-5 py-4 space-y-3 text-sm text-gray-700">
+                            <div className="px-5 py-4 space-y-3 text-sm text-ink-sub">
                                 <div className="flex gap-3">
-                                    <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                                    <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-spot-subtle text-spot">
                                         <GiCoffeePot size={18} />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="font-semibold text-gray-900">湯量は総量表示です</p>
-                                        <p className="text-gray-700">
+                                        <p className="font-semibold text-ink">湯量は総量表示です</p>
+                                        <p className="text-ink-sub">
                                             表示される湯量は合計量です。スケールを毎回0に戻す必要はありません。
                                         </p>
                                         {waterInfo && (
-                                            <p className="mt-1 text-xs text-amber-700">今回の総湯量: {waterInfo}</p>
+                                            <p className="mt-1 text-xs text-spot">今回の総湯量: {waterInfo}</p>
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="flex gap-3">
-                                    <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                                    <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-spot-subtle text-spot">
                                         <Timer size={18} weight="duotone" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="font-semibold text-gray-900">蒸らし後にタイマー開始</p>
-                                        <p className="text-gray-700">
+                                        <p className="font-semibold text-ink">蒸らし後にタイマー開始</p>
+                                        <p className="text-ink-sub">
                                             蒸らしのお湯を入れたら、タイマーを開始してください。
                                         </p>
                                     </div>
@@ -122,21 +123,22 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
                             </div>
 
                             <div className="flex items-center justify-between px-5 pb-5 pt-1">
-                                <button
-                                    type="button"
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={onClose}
-                                    className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors"
+                                    className="gap-2"
                                 >
                                     <span className="text-base">×</span>
-                                    <span className="text-sm font-medium">閉じる</span>
-                                </button>
-                                <button
-                                    type="button"
+                                    閉じる
+                                </Button>
+                                <Button
+                                    variant="primary"
                                     onClick={onStart}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-semibold text-white shadow-sm transition-all hover:bg-primary-dark active:scale-[0.99] touch-manipulation"
+                                    className="!rounded-full !px-5 !py-3 active:scale-[0.99] touch-manipulation"
                                 >
                                     ガイド開始
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </motion.div>
@@ -145,4 +147,3 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
         </AnimatePresence>
     );
 };
-

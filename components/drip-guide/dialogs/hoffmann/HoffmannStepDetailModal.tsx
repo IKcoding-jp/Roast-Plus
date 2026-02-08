@@ -4,6 +4,7 @@ import React from 'react';
 import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import { Drop, Timer, SpinnerGap } from 'phosphor-react';
 import { RECIPE_HOFFMANN_STEP_DETAILS } from '@/lib/drip-guide/recipeHoffmannContent';
+import { Button } from '@/components/ui';
 
 type StepDetailKey = keyof typeof RECIPE_HOFFMANN_STEP_DETAILS;
 
@@ -63,17 +64,17 @@ export const HoffmannStepDetailModal: React.FC<HoffmannStepDetailModalProps> = (
                         onClick={onClose}
                     >
                         <div
-                            className="w-full max-w-md rounded-2xl bg-white shadow-xl relative overflow-hidden"
+                            className="w-full max-w-md rounded-2xl bg-overlay shadow-xl relative overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-spot-subtle text-spot flex items-center justify-center">
                                         {getIcon(detail.icon)}
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900">{detail.title}</h3>
-                                        <p className="text-xs text-amber-700 font-medium">
+                                        <h3 className="text-lg font-bold text-ink">{detail.title}</h3>
+                                        <p className="text-xs text-spot font-medium">
                                             {detail.technique}
                                         </p>
                                     </div>
@@ -81,24 +82,24 @@ export const HoffmannStepDetailModal: React.FC<HoffmannStepDetailModalProps> = (
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                                    className="p-2 text-ink-muted hover:text-ink hover:bg-ground rounded-full transition-colors"
                                 >
                                     <span className="text-2xl leading-none">×</span>
                                 </button>
                             </div>
 
                             <div className="px-6 py-5 space-y-4">
-                                <p className="text-gray-700 leading-relaxed">{detail.description}</p>
+                                <p className="text-ink-sub leading-relaxed">{detail.description}</p>
 
-                                <div className="bg-amber-50 rounded-lg p-4">
-                                    <h4 className="font-semibold text-amber-800 mb-2 text-sm">ポイント</h4>
+                                <div className="bg-spot-subtle rounded-lg p-4">
+                                    <h4 className="font-semibold text-spot-hover mb-2 text-sm">ポイント</h4>
                                     <ul className="space-y-2">
                                         {detail.tips.map((tip, idx) => (
                                             <li
                                                 key={idx}
-                                                className="flex items-start gap-2 text-sm text-amber-900"
+                                                className="flex items-start gap-2 text-sm text-ink"
                                             >
-                                                <span className="text-amber-600 mt-0.5">•</span>
+                                                <span className="text-spot mt-0.5">•</span>
                                                 <span>{tip}</span>
                                             </li>
                                         ))}
@@ -106,14 +107,14 @@ export const HoffmannStepDetailModal: React.FC<HoffmannStepDetailModalProps> = (
                                 </div>
                             </div>
 
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-                                <button
-                                    type="button"
+                            <div className="px-6 py-4 bg-ground border-t border-edge flex justify-end">
+                                <Button
+                                    variant="coffee"
+                                    size="sm"
                                     onClick={onClose}
-                                    className="bg-gray-900 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-black transition-colors"
                                 >
                                     閉じる
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </motion.div>

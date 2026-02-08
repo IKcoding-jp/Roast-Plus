@@ -1,7 +1,7 @@
 'use client';
 
-import { HiX, HiSearch } from 'react-icons/hi';
-import { Button } from '@/components/ui';
+import { HiX } from 'react-icons/hi';
+import { Button, IconButton, Input, Select } from '@/components/ui';
 import type { WorkProgressStatus } from '@/types';
 
 type SortOption = 'createdAt' | 'beanName' | 'status';
@@ -24,31 +24,26 @@ export function FilterDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-scale-in">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h3 className="font-bold text-gray-800 text-lg">表示設定</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200 transition-colors">
-            <HiX className="h-6 w-6" />
-          </button>
+      <div className="bg-overlay rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-scale-in border border-edge">
+        <div className="px-6 py-4 border-b border-edge flex justify-between items-center bg-ground">
+          <h3 className="font-bold text-ink text-lg">表示設定</h3>
+          <IconButton variant="ghost" size="md" rounded onClick={onClose} aria-label="閉じる">
+            <HiX className="h-5 w-5" />
+          </IconButton>
         </div>
 
         <div className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">キーワード検索</label>
-            <div className="relative">
-              <HiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                value={filterTaskName}
-                onChange={(e) => setFilterTaskName(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
-                placeholder="作業名で検索..."
-              />
-            </div>
+            <Input
+              label="キーワード検索"
+              value={filterTaskName}
+              onChange={(e) => setFilterTaskName(e.target.value)}
+              placeholder="作業名で検索..."
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">ステータス</label>
+            <label className="block text-sm font-medium text-ink mb-2">ステータス</label>
             <div className="flex flex-wrap gap-2">
               {[
                 { value: 'all', label: 'すべて' },
@@ -60,8 +55,8 @@ export function FilterDialog({
                   key={option.value}
                   onClick={() => setFilterStatus(option.value as WorkProgressStatus | 'all')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-all ${filterStatus === option.value
-                    ? 'bg-amber-50 text-amber-700 border-amber-300 ring-1 ring-amber-300'
-                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                    ? 'bg-spot-subtle text-spot border-spot ring-1 ring-spot'
+                    : 'bg-surface text-ink-sub border-edge hover:bg-ground'
                     }`}
                 >
                   {option.label}
@@ -71,20 +66,20 @@ export function FilterDialog({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">並び替え</label>
-            <select
+            <Select
+              label="並び替え"
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as SortOption)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
-            >
-              <option value="createdAt">作成日順</option>
-              <option value="beanName">名前順</option>
-              <option value="status">ステータス順</option>
-            </select>
+              options={[
+                { value: 'createdAt', label: '作成日順' },
+                { value: 'beanName', label: '名前順' },
+                { value: 'status', label: 'ステータス順' },
+              ]}
+            />
           </div>
         </div>
 
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
+        <div className="bg-ground px-6 py-4 border-t border-edge">
           <Button
             variant="primary"
             size="md"

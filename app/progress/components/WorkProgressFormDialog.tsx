@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { HiX, HiTrash } from 'react-icons/hi';
-import { Button } from '@/components/ui';
+import { Button, IconButton, Input, Select, Textarea } from '@/components/ui';
 import { extractTargetAmount, extractUnitFromWeight } from '@/lib/firestore';
 import type { WorkProgressStatus } from '@/types';
 import type { WorkProgressInput } from '@/hooks/useWorkProgressActions';
@@ -67,97 +67,85 @@ export function WorkProgressFormDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] animate-scale-in">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h3 className="font-bold text-gray-800 text-lg">
+      <div className="bg-overlay rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] animate-scale-in border border-edge">
+        <div className="px-6 py-4 border-b border-edge flex justify-between items-center bg-ground">
+          <h3 className="font-bold text-ink text-lg">
             {isEditing ? '作業を編集' : '新しい作業を追加'}
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200 transition-colors">
-            <HiX className="h-6 w-6" />
-          </button>
+          <IconButton variant="ghost" size="md" rounded onClick={onClose} aria-label="閉じる">
+            <HiX className="h-5 w-5" />
+          </IconButton>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1">
           <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">グループ名 (任意)</label>
-              <input
-                type="text"
-                value={formData.groupName}
-                onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
-                placeholder="例: ブラジル No.2"
-              />
-            </div>
+            <Input
+              label="グループ名 (任意)"
+              value={formData.groupName}
+              onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
+              placeholder="例: ブラジル No.2"
+            />
+
+            <Input
+              label="作業名"
+              value={formData.taskName}
+              onChange={(e) => setFormData({ ...formData, taskName: e.target.value })}
+              placeholder="例: ハンドピック"
+              required
+            />
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">作業名</label>
-              <input
-                type="text"
-                value={formData.taskName}
-                onChange={(e) => setFormData({ ...formData, taskName: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
-                placeholder="例: ハンドピック"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">目標量 (任意)</label>
+              <label className="block text-sm font-medium text-ink mb-2">目標量 (任意)</label>
               <div className="flex gap-2">
-                <input
+                <Input
                   type="number"
                   value={formData.targetAmount}
                   onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
                   placeholder="数値"
                   step="0.1"
                   min="0"
+                  className="flex-1"
                 />
-                <select
+                <Select
                   value={formData.targetUnit}
                   onChange={(e) => setFormData({ ...formData, targetUnit: e.target.value })}
-                  className="px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
-                >
-                  <option value="">単位なし</option>
-                  <option value="kg">kg</option>
-                  <option value="g">g</option>
-                  <option value="個">個</option>
-                  <option value="枚">枚</option>
-                  <option value="袋">袋</option>
-                  <option value="箱">箱</option>
-                </select>
+                  options={[
+                    { value: '', label: '単位なし' },
+                    { value: 'kg', label: 'kg' },
+                    { value: 'g', label: 'g' },
+                    { value: '個', label: '個' },
+                    { value: '枚', label: '枚' },
+                    { value: '袋', label: '袋' },
+                    { value: '箱', label: '箱' },
+                  ]}
+                  className="w-28"
+                />
               </div>
-              <p className="text-xs text-gray-500 mt-1.5">
+              <p className="text-xs text-ink-muted mt-1.5">
                 ※ 数値と単位を入力すると進捗バーが表示されます（例: 10kg）。<br />
                 ※ 空欄の場合は完成数のみをカウントするモードになります。
               </p>
             </div>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">メモ (任意)</label>
-              <textarea
-                value={formData.memo}
-                onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none text-gray-900 bg-white"
-                rows={3}
-                placeholder="備考があれば入力してください"
-              />
-            </div>
+            <Textarea
+              label="メモ (任意)"
+              value={formData.memo}
+              onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
+              rows={3}
+              placeholder="備考があれば入力してください"
+            />
 
             {isEditing && (
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">状態</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as WorkProgressStatus })}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
-                >
-                  <option value="pending">作業前</option>
-                  <option value="in_progress">作業中</option>
-                  <option value="completed">完了</option>
-                </select>
-              </div>
+              <Select
+                label="状態"
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as WorkProgressStatus })}
+                options={[
+                  { value: 'pending', label: '作業前' },
+                  { value: 'in_progress', label: '作業中' },
+                  { value: 'completed', label: '完了' },
+                ]}
+              />
             )}
           </div>
 
@@ -168,7 +156,7 @@ export function WorkProgressFormDialog({
                 variant="danger"
                 size="md"
                 onClick={onDelete}
-                className="!bg-red-50 !text-red-600 hover:!bg-red-100 !rounded-xl"
+                className="!rounded-xl"
                 title="削除"
               >
                 <HiTrash className="h-5 w-5" />

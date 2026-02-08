@@ -1,9 +1,9 @@
 import type { WorkProgress } from '@/types';
 
 export const getProgressBarColor = (percentage: number) => {
-  if (percentage >= 100) return 'bg-green-500';
-  if (percentage >= 50) return 'bg-amber-500';
-  return 'bg-gray-400';
+  if (percentage >= 100) return 'bg-success';
+  if (percentage >= 50) return 'bg-spot';
+  return 'bg-edge-strong';
 };
 
 export const calculateProgressPercentage = (wp: WorkProgress) => {

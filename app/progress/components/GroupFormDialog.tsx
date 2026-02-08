@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui';
+import { Button, Input } from '@/components/ui';
 
 interface GroupFormDialogProps {
   isOpen: boolean;
@@ -20,9 +20,9 @@ export function GroupFormDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-scale-in">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-          <h3 className="font-bold text-gray-800 text-lg">
+      <div className="bg-overlay rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-scale-in border border-edge">
+        <div className="px-6 py-4 border-b border-edge bg-ground">
+          <h3 className="font-bold text-ink text-lg">
             {isEditing ? 'グループ名を編集' : '新しいグループを作成'}
           </h3>
         </div>
@@ -34,12 +34,10 @@ export function GroupFormDialog({
           className="p-6"
         >
           <div className="mb-6">
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">グループ名</label>
-            <input
-              type="text"
+            <Input
+              label="グループ名"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-gray-900 bg-white"
               placeholder="例: ブラジル No.2"
               autoFocus
               required

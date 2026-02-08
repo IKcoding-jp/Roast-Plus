@@ -13,13 +13,13 @@ function EditRecipeContent() {
     const { recipes, updateRecipe, isLoaded } = useRecipes();
 
     if (!isLoaded) {
-        return <div className="p-8 text-center text-gray-500">Loading...</div>;
+        return <div className="p-8 text-center text-ink-muted">Loading...</div>;
     }
 
     const recipe = recipes.find((r) => r.id === recipeId);
 
     if (!recipe) {
-        return <div className="p-8 text-center text-gray-500">レシピが見つかりません</div>;
+        return <div className="p-8 text-center text-ink-muted">レシピが見つかりません</div>;
     }
 
     const handleSubmit = (updatedRecipe: DripRecipe) => {
@@ -36,8 +36,8 @@ function EditRecipeContent() {
 
 export default function EditRecipePage() {
     return (
-        <div className="min-h-screen text-gray-900" style={{ backgroundColor: '#F7F7F5' }}>
-            <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+        <div className="min-h-screen text-ink bg-page transition-colors duration-1000">
+            <Suspense fallback={<div className="p-8 text-center text-ink-muted">Loading...</div>}>
                 <EditRecipeContent />
             </Suspense>
         </div>

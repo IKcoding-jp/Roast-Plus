@@ -3,10 +3,9 @@
 import React, { useState } from 'react';
 import { DripRecipe, DripStep } from '@/lib/drip-guide/types';
 import { StepEditor } from './StepEditor';
-import { FloppyDisk, ArrowLeft, ArrowClockwise } from 'phosphor-react';
-import Link from 'next/link';
+import { FloppyDisk, ArrowClockwise } from 'phosphor-react';
 import { MOCK_RECIPES } from '@/lib/drip-guide/mockData';
-import { Input, Textarea, Button } from '@/components/ui';
+import { Input, Textarea, Button, BackLink } from '@/components/ui';
 
 interface RecipeFormProps {
     initialRecipe?: DripRecipe;
@@ -90,22 +89,19 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
     return (
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto pb-20">
             <div className="mb-6 flex items-center justify-between">
-                <Link href="/drip-guide" className="flex items-center text-gray-500 hover:text-gray-800 transition-colors p-2 -ml-2 rounded-lg active:bg-gray-100">
-                    <ArrowLeft size={20} className="mr-1" />
-                    一覧に戻る
-                </Link>
-                <h1 className="text-2xl font-bold text-gray-800">
+                <BackLink href="/drip-guide">一覧に戻る</BackLink>
+                <h1 className="text-2xl font-bold text-ink">
                     {initialRecipe ? 'レシピを編集' : '新しいレシピを作成'}
                 </h1>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6 space-y-6">
+            <div className="bg-surface rounded-xl shadow-card border border-edge p-6 mb-6 space-y-6">
                 {/* Basic Info Section */}
                 <div>
-                    <h2 className="text-lg font-bold text-gray-700 mb-4 border-b pb-2">基本情報</h2>
+                    <h2 className="text-lg font-bold text-ink-sub mb-4 border-b border-edge pb-2">基本情報</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">レシピ名 <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-ink-sub mb-1">レシピ名 <span className="text-danger">*</span></label>
                             <Input
                                 type="text"
                                 value={name}
@@ -116,7 +112,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">豆の名前 <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-ink-sub mb-1">豆の名前 <span className="text-danger">*</span></label>
                             <Input
                                 type="text"
                                 value={beanName}
@@ -127,7 +123,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">用途・タグ</label>
+                            <label className="block text-sm font-medium text-ink-sub mb-1">用途・タグ</label>
                             <Input
                                 type="text"
                                 value={purpose}
@@ -137,7 +133,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">豆の量 (g)</label>
+                            <label className="block text-sm font-medium text-ink-sub mb-1">豆の量 (g)</label>
                             <Input
                                 type="number"
                                 value={beanAmountGram}
@@ -147,7 +143,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">総湯量 (g)</label>
+                            <label className="block text-sm font-medium text-ink-sub mb-1">総湯量 (g)</label>
                             <Input
                                 type="number"
                                 value={totalWaterGram}
@@ -157,7 +153,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">総時間</label>
+                            <label className="block text-sm font-medium text-ink-sub mb-1">総時間</label>
                             <div className="flex gap-2 items-center">
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -172,7 +168,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                             className="w-20 text-right"
                                             min={0}
                                         />
-                                        <span className="text-gray-600 text-sm whitespace-nowrap font-medium">分</span>
+                                        <span className="text-ink-sub text-sm whitespace-nowrap font-medium">分</span>
                                     </div>
                                 </div>
                                 <div>
@@ -189,14 +185,14 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                             min={0}
                                             max={59}
                                         />
-                                        <span className="text-gray-600 text-sm whitespace-nowrap font-medium">秒</span>
+                                        <span className="text-ink-sub text-sm whitespace-nowrap font-medium">秒</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">説明・メモ</label>
+                            <label className="block text-sm font-medium text-ink-sub mb-1">説明・メモ</label>
                             <Textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
@@ -209,9 +205,9 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
 
                 {/* Guide Mode Settings Section */}
                 <div>
-                    <h2 className="text-lg font-bold text-gray-700 mb-4 border-b pb-2">ガイドモード設定</h2>
+                    <h2 className="text-lg font-bold text-ink-sub mb-4 border-b border-edge pb-2">ガイドモード設定</h2>
                     <div className="space-y-4">
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="bg-ground rounded-lg p-4 border border-edge">
                             <div className="space-y-3">
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input
@@ -219,11 +215,11 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                         name="guideMode"
                                         checked={!isManualMode}
                                         onChange={() => setIsManualMode(false)}
-                                        className="w-5 h-5 text-amber-600 focus:ring-2 focus:ring-amber-500"
+                                        className="w-5 h-5 text-spot focus:ring-2 focus:ring-spot"
                                     />
                                     <div className="flex-1">
-                                        <div className="font-semibold text-gray-800">自動モード</div>
-                                        <div className="text-sm text-gray-600">タイマーに基づいて自動的にステップが進行します。時間が確定しているレシピに適しています。</div>
+                                        <div className="font-semibold text-ink">自動モード</div>
+                                        <div className="text-sm text-ink-sub">タイマーに基づいて自動的にステップが進行します。時間が確定しているレシピに適しています。</div>
                                     </div>
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer">
@@ -232,11 +228,11 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
                                         name="guideMode"
                                         checked={isManualMode}
                                         onChange={() => setIsManualMode(true)}
-                                        className="w-5 h-5 text-amber-600 focus:ring-2 focus:ring-amber-500"
+                                        className="w-5 h-5 text-spot focus:ring-2 focus:ring-spot"
                                     />
                                     <div className="flex-1">
-                                        <div className="font-semibold text-gray-800">手動モード</div>
-                                        <div className="text-sm text-gray-600">手動でステップを進めます。タイマーは参考として表示されます。時間が不確定なレシピ（BYSN Standard Dripなど）に適しています。</div>
+                                        <div className="font-semibold text-ink">手動モード</div>
+                                        <div className="text-sm text-ink-sub">手動でステップを進めます。タイマーは参考として表示されます。時間が不確定なレシピ（BYSN Standard Dripなど）に適しています。</div>
                                     </div>
                                 </label>
                             </div>
@@ -251,7 +247,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({ initialRecipe, onSubmit 
             </div>
 
             {/* Submit Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-overlay border-t border-edge z-10">
                 <div className="max-w-3xl mx-auto flex flex-row gap-3 justify-center">
                     {initialRecipe?.isDefault && (
                         <Button

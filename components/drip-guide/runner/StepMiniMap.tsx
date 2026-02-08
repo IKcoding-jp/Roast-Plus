@@ -61,20 +61,20 @@ export const StepMiniMap: React.FC<StepMiniMapProps> = ({
                                 className={clsx(
                                     'flex-shrink-0 rounded-lg px-3 py-2 sm:px-3 sm:py-2 min-w-[120px] sm:min-w-[120px] border-2 transition-all',
                                     isCurrent
-                                        ? 'bg-amber-50 border-amber-400 shadow-md'
+                                        ? 'bg-spot-subtle border-spot shadow-md'
                                         : isStepCompleted
-                                        ? 'bg-gray-50 border-gray-200'
-                                        : 'bg-gray-100 border-gray-200 opacity-60'
+                                        ? 'bg-ground border-edge'
+                                        : 'bg-ground/50 border-edge opacity-60'
                                 )}
                             >
                                 <div
                                     className={clsx(
                                         'text-sm sm:text-sm font-bold truncate',
                                         isCurrent
-                                            ? 'text-amber-800'
+                                            ? 'text-spot-hover'
                                             : isStepCompleted
-                                            ? 'text-gray-700'
-                                            : 'text-gray-500'
+                                            ? 'text-ink-sub'
+                                            : 'text-ink-muted'
                                     )}
                                 >
                                     {step.title}
@@ -84,10 +84,10 @@ export const StepMiniMap: React.FC<StepMiniMapProps> = ({
                                         className={clsx(
                                             'text-xs sm:text-xs font-semibold mt-0.5 sm:mt-0.5',
                                             isCurrent
-                                                ? 'text-amber-700'
+                                                ? 'text-spot'
                                                 : isStepCompleted
-                                                ? 'text-gray-600'
-                                                : 'text-gray-400'
+                                                ? 'text-ink-sub'
+                                                : 'text-ink-muted'
                                         )}
                                     >
                                         {formatTime(step.startTimeSec)} - {formatTime(stepEndTime)}
@@ -98,10 +98,10 @@ export const StepMiniMap: React.FC<StepMiniMapProps> = ({
                                         className={clsx(
                                             'text-xs sm:text-xs mt-0.5 sm:mt-0.5',
                                             isCurrent
-                                                ? 'text-amber-600'
+                                                ? 'text-spot'
                                                 : isStepCompleted
-                                                ? 'text-gray-500'
-                                                : 'text-gray-400'
+                                                ? 'text-ink-muted'
+                                                : 'text-ink-muted'
                                         )}
                                     >
                                         {step.targetTotalWater}gまで注ぐ
@@ -118,7 +118,7 @@ export const StepMiniMap: React.FC<StepMiniMapProps> = ({
                                                 100
                                             )}%`,
                                         }}
-                                        className="h-1 sm:h-1 bg-amber-500 rounded-full mt-1.5 sm:mt-1.5"
+                                        className="h-1 sm:h-1 bg-spot rounded-full mt-1.5 sm:mt-1.5"
                                         transition={{ duration: 1, ease: 'linear' }}
                                     />
                                 )}

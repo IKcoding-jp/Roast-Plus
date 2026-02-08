@@ -108,7 +108,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
     }
 
     return (
-        <div className="flex flex-col h-[100dvh] bg-white relative overflow-hidden">
+        <div className="flex flex-col h-[100dvh] bg-surface relative overflow-hidden">
             <RunnerHeader recipeName={recipe.name} />
 
             <div className="flex-grow flex flex-col items-center py-2 px-4 overflow-hidden">

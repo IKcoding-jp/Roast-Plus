@@ -38,7 +38,7 @@ function RunRecipeContent() {
         const calculatedRecipe = generateRecipe46(validServings, taste, strength);
 
         return (
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-page transition-colors duration-1000">
                 <DripGuideRunner recipe={calculatedRecipe} />
             </div>
         );
@@ -46,7 +46,7 @@ function RunRecipeContent() {
 
     // 既存レシピの処理
     if (!isLoaded) {
-        return <div className="p-8 text-center text-gray-500">Loading...</div>;
+        return <div className="p-8 text-center text-ink-muted">Loading...</div>;
     }
 
     const recipe = recipes.find((r) => r.id === recipeId);
@@ -54,8 +54,8 @@ function RunRecipeContent() {
     if (!recipe) {
         return (
             <div className="p-8 text-center">
-                <p className="text-gray-500 mb-4">レシピが見つかりません</p>
-                <Link href="/drip-guide" className="text-amber-600 hover:underline">
+                <p className="text-ink-muted mb-4">レシピが見つかりません</p>
+                <Link href="/drip-guide" className="text-spot hover:underline">
                     一覧に戻る
                 </Link>
             </div>
@@ -71,7 +71,7 @@ function RunRecipeContent() {
     const calculatedRecipe = calculateRecipeForServings(recipe, validServings);
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-page transition-colors duration-1000">
             <DripGuideRunner recipe={calculatedRecipe} />
         </div>
     );
@@ -79,7 +79,7 @@ function RunRecipeContent() {
 
 export default function RunRecipePage() {
     return (
-        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+        <Suspense fallback={<div className="p-8 text-center text-ink-muted">Loading...</div>}>
             <RunRecipeContent />
         </Suspense>
     );

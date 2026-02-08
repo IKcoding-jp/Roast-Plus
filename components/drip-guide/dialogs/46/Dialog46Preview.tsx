@@ -12,7 +12,7 @@ interface Dialog46PreviewProps {
 export const Dialog46Preview: React.FC<Dialog46PreviewProps> = ({ recipe }) => {
     return (
         <div className="px-5 pt-0 pb-4">
-            <div className="pt-4 border-t border-gray-200">
+            <div className="pt-4 border-t border-edge">
                 <RecipeSummary
                     beanAmountGram={recipe.beanAmountGram}
                     totalWaterGram={recipe.totalWaterGram}

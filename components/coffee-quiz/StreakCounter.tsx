@@ -31,28 +31,28 @@ export function StreakCounter({ streak, compact = false }: StreakCounterProps) {
 
   if (compact) {
     return (
-      <div className={`bg-white rounded-xl p-3 border ${
-        isAtRisk ? 'border-[#EF8A00]/30 bg-[#EF8A00]/5' : 'border-[#211714]/5'
+      <div className={`bg-surface rounded-xl p-3 border ${
+        isAtRisk ? 'border-spot/30 bg-spot/5' : 'border-edge'
       }`}>
         <div className="flex items-center gap-2.5">
           <div className={`w-9 h-9 rounded-full flex items-center justify-center ${
             hasStreak
-              ? 'bg-[#EF8A00] text-white'
-              : 'bg-[#211714]/5 text-[#3A2F2B]/40'
+              ? 'bg-spot text-white'
+              : 'bg-edge-subtle text-ink-muted'
           }`}>
             <FlameIcon active={hasStreak} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-1">
               <span className={`text-lg font-bold ${
-                isAtRisk ? 'text-[#EF8A00]' : hasStreak ? 'text-[#211714]' : 'text-[#3A2F2B]/40'
+                isAtRisk ? 'text-spot' : hasStreak ? 'text-ink' : 'text-ink-muted'
               }`}>
                 {streak.currentStreak}
               </span>
-              <span className="text-xs text-[#3A2F2B]/60">日連続</span>
+              <span className="text-xs text-ink-muted">日連続</span>
             </div>
             {isAtRisk && (
-              <span className="text-[10px] text-[#EF8A00] font-medium">今日やろう</span>
+              <span className="text-[10px] text-spot font-medium">今日やろう</span>
             )}
           </div>
         </div>
@@ -66,16 +66,16 @@ export function StreakCounter({ streak, compact = false }: StreakCounterProps) {
       animate={{ opacity: 1, y: 0 }}
       className={`rounded-xl p-4 border ${
         isAtRisk
-          ? 'bg-[#EF8A00]/5 border-[#EF8A00]/20'
-          : 'bg-white border-[#211714]/5'
+          ? 'bg-spot/5 border-spot/20'
+          : 'bg-surface border-edge'
       }`}
     >
       <div className="flex items-center gap-4">
         {/* 炎アイコン */}
         <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
           hasStreak
-            ? 'bg-[#EF8A00] text-white'
-            : 'bg-[#211714]/5 text-[#3A2F2B]/40'
+            ? 'bg-spot text-white'
+            : 'bg-edge-subtle text-ink-muted'
         }`}>
           <FlameIcon active={hasStreak} />
         </div>
@@ -87,21 +87,21 @@ export function StreakCounter({ streak, compact = false }: StreakCounterProps) {
               initial={{ scale: 1.1, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className={`text-2xl font-bold ${
-                isAtRisk ? 'text-[#EF8A00]' : 'text-[#211714]'
+                isAtRisk ? 'text-spot' : 'text-ink'
               }`}
             >
               {streak.currentStreak}
             </motion.span>
-            <span className="text-[#3A2F2B]/60 text-sm">日連続</span>
+            <span className="text-ink-muted text-sm">日連続</span>
           </div>
 
           {isAtRisk && (
             <motion.div
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-1.5 px-2.5 py-1 bg-[#EF8A00]/10 rounded-md inline-block"
+              className="mt-1.5 px-2.5 py-1 bg-spot/10 rounded-md inline-block"
             >
-              <span className="text-[#D67A00] font-medium text-xs">
+              <span className="text-spot-hover font-medium text-xs">
                 今日クイズをしないとストリークが切れます
               </span>
             </motion.div>
@@ -109,15 +109,15 @@ export function StreakCounter({ streak, compact = false }: StreakCounterProps) {
 
           {streak.longestStreak > streak.currentStreak && !isAtRisk && (
             <div className="flex items-center gap-1 mt-1.5">
-              <span className="text-[#3A2F2B]/50 text-xs">
+              <span className="text-ink-muted text-xs">
                 最長記録: {streak.longestStreak}日
               </span>
             </div>
           )}
 
           {streak.currentStreak >= streak.longestStreak && streak.currentStreak > 0 && (
-            <div className="mt-1.5 px-2.5 py-1 bg-[#211714]/5 rounded-md inline-block">
-              <span className="text-[#3A2F2B] text-xs font-medium">
+            <div className="mt-1.5 px-2.5 py-1 bg-edge-subtle rounded-md inline-block">
+              <span className="text-ink-sub text-xs font-medium">
                 自己ベスト更新中
               </span>
             </div>

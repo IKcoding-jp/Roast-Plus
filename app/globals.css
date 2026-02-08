@@ -32,6 +32,7 @@
     /* ボーダー */
     --edge: #e5e7eb;
     --edge-strong: #d1d5db;
+    --edge-subtle: #f3f4f6;
     /* アクセント */
     --spot: #d97706;
     --spot-hover: #b45309;
@@ -52,6 +53,13 @@
     /* エラー */
     --error: #ef4444;
     --error-ring: #fee2e2;
+    /* カードヘッダーグラデーション */
+    --card-header-from: #211714;
+    --card-header-via: #3A2F2B;
+    --card-header-to: #211714;
+    /* フィードバックテキスト */
+    --feedback-correct: #065f46;
+    --feedback-incorrect: #9f1239;
     /* シャドウ */
     --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
     --card-shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
@@ -72,6 +80,7 @@
     /* ボーダー */
     --edge: rgba(212, 175, 55, 0.2);
     --edge-strong: rgba(212, 175, 55, 0.4);
+    --edge-subtle: rgba(255, 255, 255, 0.12);
     /* アクセント */
     --spot: #d4af37;
     --spot-hover: #e8c65f;
@@ -92,6 +101,13 @@
     /* エラー */
     --error: #f87171;
     --error-ring: rgba(248,113,113,0.2);
+    /* カードヘッダー（ソリッド） */
+    --card-header-from: #143a22;
+    --card-header-via: #143a22;
+    --card-header-to: #143a22;
+    /* フィードバックテキスト */
+    --feedback-correct: #4ade80;
+    --feedback-incorrect: #fb7185;
     /* シャドウ */
     --card-shadow: 0 0 15px rgba(212,175,55,0.1);
     --card-shadow-hover: 0 0 20px rgba(212,175,55,0.15);
@@ -124,6 +140,7 @@
   --color-ink-muted: var(--ink-muted);
   --color-edge: var(--edge);
   --color-edge-strong: var(--edge-strong);
+  --color-edge-subtle: var(--edge-subtle);
   --color-spot: var(--spot);
   --color-spot-hover: var(--spot-hover);
   --color-spot-subtle: var(--spot-subtle);
@@ -140,6 +157,13 @@
   --color-warning-subtle: var(--warning-subtle);
   --color-info: var(--info);
   --color-info-hover: var(--info-hover);
+  /* カードヘッダー */
+  --color-card-header-from: var(--card-header-from);
+  --color-card-header-via: var(--card-header-via);
+  --color-card-header-to: var(--card-header-to);
+  /* フィードバックテキスト */
+  --color-feedback-correct: var(--feedback-correct);
+  --color-feedback-incorrect: var(--feedback-incorrect);
   /* エラー */
   --color-error: var(--error);
   --color-error-ring: var(--error-ring);

@@ -172,8 +172,8 @@ function QuizPageContent() {
   // 認証チェック
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
+      <div className="min-h-screen bg-page flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-spot/20 border-t-spot animate-spin" />
       </div>
     );
   }
@@ -181,17 +181,17 @@ function QuizPageContent() {
   // ローディング
   if (isLoading || !session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-page flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin mx-auto mb-3" />
-          <p className="text-[#3A2F2B]/70 text-sm">問題を読み込み中...</p>
+          <div className="w-10 h-10 rounded-full border-2 border-spot/20 border-t-spot animate-spin mx-auto mb-3" />
+          <p className="text-ink-muted text-sm">問題を読み込み中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-page">
       {/* ヘッダー */}
       <QuizPageHeader returnUrl={returnUrl} mode={modeParam} category={categoryParam} />
 
@@ -241,10 +241,10 @@ function QuizPageContent() {
             </>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#211714]/5 flex items-center justify-center text-[#211714]/40">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-edge-subtle flex items-center justify-center text-ink/40">
                 <InboxIcon />
               </div>
-              <p className="text-[#3A2F2B]/70">問題がありません</p>
+              <p className="text-ink-muted">問題がありません</p>
             </div>
           )}
         </AnimatePresence>
@@ -264,8 +264,8 @@ export default function QuizPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
+        <div className="min-h-screen bg-page flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-spot/20 border-t-spot animate-spin" />
         </div>
       }
     >

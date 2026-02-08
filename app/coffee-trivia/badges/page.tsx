@@ -28,7 +28,7 @@ import type { BadgeType } from '@/lib/coffee-quiz/types';
 
 // バッジタイプに応じたLucideアイコンを返す
 function getBadgeIcon(type: BadgeType, isEarned: boolean) {
-  const className = isEarned ? 'text-[#EF8A00]' : 'text-[#3A2F2B]/40';
+  const className = isEarned ? 'text-spot' : 'text-ink-muted';
   const size = 24;
 
   const iconMap: Record<BadgeType, React.ReactNode> = {
@@ -94,15 +94,15 @@ export default function BadgesPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="flex-none px-4 py-3 flex items-center bg-white border-b border-[#211714]/5">
+    <div className="min-h-screen flex flex-col bg-page">
+      <header className="flex-none px-4 py-3 flex items-center bg-surface border-b border-edge">
         <Link
           href="/coffee-trivia"
-          className="p-2 -ml-2 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-gray-50 rounded-full transition-colors"
+          className="p-2 -ml-2 text-ink-sub hover:text-spot hover:bg-ground rounded-full transition-colors"
         >
           <LuArrowLeft size={24} />
         </Link>
-        <h1 className="ml-3 text-lg font-bold text-[#211714] flex items-center gap-2">
+        <h1 className="ml-3 text-lg font-bold text-ink flex items-center gap-2">
           <LuTrophy size={20} />
           バッジコレクション
         </h1>
@@ -113,7 +113,7 @@ export default function BadgesPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-[#EF8A00] via-[#D67A00] to-[#EF8A00] rounded-2xl p-6 text-white text-center shadow-lg"
+          className="bg-gradient-to-r from-spot via-spot-hover to-spot rounded-2xl p-6 text-white text-center shadow-lg"
         >
           <motion.div
             initial={{ scale: 0 }}
@@ -207,10 +207,10 @@ function BadgeSection({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-white rounded-2xl shadow-lg p-5 border border-[#211714]/5"
+      className="bg-surface rounded-2xl shadow-lg p-5 border border-edge"
     >
-      <h2 className="font-bold text-[#211714] mb-4 flex items-center gap-2">
-        <span className="text-[#EF8A00]">{icon}</span>
+      <h2 className="font-bold text-ink mb-4 flex items-center gap-2">
+        <span className="text-spot">{icon}</span>
         {title}
       </h2>
       <div className="grid grid-cols-2 gap-3">
@@ -224,8 +224,8 @@ function BadgeSection({
               whileHover={isEarned ? { scale: 1.02 } : {}}
               className={`rounded-xl p-4 transition-all ${
                 isEarned
-                  ? 'bg-gray-50 border border-[#EF8A00]/20'
-                  : 'bg-[#211714]/5 border border-[#211714]/5 opacity-60'
+                  ? 'bg-ground border border-spot/20'
+                  : 'bg-edge-subtle border border-edge opacity-60'
               }`}
             >
               <div className="flex items-center gap-3 mb-2">
@@ -235,7 +235,7 @@ function BadgeSection({
                 <div className="flex-1 min-w-0">
                   <h3
                     className={`font-bold text-sm truncate ${
-                      isEarned ? 'text-[#211714]' : 'text-[#3A2F2B]/50'
+                      isEarned ? 'text-ink' : 'text-ink-muted'
                     }`}
                   >
                     {badge.name}
@@ -244,17 +244,17 @@ function BadgeSection({
               </div>
               <p
                 className={`text-xs mb-2 ${
-                  isEarned ? 'text-[#3A2F2B]/70' : 'text-[#3A2F2B]/40'
+                  isEarned ? 'text-ink-muted' : 'text-ink-muted/60'
                 }`}
               >
                 {badge.description}
               </p>
               {isEarned && earnedAt ? (
-                <p className="text-xs text-[#EF8A00] font-medium">
+                <p className="text-xs text-spot font-medium">
                   獲得: {formatDate(earnedAt)}
                 </p>
               ) : (
-                <p className="text-xs text-[#3A2F2B]/40">{badge.requirement}</p>
+                <p className="text-xs text-ink-muted/60">{badge.requirement}</p>
               )}
             </motion.div>
           );

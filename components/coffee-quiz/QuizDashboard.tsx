@@ -69,7 +69,7 @@ export function QuizDashboard({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-spot/20 border-t-spot animate-spin" />
       </div>
     );
   }
@@ -129,7 +129,7 @@ export function QuizDashboard({
       >
         <Link
           href="/coffee-trivia/quiz"
-          className="flex items-center justify-center gap-2.5 w-full py-3.5 px-5 rounded-xl font-semibold text-white bg-[#EF8A00] hover:bg-[#D67A00] active:scale-[0.98] transition-all"
+          className="flex items-center justify-center gap-2.5 w-full py-3.5 px-5 rounded-xl font-semibold text-white bg-spot hover:bg-spot-hover active:scale-[0.98] transition-all"
         >
           <PlayIcon />
           今日のクイズを始める
@@ -139,7 +139,7 @@ export function QuizDashboard({
         {dueCardsCount > 0 ? (
           <Link
             href="/coffee-trivia/review"
-            className="group flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-[#3A2F2B] bg-[#211714]/5 hover:bg-[#211714]/10 transition-colors"
+            className="group flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-ink-sub bg-edge-subtle hover:bg-edge transition-colors"
           >
             <span className="group-hover:rotate-180 transition-transform duration-300">
               <RefreshIcon />
@@ -147,7 +147,7 @@ export function QuizDashboard({
             復習する ({dueCardsCount}問)
           </Link>
         ) : (
-          <div className="flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-[#3A2F2B]/50 bg-[#211714]/5">
+          <div className="flex items-center justify-center gap-2.5 w-full py-3 px-5 rounded-xl font-medium text-ink-muted bg-edge-subtle">
             <RefreshIcon />
             復習する問題はありません
           </div>
@@ -159,9 +159,9 @@ export function QuizDashboard({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="bg-white rounded-xl p-4 border border-[#211714]/5"
+        className="bg-surface rounded-xl p-4 border border-edge"
       >
-        <h3 className="font-semibold text-[#211714] text-sm mb-3">
+        <h3 className="font-semibold text-ink text-sm mb-3">
           カテゴリ別学習
         </h3>
         <CategorySelector
@@ -178,14 +178,14 @@ export function QuizDashboard({
       >
         <Link
           href="/coffee-trivia/stats"
-          className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-[#211714]/5 hover:border-[#211714]/10 hover:shadow-sm transition-all"
+          className="group flex items-center gap-3 bg-surface rounded-xl p-3.5 border border-edge hover:border-edge-strong hover:shadow-sm transition-all"
         >
-          <div className="w-10 h-10 rounded-lg bg-[#211714]/5 group-hover:bg-[#211714]/10 flex items-center justify-center transition-colors text-[#3A2F2B]">
+          <div className="w-10 h-10 rounded-lg bg-edge-subtle group-hover:bg-edge flex items-center justify-center transition-colors text-ink-sub">
             <ChartIcon />
           </div>
           <div>
-            <span className="font-medium text-[#211714] text-sm block">統計</span>
-            <span className="text-xs text-[#3A2F2B]/60">
+            <span className="font-medium text-ink text-sm block">統計</span>
+            <span className="text-xs text-ink-muted">
               正解率 {progress?.stats.averageAccuracy ?? 0}%
             </span>
           </div>
@@ -193,14 +193,14 @@ export function QuizDashboard({
 
         <Link
           href="/coffee-trivia/badges"
-          className="group flex items-center gap-3 bg-white rounded-xl p-3.5 border border-[#211714]/5 hover:border-[#EF8A00]/20 hover:shadow-sm transition-all"
+          className="group flex items-center gap-3 bg-surface rounded-xl p-3.5 border border-edge hover:border-spot/20 hover:shadow-sm transition-all"
         >
-          <div className="w-10 h-10 rounded-lg bg-[#EF8A00]/10 group-hover:bg-[#EF8A00]/15 flex items-center justify-center transition-colors text-[#EF8A00]">
+          <div className="w-10 h-10 rounded-lg bg-spot-subtle group-hover:bg-spot/15 flex items-center justify-center transition-colors text-spot">
             <TrophyIcon />
           </div>
           <div>
-            <span className="font-medium text-[#211714] text-sm block">バッジ</span>
-            <span className="text-xs text-[#3A2F2B]/60">
+            <span className="font-medium text-ink text-sm block">バッジ</span>
+            <span className="text-xs text-ink-muted">
               {progress?.earnedBadges.length ?? 0}個獲得
             </span>
           </div>

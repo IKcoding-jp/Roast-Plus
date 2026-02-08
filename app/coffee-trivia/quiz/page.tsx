@@ -186,8 +186,8 @@ function QuizPageContent() {
   // 認証チェック
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
+      <div className="min-h-screen bg-page flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-spot/20 border-t-spot animate-spin" />
       </div>
     );
   }
@@ -195,28 +195,28 @@ function QuizPageContent() {
   // ローディング
   if (isLoading || !session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-page flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin mx-auto mb-3" />
-          <p className="text-[#3A2F2B]/70 text-sm">問題を読み込み中...</p>
+          <div className="w-10 h-10 rounded-full border-2 border-spot/20 border-t-spot animate-spin mx-auto mb-3" />
+          <p className="text-ink-muted text-sm">問題を読み込み中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-page">
       {/* ヘッダー */}
-      <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
+      <header className="sticky top-0 z-10 bg-surface border-b border-edge px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link
             href={returnUrl}
-            className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
+            className="flex items-center gap-1.5 text-ink-sub hover:text-spot transition-colors"
           >
             <ArrowLeftIcon />
             <span className="text-sm font-medium">戻る</span>
           </Link>
-          <h1 className="font-semibold text-[#211714]">
+          <h1 className="font-semibold text-ink">
             {modeParam === 'single'
               ? '問題'
               : categoryParam
@@ -236,22 +236,22 @@ function QuizPageContent() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 text-center shadow-sm border border-[#211714]/5"
+                className="bg-surface rounded-2xl p-6 text-center shadow-sm border border-edge"
               >
                 <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                  sessionStats.correct > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                  sessionStats.correct > 0 ? 'bg-success-subtle text-emerald-600' : 'bg-danger-subtle text-rose-600'
                 }`}>
                   {sessionStats.correct > 0 ? '✓' : '✗'}
                 </div>
-                <h2 className="text-lg font-bold text-[#211714] mb-2">
+                <h2 className="text-lg font-bold text-ink mb-2">
                   {sessionStats.correct > 0 ? '正解！' : '不正解'}
                 </h2>
-                <p className="text-[#3A2F2B]/70 text-sm mb-4">
+                <p className="text-ink-muted text-sm mb-4">
                   +{sessionStats.totalXP} XP獲得
                 </p>
                 <Link
                   href={returnUrl}
-                  className="inline-block bg-[#EF8A00] hover:bg-[#D67A00] text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
+                  className="inline-block bg-spot hover:bg-spot-hover text-white py-2.5 px-6 rounded-xl font-semibold transition-colors"
                 >
                   問題一覧に戻る
                 </Link>
@@ -285,7 +285,7 @@ function QuizPageContent() {
                   // Singleモード: 直接一覧に戻るボタン
                   <Link
                     href={returnUrl}
-                    className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                    className="w-full mt-4 flex items-center justify-center gap-2 bg-spot hover:bg-spot-hover text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
                   >
                     <ArrowLeftIcon />
                     一覧に戻る
@@ -303,7 +303,7 @@ function QuizPageContent() {
                         // 最後の問題
                         <Link
                           href={returnUrl}
-                          className="w-full flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                          className="w-full flex items-center justify-center gap-2 bg-spot hover:bg-spot-hover text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
                         >
                           <ArrowLeftIcon />
                           問題一覧に戻る
@@ -311,13 +311,13 @@ function QuizPageContent() {
                       ) : (
                         // 自動遷移中の表示
                         <>
-                          <div className="w-full flex items-center justify-center gap-2 bg-[#EF8A00]/80 text-white py-3.5 px-5 rounded-xl font-semibold">
+                          <div className="w-full flex items-center justify-center gap-2 bg-spot/80 text-white py-3.5 px-5 rounded-xl font-semibold">
                             <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
                             次の問題へ移動中...
                           </div>
                           <Link
                             href={returnUrl}
-                            className="w-full flex items-center justify-center gap-2 bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] py-3 px-5 rounded-xl font-medium transition-colors border border-[#211714]/10"
+                            className="w-full flex items-center justify-center gap-2 bg-edge-subtle hover:bg-edge text-ink-sub py-3 px-5 rounded-xl font-medium transition-colors border border-edge"
                           >
                             <ArrowLeftIcon />
                             一覧に戻る
@@ -330,7 +330,7 @@ function QuizPageContent() {
                         {currentIndex + 1 < totalQuestions && (
                           <motion.button
                             onClick={handleNext}
-                            className="w-full flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                            className="w-full flex items-center justify-center gap-2 bg-spot hover:bg-spot-hover text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
                           >
                             次の問題へ
                             <ArrowRightIcon />
@@ -340,8 +340,8 @@ function QuizPageContent() {
                           href={returnUrl}
                           className={`w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-medium transition-colors ${
                             currentIndex + 1 >= totalQuestions
-                              ? 'bg-[#EF8A00] hover:bg-[#D67A00] text-white font-semibold py-3.5'
-                              : 'bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] border border-[#211714]/10'
+                              ? 'bg-spot hover:bg-spot-hover text-white font-semibold py-3.5'
+                              : 'bg-edge-subtle hover:bg-edge text-ink-sub border border-edge'
                           }`}
                         >
                           <ArrowLeftIcon />
@@ -355,7 +355,7 @@ function QuizPageContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={handleNext}
-                    className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                    className="w-full mt-4 flex items-center justify-center gap-2 bg-spot hover:bg-spot-hover text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
                   >
                     {currentIndex + 1 >= totalQuestions ? (
                       '結果を見る'
@@ -371,10 +371,10 @@ function QuizPageContent() {
             </>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#211714]/5 flex items-center justify-center text-[#211714]/40">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-edge-subtle flex items-center justify-center text-ink-muted">
                 <InboxIcon />
               </div>
-              <p className="text-[#3A2F2B]/70">問題がありません</p>
+              <p className="text-ink-muted">問題がありません</p>
             </div>
           )}
         </AnimatePresence>
@@ -394,8 +394,8 @@ export default function QuizPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin" />
+        <div className="min-h-screen bg-page flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-spot/20 border-t-spot animate-spin" />
         </div>
       }
     >

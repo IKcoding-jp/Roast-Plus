@@ -24,10 +24,10 @@ export function DifficultyStatsSection({ stats, questionsStats, difficultyMaster
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-white rounded-2xl shadow-lg p-5 border border-[#211714]/5"
+      className="bg-surface rounded-2xl shadow-lg p-5 border border-edge"
     >
-      <h2 className="font-bold text-[#211714] mb-4 flex items-center gap-2">
-        <span className="text-[#EF8A00]">
+      <h2 className="font-bold text-ink mb-4 flex items-center gap-2">
+        <span className="text-spot">
           <TargetIcon />
         </span>
         難易度別
@@ -45,27 +45,27 @@ export function DifficultyStatsSection({ stats, questionsStats, difficultyMaster
           return (
             <div
               key={difficulty}
-              className="bg-gray-50 rounded-xl p-4 border border-[#211714]/5"
+              className="bg-ground rounded-xl p-4 border border-edge"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-[#211714]">
+                <span className="font-medium text-ink">
                   {DIFFICULTY_LABELS[difficulty]}
                 </span>
                 <span className={`font-bold ${
                   difficulty === 'beginner'
                     ? 'text-emerald-600'
                     : difficulty === 'intermediate'
-                    ? 'text-[#EF8A00]'
+                    ? 'text-spot'
                     : 'text-rose-600'
                 }`}>{progressPercent}%</span>
               </div>
-              <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
+              <div className="h-2 bg-edge rounded-full overflow-hidden">
                 <motion.div
                   className={`h-full rounded-full ${
                     difficulty === 'beginner'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
                       : difficulty === 'intermediate'
-                      ? 'bg-gradient-to-r from-[#EF8A00] to-[#D67A00]'
+                      ? 'bg-gradient-to-r from-spot to-spot-hover'
                       : 'bg-gradient-to-r from-rose-500 to-rose-400'
                   }`}
                   initial={{ width: 0 }}
@@ -73,7 +73,7 @@ export function DifficultyStatsSection({ stats, questionsStats, difficultyMaster
                   transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
                 />
               </div>
-              <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
+              <div className="flex items-center justify-between mt-2 text-xs text-ink-muted">
                 <span>
                   正解済み: {answeredCorrectlyCount}/{totalQuestions}問
                 </span>

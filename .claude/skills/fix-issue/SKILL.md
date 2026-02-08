@@ -376,7 +376,7 @@ git push
 ### 3. 自動マージ設定
 
 ```bash
-gh pr merge --auto --squash
+gh pr merge --auto --merge
 ```
 
 ### 4. マージ待機・クリーンアップ

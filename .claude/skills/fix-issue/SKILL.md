@@ -8,7 +8,7 @@ description: GitHub Issueを自動解決するワークフロー。Working Docum
 ## ワークフロー概要
 
 ```
-Working読込 → Issue確認 → 説明 → 計画 → 実装 → 要件確認 → 検証 → 動作確認 → 独立レビュー → Steering更新 → PR自動作成
+Working読込 → Issue確認 → 説明 → 計画 → 実装 → 要件確認 → 検証 → 動作確認 → PR作成・レビュー → Steering更新 → 自動マージ → クリーンアップ
                           🔹①     🔹②            🔹③
 ```
 
@@ -179,7 +179,7 @@ Claude Code標準ツール(Edit/Write)で実装。
 
 ---
 
-## Phase 6: 要件確認 🔹確認ポイント③（ループ型）
+## Phase 6: 要件確認 🔹確認ポイント③（ループ型・検証なし）
 
 **実装が完了したら、検証の前にユーザーに確認します。ユーザーの承認が得られるまでループします。**
 
@@ -200,12 +200,16 @@ Claude Code標準ツール(Edit/Write)で実装。
                 ↓
          追加の指示を受ける
                 ↓
-         修正を実施
+         修正を実施（検証は実行しない）
                 ↓
          再度ユーザーに報告（ループ）
 ```
 
-**⚠️ この確認をスキップしてはいけません。ユーザーの承認なしに検証フェーズへ進まないこと。**
+### ⚠️ 重要ルール
+
+- **このフェーズでは `npm run lint` / `npm run build` / `npm run test` を実行しない**
+- 追加修正は実装のみに集中し、検証はPhase 7でまとめて1回だけ実行する
+- ユーザーの承認なしに検証フェーズへ進まないこと
 
 ---
 
@@ -235,45 +239,75 @@ AskUserQuestionで以下を提示:
 
 ---
 
-## Phase 9: 独立レビュー（別AIエージェント）
+## Phase 9: コミット・PR作成・コードレビュー
 
-**Taskツールで別のAIエージェントを起動し、独立した視点でコードレビューを実行します。**
+**実装をコミットしてPRを作成し、code-reviewプラグインで独立レビューを実行します。**
 
 ### 手順
 
-1. `git diff main...HEAD` で変更差分を取得
-2. Taskツールで「レビュー専門エージェント」を起動
-   - subagent_type: `general-purpose`
-   - 変更差分と関連ファイルの情報を渡す
-   - レビュー観点:
-     - 要件を満たしているか
-     - 不要なコードがないか
-     - 既存機能への影響がないか
-     - セキュリティ上の問題がないか
-     - パフォーマンスの問題がないか
-3. レビュー結果を受け取る
-4. 問題が発見された場合 → **Phase 5（実装）に戻る** → **Phase 6（要件確認）に戻る**
-5. すべてのレビューが通過した場合 → Phase 10へ
+1. **コミット・プッシュ**
 
-### レビューエージェントへのプロンプト例
+   まず `git status` で全ての未コミット変更を確認する。
 
-```
-以下のコード変更をレビューしてください。
-実装者とは別の視点で、客観的にチェックしてください。
+   **① 実装外の変更がある場合（chore コミットを先に作成）**
+   ```bash
+   # スキル更新、.gitignore、CLAUDE.md、docs等の実装外変更を先にコミット
+   git add <実装外の変更ファイル>
+   git commit -m "chore(#<Issue番号>): <説明>"
+   ```
 
-【変更差分】
-{git diff の内容}
+   対象例: `.claude/skills/`, `.gitignore`, `CLAUDE.md`, `docs/steering/`, `docs/working/`
 
-【Issue要件】
-{Issue本文}
+   **② 実装コミット**
+   ```bash
+   git add <実装の変更ファイル>
+   git commit -m "<type>(#<Issue番号>): <説明>"
+   git push -u origin $(git branch --show-current)
+   ```
 
-【レビュー観点】
-- 要件充足度
-- コード品質
-- セキュリティ
-- パフォーマンス
-- 既存機能への影響
-```
+   ⚠️ **両方のコミットを同じPR（同じブランチ）に含める。別ブランチは不要。**
+
+2. **PR作成**
+   ```bash
+   # ⚠️ 一時ファイルはリポジトリルートに相対パスで作成（Windows互換）
+   # /tmp/ はWindowsで正しく解決されないため使用禁止
+   cat > .tmp-pr-body.md <<'PREOF'
+   ## 概要
+   Issue #番号 を解決。
+
+   ## 変更内容
+   - 変更点1
+   - 変更点2
+
+   ## テスト
+   - [x] lint / build / test 通過
+   - [ ] コードレビュー（code-reviewプラグイン）
+   - [ ] 実機動作確認
+
+   Closes #番号
+   PREOF
+
+   gh pr create --base main --title "<type>(#<Issue番号>): <タイトル>" --body-file .tmp-pr-body.md
+
+   # 一時ファイルを必ず削除
+   rm -f .tmp-pr-body.md
+   ```
+
+3. **code-reviewプラグインでレビュー実行**
+   - Skillツールで `code-review:code-review` を呼び出し
+   - プラグインが5並列エージェントで多角的にレビュー:
+     - CLAUDE.md準拠チェック
+     - バグスキャン
+     - Git履歴コンテキスト分析
+     - 過去PRコメントとの照合
+     - コードコメント準拠チェック
+   - 信頼度スコア80以上の問題のみPRにコメント投稿
+
+4. **レビュー結果の処理**
+   - **問題なし** → Phase 10（Steering更新）へ
+   - **問題あり** → 修正 → コミット → プッシュ → 再度code-reviewを実行（ループ）
+
+⚠️ **レビューで指摘された問題は、修正するか技術的根拠をもって反論すること。盲従は不要。**
 
 ---
 
@@ -299,9 +333,9 @@ Working Documents（特に design.md）を参照し、更新ドラフトを生�
 
 ---
 
-## Phase 11: コミット・PR作成・自動マージ（全自動）
+## Phase 11: 最終更新・自動マージ（全自動）
 
-**ユーザーの確認なしで自動実行します。要件確認・レビューはすでに完了しているため。**
+**ユーザーの確認なしで自動実行します。PR作成・レビューはPhase 9で完了済み。**
 
 ### 1. Working Documents最終更新
 
@@ -312,45 +346,41 @@ tasklist.mdを完了状態に更新:
 **完了日**: YYYY-MM-DD
 ```
 
-### 2. コミット
-
-git-workflowスキル準拠でコミットメッセージを作成。
-
-### 3. プッシュ
+### 2. Steering/Working更新のコミット・プッシュ（Phase 10で更新があった場合）
 
 ```bash
-git push -u origin $(git branch --show-current)
+git add docs/
+git commit -m "docs(#<Issue番号>): Steering/Working Documents更新"
+git push
 ```
 
-### 4. PR作成
-
-```bash
-cat > /tmp/pr-body.md <<'PREOF'
-## 概要
-Issue #番号 を解決。
-
-## 変更内容
-- 変更点1
-- 変更点2
-
-## テスト
-- [x] lint / build / test 通過
-- [x] コードレビュー通過（独立レビュー）
-- [ ] 実機動作確認
-
-Closes #番号
-PREOF
-
-gh pr create --base main --title "[Issue #番号] タイトル" --body-file /tmp/pr-body.md
-```
-
-### 5. 自動マージ設定
+### 3. 自動マージ設定
 
 ```bash
 gh pr merge --auto --squash
 ```
 
 ⚠️ **CI（GitHub Actions）が通過後に自動的にマージされます。**
+
+---
+
+## Phase 12: マージ後クリーンアップ（全自動）
+
+**マージ完了後、mainブランチへ切り替えてトピックブランチを削除します。**
+
+### 手順
+
+```bash
+# 1. mainに切り替え & 最新を取得
+git switch main && git fetch origin && git pull origin main
+
+# 2. トピックブランチ削除（ローカル & リモート）
+git branch -d <トピックブランチ名>
+git push origin --delete <トピックブランチ名>
+```
+
+⚠️ **マージが完了する前にブランチを削除しないこと。`gh pr merge --auto` の場合はCIを待つ。**
+⚠️ **リモートブランチがGitHub側で自動削除設定の場合は `git push origin --delete` は不要（エラーになるだけ）。**
 
 ---
 

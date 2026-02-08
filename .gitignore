@@ -50,3 +50,6 @@ next-env.d.ts
 # Claude Code local settings
 .claude/settings.local.json
 NUL
+
+# Temp files from PR creation
+.tmp-pr-body.md

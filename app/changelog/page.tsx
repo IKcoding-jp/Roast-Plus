@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Link from 'next/link';
-import { HiArrowLeft } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import type { ChangelogEntryType } from '@/types';
 import { ChangeTypeFilter, ChangelogTimeline } from '@/components/changelog';
 import { DETAILED_CHANGELOG } from '@/data/dev-stories/detailed-changelog';
+import { BackLink } from '@/components/ui/BackLink';
+import { Card } from '@/components/ui/Card';
 
 export default function ChangelogPage() {
   const [selectedTypes, setSelectedTypes] = useState<ChangelogEntryType[]>([]);
@@ -40,20 +40,13 @@ export default function ChangelogPage() {
         {/* ヘッダー */}
         <header className="mb-6 flex-shrink-0">
           <div className="flex items-center gap-4">
-            <Link
-              href="/settings"
-              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-              title="戻る"
-              aria-label="戻る"
-            >
-              <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-            </Link>
+            <BackLink href="/settings" variant="icon-only" aria-label="設定に戻る" />
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <MdHistory className="h-7 w-7 text-amber-500" />
+              <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
+                <MdHistory className="h-7 w-7 text-spot" />
                 更新履歴
               </h1>
-              <p className="text-gray-500 text-sm mt-1 hidden sm:block">
+              <p className="text-ink-muted text-sm mt-1 hidden sm:block">
                 ローストプラスの更新内容をご確認いただけます
               </p>
             </div>
@@ -61,13 +54,13 @@ export default function ChangelogPage() {
         </header>
 
         {/* フィルター */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6 flex-shrink-0">
+        <Card className="p-4 mb-6 flex-shrink-0">
           <ChangeTypeFilter
             selectedTypes={selectedTypes}
             onToggle={handleToggleType}
             onClear={handleClearFilter}
           />
-        </div>
+        </Card>
 
         {/* メインコンテンツ */}
         <main className="flex-1">
@@ -75,8 +68,8 @@ export default function ChangelogPage() {
         </main>
 
         {/* フッター */}
-        <footer className="mt-8 pt-6 border-t border-gray-200 text-center flex-shrink-0">
-          <p className="text-sm text-gray-400">
+        <footer className="mt-8 pt-6 border-t border-edge text-center flex-shrink-0">
+          <p className="text-sm text-ink-muted">
             全 {DETAILED_CHANGELOG.length} 件の更新履歴
             {selectedTypes.length > 0 && (
               <span className="ml-2">（{filteredEntries.length} 件表示中）</span>

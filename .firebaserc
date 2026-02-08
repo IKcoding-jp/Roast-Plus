@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "roastplus-72fa6"
+    "default": "roastplus-72fa6",
+    "development": "roast-plus-dev"
   }
 }

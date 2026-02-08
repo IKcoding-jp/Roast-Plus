@@ -1,61 +1,32 @@
-# RoastPlus テスト戦略
+# テスト戦略・ガイドライン
 
-## 推奨フレームワーク
+## テストフレームワーク
 
-**Vitest** を推奨（Next.js/React との相性が良い）
+**Vitest** を使用（Next.js/React との相性が良い）
 
-## セットアップ手順
+## テスト作成の原則
 
-### 1. パッケージインストール
+### 1. 新規開発は100% TDD
+新しい機能・コンポーネントを作成する際は、**必ずテストを先に書く**こと。
 
-```bash
-npm install -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/jest-dom
-```
+#### TDDワークフロー
+1. **Red**: 失敗するテストを書く
+2. **Green**: テストを通す最小限のコードを書く
+3. **Refactor**: コードを改善（テストは維持）
 
-### 2. vitest.config.ts 作成
+### 2. 既存コードは段階的にテスト追加
 
-```typescript
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+| 優先度 | 対象 | 例 |
+|--------|------|-----|
+| 高 | クリティカルなビジネスロジック | XP計算、日付計算、価格計算 |
+| 中 | ユーザー体験に直結する部分 | カスタムフック、共通コンポーネント |
+| 低 | 表示系・静的コンテンツ | レイアウトコンポーネント、スタイル |
 
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: './vitest.setup.ts',
-    include: ['**/*.test.{ts,tsx}'],
-    coverage: {
-      reporter: ['text', 'html'],
-      exclude: ['node_modules/', '.next/'],
-    },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './'),
-    },
-  },
-});
-```
+### 3. テストの粒度
 
-### 3. vitest.setup.ts 作成
-
-```typescript
-import '@testing-library/jest-dom';
-```
-
-### 4. package.json にスクリプト追加
-
-```json
-{
-  "scripts": {
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
-  }
-}
-```
+- 1つのテストケースに1つのアサーション
+- 説明的なテスト名（「正しく動く」ではなく「未ログイン時はログインページにリダイレクトする」）
+- エッジケース・エラーケースを必ずテスト
 
 ## テストファイル配置
 
@@ -72,55 +43,49 @@ roastplus/
 └── __tests__/                       # 統合テスト用（オプション）
 ```
 
-## テストパターン
+## テストの種類
 
-### ユニットテスト（ロジック）
+### ユニットテスト（lib/, hooks/）
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { calculateXP, getNextLevel } from './gamification';
+import { calculateXP } from './gamification';
 
 describe('calculateXP', () => {
   it('正解時にXPを加算する', () => {
     const result = calculateXP({ isCorrect: true, streak: 3 });
     expect(result).toBeGreaterThan(0);
   });
-
-  it('不正解時はXPを加算しない', () => {
-    const result = calculateXP({ isCorrect: false, streak: 0 });
-    expect(result).toBe(0);
-  });
 });
 ```
 
-### コンポーネントテスト
+### コンポーネントテスト（components/）
 
 ```typescript
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { QuizOption } from './QuizOption';
+import { Button } from './Button';
 
-describe('QuizOption', () => {
-  it('オプションテキストを表示する', () => {
-    render(<QuizOption text="テスト選択肢" index={0} onSelect={() => {}} />);
-    expect(screen.getByText('テスト選択肢')).toBeInTheDocument();
+describe('Button', () => {
+  it('children を表示する', () => {
+    render(<Button>クリック</Button>);
+    expect(screen.getByText('クリック')).toBeInTheDocument();
   });
 
-  it('クリック時にonSelectが呼ばれる', () => {
-    const mockOnSelect = vi.fn();
-    render(<QuizOption text="テスト" index={1} onSelect={mockOnSelect} />);
-
+  it('クリック時に onClick が呼ばれる', () => {
+    const handleClick = vi.fn();
+    render(<Button onClick={handleClick}>テスト</Button>);
     fireEvent.click(screen.getByText('テスト'));
-    expect(mockOnSelect).toHaveBeenCalledWith(1);
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 });
 ```
 
-### フックテスト
+### フックテスト（hooks/）
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useQuizData } from './useQuizData';
 
 describe('useQuizData', () => {
@@ -133,63 +98,81 @@ describe('useQuizData', () => {
 
 ## モック戦略
 
-### Firebase モック
-
+### Firebase
 ```typescript
-import { vi } from 'vitest';
-
 vi.mock('@/lib/firebase', () => ({
   db: {},
-  auth: {
-    currentUser: { uid: 'test-user-id' },
-  },
+  auth: { currentUser: { uid: 'test-user-id' } },
 }));
 ```
 
-### Framer Motion モック（アニメーション無効化）
-
+### Framer Motion（アニメーション無効化）
 ```typescript
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
   },
   AnimatePresence: ({ children }: any) => children,
 }));
 ```
 
-## カバレッジ目標
-
-| 対象 | 目標 |
-|-----|------|
-| lib/ (ロジック) | 80%以上 |
-| hooks/ | 70%以上 |
-| components/ | 60%以上 |
-
-## TDDワークフロー
-
-1. **Red**: 失敗するテストを書く
-2. **Green**: テストを通す最小限のコードを書く
-3. **Refactor**: コードを改善（テストは維持）
-
-```bash
-# ウォッチモードでTDD
-npm run test
+### Next.js Router
+```typescript
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+  usePathname: () => '/test-path',
+}));
 ```
 
-## CI/CD統合（将来）
+## カバレッジ目標
 
-```yaml
-# .github/workflows/test.yml
-name: Test
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run test:run
+| 対象 | 目標カバレッジ |
+|------|----------------|
+| lib/ | 80%以上 |
+| hooks/ | 70%以上 |
+| components/ui/ | 60%以上 |
+| components/ (その他) | 50%以上 |
+
+## チェックリスト
+
+### 新機能追加時
+- [ ] テストファイルを先に作成した
+- [ ] Red → Green → Refactor のサイクルを回した
+- [ ] エッジケース・エラーケースをテストした
+
+### バグ修正時
+- [ ] バグを再現するテストを追加した
+- [ ] テストが失敗 → 修正 → テスト成功を確認した
+
+### リファクタリング時
+- [ ] 既存のテストがすべて通ることを確認した
+- [ ] カバレッジが下がっていないことを確認した
+
+## 実行コマンド
+
+```bash
+npm run test             # ウォッチモード（TDD向け）
+npm run test:run         # 1回実行（CI向け）
+npm run test:coverage    # カバレッジレポート
+npm run test -- path/to/file.test.ts  # 特定ファイル
+```
+
+## トラブルシューティング
+
+### テストがタイムアウトする
+```typescript
+it('時間のかかる処理', async () => { /* ... */ }, 10000);
+```
+
+### モックが効かない
+```typescript
+vi.mock('@/lib/firebase'); // import文の前に記述
+beforeEach(() => { vi.clearAllMocks(); });
+```
+
+### Reactコンポーネントが見つからない
+```typescript
+screen.debug(); // DOMをコンソールに出力
+const element = await screen.findByText('非同期表示される要素');
 ```

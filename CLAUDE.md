@@ -123,7 +123,7 @@ Issue単位の仕様書。4ファイル固定:
 - ディレクトリ: `app/`, `components/`, `lib/`, `hooks/`, `types/`
 - 命名: PascalCase（コンポーネント）, camelCase（関数）, UPPER_SNAKE_CASE（定数）
 - 型定義: interface優先、ユニオン型はtype
-- 詳細は `docs/coding-standards.md` 参照
+- 詳細は `docs/steering/GUIDELINES.md` 参照
 
 ## UI Component Rules（重要）
 
@@ -277,11 +277,6 @@ npm run test     # テスト（Vitest導入後）
 - **`docs/steering/REPOSITORY.md`** - リポジトリ構造
 - **`docs/steering/GUIDELINES.md`** - 実装ガイドライン
 - **`docs/steering/UBIQUITOUS_LANGUAGE.md`** - ドメイン用語定義
-
-### 過去の設計記録
-
-- **`docs/memory.md`** - ADR参照リンク（Steering Documentsへの移行済み）
-- **`docs/coding-standards.md`** - 参照リンク（GUIDELINES.mdへの移行済み）
 
 ### Working Documents
 

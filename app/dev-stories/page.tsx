@@ -2,9 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { HiArrowLeft } from 'react-icons/hi';
 import { RiLightbulbFlashFill } from 'react-icons/ri';
+import { BackLink } from '@/components/ui';
 import { EpisodeCard } from '@/components/dev-stories/EpisodeCard';
 import { getSortedEpisodes } from '@/data/dev-stories/episodes';
 
@@ -12,24 +11,14 @@ export default function DevStoriesPage() {
   const episodes = getSortedEpisodes();
 
   return (
-    <div
-      className="h-screen overflow-y-hidden flex flex-col px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4"
-      style={{ backgroundColor: '#F7F7F5' }}
-    >
+    <div className="h-screen overflow-y-hidden flex flex-col px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4 bg-page transition-colors duration-1000">
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
         <header className="mb-4 sm:mb-6 flex-shrink-0">
           <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-              title="戻る"
-              aria-label="戻る"
-            >
-              <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-            </Link>
+            <BackLink href="/" variant="icon-only" aria-label="戻る" />
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-800">開発秘話</h1>
-              <p className="text-gray-500 text-sm mt-1 hidden sm:block">
+              <h1 className="text-2xl font-bold text-ink">開発秘話</h1>
+              <p className="text-ink-sub text-sm mt-1 hidden sm:block">
                 様々なキャラクターが、ローストプラスの開発を語ります。
               </p>
             </div>
@@ -71,12 +60,12 @@ export default function DevStoriesPage() {
           {episodes.length === 0 ? (
             <div className="text-center py-12">
               <div className="flex justify-center mb-4">
-                <div className="p-4 bg-amber-100 rounded-full">
-                  <RiLightbulbFlashFill className="h-12 w-12 text-amber-400" />
+                <div className="p-4 bg-ground rounded-full">
+                  <RiLightbulbFlashFill className="h-12 w-12 text-ink-muted" />
                 </div>
               </div>
-              <p className="text-gray-500">まだエピソードがありません</p>
-              <p className="text-sm text-gray-400 mt-2">新しいエピソードをお楽しみに！</p>
+              <p className="text-ink-sub">まだエピソードがありません</p>
+              <p className="text-sm text-ink-muted mt-2">新しいエピソードをお楽しみに！</p>
             </div>
           ) : (
             <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">

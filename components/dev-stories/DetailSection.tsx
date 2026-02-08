@@ -2,6 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { Badge } from '@/components/ui';
 
 const MarkdownRenderer = dynamic(
   () => import('@/components/MarkdownRenderer').then(mod => ({ default: mod.MarkdownRenderer })),
@@ -14,7 +15,7 @@ interface DetailSectionProps {
 
 export const DetailSection: React.FC<DetailSectionProps> = ({ content, tags }) => {
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+    <div className="bg-surface rounded-2xl p-4 sm:p-6 shadow-sm border border-edge">
       {/* 詳細説明 */}
       <div className="max-w-none">
         <MarkdownRenderer content={content} />
@@ -22,15 +23,10 @@ export const DetailSection: React.FC<DetailSectionProps> = ({ content, tags }) =
 
       {/* タグ */}
       {tags && tags.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-gray-100">
+        <div className="mt-6 pt-4 border-t border-edge">
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
-              >
-                #{tag}
-              </span>
+              <Badge key={tag} size="sm">#{tag}</Badge>
             ))}
           </div>
         </div>

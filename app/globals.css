@@ -69,7 +69,7 @@
   [data-theme="christmas"] {
     /* 背景 */
     --page: #051a0e;
-    --surface: rgba(255, 255, 255, 0.05);
+    --surface: #0d3520;
     --overlay: #0a2f1a;
     --ground: rgba(255, 255, 255, 0.03);
     --field: rgba(255, 255, 255, 0.08);

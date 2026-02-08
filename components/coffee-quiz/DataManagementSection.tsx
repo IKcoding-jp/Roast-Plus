@@ -20,9 +20,9 @@ export function DataManagementSection({ onResetClick }: DataManagementSectionPro
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-white rounded-2xl shadow-lg p-5 border border-rose-100"
+      className="bg-surface rounded-2xl shadow-lg p-5 border border-rose-500/15"
     >
-      <h2 className="font-bold text-[#211714] mb-3 flex items-center gap-2">
+      <h2 className="font-bold text-ink mb-3 flex items-center gap-2">
         <span className="text-rose-500">
           <TrashIcon />
         </span>
@@ -34,13 +34,13 @@ export function DataManagementSection({ onResetClick }: DataManagementSectionPro
         <DataManagement />
       </div>
 
-      <p className="text-[#3A2F2B]/70 text-sm mb-4">
+      <p className="text-ink-muted text-sm mb-4">
         学習データをリセットして、最初からやり直すことができます。
       </p>
 
       <button
         onClick={onResetClick}
-        className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 py-3 px-4 rounded-xl font-semibold transition-colors border border-rose-200 flex items-center justify-center gap-2"
+        className="w-full bg-rose-500/10 hover:bg-rose-500/15 text-rose-600 py-3 px-4 rounded-xl font-semibold transition-colors border border-rose-500/20 flex items-center justify-center gap-2"
       >
         <TrashIcon />
         データをリセット

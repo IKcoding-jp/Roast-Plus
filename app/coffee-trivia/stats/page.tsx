@@ -86,15 +86,15 @@ export default function StatsPage() {
   const stats = progress?.stats;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
-      <header className="flex-none px-4 py-3 flex items-center bg-white border-b border-[#211714]/5">
+    <div className="min-h-screen flex flex-col bg-page">
+      <header className="flex-none px-4 py-3 flex items-center bg-surface border-b border-edge">
         <Link
           href="/coffee-trivia"
-          className="p-2 -ml-2 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-gray-50 rounded-full transition-colors"
+          className="p-2 -ml-2 text-ink-sub hover:text-spot hover:bg-ground rounded-full transition-colors"
         >
           <ArrowLeftIcon />
         </Link>
-        <h1 className="ml-3 text-lg font-bold text-[#211714] flex items-center gap-2">
+        <h1 className="ml-3 text-lg font-bold text-ink flex items-center gap-2">
           <ChartBarIcon />
           統計
         </h1>
@@ -113,38 +113,38 @@ export default function StatsPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl shadow-lg p-5 border border-[#211714]/5"
+              className="bg-surface rounded-2xl shadow-lg p-5 border border-edge"
             >
-              <h2 className="font-bold text-[#211714] mb-4 flex items-center gap-2">
-                <span className="text-[#EF8A00]">
+              <h2 className="font-bold text-ink mb-4 flex items-center gap-2">
+                <span className="text-spot">
                   <TrendingUpIcon />
                 </span>
                 全体統計
               </h2>
 
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-[#211714]/5">
-                  <span className="text-3xl font-bold text-[#211714]">
+                <div className="bg-ground rounded-xl p-4 text-center border border-edge">
+                  <span className="text-3xl font-bold text-ink">
                     {stats?.totalQuestions ?? 0}
                   </span>
-                  <p className="text-[#3A2F2B]/60 text-sm mt-1">総回答数</p>
+                  <p className="text-ink-muted text-sm mt-1">総回答数</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-[#EF8A00]/20">
-                  <span className="text-3xl font-bold text-[#EF8A00]">
+                <div className="bg-spot-subtle rounded-xl p-4 text-center border border-spot/20">
+                  <span className="text-3xl font-bold text-spot">
                     {stats?.averageAccuracy ?? 0}%
                   </span>
-                  <p className="text-[#EF8A00]/70 text-sm mt-1">平均正解率</p>
+                  <p className="text-spot/70 text-sm mt-1">平均正解率</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-emerald-50 rounded-xl p-4 text-center border border-emerald-100">
+                <div className="bg-success-subtle rounded-xl p-4 text-center border border-success/20">
                   <span className="text-2xl font-bold text-emerald-600">
                     {stats?.totalCorrect ?? 0}
                   </span>
                   <p className="text-emerald-600/70 text-sm mt-1">正解</p>
                 </div>
-                <div className="bg-rose-50 rounded-xl p-4 text-center border border-rose-100">
+                <div className="bg-danger-subtle rounded-xl p-4 text-center border border-danger/20">
                   <span className="text-2xl font-bold text-rose-500">
                     {stats?.totalIncorrect ?? 0}
                   </span>
@@ -158,10 +158,10 @@ export default function StatsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl shadow-lg p-5 border border-[#211714]/5"
+              className="bg-surface rounded-2xl shadow-lg p-5 border border-edge"
             >
-              <h2 className="font-bold text-[#211714] mb-4 flex items-center gap-2">
-                <span className="text-[#EF8A00]">
+              <h2 className="font-bold text-ink mb-4 flex items-center gap-2">
+                <span className="text-spot">
                   <BookOpenIcon />
                 </span>
                 カテゴリ別
@@ -178,22 +178,22 @@ export default function StatsPage() {
                     const progressPercent = totalQuestions > 0 ? Math.round((answeredCorrectlyCount / totalQuestions) * 100) : 0;
 
                     return (
-                      <div key={category} className="bg-gray-50 rounded-xl p-4 border border-[#211714]/5">
+                      <div key={category} className="bg-ground rounded-xl p-4 border border-edge">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-[#211714]">
+                          <span className="font-medium text-ink">
                             {CATEGORY_LABELS[category]}
                           </span>
-                          <span className="text-[#EF8A00] font-bold">{progressPercent}%</span>
+                          <span className="text-spot font-bold">{progressPercent}%</span>
                         </div>
-                        <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
+                        <div className="h-2 bg-edge rounded-full overflow-hidden">
                           <motion.div
-                            className="h-full bg-gradient-to-r from-[#EF8A00] to-[#D67A00] rounded-full"
+                            className="h-full bg-gradient-to-r from-spot to-spot-hover rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercent}%` }}
                             transition={{ delay: 0.2, duration: 0.5 }}
                           />
                         </div>
-                        <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
+                        <div className="flex items-center justify-between mt-2 text-xs text-ink-muted">
                           <span>
                             正解済み: {answeredCorrectlyCount}/{totalQuestions}問
                           </span>
@@ -213,10 +213,10 @@ export default function StatsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl shadow-lg p-5 border border-[#211714]/5"
+              className="bg-surface rounded-2xl shadow-lg p-5 border border-edge"
             >
-              <h2 className="font-bold text-[#211714] mb-4 flex items-center gap-2">
-                <span className="text-[#EF8A00]">
+              <h2 className="font-bold text-ink mb-4 flex items-center gap-2">
+                <span className="text-spot">
                   <TargetIcon />
                 </span>
                 難易度別
@@ -235,27 +235,27 @@ export default function StatsPage() {
                     return (
                       <div
                         key={difficulty}
-                        className="bg-gray-50 rounded-xl p-4 border border-[#211714]/5"
+                        className="bg-ground rounded-xl p-4 border border-edge"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-[#211714]">
+                          <span className="font-medium text-ink">
                             {DIFFICULTY_LABELS[difficulty]}
                           </span>
                           <span className={`font-bold ${
                             difficulty === 'beginner'
                               ? 'text-emerald-600'
                               : difficulty === 'intermediate'
-                              ? 'text-[#EF8A00]'
+                              ? 'text-spot'
                               : 'text-rose-600'
                           }`}>{progressPercent}%</span>
                         </div>
-                        <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
+                        <div className="h-2 bg-edge rounded-full overflow-hidden">
                           <motion.div
                             className={`h-full rounded-full ${
                               difficulty === 'beginner'
                                 ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
                                 : difficulty === 'intermediate'
-                                ? 'bg-gradient-to-r from-[#EF8A00] to-[#D67A00]'
+                                ? 'bg-gradient-to-r from-spot to-spot-hover'
                                 : 'bg-gradient-to-r from-rose-500 to-rose-400'
                             }`}
                             initial={{ width: 0 }}
@@ -263,7 +263,7 @@ export default function StatsPage() {
                             transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
                           />
                         </div>
-                        <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
+                        <div className="flex items-center justify-between mt-2 text-xs text-ink-muted">
                           <span>
                             正解済み: {answeredCorrectlyCount}/{totalQuestions}問
                           </span>
@@ -283,9 +283,9 @@ export default function StatsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-white rounded-2xl shadow-lg p-5 border border-rose-100"
+              className="bg-surface rounded-2xl shadow-lg p-5 border border-rose-500/15"
             >
-              <h2 className="font-bold text-[#211714] mb-3 flex items-center gap-2">
+              <h2 className="font-bold text-ink mb-3 flex items-center gap-2">
                 <span className="text-rose-500">
                   <TrashIcon />
                 </span>
@@ -297,13 +297,13 @@ export default function StatsPage() {
                 <DataManagement />
               </div>
 
-              <p className="text-[#3A2F2B]/70 text-sm mb-4">
+              <p className="text-ink-muted text-sm mb-4">
                 学習データをリセットして、最初からやり直すことができます。
               </p>
 
               <button
                 onClick={() => setShowResetDialog(true)}
-                className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 py-3 px-4 rounded-xl font-semibold transition-colors border border-rose-200 flex items-center justify-center gap-2"
+                className="w-full bg-rose-500/10 hover:bg-rose-500/15 text-rose-600 py-3 px-4 rounded-xl font-semibold transition-colors border border-rose-500/20 flex items-center justify-center gap-2"
               >
                 <TrashIcon />
                 データをリセット

@@ -47,19 +47,19 @@ export default function CoffeeTriviaPage() {
   const dueCardsCount = getDueCardsForReview().length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
-      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between bg-white border-b border-[#211714]/5">
+    <div className="min-h-screen flex flex-col bg-page">
+      <header className="flex-none px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between bg-surface border-b border-edge">
         <div className="flex items-center">
           <Link
             href="/"
-            className="p-1.5 -ml-1.5 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
+            className="p-1.5 -ml-1.5 text-ink-sub hover:text-spot hover:bg-spot-subtle rounded-lg transition-colors"
             title="戻る"
             aria-label="戻る"
           >
             <ArrowLeftIcon />
           </Link>
-          <h1 className="ml-2.5 text-base font-semibold text-[#211714] flex items-center gap-2">
-            <span className="text-[#EF8A00]">
+          <h1 className="ml-2.5 text-base font-semibold text-ink flex items-center gap-2">
+            <span className="text-spot">
               <CoffeeIcon />
             </span>
             コーヒークイズ
@@ -67,7 +67,7 @@ export default function CoffeeTriviaPage() {
         </div>
         <button
           onClick={() => setShowHelpGuide(true)}
-          className="p-1.5 -mr-1.5 text-[#3A2F2B]/60 hover:text-[#EF8A00] hover:bg-[#FDF8F0] rounded-lg transition-colors"
+          className="p-1.5 -mr-1.5 text-ink-muted hover:text-spot hover:bg-spot-subtle rounded-lg transition-colors"
           title="使い方ガイド"
           aria-label="使い方ガイド"
         >

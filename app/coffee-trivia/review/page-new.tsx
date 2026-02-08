@@ -153,17 +153,17 @@ export default function ReviewPage() {
   // 復習する問題がない場合
   if (noReviewCards) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
+      <div className="min-h-screen bg-page">
+        <header className="sticky top-0 z-10 bg-surface border-b border-edge px-4 py-3">
           <div className="flex items-center justify-between max-w-lg mx-auto">
             <Link
               href="/coffee-trivia"
-              className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
+              className="flex items-center gap-1.5 text-ink-sub hover:text-spot transition-colors"
             >
               <ArrowLeftIcon />
               <span className="text-sm font-medium">戻る</span>
             </Link>
-            <h1 className="font-semibold text-[#211714] flex items-center gap-2">
+            <h1 className="font-semibold text-ink flex items-center gap-2">
               <RefreshIcon />
               復習モード
             </h1>
@@ -180,28 +180,28 @@ export default function ReviewPage() {
   // ローディング
   if (isLoading || !session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-page flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-2 border-[#EF8A00]/20 border-t-[#EF8A00] animate-spin mx-auto mb-3" />
-          <p className="text-[#3A2F2B]/70 text-sm">復習問題を準備中...</p>
+          <div className="w-10 h-10 rounded-full border-2 border-spot/20 border-t-spot animate-spin mx-auto mb-3" />
+          <p className="text-ink-muted text-sm">復習問題を準備中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-page">
       {/* ヘッダー */}
-      <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
+      <header className="sticky top-0 z-10 bg-surface border-b border-edge px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link
             href="/coffee-trivia"
-            className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
+            className="flex items-center gap-1.5 text-ink-sub hover:text-spot transition-colors"
           >
             <ArrowLeftIcon />
             <span className="text-sm font-medium">戻る</span>
           </Link>
-          <h1 className="font-semibold text-[#211714] flex items-center gap-2">
+          <h1 className="font-semibold text-ink flex items-center gap-2">
             <RefreshIcon />
             復習モード
           </h1>
@@ -238,7 +238,7 @@ export default function ReviewPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   onClick={handleNext}
-                  className="w-full mt-4 flex items-center justify-center gap-2 bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
+                  className="w-full mt-4 flex items-center justify-center gap-2 bg-spot hover:bg-spot-hover text-white py-3.5 px-5 rounded-xl font-semibold transition-colors"
                 >
                   {currentIndex + 1 >= totalQuestions ? (
                     '結果を見る'

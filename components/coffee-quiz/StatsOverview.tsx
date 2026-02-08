@@ -17,38 +17,38 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-lg p-5 border border-[#211714]/5"
+      className="bg-surface rounded-2xl shadow-lg p-5 border border-edge"
     >
-      <h2 className="font-bold text-[#211714] mb-4 flex items-center gap-2">
-        <span className="text-[#EF8A00]">
+      <h2 className="font-bold text-ink mb-4 flex items-center gap-2">
+        <span className="text-spot">
           <TrendingUpIcon />
         </span>
         全体統計
       </h2>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-gray-50 rounded-xl p-4 text-center border border-[#211714]/5">
-          <span className="text-3xl font-bold text-[#211714]">
+        <div className="bg-ground rounded-xl p-4 text-center border border-edge">
+          <span className="text-3xl font-bold text-ink">
             {stats.totalQuestions}
           </span>
-          <p className="text-[#3A2F2B]/60 text-sm mt-1">総回答数</p>
+          <p className="text-ink-muted text-sm mt-1">総回答数</p>
         </div>
-        <div className="bg-gray-50 rounded-xl p-4 text-center border border-[#EF8A00]/20">
-          <span className="text-3xl font-bold text-[#EF8A00]">
+        <div className="bg-ground rounded-xl p-4 text-center border border-spot/20">
+          <span className="text-3xl font-bold text-spot">
             {stats.averageAccuracy}%
           </span>
-          <p className="text-[#EF8A00]/70 text-sm mt-1">平均正解率</p>
+          <p className="text-spot/70 text-sm mt-1">平均正解率</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-emerald-50 rounded-xl p-4 text-center border border-emerald-100">
+        <div className="bg-success-subtle rounded-xl p-4 text-center border border-success/20">
           <span className="text-2xl font-bold text-emerald-600">
             {stats.totalCorrect}
           </span>
           <p className="text-emerald-600/70 text-sm mt-1">正解</p>
         </div>
-        <div className="bg-rose-50 rounded-xl p-4 text-center border border-rose-100">
+        <div className="bg-danger-subtle rounded-xl p-4 text-center border border-danger/20">
           <span className="text-2xl font-bold text-rose-500">
             {stats.totalIncorrect}
           </span>

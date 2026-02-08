@@ -47,19 +47,19 @@ export function QuestionListItem({
 }: QuestionListItemProps) {
   const difficultyConfig = {
     beginner: {
-      bg: 'bg-green-100',
-      text: 'text-green-700',
-      border: 'border-green-200',
+      bg: 'bg-emerald-500/15',
+      text: 'text-emerald-700',
+      border: 'border-emerald-500/20',
     },
     intermediate: {
-      bg: 'bg-yellow-100',
-      text: 'text-yellow-700',
-      border: 'border-yellow-200',
+      bg: 'bg-amber-500/15',
+      text: 'text-amber-700',
+      border: 'border-amber-500/20',
     },
     advanced: {
-      bg: 'bg-red-100',
-      text: 'text-red-700',
-      border: 'border-red-200',
+      bg: 'bg-rose-500/15',
+      text: 'text-rose-700',
+      border: 'border-rose-500/20',
     },
   };
 
@@ -73,10 +73,10 @@ export function QuestionListItem({
       onClick={onClick}
       className="
         w-full
-        bg-white
-        hover:bg-[#211714]/5
-        border border-[#211714]/5
-        hover:border-[#211714]/10
+        bg-surface
+        hover:bg-edge-subtle
+        border border-edge
+        hover:border-edge-strong
         rounded-xl
         p-4
         text-left
@@ -93,13 +93,13 @@ export function QuestionListItem({
             <span className={`text-xl font-bold ${
               answerStatus === 'correct' ? 'text-green-500' :
               answerStatus === 'incorrect' ? 'text-red-400' :
-              'text-[#3A2F2B]/30'
+              'text-ink-muted'
             }`}>
               {answerStatus === 'correct' ? '○' :
                answerStatus === 'incorrect' ? '×' :
                '−'}
             </span>
-            <span className="text-xs text-[#3A2F2B]/50 font-mono">
+            <span className="text-xs text-ink-muted font-mono">
               {question.id}
             </span>
             <span
@@ -115,7 +115,7 @@ export function QuestionListItem({
           </div>
 
           {/* 問題文（プレビュー） */}
-          <p className="text-sm text-[#211714] line-clamp-2">
+          <p className="text-sm text-ink line-clamp-2">
             {question.question}
           </p>
         </div>
@@ -123,7 +123,7 @@ export function QuestionListItem({
         {/* 矢印 */}
         <ChevronRightIcon
           size={20}
-          className="text-[#3A2F2B]/40 group-hover:text-[#3A2F2B]/60 transition-colors ml-2 flex-shrink-0"
+          className="text-ink-muted group-hover:text-ink-sub transition-colors ml-2 flex-shrink-0"
         />
       </div>
     </motion.button>

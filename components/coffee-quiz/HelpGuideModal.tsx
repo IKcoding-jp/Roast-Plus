@@ -42,13 +42,13 @@ function GuideCard({
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay }}
-      className="bg-[#FDF8F0] rounded-xl p-3 border border-[#211714]/5"
+      className="bg-spot-subtle rounded-xl p-3 border border-edge"
     >
       <div className="flex items-start gap-3">
         <span className="text-xl flex-shrink-0">{icon}</span>
         <div>
-          <h4 className="font-semibold text-[#211714] text-sm mb-1">{title}</h4>
-          <p className="text-[#3A2F2B]/70 text-xs leading-relaxed">{description}</p>
+          <h4 className="font-semibold text-ink text-sm mb-1">{title}</h4>
+          <p className="text-ink-muted text-xs leading-relaxed">{description}</p>
         </div>
       </div>
     </motion.div>
@@ -64,7 +64,7 @@ export function HelpGuideModal({ show, onClose }: HelpGuideModalProps) {
     >
       <>
         {/* ヘッダー - オレンジグラデーション */}
-            <div className="bg-gradient-to-r from-[#EF8A00] via-[#D67A00] to-[#EF8A00] px-6 py-6 text-center relative flex-shrink-0">
+            <div className="bg-gradient-to-r from-spot via-spot-hover to-spot px-6 py-6 text-center relative flex-shrink-0">
               <button
                 onClick={onClose}
                 className="absolute top-3 right-3 text-white/70 hover:text-white transition-colors"
@@ -132,7 +132,7 @@ export function HelpGuideModal({ show, onClose }: HelpGuideModalProps) {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 onClick={onClose}
-                className="w-full bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3 px-6 rounded-xl font-semibold transition-colors"
+                className="w-full bg-spot hover:bg-spot-hover text-white py-3 px-6 rounded-xl font-semibold transition-colors"
               >
                 わかった
               </motion.button>

@@ -23,16 +23,16 @@ export function QuizPageHeader({ returnUrl, mode, category }: QuizPageHeaderProp
   };
 
   return (
-    <header className="sticky top-0 z-10 bg-white border-b border-[#211714]/5 px-4 py-3">
+    <header className="sticky top-0 z-10 bg-surface border-b border-edge px-4 py-3">
       <div className="flex items-center justify-between max-w-lg mx-auto">
         <Link
           href={returnUrl}
-          className="flex items-center gap-1.5 text-[#3A2F2B] hover:text-[#EF8A00] transition-colors"
+          className="flex items-center gap-1.5 text-ink-sub hover:text-spot transition-colors"
         >
           <ArrowLeftIcon />
           <span className="text-sm font-medium">戻る</span>
         </Link>
-        <h1 className="font-semibold text-[#211714]">{getTitle()}</h1>
+        <h1 className="font-semibold text-ink">{getTitle()}</h1>
         <div className="w-14" />
       </div>
     </header>

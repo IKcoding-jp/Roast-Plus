@@ -46,27 +46,27 @@ export function QuizOption({
     if (!showFeedback) {
       // フィードバック前
       if (isSelected) {
-        return 'bg-[#EF8A00]/10 border-[#EF8A00] text-[#211714]';
+        return 'bg-spot/10 border-spot text-ink';
       }
-      return 'bg-white border-[#211714]/10 text-[#211714] hover:bg-[#FDF8F0] hover:border-[#EF8A00]/40';
+      return 'border-edge text-ink hover:bg-spot-subtle hover:border-spot/40';
     }
 
     // フィードバック後
     if (isCorrect) {
-      return 'bg-emerald-50 border-emerald-500 text-emerald-900';
+      return 'bg-success-subtle border-emerald-500 text-feedback-correct';
     }
     if (isSelected && !isCorrect) {
-      return 'bg-rose-50 border-rose-500 text-rose-900';
+      return 'bg-danger-subtle border-rose-500 text-feedback-incorrect';
     }
-    return 'bg-gray-50 border-gray-200 text-gray-400';
+    return 'bg-ground border-edge text-ink-muted';
   };
 
   const getLetterStyles = () => {
     if (!showFeedback) {
       if (isSelected) {
-        return 'bg-[#EF8A00] text-white';
+        return 'bg-spot text-white';
       }
-      return 'bg-[#211714]/5 text-[#3A2F2B]';
+      return 'bg-edge-subtle text-ink-sub';
     }
 
     if (isCorrect) {
@@ -75,7 +75,7 @@ export function QuizOption({
     if (isSelected && !isCorrect) {
       return 'bg-rose-500 text-white';
     }
-    return 'bg-gray-200 text-gray-400';
+    return 'bg-edge text-ink-muted';
   };
 
   return (
@@ -111,7 +111,7 @@ export function QuizOption({
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
-          className="flex items-center gap-1 px-2 py-0.5 bg-[#EF8A00] text-white rounded-full text-xs font-bold"
+          className="flex items-center gap-1 px-2 py-0.5 bg-spot text-white rounded-full text-xs font-bold"
         >
           +{xpEarned} XP
         </motion.span>

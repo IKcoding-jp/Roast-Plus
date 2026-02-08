@@ -41,7 +41,7 @@ export function XPGainAnimation({ xp, show, onComplete }: XPGainAnimationProps) 
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="fixed top-1/3 left-1/2 transform -translate-x-1/2 pointer-events-none z-50"
         >
-          <div className="flex items-center gap-2 bg-gradient-to-r from-[#EF8A00] to-[#D67A00] text-white px-5 py-2.5 rounded-full shadow-lg">
+          <div className="flex items-center gap-2 bg-gradient-to-r from-spot to-spot-hover text-white px-5 py-2.5 rounded-full shadow-lg">
             <motion.span
               animate={{ rotate: [0, -10, 10, 0] }}
               transition={{ repeat: 2, duration: 0.3 }}

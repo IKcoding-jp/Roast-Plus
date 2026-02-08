@@ -55,24 +55,24 @@ export function QuizResult({
     if (isPerfect) {
       return {
         text: 'パーフェクト',
-        gradient: 'from-[#d4af37] via-[#EF8A00] to-[#d4af37]',
+        gradient: 'from-[#d4af37] via-spot to-[#d4af37]',
       };
     }
     if (accuracy >= 80) {
       return {
         text: 'よくできました',
-        gradient: 'from-[#EF8A00] to-[#D67A00]',
+        gradient: 'from-spot to-spot-hover',
       };
     }
     if (accuracy >= 60) {
       return {
         text: 'いい調子',
-        gradient: 'from-[#D67A00] to-[#211714]',
+        gradient: 'from-spot-hover to-card-header-from',
       };
     }
     return {
       text: '復習しよう',
-      gradient: 'from-[#3A2F2B] to-[#211714]',
+      gradient: 'from-card-header-via to-card-header-from',
     };
   };
 
@@ -82,7 +82,7 @@ export function QuizResult({
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#211714]/5"
+      className="bg-surface rounded-2xl shadow-lg overflow-hidden border border-edge"
     >
       {/* ヘッダー */}
       <div className={`relative px-6 py-8 text-center bg-gradient-to-r ${config.gradient}`}>
@@ -116,7 +116,7 @@ export function QuizResult({
                 cx="56"
                 cy="56"
                 r="48"
-                stroke="#f3f4f6"
+                stroke="var(--edge)"
                 strokeWidth="8"
                 fill="none"
               />
@@ -124,7 +124,7 @@ export function QuizResult({
                 cx="56"
                 cy="56"
                 r="48"
-                stroke={isPerfect ? '#d4af37' : '#EF8A00'}
+                stroke={isPerfect ? '#d4af37' : 'var(--color-spot)'}
                 strokeWidth="8"
                 fill="none"
                 strokeLinecap="round"
@@ -140,14 +140,14 @@ export function QuizResult({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className={`text-3xl font-bold ${isPerfect ? 'text-[#d4af37]' : 'text-[#EF8A00]'}`}
+                className={`text-3xl font-bold ${isPerfect ? 'text-[#d4af37]' : 'text-spot'}`}
               >
                 {accuracy}
               </motion.span>
-              <span className={`text-base ${isPerfect ? 'text-[#d4af37]' : 'text-[#EF8A00]'}`}>%</span>
+              <span className={`text-base ${isPerfect ? 'text-[#d4af37]' : 'text-spot'}`}>%</span>
             </div>
           </motion.div>
-          <p className="text-[#3A2F2B]/60 text-xs mt-2">正解率</p>
+          <p className="text-ink-muted text-xs mt-2">正解率</p>
         </div>
 
         {/* 詳細統計 */}
@@ -156,7 +156,7 @@ export function QuizResult({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100"
+            className="bg-success-subtle rounded-xl p-3 text-center border border-success/20"
           >
             <span className="text-2xl font-bold text-emerald-600">{correct}</span>
             <p className="text-emerald-600/70 text-xs mt-0.5">正解</p>
@@ -166,7 +166,7 @@ export function QuizResult({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-rose-50 rounded-xl p-3 text-center border border-rose-100"
+            className="bg-danger-subtle rounded-xl p-3 text-center border border-danger/20"
           >
             <span className="text-2xl font-bold text-rose-500">{incorrect}</span>
             <p className="text-rose-500/70 text-xs mt-0.5">不正解</p>
@@ -176,10 +176,10 @@ export function QuizResult({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-[#FDF8F0] rounded-xl p-3 text-center border border-[#EF8A00]/20"
+            className="bg-spot-subtle rounded-xl p-3 text-center border border-spot/20"
           >
-            <span className="text-2xl font-bold text-[#EF8A00]">+{totalXP}</span>
-            <p className="text-[#EF8A00]/70 text-xs mt-0.5">XP</p>
+            <span className="text-2xl font-bold text-spot">+{totalXP}</span>
+            <p className="text-spot/70 text-xs mt-0.5">XP</p>
           </motion.div>
         </div>
 
@@ -190,7 +190,7 @@ export function QuizResult({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
             onClick={onRetry}
-            className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl font-semibold bg-[#EF8A00] hover:bg-[#D67A00] text-white transition-colors active:scale-[0.98]"
+            className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl font-semibold bg-spot hover:bg-spot-hover text-white transition-colors active:scale-[0.98]"
           >
             <span className="group-hover:rotate-180 transition-transform duration-300">
               <RefreshIcon />
@@ -205,7 +205,7 @@ export function QuizResult({
           >
             <Link
               href={returnUrl}
-              className="w-full flex items-center justify-center gap-2 bg-[#211714]/5 text-[#211714] py-3 px-5 rounded-xl font-semibold hover:bg-[#211714]/10 transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-edge-subtle text-ink py-3 px-5 rounded-xl font-semibold hover:bg-edge transition-colors"
             >
               <HomeIcon />
               {returnUrl === '/coffee-trivia' ? 'ダッシュボードへ' : '戻る'}

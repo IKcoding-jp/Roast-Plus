@@ -52,27 +52,27 @@ const CATEGORY_CONFIG: Record<QuizCategory, {
 }> = {
   basics: {
     icon: CoffeeIcon,
-    bg: 'bg-white',
-    hoverBg: 'hover:bg-[#211714]/5',
-    iconBg: 'bg-[#211714]/5',
+    bg: 'bg-surface',
+    hoverBg: 'hover:bg-edge-subtle',
+    iconBg: 'bg-edge-subtle',
   },
   roasting: {
     icon: BeanIcon,
-    bg: 'bg-white',
-    hoverBg: 'hover:bg-[#EF8A00]/10',
-    iconBg: 'bg-[#EF8A00]/10',
+    bg: 'bg-surface',
+    hoverBg: 'hover:bg-spot-subtle',
+    iconBg: 'bg-spot-subtle',
   },
   brewing: {
     icon: DropletIcon,
-    bg: 'bg-white',
-    hoverBg: 'hover:bg-sky-50',
-    iconBg: 'bg-sky-50',
+    bg: 'bg-surface',
+    hoverBg: 'hover:bg-sky-500/10',
+    iconBg: 'bg-sky-500/10',
   },
   history: {
     icon: BookIcon,
-    bg: 'bg-white',
-    hoverBg: 'hover:bg-[#211714]/5',
-    iconBg: 'bg-[#211714]/5',
+    bg: 'bg-surface',
+    hoverBg: 'hover:bg-edge-subtle',
+    iconBg: 'bg-edge-subtle',
   },
 };
 
@@ -100,25 +100,25 @@ export function CategorySelector({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
             onClick={() => handleCategoryClick(category)}
-            className={`relative rounded-xl p-3.5 transition-all text-left ${config.bg} ${config.hoverBg} border border-[#211714]/5 group`}
+            className={`relative rounded-xl p-3.5 transition-all text-left ${config.bg} ${config.hoverBg} border border-edge group`}
           >
             <div className="flex items-start gap-2.5">
               {/* アイコン */}
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${config.iconBg}`}>
-                <span className="text-[#3A2F2B]">
+                <span className="text-ink-sub">
                   <Icon />
                 </span>
               </div>
 
               <div className="flex-1 min-w-0">
                 {/* カテゴリ名 */}
-                <span className="font-medium text-sm block text-[#211714]">
+                <span className="font-medium text-sm block text-ink">
                   {CATEGORY_LABELS[category]}
                 </span>
 
                 {/* 正解済み問題数 / 全問題数 */}
                 {categoryStats && (
-                  <span className="text-[11px] text-[#3A2F2B]/60 mt-1 block">
+                  <span className="text-[11px] text-ink-sub/60 mt-1 block">
                     {categoryStats.answeredCorrectlyCount}/{categoryStats.total}問
                   </span>
                 )}
@@ -126,7 +126,7 @@ export function CategorySelector({
             </div>
 
             {/* 矢印インジケーター */}
-            <div className="absolute top-1/2 right-2.5 -translate-y-1/2 text-[#3A2F2B]/30 group-hover:text-[#3A2F2B]/60 transition-colors">
+            <div className="absolute top-1/2 right-2.5 -translate-y-1/2 text-ink-sub/30 group-hover:text-ink-sub/60 transition-colors">
               <ChevronRightIcon />
             </div>
           </motion.button>

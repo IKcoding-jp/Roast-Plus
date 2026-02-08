@@ -55,15 +55,15 @@ export default function StatsPage() {
   const stats = progress?.stats;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F7F5]">
-      <header className="flex-none px-4 py-3 flex items-center bg-white border-b border-[#211714]/5">
+    <div className="min-h-screen flex flex-col bg-page">
+      <header className="flex-none px-4 py-3 flex items-center bg-surface border-b border-edge">
         <Link
           href="/coffee-trivia"
-          className="p-2 -ml-2 text-[#3A2F2B] hover:text-[#EF8A00] hover:bg-gray-50 rounded-full transition-colors"
+          className="p-2 -ml-2 text-ink-sub hover:text-spot hover:bg-ground rounded-full transition-colors"
         >
           <ArrowLeftIcon />
         </Link>
-        <h1 className="ml-3 text-lg font-bold text-[#211714] flex items-center gap-2">
+        <h1 className="ml-3 text-lg font-bold text-ink flex items-center gap-2">
           <ChartBarIcon />
           統計
         </h1>

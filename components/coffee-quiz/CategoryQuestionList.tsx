@@ -137,10 +137,10 @@ export function CategoryQuestionList({
       {/* ヘッダー */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-[#211714]">
+          <h2 className="text-lg font-bold text-ink">
             {CATEGORY_LABELS[category]}
           </h2>
-          <p className="text-sm text-[#3A2F2B]/60">
+          <p className="text-sm text-ink-muted">
             全{questions.length}問
           </p>
         </div>
@@ -153,7 +153,7 @@ export function CategoryQuestionList({
           onClick={handleShuffle10}
           className="
             flex items-center justify-center gap-2
-            bg-[#EF8A00] hover:bg-[#EF8A00]/90
+            bg-spot hover:bg-spot/90
             text-white
             rounded-xl
             py-3 px-4
@@ -170,9 +170,9 @@ export function CategoryQuestionList({
           onClick={handleAllQuestions}
           className="
             flex items-center justify-center gap-2
-            bg-[#211714]/5 hover:bg-[#211714]/10
-            border border-[#211714]/10
-            text-[#211714]
+            bg-edge-subtle hover:bg-edge
+            border border-edge
+            text-ink
             rounded-xl
             py-3 px-4
             transition-colors
@@ -185,7 +185,7 @@ export function CategoryQuestionList({
 
       {/* ソートオプション */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-[#3A2F2B]/60">並び替え:</span>
+        <span className="text-xs text-ink-muted">並び替え:</span>
         <div className="flex gap-1">
           {[
             { value: 'default', label: '順番' },
@@ -198,8 +198,8 @@ export function CategoryQuestionList({
               className={`
                 text-xs px-2 py-1 rounded-md transition-colors
                 ${sortBy === option.value
-                  ? 'bg-[#EF8A00]/20 text-[#EF8A00]'
-                  : 'bg-[#211714]/5 text-[#3A2F2B]/60 hover:text-[#3A2F2B]'
+                  ? 'bg-spot/20 text-spot'
+                  : 'bg-edge-subtle text-ink-muted hover:text-ink-sub'
                 }
               `}
             >

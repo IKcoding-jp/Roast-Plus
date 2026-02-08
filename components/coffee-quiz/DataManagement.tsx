@@ -108,18 +108,18 @@ export function DataManagement({ onImportSuccess }: DataManagementProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-[#211714]/5 p-4">
-      <h3 className="text-sm font-semibold text-[#211714] mb-3">
+    <div className="bg-surface rounded-xl border border-edge p-4">
+      <h3 className="text-sm font-semibold text-ink mb-3">
         データ管理
       </h3>
-      <p className="text-xs text-[#3A2F2B]/60 mb-4">
+      <p className="text-xs text-ink-muted mb-4">
         データのバックアップや他の端末への移行ができます
       </p>
 
       <div className="flex gap-3">
         <button
           onClick={handleExport}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-[#211714]/10"
+          className="flex-1 flex items-center justify-center gap-2 bg-edge-subtle hover:bg-edge text-ink-sub py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-edge"
         >
           <DownloadIcon />
           エクスポート
@@ -127,7 +127,7 @@ export function DataManagement({ onImportSuccess }: DataManagementProps) {
 
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#211714]/5 hover:bg-[#211714]/10 text-[#3A2F2B] py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-[#211714]/10"
+          className="flex-1 flex items-center justify-center gap-2 bg-edge-subtle hover:bg-edge text-ink-sub py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-edge"
         >
           <UploadIcon />
           インポート
@@ -151,8 +151,8 @@ export function DataManagement({ onImportSuccess }: DataManagementProps) {
             exit={{ opacity: 0, y: -10 }}
             className={`mt-3 flex items-center gap-2 text-sm py-2 px-3 rounded-lg ${
               message.type === 'success'
-                ? 'bg-emerald-50 text-emerald-700'
-                : 'bg-rose-50 text-rose-700'
+                ? 'bg-emerald-500/10 text-emerald-700'
+                : 'bg-rose-500/10 text-rose-700'
             }`}
           >
             {message.type === 'success' ? <CheckIcon /> : <AlertIcon />}

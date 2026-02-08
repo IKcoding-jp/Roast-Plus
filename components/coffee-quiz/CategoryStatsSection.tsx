@@ -23,10 +23,10 @@ export function CategoryStatsSection({ stats, questionsStats, categoryMasterySta
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="bg-white rounded-2xl shadow-lg p-5 border border-[#211714]/5"
+      className="bg-surface rounded-2xl shadow-lg p-5 border border-edge"
     >
-      <h2 className="font-bold text-[#211714] mb-4 flex items-center gap-2">
-        <span className="text-[#EF8A00]">
+      <h2 className="font-bold text-ink mb-4 flex items-center gap-2">
+        <span className="text-spot">
           <BookOpenIcon />
         </span>
         カテゴリ別
@@ -42,22 +42,22 @@ export function CategoryStatsSection({ stats, questionsStats, categoryMasterySta
           const progressPercent = totalQuestions > 0 ? Math.round((answeredCorrectlyCount / totalQuestions) * 100) : 0;
 
           return (
-            <div key={category} className="bg-gray-50 rounded-xl p-4 border border-[#211714]/5">
+            <div key={category} className="bg-ground rounded-xl p-4 border border-edge">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-[#211714]">
+                <span className="font-medium text-ink">
                   {CATEGORY_LABELS[category]}
                 </span>
-                <span className="text-[#EF8A00] font-bold">{progressPercent}%</span>
+                <span className="text-spot font-bold">{progressPercent}%</span>
               </div>
-              <div className="h-2 bg-[#211714]/10 rounded-full overflow-hidden">
+              <div className="h-2 bg-edge rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#EF8A00] to-[#D67A00] rounded-full"
+                  className="h-full bg-gradient-to-r from-spot to-spot-hover rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
                   transition={{ delay: 0.2, duration: 0.5 }}
                 />
               </div>
-              <div className="flex items-center justify-between mt-2 text-xs text-[#3A2F2B]/60">
+              <div className="flex items-center justify-between mt-2 text-xs text-ink-muted">
                 <span>
                   正解済み: {answeredCorrectlyCount}/{totalQuestions}問
                 </span>

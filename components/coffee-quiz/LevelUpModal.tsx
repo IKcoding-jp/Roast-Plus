@@ -29,7 +29,7 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
     <Modal show={show} onClose={onClose}>
       <>
         {/* ヘッダー - ローストプラスカラー */}
-            <div className="bg-gradient-to-r from-[#EF8A00] via-[#D67A00] to-[#EF8A00] px-6 py-8 text-center relative">
+            <div className="bg-gradient-to-r from-spot via-spot-hover to-spot px-6 py-8 text-center relative">
               <button
                 onClick={onClose}
                 className="absolute top-3 right-3 text-white/70 hover:text-white transition-colors"
@@ -68,9 +68,9 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#FDF8F0] border-2 border-[#EF8A00]/20 mb-4"
+                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-spot-subtle border-2 border-spot/20 mb-4"
               >
-                <span className="text-4xl font-bold text-[#EF8A00]">
+                <span className="text-4xl font-bold text-spot">
                   {newLevel}
                 </span>
               </motion.div>
@@ -79,7 +79,7 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-[#3A2F2B] mb-6"
+                className="text-ink-sub mb-6"
               >
                 おめでとうございます
                 <br />
@@ -91,7 +91,7 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 onClick={onClose}
-                className="w-full bg-[#EF8A00] hover:bg-[#D67A00] text-white py-3 px-6 rounded-xl font-semibold transition-colors"
+                className="w-full bg-spot hover:bg-spot-hover text-white py-3 px-6 rounded-xl font-semibold transition-colors"
               >
                 続ける
               </motion.button>

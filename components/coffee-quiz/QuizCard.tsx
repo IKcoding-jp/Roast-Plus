@@ -84,10 +84,10 @@ export function QuizCard({
       animate={{ opacity: 1, x: 0, rotateY: 0 }}
       exit={{ opacity: 0, x: -50, rotateY: 5 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#211714]/5"
+      className="bg-surface rounded-2xl shadow-lg overflow-hidden border border-edge"
     >
       {/* ヘッダー - ローストプラスブランドカラー */}
-      <div className="relative bg-gradient-to-r from-[#211714] via-[#3A2F2B] to-[#211714] px-5 py-4">
+      <div className="relative bg-gradient-to-r from-card-header-from via-card-header-via to-card-header-to px-5 py-4">
         <div className="relative z-10">
           <QuizProgress current={currentIndex + 1} total={totalQuestions} />
           <div className="flex items-center justify-between mt-3">
@@ -110,7 +110,7 @@ export function QuizCard({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-base font-bold text-[#211714] leading-relaxed mb-5"
+          className="text-base font-bold text-ink leading-relaxed mb-5"
         >
           {question.question}
         </motion.h2>
@@ -160,15 +160,15 @@ export function QuizCard({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="mt-5 p-4 bg-[#FDF8F0] rounded-xl border border-[#EF8A00]/20"
+              className="mt-5 p-4 bg-spot-subtle rounded-xl border border-spot/20"
             >
-              <h3 className="font-bold text-[#211714] mb-2 flex items-center gap-2 text-sm">
-                <span className="w-7 h-7 rounded-lg bg-[#EF8A00]/10 flex items-center justify-center text-[#EF8A00]">
+              <h3 className="font-bold text-ink mb-2 flex items-center gap-2 text-sm">
+                <span className="w-7 h-7 rounded-lg bg-spot/10 flex items-center justify-center text-spot">
                   <LightbulbIcon />
                 </span>
                 解説
               </h3>
-              <p className="text-[#3A2F2B] text-sm leading-relaxed pl-9">
+              <p className="text-ink-sub text-sm leading-relaxed pl-9">
                 {question.explanation}
               </p>
             </motion.div>

@@ -3,7 +3,7 @@
 import { HiPlus, HiSearch, HiPencil, HiTrash, HiArchive } from 'react-icons/hi';
 import { HiOutlineCollection } from 'react-icons/hi';
 import { MdTimeline } from 'react-icons/md';
-import { Button } from '@/components/ui';
+import { Button, IconButton } from '@/components/ui';
 import { WorkProgressCard } from '@/components/work-progress/WorkProgressCard';
 import type { WorkProgress, WorkProgressStatus } from '@/types';
 import {
@@ -70,11 +70,11 @@ export function NormalView({
       {/* エンプティステート */}
       {showEmptyState && (
         <div className="flex flex-col items-center justify-center py-12 sm:py-20 text-center">
-          <div className="bg-white p-6 rounded-full shadow-lg mb-6">
-            <MdTimeline className="h-16 w-16 text-amber-500" />
+          <div className="bg-surface p-6 rounded-full shadow-lg mb-6 border border-edge">
+            <MdTimeline className="h-16 w-16 text-spot" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">作業進捗を管理しましょう</h2>
-          <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          <h2 className="text-xl sm:text-2xl font-bold text-ink mb-2">作業進捗を管理しましょう</h2>
+          <p className="text-ink-sub mb-8 max-w-md mx-auto">
             日々の作業の進捗状況を記録・可視化できます。<br />
             まずは新しい作業を追加してみましょう。
           </p>
@@ -101,7 +101,7 @@ export function NormalView({
           {archivedCount > 0 && (
             <button
               onClick={onShowArchived}
-              className="mt-8 text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
+              className="mt-8 text-ink-muted hover:text-ink-sub text-sm flex items-center gap-1 transition-colors"
             >
               <HiArchive className="h-4 w-4" />
               アーカイブ済みの作業を見る
@@ -113,13 +113,13 @@ export function NormalView({
       {/* フィルタ適用時のエンプティステート */}
       {isEmpty && hasFilters && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="text-gray-400 mb-4">
+          <div className="text-ink-muted mb-4">
             <HiSearch className="h-12 w-12 mx-auto" />
           </div>
-          <p className="text-gray-600 font-medium">条件に一致する作業が見つかりませんでした</p>
+          <p className="text-ink-sub font-medium">条件に一致する作業が見つかりませんでした</p>
           <button
             onClick={onClearFilters}
-            className="mt-4 text-amber-600 hover:text-amber-700 font-medium"
+            className="mt-4 text-spot hover:text-spot-hover font-medium transition-colors"
           >
             フィルタを解除
           </button>
@@ -129,30 +129,34 @@ export function NormalView({
       {/* グループ化された作業 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {groupedWorkProgresses.groups.map((group) => (
-          <div key={group.groupName} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+          <div key={group.groupName} className="bg-surface rounded-xl shadow-card border border-edge overflow-hidden">
+            <div className="bg-ground px-4 py-3 border-b border-edge flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <HiOutlineCollection className="text-gray-400 h-5 w-5" />
-                <h2 className="font-bold text-gray-800 text-lg">{group.groupName}</h2>
-                <span className="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">
+                <HiOutlineCollection className="text-ink-muted h-5 w-5" />
+                <h2 className="font-bold text-ink text-lg">{group.groupName}</h2>
+                <span className="text-xs font-medium bg-ground text-ink-sub px-2 py-0.5 rounded-full border border-edge">
                   {group.workProgresses.length}件
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <button
+                <IconButton
+                  variant="default"
+                  size="md"
                   onClick={() => onEditGroupName(group.groupName)}
-                  className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-full transition-colors"
                   title="グループ名を編集"
+                  rounded
                 >
                   <HiPencil className="h-4 w-4" />
-                </button>
-                <button
+                </IconButton>
+                <IconButton
+                  variant="danger"
+                  size="md"
                   onClick={() => onDeleteGroup(group.groupName)}
-                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                   title="グループを削除"
+                  rounded
                 >
                   <HiTrash className="h-4 w-4" />
-                </button>
+                </IconButton>
               </div>
             </div>
 
@@ -183,7 +187,7 @@ export function NormalView({
             <div className="px-4 pb-4">
               <button
                 onClick={() => onAddToGroup(group.groupName)}
-                className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50 transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                className="w-full py-2 border-2 border-dashed border-edge rounded-lg text-ink-muted hover:text-spot hover:border-spot-subtle hover:bg-spot-surface transition-all flex items-center justify-center gap-2 text-sm font-medium"
               >
                 <HiPlus className="h-4 w-4" />
                 作業を追加
@@ -197,7 +201,7 @@ export function NormalView({
       {groupedWorkProgresses.ungrouped.length > 0 && (
         <div className="mb-8">
           {groupedWorkProgresses.groups.length > 0 && (
-            <h2 className="text-lg font-bold text-gray-700 mb-4 px-2 border-l-4 border-gray-400">その他の作業</h2>
+            <h2 className="text-lg font-bold text-ink-sub mb-4 px-2 border-l-4 border-ink-muted">その他の作業</h2>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {groupedWorkProgresses.ungrouped.map((wp) => (

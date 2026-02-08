@@ -121,7 +121,7 @@ export default function ProgressPage() {
   if (!user) return <LoginPage />;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-page p-4 sm:p-6 lg:p-8 transition-colors duration-1000">
       <ProgressHeader
         viewMode={viewMode}
         showEmptyState={showEmptyState}

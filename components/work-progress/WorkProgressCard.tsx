@@ -44,14 +44,14 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
 
     if (isDummyWork) {
         return (
-            <div className="text-center py-6 px-4 bg-gray-50/50 border-2 border-dashed border-gray-300 rounded-lg">
-                <p className="text-sm text-gray-600 mb-3">新しく作業を追加してください</p>
+            <div className="text-center py-6 px-4 bg-ground/50 border-2 border-dashed border-edge-strong rounded-lg">
+                <p className="text-sm text-ink-sub mb-3">新しく作業を追加してください</p>
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        onEdit(wp.id); // This will trigger the add flow in the parent
+                        onEdit(wp.id);
                     }}
-                    className="w-full px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
+                    className="w-full px-3 py-1.5 text-xs font-medium text-spot bg-spot-subtle border border-spot rounded-lg hover:bg-spot-surface transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
                 >
                     <HiPlus className="h-3.5 w-3.5" />
                     <span>作業を追加</span>
@@ -63,9 +63,9 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
     return (
         <div
             className={`${isInGroup
-                    ? 'border border-gray-200 rounded-lg p-3 space-y-2.5 bg-white shadow-sm'
-                    : 'bg-white rounded-lg shadow-md border border-gray-100 p-4 sm:p-5 md:p-6 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'
-                } hover:shadow-lg hover:border-gray-300 transition-all cursor-pointer`}
+                    ? 'border border-edge rounded-lg p-3 space-y-2.5 bg-surface shadow-sm'
+                    : 'bg-surface rounded-lg shadow-card border border-edge p-4 sm:p-5 md:p-6 break-inside-avoid mb-4 sm:mb-6 w-full inline-block'
+                } hover:shadow-card-hover hover:border-edge-strong transition-all cursor-pointer`}
             onClick={() => onEdit(wp.id)}
         >
             {/* Header: Task Name & Status */}
@@ -73,7 +73,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                         {wp.taskName && (
-                            <h3 className="text-base font-bold text-gray-800 leading-tight">{wp.taskName}</h3>
+                            <h3 className="text-base font-bold text-ink leading-tight">{wp.taskName}</h3>
                         )}
                         <select
                             value={wp.status}
@@ -82,11 +82,11 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                 onStatusChange(wp.id, e.target.value as WorkProgressStatus);
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className={`px-2 py-1 text-xs font-medium rounded border focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[32px] cursor-pointer ${wp.status === 'completed'
-                                    ? 'bg-green-50 text-green-700 border-green-300'
+                            className={`px-2 py-1 text-xs font-medium rounded border focus:outline-none focus:ring-2 focus:ring-spot min-h-[32px] cursor-pointer ${wp.status === 'completed'
+                                    ? 'bg-success/10 text-success border-success/30'
                                     : wp.status === 'in_progress'
-                                        ? 'bg-amber-50 text-amber-700 border-amber-300'
-                                        : 'bg-gray-50 text-gray-700 border-gray-300'
+                                        ? 'bg-spot-subtle text-spot border-spot'
+                                        : 'bg-ground text-ink-sub border-edge'
                                 }`}
                         >
                             <option value="pending">前</option>
@@ -94,7 +94,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                             <option value="completed">済</option>
                         </select>
                     </div>
-                    {!isInGroup && wp.weight && <p className="text-xs text-gray-500 mt-1">目標: {wp.weight}</p>}
+                    {!isInGroup && wp.weight && <p className="text-xs text-ink-muted mt-1">目標: {wp.weight}</p>}
                 </div>
 
                 {/* Archive Button */}
@@ -104,7 +104,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                             e.stopPropagation();
                             onArchive(wp.id);
                         }}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 text-ink-muted hover:text-ink-sub hover:bg-ground rounded-full transition-colors"
                         title="アーカイブ"
                     >
                         <HiArchive className="h-5 w-5" />
@@ -117,23 +117,23 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                 <div className="space-y-3">
                     <div className="flex items-end justify-between gap-2">
                         <div>
-                            <div className="text-xs text-gray-500 mb-0.5">
+                            <div className="text-xs text-ink-muted mb-0.5">
                                 {(() => {
                                     const remaining = calculateRemaining(wp);
                                     if (remaining === null) return null;
                                     if (remaining <= 0) {
                                         const over = Math.abs(remaining);
                                         return over > 0 ? (
-                                            <span className="text-green-600 font-medium">目標達成 (+{formatAmount(over, unit)}{unit})</span>
+                                            <span className="text-success font-medium">目標達成 (+{formatAmount(over, unit)}{unit})</span>
                                         ) : null;
                                     }
-                                    return <span>残り <span className="font-medium text-gray-700">{formatAmount(remaining, unit)}{unit}</span></span>;
+                                    return <span>残り <span className="font-medium text-ink-sub">{formatAmount(remaining, unit)}{unit}</span></span>;
                                 })()}
                             </div>
-                            <div className="text-xl font-bold text-gray-900 leading-none flex items-baseline gap-1">
-                                <span className="text-xs font-normal text-gray-500">完成数</span>
+                            <div className="text-xl font-bold text-ink leading-none flex items-baseline gap-1">
+                                <span className="text-xs font-normal text-ink-muted">完成数</span>
                                 {formatAmount(wp.currentAmount || 0, unit)}
-                                <span className="text-sm font-normal text-gray-500 ml-1">/ {formatAmount(wp.targetAmount, unit)}{unit}</span>
+                                <span className="text-sm font-normal text-ink-muted ml-1">/ {formatAmount(wp.targetAmount, unit)}{unit}</span>
                             </div>
                         </div>
                         <button
@@ -141,7 +141,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                 e.stopPropagation();
                                 onAddProgress(wp.id);
                             }}
-                            className="px-3 py-1.5 text-xs font-bold text-white bg-primary rounded-lg hover:bg-primary-dark active:bg-primary-dark transition-colors flex items-center gap-1 shadow-sm"
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-btn-primary rounded-lg hover:bg-btn-primary-hover active:bg-btn-primary-hover transition-colors flex items-center gap-1 shadow-sm"
                         >
                             <HiPlus className="h-4 w-4" />
                             記録
@@ -149,13 +149,13 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="relative w-full bg-gray-100 rounded-full h-4 overflow-hidden shadow-inner">
+                    <div className="relative w-full bg-ground rounded-full h-4 overflow-hidden shadow-inner">
                         <div
                             className={`h-full rounded-full transition-all duration-500 ease-out ${getProgressBarColor(percentage)}`}
                             style={{ width: `${percentage}%` }}
                         />
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <span className={`text-[10px] font-bold ${percentage >= 55 ? 'text-white' : 'text-gray-600'}`}>
+                            <span className={`text-[10px] font-bold ${percentage >= 55 ? 'text-white' : 'text-ink-sub'}`}>
                                 {percentage.toFixed(0)}%
                             </span>
                         </div>
@@ -166,9 +166,9 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="text-xs text-gray-500 block mb-0.5">完成数</span>
-                            <span className="text-xl font-bold text-gray-900">
-                                {wp.completedCount || 0}<span className="text-sm font-normal text-gray-500 ml-1">個</span>
+                            <span className="text-xs text-ink-muted block mb-0.5">完成数</span>
+                            <span className="text-xl font-bold text-ink">
+                                {wp.completedCount || 0}<span className="text-sm font-normal text-ink-muted ml-1">個</span>
                             </span>
                         </div>
                         <button
@@ -176,7 +176,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                 e.stopPropagation();
                                 onAddProgress(wp.id);
                             }}
-                            className="px-3 py-1.5 text-xs font-bold text-white bg-primary rounded-lg hover:bg-primary-dark active:bg-primary-dark transition-colors flex items-center gap-1 shadow-sm"
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-btn-primary rounded-lg hover:bg-btn-primary-hover active:bg-btn-primary-hover transition-colors flex items-center gap-1 shadow-sm"
                         >
                             <HiPlus className="h-4 w-4" />
                             記録
@@ -187,7 +187,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
 
             {/* Dates */}
             {isInGroup && (wp.startedAt || wp.completedAt) && (
-                <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-gray-400">
+                <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-ink-muted">
                     {wp.startedAt && <span>開始: {formatDateTime(wp.startedAt)}</span>}
                     {wp.completedAt && <span>完了: {formatDateTime(wp.completedAt)}</span>}
                 </div>
@@ -195,20 +195,20 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
 
             {/* Memo */}
             {wp.memo && (
-                <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border border-gray-100 whitespace-pre-wrap line-clamp-2">
+                <div className="mt-2 text-xs text-ink-sub bg-ground p-2 rounded border border-edge whitespace-pre-wrap line-clamp-2">
                     {wp.memo}
                 </div>
             )}
 
             {/* History Toggle */}
             {hasProgressHistory && (
-                <div className="mt-3 pt-2 border-t border-gray-100">
+                <div className="mt-3 pt-2 border-t border-edge">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleHistory(wp.id);
                         }}
-                        className="w-full flex items-center justify-between text-xs text-gray-500 hover:text-gray-700 py-1"
+                        className="w-full flex items-center justify-between text-xs text-ink-muted hover:text-ink-sub py-1 transition-colors"
                     >
                         <span>履歴 ({wp.progressHistory!.length})</span>
                         {isHistoryExpanded ? <HiChevronUp className="h-3 w-3" /> : <HiChevronDown className="h-3 w-3" />}
@@ -227,15 +227,15 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                                 onEditHistory(wp.id, entry.id);
                                             }
                                         }}
-                                        className="text-xs flex justify-between items-start bg-gray-50 p-1.5 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                                        className="text-xs flex justify-between items-start bg-ground p-1.5 rounded cursor-pointer hover:bg-edge transition-colors"
                                     >
                                         <div>
-                                            <span className="font-medium text-gray-700">
+                                            <span className="font-medium text-ink-sub">
                                                 {entry.amount >= 0 ? '+' : '-'}{formatAmount(Math.abs(entry.amount), unit)}{unit}
                                             </span>
-                                            {entry.memo && <p className="text-gray-500 mt-0.5">{entry.memo}</p>}
+                                            {entry.memo && <p className="text-ink-muted mt-0.5">{entry.memo}</p>}
                                         </div>
-                                        <span className="text-[10px] text-gray-400">{formatDateTime(entry.date)}</span>
+                                        <span className="text-[10px] text-ink-muted">{formatDateTime(entry.date)}</span>
                                     </div>
                                 ))}
                         </div>

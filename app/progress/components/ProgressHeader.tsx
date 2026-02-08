@@ -1,9 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { HiArrowLeft, HiPlus, HiFilter, HiArchive } from 'react-icons/hi';
+import { HiPlus, HiFilter, HiArchive } from 'react-icons/hi';
 import { MdTimeline } from 'react-icons/md';
-import { Button } from '@/components/ui';
+import { Button, BackLink } from '@/components/ui';
 
 interface ProgressHeaderProps {
   viewMode: 'normal' | 'archived';
@@ -29,27 +28,20 @@ export function ProgressHeader({
       <div className="grid grid-cols-2 sm:grid-cols-3 items-center mb-4">
         {/* 左側: 戻る */}
         <div className="flex justify-start">
-          <Link
-            href="/"
-            className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-            title="戻る"
-            aria-label="戻る"
-          >
-            <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-          </Link>
+          <BackLink href="/" variant="icon-only" />
         </div>
 
         {/* 中央: タイトル */}
         <div className="hidden sm:flex justify-center items-center gap-2 sm:gap-4 min-w-0">
           {viewMode === 'archived' ? (
             <>
-              <HiArchive className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
-              <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">アーカイブ済み作業</h1>
+              <HiArchive className="h-8 w-8 sm:h-10 sm:w-10 text-spot flex-shrink-0" />
+              <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-ink whitespace-nowrap">アーカイブ済み作業</h1>
             </>
           ) : (
             <>
-              <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
-              <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">作業進捗</h1>
+              <MdTimeline className="h-8 w-8 sm:h-10 sm:w-10 text-spot flex-shrink-0" />
+              <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-ink whitespace-nowrap">作業進捗</h1>
             </>
           )}
         </div>
@@ -59,10 +51,9 @@ export function ProgressHeader({
           {viewMode === 'normal' && !showEmptyState && (
             <>
               <Button
-                variant="outline"
+                variant="surface"
                 size="sm"
                 onClick={onShowFilter}
-                className="shadow-md !bg-white !text-gray-700 hover:!bg-gray-50"
                 aria-label="フィルタと並び替え"
                 title="フィルタと並び替え"
               >
@@ -71,10 +62,9 @@ export function ProgressHeader({
               </Button>
               {hasArchivedItems && (
                 <Button
-                  variant="outline"
+                  variant="surface"
                   size="sm"
                   onClick={onShowArchived}
-                  className="shadow-md !bg-white !text-gray-700 hover:!bg-gray-50"
                   aria-label="アーカイブ一覧"
                   title="アーカイブ一覧"
                 >
@@ -94,10 +84,9 @@ export function ProgressHeader({
           )}
           {viewMode === 'archived' && (
             <Button
-              variant="secondary"
+              variant="surface"
               size="sm"
               onClick={onBackToNormal}
-              className="shadow-sm !bg-white !text-gray-700 !border !border-gray-300 hover:!bg-gray-50"
             >
               <MdTimeline className="h-4 w-4" />
               <span className="hidden sm:inline ml-2">一覧に戻る</span>
@@ -110,13 +99,13 @@ export function ProgressHeader({
       <div className="sm:hidden flex justify-center items-center gap-2 mb-4">
         {viewMode === 'archived' ? (
           <>
-            <HiArchive className="h-6 w-6 text-amber-600 flex-shrink-0" />
-            <h1 className="text-lg font-bold text-gray-800">アーカイブ済み作業</h1>
+            <HiArchive className="h-6 w-6 text-spot flex-shrink-0" />
+            <h1 className="text-lg font-bold text-ink">アーカイブ済み作業</h1>
           </>
         ) : (
           <>
-            <MdTimeline className="h-6 w-6 text-amber-600 flex-shrink-0" />
-            <h1 className="text-lg font-bold text-gray-800">作業進捗</h1>
+            <MdTimeline className="h-6 w-6 text-spot flex-shrink-0" />
+            <h1 className="text-lg font-bold text-ink">作業進捗</h1>
           </>
         )}
       </div>

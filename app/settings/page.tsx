@@ -9,12 +9,11 @@ import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
 import { useToastContext } from '@/components/Toast';
-import { ToggleSwitch } from '@/components/settings/ToggleSwitch';
 import { PasswordModal } from '@/components/settings/PasswordModal';
 import { HiArrowLeft, HiDocumentText, HiShieldCheck, HiLogout, HiMail, HiColorSwatch } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
-import { Button } from '@/components/ui';
+import { Button, Switch } from '@/components/ui';
 import { VERSION_HISTORY } from '@/data/dev-stories/version-history';
 import { getUserData } from '@/lib/firestore';
 import { formatConsentDate } from '@/lib/consent';
@@ -89,21 +88,21 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+        <div className="min-h-screen bg-page py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 transition-colors">
             <div className="max-w-4xl mx-auto">
                 <header className="mb-6 sm:mb-8">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex justify-start w-full sm:w-auto sm:flex-1">
                             <Link
                                 href="/"
-                                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+                                className="px-3 py-2 text-ink-sub hover:text-ink hover:bg-ground rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
                                 title="戻る"
                                 aria-label="戻る"
                             >
                                 <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
                             </Link>
                         </div>
-                        <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
+                        <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-ink sm:flex-1 text-center">
                             その他
                         </h1>
                         <div className="hidden sm:block flex-1 flex-shrink-0"></div>
@@ -112,40 +111,42 @@ export default function SettingsPage() {
 
                 <main className="space-y-6">
                     {/* クリスマスモードセクション */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
+                    <div className="bg-surface rounded-lg shadow-sm border border-edge p-6">
                         <div className="flex items-center justify-between">
                             <div className="flex-1">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                                    <span className="text-red-600">🎄</span> クリスマスモード
+                                <h2 className="text-xl font-semibold text-ink mb-2 flex items-center gap-2">
+                                    <span>🎄</span> クリスマスモード
                                 </h2>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-ink-sub">
                                     ホーム画面をクリスマス仕様に変更します
                                 </p>
                             </div>
                             <div className="ml-4">
-                                <ToggleSwitch
+                                <Switch
+                                    size="lg"
                                     checked={isChristmasMode}
-                                    onChange={setChristmasMode}
+                                    onChange={(e) => setChristmasMode(e.target.checked)}
                                 />
                             </div>
                         </div>
                     </div>
 
                     {/* 開発者モードセクション */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
+                    <div className="bg-surface rounded-lg shadow-sm border border-edge p-6">
                         <div className="flex items-center justify-between">
                             <div className="flex-1">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                                <h2 className="text-xl font-semibold text-ink mb-2">
                                     開発者モード
                                 </h2>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-ink-sub">
                                     開発者向けの機能を有効化します
                                 </p>
                             </div>
                             <div className="ml-4">
-                                <ToggleSwitch
+                                <Switch
+                                    size="lg"
                                     checked={isEnabled}
-                                    onChange={handleToggleChange}
+                                    onChange={(e) => handleToggleChange(e.target.checked)}
                                 />
                             </div>
                         </div>
@@ -155,47 +156,47 @@ export default function SettingsPage() {
                     {isEnabled && (
                         <Link
                             href="/dev/design-lab"
-                            className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                            className="block bg-surface rounded-lg shadow-sm border border-edge p-6 hover:shadow-card-hover hover:border-edge-strong transition-all"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                    <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                                        <HiColorSwatch className="h-5 w-5 text-amber-500" />
+                                    <h2 className="text-xl font-semibold text-ink mb-2 flex items-center gap-2">
+                                        <HiColorSwatch className="h-5 w-5 text-spot" />
                                         Developer Design Lab
                                     </h2>
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-ink-sub">
                                         UIカタログ、アニメーション、カラーパレット
                                     </p>
                                 </div>
-                                <span className="text-gray-400 text-xl">&gt;</span>
+                                <span className="text-ink-muted text-xl">&gt;</span>
                             </div>
                         </Link>
                     )}
 
                     {/* アプリバージョンセクション */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                    <div className="bg-surface rounded-lg shadow-sm border border-edge p-6">
+                        <h2 className="text-xl font-semibold text-ink mb-4">
                             アプリバージョン
                         </h2>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">現在のバージョン</p>
-                                    <p className="text-lg font-medium text-gray-800">
+                                    <p className="text-sm text-ink-sub mb-1">現在のバージョン</p>
+                                    <p className="text-lg font-medium text-ink">
                                         {version || '読み込み中...'}
                                     </p>
                                 </div>
                                 {isUpdateAvailable && (
                                     <div className="ml-4">
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-spot/10 text-spot">
                                             更新あり
                                         </span>
                                     </div>
                                 )}
                             </div>
                             {isUpdateAvailable && (
-                                <div className="pt-4 border-t border-gray-200">
-                                    <p className="text-sm text-gray-600 mb-3">
+                                <div className="pt-4 border-t border-edge">
+                                    <p className="text-sm text-ink-sub mb-3">
                                         新しいバージョンが利用可能です。更新を適用してください。
                                     </p>
                                     <Button variant="primary" size="md" onClick={applyUpdate}>
@@ -204,7 +205,7 @@ export default function SettingsPage() {
                                 </div>
                             )}
                             {!isUpdateAvailable && process.env.NODE_ENV === 'production' && (
-                                <div className="pt-4 border-t border-gray-200">
+                                <div className="pt-4 border-t border-edge">
                                     <Button
                                         variant="outline"
                                         size="md"
@@ -222,75 +223,75 @@ export default function SettingsPage() {
                     {/* 更新履歴セクション */}
                     <Link
                         href="/changelog"
-                        className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                        className="block bg-surface rounded-lg shadow-sm border border-edge p-6 hover:shadow-card-hover hover:border-edge-strong transition-all"
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex-1">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                                    <MdHistory className="h-5 w-5 text-amber-500" />
+                                <h2 className="text-xl font-semibold text-ink mb-2 flex items-center gap-2">
+                                    <MdHistory className="h-5 w-5 text-spot" />
                                     更新履歴
                                 </h2>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-ink-sub">
                                     アプリの更新内容を確認する
                                 </p>
-                                <p className="text-xs text-gray-400 mt-1">
+                                <p className="text-xs text-ink-muted mt-1">
                                     最新: v{VERSION_HISTORY[0]?.version} ({VERSION_HISTORY[0]?.date})
                                 </p>
                             </div>
-                            <span className="text-gray-400 text-xl">&gt;</span>
+                            <span className="text-ink-muted text-xl">&gt;</span>
                         </div>
                     </Link>
 
                     {/* 法的情報セクション */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <HiDocumentText className="h-5 w-5 text-gray-600" />
+                    <div className="bg-surface rounded-lg shadow-sm border border-edge p-6">
+                        <h2 className="text-xl font-semibold text-ink mb-4 flex items-center gap-2">
+                            <HiDocumentText className="h-5 w-5 text-ink-sub" />
                             法的情報
                         </h2>
                         <div className="space-y-4">
                             {/* 利用規約リンク */}
                             <Link
                                 href="/terms"
-                                className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                                className="flex items-center justify-between p-4 rounded-lg border border-edge hover:bg-ground transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <HiDocumentText className="h-5 w-5 text-orange-500" />
-                                    <span className="text-gray-800 font-medium">利用規約</span>
+                                    <HiDocumentText className="h-5 w-5 text-spot" />
+                                    <span className="text-ink font-medium">利用規約</span>
                                 </div>
-                                <span className="text-gray-400">&gt;</span>
+                                <span className="text-ink-muted">&gt;</span>
                             </Link>
 
                             {/* プライバシーポリシーリンク */}
                             <Link
                                 href="/privacy-policy"
-                                className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                                className="flex items-center justify-between p-4 rounded-lg border border-edge hover:bg-ground transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <HiShieldCheck className="h-5 w-5 text-orange-500" />
-                                    <span className="text-gray-800 font-medium">プライバシーポリシー</span>
+                                    <HiShieldCheck className="h-5 w-5 text-spot" />
+                                    <span className="text-ink font-medium">プライバシーポリシー</span>
                                 </div>
-                                <span className="text-gray-400">&gt;</span>
+                                <span className="text-ink-muted">&gt;</span>
                             </Link>
 
                             {/* お問い合わせリンク */}
                             <Link
                                 href="/contact"
-                                className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                                className="flex items-center justify-between p-4 rounded-lg border border-edge hover:bg-ground transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <HiMail className="h-5 w-5 text-orange-500" />
-                                    <span className="text-gray-800 font-medium">お問い合わせ</span>
+                                    <HiMail className="h-5 w-5 text-spot" />
+                                    <span className="text-ink font-medium">お問い合わせ</span>
                                 </div>
-                                <span className="text-gray-400">&gt;</span>
+                                <span className="text-ink-muted">&gt;</span>
                             </Link>
 
                             {/* 同意日時 */}
                             {userConsent && userConsent.hasAgreed && (
-                                <div className="pt-4 border-t border-gray-200">
-                                    <p className="text-sm text-gray-500">
+                                <div className="pt-4 border-t border-edge">
+                                    <p className="text-sm text-ink-muted">
                                         同意日: {formatConsentDate(userConsent.agreedAt)}
                                     </p>
-                                    <p className="text-xs text-gray-400 mt-1">
+                                    <p className="text-xs text-ink-muted mt-1">
                                         利用規約 v{userConsent.agreedTermsVersion} / プライバシーポリシー v{userConsent.agreedPrivacyVersion}
                                     </p>
                                 </div>
@@ -299,27 +300,26 @@ export default function SettingsPage() {
                     </div>
 
                     {/* アカウントセクション */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <HiLogout className="h-5 w-5 text-gray-600" />
+                    <div className="bg-surface rounded-lg shadow-sm border border-edge p-6">
+                        <h2 className="text-xl font-semibold text-ink mb-4 flex items-center gap-2">
+                            <HiLogout className="h-5 w-5 text-ink-sub" />
                             アカウント
                         </h2>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">ログイン中のアカウント</p>
-                                    <p className="text-sm font-medium text-gray-800">
+                                    <p className="text-sm text-ink-sub mb-1">ログイン中のアカウント</p>
+                                    <p className="text-sm font-medium text-ink">
                                         {user.email || 'メールアドレスなし'}
                                     </p>
                                 </div>
                             </div>
-                            <div className="pt-4 border-t border-gray-200">
+                            <div className="pt-4 border-t border-edge">
                                 <Button
                                     variant="danger"
                                     size="md"
                                     fullWidth
                                     onClick={handleLogout}
-                                    className="!bg-red-50 !text-red-600 hover:!bg-red-100"
                                 >
                                     <HiLogout className="h-5 w-5 mr-2" />
                                     ログアウト

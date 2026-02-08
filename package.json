@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "npm run generate:sound-list && next dev",
     "build": "npm run generate:sound-list && next build",
+    "build:dev": "npm run generate:sound-list && env-cmd -f .env.development.local next build",
     "start": "next start",
+    "deploy:prod": "firebase use default && npm run build && firebase deploy",
+    "deploy:dev": "firebase use development && npm run build:dev && firebase deploy",
     "lint": "eslint",
     "test": "vitest",
     "test:run": "vitest run",
@@ -55,6 +58,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.18",
+    "env-cmd": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "^16.0.8",
     "husky": "^9.1.7",

@@ -8,7 +8,7 @@ description: GitHub Issueを自動解決するワークフロー。Working Docum
 ## ワークフロー概要
 
 ```
-Working読込 → Issue確認 → 説明 → 計画 → 実装 → 要件確認 → 検証 → 動作確認 → PR作成・レビュー → Steering更新 → 自動マージ → クリーンアップ
+Working読込 → Issue確認 → 説明 → 計画 → 実装 → 要件確認 → 検証 → 動作確認 → PR作成・レビュー → Steering更新 → 自動マージ → マージ待機 → クリーンアップ
                           🔹①     🔹②            🔹③
 ```
 
@@ -171,9 +171,26 @@ git checkout -b test/#番号-説明   # testingラベル
 resolve-library-id → query-docs
 ```
 
-### 実装実行
+### 実装実行（TDD必須）
 
-Claude Code標準ツール(Edit/Write)で実装。
+**コード変更を含む実装は、TDDスキル（`.claude/skills/tdd/SKILL.md`）のRed→Green→Refactorサイクルに従う。**
+
+#### TDD対象の場合（lib/, hooks/, components/のロジック, バグ修正）
+
+```
+1. testing.md を読み込み → テスト設計のインプット
+2. 🔴 Red: 失敗テストを作成 → コミット
+3. 🟢 Green: テスト合格する最小実装 → コミット
+4. 🔵 Refactor: テスト維持したまま改善 → コミット（必要な場合のみ）
+```
+
+⚠️ **テストなしの実装コミットは行わない。必ずテストを先に書く。**
+
+#### TDD対象外の場合（docs/, chore, ビジュアル調整のみ）
+
+Claude Code標準ツール(Edit/Write)でそのまま実装。
+
+#### 共通
 
 **⚠️ tasklist.mdを逐次更新**: 完了したタスクは `[x]` に変更。
 
@@ -333,9 +350,10 @@ Working Documents（特に design.md）を参照し、更新ドラフトを生�
 
 ---
 
-## Phase 11: 最終更新・自動マージ（全自動）
+## Phase 11: 最終更新・自動マージ・クリーンアップ（全自動）
 
 **ユーザーの確認なしで自動実行します。PR作成・レビューはPhase 9で完了済み。**
+**このフェーズではマージ待機→クリーンアップまで一気通貫で実行します。**
 
 ### 1. Working Documents最終更新
 
@@ -360,27 +378,47 @@ git push
 gh pr merge --auto --squash
 ```
 
-⚠️ **CI（GitHub Actions）が通過後に自動的にマージされます。**
+### 4. マージ待機・クリーンアップ
 
----
-
-## Phase 12: マージ後クリーンアップ（全自動）
-
-**マージ完了後、mainブランチへ切り替えてトピックブランチを削除します。**
-
-### 手順
+**自動マージ設定後、マージ完了をポーリングで待機し、完了次第ブランチクリーンアップを実行する。**
 
 ```bash
-# 1. mainに切り替え & 最新を取得
-git switch main && git fetch origin && git pull origin main
+# PR番号とブランチ名を変数に保持
+PR_NUMBER=<PR番号>
+BRANCH_NAME=$(git branch --show-current)
 
-# 2. トピックブランチ削除（ローカル & リモート）
-git branch -d <トピックブランチ名>
-git push origin --delete <トピックブランチ名>
+# マージ完了までポーリング（30秒間隔、最大10分）
+for i in $(seq 1 20); do
+  STATE=$(gh pr view $PR_NUMBER --json state --jq '.state')
+  if [ "$STATE" = "MERGED" ]; then
+    echo "✅ PR #$PR_NUMBER がマージされました"
+    break
+  fi
+  echo "⏳ マージ待機中... ($i/20)"
+  sleep 30
+done
+
+# マージ確認
+STATE=$(gh pr view $PR_NUMBER --json state --jq '.state')
+if [ "$STATE" = "MERGED" ]; then
+  # mainに切り替え & 最新を取得
+  git switch main && git fetch origin && git pull origin main
+
+  # ローカルブランチ削除
+  git branch -d "$BRANCH_NAME"
+
+  # リモートブランチ削除（GitHub自動削除設定の場合はスキップ）
+  git push origin --delete "$BRANCH_NAME" 2>/dev/null || true
+
+  echo "🧹 ブランチクリーンアップ完了"
+else
+  echo "⚠️ マージがまだ完了していません（state: $STATE）"
+  echo "手動で確認してください: gh pr view $PR_NUMBER"
+fi
 ```
 
-⚠️ **マージが完了する前にブランチを削除しないこと。`gh pr merge --auto` の場合はCIを待つ。**
-⚠️ **リモートブランチがGitHub側で自動削除設定の場合は `git push origin --delete` は不要（エラーになるだけ）。**
+⚠️ **ポーリングは最大10分。タイムアウトした場合はユーザーに状況を報告する。**
+⚠️ **リモートブランチがGitHub側で自動削除設定の場合は `git push origin --delete` は不要（エラーを無視する）。**
 
 ---
 
@@ -392,7 +430,8 @@ git push origin --delete <トピックブランチ名>
 📋 実施内容:
 - [変更の概要]
 
-🔀 PR: #番号（CI通過後に自動マージされます）
+🔀 PR: #番号 → マージ完了 ✅
+🧹 ブランチクリーンアップ完了
 
 📝 Steering Documents:
 - [更新した場合] FEATURES.md を更新しました

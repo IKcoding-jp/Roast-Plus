@@ -84,8 +84,8 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F7F7F5] px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
+    <div className="flex min-h-screen items-center justify-center bg-page px-4">
+      <div className="w-full max-w-md rounded-lg bg-surface p-8 shadow-md border border-edge">
         <div className="mb-8 flex flex-col items-center bg-[#1a1412] py-6 rounded-xl shadow-inner">
           <h1 className="text-4xl font-bold text-white tracking-tight font-[var(--font-playfair)]">
             Roast<span className="text-amber-500">Plus</span>
@@ -93,7 +93,7 @@ function LoginForm() {
         </div>
 
         {/* タブ */}
-        <div className="mb-6 flex rounded-lg bg-gray-100 p-1">
+        <div className="mb-6 flex rounded-lg bg-ground p-1">
           <button
             type="button"
             onClick={() => {
@@ -101,8 +101,8 @@ function LoginForm() {
               setError(null);
             }}
             className={`flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${activeTab === 'signup'
-              ? 'bg-amber-600 text-white'
-              : 'text-gray-700 hover:text-gray-900'
+              ? 'bg-spot text-white'
+              : 'text-ink-sub hover:text-ink'
               }`}
           >
             新規登録
@@ -115,8 +115,8 @@ function LoginForm() {
               setConfirmPassword('');
             }}
             className={`flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${activeTab === 'login'
-              ? 'bg-amber-600 text-white'
-              : 'text-gray-700 hover:text-gray-900'
+              ? 'bg-spot text-white'
+              : 'text-ink-sub hover:text-ink'
               }`}
           >
             ログイン
@@ -183,9 +183,9 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-[#F7F7F5] px-4">
-        <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-          <h1 className="mb-8 text-center text-2xl font-bold text-gray-800">
+      <div className="flex min-h-screen items-center justify-center bg-page px-4">
+        <div className="w-full max-w-md rounded-lg bg-surface p-8 shadow-md border border-edge">
+          <h1 className="mb-8 text-center text-2xl font-bold text-ink">
             ローストプラス
           </h1>
           <Loading fullScreen={false} />

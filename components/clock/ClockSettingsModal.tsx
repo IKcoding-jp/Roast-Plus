@@ -1,6 +1,7 @@
 'use client';
 
 import { HiXMark } from 'react-icons/hi2';
+import { Modal, IconButton, Switch, Button } from '@/components/ui';
 import {
   type ClockSettings,
   type ClockTheme,
@@ -12,6 +13,7 @@ import {
 } from '@/lib/clockSettings';
 
 interface ClockSettingsModalProps {
+  show: boolean;
   settings: ClockSettings;
   onUpdate: (patch: Partial<ClockSettings>) => void;
   onReset: () => void;
@@ -21,36 +23,34 @@ interface ClockSettingsModalProps {
 const THEME_KEYS: ClockTheme[] = ['light', 'dark', 'coffee', 'green', 'lightblue'];
 const FONT_KEYS: ClockFontKey[] = ['inter', 'robotoMono', 'oswald', 'orbitron', 'notoSansJP'];
 
-export function ClockSettingsModal({ settings, onUpdate, onReset, onClose }: ClockSettingsModalProps) {
+export function ClockSettingsModal({ show, settings, onUpdate, onReset, onClose }: ClockSettingsModalProps) {
   const themeColors = getThemeColors(settings.theme);
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      {/* 背景オーバーレイ */}
-      <div className="absolute inset-0 bg-black/50" />
+  const contentClassName = 'w-full max-w-md max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl border border-edge';
 
-      {/* モーダル本体 */}
-      <div
-        className="relative w-full max-w-md max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl"
-        style={{ backgroundColor: themeColors.bg }}
-        onClick={(e) => e.stopPropagation()}
-      >
+  return (
+    <Modal
+      show={show}
+      onClose={onClose}
+      contentClassName={contentClassName}
+    >
+      <div style={{ backgroundColor: themeColors.bg }}>
         {/* ヘッダー */}
-        <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: themeColors.uiBg, backgroundColor: themeColors.bg }}>
+        <div
+          className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b"
+          style={{ borderColor: themeColors.uiBg, backgroundColor: themeColors.bg }}
+        >
           <h2 className="text-lg font-bold" style={{ color: themeColors.text }}>
             時計の設定
           </h2>
-          <button
+          <IconButton
+            variant="ghost"
+            rounded
             onClick={onClose}
-            className="flex items-center justify-center w-10 h-10 rounded-full transition-colors"
-            style={{ color: themeColors.uiText }}
             aria-label="閉じる"
           >
-            <HiXMark className="w-6 h-6" />
-          </button>
+            <HiXMark className="w-6 h-6" style={{ color: themeColors.uiText }} />
+          </IconButton>
         </div>
 
         <div className="px-5 py-4 space-y-6">
@@ -181,43 +181,50 @@ export function ClockSettingsModal({ settings, onUpdate, onReset, onClose }: Clo
           <section>
             <SectionLabel color={themeColors.uiText}>表示オプション</SectionLabel>
             <div className="mt-2 space-y-1">
-              <ToggleRow
-                label="24時間表示"
-                checked={settings.use24Hour}
-                onChange={(v) => onUpdate({ use24Hour: v })}
-                colors={themeColors}
-              />
-              <ToggleRow
-                label="秒を表示"
-                checked={settings.showSeconds}
-                onChange={(v) => onUpdate({ showSeconds: v })}
-                colors={themeColors}
-              />
-              <ToggleRow
-                label="日付を表示"
-                checked={settings.showDate}
-                onChange={(v) => onUpdate({ showDate: v })}
-                colors={themeColors}
-              />
+              <div className="flex items-center justify-between py-3 px-1 min-h-[44px]">
+                <span className="text-sm font-medium" style={{ color: themeColors.text }}>
+                  24時間表示
+                </span>
+                <Switch
+                  checked={settings.use24Hour}
+                  onChange={(e) => onUpdate({ use24Hour: e.target.checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between py-3 px-1 min-h-[44px]">
+                <span className="text-sm font-medium" style={{ color: themeColors.text }}>
+                  秒を表示
+                </span>
+                <Switch
+                  checked={settings.showSeconds}
+                  onChange={(e) => onUpdate({ showSeconds: e.target.checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between py-3 px-1 min-h-[44px]">
+                <span className="text-sm font-medium" style={{ color: themeColors.text }}>
+                  日付を表示
+                </span>
+                <Switch
+                  checked={settings.showDate}
+                  onChange={(e) => onUpdate({ showDate: e.target.checked })}
+                />
+              </div>
             </div>
           </section>
 
           {/* ─── リセットボタン ─── */}
           <div className="pt-2 pb-2">
-            <button
+            <Button
+              variant="secondary"
+              fullWidth
               onClick={onReset}
-              className="w-full py-3 rounded-xl text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: themeColors.uiBg,
-                color: themeColors.uiText,
-              }}
+              size="md"
             >
               設定をリセット
-            </button>
+            </Button>
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -228,37 +235,5 @@ function SectionLabel({ color, children }: { color: string; children: React.Reac
     <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color }}>
       {children}
     </h3>
-  );
-}
-
-function ToggleRow({
-  label,
-  checked,
-  onChange,
-  colors,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (value: boolean) => void;
-  colors: { text: string; accent: string; uiBg: string };
-}) {
-  return (
-    <label className="flex items-center justify-between py-3 px-1 cursor-pointer min-h-[44px]">
-      <span className="text-sm font-medium" style={{ color: colors.text }}>
-        {label}
-      </span>
-      <button
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        className="relative w-11 h-6 rounded-full transition-colors duration-200"
-        style={{ backgroundColor: checked ? colors.accent : colors.uiBg }}
-      >
-        <span
-          className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200"
-          style={{ transform: checked ? 'translateX(20px)' : 'translateX(0)' }}
-        />
-      </button>
-    </label>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { HiArrowLeft, HiMail, HiExclamationCircle } from 'react-icons/hi';
+import { HiMail, HiExclamationCircle } from 'react-icons/hi';
 import { ContactSuccessScreen } from '@/components/contact/ContactSuccessScreen';
 import { ContactFormFields } from '@/components/contact/ContactFormFields';
+import { Button, Card, BackLink } from '@/components/ui';
 import {
   sendContactEmail,
   isEmailJSConfigured,
@@ -96,21 +96,14 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F7F5' }}>
+    <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
       <div className="max-w-2xl mx-auto">
         <header className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-              <Link
-                href="/settings"
-                className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                title="戻る"
-                aria-label="戻る"
-              >
-                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-              </Link>
+              <BackLink href="/settings" variant="icon-only" aria-label="戻る" title="戻る" />
             </div>
-            <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-gray-800 sm:flex-1 text-center">
+            <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-ink sm:flex-1 text-center">
               お問い合わせ
             </h1>
             <div className="hidden sm:block flex-1 flex-shrink-0"></div>
@@ -118,15 +111,15 @@ export default function ContactPage() {
         </header>
 
         <main>
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <Card className="p-6">
             {/* エラーメッセージ */}
             {status === 'error' && errorMessage && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <HiExclamationCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="mb-6 p-4 bg-danger-subtle border border-danger rounded-lg flex items-start gap-3">
+                <HiExclamationCircle className="h-5 w-5 text-danger flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-red-800 font-medium">エラーが発生しました</p>
-                  <p className="text-red-600 text-sm mt-1">{errorMessage}</p>
-                  <p className="text-red-600 text-sm mt-2">
+                  <p className="text-danger font-medium">エラーが発生しました</p>
+                  <p className="text-danger text-sm mt-1">{errorMessage}</p>
+                  <p className="text-danger text-sm mt-2">
                     直接メールでのお問い合わせ:{' '}
                     <a
                       href="mailto:kensaku.ikeda04@gmail.com"
@@ -148,58 +141,39 @@ export default function ContactPage() {
 
               {/* 送信ボタン */}
               <div className="pt-4">
-                <button
+                <Button
                   type="submit"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  loading={status === 'sending'}
                   disabled={status === 'sending'}
-                  className="w-full px-6 py-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {status === 'sending' ? (
-                    <>
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      送信中...
-                    </>
+                    '送信中...'
                   ) : (
                     <>
                       <HiMail className="h-5 w-5" />
                       送信する
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             </form>
 
             {/* 運営者情報 */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-500 text-center">
+            <div className="mt-8 pt-6 border-t border-edge">
+              <p className="text-sm text-ink-muted text-center">
                 直接メールでのお問い合わせ:{' '}
                 <a
                   href="mailto:kensaku.ikeda04@gmail.com"
-                  className="text-orange-500 hover:text-orange-600 underline"
+                  className="text-spot hover:text-spot-hover underline"
                 >
                   kensaku.ikeda04@gmail.com
                 </a>
               </p>
             </div>
-          </div>
+          </Card>
         </main>
       </div>
     </div>

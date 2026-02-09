@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { saveUserData, getUserData } from '@/lib/firestore';
 import { createConsentData, needsConsent } from '@/lib/consent';
 import { Loading } from '@/components/Loading';
+import { Card, Button } from '@/components/ui';
 
 export default function ConsentPage() {
   const { user, loading: authLoading } = useAuth();
@@ -73,15 +74,15 @@ export default function ConsentPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ backgroundColor: '#F7F7F5' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-page">
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+        <Card className="p-6 sm:p-8">
           {/* ヘッダー */}
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            <h1 className="text-2xl font-bold text-ink mb-2">
               ご利用の前に
             </h1>
-            <p className="text-gray-600">
+            <p className="text-ink-sub">
               RoastPlusをご利用いただくには、以下の規約に同意していただく必要があります。
             </p>
           </div>
@@ -95,14 +96,14 @@ export default function ConsentPage() {
                   type="checkbox"
                   checked={termsAgreed}
                   onChange={(e) => setTermsAgreed(e.target.checked)}
-                  className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500 cursor-pointer"
+                  className="w-5 h-5 rounded border-2 border-edge-strong bg-field text-spot focus:ring-2 focus:ring-spot/30 focus:ring-offset-0 checked:bg-spot checked:border-spot cursor-pointer"
                 />
               </div>
-              <span className="text-gray-700 group-hover:text-gray-900">
+              <span className="text-ink group-hover:text-ink">
                 <Link
                   href="/terms"
                   target="_blank"
-                  className="text-orange-600 hover:text-orange-700 underline font-medium"
+                  className="text-spot hover:text-spot-hover underline font-medium"
                   onClick={(e) => e.stopPropagation()}
                 >
                   利用規約
@@ -118,14 +119,14 @@ export default function ConsentPage() {
                   type="checkbox"
                   checked={privacyAgreed}
                   onChange={(e) => setPrivacyAgreed(e.target.checked)}
-                  className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500 cursor-pointer"
+                  className="w-5 h-5 rounded border-2 border-edge-strong bg-field text-spot focus:ring-2 focus:ring-spot/30 focus:ring-offset-0 checked:bg-spot checked:border-spot cursor-pointer"
                 />
               </div>
-              <span className="text-gray-700 group-hover:text-gray-900">
+              <span className="text-ink group-hover:text-ink">
                 <Link
                   href="/privacy-policy"
                   target="_blank"
-                  className="text-orange-600 hover:text-orange-700 underline font-medium"
+                  className="text-spot hover:text-spot-hover underline font-medium"
                   onClick={(e) => e.stopPropagation()}
                 >
                   プライバシーポリシー
@@ -136,23 +137,21 @@ export default function ConsentPage() {
           </div>
 
           {/* 同意ボタン */}
-          <button
+          <Button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-colors ${
-              canSubmit
-                ? 'bg-orange-500 hover:bg-orange-600 cursor-pointer'
-                : 'bg-gray-300 cursor-not-allowed'
-            }`}
+            variant="primary"
+            fullWidth
+            loading={isSubmitting}
           >
             {isSubmitting ? '処理中...' : '同意して続ける'}
-          </button>
+          </Button>
 
           {/* 注意書き */}
-          <p className="mt-4 text-xs text-gray-500 text-center">
+          <p className="mt-4 text-xs text-ink-muted text-center">
             同意しない場合、本サービスをご利用いただけません。
           </p>
-        </div>
+        </Card>
       </div>
     </div>
   );

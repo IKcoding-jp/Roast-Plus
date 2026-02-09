@@ -38,7 +38,7 @@ export default function DripGuidePage() {
                     </div>
                 </header>
 
-                <main className="flex-1 min-h-0 overflow-y-auto pb-20 sm:pb-0">
+                <main className="flex-1 min-h-0 overflow-y-auto pb-4">
                     <RecipeList recipes={recipes} onDelete={deleteRecipe} />
                 </main>
             </div>

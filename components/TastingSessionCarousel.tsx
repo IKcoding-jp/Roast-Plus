@@ -155,11 +155,11 @@ export function TastingSessionCarousel({
       </div>
 
       {/* モバイル向けレイアウト (md未満で表示) */}
-      <div className="md:hidden relative w-full h-[calc(100vh-140px)] overflow-hidden flex flex-col">
+      <div className="md:hidden relative w-full h-[calc(100dvh-160px)] overflow-hidden flex flex-col">
         {/* 横スクロールコンテナ */}
         <div
           ref={scrollContainerRef}
-          className="flex flex-row gap-4 px-4 h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory
+          className="flex flex-row gap-4 px-4 pb-3 h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory
                      [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:mx-8 [&::-webkit-scrollbar-track]:rounded-full
                      [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-ground [&::-webkit-scrollbar-thumb]:bg-spot"
           style={{

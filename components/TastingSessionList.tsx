@@ -12,7 +12,7 @@ import { useMembers, getActiveMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/lib/auth';
 import { useTastingFilters } from '@/hooks/useTastingFilters';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui';
+import { Button, IconButton, Card } from '@/components/ui';
 
 interface TastingSessionListProps {
   data: AppData;
@@ -129,7 +129,7 @@ export function TastingSessionList({
     setSelectedRoastLevels(filters.selectedRoastLevels);
   };
 
-  const filterButton = (
+  const filterButtonDesktop = (
     <Button
       variant="surface"
       onClick={() => setIsFilterModalOpen(true)}
@@ -146,39 +146,54 @@ export function TastingSessionList({
     </Button>
   );
 
+  const filterButtonMobile = (
+    <IconButton
+      variant="surface"
+      onClick={() => setIsFilterModalOpen(true)}
+      aria-label="フィルター"
+    >
+      <Faders
+        size={22}
+        weight={activeFilterCount > 0 ? 'fill' : 'bold'}
+      />
+    </IconButton>
+  );
+
   if (tastingSessions.length === 0) {
     return (
       <div className="h-full flex items-center justify-center py-12 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full rounded-[3rem] p-10 border border-edge shadow-card text-center space-y-8 bg-surface"
+          className="max-w-md w-full"
         >
-          <div className="relative mx-auto w-32 h-32">
-            <div className="absolute inset-0 rounded-full scale-110 blur-2xl opacity-60 bg-spot-subtle"></div>
-            <div className="relative w-full h-full rounded-full flex items-center justify-center border-2 shadow-inner bg-ground border-edge">
-              <Coffee size={64} weight="duotone" className="text-spot opacity-50" />
+          <Card className="rounded-[3rem] p-10 text-center space-y-8">
+            <div className="relative mx-auto w-32 h-32">
+              <div className="absolute inset-0 rounded-full scale-110 blur-2xl opacity-60 bg-spot-subtle"></div>
+              <div className="relative w-full h-full rounded-full flex items-center justify-center border-2 shadow-inner bg-ground border-edge">
+                <Coffee size={64} weight="duotone" className="text-spot opacity-50" />
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-3">
-            <h3 className="text-2xl font-black tracking-tight text-ink">
-              試飲セッションがありません
-            </h3>
-            <p className="text-sm font-medium leading-relaxed text-ink-muted">
-              最初の試飲セッションを作成して、
-              <br />
-              コーヒーの奥深い世界を記録しましょう。
-            </p>
-          </div>
+            <div className="space-y-3">
+              <h3 className="text-2xl font-black tracking-tight text-ink">
+                試飲セッションがありません
+              </h3>
+              <p className="text-sm font-medium leading-relaxed text-ink-muted">
+                最初の試飲セッションを作成して、
+                <br />
+                コーヒーの奥深い世界を記録しましょう。
+              </p>
+            </div>
 
-          <Link
-            href="/tasting/sessions/new"
-            className="inline-flex items-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-lg transition-all active:scale-95 bg-gradient-to-r from-spot to-spot/80 shadow-xl shadow-spot/20 hover:from-spot/90 hover:to-spot/70"
-          >
-            <Plus size={24} weight="bold" />
-            <span>セッションを開始</span>
-          </Link>
+            <Link
+              href="/tasting/sessions/new"
+              className="inline-flex items-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-lg transition-all active:scale-95 bg-gradient-to-r from-spot to-spot/80 shadow-xl shadow-spot/20 hover:from-spot/90 hover:to-spot/70"
+            >
+              <Plus size={24} weight="bold" />
+              <span>セッションを開始</span>
+            </Link>
+          </Card>
         </motion.div>
       </div>
     );
@@ -187,8 +202,8 @@ export function TastingSessionList({
   return (
     <>
       {/* フィルターボタンを外部コンテナにPortalでレンダリング */}
-      {mounted && containers.desktop && createPortal(filterButton, containers.desktop)}
-      {mounted && containers.mobile && createPortal(filterButton, containers.mobile)}
+      {mounted && containers.desktop && createPortal(filterButtonDesktop, containers.desktop)}
+      {mounted && containers.mobile && createPortal(filterButtonMobile, containers.mobile)}
 
       <div className="h-full flex flex-col min-h-0">
         {/* フィルターモーダル */}

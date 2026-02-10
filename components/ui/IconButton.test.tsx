@@ -33,7 +33,7 @@ describe('IconButton', () => {
     it('primaryバリアントのスタイルが適用される', () => {
       render(<IconButton variant="primary">X</IconButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('text-spot');
+      expect(button.className).toContain('bg-btn-primary');
     });
 
     it('dangerバリアントのスタイルが適用される', () => {
@@ -52,6 +52,13 @@ describe('IconButton', () => {
       render(<IconButton variant="ghost">X</IconButton>);
       const button = screen.getByRole('button');
       expect(button.className).toContain('text-ink-muted');
+    });
+
+    it('surfaceバリアントのスタイルが適用される', () => {
+      render(<IconButton variant="surface">X</IconButton>);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('bg-surface');
+      expect(button.className).toContain('border-edge');
     });
   });
 

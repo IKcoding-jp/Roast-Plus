@@ -26,7 +26,7 @@ import { forwardRef } from 'react';
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** ボタンのスタイルバリエーション */
-  variant?: 'default' | 'primary' | 'danger' | 'success' | 'ghost';
+  variant?: 'default' | 'primary' | 'danger' | 'success' | 'ghost' | 'surface';
   /** ボタンのサイズ */
   size?: 'sm' | 'md' | 'lg';
   /** 丸いボタン（完全な円形） */
@@ -56,10 +56,11 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     // バリアントスタイル（CSS変数ベース）
     const variantStyles = {
       default: 'text-ink-sub hover:text-ink hover:bg-ground',
-      primary: 'text-spot hover:text-spot-hover hover:bg-spot-surface',
+      primary: 'bg-btn-primary text-white hover:bg-btn-primary-hover',
       danger: 'text-danger hover:text-danger/80 hover:bg-danger-subtle',
       success: 'text-success hover:text-success/80 hover:bg-success-subtle',
       ghost: 'text-ink-muted hover:text-ink-sub hover:bg-ground',
+      surface: 'bg-surface text-ink shadow-card hover:bg-ground border border-edge',
     };
 
     const baseStyles = 'inline-flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';

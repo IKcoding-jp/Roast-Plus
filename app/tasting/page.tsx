@@ -330,7 +330,7 @@ function TastingPageContent() {
           </div>
         </header>
 
-        <main className="pb-20 sm:pb-0">
+        <main>
           <TastingSessionList
             data={data}
             onUpdate={updateData}

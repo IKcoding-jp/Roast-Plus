@@ -50,9 +50,9 @@ export function ActionCard({
       )}
 
       <span
-        className="relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 bg-spot-subtle text-spot group-hover:bg-spot-subtle/80"
+        className="relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 icon-circle-bg text-spot"
       >
-        <Icon className="h-8 w-8 relative z-10" />
+        <Icon className="h-11 w-11 relative z-10" />
       </span>
       <div className="space-y-1 text-center relative z-10">
         <p

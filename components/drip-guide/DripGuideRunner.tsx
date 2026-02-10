@@ -6,10 +6,8 @@ import { playNotificationSound } from '@/lib/sounds';
 import { useRunnerTimer } from '@/hooks/drip-guide/useRunnerTimer';
 import { CompletionScreen } from './runner/CompletionScreen';
 import { RunnerHeader } from './runner/RunnerHeader';
-import { StepMiniMap } from './runner/StepMiniMap';
 import { TimerDisplay } from './runner/TimerDisplay';
 import { StepInfo } from './runner/StepInfo';
-import { ProgressBar } from './runner/ProgressBar';
 import { FooterControls } from './runner/FooterControls';
 
 interface DripGuideRunnerProps {
@@ -48,7 +46,8 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
         },
     });
 
-    const scrollKey = isManualMode ? manualStepIndex : currentTime;
+    // Remaining steps count (after next step)
+    const remainingStepsAfterNext = steps.length - currentStepIndex - 2;
 
     // Play countdown sound 3 seconds before next step starts
     useEffect(() => {
@@ -101,34 +100,32 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
         }
     };
 
-    const progressPercent = Math.min((currentTime / recipe.totalDurationSec) * 100, 100);
-
     if (isCompleted) {
         return <CompletionScreen onReset={resetTimer} />;
     }
 
     return (
-        <div className="flex flex-col h-[100dvh] bg-surface relative overflow-hidden">
-            <RunnerHeader recipeName={recipe.name} />
+        <div className="flex flex-col h-[100dvh] bg-ground relative overflow-hidden">
+            <RunnerHeader
+                currentStepIndex={currentStepIndex}
+                totalSteps={steps.length}
+            />
 
-            <div className="flex-grow flex flex-col items-center py-2 px-4 overflow-hidden">
-                <StepMiniMap
-                    steps={steps}
-                    currentStep={currentStep}
+            <div className="flex-1 flex flex-col items-center justify-center px-5 pb-3 overflow-y-auto">
+                <TimerDisplay
                     currentTime={currentTime}
+                    recipeName={recipe.name}
                     totalDurationSec={recipe.totalDurationSec}
                     isManualMode={isManualMode}
-                    currentStepIndex={currentStepIndex}
-                    scrollKey={scrollKey}
                 />
-
-                <div className="flex-grow flex flex-col items-center justify-center w-full">
-                    <TimerDisplay currentTime={currentTime} />
-                    <StepInfo currentStep={currentStep} />
-                </div>
+                <StepInfo
+                    currentStep={currentStep}
+                    nextStep={nextStep}
+                    currentTime={currentTime}
+                    isManualMode={isManualMode}
+                    remainingStepsAfterNext={remainingStepsAfterNext}
+                />
             </div>
-
-            <ProgressBar progressPercent={progressPercent} />
 
             <FooterControls
                 isManualMode={isManualMode}

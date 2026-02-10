@@ -5,22 +5,25 @@ import Link from 'next/link';
 import { ArrowLeft } from 'phosphor-react';
 
 interface RunnerHeaderProps {
-    recipeName: string;
+    currentStepIndex: number;
+    totalSteps: number;
 }
 
-export const RunnerHeader: React.FC<RunnerHeaderProps> = ({ recipeName }) => {
+export const RunnerHeader: React.FC<RunnerHeaderProps> = ({
+    currentStepIndex,
+    totalSteps,
+}) => {
     return (
-        <div className="flex-none px-4 py-3 flex items-center justify-between border-b border-edge bg-surface z-10">
+        <div className="flex-none flex items-center justify-between px-5 pt-4 pb-1">
             <Link
                 href="/drip-guide"
-                className="p-2 -ml-2 text-ink-muted hover:text-ink transition-colors rounded-full active:bg-ground"
+                className="p-1.5 rounded-full text-ink-muted hover:text-ink-sub transition-colors active:bg-ground"
             >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={18} weight="bold" />
             </Link>
-            <h1 className="font-bold text-ink text-lg truncate max-w-[200px] text-center">
-                {recipeName}
-            </h1>
-            <div className="w-10" />
+            <span className="text-[10px] font-bold text-ink-muted tracking-[0.15em] uppercase">
+                Step {currentStepIndex + 1} / {totalSteps}
+            </span>
         </div>
     );
 };

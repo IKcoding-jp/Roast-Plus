@@ -1,17 +1,15 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Play, Pause, ArrowCounterClockwise, X, ArrowLeft, ArrowRight, CheckCircle } from 'phosphor-react';
 import { clsx } from 'clsx';
 import Link from 'next/link';
-import { DripStep } from '@/lib/drip-guide/types';
-import { formatTime } from '@/lib/drip-guide/formatTime';
+import type { DripStep } from '@/lib/drip-guide/types';
 
 interface FooterControlsProps {
     isManualMode: boolean;
     isRunning: boolean;
-    nextStep: DripStep | null;
+    nextStep?: DripStep | null;
     manualStepIndex: number;
     stepsLength: number;
     currentStepIndex: number;
@@ -25,7 +23,6 @@ interface FooterControlsProps {
 export const FooterControls: React.FC<FooterControlsProps> = ({
     isManualMode,
     isRunning,
-    nextStep,
     manualStepIndex,
     stepsLength,
     currentStepIndex,
@@ -37,21 +34,6 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
 }) => {
     return (
         <div className="flex-none bg-surface border-t border-edge pb-8 pt-4 px-6 safe-area-bottom">
-            {/* Next Step Preview */}
-            {!isManualMode && (
-                <div className="h-8 mb-4 flex justify-center items-center">
-                    {nextStep && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-ink-muted text-xs font-medium bg-ground px-3 py-1 rounded-full"
-                        >
-                            Next: {formatTime(nextStep.startTimeSec)} - {nextStep.title}
-                        </motion.div>
-                    )}
-                </div>
-            )}
-
             {isManualMode ? (
                 // Manual mode controls
                 <div className="flex items-center justify-center gap-4 sm:gap-6">

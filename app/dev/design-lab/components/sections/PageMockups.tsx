@@ -9,6 +9,7 @@ import TimerPatternE from '../mockups/TimerPatternE';
 import TimerPatternF from '../mockups/TimerPatternF';
 import TimerPatternG from '../mockups/TimerPatternG';
 import TimerPatternH from '../mockups/TimerPatternH';
+import TitlePatterns from '../mockups/TitlePatterns';
 
 const patterns = [
   {
@@ -65,7 +66,14 @@ export default function PageMockups() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-12">
+      {/* Title Design Patterns */}
+      <TitlePatterns />
+
+      <hr className="border-edge" />
+
+      {/* Timer Design Patterns */}
+      <div className="space-y-6">
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-ink mb-1">
@@ -122,6 +130,7 @@ export default function PageMockups() {
               <p.Component />
             </div>
           ))}
+      </div>
       </div>
     </div>
   );

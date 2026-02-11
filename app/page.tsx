@@ -321,12 +321,12 @@ export default function HomePage(_props: HomePageProps = {}) {
                 </div>
 
                 <div className="relative flex flex-col items-center">
-                  <span className="text-2xl md:text-4xl font-black italic tracking-tighter flex items-center leading-none">
-                    <span className="text-[#e23636] relative drop-shadow-[0_0_10px_rgba(226,54,54,0.3)]">
+                  <span className="text-2xl md:text-4xl font-light tracking-[0.15em] flex items-center leading-none font-[var(--font-raleway)]">
+                    <span className="text-[#e23636] relative drop-shadow-[0_0_10px_rgba(226,54,54,0.3)] font-bold">
                       R
                     </span>
                     <span className="text-[#f8f1e7] drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">oast</span>
-                    <span className="text-[#d4af37] ml-0.5 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]">Plus</span>
+                    <span className="text-[#d4af37] ml-1 font-bold drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]">Plus</span>
                   </span>
                   <div className="w-full h-[1.5px] mt-0.5 bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent shadow-[0_1px_8px_rgba(212,175,55,0.4)]"></div>
                 </div>
@@ -334,9 +334,9 @@ export default function HomePage(_props: HomePageProps = {}) {
             ) : (
               <div className="flex flex-col items-start leading-none">
                 <div className="flex items-center gap-1">
-                  <span className="text-2xl md:text-3xl font-bold tracking-tight text-white font-[var(--font-playfair)]">
+                  <span className="text-2xl md:text-3xl font-light tracking-[0.15em] text-white font-[var(--font-raleway)]">
                     Roast
-                    <span className="text-[#EF8A00] ml-0.5">Plus</span>
+                    <span className="text-[#EF8A00] font-bold ml-1">Plus</span>
                   </span>
                 </div>
               </div>

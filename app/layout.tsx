@@ -8,7 +8,7 @@ import { ToastProvider } from "@/components/Toast";
 import { SplashScreenWrapper } from "@/components/SplashScreenWrapper";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
-import { Zen_Old_Mincho, Inter, Roboto_Mono, Oswald, Orbitron, Noto_Sans_JP } from "next/font/google";
+import { Zen_Old_Mincho, Inter, Roboto_Mono, Oswald, Orbitron, Noto_Sans_JP, Raleway } from "next/font/google";
 
 const zenOldMincho = Zen_Old_Mincho({
   weight: ["400", "500", "600", "700", "900"],
@@ -47,6 +47,12 @@ const notoSansJP = Noto_Sans_JP({
   display: "swap",
 });
 
+const raleway = Raleway({
+  subsets: ["latin"],
+  variable: "--font-raleway",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: 'ローストプラス',
   description: 'コーヒー豆加工業務をサポートするWebアプリ',
@@ -80,7 +86,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body
-        className={`${zenOldMincho.variable} ${inter.variable} ${robotoMono.variable} ${oswald.variable} ${orbitron.variable} ${notoSansJP.variable} antialiased font-serif`}
+        className={`${zenOldMincho.variable} ${inter.variable} ${robotoMono.variable} ${oswald.variable} ${orbitron.variable} ${notoSansJP.variable} ${raleway.variable} antialiased font-serif`}
         suppressHydrationWarning
       >
         <Script

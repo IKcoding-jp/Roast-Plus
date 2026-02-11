@@ -14,10 +14,16 @@
 
 ### 1. SDD × TDD型（コード変更のデフォルト）
 Working Documents参照 → テスト設計 → 🔴Red → 🟢Green → 🔵Refactor → 検証 → PR
-詳細は `/tdd` スキル参照
+詳細は `superpowers:test-driven-development` スキル参照
 
 ### 2. ビジュアル反復型（UI調整のみ）
 Chrome DevTools MCPでスクショ確認しながらUI改善
+
+### 3. フロントエンドデザイン生成時
+**UIページ・コンポーネントのデザインを新規生成する際は、必ず `/frontend-design` スキルを使用すること。**
+- 汎用的な「AIっぽい」デザイン（Inter/Roboto、紫グラデーション等）を避ける
+- 大胆で独自性のあるデザイン方向性を選択する
+- タイポグラフィ、カラー、モーション、空間構成に細心の注意を払う
 
 ## Documentation Policy
 
@@ -72,9 +78,22 @@ Issue単位の仕様書。4ファイル固定:
 | `think hard` | 複雑な問題、設計判断 |
 | `ultrathink` | 最も困難なアーキテクチャ決定 |
 
-## Tool Usage Policy
+## Plugins & MCP
 
-### Serena MCP（探索専用）
+### プラグイン一覧
+
+| プラグイン | スコープ | 用途 | 使用タイミング |
+|-----------|---------|------|---------------|
+| **context7** | User | ライブラリ最新ドキュメント参照 | `resolve-library-id` → `query-docs` で実装時に参照 |
+| **serena** | User | コード解析・シンボル探索 | 探索専用（下記参照） |
+| **superpowers** | User | TDD・デバッグ・レビュー・プラン | 下記参照 |
+| **code-review** | User | PRコードレビュー | `/code-review` でPRレビュー時 |
+| **claude-md-management** | User | CLAUDE.md監査・改善 | CLAUDE.md更新時 |
+| **hookify** | User | hook作成・管理 | 振る舞い制御ルール追加時 |
+| **frontend-design** | Project | UIデザイン生成 | `/frontend-design` で新規UI作成時 |
+| **firebase** | Project | Firebase実操作（Auth, Firestore, Functions等） | Firebase管理操作・デプロイ時 |
+
+### Serena（探索専用）
 **探索のみ使用。編集にはClaude Code標準ツールを使う。**
 
 | 用途 | 使用可否 | ツール |
@@ -84,12 +103,25 @@ Issue単位の仕様書。4ファイル固定:
 | パターン検索 | ✅ | `search_for_pattern` |
 | コード編集 | ❌ | `replace_symbol_body`, `insert_*`, `rename_symbol` |
 
-**理由**: 編集はClaude Codeのネイティブツール（Edit/Write）の方が安定・高速。MCP依存を減らすことでトラブルシューティングも容易。
-
+**理由**: 編集はClaude Codeのネイティブツール（Edit/Write）の方が安定・高速。
 **例外**: 大規模リファクタリングでシンボル名の一括リネームが必要な場合のみ `rename_symbol` を検討可。
 
-### Context7 MCP（実装時）
-`resolve-library-id` → `query-docs` で最新ドキュメント参照
+### superpowers（主要スキル）
+
+| スキル | 用途 | 備考 |
+|--------|------|------|
+| `superpowers:test-driven-development` | TDDサイクル（Red→Green→Refactor） | 旧`/tdd`の後継 |
+| `superpowers:systematic-debugging` | 仮説→検証→修正の体系的デバッグ | 旧`/debugging-helper`の後継 |
+| `superpowers:writing-plans` | 実装計画の策定 | Working Documents後の詳細計画に |
+| `superpowers:requesting-code-review` | 完了時のレビュー依頼 | fix-issue Phase 9で使用 |
+| `superpowers:verification-before-completion` | 完了宣言前の検証 | コミット・PR前に必ず実行 |
+
+### Firebase開発（スキル vs プラグイン）
+
+| 用途 | 使用するもの |
+|------|-------------|
+| コードパターン参照（型定義、CRUD、リアルタイム、Auth） | `/nextjs-firestore` スキル |
+| Firebase実操作（デプロイ、ルール確認、データ操作等） | `firebase` プラグイン |
 
 ### Chrome DevTools MCP（動作確認）
 `navigate_page` → `take_snapshot` → 操作 → `take_screenshot`
@@ -234,6 +266,8 @@ npm run test     # テスト（Vitest導入後）
 
 ### スキル連携フロー
 
+**SDD（仕様駆動）ワークフロー**:
+
 | スキル | タイミング | 役割 |
 |--------|-----------|------|
 | **/issue-creator** | 作業開始時 | Issue作成 + 規模に応じてWorking生成 |
@@ -241,6 +275,14 @@ npm run test     # テスト（Vitest導入後）
 | **/fix-issue** | 実装開始時 | Working読込→実装→独立レビュー→PR→自動マージ |
 | **/git-workflow** | コミット時 | Workingからスコープ自動抽出 |
 | **/project-maintenance** | 定期実行時 | リファクタリングIssue + Working自動生成 |
+
+**実装支援**:
+
+| スキル | タイミング | 役割 |
+|--------|-----------|------|
+| **/roastplus-ui** | UI実装時 | デザインシステム（配色・コンポーネント・レイアウト） |
+| **/nextjs-firestore** | Firebase実装時 | パターン参照（型定義、CRUD、リアルタイム同期、Auth） |
+| **/nano-banana-pro** | 画像生成時 | Gemini画像生成（豆の視覚化、クイズ画像等） |
 
 ## Development Flow
 1. **Issue作成** → 機能追加・修正の起点（Claudeが作成）

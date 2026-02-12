@@ -8,6 +8,8 @@ export interface ThemePreset {
   name: string;
   description: string;
   type: 'light' | 'dark';
+  /** PWAステータスバー・ナビゲーションバー用のテーマカラー */
+  themeColor: string;
   previewColors: {
     bg: string;
     surface: string;
@@ -22,6 +24,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: 'デフォルト',
     description: '暖かいコーヒー系ライトテーマ',
     type: 'light',
+    themeColor: '#261a14',
     previewColors: {
       bg: '#261a14',
       surface: '#FFFFFF',
@@ -34,6 +37,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: 'ダークロースト',
     description: '深煎りエスプレッソの高級感',
     type: 'dark',
+    themeColor: '#0d0b09',
     previewColors: {
       bg: '#0d0b09',
       surface: '#1a1614',
@@ -46,6 +50,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: 'ライトロースト',
     description: '浅煎りの朝のハンドドリップ感',
     type: 'light',
+    themeColor: '#6b5d4f',
     previewColors: {
       bg: '#faf6ef',
       surface: '#fff9f0',
@@ -58,6 +63,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: '抹茶ラテ',
     description: '和カフェの落ち着き',
     type: 'dark',
+    themeColor: '#0f1f15',
     previewColors: {
       bg: '#0f1f15',
       surface: '#1a3025',
@@ -70,6 +76,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: 'キャラメルマキアート',
     description: '秋の収穫祭の温かさ',
     type: 'dark',
+    themeColor: '#1a120d',
     previewColors: {
       bg: '#1a120d',
       surface: '#2a1f17',
@@ -82,6 +89,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: 'クリスマス',
     description: 'ホリデーシーズンの特別テーマ',
     type: 'dark',
+    themeColor: '#051a0e',
     previewColors: {
       bg: '#051a0e',
       surface: '#0d3520',

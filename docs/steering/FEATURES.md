@@ -470,21 +470,37 @@ const { isChristmasMode } = useChristmasMode();
 - **テーマ管理**: `next-themes` ライブラリ（SSR対応、フラッシュ防止、タブ間同期）
 - **テーマ定義**: CSS変数（`@layer theme` in `globals.css`）
 - **テーマプロバイダー**: `components/ThemeProvider.tsx`（アプリ全体をラップ）
-- **利用可能テーマ**: `default`（通常）, `christmas`（クリスマス）
+- **テーマ定数**: `lib/theme.ts`（テーマプリセット定数、ThemePreset型、isDarkTheme関数）
+- **テーマ保存**: localStorage（端末ごとに独立、Firestoreには保存しない）
 
-#### 後方互換API
-- **`useChristmasMode()`**: 既存APIを維持（内部で `next-themes` の `useTheme` に委譲）
-- **返り値**: `{ isChristmasMode, setChristmasMode, toggleChristmasMode }`
+#### 利用可能テーマ（6種類）
+
+| テーマID | 表示名 | タイプ | コンセプト |
+|---------|--------|--------|-----------|
+| `default` | デフォルト | ライト | 暖かいコーヒー系ライトテーマ |
+| `dark-roast` | ダークロースト | ダーク | 深煎りエスプレッソの高級感 |
+| `light-roast` | ライトロースト | ライト | 浅煎りの朝のハンドドリップ感 |
+| `matcha` | 抹茶ラテ | ダーク | 和カフェの落ち着き |
+| `caramel` | キャラメルマキアート | ダーク | 秋の収穫祭の温かさ |
+| `christmas` | クリスマス | ダーク | ホリデーシーズンの特別テーマ |
+
+#### テーマhook
+
+| hook | 用途 |
+|------|------|
+| **`useAppTheme()`** | 汎用テーマhook（currentTheme, setTheme, presets, isDarkTheme, isChristmasTheme） |
+| **`useChristmasMode()`** | 後方互換API（isChristmasMode, setChristmasMode, toggleChristmasMode） |
 
 #### クリスマスモード仕様
 
 ##### 視覚効果
 - **雪の結晶アニメーション**: SVG、Framer Motion
-- **配色変更**: CSS変数で自動切替（`.claude/skills/roastplus-ui/references/color-schemes.md` 参照）
+- **配色変更**: CSS変数で自動切替
+- **ヘッダーロゴ**: Playfair Displayフォント（イタリック）
 
-##### テーマ対応の2つの方式（移行期間中は併存）
-1. **CSS変数方式（推奨・新方式）**: `bg-page`, `text-ink` 等のセマンティックユーティリティ使用 → テーマ自動対応
-2. **`isChristmasMode` prop方式（旧方式）**: 共通UIコンポーネント経由で手動切替 → 段階的にCSS変数方式へ移行
+##### テーマ対応方式
+- **CSS変数方式（標準）**: `bg-page`, `text-ink` 等のセマンティックユーティリティ使用 → テーマ自動対応
+- **`isChristmasMode` 条件分岐**: クリスマス専用装飾（snowfall、ツリーアイコン等）のみ使用
 
 ### 禁止事項
 1. ❌ 共通コンポーネントの重複作成（既存コンポーネントを必ず確認）
@@ -506,8 +522,10 @@ const { isChristmasMode } = useChristmasMode();
 - **技術**: トースト通知（`toast()`）
 
 ### 設定（Settings）
-- **目的**: 開発者モード、テーマ切替
-- **技術**: localStorage
+- **目的**: 開発者モード、テーマ設定、アプリバージョン管理
+- **パス**: `/settings`（設定一覧）、`/settings/theme`（テーマ設定専用ページ）
+- **技術**: localStorage（テーマ）、Firestore（開発者モード）
+- **テーマ設定UI**: カードグリッド形式で6テーマプリセットから選択
 
 ### Developer Design Lab
 - **目的**: 開発者向けデザインモック検証ツール

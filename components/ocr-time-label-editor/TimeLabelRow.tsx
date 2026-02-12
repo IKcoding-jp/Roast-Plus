@@ -50,7 +50,7 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete }: TimeLabelRo
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
-                    setEditingTime({ ...editingTime, hour: value });
+                    setEditingTime(prev => ({ ...prev, hour: value }));
                   }
                 }}
                 min={0}
@@ -65,7 +65,7 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete }: TimeLabelRo
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 59)) {
-                    setEditingTime({ ...editingTime, minute: value });
+                    setEditingTime(prev => ({ ...prev, minute: value }));
                   }
                 }}
                 min={0}
@@ -124,7 +124,7 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete }: TimeLabelRo
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 23)) {
-                    setEditingContinuesUntil({ ...editingContinuesUntil, hour: value });
+                    setEditingContinuesUntil(prev => ({ ...prev, hour: value }));
                   }
                 }}
                 min={0}
@@ -138,7 +138,7 @@ export function TimeLabelRow({ label, isEditing, editor, onDelete }: TimeLabelRo
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 59)) {
-                    setEditingContinuesUntil({ ...editingContinuesUntil, minute: value });
+                    setEditingContinuesUntil(prev => ({ ...prev, minute: value }));
                   }
                 }}
                 min={0}

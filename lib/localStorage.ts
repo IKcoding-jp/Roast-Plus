@@ -10,6 +10,19 @@ const DEVICE_ID_KEY = 'roastplus_device_id';
 const LAST_46_TASTE_KEY = 'roastplus_last_46_taste';
 const LAST_46_STRENGTH_KEY = 'roastplus_last_46_strength';
 
+const TIMER_STATE_VERSION = 1;
+const TIMER_SETTINGS_VERSION = 1;
+
+interface StoredRoastTimerState {
+  version: number;
+  state: RoastTimerState;
+}
+
+interface StoredRoastTimerSettings {
+  version: number;
+  settings: RoastTimerSettings;
+}
+
 const parseJson = <T>(value: string): T | null => {
   try {
     return JSON.parse(value) as T;
@@ -46,11 +59,15 @@ export function getSelectedMemberId(): string | null {
  */
 export function setRoastTimerState(state: RoastTimerState | null | undefined): void {
   if (typeof window === 'undefined') return;
-  
+
   if (state === null || state === undefined) {
     localStorage.removeItem(ROAST_TIMER_STATE_KEY);
   } else {
-    localStorage.setItem(ROAST_TIMER_STATE_KEY, JSON.stringify(state));
+    const stored: StoredRoastTimerState = {
+      version: TIMER_STATE_VERSION,
+      state,
+    };
+    localStorage.setItem(ROAST_TIMER_STATE_KEY, JSON.stringify(stored));
   }
 }
 
@@ -59,11 +76,20 @@ export function setRoastTimerState(state: RoastTimerState | null | undefined): v
  */
 export function getRoastTimerState(): RoastTimerState | null {
   if (typeof window === 'undefined') return null;
-  
+
   const stored = localStorage.getItem(ROAST_TIMER_STATE_KEY);
   if (!stored) return null;
-  
-  return parseJson<RoastTimerState>(stored);
+
+  const parsed = parseJson<StoredRoastTimerState | RoastTimerState>(stored);
+  if (!parsed) return null;
+
+  // バージョン付きデータ
+  if ('version' in parsed && parsed.version === TIMER_STATE_VERSION) {
+    return (parsed as StoredRoastTimerState).state;
+  }
+
+  // レガシーデータ（version未設定）→ v1として扱う
+  return parsed as RoastTimerState;
 }
 
 /**
@@ -71,11 +97,15 @@ export function getRoastTimerState(): RoastTimerState | null {
  */
 export function setRoastTimerSettings(settings: RoastTimerSettings | null | undefined): void {
   if (typeof window === 'undefined') return;
-  
+
   if (settings === null || settings === undefined) {
     localStorage.removeItem(ROAST_TIMER_SETTINGS_KEY);
   } else {
-    localStorage.setItem(ROAST_TIMER_SETTINGS_KEY, JSON.stringify(settings));
+    const stored: StoredRoastTimerSettings = {
+      version: TIMER_SETTINGS_VERSION,
+      settings,
+    };
+    localStorage.setItem(ROAST_TIMER_SETTINGS_KEY, JSON.stringify(stored));
   }
 }
 
@@ -84,11 +114,20 @@ export function setRoastTimerSettings(settings: RoastTimerSettings | null | unde
  */
 export function getRoastTimerSettings(): RoastTimerSettings | null {
   if (typeof window === 'undefined') return null;
-  
+
   const stored = localStorage.getItem(ROAST_TIMER_SETTINGS_KEY);
   if (!stored) return null;
-  
-  return parseJson<RoastTimerSettings>(stored);
+
+  const parsed = parseJson<StoredRoastTimerSettings | RoastTimerSettings>(stored);
+  if (!parsed) return null;
+
+  // バージョン付きデータ
+  if ('version' in parsed && parsed.version === TIMER_SETTINGS_VERSION) {
+    return (parsed as StoredRoastTimerSettings).settings;
+  }
+
+  // レガシーデータ（version未設定）→ v1として扱う
+  return parsed as RoastTimerSettings;
 }
 
 /**

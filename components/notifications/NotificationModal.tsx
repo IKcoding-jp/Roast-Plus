@@ -68,7 +68,7 @@ export function NotificationModal({ notification, onSave, onCancel }: Notificati
                   value={title}
                   onChange={(e) => {
                     setTitle(e.target.value);
-                    if (errors.title) setErrors({ ...errors, title: undefined });
+                    if (errors.title) setErrors(prev => ({ ...prev, title: undefined }));
                   }}
                   className={`w-full px-4 py-2 border rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                     errors.title ? 'border-red-500' : 'border-gray-300'
@@ -93,7 +93,7 @@ export function NotificationModal({ notification, onSave, onCancel }: Notificati
                   value={content}
                   onChange={(e) => {
                     setContent(e.target.value);
-                    if (errors.content) setErrors({ ...errors, content: undefined });
+                    if (errors.content) setErrors(prev => ({ ...prev, content: undefined }));
                   }}
                   rows={6}
                   className={`w-full px-4 py-2 border rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 ${
@@ -120,7 +120,7 @@ export function NotificationModal({ notification, onSave, onCancel }: Notificati
                   value={date}
                   onChange={(e) => {
                     setDate(e.target.value);
-                    if (errors.date) setErrors({ ...errors, date: undefined });
+                    if (errors.date) setErrors(prev => ({ ...prev, date: undefined }));
                   }}
                   className={`w-full px-4 py-2 border rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                     errors.date ? 'border-red-500' : 'border-gray-300'

@@ -84,7 +84,7 @@ describe('localStorage', () => {
   });
 
   describe('ローストタイマー状態', () => {
-    it('タイマー状態を保存できる', () => {
+    it('タイマー状態を保存できる（バージョニング付き）', () => {
       const state: RoastTimerState = {
         isRunning: true,
         startTime: 1234567890,
@@ -95,11 +95,27 @@ describe('localStorage', () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'roastplus_roast_timer_state',
-        JSON.stringify(state)
+        JSON.stringify({ version: 1, state })
       );
     });
 
-    it('タイマー状態を取得できる', () => {
+    it('バージョニング付きタイマー状態を取得できる', () => {
+      const state: RoastTimerState = {
+        isRunning: false,
+        startTime: 9876543210,
+        elapsedSeconds: 120,
+      };
+
+      localStorageMock.setItem(
+        'roastplus_roast_timer_state',
+        JSON.stringify({ version: 1, state })
+      );
+
+      const retrieved = getRoastTimerState();
+      expect(retrieved).toEqual(state);
+    });
+
+    it('レガシーデータ（version未設定）を取得できる', () => {
       const state: RoastTimerState = {
         isRunning: false,
         startTime: 9876543210,
@@ -141,7 +157,7 @@ describe('localStorage', () => {
   });
 
   describe('ローストタイマー設定', () => {
-    it('タイマー設定を保存できる', () => {
+    it('タイマー設定を保存できる（バージョニング付き）', () => {
       const settings: RoastTimerSettings = {
         goToRoastRoomTimeSeconds: 60,
         timerSoundEnabled: true,
@@ -157,11 +173,32 @@ describe('localStorage', () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'roastplus_roast_timer_settings',
-        JSON.stringify(settings)
+        JSON.stringify({ version: 1, settings })
       );
     });
 
-    it('タイマー設定を取得できる', () => {
+    it('バージョニング付きタイマー設定を取得できる', () => {
+      const settings: RoastTimerSettings = {
+        goToRoastRoomTimeSeconds: 120,
+        timerSoundEnabled: false,
+        timerSoundFile: '/sounds/bell.mp3',
+        timerSoundVolume: 0.5,
+        notificationSoundEnabled: false,
+        notificationSoundFile: '/sounds/chime.mp3',
+        notificationSoundVolume: 0.3,
+        settingsVersion: 1,
+      };
+
+      localStorageMock.setItem(
+        'roastplus_roast_timer_settings',
+        JSON.stringify({ version: 1, settings })
+      );
+
+      const retrieved = getRoastTimerSettings();
+      expect(retrieved).toEqual(settings);
+    });
+
+    it('レガシーデータ（version未設定）を取得できる', () => {
       const settings: RoastTimerSettings = {
         goToRoastRoomTimeSeconds: 120,
         timerSoundEnabled: false,
@@ -524,7 +561,7 @@ describe('localStorage', () => {
       expect(retrieved).toBe('member-abc-123');
     });
 
-    it('タイマーを開始して状態を保存', () => {
+    it('タイマーを開始して状態を保存（バージョニング経由）', () => {
       const state: RoastTimerState = {
         isRunning: true,
         startTime: Date.now(),

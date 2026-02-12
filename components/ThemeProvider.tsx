@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
+import { THEME_IDS } from '@/lib/theme';
 
 const OLD_STORAGE_KEY = 'roastplus_christmas_mode';
 const OLD_MIGRATION_FLAG = 'roastplus_christmas_mode_migrated';
@@ -40,7 +41,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     <NextThemesProvider
       attribute="data-theme"
       defaultTheme="default"
-      themes={['default', 'christmas']}
+      themes={THEME_IDS}
       storageKey="roastplus_theme"
       enableSystem={false}
       disableTransitionOnChange

@@ -294,11 +294,8 @@ export default function HomePage(_props: HomePageProps = {}) {
       )}
 
       {/* ヘッダー */}
-      <header className={`shrink-0 relative z-50 shadow-2xl transition-all duration-1000 ${isChristmasMode
-        ? 'bg-gradient-to-r from-[#4a0e0e] via-[#5d1212] to-[#2d0a0a] backdrop-blur-xl border-b-[0.5px] border-[#d4af37]/40'
-        : 'bg-[#261a14]/98'
-        }`}>
-        {/* ヘッダー下部の極細ゴールドライン */}
+      <header className="shrink-0 relative z-50 shadow-2xl transition-all duration-1000 bg-header-bg">
+        {/* ヘッダー下部のアクセントライン（ダーク系テーマのみ） */}
         {isChristmasMode && (
           <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent shadow-[0_-1px_10px_rgba(212,175,55,0.3)]"></div>
         )}
@@ -321,7 +318,7 @@ export default function HomePage(_props: HomePageProps = {}) {
                 </div>
 
                 <div className="relative flex flex-col items-center">
-                  <span className="text-2xl md:text-4xl font-light tracking-[0.15em] flex items-center leading-none font-[var(--font-raleway)]">
+                  <span className="text-2xl md:text-4xl tracking-[0.08em] flex items-center leading-none font-[var(--font-playfair)] italic">
                     <span className="text-[#e23636] relative drop-shadow-[0_0_10px_rgba(226,54,54,0.3)] font-bold">
                       R
                     </span>
@@ -334,9 +331,9 @@ export default function HomePage(_props: HomePageProps = {}) {
             ) : (
               <div className="flex flex-col items-start leading-none">
                 <div className="flex items-center gap-1">
-                  <span className="text-2xl md:text-3xl font-light tracking-[0.15em] text-white font-[var(--font-raleway)]">
+                  <span className="text-2xl md:text-3xl font-light tracking-[0.15em] text-header-text font-[var(--font-raleway)]">
                     Roast
-                    <span className="text-[#EF8A00] font-bold ml-1">Plus</span>
+                    <span className="text-header-accent font-bold ml-1">Plus</span>
                   </span>
                 </div>
               </div>
@@ -347,11 +344,7 @@ export default function HomePage(_props: HomePageProps = {}) {
           <div className="flex items-center gap-3 md:gap-4">
             <button
               onClick={() => router.push('/clock')}
-              className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${
-                isChristmasMode
-                  ? 'text-spot bg-white/5 hover:bg-spot/20 border border-spot/20 shadow-inner'
-                  : 'text-white hover:bg-white/10'
-              }`}
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all text-header-text hover:bg-header-btn-hover"
               aria-label="デジタル時計を表示"
               title="デジタル時計"
             >
@@ -362,8 +355,7 @@ export default function HomePage(_props: HomePageProps = {}) {
               <>
                 <button
                   onClick={() => window.dispatchEvent(new Event(REPLAY_SPLASH_EVENT))}
-                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-spot bg-white/5 hover:bg-spot/20 border border-spot/20 shadow-inner' : 'text-white hover:bg-white/10'
-                    }`}
+                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all text-header-text hover:bg-header-btn-hover"
                   aria-label="スプラッシュ画面を再生"
                   title="スプラッシュ再生"
                 >
@@ -371,8 +363,7 @@ export default function HomePage(_props: HomePageProps = {}) {
                 </button>
                 <button
                   onClick={handleShowLoadingDebugModal}
-                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all ${isChristmasMode ? 'text-spot bg-white/5 hover:bg-spot/20 border border-spot/20 shadow-inner' : 'text-white hover:bg-white/10'
-                    }`}
+                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all text-header-text hover:bg-header-btn-hover"
                   aria-label="Lottieアニメーション確認モーダルを開く"
                 >
                   <PiCoffeeBeanFill className="h-6 w-6" />

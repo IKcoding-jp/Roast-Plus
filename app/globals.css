@@ -64,9 +64,19 @@
     --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
     --card-shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
     --card-glow: 0 10px 30px rgba(0,0,0,0.04);
+    /* ヘッダー */
+    --header-bg: #261a14;
+    --header-text: #FFFFFF;
+    --header-accent: #EF8A00;
+    --header-btn-hover: rgba(255, 255, 255, 0.1);
   }
 
   [data-theme="christmas"] {
+    /* ヘッダー */
+    --header-bg: #4a0e0e;
+    --header-text: #f8f1e7;
+    --header-accent: #d4af37;
+    --header-btn-hover: rgba(212, 175, 55, 0.2);
     /* 背景 */
     --page: #051a0e;
     --surface: #0d3520;
@@ -112,6 +122,218 @@
     --card-shadow: 0 0 15px rgba(212,175,55,0.1);
     --card-shadow-hover: 0 0 20px rgba(212,175,55,0.15);
     --card-glow: 0 20px 50px rgba(0,0,0,0.3);
+  }
+
+  [data-theme="dark-roast"] {
+    /* ヘッダー */
+    --header-bg: #0d0b09;
+    --header-text: #f5f0e8;
+    --header-accent: #c8a050;
+    --header-btn-hover: rgba(200, 160, 80, 0.2);
+    /* 背景 */
+    --page: #0d0b09;
+    --surface: #1a1614;
+    --overlay: #15110e;
+    --ground: rgba(255, 255, 255, 0.03);
+    --field: rgba(255, 255, 255, 0.07);
+    /* テキスト */
+    --ink: #f5f0e8;
+    --ink-sub: #c4b69c;
+    --ink-muted: rgba(196, 182, 156, 0.6);
+    /* ボーダー */
+    --edge: #2a231d;
+    --edge-strong: #3d3329;
+    --edge-subtle: rgba(255, 255, 255, 0.08);
+    /* アクセント */
+    --spot: #c8a050;
+    --spot-hover: #dab86c;
+    --spot-subtle: rgba(200, 160, 80, 0.15);
+    --spot-surface: rgba(200, 160, 80, 0.05);
+    /* ボタン */
+    --btn-primary: #c8a050;
+    --btn-primary-hover: #dab86c;
+    /* ステータスカラー */
+    --danger: #ef4444;
+    --danger-subtle: rgba(239, 68, 68, 0.15);
+    --success: #22c55e;
+    --success-subtle: rgba(34, 197, 94, 0.15);
+    --warning: #eab308;
+    --warning-subtle: rgba(234, 179, 8, 0.15);
+    --info: #06b6d4;
+    --info-hover: #22d3ee;
+    /* エラー */
+    --error: #f87171;
+    --error-ring: rgba(248, 113, 113, 0.2);
+    /* カードヘッダー */
+    --card-header-from: #1a1614;
+    --card-header-via: #2a231d;
+    --card-header-to: #1a1614;
+    /* フィードバックテキスト */
+    --feedback-correct: #4ade80;
+    --feedback-incorrect: #fb7185;
+    /* シャドウ */
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --card-shadow-hover: 0 8px 24px rgba(200, 160, 80, 0.1);
+    --card-glow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  }
+
+  [data-theme="light-roast"] {
+    /* ヘッダー */
+    --header-bg: #6b5d4f;
+    --header-text: #fff9f0;
+    --header-accent: #d4a535;
+    --header-btn-hover: rgba(214, 165, 53, 0.2);
+    /* 背景 */
+    --page: #faf6ef;
+    --surface: #fff9f0;
+    --overlay: #fff9f0;
+    --ground: #f0e9dd;
+    --field: #fff9f0;
+    /* テキスト */
+    --ink: #3d3229;
+    --ink-sub: #6b5d4f;
+    --ink-muted: #9c8b7a;
+    /* ボーダー */
+    --edge: #ede5d8;
+    --edge-strong: #ddd3c3;
+    --edge-subtle: #f5eee3;
+    /* アクセント */
+    --spot: #c69320;
+    --spot-hover: #a87b15;
+    --spot-subtle: rgba(214, 165, 53, 0.15);
+    --spot-surface: rgba(214, 165, 53, 0.06);
+    /* ボタン */
+    --btn-primary: #c69320;
+    --btn-primary-hover: #a87b15;
+    /* ステータスカラー */
+    --danger: #dc2626;
+    --danger-subtle: #fee2e2;
+    --success: #16a34a;
+    --success-subtle: #dcfce7;
+    --warning: #d4a535;
+    --warning-subtle: #fef3c7;
+    --info: #0891b2;
+    --info-hover: #0e7490;
+    /* エラー */
+    --error: #ef4444;
+    --error-ring: #fee2e2;
+    /* カードヘッダー */
+    --card-header-from: #3d3229;
+    --card-header-via: #6b5d4f;
+    --card-header-to: #3d3229;
+    /* フィードバックテキスト */
+    --feedback-correct: #065f46;
+    --feedback-incorrect: #9f1239;
+    /* シャドウ */
+    --card-shadow: 0 4px 6px -1px rgba(61, 50, 41, 0.08), 0 2px 4px -2px rgba(61, 50, 41, 0.06);
+    --card-shadow-hover: 0 10px 15px -3px rgba(61, 50, 41, 0.1), 0 4px 6px -4px rgba(61, 50, 41, 0.08);
+    --card-glow: 0 10px 30px rgba(61, 50, 41, 0.04);
+  }
+
+  [data-theme="matcha"] {
+    /* ヘッダー */
+    --header-bg: #0f1f15;
+    --header-text: #f0ebe0;
+    --header-accent: #7db358;
+    --header-btn-hover: rgba(125, 179, 88, 0.2);
+    /* 背景 */
+    --page: #0f1f15;
+    --surface: #1a3025;
+    --overlay: #152a1f;
+    --ground: rgba(255, 255, 255, 0.03);
+    --field: rgba(255, 255, 255, 0.07);
+    /* テキスト */
+    --ink: #f0ebe0;
+    --ink-sub: #b8c5a8;
+    --ink-muted: rgba(184, 197, 168, 0.6);
+    /* ボーダー */
+    --edge: #253d2e;
+    --edge-strong: #345a40;
+    --edge-subtle: rgba(255, 255, 255, 0.08);
+    /* アクセント */
+    --spot: #7db358;
+    --spot-hover: #95c774;
+    --spot-subtle: rgba(125, 179, 88, 0.15);
+    --spot-surface: rgba(125, 179, 88, 0.05);
+    /* ボタン */
+    --btn-primary: #7db358;
+    --btn-primary-hover: #95c774;
+    /* ステータスカラー */
+    --danger: #ef4444;
+    --danger-subtle: rgba(239, 68, 68, 0.15);
+    --success: #22c55e;
+    --success-subtle: rgba(34, 197, 94, 0.15);
+    --warning: #eab308;
+    --warning-subtle: rgba(234, 179, 8, 0.15);
+    --info: #06b6d4;
+    --info-hover: #22d3ee;
+    /* エラー */
+    --error: #f87171;
+    --error-ring: rgba(248, 113, 113, 0.2);
+    /* カードヘッダー */
+    --card-header-from: #1a3025;
+    --card-header-via: #253d2e;
+    --card-header-to: #1a3025;
+    /* フィードバックテキスト */
+    --feedback-correct: #4ade80;
+    --feedback-incorrect: #fb7185;
+    /* シャドウ */
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --card-shadow-hover: 0 8px 24px rgba(125, 179, 88, 0.1);
+    --card-glow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  }
+
+  [data-theme="caramel"] {
+    /* ヘッダー */
+    --header-bg: #1a120d;
+    --header-text: #f5ebe0;
+    --header-accent: #d4923a;
+    --header-btn-hover: rgba(212, 146, 58, 0.2);
+    /* 背景 */
+    --page: #1a120d;
+    --surface: #2a1f17;
+    --overlay: #231a13;
+    --ground: rgba(255, 255, 255, 0.03);
+    --field: rgba(255, 255, 255, 0.07);
+    /* テキスト */
+    --ink: #f5ebe0;
+    --ink-sub: #c9b9a5;
+    --ink-muted: rgba(201, 185, 165, 0.6);
+    /* ボーダー */
+    --edge: #3a2d22;
+    --edge-strong: #4d3d30;
+    --edge-subtle: rgba(255, 255, 255, 0.08);
+    /* アクセント */
+    --spot: #d4923a;
+    --spot-hover: #e5a54d;
+    --spot-subtle: rgba(212, 146, 58, 0.15);
+    --spot-surface: rgba(212, 146, 58, 0.05);
+    /* ボタン */
+    --btn-primary: #d4923a;
+    --btn-primary-hover: #e5a54d;
+    /* ステータスカラー */
+    --danger: #ef4444;
+    --danger-subtle: rgba(239, 68, 68, 0.15);
+    --success: #22c55e;
+    --success-subtle: rgba(34, 197, 94, 0.15);
+    --warning: #eab308;
+    --warning-subtle: rgba(234, 179, 8, 0.15);
+    --info: #06b6d4;
+    --info-hover: #22d3ee;
+    /* エラー */
+    --error: #f87171;
+    --error-ring: rgba(248, 113, 113, 0.2);
+    /* カードヘッダー */
+    --card-header-from: #2a1f17;
+    --card-header-via: #3a2d22;
+    --card-header-to: #2a1f17;
+    /* フィードバックテキスト */
+    --feedback-correct: #4ade80;
+    --feedback-incorrect: #fb7185;
+    /* シャドウ */
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --card-shadow-hover: 0 8px 24px rgba(212, 146, 58, 0.1);
+    --card-glow: 0 20px 50px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -161,6 +383,11 @@
   --color-card-header-from: var(--card-header-from);
   --color-card-header-via: var(--card-header-via);
   --color-card-header-to: var(--card-header-to);
+  /* ヘッダー */
+  --color-header-bg: var(--header-bg);
+  --color-header-text: var(--header-text);
+  --color-header-accent: var(--header-accent);
+  --color-header-btn-hover: var(--header-btn-hover);
   /* フィードバックテキスト */
   --color-feedback-correct: var(--feedback-correct);
   --color-feedback-incorrect: var(--feedback-incorrect);

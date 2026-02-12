@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth, signOut } from '@/lib/auth';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
-import { useChristmasMode } from '@/hooks/useChristmasMode';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
 import { useToastContext } from '@/components/Toast';
@@ -27,8 +27,8 @@ export default function SettingsPage() {
     const { version, isUpdateAvailable, isChecking, checkForUpdates, applyUpdate } = useAppVersion();
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [userConsent, setUserConsent] = useState<UserConsent | null>(null);
-
-    const { isChristmasMode, setChristmasMode } = useChristmasMode();
+    const { presets, currentTheme } = useAppTheme();
+    const currentPreset = presets.find((p) => p.id === currentTheme);
 
     // 同意日時を取得
     useEffect(() => {
@@ -110,26 +110,24 @@ export default function SettingsPage() {
                 </header>
 
                 <main className="space-y-6">
-                    {/* クリスマスモードセクション */}
-                    <div className="bg-surface rounded-lg shadow-sm border border-edge p-6">
+                    {/* テーマ設定 */}
+                    <Link
+                        href="/settings/theme"
+                        className="block bg-surface rounded-lg shadow-sm border border-edge p-6 hover:shadow-card-hover hover:border-edge-strong transition-all"
+                    >
                         <div className="flex items-center justify-between">
                             <div className="flex-1">
                                 <h2 className="text-xl font-semibold text-ink mb-2 flex items-center gap-2">
-                                    <span>🎄</span> クリスマスモード
+                                    <HiColorSwatch className="h-5 w-5 text-spot" />
+                                    テーマ設定
                                 </h2>
                                 <p className="text-sm text-ink-sub">
-                                    ホーム画面をクリスマス仕様に変更します
+                                    現在: {currentPreset?.name ?? 'デフォルト'}
                                 </p>
                             </div>
-                            <div className="ml-4">
-                                <Switch
-                                    size="lg"
-                                    checked={isChristmasMode}
-                                    onChange={(e) => setChristmasMode(e.target.checked)}
-                                />
-                            </div>
+                            <span className="text-ink-muted text-xl">&gt;</span>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* 開発者モードセクション */}
                     <div className="bg-surface rounded-lg shadow-sm border border-edge p-6">

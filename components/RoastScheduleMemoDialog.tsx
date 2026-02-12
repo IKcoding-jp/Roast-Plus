@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { RoastSchedule } from '@/types';
 import { getRoastMachineModeForBlend, type BeanName } from '@/lib/beanConfig';
 import { HiX } from 'react-icons/hi';
@@ -77,14 +77,6 @@ function RoastScheduleMemoDialogInner({
     if (!ratio1 || !ratio2) return undefined;
     return `${ratio1}:${ratio2}`;
   };
-
-  // 豆の名前が変更されたら、Gモードを自動設定
-  useEffect(() => {
-    if (beanName && isRoasterOn) {
-      // モードは自動設定されるが、UIには表示しない（内部で使用）
-      // ブレンド対応のため、getRoastMachineModeForBlendを使用
-    }
-  }, [beanName, beanName2, blendRatio1, blendRatio2, isRoasterOn]);
 
   // メモタイプの排他的選択
   const handleMemoTypeChange = (type: 'roasterOn' | 'roast' | 'afterPurge' | 'chaffCleaning') => {

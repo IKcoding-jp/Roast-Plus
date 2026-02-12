@@ -70,7 +70,7 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
         }
     }, [currentTime, nextStep, isManualMode]);
 
-    const toggleTimer = () => setIsRunning(!isRunning);
+    const toggleTimer = () => setIsRunning(prev => !prev);
 
     const resetTimer = () => {
         setIsRunning(false);
@@ -84,13 +84,13 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
 
     const goToNextStep = () => {
         if (isManualMode && manualStepIndex < steps.length - 1) {
-            setManualStepIndex(manualStepIndex + 1);
+            setManualStepIndex(prev => prev + 1);
         }
     };
 
     const goToPrevStep = () => {
         if (isManualMode && manualStepIndex > 0) {
-            setManualStepIndex(manualStepIndex - 1);
+            setManualStepIndex(prev => prev - 1);
         }
     };
 

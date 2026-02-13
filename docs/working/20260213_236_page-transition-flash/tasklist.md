@@ -1,5 +1,8 @@
 # タスクリスト
 
+**ステータス**: ✅ 完了
+**完了日**: 2026-02-13
+
 ## フェーズ1: CSS変数の修正
 - [x] `app/globals.css` の body 背景を `var(--page)` に変更
 - [x] `bg-background` クラスの使用箇所を確認し影響を評価 → 使用箇所ゼロ、影響なし
@@ -9,15 +12,9 @@
 - [x] `components/Loading.tsx` のハードコード背景色をテーマ対応に変更
 
 ## フェーズ3: 検証
-- [ ] `npm run build` でビルドエラーがないこと
-- [ ] `npm run lint` でLintエラーがゼロであること
-- [ ] 全テーマでページ遷移の白フラッシュが解消されていること
-  - default
-  - christmas
-  - dark-roast
-  - light-roast
-  - matcha
-  - caramel
+- [x] `npm run build` でビルドエラーがないこと
+- [x] `npm run lint` でLintエラーがゼロであること
+- [x] 全テーマでページ遷移の白フラッシュが解消されていること（手動確認済み）
 
 ## 依存関係
 - フェーズ1 → フェーズ2（CSS変数の修正後にコンポーネント修正）

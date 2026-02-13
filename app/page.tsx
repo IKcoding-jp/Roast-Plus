@@ -25,8 +25,6 @@ import { PiBellFill } from 'react-icons/pi';
 import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
 import { BsStars } from 'react-icons/bs';
 
-const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
-
 interface Action {
   key: string;
   title: string;
@@ -137,20 +135,9 @@ export default function HomePage(_props: HomePageProps = {}) {
 
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [showLoadingDebugModal, setShowLoadingDebugModal] = useState(false);
-  const [splashVisible, setSplashVisible] = useState(true);
   const [cardHeight, setCardHeight] = useState<number | null>(null);
   const [checkingConsent, setCheckingConsent] = useState(true);
   const { isChristmasMode } = useChristmasMode();
-
-  // スプラッシュ画面の表示時間を管理
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSplashVisible(false);
-    }, SPLASH_DISPLAY_TIME + 300); // フェードアウト時間を加味
-
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -226,13 +213,7 @@ export default function HomePage(_props: HomePageProps = {}) {
     };
   }, []);
 
-  // 開発用: Lottieアニメーション確認モーダルを表示
-  const handleShowLoadingDebugModal = () => {
-    setShowLoadingDebugModal(true);
-  };
-
-  // スプラッシュ表示中はLoadingを出さない
-  if ((loading || checkingConsent) && !splashVisible) {
+  if (loading || checkingConsent) {
     return <Loading />;
   }
 
@@ -252,44 +233,8 @@ export default function HomePage(_props: HomePageProps = {}) {
         <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")' }}></div>
       )}
 
-      {/* 開発用: Lottieアニメーション確認モーダル */}
-      {showLoadingDebugModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={() => setShowLoadingDebugModal(false)}
-        >
-          <div
-            className="mx-4 w-full max-w-md rounded-xl bg-white p-8 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-800">Lottieアニメーション確認</h2>
-              <button
-                onClick={() => setShowLoadingDebugModal(false)}
-                className="text-2xl font-bold text-gray-500 transition-colors hover:text-gray-700"
-                aria-label="閉じる"
-              >
-
-              </button>
-            </div>
-            <div className="mb-4">
-              <Loading fullScreen={false} message="メインスプラッシュを確認中..." />
-            </div>
-            <div className="mb-4">
-              <Loading fullScreen={false} message="読み込み状態を確認中..." />
-            </div>
-            <button
-              onClick={() => setShowLoadingDebugModal(false)}
-              className="w-full rounded-lg bg-gray-700 px-4 py-2 text-white transition-colors hover:bg-gray-800"
-            >
-              閉じる
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* ヘッダー */}
-      <HomeHeader onShowLoadingDebugModal={handleShowLoadingDebugModal} />
+      <HomeHeader />
 
       {/* メインコンテンツ */}
       <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-2 pb-2 sm:px-6 sm:pt-3 sm:pb-3 flex-1 min-h-0">

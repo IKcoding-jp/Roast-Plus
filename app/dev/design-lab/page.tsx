@@ -8,17 +8,14 @@ import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import SectionNav from './components/SectionNav';
 import ComponentGallery from './components/sections/ComponentGallery';
-import AnimationShowcase from './components/sections/AnimationShowcase';
 import PageMockups from './components/sections/PageMockups';
 import ColorPalette from './components/sections/ColorPalette';
 import Typography from './components/sections/Typography';
 import ComponentVariations from './components/sections/ComponentVariations';
-import PatternComparison from './components/PatternComparison';
 import ResponsivePreview from './components/ResponsivePreview';
 
 const sectionComponents: Record<string, React.ComponentType> = {
   components: ComponentGallery,
-  animations: AnimationShowcase,
   'page-mockups': PageMockups,
   colors: ColorPalette,
   typography: Typography,
@@ -53,9 +50,6 @@ export default function DesignLabPage() {
 
   // アクティブセクションのコンテンツ
   const renderContent = () => {
-    if (activeSection === 'pattern-comparison') {
-      return <PatternComparison />;
-    }
     if (activeSection === 'responsive-preview') {
       return (
         <ResponsivePreview>

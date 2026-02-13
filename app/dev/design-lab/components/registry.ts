@@ -11,11 +11,6 @@ export const labSections: LabSection[] = [
     description: '全共通UIコンポーネントのカタログ',
   },
   {
-    id: 'animations',
-    title: 'アニメーション',
-    description: 'スプラッシュアニメーション5パターン',
-  },
-  {
     id: 'page-mockups',
     title: 'ページモック',
     description: 'ページ全体のデザインテンプレート',
@@ -34,11 +29,6 @@ export const labSections: LabSection[] = [
     id: 'variations',
     title: 'バリエーション',
     description: 'デザインパターン比較',
-  },
-  {
-    id: 'pattern-comparison',
-    title: 'パターン並列比較',
-    description: 'アニメーション横並び比較',
   },
   {
     id: 'responsive-preview',

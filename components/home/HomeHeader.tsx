@@ -3,19 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { FaTree, FaStar } from 'react-icons/fa';
 import { HiClock } from 'react-icons/hi';
-import { HiSparkles } from 'react-icons/hi2';
-import { PiCoffeeBeanFill } from 'react-icons/pi';
-import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
-import { REPLAY_SPLASH_EVENT } from '@/components/SplashScreen';
 
-export interface HomeHeaderProps {
-  onShowLoadingDebugModal: () => void;
-}
-
-export function HomeHeader({ onShowLoadingDebugModal }: HomeHeaderProps) {
+export function HomeHeader() {
   const router = useRouter();
-  const { isEnabled: isDeveloperMode } = useDeveloperMode();
   const { isChristmasMode } = useChristmasMode();
 
   return (
@@ -66,26 +57,6 @@ export function HomeHeader({ onShowLoadingDebugModal }: HomeHeaderProps) {
           >
             <HiClock className="h-5 w-5" />
           </button>
-
-          {isDeveloperMode && (
-            <>
-              <button
-                onClick={() => window.dispatchEvent(new Event(REPLAY_SPLASH_EVENT))}
-                className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl p-2 transition-all text-header-text/70 hover:text-header-text hover:bg-header-btn-hover active:scale-95"
-                aria-label="スプラッシュ画面を再生"
-                title="スプラッシュ再生"
-              >
-                <HiSparkles className="h-5 w-5" />
-              </button>
-              <button
-                onClick={onShowLoadingDebugModal}
-                className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl p-2 transition-all text-header-text/70 hover:text-header-text hover:bg-header-btn-hover active:scale-95"
-                aria-label="Lottieアニメーション確認モーダルを開く"
-              >
-                <PiCoffeeBeanFill className="h-5 w-5" />
-              </button>
-            </>
-          )}
         </div>
       </div>
 

@@ -40,7 +40,7 @@ export function Loading({ message = '読み込み中...', fullScreen = true }: L
     : 'flex items-center justify-center py-8';
 
   return (
-    <div className={containerClass} style={{ backgroundColor: '#F7F7F5' }}>
+    <div className={`${containerClass} bg-page`}>
       <div className="text-center">
         <div className="flex justify-center mb-4">
           {isLoading || !animationData ? (

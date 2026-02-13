@@ -425,7 +425,7 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--page);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

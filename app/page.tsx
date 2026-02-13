@@ -7,11 +7,10 @@ import { FaCoffee, FaUsers } from 'react-icons/fa';
 import { IoSettings, IoSparkles } from 'react-icons/io5';
 import { RiLightbulbFlashFill } from 'react-icons/ri';
 import { MdCoffeeMaker, MdTimer, MdTimeline } from 'react-icons/md';
-import { PiCoffeeBeanFill } from 'react-icons/pi';
 import { RiBookFill, RiCalendarScheduleFill } from 'react-icons/ri';
 import { Loading } from '@/components/Loading';
 import { ActionCard } from '@/components/home/ActionCard';
-import { useDeveloperMode } from '@/hooks/useDeveloperMode';
+import { HomeHeader } from '@/components/home/HomeHeader';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
 import { useAuth } from '@/lib/auth';
 import { getUserData } from '@/lib/firestore';
@@ -24,9 +23,6 @@ const Snowfall = dynamic(() => import('@/components/Snowfall').then(mod => ({ de
 import { FaTree, FaGift, FaSnowflake, FaStar } from 'react-icons/fa';
 import { PiBellFill } from 'react-icons/pi';
 import { GiCandyCanes, GiGingerbreadMan } from 'react-icons/gi';
-import { HiClock } from 'react-icons/hi';
-import { HiSparkles } from 'react-icons/hi2';
-import { REPLAY_SPLASH_EVENT } from '@/components/SplashScreen';
 import { BsStars } from 'react-icons/bs';
 
 const SPLASH_DISPLAY_TIME = 3000; // スプラッシュ画面の表示時間 (ms)
@@ -145,7 +141,6 @@ export default function HomePage(_props: HomePageProps = {}) {
   const [splashVisible, setSplashVisible] = useState(true);
   const [cardHeight, setCardHeight] = useState<number | null>(null);
   const [checkingConsent, setCheckingConsent] = useState(true);
-  const { isEnabled: isDeveloperMode } = useDeveloperMode();
   const { isChristmasMode } = useChristmasMode();
 
   // スプラッシュ画面の表示時間を管理
@@ -294,86 +289,7 @@ export default function HomePage(_props: HomePageProps = {}) {
       )}
 
       {/* ヘッダー */}
-      <header className="shrink-0 relative z-50 shadow-2xl transition-all duration-1000 bg-header-bg">
-        {/* ヘッダー下部のアクセントライン（ダーク系テーマのみ） */}
-        {isChristmasMode && (
-          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent shadow-[0_-1px_10px_rgba(212,175,55,0.3)]"></div>
-        )}
-
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-5">
-          <div className="relative flex items-center gap-3 group cursor-default">
-            {isChristmasMode ? (
-              <div className="flex items-center gap-1">
-                <div className="relative flex items-center justify-center p-1">
-                  {/* ツリー本体 */}
-                  <FaTree className="text-[#1a472a] text-2xl md:text-4xl drop-shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all duration-700 group-hover:scale-105" />
-
-                  {/* トップスター */}
-                  <FaStar className="absolute -top-0.5 text-[#ffcc33] text-[10px] animate-pulse drop-shadow-[0_0_8px_#ffcc33]" />
-
-                  {/* オーナメント (光る飾り) */}
-                  <div className="absolute top-[35%] left-[45%] w-1 h-1 bg-[#e23636] rounded-full shadow-[0_0_6px_#e23636] animate-pulse"></div>
-                  <div className="absolute top-[55%] right-[35%] w-1 h-1 bg-[#d4af37] rounded-full shadow-[0_0_6px_#d4af37] animate-pulse [animation-delay:0.3s]"></div>
-                  <div className="absolute top-[70%] left-[38%] w-0.5 h-0.5 bg-[#f8f1e7] rounded-full shadow-[0_0_4px_white] animate-pulse [animation-delay:0.6s]"></div>
-                </div>
-
-                <div className="relative flex flex-col items-center">
-                  <span className="text-2xl md:text-4xl tracking-[0.08em] flex items-center leading-none font-[var(--font-playfair)] italic">
-                    <span className="text-[#e23636] relative drop-shadow-[0_0_10px_rgba(226,54,54,0.3)] font-bold">
-                      R
-                    </span>
-                    <span className="text-[#f8f1e7] drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">oast</span>
-                    <span className="text-[#d4af37] ml-1 font-bold drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]">Plus</span>
-                  </span>
-                  <div className="w-full h-[1.5px] mt-0.5 bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent shadow-[0_1px_8px_rgba(212,175,55,0.4)]"></div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-start leading-none">
-                <div className="flex items-center gap-1">
-                  <span className="text-2xl md:text-3xl font-light tracking-[0.15em] text-header-text font-[var(--font-raleway)]">
-                    Roast
-                    <span className="text-header-accent font-bold ml-1">Plus</span>
-                  </span>
-                </div>
-              </div>
-            )}
-
-          </div>
-
-          <div className="flex items-center gap-3 md:gap-4">
-            <button
-              onClick={() => router.push('/clock')}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all text-header-text hover:bg-header-btn-hover"
-              aria-label="デジタル時計を表示"
-              title="デジタル時計"
-            >
-              <HiClock className="h-6 w-6" />
-            </button>
-
-            {isDeveloperMode && (
-              <>
-                <button
-                  onClick={() => window.dispatchEvent(new Event(REPLAY_SPLASH_EVENT))}
-                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all text-header-text hover:bg-header-btn-hover"
-                  aria-label="スプラッシュ画面を再生"
-                  title="スプラッシュ再生"
-                >
-                  <HiSparkles className="h-6 w-6" />
-                </button>
-                <button
-                  onClick={handleShowLoadingDebugModal}
-                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-all text-header-text hover:bg-header-btn-hover"
-                  aria-label="Lottieアニメーション確認モーダルを開く"
-                >
-                  <PiCoffeeBeanFill className="h-6 w-6" />
-                </button>
-              </>
-            )}
-
-          </div>
-        </div>
-      </header>
+      <HomeHeader onShowLoadingDebugModal={handleShowLoadingDebugModal} />
 
       {/* メインコンテンツ */}
       <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-2 pb-2 sm:px-6 sm:pt-3 sm:pb-3 flex-1 min-h-0">

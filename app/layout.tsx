@@ -91,7 +91,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body
-        className={`${zenOldMincho.variable} ${inter.variable} ${robotoMono.variable} ${oswald.variable} ${orbitron.variable} ${notoSansJP.variable} ${raleway.variable} ${playfairDisplay.variable} antialiased font-serif`}
+        className={`${zenOldMincho.variable} ${inter.variable} ${robotoMono.variable} ${oswald.variable} ${orbitron.variable} ${notoSansJP.variable} ${raleway.variable} ${playfairDisplay.variable} antialiased font-serif bg-page`}
         suppressHydrationWarning
       >
         <Script

@@ -9,7 +9,7 @@ vi.mock('next-themes', () => ({
   useTheme: vi.fn(() => ({
     resolvedTheme: 'default',
     setTheme: mockSetTheme,
-    themes: ['default', 'dark-roast', 'light-roast', 'matcha', 'caramel', 'christmas'],
+    themes: ['default', 'dark-roast', 'light-roast', 'matcha', 'caramel', 'christmas', 'dark'],
   })),
 }));
 
@@ -18,10 +18,10 @@ describe('ThemeSelector', () => {
     vi.clearAllMocks();
   });
 
-  it('6つのテーマカードが表示される', () => {
+  it('7つのテーマカードが表示される', () => {
     render(<ThemeSelector />);
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(6);
+    expect(buttons).toHaveLength(7);
   });
 
   it('テーマ名と説明文が正しく表示される', () => {

@@ -713,7 +713,7 @@ function NewComponentDemo() {
 - **目的**: 開発者モード、テーマ設定、アプリバージョン管理
 - **パス**: `/settings`（設定一覧）、`/settings/theme`（テーマ設定専用ページ）
 - **技術**: localStorage（テーマ）、Firestore（開発者モード）
-- **テーマ設定UI**: カードグリッド形式で6テーマプリセットから選択
+- **テーマ設定UI**: カードグリッド形式で7テーマプリセットから選択
 
 ### Developer Design Lab
 - **目的**: 開発者向けデザインモック検証ツール

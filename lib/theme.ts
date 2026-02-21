@@ -97,6 +97,19 @@ export const THEME_PRESETS: ThemePreset[] = [
       text: '#f8f1e7',
     },
   },
+  {
+    id: 'dark',
+    name: 'ダークモード',
+    description: '目の疲れを抑える汎用ダークテーマ',
+    type: 'dark',
+    themeColor: '#0f0f0f',
+    previewColors: {
+      bg: '#0f0f0f',
+      surface: '#1a1a1a',
+      accent: '#d97706',
+      text: '#e8e8e8',
+    },
+  },
 ];
 
 /** テーマIDの配列（ThemeProvider用） */

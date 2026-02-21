@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { THEME_PRESETS, THEME_IDS, isDarkTheme } from './theme';
 
 describe('THEME_PRESETS', () => {
-  it('6つのテーマプリセットが定義されている', () => {
-    expect(THEME_PRESETS).toHaveLength(6);
+  it('7つのテーマプリセットが定義されている', () => {
+    expect(THEME_PRESETS).toHaveLength(7);
   });
 
   it('各テーマに必須フィールドが存在する', () => {
@@ -40,6 +40,7 @@ describe('THEME_PRESETS', () => {
     expect(ids).toContain('matcha');
     expect(ids).toContain('caramel');
     expect(ids).toContain('christmas');
+    expect(ids).toContain('dark');
   });
 });
 

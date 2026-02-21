@@ -270,6 +270,7 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 | `lib/` テスト | 28 | ビジネスロジックのユニットテスト |
 | `hooks/` テスト | 6 | カスタムフックのテスト |
 | `components/` テスト | 20 | UIコンポーネントテスト |
+| `__tests__/scripts/` テスト | 1 | GitHub Actionsスクリプトのユニットテスト（Node環境） |
 
 ### カバレッジ目標・実績
 
@@ -279,7 +280,7 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 | lib/ | 90%以上 | 89.44% |
 | hooks/ | 85%以上 | 87.9% |
 
-- **総テスト数**: 1054+テスト（100%合格）
+- **総テスト数**: 1066テスト（100%合格）
 
 ### E2Eテスト（Playwright）
 
@@ -325,9 +326,20 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 | Firebase Hosting | `npm run build && firebase deploy --only hosting` | 手動デプロイ |
 | Vercel | `git push`（自動デプロイ） | Git連携 |
 
+### GitHub Actions（実装済）
+
+| ワークフロー | トリガー | 内容 |
+|------------|---------|------|
+| `changelog-suggest.yml` | PR作成時（main向け） | 「ユーザー向け更新内容」が空なら、OpenAI gpt-4o-miniでドラフトを生成しPRコメントに投稿 |
+| `changelog-update.yml` | PRマージ時（main向け） | ブランチ種別でバージョンをインクリメント（feat→minor, fix/style→patch）し、changelog・package.jsonを自動更新（`[skip ci]`） |
+| `auto-fix-issue.yml` | （既存） | — |
+| `ci.yml` | （既存） | — |
+| `firebase-hosting-merge.yml` | （既存） | Firebase Hosting自動デプロイ |
+| `firebase-hosting-preview.yml` | （既存） | Firebaseプレビューチャンネル |
+
 ### 計画中
 
-- **GitHub Actions**: PR作成時のテスト自動実行、mainマージ時の自動デプロイ
+- **GitHub Actions**: PR作成時のテスト自動実行
 
 ---
 
@@ -348,9 +360,9 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 | `NEXT_PUBLIC_FIREBASE_*`（6個） | Firebase設定 | `.env.local` |
 | `NEXT_PUBLIC_EMAILJS_*`（3個） | EmailJS設定 | `.env.local` |
 | `NEXT_PUBLIC_APP_VERSION` | アプリバージョン | `package.json` から自動取得 |
-| `OPENAI_API_KEY` | OpenAI APIキー | Firebase Secret Manager（Cloud Functions専用） |
+| `OPENAI_API_KEY` | OpenAI APIキー | Firebase Secret Manager（Cloud Functions専用）/ GitHub Secrets（changelog-suggest.yml） |
 
-**重要**: `OPENAI_API_KEY` はクライアントに公開しない。Cloud Functions内でのみ使用。
+**重要**: `OPENAI_API_KEY` はクライアントに公開しない。Cloud Functions内またはGitHub Actions内でのみ使用。
 
 ---
 

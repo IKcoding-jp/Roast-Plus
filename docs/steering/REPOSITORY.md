@@ -14,9 +14,14 @@ roastplus/
 ├── hooks/                  # カスタムReactフック
 ├── types/                  # TypeScript型定義
 ├── functions/              # Firebase Cloud Functions（サーバーレスAI処理）
+├── __tests__/              # ユニットテスト（Node環境が必要なスクリプト等）
+│   └── scripts/            # GitHub Actionsスクリプトのテスト
 ├── docs/                   # ドキュメント（Steering / Working）
 ├── e2e/                    # Playwright E2Eテスト
 ├── .claude/                # Claude Code設定・スキル
+├── .github/                # GitHub設定
+│   ├── workflows/          # GitHub Actionsワークフロー
+│   └── scripts/            # Actions内で実行するスクリプト（.mjs）
 ├── public/                 # 静的ファイル（SW, マニフェスト, 画像, 音声）
 ├── scripts/                # 自動化スクリプト
 ├── remotion/               # 動画生成（Remotion）

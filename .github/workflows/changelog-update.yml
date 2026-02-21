@@ -1,0 +1,115 @@
+name: Changelog Update
+
+# PRマージ時にバージョンを自動インクリメントしchangelogを更新する
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  update:
+    # PRがマージされた場合のみ実行
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # プッシュするためにトークンを使用
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Parse changelog section
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+
+            // 「ユーザー向け更新内容」セクションを抽出
+            const match = body.match(/## ユーザー向け更新内容[\s\S]*?\n([\s\S]*?)<!-- \/changelog -->/);
+            const content = match ? match[1].trim() : '';
+
+            // "-" のみ（空エントリ）かどうか判定
+            const isEmpty = /^[\s\-*]*$/.test(content);
+
+            console.log('抽出されたコンテンツ:', JSON.stringify(content));
+            console.log('空エントリ:', isEmpty);
+
+            core.setOutput('content', content);
+            core.setOutput('is_empty', isEmpty ? 'true' : 'false');
+
+      - name: Skip if no user-facing content
+        if: steps.parse.outputs.is_empty == 'true'
+        run: |
+          echo "ユーザー向け更新内容が空のためchangelogを更新しません"
+          echo "（内部改善・リファクタリング等）"
+
+      - name: Determine version bump
+        id: version
+        if: steps.parse.outputs.is_empty == 'false'
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          CURRENT=$(node -p "require('./package.json').version")
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          echo "現在のブランチ: $BRANCH"
+          echo "現在のバージョン: $CURRENT"
+
+          if [[ "$BRANCH" == feat/* ]]; then
+            NEW="$MAJOR.$((MINOR + 1)).0"
+            TYPE="feature"
+            echo "→ minor バンプ: $CURRENT → $NEW"
+          elif [[ "$BRANCH" == fix/* || "$BRANCH" == style/* ]]; then
+            NEW="$MAJOR.$MINOR.$((PATCH + 1))"
+            TYPE="bugfix"
+            echo "→ patch バンプ: $CURRENT → $NEW"
+          else
+            echo "→ バンプなし（ブランチ: $BRANCH）"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "new_version=$NEW" >> $GITHUB_OUTPUT
+          echo "pr_type=$TYPE" >> $GITHUB_OUTPUT
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Skip if no version bump needed
+        if: steps.parse.outputs.is_empty == 'false' && steps.version.outputs.skip == 'true'
+        run: |
+          echo "バージョンバンプ対象外のブランチのためchangelogを更新しません"
+
+      - name: Update changelog files
+        if: steps.parse.outputs.is_empty == 'false' && steps.version.outputs.skip != 'true'
+        env:
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          CHANGELOG_CONTENT: ${{ steps.parse.outputs.content }}
+          PR_TYPE: ${{ steps.version.outputs.pr_type }}
+          MERGE_DATE: ${{ github.event.pull_request.merged_at }}
+        run: |
+          # 日付部分だけ抽出 (YYYY-MM-DD)
+          export MERGE_DATE="${MERGE_DATE:0:10}"
+
+          echo "バージョン $NEW_VERSION のchangelogを更新します..."
+          node .github/scripts/update-changelog.mjs
+
+      - name: Commit and push changes
+        if: steps.parse.outputs.is_empty == 'false' && steps.version.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add package.json data/dev-stories/detailed-changelog.ts data/dev-stories/version-history.ts
+          git commit -m "chore: v${{ steps.version.outputs.new_version }} changelog自動更新 [skip ci]"
+          git push
+
+          echo "✅ changelog更新をコミットしました"

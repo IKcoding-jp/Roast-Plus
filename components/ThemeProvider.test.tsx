@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from './ThemeProvider';
+import { isDarkTheme, THEME_PRESETS } from '@/lib/theme';
 
 // next-themes のモック
 const mockSetTheme = vi.fn();
@@ -107,5 +108,19 @@ describe('ThemeProvider', () => {
 
     // christmas テーマには切り替えない
     expect(mockSetTheme).not.toHaveBeenCalledWith('christmas');
+  });
+});
+
+describe('Pure Neutral Dark テーマ（#246）', () => {
+  it('isDarkTheme が dark テーマを正しく判定する', () => {
+    expect(isDarkTheme('dark')).toBe(true);
+  });
+
+  it('THEME_PRESETS に dark テーマが含まれている', () => {
+    const darkPreset = THEME_PRESETS.find((t) => t.id === 'dark');
+    expect(darkPreset).toBeDefined();
+    expect(darkPreset?.name).toBe('ダークモード');
+    expect(darkPreset?.type).toBe('dark');
+    expect(darkPreset?.themeColor).toBe('#0f0f0f');
   });
 });

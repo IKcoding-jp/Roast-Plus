@@ -7,13 +7,15 @@
 ## 目次
 
 1. [担当表（Assignment）](#1-担当表assignment)
-2. [ローストタイマー（Roast Timer）](#2-焙煎タイマーroast-timer)
-3. [ドリップガイド（Drip Guide）](#3-ドリップガイドdrip-guide)
-4. [コーヒークイズ（Coffee Quiz）](#4-コーヒークイズcoffee-quiz)
-5. [テイスティング（Tasting）](#5-テイスティングtasting)
-6. [スケジュール管理（Schedule）](#6-スケジュール管理schedule)
-7. [共通UI（UI Components）](#7-共通uiui-components)
-8. [その他機能](#8-その他機能)
+2. [スケジュール（Schedule）](#2-スケジュールschedule)
+3. [試飲感想記録（Tasting）](#3-試飲感想記録tasting)
+4. [ローストタイマー（Roast Timer）](#4-ローストタイマーroast-timer)
+5. [コーヒー豆図鑑（Defect Beans）](#5-コーヒー豆図鑑defect-beans)
+6. [作業進捗（Work Progress）](#6-作業進捗work-progress)
+7. [ドリップガイド（Drip Guide）](#7-ドリップガイドdrip-guide)
+8. [コーヒークイズ（Coffee Quiz）](#8-コーヒークイズcoffee-quiz)
+9. [開発秘話（Dev Stories）](#9-開発秘話dev-stories)
+10. [その他](#10-その他)
 
 ---
 
@@ -76,7 +78,119 @@ interface Assignment {
 
 ---
 
-## 2. 焙煎タイマー（Roast Timer）
+## 2. スケジュール（Schedule）
+
+### 目的
+業務予定のOCR読み取り、一覧表示
+
+### 主要ユースケース
+1. スケジュール画像のOCR（Firebase Cloud Functions経由でGPT-4o Vision）
+2. スケジュール一覧・編集
+3. 今日の予定表示
+
+### UI実装ルール
+
+#### 共通コンポーネント使用
+- ✅ **必須**: `Button`, `Card`, `Input` を使用
+
+#### テーマ対応
+- CSS変数による自動テーマ適用
+
+### 技術要素
+
+| 要素 | 内容 |
+|-----|------|
+| **ページ** | `app/schedule/page.tsx` |
+| **OCR** | Firebase Cloud Functions v2 `ocrScheduleFromImage`（GPT-4o Vision）<br>クライアント: `httpsCallable(functions, 'ocrScheduleFromImage')` |
+| **ロジック** | `lib/scheduleOCR.ts`（Cloud Functions呼び出しラッパー） |
+| **Firestore** | `users/{userId}` ドキュメント内のフィールド |
+
+### 設計方針
+
+#### OCR処理
+- **ツール**: Firebase Cloud Functions v2 経由でOpenAI GPT-4o Vision
+- **理由**: [ADR-004] Google Vision API → OpenAI統一
+- **呼び出し**: `httpsCallable(functions, 'ocrScheduleFromImage')` でクライアントから呼び出し
+- **シークレット管理**: OPENAI_API_KEY は Firebase Secret Manager で管理
+
+### 禁止事項
+1. ❌ OCR処理のGoogle Vision API への戻し（OpenAI統一を維持）
+2. ❌ API Routeでの実装（静的エクスポートのためCloud Functionsを使用）
+
+### 関連ADR
+- [ADR-004] OCR処理のOpenAI統一（`docs/steering/TECH_SPEC.md` 参照）
+
+---
+
+## 3. 試飲感想記録（Tasting）
+
+### 目的
+コーヒーの味わい評価、AI分析
+
+### 主要ユースケース
+1. テイスティングセッション作成
+2. フレーバーホイール評価（5軸: aroma, acidity, sweetness, body, aftertaste）
+3. AI分析（Firebase Cloud Functions経由でGPT-4o）自動実行
+4. 他ユーザーの感想閲覧
+
+### UI実装ルール
+
+#### 共通コンポーネント使用
+- ✅ **必須**: `Button`, `Card`, `Textarea` を使用
+- ❌ **禁止**: 独自のフレーバーホイールコンポーネント作成（既存の`FlavorWheel`を使用）
+
+#### テーマ対応
+- CSS変数による自動テーマ適用
+
+### 技術要素
+
+| 要素 | 内容 |
+|-----|------|
+| **ページ** | `app/tasting/page.tsx` |
+| **コンポーネント** | `components/tasting/FlavorWheel.tsx`<br>`components/tasting/TastingCard.tsx` |
+| **AI** | Firebase Cloud Functions v2 `analyzeTastingSession`（GPT-4o）<br>クライアント: `httpsCallable(functions, 'analyzeTastingSession')` |
+| **Firestore** | `users/{userId}` ドキュメント内のフィールド |
+
+### 設計方針
+
+#### フレーバーホイール評価
+- **5軸評価**: aroma（香り）, acidity（酸味）, sweetness（甘み）, body（ボディ）, aftertaste（余韻）
+- **スコア**: 1〜5の5段階評価
+
+#### AI分析
+- **自動実行**: フレーバーホイール評価後、自動的にAI分析を実行
+- **実装**: Firebase Cloud Functions v2で`analyzeTastingSession`関数を呼び出し
+- **モデル**: OpenAI GPT-4o（テキスト生成）
+- **プロンプト**: 5軸スコアを元に、コーヒーの特徴を解析
+
+#### データモデル
+```typescript
+interface TastingSession {
+  id: string;
+  userId: string;
+  coffeeName: string;
+  flavorWheel: {
+    aroma: number;
+    acidity: number;
+    sweetness: number;
+    body: number;
+    aftertaste: number;
+  };
+  aiAnalysis?: string;
+  createdAt: Timestamp;
+}
+```
+
+### 禁止事項
+1. ❌ フレーバーホイールの軸変更（互換性維持）
+2. ❌ AI分析の手動実行化（自動実行を維持）
+
+### 関連ADR
+- [ADR-005] AI分析を自動実行パターンに変更（`docs/steering/TECH_SPEC.md` 参照）
+
+---
+
+## 4. ローストタイマー（Roast Timer）
 
 ### 目的
 焙煎時間の正確な計測、温度記録のOCR読み取り
@@ -103,6 +217,7 @@ interface Assignment {
 | **ページ** | `app/roast-timer/page.tsx` |
 | **コンポーネント** | `components/roast-timer/`（サブモジュール分割済み）<br>`TimerDisplay.tsx`, `PhaseButtons.tsx` |
 | **フック** | `hooks/roast-timer/useRoastTimer.ts` |
+| **音声設定** | `lib/soundFiles.ts`（自動生成）← `scripts/generate-sound-list.ts`が`public/sounds/roasttimer/`をスキャン<br>`components/RoastTimerSettings.tsx`（音声選択UI） |
 | **OCR** | Firebase Cloud Functions v2 `ocrScheduleFromImage`（GPT-4o Vision）<br>クライアント: `httpsCallable(functions, 'ocrScheduleFromImage')` |
 | **Firestore** | `users/{userId}` ドキュメント内のフィールド |
 
@@ -116,6 +231,11 @@ interface Assignment {
 - **ツール**: Firebase Cloud Functions v2 経由でOpenAI GPT-4o Vision
 - **理由**: [ADR-004] Google Vision API → OpenAI統一。静的エクスポートのためAPI Routeは使用不可
 - **呼び出し方法**: `httpsCallable(functions, 'functionName')` によるCloud Functions呼び出し
+
+#### 音声設定
+- **タイマーサウンド**: `timerSoundFile`（Firestoreに保存）
+- **通知サウンド**: `notificationSoundFile`（Firestoreに保存）
+- **音声ファイル追加時**: `npm run generate:sound-list` を実行して`lib/soundFiles.ts`を再生成
 
 #### データ永続化
 - **ツール**: Firestore
@@ -145,7 +265,119 @@ interface RoastRecord {
 
 ---
 
-## 3. ドリップガイド（Drip Guide）
+## 5. コーヒー豆図鑑（Defect Beans）
+
+### 目的
+欠点豆の種類・特徴・写真の参照
+
+### 主要ユースケース
+1. 欠点豆一覧の閲覧（検索・ソート対応）
+2. 欠点豆の詳細表示（写真・説明）
+3. 設定（表示件数・ソート順）の保存
+
+### UI実装ルール
+
+#### 共通コンポーネント使用
+- ✅ **必須**: `Button`, `Card`, `Input` を使用
+- ❌ **禁止**: 独自の検索・ソートUIを作成（既存の`SearchFilterSection`, `SortMenu`を使用）
+
+#### テーマ対応
+- CSS変数による自動テーマ適用
+
+### 技術要素
+
+| 要素 | 内容 |
+|-----|------|
+| **ページ** | `app/defect-beans/page.tsx`（一覧）<br>`app/defect-beans/[id]/page.tsx`（詳細） |
+| **コンポーネント** | `components/defect-beans/SearchFilterSection.tsx`<br>`components/defect-beans/SortMenu.tsx`<br>`components/defect-beans/EmptyState.tsx` |
+| **フック** | `hooks/useDefectBeans.ts`<br>`hooks/useDefectBeanSettings.ts` |
+| **Firestore** | `defectBeans` コレクション（共有データ、全ユーザー共通） |
+| **画像** | `public/images/`（静的コンテンツ） |
+
+### 設計方針
+
+#### データアクセス
+- **共有データ**: `defectBeans` コレクションは全ユーザー共通（`users/{userId}` 配下ではない）
+- **読み取り専用**: クライアントからの書き込みは禁止。Firebase Consoleまたは管理スクリプトで管理
+
+### 禁止事項
+1. ❌ クライアントからの欠点豆データ書き込み（読み取り専用）
+2. ❌ 欠点豆データのユーザー個別管理（共有データを維持）
+
+---
+
+## 6. 作業進捗（Work Progress）
+
+### 目的
+焙煎作業・業務タスクの進捗管理、数量・状態の記録
+
+### 主要ユースケース
+1. 作業進捗の一覧表示（グループ別・アーカイブ対応）
+2. 進捗作成・編集・削除
+3. 進捗記録の履歴管理（日付別の数量記録）
+4. クイック追加（QuickAddModal）
+5. フィルタリング・ソート
+6. アーカイブ機能
+
+### UI実装ルール
+
+#### 共通コンポーネント使用
+- ✅ **必須**: `Button`, `Card`, `Modal`, `Dialog` を使用
+- ❌ **禁止**: 独自のカード・ダイアログコンポーネントの作成
+
+#### テーマ対応
+- CSS変数による自動テーマ適用
+
+### 技術要素
+
+| 要素 | 内容 |
+|-----|------|
+| **ページ** | `app/progress/page.tsx` |
+| **ページコンポーネント** | `app/progress/components/NormalView.tsx`<br>`app/progress/components/ArchivedView.tsx`<br>`app/progress/components/ModeSelectDialog.tsx`<br>`app/progress/components/WorkProgressFormDialog.tsx`<br>`app/progress/components/GroupFormDialog.tsx`<br>`app/progress/components/FilterDialog.tsx`<br>`app/progress/components/ProgressHeader.tsx` |
+| **共有コンポーネント** | `components/work-progress/WorkProgressCard.tsx`<br>`components/work-progress/QuickAddModal.tsx`<br>`components/work-progress/ProgressHistoryEditDialog.tsx` |
+| **フック** | `hooks/useWorkProgressActions.ts` |
+| **型定義** | `types/work-progress.ts` |
+| **Firestore** | `users/{userId}` ドキュメント内の `workProgresses` フィールド |
+
+### 設計方針
+
+#### データモデル
+```typescript
+type WorkProgressStatus = 'pending' | 'in_progress' | 'completed';
+
+interface ProgressEntry {
+  id: string;
+  date: string;       // ISO 8601形式
+  amount: number;     // 進捗量（単位はweightフィールドから取得）
+  memo?: string;
+}
+
+interface WorkProgress {
+  id: string;
+  groupName?: string;        // グループ名（任意）
+  taskName?: string;         // 作業名（任意）
+  weight?: string;           // 数量（例: "10kg", "5個"）（任意）
+  status: WorkProgressStatus;
+  memo?: string;
+  startedAt?: string;        // ISO 8601形式
+  completedAt?: string;      // ISO 8601形式
+  createdAt: string;         // ISO 8601形式
+  updatedAt: string;         // ISO 8601形式
+  targetAmount?: number;     // 目標量
+  currentAmount?: number;    // 現在の進捗量（累積）
+  progressHistory?: ProgressEntry[];
+  completedCount?: number;   // 完成数
+  archivedAt?: string;       // ISO 8601形式
+}
+```
+
+### 禁止事項
+1. ❌ `targetAmount` なしの進捗管理廃止（目標量なし運用をサポート維持）
+2. ❌ アーカイブ機能の削除
+
+---
+
+## 7. ドリップガイド（Drip Guide）
 
 ### 目的
 ドリップ抽出手順の案内、レシピ管理
@@ -194,7 +426,7 @@ interface RoastRecord {
 
 ---
 
-## 4. コーヒークイズ（Coffee Quiz）
+## 8. コーヒークイズ（Coffee Quiz）
 
 ### 目的
 コーヒー知識の習得、FSRS間隔反復学習
@@ -265,22 +497,21 @@ interface UserStats {
 
 ---
 
-## 5. テイスティング（Tasting）
+## 9. 開発秘話（Dev Stories）
 
 ### 目的
-コーヒーの味わい評価、AI分析
+開発チームのエピソード・開発の裏側を紹介するコンテンツページ
 
 ### 主要ユースケース
-1. テイスティングセッション作成
-2. フレーバーホイール評価（5軸: aroma, acidity, sweetness, body, aftertaste）
-3. AI分析（Firebase Cloud Functions経由でGPT-4o）自動実行
-4. 他ユーザーの感想閲覧
+1. エピソード一覧の閲覧
+2. エピソード詳細の閲覧（キャラクター対話形式）
+3. エピソードの追加（静的データとして管理）
 
 ### UI実装ルール
 
 #### 共通コンポーネント使用
-- ✅ **必須**: `Button`, `Card`, `Textarea` を使用
-- ❌ **禁止**: 独自のフレーバーホイールコンポーネント作成（既存の`FlavorWheel`を使用）
+- ✅ **必須**: `FloatingNav` を使用
+- ❌ **禁止**: 独自のエピソードカードコンポーネント作成（既存の`EpisodeCard`を使用）
 
 #### テーマ対応
 - CSS変数による自動テーマ適用
@@ -289,106 +520,38 @@ interface UserStats {
 
 | 要素 | 内容 |
 |-----|------|
-| **ページ** | `app/tasting/page.tsx` |
-| **コンポーネント** | `components/tasting/FlavorWheel.tsx`<br>`components/tasting/TastingCard.tsx` |
-| **AI** | Firebase Cloud Functions v2 `analyzeTastingSession`（GPT-4o）<br>クライアント: `httpsCallable(functions, 'analyzeTastingSession')` |
-| **Firestore** | `users/{userId}` ドキュメント内のフィールド |
+| **ページ** | `app/dev-stories/page.tsx`（エピソード一覧）<br>`app/dev-stories/[id]/page.tsx`（エピソード詳細） |
+| **コンポーネント** | `components/dev-stories/EpisodeCard.tsx`<br>`components/dev-stories/CharacterAvatar.tsx`<br>`components/dev-stories/DialogueBubble.tsx`<br>`components/dev-stories/DialogueSection.tsx`<br>`components/dev-stories/DetailSection.tsx` |
+| **データ** | `data/dev-stories/episodes.ts`（エピソード一覧）<br>`data/dev-stories/episode-001.ts` 〜 `episode-006.ts`（各エピソード）<br>`data/dev-stories/characters.ts`（キャラクター定義）<br>`data/dev-stories/version-history.ts`（バージョン履歴連携） |
+| **認証** | 不要（公開コンテンツ） |
 
 ### 設計方針
 
-#### フレーバーホイール評価
-- **5軸評価**: aroma（香り）, acidity（酸味）, sweetness（甘み）, body（ボディ）, aftertaste（余韻）
-- **スコア**: 1〜5の5段階評価
-
-#### AI分析
-- **自動実行**: フレーバーホイール評価後、自動的にAI分析を実行
-- **実装**: Firebase Cloud Functions v2で`analyzeTastingSession`関数を呼び出し
-- **モデル**: OpenAI GPT-4o（テキスト生成）
-- **プロンプト**: 5軸スコアを元に、コーヒーの特徴を解析
-
-#### データモデル
-```typescript
-interface TastingSession {
-  id: string;
-  userId: string;
-  coffeeName: string;
-  flavorWheel: {
-    aroma: number;
-    acidity: number;
-    sweetness: number;
-    body: number;
-    aftertaste: number;
-  };
-  aiAnalysis?: string;
-  createdAt: Timestamp;
-}
-```
+#### コンテンツ管理
+- **静的データ**: `data/dev-stories/` に TypeScript で直接記述（Firestore不使用）
+- **キャラクター対話形式**: DialogueBubble + DialogueSection で表現
+- **エピソード追加**: `data/dev-stories/` に新ファイルを追加し、`episodes.ts` にエントリを追加
 
 ### 禁止事項
-1. ❌ フレーバーホイールの軸変更（互換性維持）
-2. ❌ AI分析の手動実行化（自動実行を維持）
-
-### 関連ADR
-- [ADR-005] AI分析を自動実行パターンに変更（`docs/steering/TECH_SPEC.md` 参照）
+1. ❌ エピソードデータのFirestore移行（静的データを維持）
+2. ❌ 認証必須化（公開コンテンツのまま維持）
 
 ---
 
-## 6. スケジュール管理（Schedule）
+## 10. その他
 
-### 目的
-業務予定のOCR読み取り、一覧表示
+### 共通UI（UI Components）
 
-### 主要ユースケース
-1. スケジュール画像のOCR（Firebase Cloud Functions経由でGPT-4o Vision）
-2. スケジュール一覧・編集
-3. 今日の予定表示
-
-### UI実装ルール
-
-#### 共通コンポーネント使用
-- ✅ **必須**: `Button`, `Card`, `Input` を使用
-
-#### テーマ対応
-- CSS変数による自動テーマ適用
-
-### 技術要素
-
-| 要素 | 内容 |
-|-----|------|
-| **ページ** | `app/schedule/page.tsx` |
-| **OCR** | Firebase Cloud Functions v2 `ocrScheduleFromImage`（GPT-4o Vision）<br>クライアント: `httpsCallable(functions, 'ocrScheduleFromImage')` |
-| **ロジック** | `lib/scheduleOCR.ts`（Cloud Functions呼び出しラッパー） |
-| **Firestore** | `users/{userId}` ドキュメント内のフィールド |
-
-### 設計方針
-
-#### OCR処理
-- **ツール**: Firebase Cloud Functions v2 経由でOpenAI GPT-4o Vision
-- **理由**: [ADR-004] Google Vision API → OpenAI統一
-- **呼び出し**: `httpsCallable(functions, 'ocrScheduleFromImage')` でクライアントから呼び出し
-- **シークレット管理**: OPENAI_API_KEY は Firebase Secret Manager で管理
-
-### 禁止事項
-1. ❌ OCR処理のGoogle Vision API への戻し（OpenAI統一を維持）
-2. ❌ API Routeでの実装（静的エクスポートのためCloud Functionsを使用）
-
-### 関連ADR
-- [ADR-004] OCR処理のOpenAI統一（`docs/steering/TECH_SPEC.md` 参照）
-
----
-
-## 7. 共通UI（UI Components）
-
-### 目的
+#### 目的
 デザイン統一、マルチテーマ対応
 
-### コンポーネント一覧（19エクスポート）
+#### コンポーネント一覧（19エクスポート）
 
-#### ボタン系
+**ボタン系**
 - **Button**: 基本ボタン（variant: primary, secondary, ghost）
 - **IconButton**: アイコンボタン
 
-#### フォーム系
+**フォーム系**
 - **Input**: テキスト入力
 - **NumberInput**: 数値入力
 - **InlineInput**: インライン編集可能入力
@@ -397,23 +560,23 @@ interface TastingSession {
 - **Checkbox**: チェックボックス
 - **Switch**: トグルスイッチ
 
-#### コンテナ系
+**コンテナ系**
 - **Card**: カード（variant: default, table, feature）
 - **Modal**: モーダルダイアログ
 - **Dialog**: ダイアログ
 
-#### 表示系
+**表示系**
 - **Badge**: バッジ
 - **Tabs**: タブ（TabsList, TabsTrigger, TabsContent）
 - **Accordion**: アコーディオン（AccordionItem, AccordionTrigger, AccordionContent）
 - **ProgressBar**: プログレスバー
 - **EmptyState**: 空状態表示
 
-#### ナビゲーション系
+**ナビゲーション系**
 - **BackLink**: 戻るリンク
 - **RoastLevelBadge**: 焙煎度バッジ
 
-### 技術要素
+#### 技術要素
 
 | 要素 | 内容 |
 |-----|------|
@@ -422,13 +585,13 @@ interface TastingSession {
 | **レジストリ** | `components/ui/registry.tsx`（UIカタログ） |
 | **テストページ** | `/dev/design-lab`（Developer Design Lab、開発者モードで表示） |
 
-### UI実装ルール（重要：全機能共通）
+#### UI実装ルール（重要：全機能共通）
 
-#### 1. 共通コンポーネント使用必須
+**1. 共通コンポーネント使用必須**
 - ✅ **必須**: `@/components/ui` のコンポーネントを使用
 - ❌ **禁止**: 生のTailwindでボタン/カード/入力を作成
 
-#### 2. テーマ対応はCSS変数で自動
+**2. テーマ対応はCSS変数で自動**
 - テーマ切替は `data-theme` 属性 + CSS変数で自動適用（6テーマ対応）
 - コンポーネント側でのテーマ判定は不要
 - テーマ固有の装飾要素（snowfall等）のみ、CSS `[data-theme]` セレクタまたは `useAppTheme()` で条件レンダリング
@@ -447,10 +610,10 @@ const { isChristmasTheme } = useAppTheme();
 <Button theme="christmas">保存</Button>
 ```
 
-#### 3. 配色参照
+**3. 配色参照**
 - ✅ **参照**: `.claude/skills/roastplus-ui/references/design-tokens.md`
 
-#### 4. 新規コンポーネント追加時のレジストリ登録
+**4. 新規コンポーネント追加時のレジストリ登録**
 新しい共通UIコンポーネントを作成した場合、**必ず以下の手順で登録すること**：
 
 1. `components/ui/NewComponent.tsx` を作成
@@ -476,9 +639,9 @@ function NewComponentDemo() {
 
 → Developer Design Lab（`/dev/design-lab`）に自動表示される
 
-### テーマシステム
+#### テーマシステム
 
-#### アーキテクチャ
+**アーキテクチャ**
 - **テーマ管理**: `next-themes` ライブラリ（SSR対応、フラッシュ防止、タブ間同期）
 - **テーマ定義**: CSS変数（`@layer theme` in `globals.css`）
 - **テーマプロバイダー**: `components/ThemeProvider.tsx`（アプリ全体をラップ）
@@ -486,7 +649,7 @@ function NewComponentDemo() {
 - **テーマ保存**: localStorage（端末ごとに独立、Firestoreには保存しない）
 - **テーマ切替属性**: `data-theme` 属性（`<html>` 要素に付与）
 
-#### 利用可能テーマ（6種類）
+**利用可能テーマ（6種類）**
 
 | テーマID | 表示名 | タイプ | コンセプト |
 |---------|--------|--------|-----------|
@@ -497,7 +660,7 @@ function NewComponentDemo() {
 | `caramel` | キャラメルマキアート | ダーク | 秋の収穫祭の温かさ |
 | `christmas` | クリスマス | ダーク | ホリデーシーズンの特別テーマ |
 
-#### セマンティックCSS変数トークン
+**セマンティックCSS変数トークン**
 
 | カテゴリ | トークン | 用途 |
 |---------|---------|------|
@@ -515,7 +678,7 @@ function NewComponentDemo() {
 | アクセント | `bg-spot-hover` | ホバー時アクセント |
 | アクセント | `bg-spot-subtle` / `bg-spot-surface` | 薄いアクセント背景 |
 
-#### CSS変数の使い分け（重要）
+**CSS変数の使い分け（重要）**
 
 | 変数 | 通常モード | ダークテーマ | 用途 |
 |------|-----------|-------------|------|
@@ -523,39 +686,24 @@ function NewComponentDemo() {
 | `bg-overlay` | `#FFFFFF` | 不透明な暗色 | モーダル・ダイアログ（不透明必須） |
 | `bg-ground` | `#F3F4F6` | `rgba(255,255,255,0.08)` | ページ背景・テーブルヘッダー |
 
-#### テーマhook
+**テーマhook**
 
 | hook | 用途 |
 |------|------|
 | **`useAppTheme()`** | 汎用テーマhook（currentTheme, setTheme, presets, isDarkTheme, isChristmasTheme） |
 | **`useChristmasMode()`** | クリスマステーマ切替用（toggleChristmasMode等。Design Lab等で使用） |
 
-#### テーマ固有装飾
-
-一部のテーマ（christmasテーマ等）にはテーマ固有の装飾要素がある:
-- **snowfall（christmasテーマ）**: SVG雪の結晶 + Framer Motionアニメーション
-- **ヘッダーロゴ変更（christmasテーマ）**: Playfair Displayフォント（イタリック）
-- **配色変更**: 全テーマ共通、CSS変数で自動切替（コード不要）
-
-##### テーマ固有装飾の実装方法
+**テーマ固有装飾の実装方法**
 1. **CSS `[data-theme]` セレクタ（推奨）**: `[data-theme="christmas"] .my-element { display: block; }`
 2. **`useAppTheme().isChristmasTheme`**: JSX内の条件レンダリングが必要な場合
 3. **用途限定**: 条件レンダリングのみ。コンポーネントへのテーマprop渡しには使わない
 
-### 禁止事項
+#### 共通UIの禁止事項
 1. ❌ 共通コンポーネントの重複作成（既存コンポーネントを必ず確認）
 2. ❌ 生のTailwindでのボタン/カード/入力作成
 3. ❌ テーマをpropとしてコンポーネントに渡す（CSS変数で自動対応）
 4. ❌ ハードコード色の使用（セマンティックCSS変数を使用すること）
 5. ❌ モーダル背景に `bg-surface` を使用（ダークテーマで透過するため `bg-overlay` を使用）
-
-### 関連ADR
-- [ADR-008] ロゴを画像からテキストベースに変更（`docs/steering/TECH_SPEC.md` 参照）
-- [ADR-011] next-themes + Tailwind v4 CSS変数によるテーマシステム（`docs/steering/TECH_SPEC.md` 参照）
-
----
-
-## 8. その他機能
 
 ### 通知（Notifications）
 - **目的**: バージョン更新通知
@@ -578,10 +726,14 @@ function NewComponentDemo() {
 - **目的**: リリースノート表示
 - **技術**: マークダウンファイル読み込み
 
-### 欠点豆図鑑（Defect Beans）
-- **目的**: 欠点豆の種類・写真・説明
-- **Firestore**: `defectBeans` コレクション（共有データ）
-- **技術**: 静的コンテンツ（`public/images/`）
+### デジタル時計（Clock）
+- **目的**: 遠距離視認性に優れた大型デジタル時計表示
+- **パス**: `/clock`
+- **技術**: localStorage（表示設定）
+
+### 関連ADR
+- [ADR-008] ロゴを画像からテキストベースに変更（`docs/steering/TECH_SPEC.md` 参照）
+- [ADR-011] next-themes + Tailwind v4 CSS変数によるテーマシステム（`docs/steering/TECH_SPEC.md` 参照）
 
 ---
 
@@ -597,8 +749,9 @@ function NewComponentDemo() {
 | クイズ進捗 | `users/{userId}` のフィールド | |
 | テイスティング | `users/{userId}` のフィールド | |
 | スケジュール | `users/{userId}` のフィールド | |
+| 作業進捗 | `users/{userId}` の `workProgresses` フィールド | 配列 |
 | 担当表 | サブコレクション | Assignment固有のデータ構造 |
-| 欠点豆 | `defectBeans` コレクション | 共有データ |
+| 欠点豆 | `defectBeans` コレクション | 共有データ（全ユーザー共通） |
 | メタデータ | `_meta` コレクション | システム管理用 |
 
 ---

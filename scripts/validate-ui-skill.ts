@@ -66,8 +66,6 @@ function validateDesignTokens(): ValidationResult {
   const themeMatches = globalsCss.match(/\[data-theme="([^"]+)"\]/g) || [];
   const themes = new Set(themeMatches.map((m) => m.match(/"([^"]+)"/)?.[1]));
   const themesMd = readFileSync(resolve(SKILL_DIR, 'themes.md'), 'utf-8');
-  const docThemeCount = (themesMd.match(/data-theme/g) || []).length;
-
   // themes.md の6テーマ一覧テーブルに全テーマが記載されているか
   for (const theme of themes) {
     if (theme && !themesMd.includes(theme)) {
@@ -132,7 +130,6 @@ function validateVariants(): ValidationResult {
     { name: 'IconButton', file: 'IconButton.tsx' },
   ];
 
-  const componentsMd = readFileSync(resolve(SKILL_DIR, 'components.md'), 'utf-8');
   const skillMd = readFileSync(
     resolve(ROOT, '.claude/skills/roastplus-ui/SKILL.md'),
     'utf-8',
@@ -154,12 +151,6 @@ function validateVariants(): ValidationResult {
       const variantStr = variantTypeMatch[0];
       const variants = variantStr.match(/'([^']+)'/g)?.map((v) => v.replace(/'/g, '')) || [];
       const sourceCount = variants.length;
-
-      // components.md のvariant数と比較
-      // "10 variants" や "6 variants" のパターンを検索
-      const docVariantCountMatch = componentsMd.match(
-        new RegExp(`${target.name}[\\s\\S]{0,200}(\\d+)\\s*種`, 'i'),
-      );
 
       // SKILL.md のvariant表もチェック
       const skillVariantLine = skillMd.match(

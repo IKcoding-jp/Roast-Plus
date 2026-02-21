@@ -61,5 +61,8 @@ NUL
 # Remotion (別管理)
 remotion/
 
+# Firebase
+.firebase/
+
 # Temp files from PR creation
 .tmp-pr-body.md

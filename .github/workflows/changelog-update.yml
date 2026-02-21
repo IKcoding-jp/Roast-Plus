@@ -119,19 +119,17 @@ jobs:
           git commit -m "chore: v${VERSION} changelog自動更新"
           git push origin "$BRANCH"
 
+          # PR本文をファイルに書き出す（YAML内でheredocは使えないため）
+          printf '自動生成: PRマージに伴う changelog・バージョン更新\n\n- package.json のバージョンを更新\n- detailed-changelog.ts に新エントリを追加\n- version-history.ts に新エントリを追加\n' > .tmp-changelog-pr-body.md
+
           # PR作成 + 自動マージ設定
           gh pr create \
             --base main \
             --head "$BRANCH" \
             --title "chore: v${VERSION} changelog自動更新" \
-            --body "$(cat <<'PREOF'
-自動生成: PRマージに伴う changelog・バージョン更新
+            --body-file .tmp-changelog-pr-body.md
 
-- package.json のバージョンを更新
-- detailed-changelog.ts に新エントリを追加
-- version-history.ts に新エントリを追加
-PREOF
-)"
+          rm -f .tmp-changelog-pr-body.md
 
           gh pr merge "$BRANCH" --auto --merge
 

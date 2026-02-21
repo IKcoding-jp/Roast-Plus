@@ -7,7 +7,7 @@
 ## 目次
 
 1. [担当表（Assignment）](#1-担当表assignment)
-2. [焙煎タイマー（Roast Timer）](#2-焙煎タイマーroast-timer)
+2. [ローストタイマー（Roast Timer）](#2-焙煎タイマーroast-timer)
 3. [ドリップガイド（Drip Guide）](#3-ドリップガイドdrip-guide)
 4. [コーヒークイズ（Coffee Quiz）](#4-コーヒークイズcoffee-quiz)
 5. [テイスティング（Tasting）](#5-テイスティングtasting)

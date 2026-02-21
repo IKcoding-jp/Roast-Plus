@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.12.0',
+    date: '2026-02-21',
+    summary: '<!-- ユーザーに見える変化のみ。技術的な内容は不要です --> など 4件の更新',
+  },
+  {
     version: '0.11.0',
     date: '2026-02-03',
     summary: '開発者モード時にUIコンポーネントカタログへのリンク追加 [Issue #125] など 3件の更新',

@@ -14,23 +14,6 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
-    id: 'v0.12.0',
-    version: '0.12.0',
-    date: '2026-02-21',
-    type: 'feature',
-    title: '<!-- ユーザーに見える変化のみ。技術的な内容は不要です --> など 4件の更新',
-    content: `
-<!-- ユーザーに見える変化のみ。技術的な内容は不要です -->
-<!-- ユーザー向けの変更なし（内部改善のみ）の場合は "-" のままにしてください -->
-
-- changelog自動化が使えるようになりました
-- PRに「ユーザー向け更新内容」を書くと、アプリの更新履歴に自動で反映されます
-    `.trim(),
-    tags: [],
-    createdAt: '2026-02-21T23:30:43.802Z',
-    updatedAt: '2026-02-21T23:30:43.802Z',
-  },
-  {
     id: 'v0.11.0',
     version: '0.11.0',
     date: '2026-02-03',

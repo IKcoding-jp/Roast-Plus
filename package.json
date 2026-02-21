@@ -18,9 +18,13 @@
     "security": "npm audit",
     "complexity": "lizard ./app ./components ./hooks ./lib ./types ./scripts -C 15 -L 50 -w",
     "deadcode": "knip",
+    "maintenance": "npm run complexity && npm run security && npm run deadcode && npm run skill:validate",
+    "skill:validate": "tsx scripts/validate-ui-skill.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "remotion:studio": "npx remotion studio remotion/index.ts",
+    "remotion:render": "npx remotion render remotion/index.ts RoastPlusIntro out/roastplus-intro.mp4"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -40,7 +44,8 @@
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
     "ts-fsrs": "^5.2.3",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs}": [
@@ -50,6 +55,9 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
     "@playwright/test": "^1.58.2",
+    "@remotion/cli": "^4.0.421",
+    "@remotion/google-fonts": "^4.0.421",
+    "@remotion/transitions": "^4.0.421",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -65,6 +73,7 @@
     "jsdom": "^27.4.0",
     "knip": "^5.82.1",
     "lint-staged": "^16.2.7",
+    "remotion": "^4.0.421",
     "tailwindcss": "^4",
     "tsx": "^4.7.0",
     "typescript": "^5",

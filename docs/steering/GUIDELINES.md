@@ -1,6 +1,6 @@
 # Implementation Guidelines
 
-**最終更新**: 2026-02-07
+**最終更新**: 2026-02-21
 
 ---
 
@@ -58,13 +58,13 @@ npm run lint && npm run build && npm run test
 #### 6. PR作成
 - git-workflow スキルでコミット
 - PR作成
-- Steering Documents更新ドラフト生成（fix-issue Phase 11）
+- Steering Documents必須レビュー・更新（fix-issue Phase 10）
 
 ---
 
 ### TDD型フロー（コード変更のデフォルト）
 
-**コード変更を含む実装では、TDDが基本。** 詳細は `/tdd` スキル（`.claude/skills/tdd/SKILL.md`）を参照。
+**コード変更を含む実装では、TDDが基本。** 詳細は `superpowers:test-driven-development` スキルを参照。
 
 ```
 1. テスト設計（testing.md or 対象コード分析）
@@ -94,7 +94,7 @@ npm run lint && npm run build && npm run test
 │ Issue作成     │            │ Phase 1: Working読込   │
 │ Working生成   │───────────→│ Phase 4: 計画承認      │
 │  └ testing.md │   ファイル  │ Phase 5: TDD実装      │
-│    (テスト設計)│   経由で連携│  └ /tdd の手順に従う   │
+│    (テスト設計)│   経由で連携│  └ TDDスキルに従う     │
 └──────────────┘            │ Phase 7: 検証          │
                             └───────────────────────┘
 ```
@@ -119,7 +119,7 @@ npm run lint && npm run build && npm run test
 **使用タイミング**:
 - UI調整（レイアウト、配色、アニメーション）
 - レスポンシブデザイン確認
-- クリスマスモード対応確認
+- 全テーマ対応確認（ライト系・ダーク系でレイアウト崩れがないか）
 
 ---
 
@@ -132,7 +132,7 @@ npm run lint && npm run build && npm run test
 | コンポーネント | PascalCase | `QuizCard`, `DripTimer` |
 | 関数 | camelCase | `calculateXP`, `updateStreak` |
 | 変数 | camelCase | `isLoading`, `userData` |
-| ブール値 | `is`, `has`, `should` 始まり | `isChristmasMode`, `hasError` |
+| ブール値 | `is`, `has`, `should` 始まり | `isLoading`, `hasError`, `isDarkTheme` |
 | 定数 | UPPER_SNAKE_CASE | `CATEGORY_LABELS`, `XP_CONFIG` |
 | 型/インターフェース | PascalCase | `QuizQuestion`, `DripRecipe` |
 | ファイル（コンポーネント） | PascalCase | `QuizCard.tsx` |
@@ -338,18 +338,24 @@ import {
 
 ---
 
-### クリスマスモード対応
+### テーマ対応
 
-**すべてのコンポーネント**に `isChristmasMode` propを渡す。
+テーマ切替は `data-theme` 属性 + CSS変数で**自動適用**。コンポーネントへのテーマprop渡しは不要。
 
 #### 実装パターン
 
 ```tsx
-const { isChristmasMode } = useChristmasMode();
+// ✅ テーマは自動適用。propは不要
+<Button variant="primary">保存</Button>
+<Card variant="table">...</Card>
+<Input label="名前" />
 
-<Button variant="primary" isChristmasMode={isChristmasMode}>保存</Button>
-<Card variant="table" isChristmasMode={isChristmasMode}>...</Card>
-<Input label="名前" isChristmasMode={isChristmasMode} />
+// ✅ テーマ固有の装飾要素のみ条件レンダリング
+const { isChristmasTheme } = useAppTheme();
+{isChristmasTheme && <Snowfall />}
+
+// ❌ テーマをpropで渡さない
+<Button theme="christmas">保存</Button>
 ```
 
 ---
@@ -362,8 +368,8 @@ const { isChristmasMode } = useChristmasMode();
 
 ```tsx
 // registry.tsx への追加例
-function NewComponentDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
-  return <NewComponent isChristmasMode={isChristmasMode} />;
+function NewComponentDemo() {
+  return <NewComponent />;
 }
 
 // componentRegistry配列に追加
@@ -408,7 +414,7 @@ function NewComponentDemo({ isChristmasMode }: { isChristmasMode: boolean }) {
 
 ### カバレッジ目標
 
-| 対象 | 目標 | 現状（2026-02-05） |
+| 対象 | 目標 | 現状（2026-02-21） |
 |-----|------|-------------------|
 | 全体 | 75%以上 | 76.19% |
 | `lib/` | 90%以上 | 89.44% |
@@ -581,7 +587,7 @@ vi.mock('@/lib/coffee-quiz/fsrs', () => ({
 }));
 ```
 
-詳細は `C:\Users\kensa\.claude\projects\D--Dev-roastplus\memory\MEMORY.md` 参照
+詳細はプロジェクトメモリ参照
 
 ---
 
@@ -705,7 +711,7 @@ gh pr create --base main --title "[Issue #123] タイトル" --body-file /tmp/pr
 | UBIQUITOUS_LANGUAGE.md | 新規用語追加時 |
 
 **更新方法**:
-1. PR完了後、AIがドラフト生成（fix-issue Phase 11）
+1. PR作成前、AIが全6ドキュメントを必須レビュー（fix-issue Phase 10）
 2. ユーザーが確認・承認
 3. Gitコミット
 
@@ -772,7 +778,7 @@ gh pr create --base main --title "[Issue #123] タイトル" --body-file /tmp/pr
 
 ---
 
-### 現在のリファクタリング対象（2026-02-05）
+### 現在のリファクタリング対象（2026-02-21）
 
 | ファイル | 関数名 | CCN | NLOC | 優先度 |
 |---------|--------|-----|------|--------|
@@ -812,5 +818,5 @@ gh pr create --base main --title "[Issue #123] タイトル" --body-file /tmp/pr
 - **技術仕様**: `docs/steering/TECH_SPEC.md`
 - **ユビキタス言語**: `docs/steering/UBIQUITOUS_LANGUAGE.md`
 - **機能一覧**: `docs/steering/FEATURES.md`
-- **ADR**: `docs/memory.md`
+- **ADR**: `docs/steering/TECH_SPEC.md`（ADRセクション）
 - **テスト実装の学び**: `C:\Users\kensa\.claude\projects\D--Dev-roastplus\memory\MEMORY.md`

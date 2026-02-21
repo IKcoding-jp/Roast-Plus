@@ -1,216 +1,18 @@
 # GitHub Issue 作成例集
 
-RoastPlusでのIssue作成の具体例。Serena MCPでの調査結果からIssue本文作成、ラベル付け、gh CLIコマンド実行までの流れをまとめています。
-
 ## 目次
 
-1. [バグ報告Issue（タイマー停止問題）](#1-バグ報告issueタイマー停止問題)
-2. [バグ報告Issue（共通UI不統一）](#2-バグ報告issue共通ui不統一)
-3. [機能追加Issue（CSVエクスポート機能）](#3-機能追加issuecsvエクスポート機能)
-4. [リファクタリングIssue（複雑度削減）](#4-リファクタリングissue複雑度削減)
-5. [ドキュメント追加Issue](#5-ドキュメント追加issue)
+1. [バグ報告（タイマー停止問題）](#1-バグ報告タイマー停止問題)
+2. [共通UI不統一](#2-共通ui不統一)
+3. [機能追加（CSVエクスポート）](#3-機能追加csvエクスポート)
+4. [リファクタリング（複雑度削減）](#4-リファクタリング複雑度削減)
+5. [ドキュメント追加](#5-ドキュメント追加)
 
 ---
 
-## 1. バグ報告Issue（タイマー停止問題）
+## 共通パターン: gh CLI コマンド
 
-### Serena MCP調査結果
-
-```
-# 問題の特定
-search_for_pattern: "clearInterval"
-→ 検出: app/roast-timer/page.tsx:85
-→ 検出: hooks/useRoastTimer.ts:42
-
-# 構造把握
-get_symbols_overview: app/roast-timer/
-→ 構造: RoastTimerPage → useRoastTimer → TimerDisplay
-
-# 参照箇所確認
-find_referencing_symbols: useRoastTimer
-→ 参照元: app/roast-timer/page.tsx:15
-→ 参照元: components/QuickTimer.tsx:8
-```
-
-### Issue本文
-
-```markdown
-## 概要
-
-ローストタイマーが一時停止後に再開できず、停止したままになる問題を修正する。
-
-## 再現手順
-
-1. ローストタイマー画面を開く
-2. タイマーを開始
-3. 一時停止ボタンをクリック
-4. 再開ボタンをクリック → **タイマーが動かない**
-
-## 原因
-
-`useRoastTimer` フック内で、タイマーIDが正しく管理されていない。
-一時停止時に `clearInterval` を呼ぶが、タイマーIDが `null` に設定されないため、
-再開時に新しいタイマーが開始されず、古いタイマーIDを参照し続ける。
-
-## 対象箇所
-
-- `hooks/useRoastTimer.ts:42` - `pauseTimer` 関数
-- `hooks/useRoastTimer.ts:55` - `resumeTimer` 関数
-
-## 作業内容
-
-- [ ] `pauseTimer` 関数でタイマーIDを `null` に設定
-- [ ] `resumeTimer` 関数で既存タイマーをクリアしてから新規タイマー開始
-- [ ] タイマー状態の管理を `useRef` で統一
-- [ ] テストケース追加（一時停止→再開のシナリオ）
-
-## 影響範囲
-
-- ローストタイマー機能全体
-- クイックタイマー（`components/QuickTimer.tsx`）
-```
-
-### ラベル
-
-- `bug`
-- `priority: high`
-- `ui`
-
-### 実際のコマンド
-
-```bash
-# Issue本文を一時ファイルに保存
-cat > /tmp/issue_body.md <<'EOF'
-## 概要
-
-ローストタイマーが一時停止後に再開できず、停止したままになる問題を修正する。
-
-## 再現手順
-
-1. ローストタイマー画面を開く
-2. タイマーを開始
-3. 一時停止ボタンをクリック
-4. 再開ボタンをクリック → **タイマーが動かない**
-
-## 原因
-
-`useRoastTimer` フック内で、タイマーIDが正しく管理されていない。
-一時停止時に `clearInterval` を呼ぶが、タイマーIDが `null` に設定されないため、
-再開時に新しいタイマーが開始されず、古いタイマーIDを参照し続ける。
-
-## 対象箇所
-
-- `hooks/useRoastTimer.ts:42` - `pauseTimer` 関数
-- `hooks/useRoastTimer.ts:55` - `resumeTimer` 関数
-
-## 作業内容
-
-- [ ] `pauseTimer` 関数でタイマーIDを `null` に設定
-- [ ] `resumeTimer` 関数で既存タイマーをクリアしてから新規タイマー開始
-- [ ] タイマー状態の管理を `useRef` で統一
-- [ ] テストケース追加（一時停止→再開のシナリオ）
-
-## 影響範囲
-
-- ローストタイマー機能全体
-- クイックタイマー（`components/QuickTimer.tsx`）
-EOF
-
-# Issue作成
-gh issue create \
-  --title "fix(timer): タイマー一時停止後の再開不具合を修正" \
-  --body-file /tmp/issue_body.md \
-  --label "bug,priority: high,ui"
-
-# 一時ファイル削除
-rm /tmp/issue_body.md
-```
-
----
-
-## 2. バグ報告Issue（共通UI不統一）
-
-### Serena MCP調査結果
-
-```
-# 共通UIコンポーネントの確認
-get_symbols_overview: components/ui/
-→ Button, Card, Modal, Input, Checkbox 等が存在
-
-# 生のTailwindを使用している箇所を検索
-search_for_pattern: "className.*bg-amber-600.*rounded"
-→ 検出: app/settings/page.tsx:45 - カスタムボタン
-→ 検出: app/profile/page.tsx:28 - カスタムカード
-→ 検出: components/CustomDialog.tsx:12 - カスタムダイアログ
-
-# 参照箇所の確認
-find_referencing_symbols: Button
-→ 参照元: 20ファイル（正しく共通UIを使用）
-```
-
-### Issue本文
-
-```markdown
-## 概要
-
-一部のページで共通UIコンポーネントを使用せず、生のTailwind CSSで実装されているため、デザインの一貫性が損なわれている。
-
-## 問題
-
-CLAUDE.mdの「UI Component Rules」に違反している箇所が3つ検出された：
-
-1. `app/settings/page.tsx:45` - カスタムボタン
-2. `app/profile/page.tsx:28` - カスタムカード
-3. `components/CustomDialog.tsx:12` - カスタムダイアログ
-
-**現状:**
-```tsx
-// ❌ NG: 生のTailwindでボタンを作成
-<button className="px-6 py-3 bg-amber-600 text-white rounded-lg">保存</button>
-```
-
-**期待:**
-```tsx
-// ✅ OK: 共通コンポーネントを使用
-<Button variant="primary" isChristmasMode={isChristmasMode}>保存</Button>
-```
-
-## 理由/背景
-
-共通UIコンポーネントを使用することで：
-- デザインの一貫性を保つ
-- クリスマスモード対応が自動で適用される
-- メンテナンス性が向上する
-
-## 対象箇所
-
-- `app/settings/page.tsx:45` - Button コンポーネントに置き換え
-- `app/profile/page.tsx:28` - Card コンポーネントに置き換え
-- `components/CustomDialog.tsx:12` - Modal/Dialog コンポーネントに置き換え
-
-## 作業内容
-
-- [ ] `app/settings/page.tsx` でButton コンポーネントをインポート
-- [ ] カスタムボタンを `<Button>` に置き換え
-- [ ] `app/profile/page.tsx` でCard コンポーネントをインポート
-- [ ] カスタムカードを `<Card>` に置き換え
-- [ ] `components/CustomDialog.tsx` をModal/Dialog コンポーネントに移行
-- [ ] クリスマスモード対応確認
-
-## 影響範囲
-
-- 設定画面
-- プロフィール画面
-- CustomDialogを使用している全画面（検索必要）
-```
-
-### ラベル
-
-- `refactor`
-- `ui`
-- `design`
-
-### 実際のコマンド
+全例共通。`--body-file` で一時ファイルを使用（バッククォート問題回避）:
 
 ```bash
 cat > /tmp/issue_body.md <<'EOF'
@@ -218,358 +20,167 @@ cat > /tmp/issue_body.md <<'EOF'
 EOF
 
 gh issue create \
-  --title "refactor(ui): 共通UIコンポーネントに統一" \
+  --title "[type](scope): タイトル" \
   --body-file /tmp/issue_body.md \
-  --label "refactor,ui,design"
+  --label "label1,label2"
 
 rm /tmp/issue_body.md
 ```
 
+**ラベル対応**: bug→`bug`, feat→`enhancement`, refactor→`refactor`, docs→`documentation`, style→`design`, perf→`performance`, chore→`chore`, test→`testing`
+
 ---
 
-## 3. 機能追加Issue（CSVエクスポート機能）
+## 1. バグ報告（タイマー停止問題）
 
-### Serena MCP調査結果
+**調査**: `search_for_pattern: "clearInterval"` → `hooks/useRoastTimer.ts:42` 検出。`find_referencing_symbols: useRoastTimer` → 2箇所で参照。
 
-```
-# 既存のデータ取得ロジック確認
-find_symbol: "useAppData"
-→ hooks/useAppData.ts:25 - コーヒーデータ取得フック
-
-# 参照箇所確認
-find_referencing_symbols: useAppData
-→ 参照元: app/assignment/page.tsx
-→ 参照元: app/progress/page.tsx
-→ 参照元: app/tasting/page.tsx
-
-# 類似機能の確認
-search_for_pattern: "export.*csv"
-→ 検出なし（CSV エクスポート機能は未実装）
-```
-
-### Issue本文
+**Issue本文**:
 
 ```markdown
 ## 概要
+ローストタイマーが一時停止後に再開できず、停止したままになる問題を修正する。
 
+## 再現手順
+1. ローストタイマー画面を開く → タイマー開始 → 一時停止 → 再開 → **動かない**
+
+## 原因
+`useRoastTimer` 内で一時停止時に `clearInterval` 後、タイマーIDが `null` に設定されない。
+
+## 対象箇所
+- `hooks/useRoastTimer.ts:42` - `pauseTimer` 関数
+- `hooks/useRoastTimer.ts:55` - `resumeTimer` 関数
+
+## 作業内容
+- [ ] `pauseTimer` でタイマーIDを `null` に設定
+- [ ] `resumeTimer` で既存タイマーをクリアしてから新規開始
+- [ ] テストケース追加（一時停止→再開シナリオ）
+
+## 影響範囲
+- ローストタイマー機能全体、クイックタイマー
+```
+
+**ラベル**: `bug`, `priority: high`
+**タイトル**: `fix(timer): タイマー一時停止後の再開不具合を修正`
+
+---
+
+## 2. 共通UI不統一
+
+**調査**: `search_for_pattern: "className.*bg-amber-600.*rounded"` → 3箇所で生のTailwindボタン/カード検出。
+
+**Issue本文**:
+
+```markdown
+## 概要
+一部ページで共通UIコンポーネント未使用。デザイン一貫性が損なわれている。
+
+## 問題
+CLAUDE.md「UI Component Rules」違反が3箇所：
+1. `app/settings/page.tsx:45` - カスタムボタン → `<Button>` に置換
+2. `app/profile/page.tsx:28` - カスタムカード → `<Card>` に置換
+3. `components/CustomDialog.tsx:12` - カスタムダイアログ → `<Dialog>` に置換
+
+## 作業内容
+- [ ] 各箇所を共通UIコンポーネントに置き換え
+- [ ] テーマ対応確認
+```
+
+**ラベル**: `refactor`, `ui`
+**タイトル**: `refactor(ui): 共通UIコンポーネントに統一`
+
+---
+
+## 3. 機能追加（CSVエクスポート）
+
+**調査**: `find_symbol: "useAppData"` → データ取得フック確認。`search_for_pattern: "export.*csv"` → 未実装確認。
+
+**Issue本文**:
+
+```markdown
+## 概要
 コーヒー記録データをCSV形式でエクスポートする機能を追加する。
 
 ## 理由/背景
-
-ユーザーが外部ツール（Excel、Googleスプレッドシート等）でデータ分析を行えるようにするため。
-特に、焙煎履歴や抽出記録を時系列で分析したいという要望が多い。
+外部ツール（Excel等）でデータ分析を行いたいという要望。
 
 ## 対象箇所
-
 ### 新規作成
 - `lib/export/csv-exporter.ts` - CSV生成ロジック
-- `components/ExportButton.tsx` - エクスポートボタンコンポーネント
+- `components/ExportButton.tsx` - エクスポートボタン
 
 ### 既存修正
 - `app/assignment/page.tsx` - エクスポートボタン追加
 - `app/tasting/page.tsx` - エクスポートボタン追加
 
 ## 作業内容
-
-- [ ] CSV生成ユーティリティ関数を実装
-  - 日本語ヘッダー対応
-  - UTF-8 BOM付きで出力（Excel対応）
-  - 日付フォーマット統一（YYYY-MM-DD）
+- [ ] CSV生成ユーティリティ（UTF-8 BOM付き、日本語ヘッダー対応）
 - [ ] ExportButtonコンポーネント作成
-  - ダウンロードアイコン表示
-  - ローディング状態管理
-  - クリスマスモード対応
-- [ ] 割付画面にエクスポートボタン追加
-  - フィルタ適用後のデータをエクスポート
-  - ファイル名: `roastplus-assignment-YYYYMMDD.csv`
-- [ ] テイスティング画面にエクスポートボタン追加
-  - 全テイスティング記録をエクスポート
-  - ファイル名: `roastplus-tasting-YYYYMMDD.csv`
-- [ ] テストケース追加
-  - CSV生成の正確性確認
-  - 特殊文字（改行、カンマ）のエスケープ確認
+- [ ] 割付画面・テイスティング画面にボタン追加
+- [ ] テストケース追加（エスケープ処理含む）
 
 ## 影響範囲
-
-- 割付管理機能
-- テイスティング記録機能
-- 進捗画面（将来的に追加予定）
-
-## 参考
-
-- Papa Parse（CSVパーサー）: https://www.papaparse.com/
-- または、シンプルな実装で自作（依存関係を増やさない）
+- 割付管理機能、テイスティング記録機能
 ```
 
-### ラベル
-
-- `enhancement`
-- `feature`
-- `ui`
-
-### 実際のコマンド
-
-```bash
-cat > /tmp/issue_body.md <<'EOF'
-[Issue本文]
-EOF
-
-gh issue create \
-  --title "feat(export): CSVエクスポート機能を追加" \
-  --body-file /tmp/issue_body.md \
-  --label "enhancement,feature,ui"
-
-rm /tmp/issue_body.md
-```
+**ラベル**: `enhancement`
+**タイトル**: `feat(export): CSVエクスポート機能を追加`
 
 ---
 
-## 4. リファクタリングIssue（複雑度削減）
+## 4. リファクタリング（複雑度削減）
 
-### Serena MCP調査結果
+**調査**: Lizardスキャン結果 → `DesktopTableView.tsx`(CCN 125)、`TableModals.tsx`(CCN 117)。
 
-```
-# 複雑度監査結果の確認
-# complexity-audit スキルで事前にスキャン済み
-
-# 対象ファイルの構造確認
-get_symbols_overview: app/assignment/components/assignment-table/
-→ DesktopTableView.tsx（CCN 125）
-→ TableModals.tsx（CCN 117）
-
-# 依存関係確認
-find_referencing_symbols: DesktopTableView
-→ 参照元: app/assignment/page.tsx:45
-```
-
-### Issue本文
+**Issue本文**:
 
 ```markdown
 ## 概要
-
-複雑度監査で検出された高CCN（循環的複雑度）の関数をリファクタリングし、保守性を向上させる。
+高CCN関数をリファクタリングし、保守性を向上させる。
 
 ## 理由/背景
-
-`complexity-audit` スキルで実行したLizardスキャン結果より：
-
-| ファイル | 関数名 | CCN | NLOC | 重症度 |
-|---------|--------|-----|------|--------|
-| `app/assignment/components/assignment-table/DesktopTableView.tsx` | `DesktopTableView` | 125 | 289 | 🔴 即対応 |
-| `app/assignment/components/assignment-table/TableModals.tsx` | `TableModals` | 117 | 414 | 🔴 即対応 |
-
-CCN 100超は「即座に分割すべき」レベルであり、バグ混入リスクが極めて高い。
-
-## 対象箇所
-
-- `app/assignment/components/assignment-table/DesktopTableView.tsx`
-- `app/assignment/components/assignment-table/TableModals.tsx`
+| ファイル | CCN | 重症度 |
+|---------|-----|--------|
+| `DesktopTableView.tsx` | 125 | 即対応 |
+| `TableModals.tsx` | 117 | 即対応 |
 
 ## 作業内容
-
 ### DesktopTableView.tsx（CCN 125 → 30以下目標）
-
-- [ ] テーブル行レンダリングロジックを `TableRow` コンポーネントに抽出
-- [ ] 条件分岐を `CellRenderer` コンポーネントに分離
-- [ ] ソート・フィルタロジックを `useTableLogic` カスタムフックに移動
-- [ ] ガード節導入で早期リターン
-- [ ] ステートマシンパターンで状態遷移を明示化
+- [ ] テーブル行を `TableRow` コンポーネントに抽出
+- [ ] ソート・フィルタを `useTableLogic` フックに移動
 
 ### TableModals.tsx（CCN 117 → 30以下目標）
-
 - [ ] 各モーダルを独立コンポーネントに分割
-  - `EditModal`
-  - `DeleteConfirmModal`
-  - `BulkActionModal`
-- [ ] モーダル状態管理を `useModalState` カスタムフックに移動
-- [ ] バリデーションロジックを `validators.ts` に抽出
+- [ ] バリデーションを `validators.ts` に抽出
 
 ### 検証
-
-- [ ] リファクタリング後にCCNを再測定
-- [ ] 既存のテストがすべて通過することを確認
-- [ ] E2Eテストで動作確認
-
-## 影響範囲
-
-- 割付管理機能全体
-- テーブル表示・編集・削除機能
+- [ ] リファクタリング後にCCN再測定
+- [ ] 既存テスト全通過確認
 ```
 
-### ラベル
-
-- `refactor`
-- `code-quality`
-- `priority: medium`
-
-### 実際のコマンド
-
-```bash
-cat > /tmp/issue_body.md <<'EOF'
-[Issue本文]
-EOF
-
-gh issue create \
-  --title "refactor(assignment): 高CCN関数のリファクタリング" \
-  --body-file /tmp/issue_body.md \
-  --label "refactor,code-quality,priority: medium"
-
-rm /tmp/issue_body.md
-```
+**ラベル**: `refactor`, `code-quality`
+**タイトル**: `refactor(assignment): 高CCN関数のリファクタリング`
 
 ---
 
-## 5. ドキュメント追加Issue
+## 5. ドキュメント追加
 
-### Serena MCP調査結果
+**調査**: `search_for_pattern: "@param|@returns"` → `hooks/` 配下でJSDoc不足を検出。
 
-```
-# 既存ドキュメント確認
-list_dir: docs/
-→ coding-standards.md
-→ testing-strategy.md
-→ memory.md
-
-# APIドキュメントの確認
-search_for_pattern: "@param|@returns"
-→ lib/firebase/ 配下で検出（JSDoc あり）
-→ hooks/ 配下で検出なし（JSDoc 不足）
-```
-
-### Issue本文
+**Issue本文**:
 
 ```markdown
 ## 概要
-
-カスタムフックのAPIドキュメントを追加し、使用方法を明確にする。
-
-## 理由/背景
-
-`hooks/` ディレクトリ配下のカスタムフックにJSDocコメントが不足しており、
-使用方法や引数・戻り値の型が不明確。
-
-特に以下のフックは複数のページで使用されているため、ドキュメント化が必要：
-- `useAppData`
-- `useRoastTimer`
-- `useChristmasMode`
-- `useAuth`
+カスタムフックのAPIドキュメント（JSDoc）を追加する。
 
 ## 対象箇所
-
-- `hooks/useAppData.ts` - JSDoc追加
-- `hooks/useRoastTimer.ts` - JSDoc追加
-- `hooks/useChristmasMode.ts` - JSDoc追加
-- `hooks/useAuth.ts` - JSDoc追加
-- `docs/hooks-api-reference.md` - 新規作成
+- `hooks/useAppData.ts`
+- `hooks/useRoastTimer.ts`
+- `hooks/useAuth.ts`
 
 ## 作業内容
-
-### JSDocコメント追加
-
-各フックに以下を追加：
-
-```tsx
-/**
- * RoastPlusアプリケーション全体のデータを管理するカスタムフック
- *
- * @returns {Object} アプリケーションデータとメソッド
- * @returns {CoffeeData[]} coffeeList - コーヒーデータ一覧
- * @returns {boolean} loading - ローディング状態
- * @returns {(data: CoffeeData) => Promise<void>} addCoffee - コーヒーデータ追加
- *
- * @example
- * ```tsx
- * function MyComponent() {
- *   const { coffeeList, loading, addCoffee } = useAppData();
- *
- *   if (loading) return <Loading />;
- *
- *   return <CoffeeList data={coffeeList} />;
- * }
- * ```
- */
-export function useAppData() {
-  // ...
-}
+- [ ] 各フックにJSDoc（@param, @returns, @example）追加
 ```
 
-### APIリファレンス作成
-
-`docs/hooks-api-reference.md` を作成：
-- 全カスタムフックの一覧
-- 各フックの使用例
-- 注意点・制約事項
-
-## 影響範囲
-
-- 開発者体験の向上
-- オンボーディング時間の短縮
-```
-
-### ラベル
-
-- `documentation`
-- `enhancement`
-
-### 実際のコマンド
-
-```bash
-cat > /tmp/issue_body.md <<'EOF'
-[Issue本文]
-EOF
-
-gh issue create \
-  --title "docs(hooks): カスタムフックのAPIドキュメントを追加" \
-  --body-file /tmp/issue_body.md \
-  --label "documentation,enhancement"
-
-rm /tmp/issue_body.md
-```
-
----
-
-## Issue作成のベストプラクティス
-
-### 1. 調査フェーズ
-
-Serena MCPで以下を確認：
-- `search_for_pattern`: 関連コードの検索
-- `get_symbols_overview`: ファイル構造の把握
-- `find_referencing_symbols`: 影響範囲の特定
-
-### 2. Issue本文の構成
-
-必須セクション:
-- **概要**: 何をするか（1-2文）
-- **理由/背景**: なぜ必要か
-- **対象箇所**: 修正・追加するファイルと行番号
-- **作業内容**: チェックリスト形式
-- **影響範囲**: 関連機能・コンポーネント
-
-### 3. ラベル選択
-
-| ラベル | 用途 |
-|--------|------|
-| `bug` | バグ修正 |
-| `enhancement` / `feature` | 新機能追加 |
-| `refactor` | リファクタリング |
-| `documentation` | ドキュメント |
-| `ui` / `design` | UI関連 |
-| `priority: high/medium/low` | 優先度 |
-
-### 4. gh CLIコマンド
-
-必ず `--body-file` を使用（バッククォート問題回避）:
-
-```bash
-cat > /tmp/issue_body.md <<'EOF'
-[Issue本文]
-EOF
-
-gh issue create \
-  --title "[type]: タイトル" \
-  --body-file /tmp/issue_body.md \
-  --label "label1,label2"
-
-rm /tmp/issue_body.md
-```
+**ラベル**: `documentation`
+**タイトル**: `docs(hooks): カスタムフックのAPIドキュメントを追加`

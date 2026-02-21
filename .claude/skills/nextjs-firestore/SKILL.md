@@ -1,83 +1,100 @@
 ---
 name: nextjs-firestore
-description: Next.js + Firebase/Firestore統合開発パターン。型定義、データ操作(CRUD)、リアルタイム同期、認証、セキュリティルールに使用。Firestore、Firebase、データベース操作、リアルタイムリスナー、Firebase Auth時に使用。
+description: RoastPlus固有のFirebase/Firestoreアーキテクチャパターン。単一ドキュメント設計、Write Queue（デバウンス+リトライ）、楽観的更新、データ消失防止、Cloud Functions（httpsCallable）、サブコレクションCRUD、セキュリティルールに使用。Firestore読み書き、Firebase Auth、Cloud Functions、リアルタイム同期、オフライン対応実装時に参照。
 ---
 
-# Next.js + Firestore 開発スキル
+# Next.js + Firestore 開発スキル（RoastPlus固有）
 
-Next.jsアプリケーションでFirestoreを効率的に使用するためのパターンとベストプラクティス。
+RoastPlusのFirebase/Firestoreアーキテクチャと実装パターン。汎用的なFirebase知識ではなく、**プロジェクト固有の設計判断と実装パターン**に焦点。
 
-## クイックスタート
+## アーキテクチャ概要
 
-### 基本的なドキュメント型定義
+```
+クライアント（静的エクスポート: output: 'export'）
+  ├── useAuth() → onAuthStateChanged
+  ├── useAppData() → 単一ドキュメント /users/{userId}
+  │     ├── 楽観的更新 + lockedKeysRef
+  │     ├── Write Queue（デバウンス300ms + リトライ）
+  │     └── データ消失防止
+  ├── useMembers() → サブコレクション /users/{userId}/members/*
+  └── httpsCallable → Cloud Functions v2
+        ├── ocrScheduleFromImage（GPT-4o Vision）
+        └── analyzeTastingSession（GPT-4o テキスト）
+```
+
+## 設計判断（ADR）
+
+| 判断 | 採用 | 不採用 | 理由 |
+|------|------|--------|------|
+| データモデル | 単一ドキュメント + 配列 | サブコレクション | 8人チーム規模、1回のreadで全データ取得可能 |
+| 型変換 | `normalizeAppData()` 手動正規化 | `FirestoreDataConverter` | AppData全体を一括正規化する方が効率的 |
+| 日付型 | ISO 8601文字列 (`string`) | `Timestamp` | JSON直列化容易、localStorage互換 |
+| 書き込み | Write Queue + デバウンス | 直接 `setDoc` | Write stream exhausted防止 |
+| オフライン | localStorage + Service Worker | `enablePersistence` | 静的エクスポート環境での安定性 |
+| AI処理 | Cloud Functions v2 | Next.js API Routes | `output: 'export'` でAPI Routes使用不可 |
+| 状態管理 | React useState のみ | Zustand/Redux | チーム規模で十分 |
+
+## 重要ファイルマップ
+
+| パス | 役割 |
+|------|------|
+| `lib/firebase.ts` | Firebase初期化（シングルトン） |
+| `lib/firestore/userData/crud.ts` | AppData CRUD（getUserData, saveUserData） |
+| `lib/firestore/userData/write-queue.ts` | Write Queue（デバウンス + リトライ + 同時実行制限） |
+| `lib/firestore/common.ts` | `removeUndefinedFields`, `normalizeAppData` |
+| `hooks/useAppData.ts` | メインデータフック（楽観的更新 + ロック） |
+| `hooks/useMembers.ts` | サブコレクション購読 |
+| `lib/auth.ts` | 認証（`useAuth`） |
+| `lib/scheduleOCR.ts` | Cloud Functions呼び出し（httpsCallable） |
+| `lib/storage.ts` | Firebase Storage（画像アップロード/削除） |
+| `lib/localStorage.ts` | ローカルストレージ（クイズ進捗、タイマー状態等） |
+| `types/index.ts` | AppData型定義 |
+| `firestore.rules` | セキュリティルール |
+| `functions/src/` | Cloud Functions v2実装 |
+
+## データモデル
+
+### メインドキュメント: `/users/{userId}`
 
 ```typescript
-import { Timestamp } from 'firebase/firestore';
-
-interface BaseDocument {
-  id: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-
-export interface User extends BaseDocument {
-  email: string;
-  displayName: string;
-  photoURL?: string;
+// types/index.ts - AppData は全機能のデータを1ドキュメントに集約
+export interface AppData {
+  todaySchedules: TimeLabel[];        // スケジュール
+  roastSchedules: RoastSchedule[];    // 焙煎スケジュール
+  tastingSessions: TastingSession[];  // テイスティングセッション
+  tastingRecords: TastingRecord[];    // テイスティング記録
+  notifications: Notification[];      // 通知
+  roastTimerRecords: RoastTimerRecord[];  // 焙煎タイマー履歴
+  workProgresses: WorkProgress[];     // 作業進捗
+  dripRecipes: DripRecipe[];          // ドリップレシピ
+  userSettings?: UserSettings;        // ユーザー設定
+  // ... その他オプショナルフィールド
 }
 ```
 
-### ドキュメント取得
+### サブコレクション（担当表機能）
 
-```typescript
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-
-export async function getUser(userId: string): Promise<User | null> {
-  const docRef = doc(db, 'users', userId);
-  const docSnap = await getDoc(docRef);
-  return docSnap.exists() ? docSnap.data() as User : null;
-}
+```
+/users/{userId}/teams/{teamId}
+/users/{userId}/members/{memberId}
+/users/{userId}/managers/default
+/users/{userId}/taskLabels/{taskLabelId}
+/users/{userId}/assignmentDays/{date}
+/users/{userId}/shuffleEvents/{date}
+/users/{userId}/shuffleHistory/{historyId}
 ```
 
-### リアルタイムリスナー（カスタムフック）
+### グローバルコレクション
 
-```typescript
-import { doc, onSnapshot } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
-
-export function useUser(userId: string) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      doc(db, 'users', userId),
-      (snapshot) => {
-        setUser(snapshot.exists() ? snapshot.data() as User : null);
-        setLoading(false);
-      }
-    );
-    return () => unsubscribe();
-  }, [userId]);
-
-  return { user, loading };
-}
+```
+/defectBeans/{defectBeanId}    // 欠陥豆マスターデータ（全ユーザー共有）
 ```
 
-### 認証状態管理
+## 認証パターン
 
 ```typescript
-import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-
-const AuthContext = createContext<{ user: User | null; loading: boolean }>({
-  user: null,
-  loading: true
-});
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+// lib/auth.ts - useAuth フック
+export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -89,64 +106,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export const useAuth = () => useContext(AuthContext);
-```
-
----
-
-## 詳細パターン
-
-より詳細な実装パターンと例は以下のリファレンスを参照:
-
-- **[data-operations.md](references/data-operations.md)** - CRUD操作、クエリ、トランザクション、Converterパターン
-- **[realtime-listeners.md](references/realtime-listeners.md)** - リアルタイムリスナーの詳細パターン、エラーハンドリング
-- **[auth-patterns.md](references/auth-patterns.md)** - 認証フロー、サインイン/アウト、ユーザー管理
-- **[security-rules.md](references/security-rules.md)** - Firestoreセキュリティルールのベストプラクティス
-
----
-
-## ベストプラクティス
-
-### 型定義
-- `BaseDocument`を継承して一貫性を保つ
-- Converterパターンで型安全性を確保
-
-### データ操作
-- `serverTimestamp()`で一貫性を保つ
-- エラーハンドリングを必ず実装
-
-### リアルタイムリスナー
-- `useEffect`のreturnでunsubscribeを呼ぶ
-- ローディング状態とエラー状態を管理
-
-### セキュリティ
-- クライアントサイドでのセキュリティ依存は避ける
-- セキュリティルールを必ず設定
-
----
-
-## エラーハンドリング
-
-```typescript
-import { FirebaseError } from 'firebase/app';
-
-export function handleFirestoreError(error: unknown): string {
-  if (error instanceof FirebaseError) {
-    switch (error.code) {
-      case 'permission-denied': return 'アクセス権限がありません';
-      case 'not-found': return 'データが見つかりません';
-      case 'already-exists': return 'データが既に存在します';
-      case 'unavailable': return 'サービスが一時的に利用できません';
-      default: return `エラーが発生しました: ${error.message}`;
-    }
-  }
-  return '予期しないエラーが発生しました';
+  return { user, loading };
 }
 ```
+
+認証方式: Google + Email/Password。`onAuthStateChanged` で状態監視。
+
+## 詳細リファレンス
+
+実装時は以下を参照:
+
+- **[data-operations.md](references/data-operations.md)** — Write Queue、楽観的更新、データ消失防止、CRUD操作、サブコレクション操作
+- **[cloud-functions.md](references/cloud-functions.md)** — httpsCallable呼び出し、onCall実装、Secrets管理、エラーハンドリング
+- **[security-rules.md](references/security-rules.md)** — 実際のFirestoreルール、サブコレクションルール、バリデーション
+
+## 実装時の注意点
+
+1. **AppData書き込みは必ずWrite Queue経由** — `saveUserData()` を使用。直接 `setDoc` しない
+2. **undefined値はFirestoreに保存不可** — `removeUndefinedFields()` で除去してから保存
+3. **日付はISO 8601文字列** — `new Date().toISOString()` を使用、`serverTimestamp()` は不使用
+4. **IDは `crypto.randomUUID()`** — Firestoreの自動IDではなくクライアント生成
+5. **静的エクスポート制約** — Next.js API Routes不使用、サーバー処理はCloud Functions経由
+6. **画像はFirebase Storage** — `lib/storage.ts` の `uploadDefectBeanImage` / `deleteDefectBeanImage`

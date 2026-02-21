@@ -173,7 +173,7 @@ resolve-library-id → query-docs
 
 ### 実装実行（TDD必須）
 
-**コード変更を含む実装は、TDDスキル（`.claude/skills/tdd/SKILL.md`）のRed→Green→Refactorサイクルに従う。**
+**コード変更を含む実装は、`superpowers:test-driven-development` スキルのRed→Green→Refactorサイクルに従う。**
 
 #### TDD対象の場合（lib/, hooks/, components/のロジック, バグ修正）
 
@@ -331,23 +331,45 @@ npm run lint && npm run build && npm run test
 
 ---
 
-## Phase 10: Steering Documents更新
+## Phase 10: Steering Documents更新（必須）
 
-**PR作成前に、Steering Documentsの更新が必要か判断します。**
+**毎回必ず全6ドキュメントをレビューし、更新が必要なものを更新する。スキップ不可。**
 
-### 更新対象の判定
+### 10.1 全ドキュメントレビュー（必須）
 
-以下のいずれかに該当する場合、Steering更新が必要:
-- 新機能追加（FEATURES.md 更新）
-- 技術スタック変更（TECH_SPEC.md 更新）
-- 新しいドメイン用語追加（UBIQUITOUS_LANGUAGE.md 更新）
-- 実装パターン変更（GUIDELINES.md 更新）
+以下の6ドキュメントを**すべて読み込み**、今回の変更との差分を確認する:
 
-### 更新ドラフト生成
+| # | ドキュメント | チェック観点 |
+|---|-------------|-------------|
+| 1 | **FEATURES.md** | 機能の追加・変更・削除、UI実装ルール、禁止事項 |
+| 2 | **TECH_SPEC.md** | 技術スタック変更、新ADR追加、バージョン変更、テスト数・カバレッジ |
+| 3 | **GUIDELINES.md** | 実装パターン変更、テスト戦略、リファクタリング対象 |
+| 4 | **REPOSITORY.md** | ファイル追加・削除・移動、ディレクトリ構造変更 |
+| 5 | **UBIQUITOUS_LANGUAGE.md** | 新しいドメイン用語、命名規則の変更 |
+| 6 | **PRODUCT.md** | スコープ変更、バージョン更新、テスト数更新 |
 
-Working Documents（特に design.md）を参照し、更新ドラフトを生成。
+### 10.2 更新チェックリスト生成（必須）
 
-**ユーザーに提示し、承認後に更新します。**
+AskUserQuestionで以下の形式のレビュー結果を**必ず**提示する:
+
+```
+📋 Steering Documents レビュー結果:
+
+1. FEATURES.md     → ✏️ 更新あり（〇〇を追記）
+2. TECH_SPEC.md    → ✅ 変更なし（理由: 技術スタック変更なし）
+3. GUIDELINES.md   → ✏️ 更新あり（〇〇パターンを追加）
+4. REPOSITORY.md   → ✅ 変更なし（理由: ファイル構造変更なし）
+5. UBIQUITOUS_LANGUAGE.md → ✅ 変更なし（理由: 新規用語なし）
+6. PRODUCT.md      → ✏️ 更新あり（テスト数を更新）
+
+更新を実行してよろしいですか？
+```
+
+⚠️ **「変更なし」にも必ず理由を明記すること。理由なしの「変更なし」は禁止。**
+
+### 10.3 更新実行
+
+ユーザー承認後、更新対象ドキュメントを編集する。
 
 ⚠️ **ユーザーの最終確認なしに Steering Documents を更新しないこと。**
 
@@ -436,7 +458,11 @@ fi
 🔀 PR: #番号 → マージ完了 ✅
 🧹 ブランチクリーンアップ完了
 
-📝 Steering Documents:
-- [更新した場合] FEATURES.md を更新しました
-- [更新しなかった場合] 更新不要と判断しました
+📝 Steering Documents レビュー完了:
+- FEATURES.md: [✏️更新済 / ✅変更なし（理由）]
+- TECH_SPEC.md: [✏️更新済 / ✅変更なし（理由）]
+- GUIDELINES.md: [✏️更新済 / ✅変更なし（理由）]
+- REPOSITORY.md: [✏️更新済 / ✅変更なし（理由）]
+- UBIQUITOUS_LANGUAGE.md: [✏️更新済 / ✅変更なし（理由）]
+- PRODUCT.md: [✏️更新済 / ✅変更なし（理由）]
 ```

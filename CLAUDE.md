@@ -1,12 +1,93 @@
-# RoastPlus - Project Rules
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview
-コーヒー焙煎・抽出業務支援アプリ（Next.js PWA）
 
-## Tech Stack
-- Next.js 16 (App Router) / React 19 / TypeScript 5
-- Tailwind CSS v4 / Framer Motion / Lottie
-- Firebase (Auth, Firestore, Storage)
+コーヒー焙煎・抽出業務支援PWAアプリ。8名のチームで毎日使われている現場発の業務効率化ツール。
+
+**Tech Stack**: Next.js 16 (App Router) / React 19 / TypeScript 5 / Tailwind CSS v4 / Framer Motion / Firebase (Auth, Firestore, Storage, Cloud Functions) / OpenAI GPT-4o (Cloud Functions経由)
+
+## Architecture
+
+```
+クライアント（PWA, 静的エクスポート）
+  Next.js 16 + React 19 + TypeScript 5
+  ├── Tailwind CSS v4 + Framer Motion（UI/アニメーション）
+  ├── Firebase SDK（Auth, Firestore, Storage）
+  └── httpsCallable → Cloud Functions（AI処理）
+        ↓
+Firebase（BaaS）
+  ├── Authentication（Google, Email/Password）
+  ├── Firestore（NoSQL, リアルタイム同期, オフラインキャッシュ）
+  ├── Storage（画像ファイル）
+  ├── Cloud Functions v2（サーバーレスAI処理）
+  │     ├── ocrScheduleFromImage（GPT-4o Vision OCR）
+  │     └── analyzeTastingSession（GPT-4o テキスト分析）
+  │     └── OPENAI_API_KEY: Firebase Secret Manager管理
+  └── Hosting / Vercel（デプロイ先）
+```
+
+### 重要なアーキテクチャ特性
+
+- **静的エクスポート**: 本番ビルドは `output: 'export'`。Next.js API Routesは使用不可
+- **AI処理はCloud Functions経由**: AI機能（OCR、テイスティング分析）はFirebase Cloud Functions v2経由でOpenAI GPT-4oを呼び出す。クライアントにAPIキーを持たない
+- **テーマシステム**: `next-themes` + CSS変数（`data-theme`属性）で6テーマ対応。コンポーネント側でのテーマ判定は不要
+- **モジュール境界**: `types/ → lib/ → hooks/ → components/ → app/`（循環依存禁止）
+- **状態管理**: React useState のみ（Zustand/Redux不使用）
+- **カスタムService Worker**: `public/sw.js` に手書き実装（next-pwa不使用）。Network First戦略
+
+### 主要機能
+
+| 機能 | パス | 概要 |
+|------|------|------|
+| 担当表 | `app/assignment/` | 作業分担の自動割り当て（シャッフルロジック） |
+| 焙煎タイマー | `app/roast-timer/` | 焙煎時間計測、温度記録OCR |
+| ドリップガイド | `app/drip-guide/` | レシピガイド（4:6メソッド等）、音声案内 |
+| コーヒークイズ | `app/coffee-trivia/` | FSRS間隔反復学習、XP・ストリーク |
+| テイスティング | `app/tasting/` | フレーバーホイール5軸評価、AI分析 |
+| スケジュール | `app/schedule/` | 業務予定のOCR読み取り |
+
+## Commands
+
+```bash
+# 開発
+npm run dev                    # 開発サーバー（localhost:3000）
+npm run build                  # プロダクションビルド（静的エクスポート）
+npm run lint                   # ESLint実行
+
+# テスト
+npm run test                   # Vitest ウォッチモード（TDD向け）
+npm run test:run               # Vitest 1回実行（CI向け）
+npm run test:coverage          # カバレッジレポート生成
+npx vitest run path/to/file.test.ts  # 特定ファイルのみ実行
+
+# E2Eテスト（Playwright）
+npm run test:e2e               # E2Eテスト実行
+npm run test:e2e:ui            # UIモード
+npm run test:e2e:report        # レポート表示
+
+# 品質チェック
+npm run security               # npm audit（脆弱性検出）
+npm run complexity             # Lizard（循環的複雑度チェック、CCN 15超 / 50行超を検出）
+npm run deadcode               # Knip（デッドコード検出）
+npm run skill:validate         # UIスキルとソースコードの整合性検証
+npm run maintenance            # 上記4つを統合実行
+
+# デプロイ
+npm run deploy:prod            # 本番デプロイ（firebase use default → build → deploy）
+npm run deploy:dev             # 開発環境デプロイ
+
+# その他
+npm run generate:sound-list    # 音声ファイルリスト自動生成（dev/buildで自動実行）
+npm run remotion:studio        # Remotion Studio起動
+```
+
+### 検証コマンド（実装完了時に必ず実行）
+
+```bash
+npm run lint && npm run build && npm run test:run
+```
 
 ## Workflows
 
@@ -17,149 +98,92 @@ Working Documents参照 → テスト設計 → 🔴Red → 🟢Green → 🔵Re
 詳細は `superpowers:test-driven-development` スキル参照
 
 ### 2. ビジュアル反復型（UI調整のみ）
-Chrome DevTools MCPでスクショ確認しながらUI改善
+Playwright MCPまたはChrome DevTools MCPでスクショ確認しながらUI改善
 
 ### 3. フロントエンドデザイン生成時
 **UIページ・コンポーネントのデザインを新規生成する際は、必ず `/frontend-design` スキルを使用すること。**
 - 汎用的な「AIっぽい」デザイン（Inter/Roboto、紫グラデーション等）を避ける
 - 大胆で独自性のあるデザイン方向性を選択する
-- タイポグラフィ、カラー、モーション、空間構成に細心の注意を払う
 
 ## Documentation Policy
 
 ### Steering Documents（永続化ドキュメント）
 
-**場所**: `docs/steering/`
-
-プロジェクト全体の設計指針を定義する6種類のドキュメント:
+**場所**: `docs/steering/`　— `/clear` 後のコンテキスト回復の起点
 
 | ドキュメント | 内容 | 参照タイミング |
 |-------------|------|---------------|
 | **PRODUCT.md** | プロダクトビジョン、コアバリュー、スコープ | Issue理解時 |
 | **FEATURES.md** | 全機能の詳細仕様、UI実装ルール、禁止事項 | 機能実装時（最重要） |
-| **TECH_SPEC.md** | 技術スタック、アーキテクチャ、ADR参照 | 技術選定時 |
+| **TECH_SPEC.md** | 技術スタック、アーキテクチャ、ADR | 技術選定時 |
 | **REPOSITORY.md** | ディレクトリ構造、ファイル命名規則 | ファイル配置時 |
 | **GUIDELINES.md** | 実装ガイドライン、コーディング規約 | コード作成時 |
 | **UBIQUITOUS_LANGUAGE.md** | ドメイン用語定義、命名規則 | 命名時 |
-
-**重要**: AIは `/clear` 後もSteering Documentsを参照することで、プロジェクトの設計を完全に理解できる。
 
 ### Working Documents（作業用ドキュメント）
 
 **場所**: `docs/working/{YYYYMMDD}_{Issue番号}_{タイトル}/`
 
-Issue単位の仕様書。4ファイル固定:
+Issue単位の仕様書。最大4ファイル:
+- **requirement.md**（必須） — 要件定義、受け入れ基準
+- **tasklist.md**（必須） — タスク分割、依存関係
+- **design.md**（複雑なタスク） — 設計書、変更対象ファイル
+- **testing.md**（複雑なタスク） — テスト計画、カバレッジ目標
 
-| ファイル | 内容 |
-|---------|------|
-| **requirement.md** | 要件定義、ユーザーストーリー、受け入れ基準 |
-| **design.md** | 設計書、変更対象ファイル、禁止事項チェック |
-| **tasklist.md** | タスク分割、依存関係、見積もり |
-| **testing.md** | テスト計画、テストケース、カバレッジ目標 |
-
-**生成**: `/create-spec` スキルで自動生成（AIが80%ドラフト、ユーザーが確認・修正）
-**更新**: 実装中に逐次更新（設計変更、タスク完了時）
-**保管**: PR完了後もGit保管（削除しない、過去の設計判断の記録）
+**生成**: `/create-spec` スキル or `/issue-creator` で自動生成
+**保管**: PR完了後もGit保管（削除しない）
 
 ### EnterPlanModeとの使い分け
 
-| 項目 | Working Documents | EnterPlanMode |
-|------|------------------|---------------|
-| 永続性 | ✅ Git保管 | ❌ 一時的 |
-| スコープ | Issue単位 | 実装の詳細計画 |
-| 用途 | 永続的な設計メモ | 複雑な実装の事前検討 |
-
+Working Documentsは永続的な設計メモ（Git保管）。EnterPlanModeは一時的な詳細計画。
 **併用推奨**: Working生成後、複雑な実装はEnterPlanModeで詳細計画を立案。
-
-## Thinking Keywords
-| キーワード | 用途 |
-|-----------|------|
-| `think` | 通常の推論 |
-| `think hard` | 複雑な問題、設計判断 |
-| `ultrathink` | 最も困難なアーキテクチャ決定 |
 
 ## Plugins & MCP
 
 ### プラグイン一覧
 
-| プラグイン | スコープ | 用途 | 使用タイミング |
-|-----------|---------|------|---------------|
-| **context7** | User | ライブラリ最新ドキュメント参照 | `resolve-library-id` → `query-docs` で実装時に参照 |
-| **serena** | User | コード解析・シンボル探索 | 探索専用（下記参照） |
-| **superpowers** | User | TDD・デバッグ・レビュー・プラン | 下記参照 |
-| **code-review** | User | PRコードレビュー | `/code-review` でPRレビュー時 |
-| **claude-md-management** | User | CLAUDE.md監査・改善 | CLAUDE.md更新時 |
-| **hookify** | User | hook作成・管理 | 振る舞い制御ルール追加時 |
-| **frontend-design** | Project | UIデザイン生成 | `/frontend-design` で新規UI作成時 |
-| **firebase** | Project | Firebase実操作（Auth, Firestore, Functions等） | Firebase管理操作・デプロイ時 |
-
-### Serena（探索専用）
-**探索のみ使用。編集にはClaude Code標準ツールを使う。**
-
-| 用途 | 使用可否 | ツール |
-|------|----------|--------|
-| シンボル構造の把握 | ✅ | `get_symbols_overview`, `find_symbol` |
-| 参照箇所の追跡 | ✅ | `find_referencing_symbols` |
-| パターン検索 | ✅ | `search_for_pattern` |
-| コード編集 | ❌ | `replace_symbol_body`, `insert_*`, `rename_symbol` |
-
-**理由**: 編集はClaude Codeのネイティブツール（Edit/Write）の方が安定・高速。
-**例外**: 大規模リファクタリングでシンボル名の一括リネームが必要な場合のみ `rename_symbol` を検討可。
+| プラグイン | 用途 | 使用タイミング |
+|-----------|------|---------------|
+| **context7** | ライブラリ最新ドキュメント参照 | `resolve-library-id` → `query-docs` |
+| **serena** | コード解析・シンボル探索（**探索のみ、編集禁止**） | `get_symbols_overview`, `find_symbol`, `find_referencing_symbols` |
+| **superpowers** | TDD・デバッグ・レビュー・プラン | 下記参照 |
+| **playwright** | ブラウザ自動操作・スクリーンショット | UI検証・E2Eテスト |
+| **firebase** | Firebase実操作（Auth, Firestore, Functions等） | Firebase管理操作・デプロイ時 |
+| **frontend-design** | UIデザイン生成 | 新規UI作成時 |
 
 ### superpowers（主要スキル）
 
-| スキル | 用途 | 備考 |
-|--------|------|------|
-| `superpowers:test-driven-development` | TDDサイクル（Red→Green→Refactor） | 旧`/tdd`の後継 |
-| `superpowers:systematic-debugging` | 仮説→検証→修正の体系的デバッグ | 旧`/debugging-helper`の後継 |
-| `superpowers:writing-plans` | 実装計画の策定 | Working Documents後の詳細計画に |
-| `superpowers:requesting-code-review` | 完了時のレビュー依頼 | fix-issue Phase 9で使用 |
-| `superpowers:verification-before-completion` | 完了宣言前の検証 | コミット・PR前に必ず実行 |
+| スキル | 用途 |
+|--------|------|
+| `superpowers:test-driven-development` | TDDサイクル（Red→Green→Refactor） |
+| `superpowers:systematic-debugging` | 仮説→検証→修正の体系的デバッグ |
+| `superpowers:writing-plans` | 実装計画の策定 |
+| `superpowers:requesting-code-review` | 完了時のレビュー依頼（fix-issue Phase 9） |
+| `superpowers:verification-before-completion` | 完了宣言前の検証（コミット・PR前に必ず実行） |
 
-### Firebase開発（スキル vs プラグイン）
+### Serena利用制限
 
-| 用途 | 使用するもの |
-|------|-------------|
-| コードパターン参照（型定義、CRUD、リアルタイム、Auth） | `/nextjs-firestore` スキル |
-| Firebase実操作（デプロイ、ルール確認、データ操作等） | `firebase` プラグイン |
-
-### Chrome DevTools MCP（動作確認）
-`navigate_page` → `take_snapshot` → 操作 → `take_screenshot`
+| 用途 | 可否 |
+|------|------|
+| シンボル探索・参照追跡 | ✅ |
+| パターン検索 | ✅ |
+| **コード編集** | ❌（Claude Code標準ツールEdit/Writeを使用） |
 
 ## Steering Documents参照ルール
 
 実装前に必ず以下のSteering Documentsを参照すること:
 
-### Issue取得時（fix-issue Phase 1）
-- **FEATURES.md** - 関連機能の確認
-
-### Working Documents生成時（/create-spec）
-- **PRODUCT.md** - プロダクトビジョン
-- **FEATURES.md** - 関連機能の仕様
-- **UBIQUITOUS_LANGUAGE.md** - 用語統一
-- **GUIDELINES.md** - 実装パターン
-
-### 実装時（fix-issue Phase 5）
-- **TECH_SPEC.md** - 技術仕様
-- **REPOSITORY.md** - ファイル配置
-- **GUIDELINES.md** - コーディング規約
-
-### PR完了時（fix-issue Phase 11.5）
-- **全Steering Documents** - 更新が必要か判断
-
-**コンテキスト喪失防止**: `/clear` 実行後も、Steering Documentsを参照することでプロジェクトの全体像を理解できる。
-
-## Code Style
-- ディレクトリ: `app/`, `components/`, `lib/`, `hooks/`, `types/`
-- 命名: PascalCase（コンポーネント）, camelCase（関数）, UPPER_SNAKE_CASE（定数）
-- 型定義: interface優先、ユニオン型はtype
-- 詳細は `docs/steering/GUIDELINES.md` 参照
+| タイミング | 参照ドキュメント |
+|-----------|----------------|
+| Issue取得時 | FEATURES.md |
+| Working生成時 | PRODUCT.md, FEATURES.md, UBIQUITOUS_LANGUAGE.md, GUIDELINES.md |
+| 実装時 | TECH_SPEC.md, REPOSITORY.md, GUIDELINES.md |
+| PR完了時（Phase 10） | **全6 Steering Documents 必須レビュー**（変更なしにも理由明記） |
 
 ## UI Component Rules（重要）
 
 **UI作成・編集時は必ず `@/components/ui` の共通コンポーネントを使用すること。**
 
-### 共通コンポーネント一覧
 ```tsx
 import {
   Button, IconButton,           // ボタン系
@@ -169,163 +193,106 @@ import {
 } from '@/components/ui';
 ```
 
-### ルール
+### 必須ルール
 1. **生のTailwindでボタン/カード/入力を作らない** → 共通コンポーネントを使用
-2. **テーマ対応はCSS変数で自動** → `isChristmasMode` propは不要（`data-theme`属性で自動切替）
-3. **配色** → `.claude/skills/roastplus-ui/references/color-schemes.md` 参照
-4. **既存で対応不可の場合** → `components/ui/` に新規共通コンポーネントを作成
-5. **共通コンポーネントの重複禁止** → 作成前に既存コンポーネントを必ず確認
-6. **モーダル背景は `bg-overlay`** → `bg-surface` はクリスマスモードで透過するため使用禁止
+2. **テーマ対応はCSS変数で自動** → テーマ関連のpropは不要（`data-theme`属性で6テーマ自動切替）
+3. **モーダル背景は `bg-overlay`** → `bg-surface` はダークテーマで半透明のため使用禁止
+4. **共通コンポーネントの重複禁止** → 作成前に既存コンポーネントを必ず確認
+5. **配色** → `.claude/skills/roastplus-ui/references/design-tokens.md` 参照
 
 ### 新規コンポーネント追加時（レジストリ方式）
-新しい共通UIコンポーネントを作成した場合、**必ず以下の手順で登録すること**：
-
 1. `components/ui/NewComponent.tsx` を作成
 2. `components/ui/index.ts` にエクスポートを追加
-3. `components/ui/registry.tsx` に以下を追加：
-   - デモコンポーネント（`NewComponentDemo`関数）
-   - `componentRegistry`配列にエントリを追加（name, description, category, Demo）
+3. `components/ui/registry.tsx` にデモコンポーネントとエントリを追加
+→ Developer Design Lab（`/dev/design-lab`）に自動表示
 
-```tsx
-// registry.tsx への追加例
-function NewComponentDemo() {
-  return <NewComponent />;
-}
+### テーマ対応CSS変数
 
-// componentRegistry配列に追加
-{
-  name: 'NewComponent',
-  description: 'コンポーネントの説明',
-  category: 'button' | 'form' | 'container' | 'display' | 'feedback',
-  Demo: NewComponentDemo,
-}
-```
+テーマ切替は `data-theme` 属性 + CSS変数で自動適用。セマンティックユーティリティを使用:
+- 背景: `bg-page`, `bg-surface`, `bg-overlay`, `bg-ground`, `bg-field`
+- テキスト: `text-ink`, `text-ink-sub`, `text-ink-muted`
+- ボーダー: `border-edge`, `border-edge-strong`
+- アクセント: `bg-spot`, `text-spot`
 
-→ UIテストページ（`/ui-test`）に自動表示される
+⚠️ **ハードコード色（`bg-white`, `text-gray-800`等）はテーマ切替で色が変わらないため非推奨**
 
-### テーマ対応（CSS変数方式）
-テーマ切替は `data-theme` 属性 + CSS変数で自動適用。コンポーネント側でのテーマ判定は不要。
-```tsx
-// テーマは自動適用。propは不要
-<Button variant="primary">保存</Button>
-<Card variant="table">...</Card>
-<Input label="名前" />
-```
+## Quality Gates（技術的負債防止）
 
-### CSS変数の使い分け（重要）
-| 変数 | 通常モード | クリスマスモード | 用途 |
-|------|-----------|----------------|------|
-| `bg-surface` | `#FFFFFF` | `rgba(255,255,255,0.05)` | カード・セクション（半透明OK） |
-| `bg-overlay` | `#FFFFFF` | `#0a2f1a` | モーダル・ダイアログ（不透明必須） |
-| `bg-ground` | `#F3F4F6` | `rgba(255,255,255,0.08)` | ページ背景・テーブルヘッダー |
+### 実装時の必須チェック
+1. **Lintエラー・warningは常にゼロを維持** — 発見次第すべて修正
+2. **新規コード変更にはテストを書く**（TDD必須: lib/, hooks/, components/のロジック部分）
+3. **型チェック通過** — `strict: true` を維持
+4. **コミット前に `npm run lint && npm run build && npm run test:run` を実行**
 
-## Testing
-- **推奨**: Vitest
-- テストファイル: `*.test.ts`, `*.test.tsx`
-- 詳細は `docs/testing-strategy.md` 参照
+### カバレッジ目標
+| 対象 | 目標 |
+|------|------|
+| 全体 | 75%以上 |
+| lib/ | 90%以上 |
+| hooks/ | 85%以上 |
 
-## Commands
-```bash
-npm run dev      # 開発サーバー
-npm run build    # ビルド
-npm run lint     # Lint
-npm run test     # テスト（Vitest導入後）
-```
+### セキュリティ
+- **APIキー・シークレットのコミット禁止** — `.env.local` に配置、`.gitignore` に含まれていることを確認
+- **Firebase設定（`NEXT_PUBLIC_*`）はクライアントに公開される** — Firestore Security Rulesで保護
+- **Firestore Security Rules変更時は慎重に** — 認証必須、ユーザースコープを維持
+- **依存関係の脆弱性** — `npm run security` で定期チェック
 
-## 理想のワークフロー（SDD運用時）
-
-### 新機能開発の流れ
-
-```
-1. /issue-creator（ハイブリッド型）
-   - 規模判定 → 規模に応じた調査 → Issue作成
-   - AIが規模に応じてWorking Documents生成を判断
-   ↓
-2. /fix-issue（11フェーズ・確認ポイント3つ）
-   - Phase 1: Working読み込み
-   - Phase 3: Issue説明（エンジニア初心者向け、コードなし）🔹①
-   - Phase 4: 計画（毎回ユーザー承認）🔹②
-   - Phase 5: 実装
-   - Phase 6: 動作確認（自動/手動選択）
-   - Phase 7: 要件確認（承認ループ）🔹③
-   - Phase 8: 検証（自動）
-   - Phase 9: 独立レビュー（別AIエージェント）
-   - Phase 10: Steering更新
-   - Phase 11: コミット→PR→自動マージ（全自動）
-```
-
-### セッション途中の引き継ぎ
-
-新しいセッション開始時、以下を参照してコンテキストを回復:
-
-1. **`docs/steering/`** - プロジェクト全体の理解
-2. **`docs/working/{最新}/`** - 進行中のIssueの設計
-3. **`git log`** - 最新のコミット履歴
-
-**コンテキストを忘れない仕組み = SDD（仕様駆動開発）**
-
-### スキル連携フロー
-
-**SDD（仕様駆動）ワークフロー**:
-
-| スキル | タイミング | 役割 |
-|--------|-----------|------|
-| **/issue-creator** | 作業開始時 | Issue作成 + 規模に応じてWorking生成 |
-| **/create-spec** | 手動実行時 | 既存IssueへのWorking Documents生成 |
-| **/fix-issue** | 実装開始時 | Working読込→実装→独立レビュー→PR→自動マージ |
-| **/git-workflow** | コミット時 | Workingからスコープ自動抽出 |
-| **/project-maintenance** | 定期実行時 | リファクタリングIssue + Working自動生成 |
-
-**実装支援**:
-
-| スキル | タイミング | 役割 |
-|--------|-----------|------|
-| **/roastplus-ui** | UI実装時 | デザインシステム（配色・コンポーネント・レイアウト） |
-| **/nextjs-firestore** | Firebase実装時 | パターン参照（型定義、CRUD、リアルタイム同期、Auth） |
-| **/nano-banana-pro** | 画像生成時 | Gemini画像生成（豆の視覚化、クイズ画像等） |
+### リファクタリング優先順位
+1. セキュリティ問題（最優先）
+2. 循環的複雑度 CCN 51+（即座に分割）
+3. 循環的複雑度 CCN 26-50（計画的リファクタリング）
+4. デッドコード
 
 ## Development Flow
-1. **Issue作成** → 機能追加・修正の起点（Claudeが作成）
+
+1. **Issue作成** → `/issue-creator`（規模に応じてWorking Documents自動生成）
 2. **ブランチ作成** → `feat/#123-xxx`、`fix/#123-xxx`
-3. **実装 → 動作確認 → 要件確認（承認ループ）**
-4. **検証（自動） → 独立レビュー**
-5. **コミット → PR作成 → 自動マージ（CI通過後）**
+3. **実装** → TDDサイクル（Red→Green→Refactor）
+4. **検証** → lint / build / test
+5. **独立レビュー** → 別AIエージェントによるコードレビュー
+6. **Steering更新** → 設計変更があれば該当ドキュメントを更新
+7. **コミット → PR作成 → 自動マージ**
 
 ⚠️ **mainブランチへの直接コミット禁止**
 
-## Git & GitHub CLI
+### Git運用
 - **ベースブランチ**: `main`
-- Issue/PR作成時は `--body-file` で一時ファイルを使用（バッククォート問題回避）
+- **コミットメッセージ**: コンベンショナルコミット形式（日本語）
+- **PR作成時**: `--body-file` で一時ファイルを使用（バッククォート問題回避）
+- **pre-commit hook**: Husky + lint-staged（ESLint自動修正）
 
-## Shortcuts
-| キー | 機能 |
-|-----|------|
-| `Escape` | 現在の生成を中断 |
-| `Ctrl+Esc` | 全応答を中止、履歴遡行 |
-| `/clear` | コンテキストリセット |
-| `/compact` | 長いセッションを圧縮 |
+## SDD ワークフロー（スキル連携）
 
-## Project Memory
+| スキル | タイミング | 役割 |
+|--------|-----------|------|
+| **/issue-creator** | 作業開始時 | Issue作成 + Working生成 |
+| **/create-spec** | 手動実行時 | 既存IssueへのWorking生成 |
+| **/fix-issue** | 実装開始時 | Working読込→実装→レビュー→PR→自動マージ |
+| **/roastplus-ui** | UI実装時 | デザインシステム参照 |
+| **/nextjs-firestore** | Firebase実装時 | CRUD・Auth・リアルタイムパターン |
 
-### Steering Documents（最優先）
+### セッション途中の引き継ぎ（`/clear` 後）
 
-プロジェクトの永続的な設計記録:
+1. **`docs/steering/`** — プロジェクト全体の理解
+2. **`docs/working/{最新}/`** — 進行中のIssueの設計
+3. **`git log`** — 最新のコミット履歴
 
-- **`docs/steering/PRODUCT.md`** - プロダクトビジョン
-- **`docs/steering/FEATURES.md`** - 全機能の詳細仕様
-- **`docs/steering/TECH_SPEC.md`** - 技術仕様、ADR参照
-- **`docs/steering/REPOSITORY.md`** - リポジトリ構造
-- **`docs/steering/GUIDELINES.md`** - 実装ガイドライン
-- **`docs/steering/UBIQUITOUS_LANGUAGE.md`** - ドメイン用語定義
+## Thinking Keywords
 
-### Working Documents
+| キーワード | 用途 |
+|-----------|------|
+| `think` | 通常の推論 |
+| `think hard` | 複雑な問題、設計判断 |
+| `ultrathink` | 最も困難なアーキテクチャ決定 |
 
-- **`docs/working/`** - 過去のIssue仕様書（Git保管、削除しない）
+## Code Style
 
-**重要な設計判断を行った際**:
-1. 該当するSteering Documentを更新（FEATURES.md, TECH_SPEC.md等）
-2. PR作成前、fix-issue Phase 10で更新ドラフトを生成
-3. ユーザー承認後にコミット
+- ディレクトリ: `app/`, `components/`, `lib/`, `hooks/`, `types/`
+- 命名: PascalCase（コンポーネント）, camelCase（関数）, UPPER_SNAKE_CASE（定数）
+- 型定義: interface優先、ユニオン型はtype
+- インポート: 外部 → ローカル → `import type` → 定数
+- 詳細は `docs/steering/GUIDELINES.md` 参照
 
 ## Ignored Directories
-`node_modules/`, `.next/`, `out/`, `.git/`, `coverage/`, `public/sounds/`, `public/lottie/`
+
+`node_modules/`, `.next/`, `out/`, `.git/`, `coverage/`, `public/sounds/`, `public/lottie/`, `remotion/`

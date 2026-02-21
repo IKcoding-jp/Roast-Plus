@@ -43,7 +43,7 @@ export default function CoffeeTriviaPage() {
         }
       />
 
-      <main className="flex-1 container mx-auto p-4 lg:p-6 pt-14 max-w-lg">
+      <main className="flex-1 container mx-auto px-4 lg:px-6 pt-14 pb-6 max-w-lg flex flex-col justify-center">
         <QuizDashboard
           progress={progress}
           dueCardsCount={dueCardsCount}

@@ -1,22 +1,11 @@
 import { TERMS_SECTIONS, TERMS_LAST_UPDATED } from '@/data/legal/terms';
-import { Card, BackLink } from '@/components/ui';
+import { Card, FloatingNav } from '@/components/ui';
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
+    <div className="min-h-screen pt-14 pb-4 sm:pb-6 lg:pb-8 px-4 sm:px-6 lg:px-8 bg-page">
+      <FloatingNav backHref="/" />
       <div className="max-w-3xl mx-auto">
-        <header className="mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-              <BackLink href="/" variant="icon-only" aria-label="戻る" title="戻る" />
-            </div>
-            <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-ink sm:flex-1 text-center">
-              利用規約
-            </h1>
-            <div className="hidden sm:block flex-1 flex-shrink-0"></div>
-          </div>
-        </header>
-
         <main>
           <Card className="p-6 sm:p-8">
             <p className="text-sm text-ink-muted mb-6">

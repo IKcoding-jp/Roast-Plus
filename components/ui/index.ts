@@ -89,5 +89,8 @@ export type { AccordionProps, AccordionItemProps, AccordionTriggerProps, Accordi
 export { BackLink } from './BackLink';
 export type { BackLinkProps } from './BackLink';
 
+export { FloatingNav } from './FloatingNav';
+export type { FloatingNavProps } from './FloatingNav';
+
 export { RoastLevelBadge } from './RoastLevelBadge';
 export type { RoastLevelBadgeProps, RoastLevel } from './RoastLevelBadge';

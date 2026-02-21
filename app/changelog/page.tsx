@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { MdHistory } from 'react-icons/md';
 import type { ChangelogEntryType } from '@/types';
 import { ChangeTypeFilter, ChangelogTimeline } from '@/components/changelog';
 import { DETAILED_CHANGELOG } from '@/data/dev-stories/detailed-changelog';
-import { BackLink } from '@/components/ui/BackLink';
+import { FloatingNav } from '@/components/ui/FloatingNav';
 import { Card } from '@/components/ui/Card';
 
 export default function ChangelogPage() {
@@ -34,25 +33,10 @@ export default function ChangelogPage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 lg:pt-8 pb-20 sm:pb-8 bg-page"
+      className="min-h-screen flex flex-col px-3 sm:px-6 lg:px-8 pt-14 pb-20 sm:pb-8 bg-page"
     >
+      <FloatingNav backHref="/settings" />
       <div className="max-w-3xl mx-auto w-full flex flex-col flex-1">
-        {/* ヘッダー */}
-        <header className="mb-6 flex-shrink-0">
-          <div className="flex items-center gap-4">
-            <BackLink href="/settings" variant="icon-only" aria-label="設定に戻る" />
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
-                <MdHistory className="h-7 w-7 text-spot" />
-                更新履歴
-              </h1>
-              <p className="text-ink-muted text-sm mt-1 hidden sm:block">
-                ローストプラスの更新内容をご確認いただけます
-              </p>
-            </div>
-          </div>
-        </header>
-
         {/* フィルター */}
         <Card className="p-4 mb-6 flex-shrink-0">
           <ChangeTypeFilter

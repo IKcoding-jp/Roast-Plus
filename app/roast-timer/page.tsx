@@ -7,6 +7,7 @@ import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { requestNotificationPermission } from '@/lib/notifications';
 import LoginPage from '@/app/login/page';
 import { useEffect } from 'react';
+import { FloatingNav } from '@/components/ui';
 
 export default function RoastTimerPage() {
   const { user, loading: authLoading } = useAuth();
@@ -27,8 +28,9 @@ export default function RoastTimerPage() {
 
   return (
     <div className="h-screen overflow-hidden flex flex-col px-2 sm:px-4 py-2 sm:py-4 bg-page">
-          <div className="flex-1 min-h-0">
-            <RoastTimer />
+      <FloatingNav backHref="/" />
+      <div className="flex-1 min-h-0">
+        <RoastTimer />
       </div>
     </div>
   );

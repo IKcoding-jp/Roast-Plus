@@ -13,8 +13,7 @@ import { Loading } from '@/components/Loading';
 import type { TastingSession, TastingRecord } from '@/types';
 import { Plus } from 'phosphor-react';
 import { useToastContext } from '@/components/Toast';
-import { motion } from 'framer-motion';
-import { Button, IconButton, Card, BackLink } from '@/components/ui';
+import { Button, IconButton, Card, FloatingNav } from '@/components/ui';
 
 function TastingPageContent() {
   const { user, loading: authLoading } = useAuth();
@@ -113,25 +112,9 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6 bg-page">
+      <div className="min-h-screen pt-14 pb-6 sm:pb-8 px-4 sm:px-6 bg-page">
+        <FloatingNav backHref="/tasting" />
         <div className="max-w-lg mx-auto space-y-6">
-          <motion.header
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative flex flex-col items-center text-center pt-6"
-          >
-            <BackLink
-              href="/tasting"
-              variant="icon-only"
-              className="absolute left-0 top-0"
-            />
-
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink">
-              セッションを編集
-            </h1>
-            <p className="mt-1 text-sm font-medium text-ink-muted">セッションの情報を更新します</p>
-          </motion.header>
-
           <main>
             <TastingSessionForm
               session={session}
@@ -203,25 +186,9 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6 bg-page">
+      <div className="min-h-screen pt-14 pb-6 sm:pb-8 px-4 sm:px-6 bg-page">
+        <FloatingNav backHref="/tasting" />
         <div className="max-w-lg mx-auto space-y-6">
-          <motion.header
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative flex flex-col items-center text-center pt-6"
-          >
-            <BackLink
-              href="/tasting"
-              variant="icon-only"
-              className="absolute left-0 top-0"
-            />
-
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink">
-              記録を編集
-            </h1>
-            <p className="mt-1 text-sm font-medium text-ink-muted">試飲の感想を更新します</p>
-          </motion.header>
-
           <main>
             <TastingRecordForm
               record={record}
@@ -255,25 +222,9 @@ function TastingPageContent() {
     }
 
     return (
-      <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6 bg-page">
+      <div className="min-h-screen pt-14 pb-6 sm:pb-8 px-4 sm:px-6 bg-page">
+        <FloatingNav backHref="/tasting" />
         <div className="max-w-lg mx-auto space-y-6">
-          <motion.header
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative flex flex-col items-center text-center pt-6"
-          >
-            <BackLink
-              href="/tasting"
-              variant="icon-only"
-              className="absolute left-0 top-0"
-            />
-
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink">
-              記録の追加・編集
-            </h1>
-            <p className="mt-1 text-sm font-medium text-ink-muted">セッションの試飲記録を管理します</p>
-          </motion.header>
-
           <main>
             <TastingSessionDetail session={session} data={data} onUpdate={updateData} />
           </main>
@@ -286,49 +237,39 @@ function TastingPageContent() {
   const isEmpty = tastingSessions.length === 0;
 
   return (
-    <div className="min-h-screen flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4 bg-page">
-      <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
-        <header className="mb-4 sm:mb-6 flex-shrink-0">
-          <div className="relative flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex justify-between items-center w-full sm:w-auto sm:flex-1">
-              <BackLink
-                href="/"
-                variant="icon-only"
-              />
-              <div className="flex items-center gap-2 sm:hidden">
-                <div id="filter-button-container-mobile" className="min-w-[1px]"></div>
-                {!isEmpty && (
-                  <IconButton
-                    variant="primary"
-                    onClick={() => router.push('/tasting/sessions/new')}
-                    aria-label="新規セッション作成"
-                  >
-                    <Plus size={22} weight="bold" />
-                  </IconButton>
-                )}
-              </div>
-            </div>
-
-            <h1 className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 text-2xl sm:text-3xl font-black tracking-tight text-ink">
-              試飲感想記録
-            </h1>
-
-            <div className="hidden sm:flex justify-end items-center gap-2 sm:gap-3 w-full sm:w-auto sm:flex-1">
-              <div id="filter-button-container" className="min-w-[1px]"></div>
-              {!isEmpty && (
+    <div className="min-h-screen flex flex-col px-4 sm:px-6 lg:px-8 pt-14 pb-2 sm:pb-3 lg:pb-4 bg-page">
+      <FloatingNav
+        backHref="/"
+        right={
+          !isEmpty ? (
+            <>
+              <div id="filter-button-container" className="hidden sm:block min-w-[1px]"></div>
+              <div id="filter-button-container-mobile" className="sm:hidden min-w-[1px]"></div>
+              <div className="hidden sm:block">
                 <Button
                   variant="primary"
                   onClick={() => router.push('/tasting/sessions/new')}
                   aria-label="新規セッション作成"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 shadow-md"
                 >
                   <Plus size={20} weight="bold" />
                   <span className="whitespace-nowrap">セッションを作成</span>
                 </Button>
-              )}
-            </div>
-          </div>
-        </header>
+              </div>
+              <div className="sm:hidden">
+                <IconButton
+                  variant="primary"
+                  onClick={() => router.push('/tasting/sessions/new')}
+                  aria-label="新規セッション作成"
+                >
+                  <Plus size={22} weight="bold" />
+                </IconButton>
+              </div>
+            </>
+          ) : undefined
+        }
+      />
+      <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
 
         <main>
           <TastingSessionList

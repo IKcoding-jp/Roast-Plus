@@ -30,6 +30,7 @@ import {
   AccordionContent,
   BackLink,
   RoastLevelBadge,
+  FloatingNav,
 } from './index';
 
 /**
@@ -562,6 +563,39 @@ function BackLinkDemo() {
   );
 }
 
+function FloatingNavDemo() {
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
+          戻るボタンのみ
+        </h3>
+        <div className="relative h-24 bg-ground rounded-lg overflow-hidden">
+          <FloatingNav backHref="#" />
+          <p className="pt-14 text-center text-sm text-ink-sub">コンテンツ領域</p>
+        </div>
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold mb-2 text-ink">
+          戻る + 右アクション
+        </h3>
+        <div className="relative h-24 bg-ground rounded-lg overflow-hidden">
+          <FloatingNav
+            backHref="#"
+            right={
+              <>
+                <Button variant="surface" size="sm"><HiCog className="h-4 w-4" /></Button>
+                <Button variant="primary" size="sm"><HiPlus className="h-4 w-4" /> 追加</Button>
+              </>
+            }
+          />
+          <p className="pt-14 text-center text-sm text-ink-sub">コンテンツ領域</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============================================
 // コンポーネントレジストリ
 // ============================================
@@ -594,6 +628,13 @@ export const componentRegistry: ComponentRegistryItem[] = [
     category: 'button',
     isNew: true,
     Demo: BackLinkDemo,
+  },
+  {
+    name: 'FloatingNav',
+    description: 'フローティングナビゲーション。固定位置の戻るボタンと右側アクションボタンを提供。',
+    category: 'button',
+    isNew: true,
+    Demo: FloatingNavDemo,
   },
 
   // フォーム系

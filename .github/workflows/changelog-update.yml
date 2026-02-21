@@ -37,7 +37,10 @@ jobs:
 
             // 「ユーザー向け更新内容」セクションを抽出
             const match = body.match(/## ユーザー向け更新内容[\s\S]*?\n([\s\S]*?)<!-- \/changelog -->/);
-            const content = match ? match[1].trim() : '';
+            const rawContent = match ? match[1].trim() : '';
+
+            // PRテンプレートのHTMLコメント（使い方説明）を除去
+            const content = rawContent.replace(/<!--[\s\S]*?-->/g, '').trim();
 
             // "-" のみ（空エントリ）かどうか判定
             const isEmpty = /^[\s\-*]*$/.test(content);

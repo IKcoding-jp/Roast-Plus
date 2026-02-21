@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   update:
@@ -102,14 +102,37 @@ jobs:
           echo "バージョン $NEW_VERSION のchangelogを更新します..."
           node .github/scripts/update-changelog.mjs
 
-      - name: Commit and push changes
+      - name: Create PR with changelog updates
         if: steps.parse.outputs.is_empty == 'false' && steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          VERSION="${{ steps.version.outputs.new_version }}"
+          BRANCH="chore/v${VERSION}-changelog"
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # changelog更新専用のブランチを作成して push
+          git checkout -b "$BRANCH"
           git add package.json data/dev-stories/detailed-changelog.ts data/dev-stories/version-history.ts
-          git commit -m "chore: v${{ steps.version.outputs.new_version }} changelog自動更新 [skip ci]"
-          git push
+          git commit -m "chore: v${VERSION} changelog自動更新"
+          git push origin "$BRANCH"
 
-          echo "✅ changelog更新をコミットしました"
+          # PR作成 + 自動マージ設定
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: v${VERSION} changelog自動更新" \
+            --body "$(cat <<'PREOF'
+自動生成: PRマージに伴う changelog・バージョン更新
+
+- package.json のバージョンを更新
+- detailed-changelog.ts に新エントリを追加
+- version-history.ts に新エントリを追加
+PREOF
+)"
+
+          gh pr merge "$BRANCH" --auto --merge
+
+          echo "✅ changelog更新PRを作成し、自動マージを設定しました（ブランチ: $BRANCH）"

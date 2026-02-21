@@ -17,6 +17,24 @@ Working読込 → Issue確認 → 説明 → 計画 → 実装 → 動作確認 
 
 ---
 
+## superpowersスキルとの排他制御
+
+**fix-issueは統合ワークフローとして、superpowersの主要機能を各Phaseに内包している。** 二重呼び出しを防ぐため、fix-issue実行中は以下のルールを適用する。
+
+| superpowersスキル | fix-issue内の代替Phase | 自動発動 |
+|-------------------|----------------------|:---:|
+| `brainstorming` | Phase 3-4（説明・計画） | ❌ 不要 |
+| `writing-plans` | Working Documents（Phase 1で読込） | ❌ 不要 |
+| `test-driven-development` | Phase 5（**明示的に呼び出す**） | ❌ 自動不要 |
+| `verification-before-completion` | Phase 8（検証） | ❌ 不要 |
+| `requesting-code-review` | Phase 9（コードレビュー） | ❌ 不要 |
+| `finishing-a-development-branch` | Phase 11（マージ・クリーンアップ） | ❌ 不要 |
+| `systematic-debugging` | （代替なし） | ✅ 必要時に使用 |
+
+⚠️ **`using-superpowers`の「1%ルール」はfix-issue実行中には適用しない。** 上記テーブルの「明示的に呼び出す」もののみ使用すること。
+
+---
+
 ## Phase 1: Working Documents読み込み
 
 **Working Documentsが存在する場合は読み込み、存在しない場合は生成を促します。**
@@ -104,6 +122,15 @@ Working Documentsと照合し、要件を確認。
 
 ## Phase 3: Issue説明 🔹確認ポイント①
 
+### `/issue-creator` 直後の場合（同一セッション内）
+
+ブレインストーミング・Working生成が直前に完了しているため、**軽量版**で実施:
+- 背景・根本原因の詳細説明は省略（issue-creatorで確認済み）
+- **修正の方針**と**懸念点・リスク**の要点のみ提示
+- ユーザー確認は維持（スキップ不可）
+
+### 通常の場合
+
 **エンジニア初心者向けに**以下を説明します:
 
 1. **問題の背景** - なぜこのIssueが作られたのか
@@ -173,15 +200,18 @@ resolve-library-id → query-docs
 
 ### 実装実行（TDD必須）
 
-**コード変更を含む実装は、`superpowers:test-driven-development` スキルのRed→Green→Refactorサイクルに従う。**
+**コード変更を含む実装は、`superpowers:test-driven-development` スキルを Skill ツールで明示的に呼び出し、Red→Green→Refactorサイクルに従う。**
+
+⚠️ **TDDスキルはここで明示的に呼び出す。using-superpowersの自動発動には依存しない。**
 
 #### TDD対象の場合（lib/, hooks/, components/のロジック, バグ修正）
 
 ```
-1. testing.md を読み込み → テスト設計のインプット
-2. 🔴 Red: 失敗テストを作成 → コミット
-3. 🟢 Green: テスト合格する最小実装 → コミット
-4. 🔵 Refactor: テスト維持したまま改善 → コミット（必要な場合のみ）
+1. Skill ツールで superpowers:test-driven-development を呼び出す
+2. testing.md を読み込み → テスト設計のインプット
+3. 🔴 Red: 失敗テストを作成 → コミット
+4. 🟢 Green: テスト合格する最小実装 → コミット
+5. 🔵 Refactor: テスト維持したまま改善 → コミット（必要な場合のみ）
 ```
 
 ⚠️ **テストなしの実装コミットは行わない。必ずテストを先に書く。**

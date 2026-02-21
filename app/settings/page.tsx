@@ -10,10 +10,10 @@ import { useAppVersion } from '@/hooks/useAppVersion';
 import { Loading } from '@/components/Loading';
 import { useToastContext } from '@/components/Toast';
 import { PasswordModal } from '@/components/settings/PasswordModal';
-import { HiArrowLeft, HiDocumentText, HiShieldCheck, HiLogout, HiMail, HiColorSwatch } from 'react-icons/hi';
+import { HiDocumentText, HiShieldCheck, HiLogout, HiMail, HiColorSwatch } from 'react-icons/hi';
 import { MdHistory } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
-import { Button, Switch } from '@/components/ui';
+import { Button, Switch, FloatingNav } from '@/components/ui';
 import { VERSION_HISTORY } from '@/data/dev-stories/version-history';
 import { getUserData } from '@/lib/firestore';
 import { formatConsentDate } from '@/lib/consent';
@@ -88,27 +88,9 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-page py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 transition-colors">
+        <div className="min-h-screen bg-page pt-14 pb-4 sm:pb-6 lg:pb-8 px-4 sm:px-6 lg:px-8 transition-colors">
+            <FloatingNav backHref="/" />
             <div className="max-w-4xl mx-auto">
-                <header className="mb-6 sm:mb-8">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-                            <Link
-                                href="/"
-                                className="px-3 py-2 text-ink-sub hover:text-ink hover:bg-ground rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-                                title="戻る"
-                                aria-label="戻る"
-                            >
-                                <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-                            </Link>
-                        </div>
-                        <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold text-ink sm:flex-1 text-center">
-                            その他
-                        </h1>
-                        <div className="hidden sm:block flex-1 flex-shrink-0"></div>
-                    </div>
-                </header>
-
                 <main className="space-y-6">
                     {/* テーマ設定 */}
                     <Link

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useAppData } from '@/hooks/useAppData';
 import { useScheduleDateNavigation } from '@/hooks/useScheduleDateNavigation';
@@ -9,11 +8,11 @@ import { useScheduleOCR } from '@/hooks/useScheduleOCR';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { RoastSchedulerTab } from '@/components/RoastSchedulerTab';
 import { Loading } from '@/components/Loading';
-import { HiArrowLeft, HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCamera } from 'react-icons/hi';
+import { HiCalendar, HiClock, HiChevronLeft, HiChevronRight, HiCamera } from 'react-icons/hi';
 import { DatePickerModal } from '@/components/DatePickerModal';
 import { ScheduleOCRModal } from '@/components/ScheduleOCRModal';
 import LoginPage from '@/app/login/page';
-import { Button, IconButton } from '@/components/ui';
+import { Button, IconButton, FloatingNav } from '@/components/ui';
 
 type TabType = 'today' | 'roast';
 
@@ -53,120 +52,107 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="h-screen md:h-[100dvh] lg:h-screen pt-2 pb-4 px-4 sm:py-4 sm:px-4 lg:py-6 lg:px-6 flex flex-col overflow-hidden bg-page">
-      <div className="w-full flex-1 flex flex-col min-h-0 lg:max-w-7xl lg:mx-auto">
-        {/* ヘッダー */}
-        <header className="mb-4 flex-shrink-0 flex items-center">
-          <div className="flex-1 flex justify-start items-center">
-            <Link
-              href="/"
-              className="px-3 py-2 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px] text-ink-sub hover:text-ink hover:bg-ground"
-              title="戻る"
-              aria-label="戻る"
+    <div className="h-screen md:h-[100dvh] lg:h-screen pt-2 sm:pt-3 pb-4 px-4 sm:px-4 lg:px-6 flex flex-col overflow-hidden bg-page">
+      <FloatingNav
+        backHref="/"
+        right={
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => setIsOCROpen(true)}
+              className="shadow-md"
+              title="画像から読み取り"
+              aria-label="画像から読み取り"
             >
-              <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-            </Link>
+              <HiCamera className="h-5 w-5 flex-shrink-0 mr-2" />
+              <span className="font-medium">AIで読み取る</span>
+            </Button>
           </div>
-          <div className="flex-1 flex justify-center items-center">
-            {/* スマホレイアウト：1つのカード */}
-            <div className="sm:hidden w-full max-w-xs">
-              <div className="rounded-2xl shadow-xl px-3 py-2.5 bg-surface border-2 border-edge-strong">
-                {/* 日付ナビゲーション */}
-                <div className="flex items-center justify-center gap-1.5">
-                  <IconButton
-                    variant="ghost"
-                    size="sm"
-                    onClick={moveToPreviousDay}
-                    aria-label="前日"
-                  >
-                    <HiChevronLeft className="h-5 w-5" />
-                  </IconButton>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsDatePickerOpen(true)}
-                    aria-label="日付を選択"
-                    className="flex-1 justify-center"
-                  >
-                    <span className="text-base font-semibold font-sans whitespace-nowrap leading-tight text-ink">
-                      {formatDateString(selectedDate)}
-                    </span>
-                  </Button>
-                  <IconButton
-                    variant="ghost"
-                    size="sm"
-                    onClick={moveToNextDay}
-                    disabled={isMaxDate}
-                    aria-label="翌日"
-                  >
-                    <HiChevronRight className="h-5 w-5" />
-                  </IconButton>
-                </div>
-              </div>
-            </div>
-            {/* タブレット・デスクトップレイアウト：横並び */}
-            <div className="hidden sm:flex flex-row items-center gap-3 md:gap-4 px-5 py-2 md:px-6 md:py-2.5 rounded-2xl shadow-xl bg-surface border-2 border-edge-strong">
-              {/* 日付ナビゲーション */}
-              <div className="flex items-center gap-2 md:gap-2.5">
+        }
+      />
+      <div className="w-full flex-1 flex flex-col min-h-0 lg:max-w-7xl lg:mx-auto">
+        {/* 日付ナビゲーション */}
+        <div className="mb-2 flex-shrink-0 flex justify-center">
+          {/* スマホレイアウト：1つのカード */}
+          <div className="sm:hidden w-full max-w-xs">
+            <div className="rounded-2xl shadow-xl px-3 py-2.5 bg-surface border-2 border-edge-strong">
+              <div className="flex items-center justify-center gap-1.5">
                 <IconButton
                   variant="ghost"
-                  size="md"
+                  size="sm"
                   onClick={moveToPreviousDay}
                   aria-label="前日"
                 >
-                  <HiChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+                  <HiChevronLeft className="h-5 w-5" />
                 </IconButton>
                 <Button
                   variant="ghost"
-                  size="md"
+                  size="sm"
                   onClick={() => setIsDatePickerOpen(true)}
                   aria-label="日付を選択"
-                  className="gap-2 md:gap-2.5"
+                  className="flex-1 justify-center"
                 >
-                  <HiCalendar className="h-5 w-5 md:h-6 md:w-6 flex-shrink-0 text-spot" />
-                  <span className="text-base md:text-lg font-semibold font-sans whitespace-nowrap leading-tight text-ink">
+                  <span className="text-base font-semibold font-sans whitespace-nowrap leading-tight text-ink">
                     {formatDateString(selectedDate)}
                   </span>
                 </Button>
                 <IconButton
                   variant="ghost"
-                  size="md"
+                  size="sm"
                   onClick={moveToNextDay}
                   disabled={isMaxDate}
                   aria-label="翌日"
                 >
-                  <HiChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+                  <HiChevronRight className="h-5 w-5" />
                 </IconButton>
               </div>
-              {/* 区切り線 */}
-              <div className="flex-shrink-0 h-7 md:h-8 flex items-center">
-                <div className="w-px h-full bg-edge"></div>
-              </div>
-              {/* 時刻 */}
-              <div className="flex items-center gap-2 md:gap-2.5">
-                <HiClock className="h-5 w-5 md:h-6 md:w-6 flex-shrink-0 text-spot" />
-                <span className="text-base md:text-lg font-semibold font-sans whitespace-nowrap leading-tight text-ink">
-                  {formatTime(currentTime)}
-                </span>
-              </div>
             </div>
           </div>
-          <div className="flex-1 flex justify-end items-center">
-            <div className="hidden sm:flex items-center gap-2 sm:gap-3">
-              <Button
-                variant="primary"
+          {/* タブレット・デスクトップレイアウト：横並び */}
+          <div className="hidden sm:flex flex-row items-center gap-3 md:gap-4 px-5 py-2 md:px-6 md:py-2.5 rounded-2xl shadow-xl bg-surface border-2 border-edge-strong">
+            <div className="flex items-center gap-2 md:gap-2.5">
+              <IconButton
+                variant="ghost"
                 size="md"
-                onClick={() => setIsOCROpen(true)}
-                className="shadow-md"
-                title="画像から読み取り"
-                aria-label="画像から読み取り"
+                onClick={moveToPreviousDay}
+                aria-label="前日"
               >
-                <HiCamera className="h-5 w-5 flex-shrink-0 mr-2" />
-                <span className="font-medium">AIで読み取る</span>
+                <HiChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+              </IconButton>
+              <Button
+                variant="ghost"
+                size="md"
+                onClick={() => setIsDatePickerOpen(true)}
+                aria-label="日付を選択"
+                className="gap-2 md:gap-2.5"
+              >
+                <HiCalendar className="h-5 w-5 md:h-6 md:w-6 flex-shrink-0 text-spot" />
+                <span className="text-base md:text-lg font-semibold font-sans whitespace-nowrap leading-tight text-ink">
+                  {formatDateString(selectedDate)}
+                </span>
               </Button>
+              <IconButton
+                variant="ghost"
+                size="md"
+                onClick={moveToNextDay}
+                disabled={isMaxDate}
+                aria-label="翌日"
+              >
+                <HiChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+              </IconButton>
+            </div>
+            <div className="flex-shrink-0 h-7 md:h-8 flex items-center">
+              <div className="w-px h-full bg-edge"></div>
+            </div>
+            <div className="flex items-center gap-2 md:gap-2.5">
+              <HiClock className="h-5 w-5 md:h-6 md:w-6 flex-shrink-0 text-spot" />
+              <span className="text-base md:text-lg font-semibold font-sans whitespace-nowrap leading-tight text-ink">
+                {formatTime(currentTime)}
+              </span>
             </div>
           </div>
-        </header>
+        </div>
 
         {/* タブナビゲーション（スマホ版：画面下部に固定） */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-20 px-4 pb-4">

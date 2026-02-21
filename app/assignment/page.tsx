@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AssignmentTable } from './components/assignment-table';
 import { RouletteOverlay } from './components/RouletteOverlay';
 import { ManagerDialog } from './components/ManagerDialog';
@@ -11,13 +10,11 @@ import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAuth } from '@/lib/auth';
 import { setManager, deleteManager, addPairExclusion, deletePairExclusion } from './lib/firebase';
 import { useAssignmentData, useShuffleExecution, useAssignmentHandlers } from './hooks';
-import { IoArrowBack } from "react-icons/io5";
-import { FaUsers, FaUserTie } from "react-icons/fa";
+import { FaUserTie } from "react-icons/fa";
 import { HiPlus, HiCog } from "react-icons/hi";
-import { Button } from '@/components/ui';
+import { Button, FloatingNav } from '@/components/ui';
 
 export default function AssignmentPage() {
-    const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const userId = user?.uid ?? null;
     const { isEnabled: isDeveloperMode } = useDeveloperMode();
@@ -58,49 +55,22 @@ export default function AssignmentPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-page">
-            {/* ヘッダー */}
-            <header className="shadow-sm sticky top-0 z-30 flex-shrink-0 bg-surface border-b border-edge">
-                <div className="w-full px-4 h-16 relative flex items-center justify-center">
-                    {/* 左側: 戻るボタン */}
-                    <div className="absolute left-4 flex items-center z-10">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => router.back()}
-                            className="!p-2 -ml-2 !text-ink-sub hover:!text-ink"
-                        >
-                            <IoArrowBack size={24} />
-                        </Button>
-                    </div>
+            <FloatingNav
+                backHref="/"
+                right={isDeveloperMode ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsPairExclusionModalOpen(true)}
+                        className="!rounded-full !px-3 !py-2 shadow-md !bg-surface !text-ink-sub hover:!bg-ground !border !border-edge-strong"
+                        title="ペア除外設定"
+                    >
+                        <HiCog className="w-5 h-5" />
+                    </Button>
+                ) : undefined}
+            />
 
-                    {/* 中央: 見出し */}
-                    <div className="flex items-center justify-center z-0">
-                        <div className="flex items-center gap-2">
-                            <FaUsers className="w-6 h-6 md:w-7 md:h-7 text-spot" />
-                            <h1 className="text-xl md:text-2xl font-bold text-ink">
-                                担当表
-                            </h1>
-                        </div>
-                    </div>
-
-                    {/* 右側: 設定ボタン */}
-                    <div className="absolute right-4 flex items-center gap-2 z-10">
-                        {isDeveloperMode && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setIsPairExclusionModalOpen(true)}
-                                className="!rounded-full !px-3 !py-2 shadow-md !bg-surface !text-ink-sub hover:!bg-ground !border !border-edge-strong"
-                                title="ペア除外設定"
-                            >
-                                <HiCog className="w-5 h-5" />
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </header>
-
-            <main className="flex-1 w-full px-2 md:px-4 py-4 flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
+            <main className="flex-1 w-full px-2 md:px-4 pt-14 pb-4 flex flex-col items-center justify-center min-h-[calc(100vh-56px)]">
                 <AssignmentTable
                     teams={data.teams}
                     taskLabels={data.taskLabels}

@@ -8,9 +8,9 @@ import { useAppData } from '@/hooks/useAppData';
 import { RoastRecordForm } from '@/components/RoastRecordForm';
 import { RoastRecordList } from '@/components/RoastRecordList';
 import { Loading } from '@/components/Loading';
-import { IconButton, Button, Card } from '@/components/ui';
+import { Button, Card, FloatingNav } from '@/components/ui';
 import type { RoastTimerRecord } from '@/types';
-import { HiPlus, HiArrowLeft } from 'react-icons/hi';
+import { HiPlus } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 
 function RoastRecordPageContent() {
@@ -119,26 +119,9 @@ function RoastRecordPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
+      <div className="min-h-screen pt-14 pb-4 sm:pb-6 lg:pb-8 px-4 sm:px-6 lg:px-8 bg-page">
+        <FloatingNav backHref="/roast-record" />
         <div className="max-w-2xl mx-auto">
-          <header className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-                <IconButton
-                  onClick={() => router.push('/roast-record')}
-                  size="lg"
-                  title="一覧に戻る"
-                  aria-label="一覧に戻る"
-                >
-                  <HiArrowLeft className="h-6 w-6" />
-                </IconButton>
-              </div>
-              <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold sm:flex-1 text-center text-ink">
-                記録を編集
-              </h1>
-              <div className="hidden sm:block flex-1 flex-shrink-0"></div>
-            </div>
-          </header>
           <main>
             <Card className="p-4 sm:p-6">
               <RoastRecordForm
@@ -190,26 +173,9 @@ function RoastRecordPageContent() {
     };
 
     return (
-      <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 bg-page">
+      <div className="min-h-screen pt-14 pb-4 sm:pb-6 lg:pb-8 px-4 sm:px-6 lg:px-8 bg-page">
+        <FloatingNav backHref="/roast-record" />
         <div className="max-w-2xl mx-auto">
-          <header className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex justify-start w-full sm:w-auto sm:flex-1">
-                <IconButton
-                  onClick={() => router.push('/roast-record')}
-                  size="lg"
-                  title="一覧に戻る"
-                  aria-label="一覧に戻る"
-                >
-                  <HiArrowLeft className="h-6 w-6" />
-                </IconButton>
-              </div>
-              <h1 className="w-full sm:w-auto text-2xl sm:text-3xl font-bold sm:flex-1 text-center text-ink">
-                新規記録を作成
-              </h1>
-              <div className="hidden sm:block flex-1 flex-shrink-0"></div>
-            </div>
-          </header>
           <main>
             <Card className="p-4 sm:p-6">
               <RoastRecordForm
@@ -227,40 +193,23 @@ function RoastRecordPageContent() {
 
   // 一覧表示（デフォルト）
   return (
-    <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-3 lg:pb-4 bg-page">
+    <div className="h-screen overflow-y-hidden flex flex-col px-4 sm:px-6 lg:px-8 pt-14 pb-2 sm:pb-3 lg:pb-4 bg-page">
+      <FloatingNav
+        backHref="/"
+        right={
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => router.push('/roast-record?new=true')}
+            className="flex items-center gap-2 shadow-md"
+            aria-label="新規記録作成"
+          >
+            <HiPlus className="text-base sm:text-lg flex-shrink-0" />
+            <span className="whitespace-nowrap">新規記録を作成</span>
+          </Button>
+        }
+      />
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
-        <header className="mb-3 sm:mb-6 flex-shrink-0">
-          <div className="flex items-center justify-between gap-2 sm:gap-4">
-            <div className="flex items-center gap-2 sm:flex-1">
-              <IconButton
-                onClick={() => router.push('/')}
-                size="lg"
-                title="戻る"
-                aria-label="戻る"
-              >
-                <HiArrowLeft className="h-6 w-6" />
-              </IconButton>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold sm:hidden text-ink">
-                ロースト記録
-              </h1>
-            </div>
-            <h1 className="hidden sm:block text-2xl sm:text-3xl font-bold sm:flex-1 text-center text-ink">
-              ロースト記録
-            </h1>
-            <div className="flex justify-end sm:flex-1">
-              <Button
-                variant="primary"
-                size="md"
-                onClick={() => router.push('/roast-record?new=true')}
-                className="flex items-center gap-2"
-                aria-label="新規記録作成"
-              >
-                <HiPlus className="text-base sm:text-lg flex-shrink-0" />
-                <span className="whitespace-nowrap">新規記録を作成</span>
-              </Button>
-            </div>
-          </div>
-        </header>
 
         <main className="flex-1 min-h-0 overflow-hidden">
           <RoastRecordList data={data} onUpdate={updateData} />

@@ -3,14 +3,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import { HiPlus } from 'react-icons/hi';
-import { RiBookFill } from 'react-icons/ri';
 import { MdCompareArrows } from 'react-icons/md';
 import LoginPage from '@/app/login/page';
 import { useDefectBeans } from '@/hooks/useDefectBeans';
 import { useDefectBeanSettings } from '@/hooks/useDefectBeanSettings';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useToastContext } from '@/components/Toast';
-import { Button, BackLink } from '@/components/ui';
+import { Button, FloatingNav } from '@/components/ui';
 import { DefectBeanCard } from '@/components/DefectBeanCard';
 import { DefectBeanForm } from '@/components/DefectBeanForm';
 import { DefectBeanCompare } from '@/components/DefectBeanCompare';
@@ -226,86 +225,61 @@ export default function DefectBeansPage() {
   );
 
   return (
-    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8 transition-colors duration-1000 bg-page">
-      <div className="max-w-7xl mx-auto">
-        {/* ヘッダー */}
-        <header className="mb-4">
-          {/* タイトルとナビゲーション（一番上、同じ行） */}
-          <div className="flex sm:grid sm:grid-cols-3 items-center justify-between mb-3">
-            {/* 左側: 戻る */}
-            <div className="flex justify-start">
-              <BackLink
-                href="/"
-                variant="icon-only"
-              />
-            </div>
-
-            {/* 中央: タイトル */}
-            <div className="flex justify-center items-center gap-2 sm:gap-3 min-w-0">
-              <RiBookFill className="hidden sm:block h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0 text-spot" />
-              <h1 className="hidden sm:block text-lg sm:text-xl lg:text-2xl font-bold whitespace-nowrap text-ink">
-                コーヒー豆図鑑
-              </h1>
-            </div>
-
-            {/* 右側: アクションボタン */}
-            <div className="flex justify-end items-center gap-2 sm:gap-3 flex-shrink-0 flex-wrap">
-              {!(filteredDefectBeans.length === 0 && !searchQuery && filterOption === 'all') && (
-                <>
-                  {/* ソートボタン */}
-                  {!compareMode && (
-                    <SortMenu
-                      sortOption={sortOption}
-                      onSortChange={setSortOption}
-                      showSortMenu={showSortMenu}
-                      onToggleMenu={() => setShowSortMenu(!showSortMenu)}
-                      onClose={() => setShowSortMenu(false)}
-  
-                    />
-                  )}
-                  <Button
-                    variant={compareMode ? 'primary' : 'surface'}
-                    size="sm"
-                    onClick={toggleCompareMode}
-
-                    title={compareMode ? '選択モード' : '比較モード'}
-                    className="!px-3 !py-2 gap-1.5"
-                  >
-                    <MdCompareArrows className="h-5 w-5" />
-                    <span className="text-xs sm:text-sm">
-                      {compareMode ? '選択モード' : '比較'}
-                    </span>
-                  </Button>
-                  {compareMode && selectedIds.size > 0 && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={handleShowCompare}
-  
-                      title="比較を表示"
-                      className="!px-3 !py-2 gap-1.5"
-                    >
-                      比較 ({selectedIds.size})
-                    </Button>
-                  )}
-                  {!compareMode && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => setShowAddForm(true)}
-  
-                      title="欠点豆を追加"
-                      className="!px-3 !py-2 gap-1.5"
-                    >
-                      <HiPlus className="h-5 w-5" />
-                      <span className="text-xs sm:text-sm">追加</span>
-                    </Button>
-                  )}
-                </>
+    <div className="min-h-screen pt-14 pb-2 sm:pb-4 px-4 sm:px-6 lg:px-8 transition-colors duration-1000 bg-page">
+      <FloatingNav
+        backHref="/"
+        right={
+          !(filteredDefectBeans.length === 0 && !searchQuery && filterOption === 'all') ? (
+            <>
+              {!compareMode && (
+                <SortMenu
+                  sortOption={sortOption}
+                  onSortChange={setSortOption}
+                  showSortMenu={showSortMenu}
+                  onToggleMenu={() => setShowSortMenu(!showSortMenu)}
+                  onClose={() => setShowSortMenu(false)}
+                />
               )}
-            </div>
-          </div>
-        </header>
+              <Button
+                variant={compareMode ? 'primary' : 'surface'}
+                size="sm"
+                onClick={toggleCompareMode}
+                title={compareMode ? '選択モード' : '比較モード'}
+                className="!px-3 !py-2 gap-1.5"
+              >
+                <MdCompareArrows className="h-5 w-5" />
+                <span className="text-xs sm:text-sm">
+                  {compareMode ? '選択モード' : '比較'}
+                </span>
+              </Button>
+              {compareMode && selectedIds.size > 0 && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleShowCompare}
+                  title="比較を表示"
+                  className="!px-3 !py-2 gap-1.5"
+                >
+                  比較 ({selectedIds.size})
+                </Button>
+              )}
+              {!compareMode && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setShowAddForm(true)}
+                  title="欠点豆を追加"
+                  className="!px-3 !py-2 gap-1.5"
+                >
+                  <HiPlus className="h-5 w-5" />
+                  <span className="text-xs sm:text-sm">追加</span>
+                </Button>
+              )}
+            </>
+          ) : undefined
+        }
+      />
+      <div className="max-w-7xl mx-auto">
 
         {/* 検索とフィルタ */}
         {allDefectBeans.length > 0 && (

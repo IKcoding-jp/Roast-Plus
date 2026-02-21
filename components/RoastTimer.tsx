@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAppData } from '@/hooks/useAppData';
 import { useRoastTimer } from '@/hooks/useRoastTimer';
 import { useRoastTimerDialogs } from '@/hooks/useRoastTimerDialogs';
@@ -14,7 +13,6 @@ import type { RoastLevel, Weight } from '@/lib/constants';
 
 export function RoastTimer() {
   const { data, updateData, isLoading } = useAppData();
-  const router = useRouter();
   const {
     state,
     startTimer,
@@ -119,7 +117,6 @@ export function RoastTimer() {
       {!isIdle && (
         <div className="flex-1 flex flex-col items-center justify-center min-h-0 relative px-4 sm:px-6 py-8">
           <TimerHeader
-            onBack={() => router.push('/')}
             onSettingsClick={() => setShowSettings(true)}
             isOverlay
               />
@@ -147,7 +144,6 @@ export function RoastTimer() {
       {isIdle && (
         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
           <TimerHeader
-            onBack={() => router.back()}
             onSettingsClick={() => setShowSettings(true)}
               />
           <SetupPanel onStart={handleStart} isLoading={isLoading} />

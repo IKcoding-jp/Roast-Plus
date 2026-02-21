@@ -1,12 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { HiArrowLeft } from 'react-icons/hi';
-import { MdCoffeeMaker } from 'react-icons/md';
 import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import LoginPage from '@/app/login/page';
+import { FloatingNav } from '@/components/ui';
 
 export default function BrewingPage() {
   const { user, loading: authLoading } = useAuth();
@@ -22,25 +20,8 @@ export default function BrewingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F7F7F5' }}>
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-4xl">
-        {/* ヘッダー */}
-        <header className="mb-6 sm:mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Link
-              href="/"
-              className="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
-              title="戻る"
-              aria-label="戻る"
-            >
-              <HiArrowLeft className="h-6 w-6 flex-shrink-0" />
-            </Link>
-            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-              <MdCoffeeMaker className="h-8 w-8 sm:h-10 sm:w-10 text-amber-600 flex-shrink-0" />
-              <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap">ドリップガイド</h1>
-            </div>
-          </div>
-        </header>
-
+      <FloatingNav backHref="/" />
+      <div className="container mx-auto px-4 sm:px-6 pt-14 pb-4 sm:pb-6 max-w-4xl">
         {/* メインコンテンツ */}
         <main className="bg-white rounded-lg shadow-md p-6 sm:p-8">
           <div className="space-y-6">

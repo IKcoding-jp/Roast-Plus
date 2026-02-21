@@ -493,7 +493,7 @@ import { HiInbox } from 'react-icons/hi';
      Demo: NewComponentDemo,
    }
    ```
-4. `/ui-test` ページに自動表示される
+4. `/dev/design-lab` に自動表示される
 
 ### コンポーネント作成時のルール
 

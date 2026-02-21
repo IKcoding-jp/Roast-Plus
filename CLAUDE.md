@@ -223,6 +223,7 @@ import {
 3. **モーダル背景は `bg-overlay`** → `bg-surface` はダークテーマで半透明のため使用禁止
 4. **共通コンポーネントの重複禁止** → 作成前に既存コンポーネントを必ず確認
 5. **配色** → `.claude/skills/roastplus-ui/references/design-tokens.md` 参照
+6. **UIデザイン作業は仕様先行** → 実装前に具体的なサイズ・色（CSS変数名またはhex値）・スペーシング・レイアウト構造をテキストで説明し、承認を得てから実装する。試みが却下された場合はクリーンにリバートする
 
 ### 新規コンポーネント追加時（レジストリ方式）
 1. `components/ui/NewComponent.tsx` を作成
@@ -316,6 +317,11 @@ import {
 - 型定義: interface優先、ユニオン型はtype
 - インポート: 外部 → ローカル → `import type` → 定数
 - 詳細は `docs/steering/GUIDELINES.md` 参照
+
+## Interaction Rules
+
+- **ファイルは自動的に読む** — コードや設定の内容が必要な場合は、Readツールで直接読み込む。「コードを貼り付けてください」「ファイルを見せてください」と聞かない
+- **ファイル削除・依存関係削除後は一括検証** — 削除後は `npm run lint && npm run build && npm run test:run` を1パスで実行し、すべてのカスケードエラーをコミット前に修正する
 
 ## Ignored Directories
 

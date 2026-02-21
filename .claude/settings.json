@@ -1,5 +1,18 @@
 {
   "enabledPlugins": {
     "firebase@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_INPUT_file_path\" =~ \\.(ts|tsx|js|jsx)$ ]]; then npx eslint --fix \"$CLAUDE_TOOL_INPUT_file_path\" 2>&1 || true; fi"
+          }
+        ]
+      }
+    ]
   }
 }

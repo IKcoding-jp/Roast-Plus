@@ -307,81 +307,15 @@ const DIFFICULTY_STYLES = {
 
 ## UI実装ルール
 
-### 共通UIコンポーネント必須
+> **正本**: `docs/steering/FEATURES.md`「共通UI（UI Components）」セクション参照。
+> 以下はクイックリファレンス。
 
-**最重要ルール**: 生のTailwindでボタン・カード・入力を作らない → `@/components/ui` を使用
-
-#### 共通UIコンポーネント一覧
-
-```tsx
-import {
-  Button, IconButton,           // ボタン系
-  Input, NumberInput, InlineInput, Textarea, Select, Checkbox, Switch,  // フォーム系
-  Card, Modal, Dialog,          // コンテナ系
-  Badge, Tabs, Accordion, ProgressBar, EmptyState  // その他
-} from '@/components/ui';
-```
-
-#### 使用例
-
-```tsx
-// ✅ 正しい
-<Button variant="primary" onClick={handleSubmit}>
-  保存
-</Button>
-
-// ❌ 間違い
-<button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>
-  保存
-</button>
-```
-
----
-
-### テーマ対応
-
-テーマ切替は `data-theme` 属性 + CSS変数で**自動適用**。コンポーネントへのテーマprop渡しは不要。
-
-#### 実装パターン
-
-```tsx
-// ✅ テーマは自動適用。propは不要
-<Button variant="primary">保存</Button>
-<Card variant="table">...</Card>
-<Input label="名前" />
-
-// ✅ テーマ固有の装飾要素のみ条件レンダリング
-const { isChristmasTheme } = useAppTheme();
-{isChristmasTheme && <Snowfall />}
-
-// ❌ テーマをpropで渡さない
-<Button theme="christmas">保存</Button>
-```
-
----
-
-### 新規共通コンポーネント追加時
-
-1. `components/ui/NewComponent.tsx` を作成
-2. `components/ui/index.ts` にエクスポート追加
-3. `components/ui/registry.tsx` にデモ追加
-
-```tsx
-// registry.tsx への追加例
-function NewComponentDemo() {
-  return <NewComponent />;
-}
-
-// componentRegistry配列に追加
-{
-  name: 'NewComponent',
-  description: 'コンポーネントの説明',
-  category: 'button' | 'form' | 'container' | 'display' | 'feedback',
-  Demo: NewComponentDemo,
-}
-```
-
-→ `/ui-test` ページに自動表示される
+### 核心ルール
+- **生のTailwindでボタン/カード/入力を作らない** → `@/components/ui` を使用
+- **テーマ対応はCSS変数で自動** → `data-theme` 属性で7テーマ自動切替、テーマprop不要
+- **モーダル背景は `bg-overlay`** → `bg-surface` はダークテーマで半透明のため禁止
+- **ハードコード色（`bg-white`, `text-gray-800`等）禁止** → セマンティックトークン（`bg-page`, `text-ink`等）を使用
+- **新規コンポーネント追加時は `registry.tsx` への登録必須** → `/dev/design-lab` に自動表示
 
 ---
 

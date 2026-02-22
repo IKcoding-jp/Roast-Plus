@@ -190,7 +190,7 @@ roastplus/
 | ファイル | 役割 |
 |---------|------|
 | `useAppData.ts` | アプリ全体のデータ管理 |
-| `useAppTheme.ts` | テーマ管理（6テーマ切替） |
+| `useAppTheme.ts` | テーマ管理（7テーマ切替） |
 | `useAppLifecycle.ts` | アプリライフサイクル管理 |
 | `useAppVersion.ts` | バージョン情報 |
 | `useChristmasMode.ts` | クリスマステーマ切替・判定 |
@@ -277,11 +277,11 @@ functions/
 
 Issue単位の仕様書。`{YYYYMMDD}_{Issue番号}_{タイトル}/` 形式で作成。PR完了後もGit保管（削除しない）。
 
-4ファイル固定:
-- `requirement.md` - 要件定義
-- `design.md` - 設計書
-- `tasklist.md` - タスクリスト
-- `testing.md` - テスト計画
+最大4ファイル（タスク複雑度により調整）:
+- `requirement.md` - 要件定義（**必須**）
+- `tasklist.md` - タスクリスト（**必須**）
+- `design.md` - 設計書（複雑なタスクのみ）
+- `testing.md` - テスト計画（複雑なタスクのみ）
 
 ### その他
 

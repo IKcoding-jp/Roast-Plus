@@ -1,13 +1,13 @@
 ---
 name: roastplus-ui
-description: ローストプラスのUI/UXデザインシステム完全リファレンス。CSS変数ベースのセマンティックトークン、共通UIコンポーネント（Button, Card, Modal, Dialog, Input等）のAPI仕様、レイアウトパターン、アニメーション、6テーマ対応システム（data-theme属性+CSS変数で自動切替）を提供。UIページ・コンポーネントの新規作成、既存UIの修正、デザイン一貫性チェック、テーマ対応実装時に使用。
+description: ローストプラスのUI/UXデザインシステム完全リファレンス。CSS変数ベースのセマンティックトークン、共通UIコンポーネント（Button, Card, Modal, Dialog, Input等）のAPI仕様、レイアウトパターン、アニメーション、7テーマ対応システム（data-theme属性+CSS変数で自動切替）を提供。UIページ・コンポーネントの新規作成、既存UIの修正、デザイン一貫性チェック、テーマ対応実装時に使用。
 ---
 
 # ローストプラス UIデザインシステム
 
 ## 基本原則
 
-- **テーマ自動切替**: CSS変数 + `data-theme` 属性で6テーマ自動切替。コンポーネント側でのテーマ判定・prop不要
+- **テーマ自動切替**: CSS変数 + `data-theme` 属性で7テーマ自動切替。コンポーネント側でのテーマ判定・prop不要
 - **共通コンポーネント必須**: `@/components/ui` を使用。生Tailwindでボタン・カード・入力を作らない
 - **セマンティックトークン必須**: `bg-surface`, `text-ink`, `border-edge` 等を使用。ハードコード色（`bg-white`, `text-gray-800`）禁止
 - **モーダル背景は `bg-overlay`**: `bg-surface` はダーク系テーマで半透明のため不可

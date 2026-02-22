@@ -2,7 +2,7 @@
 
 ローストプラスのCSS変数ベーステーマシステム。`data-theme` 属性で自動切替。
 
-**6テーマ**: `default`, `christmas`, `dark-roast`, `light-roast`, `matcha`, `caramel`
+**7テーマ**: `default`, `christmas`, `dark-roast`, `light-roast`, `matcha`, `caramel`, `dark`
 
 以下は代表として default / christmas の値を記載。他テーマの値は `app/globals.css` を参照。
 
@@ -20,7 +20,7 @@
 
 ## 1. セマンティックトークン完全一覧
 
-`globals.css` で定義。全6テーマで値が自動切替。
+`globals.css` で定義。全7テーマで値が自動切替。
 
 ### 背景色
 
@@ -222,6 +222,6 @@
 
 ### 新しいCSS変数を追加する場合
 
-1. `app/globals.css` の `:root` と全6テーマの `[data-theme="xxx"]` ブロックに変数を追加
+1. `app/globals.css` の `:root` と全7テーマの `[data-theme="xxx"]` ブロックに変数を追加
 2. `@theme inline` ブロックに `--color-xxx: var(--xxx)` を追加
 3. Tailwindクラスとして使用可能になる

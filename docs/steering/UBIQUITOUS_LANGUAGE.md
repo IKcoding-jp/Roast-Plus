@@ -84,9 +84,9 @@
 | 用語 | 英語 | 定義 | コードでの使用例 |
 |-----|------|------|----------------|
 | **テーマプリセット** | ThemePreset | テーマの定義情報（ID、名前、配色、タイプ等） | `ThemePreset` interface in `lib/theme.ts` |
-| **テーマID** | ThemeID | テーマの一意識別子（`default`, `dark-roast`, `light-roast`, `matcha`, `caramel`, `christmas`） | `THEME_PRESETS[].id` |
+| **テーマID** | ThemeID | テーマの一意識別子（`default`, `dark-roast`, `light-roast`, `matcha`, `caramel`, `christmas`, `dark`） | `THEME_PRESETS[].id` |
 | **セマンティックトークン** | SemanticToken | テーマ対応のCSS変数（`bg-page`, `text-ink`等） | `bg-surface`, `text-ink-sub`, `border-edge` |
-| **クリスマステーマ** | ChristmasTheme | 6テーマの1つ（ID: `christmas`）。配色はCSS変数で自動適用。テーマ固有の装飾要素（snowfall等）のみ条件レンダリング | `useAppTheme().isChristmasTheme` |
+| **クリスマステーマ** | ChristmasTheme | 7テーマの1つ（ID: `christmas`）。配色はCSS変数で自動適用。テーマ固有の装飾要素（snowfall等）のみ条件レンダリング | `useAppTheme().isChristmasTheme` |
 | **共通UIコンポーネント** | SharedUIComponent | `@/components/ui` の再利用可能コンポーネント | `Button`, `Card`, `Modal` |
 | **UIカタログ** | UICatalog | Developer Design Labで閲覧可能な全コンポーネント一覧 | `registry.tsx` |
 | **モーダル** | Modal | ポップアップダイアログ（不透明背景: `bg-overlay`） | `Modal`, `Dialog` |

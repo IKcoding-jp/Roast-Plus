@@ -592,7 +592,7 @@ interface UserStats {
 - ❌ **禁止**: 生のTailwindでボタン/カード/入力を作成
 
 **2. テーマ対応はCSS変数で自動**
-- テーマ切替は `data-theme` 属性 + CSS変数で自動適用（6テーマ対応）
+- テーマ切替は `data-theme` 属性 + CSS変数で自動適用（7テーマ対応）
 - コンポーネント側でのテーマ判定は不要
 - テーマ固有の装飾要素（snowfall等）のみ、CSS `[data-theme]` セレクタまたは `useAppTheme()` で条件レンダリング
 
@@ -649,7 +649,7 @@ function NewComponentDemo() {
 - **テーマ保存**: localStorage（端末ごとに独立、Firestoreには保存しない）
 - **テーマ切替属性**: `data-theme` 属性（`<html>` 要素に付与）
 
-**利用可能テーマ（6種類）**
+**利用可能テーマ（7種類）**
 
 | テーマID | 表示名 | タイプ | コンセプト |
 |---------|--------|--------|-----------|
@@ -659,6 +659,7 @@ function NewComponentDemo() {
 | `matcha` | 抹茶ラテ | ダーク | 和カフェの落ち着き |
 | `caramel` | キャラメルマキアート | ダーク | 秋の収穫祭の温かさ |
 | `christmas` | クリスマス | ダーク | ホリデーシーズンの特別テーマ |
+| `dark` | ダーク | ダーク | 汎用ダークモード・目の疲れ防止（WCAG AA 14.5:1） |
 
 **セマンティックCSS変数トークン**
 
@@ -806,7 +807,7 @@ function NewComponentDemo() {
 
 - [ ] `@/components/ui` の共通コンポーネントを使用
 - [ ] CSS変数テーマが正しく適用されている（ハードコード色なし）
-- [ ] 全6テーマで表示確認（特にライト系/ダーク系の切替）
+- [ ] 全7テーマで表示確認（特にライト系/ダーク系の切替）
 - [ ] `docs/steering/UBIQUITOUS_LANGUAGE.md` に新規用語を追加
 - [ ] `docs/steering/FEATURES.md` に機能を追記（本ファイル）
 - [ ] Firestore Security Rules を更新（必要な場合）

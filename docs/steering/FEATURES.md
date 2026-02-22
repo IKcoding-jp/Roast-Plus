@@ -1,6 +1,6 @@
 # Features
 
-**最終更新**: 2026-02-21
+**最終更新**: 2026-02-22
 
 ---
 
@@ -402,7 +402,7 @@ interface WorkProgress {
 | 要素 | 内容 |
 |-----|------|
 | **ページ** | `app/drip-guide/page.tsx`（レシピ一覧）<br>`app/drip-guide/run/page.tsx`（ガイド実行） |
-| **コンポーネント** | `components/drip-guide/RecipeCard.tsx`<br>`components/drip-guide/MethodDialog.tsx` |
+| **コンポーネント** | `components/drip-guide/RecipeCard.tsx`<br>`components/drip-guide/MethodDialog.tsx`<br>`components/drip-guide/runner/TimerDisplay.tsx`（タイマー表示: 5.5rem）<br>`components/drip-guide/runner/StepInfo.tsx`（注水量・ステップ情報: 3rem） |
 | **ロジック** | `lib/drip-guide/recipe.ts`（レシピ計算）<br>`lib/drip-guide/46method.ts`（4:6メソッド計算） |
 | **フック** | `hooks/drip-guide/useRecipeGuide.ts` |
 | **Firestore** | `users/{userId}` ドキュメント内のフィールド |

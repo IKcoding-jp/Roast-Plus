@@ -58,10 +58,10 @@ export const StepInfo: React.FC<StepInfoProps> = ({
 
                                 {currentStep.targetTotalWater && (
                                     <div className="flex items-baseline gap-1 mb-2">
-                                        <span className="text-[2.25rem] font-extrabold text-spot tabular-nums tracking-tight leading-none font-nunito">
+                                        <span className="text-[3rem] font-extrabold text-spot tabular-nums tracking-tight leading-none font-nunito">
                                             {currentStep.targetTotalWater}
                                         </span>
-                                        <span className="text-lg font-bold text-spot/50">g</span>
+                                        <span className="text-xl font-bold text-spot/50">g</span>
                                         <span className="text-sm text-ink-muted ml-1 font-medium">まで注ぐ</span>
                                     </div>
                                 )}

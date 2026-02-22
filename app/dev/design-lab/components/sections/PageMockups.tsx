@@ -10,6 +10,8 @@ import TimerPatternF from '../mockups/TimerPatternF';
 import TimerPatternG from '../mockups/TimerPatternG';
 import TimerPatternH from '../mockups/TimerPatternH';
 import TitlePatterns from '../mockups/TitlePatterns';
+import DripSizeA from '../mockups/DripSizeA';
+import DripSizeB from '../mockups/DripSizeB';
 
 const patterns = [
   {
@@ -67,6 +69,30 @@ export default function PageMockups() {
 
   return (
     <div className="space-y-12">
+      {/* Drip Guide Size Comparison */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-ink mb-1">
+            ドリップガイド スマホ表示サイズ比較
+          </h2>
+          <p className="text-sm text-ink-sub">
+            Issue #xxx: 現行（左）vs 3サイズ案。ハンドドリップ中の視認性改善。ボトムボタンサイズは全案共通。
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <p className="text-xs text-ink-muted">タイマー 5.5rem / 注水量 3rem（タイマー＋注水量のみ拡大）</p>
+            <DripSizeA />
+          </div>
+          <div className="space-y-3">
+            <p className="text-xs text-ink-muted">タイマー 5.5rem / 注水量 3rem + テキスト全体↑（全体を均等に拡大）</p>
+            <DripSizeB />
+          </div>
+        </div>
+      </div>
+
+      <hr className="border-edge" />
+
       {/* Title Design Patterns */}
       <TitlePatterns />
 

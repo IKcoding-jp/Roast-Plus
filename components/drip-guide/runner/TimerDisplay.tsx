@@ -26,7 +26,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
             </span>
 
             {/* Timer digits */}
-            <div className="text-[4.5rem] font-extrabold text-ink tracking-[-0.04em] tabular-nums leading-none font-nunito">
+            <div className="text-[5.5rem] font-extrabold text-ink tracking-[-0.04em] tabular-nums leading-none font-nunito">
                 {formatTime(currentTime)}
             </div>
 

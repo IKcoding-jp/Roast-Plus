@@ -19,7 +19,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
     const overallProgress = Math.min(currentTime / totalDurationSec, 1);
 
     return (
-        <div className="relative flex flex-col items-center pt-2 pb-5 w-full">
+        <div className="relative flex flex-col items-center pt-2 pb-5 w-full md:hidden">
             {/* Recipe name */}
             <span className="text-sm text-ink-muted font-semibold mb-3 tracking-wide">
                 {recipeName}

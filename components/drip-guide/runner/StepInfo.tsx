@@ -30,7 +30,7 @@ export const StepInfo: React.FC<StepInfoProps> = ({
         : 0;
 
     return (
-        <div className="w-full max-w-md flex-shrink-0">
+        <div className="w-full max-w-md md:max-w-none flex-shrink-0">
             <AnimatePresence mode="wait">
                 {currentStep ? (
                     <motion.div

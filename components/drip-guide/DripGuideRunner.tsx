@@ -9,6 +9,7 @@ import { RunnerHeader } from './runner/RunnerHeader';
 import { TimerDisplay } from './runner/TimerDisplay';
 import { StepInfo } from './runner/StepInfo';
 import { FooterControls } from './runner/FooterControls';
+import { StepListSidebar } from './runner/StepListSidebar';
 
 interface DripGuideRunnerProps {
     recipe: DripRecipe;
@@ -109,22 +110,37 @@ export const DripGuideRunner: React.FC<DripGuideRunnerProps> = ({ recipe }) => {
             <RunnerHeader
                 currentStepIndex={currentStepIndex}
                 totalSteps={steps.length}
+                currentTime={currentTime}
+                totalDurationSec={recipe.totalDurationSec}
+                recipeName={recipe.name}
             />
 
-            <div className="flex-1 flex flex-col items-center justify-center px-5 pb-3 overflow-y-auto">
-                <TimerDisplay
-                    currentTime={currentTime}
-                    recipeName={recipe.name}
-                    totalDurationSec={recipe.totalDurationSec}
-                    isManualMode={isManualMode}
-                />
-                <StepInfo
-                    currentStep={currentStep}
-                    nextStep={nextStep}
-                    currentTime={currentTime}
-                    isManualMode={isManualMode}
-                    remainingStepsAfterNext={remainingStepsAfterNext}
-                />
+            {/* メインエリア: md:flex-row で横並び */}
+            <div className="flex-1 flex flex-col md:flex-row min-h-0">
+                {/* iPad専用: 左サイドバー */}
+                <div className="hidden md:block flex-none">
+                    <StepListSidebar
+                        steps={steps}
+                        currentStepIndex={currentStepIndex}
+                    />
+                </div>
+
+                {/* メインコンテンツ */}
+                <div className="flex-1 flex flex-col items-center justify-center px-5 pb-3 overflow-y-auto">
+                    <TimerDisplay
+                        currentTime={currentTime}
+                        recipeName={recipe.name}
+                        totalDurationSec={recipe.totalDurationSec}
+                        isManualMode={isManualMode}
+                    />
+                    <StepInfo
+                        currentStep={currentStep}
+                        nextStep={nextStep}
+                        currentTime={currentTime}
+                        isManualMode={isManualMode}
+                        remainingStepsAfterNext={remainingStepsAfterNext}
+                    />
+                </div>
             </div>
 
             <FooterControls

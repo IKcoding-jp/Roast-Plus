@@ -41,8 +41,8 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                         onClick={onResetTimer}
                         className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
                     >
-                        <div className="p-3 rounded-full bg-ground">
-                            <ArrowCounterClockwise size={24} />
+                        <div className="p-3 md:p-2.5 rounded-full bg-ground">
+                            <ArrowCounterClockwise size={24} className="md:w-5 md:h-5" />
                         </div>
                         <span className="text-xs font-medium">リセット</span>
                     </button>
@@ -57,8 +57,8 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                                 : 'text-ink-muted hover:text-ink-sub'
                         )}
                     >
-                        <div className="p-3 rounded-full bg-ground">
-                            <ArrowLeft size={24} />
+                        <div className="p-3 md:p-2.5 rounded-full bg-ground">
+                            <ArrowLeft size={24} className="md:w-5 md:h-5" />
                         </div>
                         <span className="text-xs font-medium">前へ</span>
                     </button>
@@ -66,16 +66,16 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                     <button
                         onClick={onToggleTimer}
                         className={clsx(
-                            'w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation',
+                            'w-16 h-16 sm:w-20 sm:h-20 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation',
                             isRunning
                                 ? 'bg-surface border-2 border-spot/20 text-spot'
                                 : 'bg-spot text-white shadow-spot/30'
                         )}
                     >
                         {isRunning ? (
-                            <Pause size={28} weight="fill" className="sm:w-9 sm:h-9" />
+                            <Pause size={28} weight="fill" className="sm:w-9 sm:h-9 md:w-7 md:h-7" />
                         ) : (
-                            <Play size={28} weight="fill" className="ml-1 sm:w-9 sm:h-9" />
+                            <Play size={28} weight="fill" className="ml-1 sm:w-9 sm:h-9 md:w-7 md:h-7" />
                         )}
                     </button>
 
@@ -84,8 +84,8 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                             onClick={onComplete}
                             className="flex flex-col items-center gap-1 text-success hover:text-success/80 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
                         >
-                            <div className="p-3 rounded-full bg-success-subtle">
-                                <CheckCircle size={24} weight="fill" />
+                            <div className="p-3 md:p-2.5 rounded-full bg-success-subtle">
+                                <CheckCircle size={24} weight="fill" className="md:w-5 md:h-5" />
                             </div>
                             <span className="text-xs font-medium">完了</span>
                         </button>
@@ -94,8 +94,8 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                             onClick={onGoToNextStep}
                             className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
                         >
-                            <div className="p-3 rounded-full bg-ground">
-                                <ArrowRight size={24} />
+                            <div className="p-3 md:p-2.5 rounded-full bg-ground">
+                                <ArrowRight size={24} className="md:w-5 md:h-5" />
                             </div>
                             <span className="text-xs font-medium">次へ</span>
                         </button>
@@ -105,8 +105,8 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                         href="/drip-guide"
                         className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
                     >
-                        <div className="p-3 rounded-full bg-ground">
-                            <X size={24} />
+                        <div className="p-3 md:p-2.5 rounded-full bg-ground">
+                            <X size={24} className="md:w-5 md:h-5" />
                         </div>
                         <span className="text-xs font-medium">終了</span>
                     </Link>
@@ -118,8 +118,8 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                         onClick={onResetTimer}
                         className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95"
                     >
-                        <div className="p-3 rounded-full bg-ground">
-                            <ArrowCounterClockwise size={24} />
+                        <div className="p-3 md:p-2.5 rounded-full bg-ground">
+                            <ArrowCounterClockwise size={24} className="md:w-5 md:h-5" />
                         </div>
                         <span className="text-xs font-medium">リセット</span>
                     </button>
@@ -127,16 +127,16 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                     <button
                         onClick={onToggleTimer}
                         className={clsx(
-                            'w-20 h-20 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation',
+                            'w-20 h-20 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation',
                             isRunning
                                 ? 'bg-surface border-2 border-spot/20 text-spot'
                                 : 'bg-spot text-white shadow-spot/30'
                         )}
                     >
                         {isRunning ? (
-                            <Pause size={36} weight="fill" />
+                            <Pause size={36} weight="fill" className="md:w-7 md:h-7" />
                         ) : (
-                            <Play size={36} weight="fill" className="ml-1" />
+                            <Play size={36} weight="fill" className="ml-1 md:w-7 md:h-7" />
                         )}
                     </button>
 
@@ -144,8 +144,8 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
                         href="/drip-guide"
                         className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95"
                     >
-                        <div className="p-3 rounded-full bg-ground">
-                            <X size={24} />
+                        <div className="p-3 md:p-2.5 rounded-full bg-ground">
+                            <X size={24} className="md:w-5 md:h-5" />
                         </div>
                         <span className="text-xs font-medium">終了</span>
                     </Link>

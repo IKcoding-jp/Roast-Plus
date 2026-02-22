@@ -174,6 +174,7 @@ Working Documentsと照合し、要件を確認。
 
 - **[error-patterns.md](references/error-patterns.md)** - よくあるエラーパターンの原因・解決方法・予防策
 - **[issue-resolution-history.md](references/issue-resolution-history.md)** - 過去に解決したIssueの詳細記録
+- **[changelog-guide.md](references/changelog-guide.md)** - changelog更新のファイル形式・バージョンバンプルール・AI生成ガイドライン（Phase 9 Step 0で参照）
 
 ---
 
@@ -315,6 +316,21 @@ npm run lint && npm run build && npm run test
 
 ### 手順
 
+0. **changelog更新**（詳細: [changelog-guide.md](references/changelog-guide.md)）
+
+   ブランチ名からバージョンバンプを判定:
+   - `feat/*` → minor バンプ
+   - `fix/*`, `style/*` → patch バンプ
+   - `docs/*`, `test/*`, `chore/*` → **スキップ**（changelog更新なし）
+
+   バンプ対象の場合のみ:
+   1. AIが実装内容・Issueのコンテキストからchangelogエントリを自動生成
+   2. AskUserQuestionで内容を確認（title / content / type / tags）
+   3. `package.json`, `version-history.ts`, `detailed-changelog.ts` を更新
+   4. 更新ファイルを次の chore コミット（Step 1 ①）に含める
+
+   ⚠️ **changelog更新は別コミット・別PR不要。Step 1 ① の chore コミットに同梱する。**
+
 1. **コミット・プッシュ**
 
    まず `git status` で全ての未コミット変更を確認する。
@@ -322,11 +338,12 @@ npm run lint && npm run build && npm run test
    **① 実装外の変更がある場合（chore コミットを先に作成）**
    ```bash
    # スキル更新、.gitignore、CLAUDE.md、docs等の実装外変更を先にコミット
-   git add <実装外の変更ファイル>
+   # changelog更新ファイルもここに含める
+   git add <実装外の変更ファイル> package.json data/dev-stories/version-history.ts data/dev-stories/detailed-changelog.ts
    git commit -m "chore(#<Issue番号>): <説明>"
    ```
 
-   対象例: `.claude/skills/`, `.gitignore`, `CLAUDE.md`, `docs/steering/`, `docs/working/`
+   対象例: `.claude/skills/`, `.gitignore`, `CLAUDE.md`, `docs/steering/`, `docs/working/`, changelog更新ファイル
 
    **② 実装コミット**
    ```bash

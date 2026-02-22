@@ -89,5 +89,5 @@ interface FloatingNavProps {
 - [ ] FloatingNavコンポーネントがDesign Labに登録・表示される
 - [ ] `npm run lint && npm run build && npm run test:run` がすべて通る
 - [ ] 各ページの既存機能（戻るボタン、右側アクション）が正常動作する
-- [ ] テーマ切替（6テーマ）で正しく表示される
+- [ ] テーマ切替（7テーマ）で正しく表示される
 - [ ] コンテンツがフローティングボタンと重ならない

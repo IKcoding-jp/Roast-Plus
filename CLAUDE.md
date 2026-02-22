@@ -32,7 +32,7 @@ Firebase（BaaS）
 
 - **静的エクスポート**: 本番ビルドは `output: 'export'`。Next.js API Routesは使用不可
 - **AI処理はCloud Functions経由**: AI機能（OCR、テイスティング分析）はFirebase Cloud Functions v2経由でOpenAI GPT-4oを呼び出す。クライアントにAPIキーを持たない
-- **テーマシステム**: `next-themes` + CSS変数（`data-theme`属性）で6テーマ対応。コンポーネント側でのテーマ判定は不要
+- **テーマシステム**: `next-themes` + CSS変数（`data-theme`属性）で7テーマ対応。コンポーネント側でのテーマ判定は不要
 - **モジュール境界**: `types/ → lib/ → hooks/ → components/ → app/`（循環依存禁止）
 - **状態管理**: React useState のみ（Zustand/Redux不使用）
 - **カスタムService Worker**: `public/sw.js` に手書き実装（next-pwa不使用）。Network First戦略
@@ -219,27 +219,13 @@ import {
 
 ### 必須ルール
 1. **生のTailwindでボタン/カード/入力を作らない** → 共通コンポーネントを使用
-2. **テーマ対応はCSS変数で自動** → テーマ関連のpropは不要（`data-theme`属性で6テーマ自動切替）
+2. **テーマ対応はCSS変数で自動** → テーマ関連のpropは不要（`data-theme`属性で7テーマ自動切替）
 3. **モーダル背景は `bg-overlay`** → `bg-surface` はダークテーマで半透明のため使用禁止
 4. **共通コンポーネントの重複禁止** → 作成前に既存コンポーネントを必ず確認
 5. **配色** → `.claude/skills/roastplus-ui/references/design-tokens.md` 参照
 6. **UIデザイン作業は仕様先行** → 実装前に具体的なサイズ・色（CSS変数名またはhex値）・スペーシング・レイアウト構造をテキストで説明し、承認を得てから実装する。試みが却下された場合はクリーンにリバートする
 
-### 新規コンポーネント追加時（レジストリ方式）
-1. `components/ui/NewComponent.tsx` を作成
-2. `components/ui/index.ts` にエクスポートを追加
-3. `components/ui/registry.tsx` にデモコンポーネントとエントリを追加
-→ Developer Design Lab（`/dev/design-lab`）に自動表示
-
-### テーマ対応CSS変数
-
-テーマ切替は `data-theme` 属性 + CSS変数で自動適用。セマンティックユーティリティを使用:
-- 背景: `bg-page`, `bg-surface`, `bg-overlay`, `bg-ground`, `bg-field`
-- テキスト: `text-ink`, `text-ink-sub`, `text-ink-muted`
-- ボーダー: `border-edge`, `border-edge-strong`
-- アクセント: `bg-spot`, `text-spot`
-
-⚠️ **ハードコード色（`bg-white`, `text-gray-800`等）はテーマ切替で色が変わらないため非推奨**
+詳細なUI実装ルール・新規コンポーネント追加手順・テーマCSS変数の完全一覧は `docs/steering/FEATURES.md`「共通UI」セクション参照。
 
 ## Quality Gates（技術的負債防止）
 
@@ -258,6 +244,7 @@ import {
 
 ### セキュリティ
 - **APIキー・シークレットのコミット禁止** — `.env.local` に配置、`.gitignore` に含まれていることを確認
+- **OPENAI_API_KEY**: Firebase Secret Manager（Cloud Functions用）/ GitHub Secrets（GitHub Actions `changelog-suggest.yml` 用）の2箇所で管理
 - **Firebase設定（`NEXT_PUBLIC_*`）はクライアントに公開される** — Firestore Security Rulesで保護
 - **Firestore Security Rules変更時は慎重に** — 認証必須、ユーザースコープを維持
 - **依存関係の脆弱性** — `npm run security` で定期チェック

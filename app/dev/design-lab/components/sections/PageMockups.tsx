@@ -12,6 +12,9 @@ import TimerPatternH from '../mockups/TimerPatternH';
 import TitlePatterns from '../mockups/TitlePatterns';
 import DripSizeA from '../mockups/DripSizeA';
 import DripSizeB from '../mockups/DripSizeB';
+import IpadLayoutB1 from '../mockups/IpadLayoutB1';
+import IpadLayoutB2 from '../mockups/IpadLayoutB2';
+import IpadLayoutB3 from '../mockups/IpadLayoutB3';
 
 const patterns = [
   {
@@ -69,6 +72,25 @@ export default function PageMockups() {
 
   return (
     <div className="space-y-12">
+      {/* iPad Layout Comparison */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-ink mb-1">
+            ドリップガイド iPad レイアウト比較
+          </h2>
+          <p className="text-sm text-ink-sub">
+            Issue #xxx: iPadランドスケープ（768px〜1024px）向け2カラムレイアウト案。3パターンを比較検討。
+          </p>
+        </div>
+        <div className="space-y-10">
+          <IpadLayoutB1 />
+          <IpadLayoutB2 />
+          <IpadLayoutB3 />
+        </div>
+      </div>
+
+      <hr className="border-edge" />
+
       {/* Drip Guide Size Comparison */}
       <div className="space-y-6">
         <div>

@@ -55,6 +55,33 @@ describe('THEME_IDS', () => {
   });
 });
 
+describe('ThemePreset フィールド拡張', () => {
+  it('全テーマに fontStyle が定義されている', () => {
+    THEME_PRESETS.forEach((preset) => {
+      expect(preset.fontStyle).toBeDefined();
+      expect(typeof preset.fontStyle).toBe('string');
+    });
+  });
+
+  it('全テーマに animationType が定義されている', () => {
+    const validTypes = ['steam', 'flame', 'particles', 'leaf', 'glow', 'snow', 'stars'];
+    THEME_PRESETS.forEach((preset) => {
+      expect(validTypes).toContain(preset.animationType);
+    });
+  });
+
+  it('fontStyle が有効な Tailwind クラスを含む', () => {
+    THEME_PRESETS.forEach((preset) => {
+      expect(preset.fontStyle).toMatch(
+        /font-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)/,
+      );
+      expect(preset.fontStyle).toMatch(
+        /tracking-(tighter|tight|normal|wide|wider|widest)/,
+      );
+    });
+  });
+});
+
 describe('isDarkTheme', () => {
   it('ダーク系テーマでtrueを返す', () => {
     expect(isDarkTheme('dark-roast')).toBe(true);

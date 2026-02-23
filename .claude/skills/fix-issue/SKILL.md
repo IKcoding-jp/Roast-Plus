@@ -1,6 +1,6 @@
 ---
 name: fix-issue
-description: GitHub Issueを自動解決するワークフロー。Working Documents読み込み→Issue説明→計画→実装→動作確認→要件確認→検証→独立レビュー→Steering更新→PR作成・自動マージまで。Issue番号を引数に取る。「/fix-issue 123」のように使用。トピックブランチ必須、main直接コミット禁止。
+description: GitHub Issueを自動解決するワークフロー。Issue確認→Working Documents読み込み→Issue説明→計画→実装→動作確認→要件確認→検証→独立レビュー→Steering更新→PR作成・自動マージまで。Issue番号を引数に取る（例: /fix-issue 123）。トピックブランチ必須、main直接コミット禁止。
 ---
 
 # Issue自動解決スキル
@@ -8,12 +8,10 @@ description: GitHub Issueを自動解決するワークフロー。Working Docum
 ## ワークフロー概要
 
 ```
-Working読込 → Issue確認 → 説明 → 計画 → 実装 → 動作確認 → 要件確認 → 検証 → PR作成・レビュー → Steering更新 → 自動マージ → マージ待機 → クリーンアップ
-                          🔹①     🔹②                       🔹③
+Issue確認 → Working読込 → 説明 → 計画 → 実装 → 動作確認 → 要件確認 → 検証 → PR作成・レビュー → Steering更新 → 自動マージ → クリーンアップ
 ```
 
-🔹 = ユーザー確認ポイント（AskUserQuestionで確認後に次へ進む）
-確認ポイントは3つ（Issue説明、計画、要件確認）
+🔹 確認ポイント（AskUserQuestionで確認後に次へ）: 🔹① 説明（Phase 3）　🔹② 計画（Phase 4）　🔹③ 要件確認（Phase 7）
 
 ---
 
@@ -21,18 +19,27 @@ Working読込 → Issue確認 → 説明 → 計画 → 実装 → 動作確認 
 
 ---
 
-## Phase 1: Working Documents読み込み
+## Phase 1: Issue確認
+
+```bash
+gh issue view $ARGUMENTS --json title,body,labels,number,assignees
+```
+
+Issueの内容を確認する。次のPhase 2でWorking Documents検索に使用する。
+
+---
+
+## Phase 2: Working Documents読み込み
 
 **Working Documentsが存在する場合は読み込み、存在しない場合は生成を促します。**
 
-### 1.1 Working Documents検索
+### 2.1 Working Documents検索
 
 ```bash
-# Issue番号でディレクトリを検索
-ls docs/working/*_${ISSUE_NUMBER}_*/
+ls -d docs/working/*_${ISSUE_NUMBER}_* 2>/dev/null || echo "Not found"
 ```
 
-### 1.2 存在する場合
+### 2.2 存在する場合
 
 以下のファイルを読み込み、コンテキストを復元:
 
@@ -46,28 +53,22 @@ docs/working/{YYYYMMDD}_{Issue番号}_{タイトル}/
 
 ⚠️ **Working Documentsがあれば、コード探索は不要。設計書に必要な情報が記載されている。**
 
-### 1.3 存在しない場合
+### 2.3 存在しない場合
 
-```
-⚠️ Working Documents が見つかりません。
+AskUserQuestionで以下を提示:
 
-以下のいずれかを選択してください:
-1. 今ここで Working Documents を生成する（推奨）
-2. Working なしで続行（探索フェーズを実行）
-```
-
-**選択肢1の場合**: Phase 1.4（Working生成）を実行
-**選択肢2の場合**: Phase 1.5（コード探索）を実行
+1. **今ここで Working Documents を生成する（推奨）** → Phase 2.4へ
+2. **Working なしで続行（探索フェーズを実行）** → Phase 2.5へ
 
 ---
 
-## Phase 1.4: Working Documents生成（既存Issue用）
+## Phase 2.4: Working Documents生成（既存Issue用）
 
 **Working Documentsがない既存Issueに対して、その場で生成します。**
 
 ### 手順
 
-1. **Issue本文を読み込み**（Phase 2で取得済み）
+1. **Issue本文を読み込み**（Phase 1で取得済み）
 2. **Serena MCPで関連コード調査**
    ```
    search_for_pattern → get_symbols_overview → find_symbol → find_referencing_symbols
@@ -77,14 +78,14 @@ docs/working/{YYYYMMDD}_{Issue番号}_{タイトル}/
    - requirement.md, tasklist.md, design.md, testing.md を生成
    - タスクタイプに応じて生成内容を調整
 
-4. **ユーザー確認**
+4. **ユーザー確認（AskUserQuestion）**
    - 生成されたWorking Documentsを提示
    - 修正があれば対応
    - OKならPhase 3（説明）へ
 
 ---
 
-## Phase 1.5: コード探索（Working Documentsがない場合のみ）
+## Phase 2.5: コード探索（Working Documentsがない場合のみ）
 
 ⚠️ **通常はスキップ。Working Documentsがない緊急時のみ実行。**
 
@@ -96,16 +97,6 @@ search_for_pattern → get_symbols_overview → find_symbol → find_referencing
 
 ---
 
-## Phase 2: Issue確認
-
-```bash
-gh issue view $ARGUMENTS --json title,body,labels,number,assignees
-```
-
-Working Documentsと照合し、要件を確認。
-
----
-
 ## Phase 3: Issue説明 🔹確認ポイント①
 
 ### `/issue-creator` 直後の場合（同一セッション内）
@@ -113,7 +104,6 @@ Working Documentsと照合し、要件を確認。
 ブレインストーミング・Working生成が直前に完了しているため、**軽量版**で実施:
 - 背景・根本原因の詳細説明は省略（issue-creatorで確認済み）
 - **修正の方針**と**懸念点・リスク**の要点のみ提示
-- ユーザー確認は維持（スキップ不可）
 
 ### 通常の場合
 
@@ -129,9 +119,8 @@ Working Documentsと照合し、要件を確認。
 - 技術用語は使用OK（ただし初出の用語は簡潔に補足説明する）
 - ⚠️ **コードは提示しない**（ファイル名や関数名は記載OK）
 - 図解やダイアグラムを活用
-- 具体例を用いる
 
-**説明後、ユーザーの意見を確認して修正可能か判断を仰ぐ。**
+**AskUserQuestionで確認**: 方針に問題がなければPhase 4へ進む。
 
 ---
 
@@ -148,9 +137,8 @@ Working Documentsと照合し、要件を確認。
 
 - EnterPlanModeで実装計画を立案
 - 「think hard」で計画を検討
-- 計画承認後、次のフェーズへ
 
-⚠️ **必ずユーザーの承認を得てから実装に進む。毎回省略不可。**
+**AskUserQuestionで計画承認を求める。承認後に実装へ進む。省略不可。**
 
 ---
 
@@ -166,12 +154,11 @@ Working Documentsと照合し、要件を確認。
 
 ## Phase 5: 実装
 
-### ブランチ作成(必須)
+### ブランチ作成（必須）
 
 ⚠️ **mainブランチへの直接コミット禁止**
 
 ```bash
-# Issueラベルに応じたブランチ名
 git checkout -b fix/#番号-説明    # bug/bugfixラベル
 git checkout -b feat/#番号-説明   # enhancement/featureラベル
 git checkout -b test/#番号-説明   # testingラベル
@@ -179,9 +166,9 @@ git checkout -b test/#番号-説明   # testingラベル
 
 ### 事前調査（Bugラベルの場合のみ）
 
-**IssueがBug/Bugfix/想定外動作の場合に実行。Enhancement/feat/docs/chore系はスキップ。**
+**Bug/Bugfix/想定外動作の場合に実行。Enhancement/feat/docs/chore系はスキップ。**
 
-実装前にTaskエージェントを起動してデータフローを調査する。これにより「初回実装の誤り」を防ぐ:
+Taskエージェントを起動してデータフローを調査する。これにより「初回実装の誤り」を防ぐ:
 
 ```
 Task ツールで調査エージェントを起動:
@@ -226,11 +213,22 @@ resolve-library-id → query-docs
 
 #### TDD対象外の場合（docs/, chore, ビジュアル調整のみ）
 
-Claude Code標準ツール(Edit/Write)でそのまま実装。
+Claude Code標準ツール（Edit/Write）でそのまま実装。
 
 #### 共通
 
 **⚠️ tasklist.mdを逐次更新**: 完了したタスクは `[x]` に変更。
+
+### ⚠️ 緊急ロールバック
+
+実装が取り返しのつかない状態になった場合:
+
+```bash
+git stash              # 変更を一時退避
+git reset --hard HEAD  # 最後のコミットに戻す
+```
+
+問題が複雑な場合は `systematic-debugging` スキルを使用して根本原因を特定してから再実装する。
 
 ---
 
@@ -240,8 +238,8 @@ Claude Code標準ツール(Edit/Write)でそのまま実装。
 
 AskUserQuestionで以下を提示:
 
-1. **自動確認（推奨）** - Chrome DevTools MCPでスクリーンショット・スナップショットを取得してユーザーと一緒に確認
-2. **手動確認** - ユーザーが自分でブラウザで確認（`npm run dev` を案内）
+1. **手動確認（推奨）** - ユーザーが自分でブラウザで確認（`npm run dev` を案内）
+2. **自動確認** - Playwright MCPでスクリーンショット・スナップショットを取得して確認
 3. **スキップ** - 動作確認を省略（テストで十分と判断した場合）
 
 **自動確認の場合**: スクリーンショットをユーザーに提示し、問題がないか確認する。
@@ -261,17 +259,13 @@ AskUserQuestionで以下を提示:
 ### フローチャート
 
 ```
-動作確認完了 → ユーザーに報告
-                    ↓
-             ユーザー承認？
-              ├── ✅ OK → Phase 8（検証）へ
-              └── ❌ 追加修正が必要
-                    ↓
-             追加の指示を受ける
-                    ↓
-             修正を実施 → 必要に応じて動作再確認
-                    ↓
-             再度ユーザーに報告（ループ）
+ユーザーに報告
+      ↓
+ ユーザー承認？
+  ├── ✅ OK → Phase 8（検証）へ
+  └── ❌ 追加修正が必要
+        ↓
+   追加の指示を受ける → 修正 → 必要に応じて動作再確認 → 再度報告（ループ）
 ```
 
 ### ⚠️ 重要ルール
@@ -293,6 +287,14 @@ npm run lint && npm run build && npm run test:run
 - Lintエラーは完全解消するまでループ
 - ビルド・テストが通るまで修正を繰り返す
 - 自動で完了する（ユーザーへの確認不要）
+
+### エラー発生時のエスカレーション
+
+- **Lintエラー**: `npm run lint -- --fix` → 手動修正（[error-patterns.md](references/error-patterns.md) 参照）
+- **ビルドエラー**: エラーを確認 → 関連ファイル修正 → 再ビルド
+- **テスト失敗**: モック・前提条件確認 → 実装ロジック見直し
+
+⚠️ **いずれも5回以上ループして解消しない場合は `systematic-debugging` スキルを呼び出す。**
 
 ---
 
@@ -373,6 +375,14 @@ npm run lint && npm run build && npm run test:run
 
 ⚠️ **レビューで指摘された問題は、修正するか技術的根拠をもって反論すること。盲従は不要。**
 
+### ⚠️ Push/PR失敗時の対応
+
+| 問題 | 対処 |
+|-----|------|
+| push失敗 | `git push --set-upstream origin $(git branch --show-current)` |
+| PR作成失敗 | `.tmp-pr-body.md` 残存確認 → `rm -f` → 再実行 |
+| コンフリクト | `git fetch origin main && git rebase origin/main` → `git push --force-with-lease` |
+
 ---
 
 ## Phase 10: Steering Documents更新（必須）
@@ -452,8 +462,9 @@ gh pr merge --auto --merge --delete-branch
 **自動マージ・リモートブランチ削除は `--delete-branch` で自動設定済み。ローカルブランチのみ即時削除する。**
 
 ```bash
+FEATURE_BRANCH=$(git branch --show-current)
 git switch main && git pull origin main
-git branch -D $(git branch --show-current 2>/dev/null || echo "")
+git branch -D "$FEATURE_BRANCH"
 ```
 
 ---

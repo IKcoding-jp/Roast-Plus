@@ -29,6 +29,8 @@ export interface ThemePreset {
   fontStyle: string;
   /** アンビエントアニメーションの種別 */
   animationType: ThemeAnimationType;
+  /** プレビューカード背景グラデーション (CSS background プロパティ値) */
+  bgGradient: string;
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
@@ -46,6 +48,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-bold tracking-normal',
     animationType: 'steam',
+    bgGradient: 'linear-gradient(135deg, #261a14 0%, #3d2008 100%)',
   },
   {
     id: 'dark-roast',
@@ -61,6 +64,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-black tracking-tight',
     animationType: 'flame',
+    bgGradient: 'linear-gradient(135deg, #0d0b09 0%, #200a04 100%)',
   },
   {
     id: 'light-roast',
@@ -76,6 +80,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-light tracking-wide',
     animationType: 'particles',
+    bgGradient: 'linear-gradient(135deg, #faf6ef 0%, #ede0c8 100%)',
   },
   {
     id: 'matcha',
@@ -91,6 +96,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-semibold tracking-widest',
     animationType: 'leaf',
+    bgGradient: 'linear-gradient(135deg, #0f1f15 0%, #041a09 100%)',
   },
   {
     id: 'caramel',
@@ -106,6 +112,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-bold tracking-normal',
     animationType: 'glow',
+    bgGradient: 'linear-gradient(135deg, #1a120d 0%, #2e1200 100%)',
   },
   {
     id: 'christmas',
@@ -121,6 +128,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-extrabold tracking-tight',
     animationType: 'snow',
+    bgGradient: 'linear-gradient(135deg, #051a0e 0%, #100520 100%)',
   },
   {
     id: 'dark',
@@ -136,6 +144,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-black tracking-tight',
     animationType: 'stars',
+    bgGradient: 'linear-gradient(135deg, #0f0f0f 0%, #0f1020 100%)',
   },
 ];
 

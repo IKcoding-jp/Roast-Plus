@@ -70,6 +70,14 @@ describe('ThemePreset フィールド拡張', () => {
     });
   });
 
+  it('全テーマに bgGradient が定義されている', () => {
+    THEME_PRESETS.forEach((preset) => {
+      expect(preset.bgGradient).toBeDefined();
+      expect(typeof preset.bgGradient).toBe('string');
+      expect(preset.bgGradient).toMatch(/linear-gradient/);
+    });
+  });
+
   it('fontStyle が有効な Tailwind クラスを含む', () => {
     THEME_PRESETS.forEach((preset) => {
       expect(preset.fontStyle).toMatch(

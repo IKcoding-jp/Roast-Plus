@@ -42,7 +42,7 @@ function SteamAnimation({ color }: { color: string }) {
             backgroundColor: color,
             willChange: 'transform, opacity',
           }}
-          animate={{ y: [0, -30], opacity: [0, 0.35, 0] }}
+          animate={{ y: [0, -30], opacity: [0, 0.65, 0] }}
           transition={{
             duration: 2.5,
             delay: i * 0.85,
@@ -64,7 +64,7 @@ function FlameAnimation({ color }: { color: string }) {
           color,
           willChange: 'transform, opacity',
         }}
-        animate={{ scale: [1, 1.1, 1], opacity: [0.08, 0.2, 0.08] }}
+        animate={{ scale: [1, 1.35, 1], opacity: [0.3, 0.65, 0.3] }}
         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
       >
         <TbFlame size={52} />
@@ -110,10 +110,10 @@ function LeafAnimation({ color }: { color: string }) {
           color,
           willChange: 'transform',
         }}
-        animate={{ rotate: [-4, 4, -4] }}
+        animate={{ rotate: [-10, 10, -10], opacity: [0.15, 0.35, 0.15] }}
         transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <TbLeaf size={46} style={{ opacity: 0.12 }} />
+        <TbLeaf size={46} />
       </motion.div>
     </div>
   );
@@ -124,7 +124,7 @@ function GlowAnimation({ color }: { color: string }) {
     <motion.div
       className="absolute inset-0 pointer-events-none"
       style={{
-        background: `radial-gradient(ellipse at 60% 40%, ${color}22 0%, transparent 65%)`,
+        background: `radial-gradient(ellipse at 60% 40%, ${color}55 0%, transparent 65%)`,
         willChange: 'opacity, transform',
       }}
       animate={{ opacity: [0, 1, 0], scale: [0.85, 1.1, 0.85] }}
@@ -146,7 +146,7 @@ function SnowAnimation({ color }: { color: string }) {
             width: i % 2 === 0 ? 4 : 3,
             height: i % 2 === 0 ? 4 : 3,
             backgroundColor: color,
-            opacity: 0.65,
+            opacity: 0.9,
             willChange: 'transform',
           }}
           animate={{
@@ -180,7 +180,7 @@ function StarsAnimation({ color }: { color: string }) {
             backgroundColor: color,
             willChange: 'opacity',
           }}
-          animate={{ opacity: [0.8, 0.1, 0.8] }}
+          animate={{ opacity: [1, 0.05, 1] }}
           transition={{
             duration: 1.2 + i * 0.25,
             delay: i * 0.18,
@@ -252,26 +252,21 @@ function ThemePreviewCard({
             : 'border-transparent hover:border-white/20'
         }
       `}
-      style={{ backgroundColor: bg }}
+      style={{ background: preset.bgGradient }}
     >
+      {/* 背景層: 大型装飾アイコン（右下） */}
+      <div className="absolute bottom-0 right-1 pointer-events-none">
+        <Icon size={90} style={{ color: accent, opacity: 0.10 }} aria-hidden />
+      </div>
+
       {/* アンビエントアニメーション層 */}
       <ThemeAnimation type={preset.animationType} textColor={text} />
 
       {/* カードコンテンツ */}
       <div className="relative z-10 p-4 flex flex-col gap-2 min-h-[152px]">
-        {/* 上部: アイコン + LIGHT/DARKバッジ */}
-        <div className="flex items-start justify-between">
+        {/* 上部: アイコン単独（バッジなし） */}
+        <div>
           <Icon size={22} style={{ color: text }} aria-hidden />
-          <span
-            data-testid={`badge-${preset.id}`}
-            className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border leading-none"
-            style={{
-              color: text,
-              borderColor: `${text}40`,
-            }}
-          >
-            {preset.type === 'light' ? 'LIGHT' : 'DARK'}
-          </span>
         </div>
 
         {/* 中部: テーマ名 + 説明文 */}
@@ -290,8 +285,18 @@ function ThemePreviewCard({
           </p>
         </div>
 
-        {/* 下部: 色スウォッチ + 選択チェック */}
-        <div className="flex items-center justify-between">
+        {/* 下部: バッジ + 色スウォッチ + 選択チェック */}
+        <div className="flex items-center gap-2">
+          <span
+            data-testid={`badge-${preset.id}`}
+            className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded border leading-none shrink-0"
+            style={{
+              color: text,
+              borderColor: `${text}40`,
+            }}
+          >
+            {preset.type === 'light' ? 'LIGHT' : 'DARK'}
+          </span>
           <div className="flex gap-1.5">
             {[bg, surface, accent].map((color, i) => (
               <span
@@ -305,18 +310,20 @@ function ThemePreviewCard({
               />
             ))}
           </div>
-          {isSelected && (
-            <span
-              data-testid="selected-check"
-              className="flex items-center justify-center w-5 h-5 rounded-full"
-              style={{
-                backgroundColor: `${text}20`,
-                color: text,
-              }}
-            >
-              <HiCheck className="w-3.5 h-3.5" />
-            </span>
-          )}
+          <div className="ml-auto">
+            {isSelected && (
+              <span
+                data-testid="selected-check"
+                className="flex items-center justify-center w-5 h-5 rounded-full"
+                style={{
+                  backgroundColor: `${text}20`,
+                  color: text,
+                }}
+              >
+                <HiCheck className="w-3.5 h-3.5" />
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </button>

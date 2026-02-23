@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.13.0',
+    date: '2026-02-23',
+    summary: 'テーマ選択画面のデザインをリニューアルしました など 4件の更新',
+  },
+  {
     version: '0.12.0',
     date: '2026-02-21',
     summary: 'ダークモード・テーマ切り替え機能を追加しました など 7件の更新',

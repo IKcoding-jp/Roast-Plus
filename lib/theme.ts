@@ -3,6 +3,15 @@
  * 全テーマのメタデータを集約管理
  */
 
+export type ThemeAnimationType =
+  | 'steam'
+  | 'flame'
+  | 'particles'
+  | 'leaf'
+  | 'glow'
+  | 'snow'
+  | 'stars';
+
 export interface ThemePreset {
   id: string;
   name: string;
@@ -16,6 +25,10 @@ export interface ThemePreset {
     accent: string;
     text: string;
   };
+  /** プレビューカード内のフォントスタイル（Tailwindクラス文字列） */
+  fontStyle: string;
+  /** アンビエントアニメーションの種別 */
+  animationType: ThemeAnimationType;
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
@@ -29,8 +42,10 @@ export const THEME_PRESETS: ThemePreset[] = [
       bg: '#261a14',
       surface: '#FFFFFF',
       accent: '#d97706',
-      text: '#1f2937',
+      text: '#f5e6d0',
     },
+    fontStyle: 'font-bold tracking-normal',
+    animationType: 'steam',
   },
   {
     id: 'dark-roast',
@@ -44,6 +59,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#c8a050',
       text: '#f5f0e8',
     },
+    fontStyle: 'font-black tracking-tight',
+    animationType: 'flame',
   },
   {
     id: 'light-roast',
@@ -57,6 +74,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d4a535',
       text: '#3d3229',
     },
+    fontStyle: 'font-light tracking-wide',
+    animationType: 'particles',
   },
   {
     id: 'matcha',
@@ -70,6 +89,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#7db358',
       text: '#f0ebe0',
     },
+    fontStyle: 'font-semibold tracking-widest',
+    animationType: 'leaf',
   },
   {
     id: 'caramel',
@@ -83,6 +104,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d4923a',
       text: '#f5ebe0',
     },
+    fontStyle: 'font-bold tracking-normal',
+    animationType: 'glow',
   },
   {
     id: 'christmas',
@@ -96,6 +119,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d4af37',
       text: '#f8f1e7',
     },
+    fontStyle: 'font-extrabold tracking-tight',
+    animationType: 'snow',
   },
   {
     id: 'dark',
@@ -109,6 +134,8 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d97706',
       text: '#e8e8e8',
     },
+    fontStyle: 'font-black tracking-tight',
+    animationType: 'stars',
   },
 ];
 

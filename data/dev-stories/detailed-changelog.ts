@@ -14,6 +14,22 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.13.0',
+    version: '0.13.0',
+    date: '2026-02-23',
+    type: 'style',
+    title: 'テーマ選択画面のデザインをリニューアルしました',
+    content: `
+- テーマカードがフルイマーシブデザインになりました（各テーマの雰囲気を直感的に伝える配色でカード全体を塗りつぶし）
+- 各テーマに専用アイコンとLIGHT/DARKバッジを追加しました
+- テーマに合わせた大きなフォントでテーマ名を表示するようになりました
+- カードにアンビエントアニメーションを追加しました（湯気・炎・粒子・葉・光波・雪・星）
+    `.trim(),
+    tags: ['テーマ', 'UI', '設定'],
+    createdAt: '2026-02-23T00:00:00.000Z',
+    updatedAt: '2026-02-23T00:00:00.000Z',
+  },
+  {
     id: 'v0.12.0',
     version: '0.12.0',
     date: '2026-02-21',

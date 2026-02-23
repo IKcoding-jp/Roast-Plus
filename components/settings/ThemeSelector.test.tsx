@@ -64,13 +64,26 @@ describe('ThemeSelector', () => {
 
   it('選択中テーマにチェックマークが表示される', () => {
     render(<ThemeSelector />);
-    // デフォルトが選択中なので、そのカード内にチェックアイコンがある
-    const buttons = screen.getAllByRole('button');
-    const defaultButton = buttons.find((btn) =>
-      btn.textContent?.includes('デフォルト')
-    );
-    // チェックマーク（HiCheck SVG）が含まれる
-    const checkIcon = defaultButton?.querySelector('svg');
+    const checkIcon = screen.getByTestId('selected-check');
     expect(checkIcon).toBeInTheDocument();
+  });
+
+  it('lightテーマにLIGHTバッジが表示される', () => {
+    render(<ThemeSelector />);
+    // デフォルト（light）カードにLIGHTバッジがある
+    expect(screen.getByTestId('badge-default')).toHaveTextContent('LIGHT');
+  });
+
+  it('darkテーマにDARKバッジが表示される', () => {
+    render(<ThemeSelector />);
+    // ダークロースト（dark）カードにDARKバッジがある
+    expect(screen.getByTestId('badge-dark-roast')).toHaveTextContent('DARK');
+  });
+
+  it('各カードに3色スウォッチが表示される', () => {
+    render(<ThemeSelector />);
+    const swatches = screen.getAllByTestId('color-swatch');
+    // 7テーマ × 3色 = 21個
+    expect(swatches).toHaveLength(21);
   });
 });

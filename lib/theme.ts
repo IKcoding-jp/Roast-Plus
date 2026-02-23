@@ -48,7 +48,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-bold tracking-normal',
     animationType: 'steam',
-    bgGradient: 'linear-gradient(135deg, #261a14 0%, #3d2008 100%)',
+    bgGradient: 'linear-gradient(135deg, #1c0d00 0%, #5c2800 50%, #8b4513 100%)',
   },
   {
     id: 'dark-roast',
@@ -64,7 +64,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-black tracking-tight',
     animationType: 'flame',
-    bgGradient: 'linear-gradient(135deg, #0d0b09 0%, #200a04 100%)',
+    bgGradient: 'linear-gradient(135deg, #050505 0%, #1a0a00 50%, #2d1500 100%)',
   },
   {
     id: 'light-roast',
@@ -80,7 +80,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-light tracking-wide',
     animationType: 'particles',
-    bgGradient: 'linear-gradient(135deg, #faf6ef 0%, #ede0c8 100%)',
+    bgGradient: 'linear-gradient(135deg, #fff9f2 0%, #f5e6c8 50%, #e8d0a0 100%)',
   },
   {
     id: 'matcha',
@@ -96,7 +96,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-semibold tracking-widest',
     animationType: 'leaf',
-    bgGradient: 'linear-gradient(135deg, #0f1f15 0%, #041a09 100%)',
+    bgGradient: 'linear-gradient(135deg, #0a1a0d 0%, #1a3520 50%, #2a4a30 100%)',
   },
   {
     id: 'caramel',
@@ -112,7 +112,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-bold tracking-normal',
     animationType: 'glow',
-    bgGradient: 'linear-gradient(135deg, #1a120d 0%, #2e1200 100%)',
+    bgGradient: 'linear-gradient(135deg, #180900 0%, #3d1200 50%, #6b2d00 100%)',
   },
   {
     id: 'christmas',
@@ -128,7 +128,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-extrabold tracking-tight',
     animationType: 'snow',
-    bgGradient: 'linear-gradient(135deg, #051a0e 0%, #100520 100%)',
+    bgGradient: 'linear-gradient(135deg, #030f07 0%, #0a2010 50%, #1a0828 100%)',
   },
   {
     id: 'dark',
@@ -144,7 +144,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
     fontStyle: 'font-black tracking-tight',
     animationType: 'stars',
-    bgGradient: 'linear-gradient(135deg, #0f0f0f 0%, #0f1020 100%)',
+    bgGradient: 'linear-gradient(135deg, #000000 0%, #0a0a14 50%, #141428 100%)',
   },
 ];
 

@@ -17,21 +17,7 @@ Working読込 → Issue確認 → 説明 → 計画 → 実装 → 動作確認 
 
 ---
 
-## superpowersスキルとの排他制御
-
-**fix-issueは統合ワークフローとして、superpowersの主要機能を各Phaseに内包している。** 二重呼び出しを防ぐため、fix-issue実行中は以下のルールを適用する。
-
-| superpowersスキル | fix-issue内の代替Phase | 自動発動 |
-|-------------------|----------------------|:---:|
-| `brainstorming` | Phase 3-4（説明・計画） | ❌ 不要 |
-| `writing-plans` | Working Documents（Phase 1で読込） | ❌ 不要 |
-| `test-driven-development` | Phase 5（**明示的に呼び出す**） | ❌ 自動不要 |
-| `verification-before-completion` | Phase 8（検証） | ❌ 不要 |
-| `requesting-code-review` | Phase 9（コードレビュー） | ❌ 不要 |
-| `finishing-a-development-branch` | Phase 11（マージ・クリーンアップ） | ❌ 不要 |
-| `systematic-debugging` | （代替なし） | ✅ 必要時に使用 |
-
-⚠️ **`using-superpowers`の「1%ルール」はfix-issue実行中には適用しない。** 上記テーブルの「明示的に呼び出す」もののみ使用すること。
+⚠️ **superpowers排他制御**: fix-issue実行中は CLAUDE.md の「スキル優先順位と排他制御」に従う。`test-driven-development`（Phase 5で明示呼出）と `systematic-debugging`（必要時）のみ使用。
 
 ---
 
@@ -301,7 +287,7 @@ AskUserQuestionで以下を提示:
 **ユーザーの操作なしで自動実行します。**
 
 ```bash
-npm run lint && npm run build && npm run test
+npm run lint && npm run build && npm run test:run
 ```
 
 - Lintエラーは完全解消するまでループ
@@ -317,19 +303,9 @@ npm run lint && npm run build && npm run test
 ### 手順
 
 0. **changelog更新**（詳細: [changelog-guide.md](references/changelog-guide.md)）
-
-   ブランチ名からバージョンバンプを判定:
-   - `feat/*` → minor バンプ
-   - `fix/*`, `style/*` → patch バンプ
-   - `docs/*`, `test/*`, `chore/*` → **スキップ**（changelog更新なし）
-
-   バンプ対象の場合のみ:
-   1. AIが実装内容・Issueのコンテキストからchangelogエントリを自動生成
-   2. AskUserQuestionで内容を確認（title / content / type / tags）
-   3. `package.json`, `version-history.ts`, `detailed-changelog.ts` を更新
-   4. 更新ファイルを次の chore コミット（Step 1 ①）に含める
-
-   ⚠️ **changelog更新は別コミット・別PR不要。Step 1 ① の chore コミットに同梱する。**
+   - `feat/*` → minor バンプ / `fix/*`, `style/*` → patch / それ以外はスキップ
+   - バンプ対象: AI自動生成 → AskUserQuestionで確認 → `package.json`, `version-history.ts`, `detailed-changelog.ts` 更新
+   - ⚠️ chore コミット（Step 1 ①）に同梱。別コミット・別PR不要。
 
 1. **コミット・プッシュ**
 
@@ -468,50 +444,17 @@ git push
 ### 3. 自動マージ設定
 
 ```bash
-gh pr merge --auto --merge
+gh pr merge --auto --merge --delete-branch
 ```
 
-### 4. マージ待機・クリーンアップ
+### 4. ブランチクリーンアップ
 
-**自動マージ設定後、マージ完了をポーリングで待機し、完了次第ブランチクリーンアップを実行する。**
+**自動マージ・リモートブランチ削除は `--delete-branch` で自動設定済み。ローカルブランチのみ即時削除する。**
 
 ```bash
-# PR番号とブランチ名を変数に保持
-PR_NUMBER=<PR番号>
-BRANCH_NAME=$(git branch --show-current)
-
-# マージ完了までポーリング（30秒間隔、最大10分）
-for i in $(seq 1 20); do
-  STATE=$(gh pr view $PR_NUMBER --json state --jq '.state')
-  if [ "$STATE" = "MERGED" ]; then
-    echo "✅ PR #$PR_NUMBER がマージされました"
-    break
-  fi
-  echo "⏳ マージ待機中... ($i/20)"
-  sleep 30
-done
-
-# マージ確認
-STATE=$(gh pr view $PR_NUMBER --json state --jq '.state')
-if [ "$STATE" = "MERGED" ]; then
-  # mainに切り替え & 最新を取得
-  git switch main && git fetch origin && git pull origin main
-
-  # ローカルブランチ削除
-  git branch -d "$BRANCH_NAME"
-
-  # リモートブランチ削除（GitHub自動削除設定の場合はスキップ）
-  git push origin --delete "$BRANCH_NAME" 2>/dev/null || true
-
-  echo "🧹 ブランチクリーンアップ完了"
-else
-  echo "⚠️ マージがまだ完了していません（state: $STATE）"
-  echo "手動で確認してください: gh pr view $PR_NUMBER"
-fi
+git switch main && git pull origin main
+git branch -D $(git branch --show-current 2>/dev/null || echo "")
 ```
-
-⚠️ **ポーリングは最大10分。タイムアウトした場合はユーザーに状況を報告する。**
-⚠️ **リモートブランチがGitHub側で自動削除設定の場合は `git push origin --delete` は不要（エラーを無視する）。**
 
 ---
 

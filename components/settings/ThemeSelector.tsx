@@ -55,24 +55,24 @@ function SteamAnimation({ color }: { color: string }) {
   );
 }
 
-function FlameAnimation({ color }: { color: string }) {
+function FlameAnimation({ accentColor }: { color: string; accentColor: string }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {/* 横長の艶光エフェクト */}
+      {/* 金色の横長艶光エフェクト */}
       <motion.div
         className="absolute"
         style={{
-          background: `radial-gradient(ellipse at center, ${color}60 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse at center, ${accentColor}65 0%, transparent 70%)`,
           width: '75%',
           height: 44,
           top: '30%',
           left: '12%',
           willChange: 'opacity, transform',
         }}
-        animate={{ opacity: [0.3, 0.65, 0.3], scaleX: [0.85, 1.2, 0.85] }}
+        animate={{ opacity: [0.3, 0.7, 0.3], scaleX: [0.85, 1.2, 0.85] }}
         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
       />
-      {/* 火花パーティクル */}
+      {/* 金の火花パーティクル */}
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
@@ -82,10 +82,10 @@ function FlameAnimation({ color }: { color: string }) {
             bottom: '28%',
             width: 3,
             height: 3,
-            backgroundColor: color,
+            backgroundColor: accentColor,
             willChange: 'transform, opacity',
           }}
-          animate={{ y: [0, -22], opacity: [0.6, 0] }}
+          animate={{ y: [0, -22], opacity: [0.7, 0] }}
           transition={{
             duration: 1.2,
             delay: i * 0.4,
@@ -158,12 +158,12 @@ function LeafAnimation({ color }: { color: string }) {
   );
 }
 
-function GlowAnimation({ color }: { color: string }) {
+function GlowAnimation({ accentColor }: { color: string; accentColor: string }) {
   return (
     <motion.div
       className="absolute inset-0 pointer-events-none"
       style={{
-        background: `radial-gradient(ellipse at 60% 40%, ${color}55 0%, transparent 65%)`,
+        background: `radial-gradient(ellipse at 60% 40%, ${accentColor}60 0%, transparent 65%)`,
         willChange: 'opacity, transform',
       }}
       animate={{ opacity: [0, 1, 0], scale: [0.85, 1.1, 0.85] }}
@@ -172,9 +172,10 @@ function GlowAnimation({ color }: { color: string }) {
   );
 }
 
-function SnowAnimation({ color }: { color: string }) {
+function SnowAnimation({ color, accentColor }: { color: string; accentColor: string }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* 白い雪 */}
       {[0, 1, 2, 3, 4, 5].map((i) => (
         <motion.div
           key={i}
@@ -197,6 +198,28 @@ function SnowAnimation({ color }: { color: string }) {
             delay: i * 0.6,
             repeat: Infinity,
             ease: 'linear',
+          }}
+        />
+      ))}
+      {/* 金のきらめき */}
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={`glitter-${i}`}
+          className="absolute rounded-full"
+          style={{
+            left: `${20 + i * 25}%`,
+            top: `${25 + i * 20}%`,
+            width: 3,
+            height: 3,
+            backgroundColor: accentColor,
+            willChange: 'opacity, transform',
+          }}
+          animate={{ opacity: [0, 0.85, 0], scale: [0.5, 1.5, 0.5] }}
+          transition={{
+            duration: 1.8,
+            delay: i * 0.6,
+            repeat: Infinity,
+            ease: 'easeInOut',
           }}
         />
       ))}
@@ -235,9 +258,11 @@ function StarsAnimation({ color }: { color: string }) {
 function ThemeAnimation({
   type,
   textColor,
+  accentColor,
 }: {
   type: ThemeAnimationType;
   textColor: string;
+  accentColor: string;
 }) {
   const prefersReduced = useReducedMotion();
   if (prefersReduced) return null;
@@ -246,15 +271,15 @@ function ThemeAnimation({
     case 'steam':
       return <SteamAnimation color={textColor} />;
     case 'flame':
-      return <FlameAnimation color={textColor} />;
+      return <FlameAnimation color={textColor} accentColor={accentColor} />;
     case 'particles':
       return <ParticlesAnimation color={textColor} />;
     case 'leaf':
       return <LeafAnimation color={textColor} />;
     case 'glow':
-      return <GlowAnimation color={textColor} />;
+      return <GlowAnimation color={textColor} accentColor={accentColor} />;
     case 'snow':
-      return <SnowAnimation color={textColor} />;
+      return <SnowAnimation color={textColor} accentColor={accentColor} />;
     case 'stars':
       return <StarsAnimation color={textColor} />;
     default:
@@ -299,7 +324,7 @@ function ThemePreviewCard({
       </div>
 
       {/* アンビエントアニメーション層 */}
-      <ThemeAnimation type={preset.animationType} textColor={text} />
+      <ThemeAnimation type={preset.animationType} textColor={text} accentColor={accent} />
 
       {/* カードコンテンツ */}
       <div className="relative z-10 p-4 flex flex-col gap-2 min-h-[152px]">

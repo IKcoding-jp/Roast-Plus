@@ -58,17 +58,42 @@ function SteamAnimation({ color }: { color: string }) {
 function FlameAnimation({ color }: { color: string }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* 横長の艶光エフェクト */}
       <motion.div
-        className="absolute top-1 right-2"
+        className="absolute"
         style={{
-          color,
-          willChange: 'transform, opacity',
+          background: `radial-gradient(ellipse at center, ${color}60 0%, transparent 70%)`,
+          width: '75%',
+          height: 44,
+          top: '30%',
+          left: '12%',
+          willChange: 'opacity, transform',
         }}
-        animate={{ scale: [1, 1.35, 1], opacity: [0.3, 0.65, 0.3] }}
+        animate={{ opacity: [0.3, 0.65, 0.3], scaleX: [0.85, 1.2, 0.85] }}
         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <TbFlame size={52} />
-      </motion.div>
+      />
+      {/* 火花パーティクル */}
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            left: `${25 + i * 20}%`,
+            bottom: '28%',
+            width: 3,
+            height: 3,
+            backgroundColor: color,
+            willChange: 'transform, opacity',
+          }}
+          animate={{ y: [0, -22], opacity: [0.6, 0] }}
+          transition={{
+            duration: 1.2,
+            delay: i * 0.4,
+            repeat: Infinity,
+            ease: 'easeOut',
+          }}
+        />
+      ))}
     </div>
   );
 }
@@ -104,17 +129,31 @@ function ParticlesAnimation({ color }: { color: string }) {
 function LeafAnimation({ color }: { color: string }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      <motion.div
-        className="absolute top-1 right-2"
-        style={{
-          color,
-          willChange: 'transform',
-        }}
-        animate={{ rotate: [-10, 10, -10], opacity: [0.15, 0.35, 0.15] }}
-        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <TbLeaf size={46} />
-      </motion.div>
+      {[0, 1, 2, 3].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-sm"
+          style={{
+            left: `${15 + i * 18}%`,
+            bottom: `${20 + (i % 2) * 15}%`,
+            width: i % 2 === 0 ? 4 : 3,
+            height: i % 2 === 0 ? 4 : 3,
+            backgroundColor: color,
+            willChange: 'transform, opacity',
+          }}
+          animate={{
+            y: [0, -32],
+            x: [0, i % 2 === 0 ? 10 : -10],
+            opacity: [0.15, 0.35, 0.15],
+          }}
+          transition={{
+            duration: 2.8 + i * 0.3,
+            delay: i * 0.7,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
     </div>
   );
 }

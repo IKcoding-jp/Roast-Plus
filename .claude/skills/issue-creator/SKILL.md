@@ -113,12 +113,14 @@ Issue本文を提示し、以下を確認:
 ## Phase 5: Issue作成
 
 ```bash
-cat > /tmp/issue_body.md <<'EOF'
+# ⚠️ 一時ファイルはリポジトリルートに相対パスで作成（Windows互換）
+# /tmp/ はWindowsで正しく解決されないため使用禁止
+cat > .tmp-issue-body.md <<'EOF'
 [Issue本文]
 EOF
 
-gh issue create --title "[type]: タイトル" --body-file /tmp/issue_body.md --label "ラベル"
-rm /tmp/issue_body.md
+gh issue create --title "[type]: タイトル" --body-file .tmp-issue-body.md --label "ラベル"
+rm -f .tmp-issue-body.md
 ```
 
 **ラベル対応**: bug→`bug`, feat→`enhancement`, refactor→`refactor`, docs→`documentation`, style→`design`, perf→`performance`, chore→`chore`, test→`testing`

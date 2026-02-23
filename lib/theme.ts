@@ -42,7 +42,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       bg: '#261a14',
       surface: '#FFFFFF',
       accent: '#d97706',
-      text: '#1f2937',
+      text: '#f5e6d0',
     },
     fontStyle: 'font-bold tracking-normal',
     animationType: 'steam',

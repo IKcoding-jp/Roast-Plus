@@ -117,7 +117,7 @@ CSS変数の使い分け（`bg-surface` vs `bg-overlay` 等）は `docs/steering
 ### Framer Motion
 - **バージョン**: ^12.23.24
 - **用途**: ページトランジション、コンポーネントアニメーション、ジェスチャー
-- **テーマ連動**: christmasテーマの雪の結晶アニメーション（SVG + Framer Motion）
+- **テーマ連動**: 7テーマのアンビエントアニメーション（湯気/炎/粒子/葉/光波/雪/星）+ `useReducedMotion` 対応
 
 ### Lottie
 - **ライブラリ**: `lottie-react`（^2.4.1）

@@ -1,6 +1,6 @@
 # Features
 
-**最終更新**: 2026-02-22
+**最終更新**: 2026-02-26
 
 ---
 
@@ -383,7 +383,7 @@ interface WorkProgress {
 ドリップ抽出手順の案内、レシピ管理
 
 ### 主要ユースケース
-1. デフォルトレシピ（4:6メソッド）
+1. デフォルトレシピ（4:6メソッド / BYSN Standard / 井崎流 / Hoffmann V60 / ドリップパック）
 2. カスタムレシピ作成・編集・削除
 3. ガイド実行（タイマー付き、音声案内）
 4. 人前（1〜8杯）のスケーリング
@@ -408,6 +408,11 @@ interface WorkProgress {
 | **Firestore** | `users/{userId}` ドキュメント内のフィールド |
 
 ### 設計方針
+
+#### デフォルトレシピの追加方針
+- `lib/drip-guide/mockData.ts` の `MOCK_RECIPES` 配列に追加する（新規ファイル不要）
+- 表示順は `components/drip-guide/RecipeList.tsx` の `defaultOrder` 配列で管理: `['recipe-001', 'recipe-003', 'recipe-046', 'recipe-hoffmann', 'recipe-drip-bag']`
+- `isManualMode: true` のレシピは `StartHintDialog` に「手順はタップで進みます」の説明が表示される
 
 #### レシピ計算
 - **4:6メソッド**: `lib/drip-guide/46method.ts` で計算ロジック実装

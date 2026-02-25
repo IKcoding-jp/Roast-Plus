@@ -2,7 +2,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
-import { Coffee, Timer } from 'phosphor-react';
+import { Coffee, Timer, HandPointing } from 'phosphor-react';
 import { GiCoffeePot } from 'react-icons/gi';
 import { Button } from '@/components/ui';
 
@@ -13,6 +13,7 @@ interface StartHintDialogProps {
     totalWaterGram?: number;
     servings?: number;
     recipeName?: string;
+    isManualMode?: boolean;
 }
 
 const overlayMotion = {
@@ -35,6 +36,7 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
     totalWaterGram,
     servings,
     recipeName,
+    isManualMode,
 }) => {
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
@@ -119,6 +121,20 @@ export const StartHintDialog: React.FC<StartHintDialogProps> = ({
                                         </p>
                                     </div>
                                 </div>
+
+                                {isManualMode && (
+                                    <div className="flex gap-3">
+                                        <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-spot-subtle text-spot">
+                                            <HandPointing size={18} weight="duotone" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="font-semibold text-ink">手順はタップで進みます</p>
+                                            <p className="text-ink-sub">
+                                                各手順は画面下の「次へ」ボタンをタップして手動で進めます。タイマーは経過時間の目安として動きます。
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
 
                             </div>
 

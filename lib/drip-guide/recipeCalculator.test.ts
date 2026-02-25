@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateRecipeForServings } from './recipeCalculator';
+import { MOCK_RECIPES } from './mockData';
 import type { DripRecipe } from './types';
 
 const baseRecipe: DripRecipe = {
@@ -58,5 +59,24 @@ describe('calculateRecipeForServings', () => {
     expect(baseRecipe.beanAmountGram).toBe(15);
     expect(baseRecipe.totalWaterGram).toBe(250);
     expect(baseRecipe.steps[0].targetTotalWater).toBe(30);
+  });
+});
+
+describe('ドリップパックレシピ', () => {
+  it('ドリップパックレシピが存在すること', () => {
+    const recipe = MOCK_RECIPES.find(r => r.id === 'recipe-drip-bag');
+    expect(recipe).toBeDefined();
+    expect(recipe?.isManualMode).toBe(true);
+    expect(recipe?.isDefault).toBe(true);
+    expect(recipe?.totalWaterGram).toBe(155);
+    expect(recipe?.steps).toHaveLength(6);
+  });
+
+  it('ドリップパックレシピを2人前でスケールできること', () => {
+    const recipe = MOCK_RECIPES.find(r => r.id === 'recipe-drip-bag');
+    if (!recipe) throw new Error('recipe-drip-bag not found');
+    const scaled = calculateRecipeForServings(recipe, 2);
+    expect(scaled.beanAmountGram).toBe(14);
+    expect(scaled.totalWaterGram).toBe(310);
   });
 });

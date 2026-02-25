@@ -74,9 +74,9 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
         setStartTargetId(null);
     };
 
-    // デフォルトレシピの表示順序を明示的に指定（BYSN → 井崎 → 粕谷 → Hoffmann）
+    // デフォルトレシピの表示順序を明示的に指定（BYSN → 井崎 → 粕谷 → Hoffmann → ドリップパック）
     const sortedRecipes = useMemo(() => {
-        const defaultOrder = ['recipe-001', 'recipe-003', 'recipe-046', 'recipe-hoffmann'];
+        const defaultOrder = ['recipe-001', 'recipe-003', 'recipe-046', 'recipe-hoffmann', 'recipe-drip-bag'];
         return [...recipes].sort((a, b) => {
             const indexA = defaultOrder.indexOf(a.id);
             const indexB = defaultOrder.indexOf(b.id);
@@ -238,6 +238,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
                     totalWaterGram={startTargetCalculated?.totalWaterGram}
                     servings={startTargetRecipe ? getServingsForRecipe(startTargetRecipe.id) : undefined}
                     recipeName={startTargetRecipe?.name}
+                    isManualMode={startTargetRecipe?.isManualMode}
                 />
             )}
         </>

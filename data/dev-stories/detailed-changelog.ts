@@ -14,6 +14,20 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.14.0',
+    version: '0.14.0',
+    date: '2026-02-26',
+    type: 'feature',
+    title: 'ドリップガイドにドリップパックレシピを追加しました',
+    content: `
+- ドリップパック（7〜10g）用のレシピを追加しました（3投で丁寧に、雑味なく抽出）
+- ガイド開始前の画面に「手順はタップで進みます」の説明を追加しました（BYSN Standard・井崎流にも表示）
+    `.trim(),
+    tags: ['ドリップガイド', 'レシピ'],
+    createdAt: '2026-02-26T00:00:00.000Z',
+    updatedAt: '2026-02-26T00:00:00.000Z',
+  },
+  {
     id: 'v0.13.0',
     version: '0.13.0',
     date: '2026-02-23',

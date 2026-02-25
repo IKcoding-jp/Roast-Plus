@@ -63,7 +63,12 @@ npm run lint && npm run build && npm run test:run
 
 ## 完了条件
 
-- [ ] T1: mockData.ts にレシピ追加
-- [ ] T2: RecipeList.tsx の表示順更新
-- [ ] T3: StartHintDialog.tsx に手動モード説明追加
-- [ ] T4: lint / build / test パス
+- [x] T1: mockData.ts にレシピ追加
+- [x] T2: RecipeList.tsx の表示順更新
+- [x] T3: StartHintDialog.tsx に手動モード説明追加
+- [x] T4: lint / build / test パス
+
+---
+
+**ステータス**: ✅ 完了
+**完了日**: 2026-02-26

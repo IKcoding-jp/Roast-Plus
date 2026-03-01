@@ -279,7 +279,7 @@ interface RoastRecord {
 
 #### 共通コンポーネント使用
 - ✅ **必須**: `Button`, `Card`, `Input` を使用
-- ❌ **禁止**: 独自の検索・ソートUIを作成（既存の`SearchFilterSection`, `SortMenu`を使用）
+- ❌ **禁止**: 独自の検索・ソートUIを作成（`FilterMenu`コンポーネントを使用）
 
 #### テーマ対応
 - CSS変数による自動テーマ適用
@@ -289,7 +289,7 @@ interface RoastRecord {
 | 要素 | 内容 |
 |-----|------|
 | **ページ** | `app/defect-beans/page.tsx`（一覧）<br>`app/defect-beans/[id]/page.tsx`（詳細） |
-| **コンポーネント** | `components/defect-beans/SearchFilterSection.tsx`<br>`components/defect-beans/SortMenu.tsx`<br>`components/defect-beans/EmptyState.tsx` |
+| **コンポーネント** | `components/defect-beans/FilterMenu.tsx`（検索・絞り込み・ソートを統合したモーダル）<br>`components/defect-beans/EmptyState.tsx` |
 | **フック** | `hooks/useDefectBeans.ts`<br>`hooks/useDefectBeanSettings.ts` |
 | **Firestore** | `defectBeans` コレクション（共有データ、全ユーザー共通） |
 | **画像** | `public/images/`（静的コンテンツ） |

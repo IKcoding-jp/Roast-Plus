@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.14.2',
+    date: '2026-03-01',
+    summary: '欠点豆図鑑のフィルター・検索・ソートを1つのボタンにまとめました',
+  },
+  {
     version: '0.14.1',
     date: '2026-03-01',
     summary: '欠点豆図鑑の追加フォームが固まる問題を修正しました など 3件の更新',

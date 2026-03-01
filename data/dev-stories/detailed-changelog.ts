@@ -14,6 +14,20 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.14.2',
+    version: '0.14.2',
+    date: '2026-03-01',
+    type: 'style',
+    title: '欠点豆図鑑のフィルター・検索・ソートを1つのボタンにまとめました',
+    content: `
+- フィルターボタン1つで検索・絞り込み・ソートをまとめて設定できるようになりました
+- 画面上部のレイアウトがすっきりし、iPadでも快適に使えるようになりました
+    `.trim(),
+    tags: ['欠点豆', 'UI', 'フィルター'],
+    createdAt: '2026-03-01T00:00:00.000Z',
+    updatedAt: '2026-03-01T00:00:00.000Z',
+  },
+  {
     id: 'v0.14.1',
     version: '0.14.1',
     date: '2026-03-01',

@@ -9,9 +9,9 @@ import type { DefectBean } from '@/types';
 
 export function useDefectBeans() {
   const { user, loading: authLoading } = useAuth();
-  const { data: appData, updateData } = useAppData();
+  const { data: appData, updateData, isLoading: appDataLoading } = useAppData();
   const [masterDefectBeans, setMasterDefectBeans] = useState<DefectBean[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [masterLoading, setMasterLoading] = useState(true);
 
   // マスターデータを取得
   useEffect(() => {
@@ -22,7 +22,7 @@ export function useDefectBeans() {
 
     // 認証済みユーザーのみマスターデータを取得
     if (!user) {
-      setIsLoading(false);
+      setMasterLoading(false);
       return;
     }
 
@@ -35,7 +35,7 @@ export function useDefectBeans() {
         // エラー時も空配列を設定してローディングを終了
         setMasterDefectBeans([]);
       } finally {
-        setIsLoading(false);
+        setMasterLoading(false);
       }
     };
 
@@ -209,7 +209,7 @@ export function useDefectBeans() {
     masterDefectBeans,
     userDefectBeans: appData.defectBeans || [],
     allDefectBeans: getAllDefectBeans(),
-    isLoading,
+    isLoading: masterLoading || appDataLoading,
     addDefectBean,
     updateDefectBean,
     removeDefectBean,

@@ -14,8 +14,7 @@ import { DefectBeanCard } from '@/components/DefectBeanCard';
 import { DefectBeanForm } from '@/components/DefectBeanForm';
 import { DefectBeanCompare } from '@/components/DefectBeanCompare';
 import { Loading } from '@/components/Loading';
-import { SearchFilterSection } from '@/components/defect-beans/SearchFilterSection';
-import { SortMenu } from '@/components/defect-beans/SortMenu';
+import { FilterMenu } from '@/components/defect-beans/FilterMenu';
 import { EmptyState } from '@/components/defect-beans/EmptyState';
 import type { DefectBean } from '@/types';
 
@@ -36,7 +35,6 @@ export default function DefectBeansPage() {
   const [showCompare, setShowCompare] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('default');
-  const [showSortMenu, setShowSortMenu] = useState(false);
 
   // フィルタリングと検索（Hooksは早期リターンの前に呼び出す必要がある）
   const filteredDefectBeans = useMemo(() => {
@@ -225,19 +223,20 @@ export default function DefectBeansPage() {
   );
 
   return (
-    <div className="min-h-screen pt-14 pb-2 sm:pb-4 px-4 sm:px-6 lg:px-8 transition-colors duration-1000 bg-page">
+    <div className="min-h-screen pt-16 pb-2 sm:pb-4 px-4 sm:px-6 lg:px-8 transition-colors duration-1000 bg-page">
       <FloatingNav
         backHref="/"
         right={
           !(filteredDefectBeans.length === 0 && !searchQuery && filterOption === 'all') ? (
             <>
               {!compareMode && (
-                <SortMenu
+                <FilterMenu
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  filterOption={filterOption}
+                  onFilterChange={setFilterOption}
                   sortOption={sortOption}
                   onSortChange={setSortOption}
-                  showSortMenu={showSortMenu}
-                  onToggleMenu={() => setShowSortMenu(!showSortMenu)}
-                  onClose={() => setShowSortMenu(false)}
                 />
               )}
               <Button
@@ -280,17 +279,6 @@ export default function DefectBeansPage() {
         }
       />
       <div className="max-w-7xl mx-auto">
-
-        {/* 検索とフィルタ */}
-        {allDefectBeans.length > 0 && (
-          <SearchFilterSection
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            filterOption={filterOption}
-            onFilterChange={setFilterOption}
-
-          />
-        )}
 
         {/* グリッド表示 */}
         {filteredDefectBeans.length === 0 ? (

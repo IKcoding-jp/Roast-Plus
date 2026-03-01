@@ -11,6 +11,8 @@ function getStorageInstance(): FirebaseStorage {
   return storage;
 }
 
+const UPLOAD_TIMEOUT_MS = 30_000;
+
 /**
  * 欠点豆の画像をFirebase Storageにアップロード
  * @param userId ユーザーID（空文字列の場合はマスターデータ）
@@ -23,24 +25,34 @@ export async function uploadDefectBeanImage(
   defectBeanId: string,
   file: File
 ): Promise<string> {
-  try {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(
+      () => reject(new Error('画像のアップロードがタイムアウトしました（30秒）')),
+      UPLOAD_TIMEOUT_MS
+    );
+  });
+
+  const doUpload = async (): Promise<string> => {
     const storageInstance = getStorageInstance();
-    
+
     // マスターデータの場合は別のパスを使用
     const storagePath = userId
       ? `defect-beans/${userId}/${defectBeanId}/${Date.now()}_${file.name}`
       : `defect-beans-master/${defectBeanId}/${Date.now()}_${file.name}`;
-    
+
     const storageRef = ref(storageInstance, storagePath);
-    
-    // ファイルをアップロード
     await uploadBytes(storageRef, file);
-    
-    // ダウンロードURLを取得
-    const downloadURL = await getDownloadURL(storageRef);
-    
-    return downloadURL;
+    return getDownloadURL(storageRef);
+  };
+
+  try {
+    const result = await Promise.race([doUpload(), timeoutPromise]);
+    clearTimeout(timeoutId);
+    return result;
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error('Failed to upload defect bean image:', error);
     throw error;
   }

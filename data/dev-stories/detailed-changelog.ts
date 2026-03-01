@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.14.3',
+    version: '0.14.3',
+    date: '2026-03-01',
+    type: 'style',
+    title: '試飲セッション編集画面のレイアウトを改善しました',
+    content: `
+- 編集フォームが画面の縦中央に表示されるようになりました
+- 削除機能を「危険な操作」セクションとしてフォーム下部に移動しました
+- ボタンが常に1行に収まるようになりました
+    `.trim(),
+    tags: ['テイスティング', 'UI'],
+    createdAt: '2026-03-01T00:00:00.000Z',
+    updatedAt: '2026-03-01T00:00:00.000Z',
+  },
+  {
     id: 'v0.14.2',
     version: '0.14.2',
     date: '2026-03-01',

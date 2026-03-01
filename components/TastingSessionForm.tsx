@@ -11,7 +11,8 @@ import {
   Trash,
   X,
   Plus,
-  Check
+  Check,
+  Warning,
 } from 'phosphor-react';
 import { Input, Select, Button } from '@/components/ui';
 import { ROAST_LEVELS } from '@/lib/constants';
@@ -23,6 +24,23 @@ interface TastingSessionFormProps {
   onCancel: () => void;
   onDelete?: (id: string) => void;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 14, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: 'spring' as const, damping: 22, stiffness: 350 },
+  },
+};
 
 export function TastingSessionForm({
   session,
@@ -43,8 +61,7 @@ export function TastingSessionForm({
 
   const handleDelete = () => {
     if (!session || !onDelete) return;
-    // 確認ダイアログは親コンポーネントで表示されるため、ここでは削除処理を委譲
-      onDelete(session.id);
+    onDelete(session.id);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,7 +80,7 @@ export function TastingSessionForm({
       roastLevel,
       createdAt: createdAtDate,
       updatedAt: now,
-      userId: session?.userId || '', // 呼び出し側で設定される想定
+      userId: session?.userId || '',
     };
 
     onSave(sessionData);
@@ -71,80 +88,83 @@ export function TastingSessionForm({
 
   return (
     <motion.form
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
       onSubmit={handleSubmit}
-      className="space-y-5"
+      className="space-y-4"
     >
-      <div className="rounded-2xl p-5 sm:p-6 shadow-sm space-y-5 bg-surface border border-edge">
-        {/* 豆の名前（必須） */}
-        <div className="space-y-2">
-          <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
-            <Coffee size={18} weight="bold" className="text-spot" />
-            豆の名前 <span className="text-red-500">*</span>
-          </label>
-          <Input
-            type="text"
-            value={beanName}
-            onChange={(e) => setBeanName(e.target.value)}
-            required
-            placeholder="例: コロンビア・エチオピアなど"
-          />
+      {/* メインカード */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-2xl bg-surface border border-edge shadow-sm overflow-hidden"
+      >
+        {/* セクションヘッダー */}
+        <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-edge flex items-center gap-2">
+          <Coffee size={16} weight="fill" className="text-spot" />
+          <span className="text-sm font-semibold text-ink">セッション詳細</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {/* 焙煎度合い（必須） */}
+        {/* フィールド群 */}
+        <div className="px-5 sm:px-6 pt-4 pb-5 sm:pb-6 space-y-5">
+          {/* 豆の名前 */}
           <div className="space-y-2">
             <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
-              <Thermometer size={18} weight="bold" className="text-spot" />
-              焙煎度合い <span className="text-red-500">*</span>
-            </label>
-            <Select
-              value={roastLevel}
-              onChange={(e) =>
-                setRoastLevel(
-                  e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
-                )
-              }
-              options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
-              required
-            />
-          </div>
-
-          {/* 試飲日 */}
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
-              <CalendarBlank size={18} weight="bold" className="text-spot" />
-              試飲日 <span className="text-red-500">*</span>
+              <Coffee size={18} weight="bold" className="text-spot" />
+              豆の名前 <span className="text-red-500">*</span>
             </label>
             <Input
-              type="date"
-              value={createdAt}
-              onChange={(e) => setCreatedAt(e.target.value)}
+              type="text"
+              value={beanName}
+              onChange={(e) => setBeanName(e.target.value)}
               required
+              placeholder="例: コロンビア・エチオピアなど"
             />
           </div>
-        </div>
-      </div>
 
-      {/* ボタン */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        {!isNew && onDelete && (
-          <Button
-            type="button"
-            variant="danger"
-            onClick={handleDelete}
-            className="flex-1 order-3 sm:order-1"
-          >
-            <Trash size={20} weight="bold" />
-            削除
-          </Button>
-        )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* 焙煎度合い */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
+                <Thermometer size={18} weight="bold" className="text-spot" />
+                焙煎度合い <span className="text-red-500">*</span>
+              </label>
+              <Select
+                value={roastLevel}
+                onChange={(e) =>
+                  setRoastLevel(
+                    e.target.value as '浅煎り' | '中煎り' | '中深煎り' | '深煎り'
+                  )
+                }
+                options={ROAST_LEVELS.map((level) => ({ value: level, label: level }))}
+                required
+              />
+            </div>
+
+            {/* 試飲日 */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-bold ml-1 text-ink-sub">
+                <CalendarBlank size={18} weight="bold" className="text-spot" />
+                試飲日 <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="date"
+                value={createdAt}
+                onChange={(e) => setCreatedAt(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ボタン行 */}
+      <motion.div variants={itemVariants} className="flex gap-3">
         <Button
           type="button"
           variant="secondary"
           onClick={onCancel}
-          className="flex-1 order-2"
+          className="flex-1"
         >
           <X size={20} weight="bold" />
           キャンセル
@@ -152,7 +172,7 @@ export function TastingSessionForm({
         <Button
           type="submit"
           variant="primary"
-          className="flex-[1.5] order-1 sm:order-3"
+          className="flex-[1.5]"
         >
           {isNew ? (
             <>
@@ -166,8 +186,36 @@ export function TastingSessionForm({
             </>
           )}
         </Button>
-      </div>
+      </motion.div>
+
+      {/* Danger Zone（編集時のみ） */}
+      {!isNew && onDelete && (
+        <motion.div
+          variants={itemVariants}
+          className="rounded-xl border border-edge bg-danger-subtle p-4"
+        >
+          <div className="flex items-center gap-1.5 mb-3">
+            <Warning size={13} weight="fill" className="text-danger" />
+            <span className="text-xs font-bold text-danger tracking-wider">
+              危険な操作
+            </span>
+          </div>
+          <motion.div
+            whileHover={{ x: [0, -3, 3, -2, 2, 0] }}
+            transition={{ duration: 0.4 }}
+          >
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleDelete}
+              className="w-full"
+            >
+              <Trash size={16} weight="bold" />
+              この試飲セッションを削除する
+            </Button>
+          </motion.div>
+        </motion.div>
+      )}
     </motion.form>
   );
 }
-

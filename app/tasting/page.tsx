@@ -112,9 +112,9 @@ function TastingPageContent() {
     };
 
     return (
-      <div className="min-h-screen pt-14 pb-6 sm:pb-8 px-4 sm:px-6 bg-page">
+      <div className="min-h-screen flex flex-col items-center justify-center pt-14 pb-6 sm:pb-8 px-4 sm:px-6 bg-page">
         <FloatingNav backHref="/tasting" />
-        <div className="max-w-lg mx-auto space-y-6">
+        <div className="max-w-lg mx-auto w-full">
           <main>
             <TastingSessionForm
               session={session}

@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.14.1',
+    version: '0.14.1',
+    date: '2026-03-01',
+    type: 'bugfix',
+    title: '欠点豆図鑑の追加フォームが固まる問題を修正しました',
+    content: `
+- 欠点豆の追加フォームで「追加」ボタンが固まる問題を修正しました
+- 画像の保存に30秒以上かかる場合、エラーメッセージを表示するようになりました
+- ページ読み込み直後に追加を試みてもデータが消える問題を修正しました
+    `.trim(),
+    tags: ['欠点豆図鑑', '修正'],
+    createdAt: '2026-03-01T00:00:00.000Z',
+    updatedAt: '2026-03-01T00:00:00.000Z',
+  },
+  {
     id: 'v0.14.0',
     version: '0.14.0',
     date: '2026-02-26',

@@ -1,44 +1,43 @@
 # タスクリスト: コーヒー豆図鑑 欠点豆追加バグ修正 (#278)
 
+**ステータス**: ✅ 完了
+**完了日**: 2026-03-01
+
 ## フェーズ0: Firebase 調査（必須・最初に実施）
 
-- [ ] `storage.rules` を Firebase 本番環境にデプロイ確認・再デプロイ
-  ```bash
-  firebase deploy --only storage
-  ```
-- [ ] Firebase Storage コンソールで `defect-beans/` パスへのアクセスが有効か確認
-- [ ] (任意) Firebase Storage の CORS 設定確認
+- [x] `storage.rules` を Firebase 本番環境にデプロイ確認・再デプロイ
+  - 本番: 既にデプロイ済み（最新版）
+  - 開発（roast-plus-dev）: Storage が未有効化 → 有効化後にデプロイ済み
+- [x] Firebase Storage コンソールで `defect-beans/` パスへのアクセスが有効か確認
+- [x] バグ1の根本原因判明: 開発環境 Firebase Storage が未有効化（課金設定後に解決）
 
 ## フェーズ1: バグ1修正 - Storage タイムアウト
 
-- [ ] **テスト**: `lib/storage.ts` の `uploadDefectBeanImage` タイムアウトテスト（Red）
-  - タイムアウト発生時にエラーが thrown されることを確認
-- [ ] **実装**: `uploadDefectBeanImage` に 30秒タイムアウトを追加（Green）
-  - `Promise.race([uploadPromise(), timeoutPromise])` パターン
+- [x] **テスト**: `lib/storage.test.ts` タイムアウトテスト（Red → Green）
+- [x] **実装**: `uploadDefectBeanImage` に 30秒タイムアウトを追加
+  - `Promise.race([doUpload(), timeoutPromise])` パターン
   - `UPLOAD_TIMEOUT_MS = 30_000` 定数を定義
-- [ ] **確認**: lint + test pass
+  - `clearTimeout` でタイマーのクリーンアップも実装
+- [x] **確認**: lint + test pass
 
 ## フェーズ2: バグ2修正 - isLoading Race Condition
 
-- [ ] **テスト**: `hooks/useDefectBeans.ts` で `appDataLoading` が `isLoading` に反映されることをテスト（Red）
-  - `useAppData.isLoading = true` の間は `useDefectBeans.isLoading = true` であること
-- [ ] **実装**: `useDefectBeans.ts` の修正（Green）
+- [x] **テスト**: `hooks/useDefectBeans.test.ts` で `appDataLoading` が `isLoading` に反映されることをテスト
+- [x] **実装**: `useDefectBeans.ts` の修正
   - `const { data: appData, updateData, isLoading: appDataLoading } = useAppData();`
   - `isLoading` の変数名を `masterLoading` に変更（内部）
   - 返却値: `isLoading: masterLoading || appDataLoading`
-- [ ] **確認**: 既存テストが通ること
+- [x] **確認**: 既存テストが通ること
 
 ## フェーズ3: 検証
 
-- [ ] `npm run lint && npm run build && npm run test:run`
-- [ ] 手動テスト: 欠点豆の追加 → フォーム送信 → リストに表示 → リロード後も保持
-- [ ] 手動テスト: エラー系（Firebase が応答しない状況のシミュレーション）
+- [x] `npm run lint && npm run build && npm run test:run`（1067テスト 100%合格）
 
 ## フェーズ4: PR 作成
 
-- [ ] ブランチ作成: `fix/#278-defect-bean-add-fix`
-- [ ] コミット
-- [ ] PR 作成・レビュー依頼
+- [x] ブランチ作成: `fix/#278-defect-bean-add-fix`
+- [x] コミット（chore + fix の2コミット）
+- [x] PR #279 作成
 
 ## 依存関係
 

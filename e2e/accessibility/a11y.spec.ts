@@ -8,6 +8,13 @@ const pages = [
   { name: 'タイマー', path: '/roast-timer' },
   { name: 'スケジュール', path: '/schedule' },
   { name: 'テイスティング', path: '/tasting' },
+  { name: 'ログイン', path: '/login' },
+  { name: '担当表', path: '/assignment' },
+  { name: 'ドリップガイド', path: '/drip-guide' },
+  { name: '欠点豆', path: '/defect-beans' },
+  { name: '設定', path: '/settings' },
+  { name: 'お問い合わせ', path: '/contact' },
+  { name: '変更履歴', path: '/changelog' },
 ];
 
 test.describe('アクセシビリティ: axe-core自動スキャン', () => {

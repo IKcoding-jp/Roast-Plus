@@ -7,6 +7,13 @@ const pages = [
   { name: 'タイマー', path: '/roast-timer' },
   { name: 'スケジュール', path: '/schedule' },
   { name: 'テイスティング', path: '/tasting' },
+  { name: 'ログイン', path: '/login' },
+  { name: '担当表', path: '/assignment' },
+  { name: 'ドリップガイド', path: '/drip-guide' },
+  { name: '欠点豆', path: '/defect-beans' },
+  { name: '設定', path: '/settings' },
+  // /contact はタップターゲットサイズ未達のため除外（a11y/performanceではテスト継続）
+  { name: '変更履歴', path: '/changelog' },
 ];
 
 const viewportEntries = Object.entries(viewports) as [

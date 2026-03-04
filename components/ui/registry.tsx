@@ -570,7 +570,7 @@ function FloatingNavDemo() {
         <h3 className="text-sm font-semibold mb-2 text-ink">
           戻るボタンのみ
         </h3>
-        <div className="relative h-24 bg-ground rounded-lg overflow-hidden">
+        <div className="relative h-24 bg-ground rounded-lg overflow-hidden transform-gpu">
           <FloatingNav backHref="#" />
           <p className="pt-14 text-center text-sm text-ink-sub">コンテンツ領域</p>
         </div>
@@ -579,7 +579,7 @@ function FloatingNavDemo() {
         <h3 className="text-sm font-semibold mb-2 text-ink">
           戻る + 右アクション
         </h3>
-        <div className="relative h-24 bg-ground rounded-lg overflow-hidden">
+        <div className="relative h-24 bg-ground rounded-lg overflow-hidden transform-gpu">
           <FloatingNav
             backHref="#"
             right={

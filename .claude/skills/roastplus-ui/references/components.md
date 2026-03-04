@@ -6,7 +6,7 @@
 
 ## 目次
 
-1. ボタン系（Button, IconButton, BackLink）
+1. ボタン系（Button, IconButton, BackLink, FloatingNav）
 2. フォーム系（Input, NumberInput, InlineInput, Select, Textarea, Checkbox, Switch）
 3. コンテナ系（Card, Modal, Dialog, Tabs, Accordion）
 4. 表示系（Badge, RoastLevelBadge, ProgressBar, EmptyState）
@@ -93,6 +93,42 @@ import { BackLink } from '@/components/ui';
 | `href` | `string` | (必須) | リンク先URL |
 | `variant` | `'default' \| 'icon-only'` | `'default'` | 表示スタイル |
 | `children` | `ReactNode` | - | リンクテキスト |
+
+### FloatingNav
+
+画面に浮かぶナビゲーション。左上に戻るボタン、右側にアクション要素を `fixed` 配置。BackLink と違い、コンテンツの上に重なるオーバーレイ型。
+
+```tsx
+import { FloatingNav } from '@/components/ui';
+import { IconButton } from '@/components/ui';
+
+// 戻るボタンのみ
+<FloatingNav backHref="/tasting" />
+
+// 戻るボタン + 右側アクション
+<FloatingNav
+  backHref="/tasting"
+  right={
+    <IconButton variant="surface" aria-label="設定">
+      <HiCog size={20} />
+    </IconButton>
+  }
+/>
+
+// 右側のみ（戻るボタンなし）
+<FloatingNav right={<Button variant="primary" size="sm">保存</Button>} />
+```
+
+| Prop | 型 | デフォルト | 説明 |
+|------|-----|----------|------|
+| `backHref` | `string` | - | 戻るボタンのリンク先。未指定で戻るボタン非表示 |
+| `right` | `ReactNode` | - | 右側コンテンツ（ボタン・メニュー等） |
+| `className` | `string` | `''` | 右側コンテナの追加CSSクラス |
+
+**特性:**
+- `z-50 + fixed` で常時最前面に表示
+- `bg-surface/80 + backdrop-blur-sm` でガラス効果
+- 戻るボタンは44×44pxの丸形タッチターゲット
 
 ---
 

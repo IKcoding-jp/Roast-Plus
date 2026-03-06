@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MdAdd, MdDelete, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md';
 import { DEFAULT_TABLE_SETTINGS, WidthConfig, HeightConfig } from './types';
 import { Button, Input, IconButton, NumberInput } from '@/components/ui';
+import { MAX_MEMBERS } from '../../lib/constants';
 
 type TableModalsProps = {
     teams: Team[];
@@ -318,23 +319,25 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             </div>
 
                             {/* 新規追加 */}
-                            <div className="flex gap-2 mb-4 pb-4 border-b border-edge">
-                                <Input
-                                    placeholder="新規メンバー名"
-                                    value={newMemberName}
-                                    onChange={e => setNewMemberName(e.target.value)}
-                                    className="flex-1 !py-2 !text-sm"
-                                />
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId)}
-                                    disabled={!newMemberName.trim()}
-                                    className="!px-3"
-                                >
-                                    <MdAdd size={20} />
-                                </Button>
-                            </div>
+                            {members.length < MAX_MEMBERS && (
+                                <div className="flex gap-2 mb-4 pb-4 border-b border-edge">
+                                    <Input
+                                        placeholder="新規メンバー名"
+                                        value={newMemberName}
+                                        onChange={e => setNewMemberName(e.target.value)}
+                                        className="flex-1 !py-2 !text-sm"
+                                    />
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId)}
+                                        disabled={!newMemberName.trim()}
+                                        className="!px-3"
+                                    >
+                                        <MdAdd size={20} />
+                                    </Button>
+                                </div>
+                            )}
 
                             <div className="max-h-60 overflow-y-auto space-y-2">
                                 {members.map(m => {

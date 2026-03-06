@@ -2,10 +2,13 @@ import { useState, useCallback } from 'react';
 import { Team, TaskLabel, Member, TableSettings } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_TABLE_SETTINGS, WidthConfig, HeightConfig } from './types';
+import { useToastContext } from '@/components/Toast';
+import { MAX_TEAMS, MAX_TASK_LABELS, MAX_MEMBERS } from '../../lib/constants';
 
 type UseTableEditingParams = {
     teams: Team[];
     taskLabels: TaskLabel[];
+    members: Member[];
     tableSettings: TableSettings | null;
     onUpdateTableSettings: (settings: TableSettings) => Promise<void>;
     onUpdateTaskLabel: (taskLabel: TaskLabel) => Promise<void>;
@@ -21,6 +24,7 @@ type UseTableEditingParams = {
 export function useTableEditing({
     teams,
     taskLabels,
+    members,
     tableSettings,
     onUpdateTableSettings,
     onUpdateTaskLabel,
@@ -32,6 +36,7 @@ export function useTableEditing({
     onAddMember,
     onUpdateMember,
 }: UseTableEditingParams) {
+    const { showToast } = useToastContext();
     // 新規ラベル入力用
     const [newLeftLabel, setNewLeftLabel] = useState('');
     const [newRightLabel, setNewRightLabel] = useState('');
@@ -157,6 +162,10 @@ export function useTableEditing({
 
     // 新規ラベル追加
     const handleAddTaskLabel = useCallback(async () => {
+        if (taskLabels.length >= MAX_TASK_LABELS) {
+            showToast(`作業は最大${MAX_TASK_LABELS}つまでです`, 'warning');
+            return;
+        }
         if (!newLeftLabel.trim()) return;
 
         const maxOrder = taskLabels.length > 0 ? Math.max(...taskLabels.map(t => t.order || 0)) : 0;
@@ -170,10 +179,18 @@ export function useTableEditing({
 
         setNewLeftLabel('');
         setNewRightLabel('');
-    }, [newLeftLabel, newRightLabel, taskLabels, onAddTaskLabel]);
+
+        if (taskLabels.length + 1 >= MAX_TASK_LABELS) {
+            showToast(`作業は最大${MAX_TASK_LABELS}つまでです`, 'info');
+        }
+    }, [newLeftLabel, newRightLabel, taskLabels, onAddTaskLabel, showToast]);
 
     // 新規メンバー追加 & 割り当て
     const handleAddMember = useCallback(async (taskLabelId: string, teamId: string) => {
+        if (members.length >= MAX_MEMBERS) {
+            showToast(`メンバーは最大${MAX_MEMBERS}名までです`, 'warning');
+            return;
+        }
         if (!newMemberName.trim()) return;
 
         const newMember: Member = {
@@ -193,10 +210,18 @@ export function useTableEditing({
 
         setNewMemberName('');
         setShowMemberMenu(null);
-    }, [newMemberName, onAddMember, onUpdateMember]);
+
+        if (members.length + 1 >= MAX_MEMBERS) {
+            showToast(`メンバーは最大${MAX_MEMBERS}名までです`, 'info');
+        }
+    }, [newMemberName, members, onAddMember, onUpdateMember, showToast]);
 
     // チーム追加
     const handleAddTeam = useCallback(async () => {
+        if (teams.length >= MAX_TEAMS) {
+            showToast(`班は最大${MAX_TEAMS}つまでです`, 'warning');
+            return;
+        }
         const maxOrder = teams.length > 0 ? Math.max(...teams.map(t => t.order || 0)) : 0;
         const newTeam: Team = {
             id: uuidv4(),
@@ -207,7 +232,11 @@ export function useTableEditing({
         await onAddTeam(newTeam);
         setNewTeamName('');
         setIsAddingTeam(false);
-    }, [teams, newTeamName, onAddTeam]);
+
+        if (teams.length + 1 >= MAX_TEAMS) {
+            showToast(`班は最大${MAX_TEAMS}つまでです`, 'info');
+        }
+    }, [teams, newTeamName, onAddTeam, showToast]);
 
     // チーム更新 (インライン)
     const handleUpdateTeam = useCallback(async (teamId: string) => {

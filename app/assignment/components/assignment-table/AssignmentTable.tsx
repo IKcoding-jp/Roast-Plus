@@ -36,6 +36,7 @@ export const AssignmentTable: React.FC<Props> = (props) => {
     const tableEditing = useTableEditing({
         teams,
         taskLabels,
+        members,
         tableSettings,
         onUpdateTableSettings,
         onUpdateTaskLabel,

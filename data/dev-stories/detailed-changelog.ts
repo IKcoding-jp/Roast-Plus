@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.14.4',
+    version: '0.14.4',
+    date: '2026-03-07',
+    type: 'feature',
+    title: '担当表の班・作業・メンバーに上限制限を追加しました',
+    content: `
+- 班は最大4つ、作業は最大8つ、メンバーは最大15名まで追加できます
+- 上限に達したとき、通知でお知らせします
+- 通知の色がテーマに合わせて変わるようになりました
+    `.trim(),
+    tags: ['担当表', '上限制限', 'Toast'],
+    createdAt: '2026-03-07T00:00:00.000Z',
+    updatedAt: '2026-03-07T00:00:00.000Z',
+  },
+  {
     id: 'v0.14.3',
     version: '0.14.3',
     date: '2026-03-01',

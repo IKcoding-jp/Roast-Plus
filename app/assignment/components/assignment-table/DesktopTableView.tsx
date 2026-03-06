@@ -4,6 +4,7 @@ import { MdAdd } from 'react-icons/md';
 import { PiShuffleBold } from 'react-icons/pi';
 import { DEFAULT_TABLE_SETTINGS, WidthConfig, HeightConfig } from './types';
 import { Button, Input, InlineInput, IconButton, Card } from '@/components/ui';
+import { MAX_TEAMS, MAX_TASK_LABELS } from '../../lib/constants';
 
 type DesktopTableViewProps = {
     teams: Team[];
@@ -200,7 +201,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                     title="クリックして幅を変更"
                 >
                     <div className="relative">
-                        {teams.length > 0 && (
+                        {teams.length > 0 && teams.length < MAX_TEAMS && (
                             isAddingTeam ? (
                                 <>
                                     <div
@@ -342,21 +343,25 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                     </div>
                 ))}
 
-                {/* 新規ラベル追加行 */}
+                {/* 新規ラベル追加行 / シャッフル */}
                 <div
                     className="grid items-center p-2 py-2 border-t min-h-[60px] bg-ground border-edge"
                     style={{ gridTemplateColumns }}
                 >
-                    <div className="pr-2">
-                        <Input
-                            value={newLeftLabel}
-                            onChange={e => setNewLeftLabel(e.target.value)}
-                            onKeyDown={e => {
-                                if (e.key === 'Enter') handleAddTaskLabel();
-                            }}
-                            className="!p-2 !text-sm !min-h-0"
-                        />
-                    </div>
+                    {taskLabels.length < MAX_TASK_LABELS ? (
+                        <div className="pr-2">
+                            <Input
+                                value={newLeftLabel}
+                                onChange={e => setNewLeftLabel(e.target.value)}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter') handleAddTaskLabel();
+                                }}
+                                className="!p-2 !text-sm !min-h-0"
+                            />
+                        </div>
+                    ) : (
+                        <div />
+                    )}
 
                     {/* シャッフルボタン（中央配置） */}
                     <div className="col-span-full px-2 flex items-center justify-center" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
@@ -372,25 +377,29 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                         </Button>
                     </div>
 
-                    <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
-                        <Input
-                            value={newRightLabel}
-                            onChange={e => setNewRightLabel(e.target.value)}
-                            onKeyDown={e => {
-                                if (e.key === 'Enter') handleAddTaskLabel();
-                            }}
-                            className="!min-w-0 !p-2 !text-right !text-sm !min-h-0"
-                        />
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={handleAddTaskLabel}
-                            disabled={!newLeftLabel.trim()}
-                            className="!px-2 !py-1 !min-h-0 !h-full max-h-[38px] flex-shrink-0"
-                        >
-                            <MdAdd size={20} />
-                        </Button>
-                    </div>
+                    {taskLabels.length < MAX_TASK_LABELS ? (
+                        <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
+                            <Input
+                                value={newRightLabel}
+                                onChange={e => setNewRightLabel(e.target.value)}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter') handleAddTaskLabel();
+                                }}
+                                className="!min-w-0 !p-2 !text-right !text-sm !min-h-0"
+                            />
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={handleAddTaskLabel}
+                                disabled={!newLeftLabel.trim()}
+                                className="!px-2 !py-1 !min-h-0 !h-full max-h-[38px] flex-shrink-0"
+                            >
+                                <MdAdd size={20} />
+                            </Button>
+                        </div>
+                    ) : (
+                        <div />
+                    )}
                 </div>
             </div>
         </Card>

@@ -1,6 +1,6 @@
 # Features
 
-**最終更新**: 2026-02-26
+**最終更新**: 2026-03-07
 
 ---
 
@@ -48,6 +48,18 @@
 | **コンポーネント** | `components/assignment-table/DesktopTableView.tsx` (CCN: 125 - リファクタリング対象)<br>`components/assignment-table/TableModals.tsx` (CCN: 117 - リファクタリング対象) |
 | **Firestore** | `users/{userId}` ドキュメント内のフィールド + 担当データはサブコレクション |
 | **状態管理** | React useState のみ |
+
+### 上限制限
+
+| 項目 | 上限値 | 定数名 | 定義ファイル |
+|-----|--------|--------|-------------|
+| **班（Team）** | 4 | `MAX_TEAMS` | `app/assignment/lib/constants.ts` |
+| **作業ラベル（TaskLabel）** | 8 | `MAX_TASK_LABELS` | `app/assignment/lib/constants.ts` |
+| **メンバー（Member）** | 15 | `MAX_MEMBERS` | `app/assignment/lib/constants.ts` |
+
+- 上限到達時: 追加ボタンを非表示（DesktopTableView, TableModals）
+- 上限到達時のハンドラー呼び出し: warning Toast で通知（useTableEditing）
+- 最後の1つを追加した直後: info Toast で上限到達を通知
 
 ### 設計方針
 

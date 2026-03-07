@@ -247,7 +247,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                             )
                         )}
                     </div>
-                    <span>{headerLabels.right}</span>
+                    <span className="whitespace-nowrap">{headerLabels.right}</span>
                     <span className="w-4"></span>
                 </div>
             </div>
@@ -264,20 +264,20 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                         }}
                     >
                         {/* 左ラベル列 */}
-                        <div className="p-3 md:p-4 py-2 border-r h-full flex items-center justify-center border-edge">
-                            <div
-                                className="w-full p-1 cursor-pointer font-medium text-sm md:text-base whitespace-nowrap text-center rounded transition-colors overflow-visible text-ink hover:bg-ground"
-                                onClick={() => {
-                                    setHeightConfig({
-                                        taskLabelId: label.id,
-                                        currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
-                                        label: `${headerLabels.left}の設定`,
-                                        currentName: label.leftLabel,
-                                        editMode: 'left',
-                                        currentRightLabel: label.rightLabel || ''
-                                    });
-                                }}
-                            >
+                        <div
+                            className="p-3 md:p-4 py-2 border-r h-full flex items-center justify-center border-edge cursor-pointer transition-colors hover:bg-ground"
+                            onClick={() => {
+                                setHeightConfig({
+                                    taskLabelId: label.id,
+                                    currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
+                                    label: `${headerLabels.left}の設定`,
+                                    currentName: label.leftLabel,
+                                    editMode: 'left',
+                                    currentRightLabel: label.rightLabel || ''
+                                });
+                            }}
+                        >
+                            <div className="w-full p-1 font-medium text-sm md:text-base whitespace-nowrap text-center overflow-visible text-ink">
                                 {label.leftLabel}
                             </div>
                         </div>
@@ -323,20 +323,20 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                         )}
 
                         {/* 右ラベル列 */}
-                        <div className="p-3 md:p-4 py-2 h-full flex items-center relative">
-                            <div
-                                className="w-full p-1 cursor-pointer font-medium text-sm md:text-base whitespace-nowrap text-center rounded transition-colors overflow-visible text-ink hover:bg-ground"
-                                onClick={() => {
-                                    setHeightConfig({
-                                        taskLabelId: label.id,
-                                        currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
-                                        label: `${headerLabels.right}の設定`,
-                                        currentName: label.rightLabel || '',
-                                        editMode: 'right',
-                                        currentRightLabel: label.leftLabel
-                                    });
-                                }}
-                            >
+                        <div
+                            className="p-3 md:p-4 py-2 border-l h-full flex items-center border-edge cursor-pointer transition-colors hover:bg-ground"
+                            onClick={() => {
+                                setHeightConfig({
+                                    taskLabelId: label.id,
+                                    currentHeight: tableSettings?.rowHeights?.[label.id] ?? 60,
+                                    label: `${headerLabels.right}の設定`,
+                                    currentName: label.rightLabel || '',
+                                    editMode: 'right',
+                                    currentRightLabel: label.leftLabel
+                                });
+                            }}
+                        >
+                            <div className="w-full p-1 font-medium text-sm md:text-base whitespace-nowrap text-center overflow-visible text-ink">
                                 {label.rightLabel}
                             </div>
                         </div>
@@ -349,7 +349,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                     style={{ gridTemplateColumns }}
                 >
                     {taskLabels.length < MAX_TASK_LABELS ? (
-                        <div className="pr-2">
+                        <div className="px-2">
                             <Input
                                 value={newLeftLabel}
                                 onChange={e => setNewLeftLabel(e.target.value)}

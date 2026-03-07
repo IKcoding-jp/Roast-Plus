@@ -14,6 +14,22 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.14.5',
+    version: '0.14.5',
+    date: '2026-03-07',
+    type: 'style',
+    title: '担当表の表示を改善しました',
+    content: `
+- 削除ボタンが正しく赤色で表示されるようになりました
+- 行設定モーダルのボタン配置を改善しました
+- 左右のラベル列の幅を揃えました
+- ラベルのクリック範囲を広げました
+    `.trim(),
+    tags: ['担当表', 'UI'],
+    createdAt: '2026-03-07T00:00:00.000Z',
+    updatedAt: '2026-03-07T00:00:00.000Z',
+  },
+  {
     id: 'v0.14.4',
     version: '0.14.4',
     date: '2026-03-07',

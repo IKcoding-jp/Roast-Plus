@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.16.2',
+    version: '0.16.2',
+    date: '2026-03-07',
+    type: 'bugfix',
+    title: 'スケジュールページのタブ文字が黒くなる問題を修正しました',
+    content: `
+- タブのアクティブ状態の文字が黒く表示される問題を修正しました
+- タブを押しやすい大きさに広げました
+- 日付ナビゲーションを横に広げて操作しやすくしました
+    `.trim(),
+    tags: ['スケジュール', 'UI', 'バグ修正'],
+    createdAt: '2026-03-07T23:50:00.000Z',
+    updatedAt: '2026-03-07T23:50:00.000Z',
+  },
+  {
     id: 'v0.16.1',
     version: '0.16.1',
     date: '2026-03-07',

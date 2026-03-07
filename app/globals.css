@@ -36,8 +36,8 @@
     /* アクセント */
     --spot: #d97706;
     --spot-hover: #b45309;
-    --spot-subtle: #fef3c7;
-    --spot-surface: #fffbeb;
+    --spot-subtle: #f0f0f0;
+    --spot-surface: #f7f7f7;
     /* ボタン */
     --btn-primary: #d97706;
     --btn-primary-hover: #b45309;

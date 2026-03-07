@@ -130,7 +130,7 @@ CSS変数の使い分け（`bg-surface` vs `bg-overlay` 等）は `docs/steering
 
 ### Firebase
 
-**バージョン**: firebase ^12.5.0
+**バージョン**: firebase ^12.10.0
 
 #### Authentication
 - **認証方法**: Google, Email/Password

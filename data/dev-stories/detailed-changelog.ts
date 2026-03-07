@@ -14,6 +14,22 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.14.6',
+    version: '0.14.6',
+    date: '2026-03-07',
+    type: 'style',
+    title: '担当表のモーダルデザインを統一しました',
+    content: `
+- 担当表の全モーダルのデザインを統一しました
+- 班編集モーダルのボタン配置を改善しました
+- 行追加ボタンをシャッフルボタンの横に移動しました
+- 班名が未設定のときにヒントを表示するようにしました
+    `.trim(),
+    tags: ['担当表', 'UI', 'モーダル'],
+    createdAt: '2026-03-07T14:00:00.000Z',
+    updatedAt: '2026-03-07T14:00:00.000Z',
+  },
+  {
     id: 'v0.14.5',
     version: '0.14.5',
     date: '2026-03-07',

@@ -157,7 +157,7 @@ export function AssignmentSettingsModal({
                                         value="pair"
                                         checked={(shuffleSettings.priority ?? 'pair') === 'pair'}
                                         onChange={() => onUpdateShuffleSettings({ priority: 'pair' })}
-                                        className="mt-0.5 accent-brand"
+                                        className="mt-0.5 accent-spot"
                                         aria-label="同じ人との組み合わせを避ける"
                                     />
                                     <div>
@@ -174,7 +174,7 @@ export function AssignmentSettingsModal({
                                         value="row"
                                         checked={shuffleSettings.priority === 'row'}
                                         onChange={() => onUpdateShuffleSettings({ priority: 'row' })}
-                                        className="mt-0.5 accent-brand"
+                                        className="mt-0.5 accent-spot"
                                         aria-label="同じ作業の連続を避ける"
                                     />
                                     <div>

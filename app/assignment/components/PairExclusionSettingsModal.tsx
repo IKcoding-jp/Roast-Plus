@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { HiX, HiTrash } from 'react-icons/hi';
+import { HiTrash } from 'react-icons/hi';
+import { MdClose } from 'react-icons/md';
 import type { Member, PairExclusion } from '@/types';
-import { Button, Select } from '@/components/ui';
+import { Button, Select, IconButton } from '@/components/ui';
 
 interface PairExclusionSettingsModalProps {
     isOpen: boolean;
@@ -99,29 +100,30 @@ export function PairExclusionSettingsModal({
 
     return (
         <div
-            className="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
             onClick={onClose}
         >
             <div
-                className="rounded-lg p-6 max-w-md w-full mx-4 shadow-xl max-h-[80vh] flex flex-col bg-overlay border border-edge"
+                className="rounded-xl max-w-md w-full mx-4 shadow-xl max-h-[80vh] flex flex-col bg-overlay border border-edge overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* ヘッダー */}
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-ink">
+                <div className="px-4 py-3 flex items-center justify-between bg-ground border-b border-edge">
+                    <h2 className="font-bold text-ink">
                         ペア除外設定
                     </h2>
-                    <Button
+                    <IconButton
                         variant="ghost"
                         size="sm"
                         onClick={onClose}
-                        className="!p-1 !min-h-0"
                         aria-label="閉じる"
                     >
-                        <HiX className="w-5 h-5" />
-                    </Button>
+                        <MdClose size={20} />
+                    </IconButton>
                 </div>
 
+                {/* ボディ */}
+                <div className="p-6 flex-1 flex flex-col overflow-hidden">
                 {/* 説明文 */}
                 <p className="text-sm mb-4 text-ink-sub">
                     シャッフル時に同じ行（タスク）に配置しないメンバーの組み合わせを設定します。
@@ -206,6 +208,7 @@ export function PairExclusionSettingsModal({
                             ))}
                         </ul>
                     )}
+                </div>
                 </div>
             </div>
         </div>

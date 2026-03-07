@@ -169,7 +169,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                             setShowMemberMenu({ taskLabelId: contextMenu.taskLabelId, teamId: contextMenu.teamId });
                                             setContextMenu(null);
                                         }}
-                                        className="!justify-start !gap-3 !p-3 !bg-ground hover:!bg-ground/80"
+                                        className="!justify-start !gap-3 !p-3 !bg-ground hover:!bg-ground/80 !text-ink"
                                     >
                                         <MdPerson size={20} />
                                         <span className="text-sm font-bold">メンバーを変更・追加</span>
@@ -196,7 +196,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                 variant="ghost"
                                                 size="md"
                                                 onClick={() => setIsExclusionSettingsOpen(!isExclusionSettingsOpen)}
-                                                className="!w-full !justify-between !gap-3 !p-3 !rounded-none !bg-ground hover:!bg-ground/80"
+                                                className="!w-full !justify-between !gap-3 !p-3 !rounded-none !bg-ground hover:!bg-ground/80 !text-ink"
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <MdBlock size={20} className="text-ink-muted" />
@@ -394,7 +394,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="rounded-xl shadow-xl p-6 w-full max-w-sm relative z-10 bg-overlay border border-edge"
+                            className="rounded-xl shadow-xl p-6 w-full max-w-xs relative z-10 bg-overlay border border-edge"
                         >
                             <h3 className="text-lg font-bold mb-4 text-ink">
                                 班の編集
@@ -424,33 +424,35 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                 />
                             </div>
 
-                            <div className="space-y-3">
-                                <Button
-                                    variant="primary"
-                                    size="md"
-                                    fullWidth
-                                    onClick={handleUpdateTeamFromModal}
-                                >
-                                    更新する
-                                </Button>
+                            <div className="space-y-2">
                                 <Button
                                     variant="danger"
-                                    size="md"
-                                    fullWidth
-                                    onClick={handleDeleteTeamFromModal}
-                                    className="!flex !items-center !justify-center !gap-2"
-                                >
-                                    <MdDelete size={20} />
-                                    この班を削除
-                                </Button>
-                                <Button
-                                    variant="ghost"
                                     size="sm"
                                     fullWidth
-                                    onClick={() => setActiveTeamActionId(null)}
+                                    onClick={handleDeleteTeamFromModal}
+                                    className="!flex !items-center !justify-center !gap-1"
                                 >
-                                    キャンセル
+                                    <MdDelete size={18} />
+                                    削除
                                 </Button>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => setActiveTeamActionId(null)}
+                                        className="flex-1"
+                                    >
+                                        キャンセル
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={handleUpdateTeamFromModal}
+                                        className="flex-1"
+                                    >
+                                        更新
+                                    </Button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
@@ -495,7 +497,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             </div>
                             <div className="flex gap-2">
                                 <Button
-                                    variant="ghost"
+                                    variant="secondary"
                                     size="md"
                                     onClick={() => setWidthConfig(null)}
                                     className="flex-1"

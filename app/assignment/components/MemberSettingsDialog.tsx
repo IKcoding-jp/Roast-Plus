@@ -1,6 +1,7 @@
 import React from 'react';
+import { MdClose } from 'react-icons/md';
 import { Member, TaskLabel } from '../../../types';
-import { Button } from '@/components/ui';
+import { Button, IconButton } from '@/components/ui';
 
 type Props = {
     member: Member;
@@ -28,20 +29,20 @@ export const MemberSettingsDialog: React.FC<Props> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="rounded-xl shadow-2xl w-full max-w-md overflow-hidden bg-overlay border border-edge">
-                <div className="px-6 py-4 flex justify-between items-center bg-primary">
-                    <h3 className="font-bold text-lg text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="rounded-xl shadow-xl w-full max-w-md overflow-hidden bg-overlay border border-edge">
+                <div className="px-4 py-3 flex justify-between items-center bg-ground border-b border-edge">
+                    <h3 className="font-bold text-ink">
                         {member.name} さんの設定
                     </h3>
-                    <Button
+                    <IconButton
                         variant="ghost"
                         size="sm"
                         onClick={onClose}
-                        className="!p-1 !min-h-0 !text-white hover:!text-gray-200"
+                        aria-label="閉じる"
                     >
-                        ×
-                    </Button>
+                        <MdClose size={20} />
+                    </IconButton>
                 </div>
 
                 <div className="p-6">

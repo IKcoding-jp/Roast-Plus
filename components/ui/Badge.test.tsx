@@ -26,8 +26,8 @@ describe('Badge', () => {
     it('primaryバリアントのスタイルが適用される', () => {
       render(<Badge variant="primary">プライマリ</Badge>);
       const badge = screen.getByText('プライマリ');
-      expect(badge.className).toContain('bg-spot-subtle');
-      expect(badge.className).toContain('text-spot');
+      expect(badge.className).toContain('bg-spot');
+      expect(badge.className).toContain('text-on-spot');
     });
 
     it('secondaryバリアントのスタイルが適用される', () => {

@@ -37,7 +37,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
     // CSS変数ベースの統一バリアントスタイル
     const variantStyles = {
       default: 'bg-ground text-ink',
-      primary: 'bg-spot-subtle text-spot',
+      primary: 'bg-spot text-on-spot',
       secondary: 'bg-ground text-ink',
       success: 'bg-success-subtle text-success',
       warning: 'bg-warning-subtle text-warning',

@@ -127,21 +127,29 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                 </IconButton>
                             </div>
 
-                            <div className="p-4 space-y-4">
+                            <div className="p-4">
                                 {contextMenu.memberId ? (
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 mb-4 pb-4 border-b border-edge">
                                         <label className="text-xs font-bold text-ink-sub">
                                             メンバー名
                                         </label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                value={editingMemberName}
-                                                onChange={(e) => setEditingMemberName(e.target.value)}
-                                                className="flex-1 !py-2"
-                                            />
-                                            <Button
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 min-w-0">
+                                                <Input
+                                                    value={editingMemberName}
+                                                    onChange={(e) => setEditingMemberName(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && contextMenu.memberId && editingMemberName.trim()) {
+                                                            onUpdateMemberName(contextMenu.memberId, editingMemberName);
+                                                            setContextMenu(null);
+                                                        }
+                                                    }}
+                                                    className="!py-2"
+                                                />
+                                            </div>
+                                            <IconButton
                                                 variant="primary"
-                                                size="sm"
+                                                size="md"
                                                 onClick={async () => {
                                                     if (contextMenu.memberId && editingMemberName.trim()) {
                                                         await onUpdateMemberName(contextMenu.memberId, editingMemberName);
@@ -149,19 +157,19 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                     }
                                                 }}
                                                 disabled={!editingMemberName.trim()}
-                                                className="!px-3"
+                                                className="!w-11 !h-11 shrink-0"
                                             >
                                                 <MdCheck size={20} />
-                                            </Button>
+                                            </IconButton>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-2 text-ink-muted">
+                                    <div className="text-center py-2 mb-4 pb-4 border-b border-edge text-ink-muted">
                                         メンバーが割り当てられていません
                                     </div>
                                 )}
 
-                                <div className="pt-4 grid gap-2 border-t border-edge">
+                                <div className="grid gap-3">
                                     <Button
                                         variant="ghost"
                                         size="md"
@@ -191,7 +199,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     )}
 
                                     {contextMenu.memberId && (
-                                        <div className="rounded-lg overflow-hidden mt-2 border border-edge">
+                                        <div className="rounded-lg overflow-hidden border border-edge">
                                             <Button
                                                 variant="ghost"
                                                 size="md"
@@ -298,81 +306,94 @@ export const TableModals: React.FC<TableModalsProps> = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="rounded-lg shadow-xl p-4 w-full max-w-sm relative z-10 bg-overlay border border-edge"
+                            className="rounded-xl shadow-xl w-full max-w-sm relative z-10 overflow-hidden bg-overlay border border-edge"
                         >
-                            <div className="flex justify-between items-center mb-4">
-                                <div className="text-sm font-bold text-ink-sub">
+                            {/* ヘッダー */}
+                            <div className="px-4 py-3 flex items-center justify-between bg-ground border-b border-edge">
+                                <h3 className="font-bold text-ink">
                                     {(() => {
                                         const team = teams.find(t => t.id === showMemberMenu.teamId);
                                         const title = formatTeamTitle(team?.name);
                                         const label = taskLabels.find(l => l.id === showMemberMenu.taskLabelId)?.leftLabel ?? '';
                                         return title ? `${title} - ${label}` : label;
                                     })()}
-                                </div>
+                                </h3>
                                 <IconButton
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setShowMemberMenu(null)}
+                                    aria-label="閉じる"
                                 >
-                                    <MdClose />
+                                    <MdClose size={20} />
                                 </IconButton>
                             </div>
 
-                            {/* 新規追加 */}
-                            {members.length < MAX_MEMBERS && (
-                                <div className="flex gap-2 mb-4 pb-4 border-b border-edge">
-                                    <Input
-                                        placeholder="新規メンバー名"
-                                        value={newMemberName}
-                                        onChange={e => setNewMemberName(e.target.value)}
-                                        className="flex-1 !py-2 !text-sm"
-                                    />
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={() => handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId)}
-                                        disabled={!newMemberName.trim()}
-                                        className="!px-3"
-                                    >
-                                        <MdAdd size={20} />
-                                    </Button>
-                                </div>
-                            )}
-
-                            <div className="max-h-60 overflow-y-auto space-y-2">
-                                {members.map(m => {
-                                    const isAssigned = assignments.some(a => a.memberId === m.id);
-                                    if (isAssigned) return null;
-
-                                    return (
-                                        <div key={m.id} className="flex items-center gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => {
-                                                    onUpdateMember({ teamId: showMemberMenu.teamId, taskLabelId: showMemberMenu.taskLabelId, memberId: null, assignedDate: '' }, m.id);
-                                                    setShowMemberMenu(null);
-                                                }}
-                                                className="flex-1 !justify-start !text-left hover:!bg-ground"
-                                            >
-                                                {m.name}
-                                            </Button>
-                                            <IconButton
-                                                variant="danger"
-                                                size="sm"
-                                                onClick={async (e) => {
-                                                    e.stopPropagation();
-                                                    if (confirm(`${m.name}を削除しますか？\n割り当てからも解除されます。`)) {
-                                                        await onDeleteMember(m.id);
+                            {/* ボディ */}
+                            <div className="p-4">
+                                {/* 新規追加 */}
+                                {members.length < MAX_MEMBERS && (
+                                    <div className="flex items-center gap-2 mb-4 pb-4 border-b border-edge">
+                                        <div className="flex-1 min-w-0">
+                                            <Input
+                                                placeholder="新規メンバー名"
+                                                value={newMemberName}
+                                                onChange={e => setNewMemberName(e.target.value)}
+                                                onKeyDown={e => {
+                                                    if (e.key === 'Enter' && newMemberName.trim()) {
+                                                        handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId);
                                                     }
                                                 }}
-                                                title="メンバーを削除"
-                                            >
-                                                <MdDelete size={20} />
-                                            </IconButton>
+                                                className="!py-2 !text-sm"
+                                                autoFocus
+                                            />
                                         </div>
-                                    );
-                                })}
+                                        <IconButton
+                                            variant="primary"
+                                            size="md"
+                                            onClick={() => handleAddMember(showMemberMenu.taskLabelId, showMemberMenu.teamId)}
+                                            disabled={!newMemberName.trim()}
+                                            className="!w-11 !h-11 shrink-0"
+                                        >
+                                            <MdAdd size={20} />
+                                        </IconButton>
+                                    </div>
+                                )}
+
+                                <div className="max-h-60 overflow-y-auto space-y-2">
+                                    {members.map(m => {
+                                        const isAssigned = assignments.some(a => a.memberId === m.id);
+                                        if (isAssigned) return null;
+
+                                        return (
+                                            <div key={m.id} className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        onUpdateMember({ teamId: showMemberMenu.teamId, taskLabelId: showMemberMenu.taskLabelId, memberId: null, assignedDate: '' }, m.id);
+                                                        setShowMemberMenu(null);
+                                                    }}
+                                                    className="flex-1 !justify-start !text-left !text-ink hover:!bg-ground"
+                                                >
+                                                    {m.name}
+                                                </Button>
+                                                <IconButton
+                                                    variant="danger"
+                                                    size="sm"
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        if (confirm(`${m.name}を削除しますか？\n割り当てからも解除されます。`)) {
+                                                            await onDeleteMember(m.id);
+                                                        }
+                                                    }}
+                                                    title="メンバーを削除"
+                                                >
+                                                    <MdDelete size={20} />
+                                                </IconButton>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </motion.div>
                     </div>

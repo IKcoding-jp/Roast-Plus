@@ -110,10 +110,22 @@ interface Assignment {
 ### UI実装ルール
 
 #### 共通コンポーネント使用
-- ✅ **必須**: `Button`, `Card`, `Input` を使用
+- ✅ **必須**: `Button`, `IconButton`, `Card` を使用
 
 #### テーマ対応
 - CSS変数による自動テーマ適用
+- **コーヒー色アクセント**: `header-bg` CSS変数を使用（7テーマ自動対応）
+  - 空状態アイコン: `bg-header-bg text-white`
+  - ホバー効果: `hover:bg-header-bg/[0.04]`, `hover:border-header-bg/30`
+  - ハードコード色（`#4E3526`, `#211714`等）の使用禁止 → `header-bg` を使用
+
+#### スケジュールUI仕様
+- **モバイル日付ナビ**: FloatingNav右側に統合（`fixed top-3 left-16 right-3`）
+- **タブナビ**: セグメントコントロール風（Framer Motion フェードアニメーション）
+- **中央OCRボタン**: タブバー中央に二重丸（`ring-4 ring-surface` + `bg-spot`）
+- **ScheduleCard**: タイプ別左カラーバー（予熱=orange, ロースト=amber, パージ=blue, 掃除=gray）
+- **時間バッジ**: `bg-surface text-ink border border-edge`（クリーンホワイト）
+- **空状態**: `Card variant="guide"` + `bg-header-bg` アイコン円
 
 ### 技術要素
 

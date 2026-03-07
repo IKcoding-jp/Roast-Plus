@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.16.3',
+    version: '0.16.3',
+    date: '2026-03-08',
+    type: 'style',
+    title: '試飲感想ページのモバイル操作性を改善しました',
+    content: `
+- フィルターボタンと新規作成ボタンのタップ領域を拡大しました
+- セッションカードの表示位置を画面中央寄りに調整しました
+- 画面下部の余白を縮小してカードをより大きく表示するようにしました
+    `.trim(),
+    tags: ['テイスティング', 'モバイル', 'UI'],
+    createdAt: '2026-03-08T00:00:00.000Z',
+    updatedAt: '2026-03-08T00:00:00.000Z',
+  },
+  {
     id: 'v0.16.2',
     version: '0.16.2',
     date: '2026-03-07',

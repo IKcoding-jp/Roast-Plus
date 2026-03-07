@@ -438,7 +438,7 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                     size="md"
                                     fullWidth
                                     onClick={handleDeleteTeamFromModal}
-                                    className="!flex !items-center !justify-center !gap-2 !bg-ground hover:!bg-red-50"
+                                    className="!flex !items-center !justify-center !gap-2"
                                 >
                                     <MdDelete size={20} />
                                     この班を削除
@@ -557,37 +557,40 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                 />
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="space-y-2">
                                 <Button
                                     variant="danger"
                                     size="sm"
+                                    fullWidth
                                     onClick={() => {
                                         if (confirm('この作業ラベルを削除しますか？\n（全てのチームから削除されます）')) {
                                             onDeleteTaskLabel(heightConfig.taskLabelId);
                                             setHeightConfig(null);
                                         }
                                     }}
-                                    className="flex-1 !flex !items-center !justify-center !gap-1 !bg-ground hover:!bg-red-50"
+                                    className="!flex !items-center !justify-center !gap-1"
                                 >
                                     <MdDelete size={18} />
                                     削除
                                 </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setHeightConfig(null)}
-                                    className="flex-1"
-                                >
-                                    キャンセル
-                                </Button>
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
-                                    className="flex-1"
-                                >
-                                    保存
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => setHeightConfig(null)}
+                                        className="flex-1"
+                                    >
+                                        キャンセル
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => handleSaveRowConfig(heightConfig.currentHeight, heightConfig.currentName)}
+                                        className="flex-1"
+                                    >
+                                        保存
+                                    </Button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>

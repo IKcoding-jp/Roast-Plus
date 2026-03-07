@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
@@ -72,7 +72,7 @@ jobs:
           else
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         if: steps.changes.outputs.changed == 'true'
         with:
           node-version: 20
@@ -81,7 +81,7 @@ jobs:
         run: cd functions && npm ci
       - name: Deploy Functions
         if: steps.changes.outputs.changed == 'true'
-        uses: w9jds/firebase-action@v15.7.0
+        uses: w9jds/firebase-action@v15.8.0
         with:
           args: deploy --only functions
         env:

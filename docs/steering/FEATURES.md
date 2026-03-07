@@ -80,6 +80,12 @@ interface Assignment {
 - 過去の担当履歴を考慮
 - 出欠状況（`isPresent`）を反映
 - 公平性スコアで評価
+- **班内シャッフル制約**: `crossTeamShuffle` 設定（デフォルト: OFF）により、OFFの場合はメンバーが自分の班内でのみタスクを入れ替え、ONの場合は班をまたいだ配置が可能
+
+#### 詳細設定モーダル（`AssignmentSettingsModal`）
+- セクション1: シャッフル設定（全ユーザー表示）— 「班をまたいでシャッフル」トグル
+- セクション2: ペア除外設定（isDeveloperModeのみ表示）
+- 設定はFirestore `users/{userId}/assignmentSettings/shuffle` に永続化
 
 ### 禁止事項
 1. ❌ 独自のテーブルコンポーネント作成（既存のDesktopTableViewを使用）

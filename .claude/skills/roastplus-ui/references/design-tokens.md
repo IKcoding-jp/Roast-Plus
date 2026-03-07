@@ -54,8 +54,8 @@
 |---------|---------------|-----------|----------------|------|
 | `--spot` | `text-spot`, `bg-spot` | `#d97706` | `#d4af37` | アクセント色 |
 | `--spot-hover` | `text-spot-hover` | `#b45309` | `#e8c65f` | アクセントホバー |
-| `--spot-subtle` | `bg-spot-subtle` | `#fef3c7` | `rgba(212,175,55,0.15)` | アクセント薄背景 |
-| `--spot-surface` | `bg-spot-surface` | `#fffbeb` | `rgba(212,175,55,0.05)` | アクセント極薄背景 |
+| `--spot-subtle` | `bg-spot-subtle` | `#f0f0f0` | `rgba(212,175,55,0.15)` | アクセント薄背景 |
+| `--spot-surface` | `bg-spot-surface` | `#f7f7f7` | `rgba(212,175,55,0.05)` | アクセント極薄背景 |
 
 ### ボタン
 

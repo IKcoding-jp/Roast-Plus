@@ -56,7 +56,7 @@ export function useShuffleExecution({
             const history: Assignment[][] = shuffleHistoryList.map(h => h.assignments);
 
             // 2. Run calculation
-            const result = calculateAssignment(teams, taskLabels, members, history, targetDate, displayAssignments, pairExclusions, shuffleSettings.crossTeamShuffle);
+            const result = calculateAssignment(teams, taskLabels, members, history, targetDate, displayAssignments, pairExclusions, shuffleSettings.crossTeamShuffle, shuffleSettings.priority);
 
             // 3. Broadcast event to other clients
             const eventId = uuidv4();

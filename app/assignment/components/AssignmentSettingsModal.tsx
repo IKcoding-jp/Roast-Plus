@@ -145,6 +145,47 @@ export function AssignmentSettingsModal({
                                 aria-label="班をまたいでシャッフル"
                             />
                         </div>
+
+                        {/* シャッフルの優先順位 */}
+                        <div className="mt-3 p-3 rounded-lg bg-ground">
+                            <div className="text-sm font-medium text-ink mb-2">シャッフルの優先順位</div>
+                            <div className="space-y-2">
+                                <label className="flex items-start gap-2 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="shufflePriority"
+                                        value="pair"
+                                        checked={(shuffleSettings.priority ?? 'pair') === 'pair'}
+                                        onChange={() => onUpdateShuffleSettings({ priority: 'pair' })}
+                                        className="mt-0.5 accent-spot"
+                                        aria-label="同じ人との組み合わせを避ける"
+                                    />
+                                    <div>
+                                        <div className="text-sm text-ink">同じ人との組み合わせを避ける</div>
+                                        <div className="text-xs text-ink-sub mt-0.5">
+                                            毎回なるべく違う人と組みます。ただし同じ作業が連続することがあります
+                                        </div>
+                                    </div>
+                                </label>
+                                <label className="flex items-start gap-2 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="shufflePriority"
+                                        value="row"
+                                        checked={shuffleSettings.priority === 'row'}
+                                        onChange={() => onUpdateShuffleSettings({ priority: 'row' })}
+                                        className="mt-0.5 accent-spot"
+                                        aria-label="同じ作業の連続を避ける"
+                                    />
+                                    <div>
+                                        <div className="text-sm text-ink">同じ作業の連続を避ける</div>
+                                        <div className="text-xs text-ink-sub mt-0.5">
+                                            毎回なるべく違う作業になります。ただし同じ人と組むことがあります
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     {/* セクション2: ペア除外設定（isDeveloperModeのみ） */}

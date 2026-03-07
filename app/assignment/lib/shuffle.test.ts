@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateAssignment } from './shuffle';
-import type { Team, Member, TaskLabel } from '@/types';
+import type { Team, Member, TaskLabel, Assignment } from '@/types';
 
 // テスト用ヘルパー: 2班×2タスクの基本構成
 const createTestData = () => {
@@ -203,6 +203,154 @@ describe('calculateAssignment - crossTeamShuffle', () => {
         const hasM1 = memberIds.includes('m1');
         const hasM2 = memberIds.includes('m2');
         expect(hasM1 && hasM2).toBe(false);
+      }
+    });
+  });
+});
+
+// テスト用ヘルパー: 優先順位テスト用の構成
+// 2班×2タスク、4メンバー、crossTeamShuffle=true
+// 鳩ノ巣原理により「全ペア新規」と「全行新規」を同時に満たせないケースを作る
+const createPriorityTestData = () => {
+  const teams: Team[] = [
+    { id: 'tA', name: 'A' },
+    { id: 'tB', name: 'B' },
+  ];
+
+  const taskLabels: TaskLabel[] = [
+    { id: 'r1', leftLabel: 'R1' },
+    { id: 'r2', leftLabel: 'R2' },
+  ];
+
+  const members: Member[] = [
+    { id: 'm1', name: 'M1', teamId: 'tA', excludedTaskLabelIds: [], active: true },
+    { id: 'm2', name: 'M2', teamId: 'tA', excludedTaskLabelIds: [], active: true },
+    { id: 'm3', name: 'M3', teamId: 'tB', excludedTaskLabelIds: [], active: true },
+    { id: 'm4', name: 'M4', teamId: 'tB', excludedTaskLabelIds: [], active: true },
+  ];
+
+  // 履歴: r1→[m1,m2], r2→[m3,m4]
+  // ペア履歴: m1-m2, m3-m4
+  // 行履歴: m1→r1, m2→r1, m3→r2, m4→r2
+  const history: Assignment[][] = [
+    [
+      { teamId: 'tA', taskLabelId: 'r1', memberId: 'm1', assignedDate: '2026-03-06' },
+      { teamId: 'tB', taskLabelId: 'r1', memberId: 'm2', assignedDate: '2026-03-06' },
+      { teamId: 'tA', taskLabelId: 'r2', memberId: 'm3', assignedDate: '2026-03-06' },
+      { teamId: 'tB', taskLabelId: 'r2', memberId: 'm4', assignedDate: '2026-03-06' },
+    ],
+  ];
+
+  return { teams, taskLabels, members, history };
+};
+
+// ヘルパー: 結果から行ごとのメンバーグループを取得
+const getRowGroups = (result: Assignment[]): Map<string, string[]> => {
+  const groups = new Map<string, string[]>();
+  for (const a of result) {
+    if (a.memberId) {
+      if (!groups.has(a.taskLabelId)) groups.set(a.taskLabelId, []);
+      groups.get(a.taskLabelId)!.push(a.memberId);
+    }
+  }
+  return groups;
+};
+
+describe('calculateAssignment - priority（制約優先順位）', () => {
+  describe('priority: "row"（担当優先）', () => {
+    it('行の連続回避がペアより優先される', () => {
+      const { teams, taskLabels, members, history } = createPriorityTestData();
+
+      // 複数回実行して全て行回避を確認（ランダム性があるため）
+      for (let i = 0; i < 20; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, history, '2026-03-07',
+          undefined, undefined, true, 'row'
+        );
+
+        const rowGroups = getRowGroups(result);
+
+        // 行回避: 履歴でr1にいたm1,m2は今回r1にいない
+        const r1Members = rowGroups.get('r1') ?? [];
+        expect(r1Members).not.toContain('m1'); // m1は履歴でr1→今回r1以外
+        expect(r1Members).not.toContain('m2'); // m2は履歴でr1→今回r1以外
+
+        // 行回避: 履歴でr2にいたm3,m4は今回r2にいない
+        const r2Members = rowGroups.get('r2') ?? [];
+        expect(r2Members).not.toContain('m3'); // m3は履歴でr2→今回r2以外
+        expect(r2Members).not.toContain('m4'); // m4は履歴でr2→今回r2以外
+      }
+    });
+
+    it('ペア除外設定はrow優先モードでも全レベルで強制される', () => {
+      const { teams, taskLabels, members, history } = createPriorityTestData();
+
+      // m3とm4のペア除外設定
+      const pairExclusions = [
+        { id: 'ex1', memberId1: 'm3', memberId2: 'm4', createdAt: { seconds: 0, nanoseconds: 0 } },
+      ];
+
+      for (let i = 0; i < 20; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, history, '2026-03-07',
+          undefined, pairExclusions, true, 'row'
+        );
+
+        const rowGroups = getRowGroups(result);
+
+        // m3とm4が同じ行にいないこと
+        for (const [, memberIds] of rowGroups) {
+          const hasM3 = memberIds.includes('m3');
+          const hasM4 = memberIds.includes('m4');
+          expect(hasM3 && hasM4).toBe(false);
+        }
+      }
+    });
+  });
+
+  describe('priority: "pair"（ペア優先）', () => {
+    it('ペアの連続回避が行より優先される（従来動作）', () => {
+      const { teams, taskLabels, members, history } = createPriorityTestData();
+
+      for (let i = 0; i < 20; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, history, '2026-03-07',
+          undefined, undefined, true, 'pair'
+        );
+
+        const rowGroups = getRowGroups(result);
+
+        // ペア回避: 履歴のペア(m1-m2, m3-m4)が同じ行にいない
+        for (const [, memberIds] of rowGroups) {
+          const hasM1M2 = memberIds.includes('m1') && memberIds.includes('m2');
+          const hasM3M4 = memberIds.includes('m3') && memberIds.includes('m4');
+          expect(hasM1M2).toBe(false); // m1-m2ペアは回避
+          expect(hasM3M4).toBe(false); // m3-m4ペアは回避
+        }
+      }
+    });
+  });
+
+  describe('priority: undefined（デフォルト）', () => {
+    it('ペア優先と同じ動作になる（後方互換）', () => {
+      const { teams, taskLabels, members, history } = createPriorityTestData();
+
+      for (let i = 0; i < 20; i++) {
+        // priority引数なし（9番目のパラメータを省略）
+        const result = calculateAssignment(
+          teams, taskLabels, members, history, '2026-03-07',
+          undefined, undefined, true
+        );
+
+        const rowGroups = getRowGroups(result);
+
+        // デフォルト = ペア優先: 履歴のペアが同じ行にいない
+        for (const [, memberIds] of rowGroups) {
+          const hasM1M2 = memberIds.includes('m1') && memberIds.includes('m2');
+          const hasM3M4 = memberIds.includes('m3') && memberIds.includes('m4');
+          expect(hasM1M2).toBe(false);
+          expect(hasM3M4).toBe(false);
+        }
       }
     });
   });

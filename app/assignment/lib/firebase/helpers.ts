@@ -73,6 +73,7 @@ export const toMillisSafe = (value?: FirestoreTimestamp | null): number => {
 
 export const DEFAULT_SHUFFLE_SETTINGS: ShuffleSettings = {
     crossTeamShuffle: false,
+    priority: 'pair',
 };
 
 export const DEFAULT_TABLE_SETTINGS: TableSettings = {

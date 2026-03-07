@@ -14,6 +14,22 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.16.0',
+    version: '0.16.0',
+    date: '2026-03-07',
+    type: 'feature',
+    title: 'シャッフルの優先順位設定を追加しました',
+    content: `
+- シャッフル時に「組み合わせ優先」と「作業優先」を選べるようになりました
+- 「同じ人との組み合わせを避ける」を選ぶと、毎回なるべく違う人と組みます
+- 「同じ作業の連続を避ける」を選ぶと、毎回なるべく違う作業になります
+- 詳細設定モーダルから切り替えできます
+    `.trim(),
+    tags: ['担当表', 'シャッフル', '設定'],
+    createdAt: '2026-03-07T17:00:00.000Z',
+    updatedAt: '2026-03-07T17:00:00.000Z',
+  },
+  {
     id: 'v0.15.0',
     version: '0.15.0',
     date: '2026-03-07',

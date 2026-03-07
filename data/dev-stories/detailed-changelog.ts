@@ -14,6 +14,22 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.15.0',
+    version: '0.15.0',
+    date: '2026-03-07',
+    type: 'feature',
+    title: '担当表に詳細設定モーダルと班内シャッフル機能を追加しました',
+    content: `
+- 担当表に詳細設定モーダルを追加しました
+- 「班をまたいでシャッフル」の切り替え設定を追加しました
+- OFFの場合、シャッフル時に各メンバーは自分の班内でのみタスクが入れ替わります
+- 設定ボタンをすべてのユーザーに表示するようにしました
+    `.trim(),
+    tags: ['担当表', 'シャッフル', '設定'],
+    createdAt: '2026-03-07T15:00:00.000Z',
+    updatedAt: '2026-03-07T15:00:00.000Z',
+  },
+  {
     id: 'v0.14.6',
     version: '0.14.6',
     date: '2026-03-07',

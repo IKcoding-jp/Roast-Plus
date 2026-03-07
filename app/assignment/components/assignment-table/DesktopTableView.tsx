@@ -173,13 +173,13 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                 />
                             ) : (
                                 <div
-                                    className="cursor-pointer rounded px-2 py-1 truncate w-full select-none hover:bg-gray-800 active:bg-gray-700"
+                                    className="cursor-pointer rounded px-2 py-1 truncate w-full select-none hover:bg-gray-800 active:bg-gray-700 min-h-[28px] flex items-center justify-center"
                                     onClick={() => {
                                         setActiveTeamActionId(team.id);
                                         setActiveTeamName(team.name);
                                     }}
                                 >
-                                    {formatTeamTitle(team.name)}
+                                    {formatTeamTitle(team.name) || <span className="text-gray-500 text-xs">班名を設定</span>}
                                 </div>
                             )}
                         </div>
@@ -257,7 +257,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                 {taskLabels.map(label => (
                     <div
                         key={label.id}
-                        className="grid items-center transition-colors group hover:bg-spot-subtle/30"
+                        className="grid items-center transition-colors group hover:bg-ground/50"
                         style={{
                             gridTemplateColumns,
                             minHeight: `${tableSettings?.rowHeights?.[label.id] ?? 60}px`
@@ -345,7 +345,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                 {/* 新規ラベル追加行 / シャッフル */}
                 <div
-                    className="grid items-center p-2 py-2 border-t min-h-[60px] bg-ground border-edge"
+                    className="grid items-center py-2 border-t min-h-[60px] bg-ground border-edge"
                     style={{ gridTemplateColumns }}
                 >
                     {taskLabels.length < MAX_TASK_LABELS ? (
@@ -356,15 +356,28 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                 onKeyDown={e => {
                                     if (e.key === 'Enter') handleAddTaskLabel();
                                 }}
-                                className="!p-2 !text-sm !min-h-0"
+                                placeholder={`${headerLabels.left}を入力`}
+                                className="!p-2 !text-sm !min-h-0 !text-center"
                             />
                         </div>
                     ) : (
                         <div />
                     )}
 
-                    {/* シャッフルボタン（中央配置） */}
-                    <div className="col-span-full px-2 flex items-center justify-center" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
+                    {/* シャッフル & 追加ボタン（中央配置） */}
+                    <div className="col-span-full px-2 flex items-center justify-center gap-3" style={{ gridColumn: `2 / span ${Math.max(1, teams.length)}` }}>
+                        {taskLabels.length < MAX_TASK_LABELS && (
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleAddTaskLabel}
+                                disabled={!newLeftLabel.trim()}
+                                className="!rounded-full !px-4 shadow-md active:scale-95"
+                            >
+                                <MdAdd size={18} />
+                                <span className="font-medium text-sm">担当を追加</span>
+                            </Button>
+                        )}
                         <Button
                             variant="primary"
                             size="sm"
@@ -378,24 +391,16 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                     </div>
 
                     {taskLabels.length < MAX_TASK_LABELS ? (
-                        <div className="pl-2 flex gap-2 w-full h-full" style={{ gridColumn: '-2 / -1' }}>
+                        <div className="px-2 flex items-center w-full h-full" style={{ gridColumn: '-2 / -1' }}>
                             <Input
                                 value={newRightLabel}
                                 onChange={e => setNewRightLabel(e.target.value)}
                                 onKeyDown={e => {
                                     if (e.key === 'Enter') handleAddTaskLabel();
                                 }}
-                                className="!min-w-0 !p-2 !text-right !text-sm !min-h-0"
+                                placeholder={`${headerLabels.right}を入力`}
+                                className="!min-w-0 !p-2 !text-center !text-sm !min-h-0 w-full"
                             />
-                            <Button
-                                variant="primary"
-                                size="sm"
-                                onClick={handleAddTaskLabel}
-                                disabled={!newLeftLabel.trim()}
-                                className="!px-2 !py-1 !min-h-0 !h-full max-h-[38px] flex-shrink-0"
-                            >
-                                <MdAdd size={20} />
-                            </Button>
                         </div>
                     ) : (
                         <div />

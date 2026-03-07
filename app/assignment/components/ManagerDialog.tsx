@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HiX } from 'react-icons/hi';
+import { MdClose } from 'react-icons/md';
 import type { Manager } from '@/types';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, IconButton } from '@/components/ui';
 
 interface ManagerDialogProps {
   isOpen: boolean;
@@ -71,66 +71,68 @@ export function ManagerDialog({
 
   return (
     <div
-      className="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
       onClick={onClose}
     >
       <div
-        className="rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl bg-overlay border border-edge"
+        className="rounded-xl max-w-sm w-full mx-4 shadow-xl bg-overlay border border-edge overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-ink">
+        <div className="px-4 py-3 flex items-center justify-between bg-ground border-b border-edge">
+          <h2 className="font-bold text-ink">
             {manager ? '管理者を編集' : '管理者を追加'}
           </h2>
-          <Button
+          <IconButton
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="!p-1 !min-h-0"
             aria-label="閉じる"
           >
-            <HiX className="w-5 h-5" />
-          </Button>
+            <MdClose size={20} />
+          </IconButton>
         </div>
 
-        {/* 入力フォーム */}
-        <div className="mb-6">
-          <Input
-            label="名前"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="管理者の名前を入力"
-            autoFocus
-            disabled={isLoading}
-          />
-        </div>
-
-        {/* ボタン */}
-        <div className="flex gap-3">
-          {manager && (
-            <Button
-              variant="danger"
-              size="md"
-              onClick={handleDelete}
+        {/* ボディ */}
+        <div className="p-6">
+          {/* 入力フォーム */}
+          <div className="mb-6">
+            <Input
+              label="名前"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="管理者の名前を入力"
+              autoFocus
               disabled={isLoading}
+            />
+          </div>
+
+          {/* ボタン */}
+          <div className="flex gap-3">
+            {manager && (
+              <Button
+                variant="danger"
+                size="md"
+                onClick={handleDelete}
+                disabled={isLoading}
+                className="flex-1"
+              >
+                削除
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleSave}
+              disabled={isLoading || !name.trim()}
+              loading={isLoading}
               className="flex-1"
             >
-              削除
+              {manager ? '更新' : '追加'}
             </Button>
-          )}
-          <Button
-            variant="primary"
-            size="md"
-            onClick={handleSave}
-            disabled={isLoading || !name.trim()}
-            loading={isLoading}
-            className="flex-1"
-          >
-            {manager ? '更新' : '追加'}
-          </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -81,6 +81,7 @@ export interface PairExclusion {
 // シャッフル設定
 export interface ShuffleSettings {
   crossTeamShuffle: boolean; // 班をまたいでシャッフルするか（デフォルト: false）
+  priority?: 'pair' | 'row'; // 制約優先順位（デフォルト: 'pair'）
 }
 
 // ペアのメンバーIDを正規化するヘルパー関数

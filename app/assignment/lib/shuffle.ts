@@ -106,17 +106,19 @@ const getCombinations = (arr: string[], k: number): string[][] => {
 /**
  * 制約の厳しさレベル（段階的に緩和）
  *
- * ペア回避を行回避より優先し、行を先に緩和する。
- * これにより「毎回違うペア」を最優先で保証する。
+ * priority設定に応じて、ペア優先系(pair_*)または担当優先系(row_*)のレベルを使用する。
  *
- * - strict:        行(現在+1回前) + ペア(現在+1回前)
- * - pair_strict:   行(現在のみ)   + ペア(現在+1回前)
- * - pair_hard:     行(ソフト)     + ペア(現在+1回前)
- * - balanced:      行(現在のみ)   + ペア(現在のみ)
- * - pair_only:     行(ソフト)     + ペア(現在のみ)
- * - minimal:       ペア除外設定のみ（緊急フォールバック）
+ * - strict:        行(現在+1回前) + ペア(現在+1回前)   ── 共通
+ * - pair_strict:   行(現在のみ)   + ペア(現在+1回前)   ── ペア優先系
+ * - pair_hard:     行(ソフト)     + ペア(現在+1回前)   ── ペア優先系
+ * - row_strict:    行(現在+1回前) + ペア(現在のみ)     ── 担当優先系
+ * - row_hard:      行(現在+1回前) + ペア(ソフト)       ── 担当優先系
+ * - balanced:      行(現在のみ)   + ペア(現在のみ)     ── 共通
+ * - pair_only:     行(ソフト)     + ペア(現在のみ)     ── ペア優先系
+ * - row_only:      行(現在のみ)   + ペア(ソフト)       ── 担当優先系
+ * - minimal:       ペア除外設定のみ（緊急フォールバック）── 共通
  */
-type ConstraintLevel = 'strict' | 'pair_strict' | 'pair_hard' | 'balanced' | 'pair_only' | 'minimal';
+type ConstraintLevel = 'strict' | 'pair_strict' | 'pair_hard' | 'row_strict' | 'row_hard' | 'balanced' | 'pair_only' | 'row_only' | 'minimal';
 
 type RowInfo = {
     taskLabelId: string;
@@ -141,7 +143,8 @@ export const calculateAssignment = (
     targetDate: string,
     currentAssignments?: Assignment[],
     pairExclusions?: PairExclusion[],
-    crossTeamShuffle?: boolean
+    crossTeamShuffle?: boolean,
+    priority?: 'pair' | 'row'
 ): Assignment[] => {
     // 1. 対象メンバーの抽出（アクティブなメンバーのみ）
     const eligibleMembers = members.filter(m => m.active !== false);
@@ -212,10 +215,10 @@ export const calculateAssignment = (
     ): boolean => {
         // pair_hard, pair_only, minimal では行をソフト制約に降格
         if (level === 'pair_hard' || level === 'pair_only' || level === 'minimal') return false;
-        // 現在の行回避: strict, pair_strict, balanced でハード制約
+        // 現在の行回避: strict, pair_strict, balanced, row_strict, row_hard, row_only でハード制約
         if (currentRowHistory.get(taskLabelId)?.has(memberId)) return true;
-        // 1回前の行回避: strict のみハード制約
-        if (level === 'strict') {
+        // 1回前の行回避: strict, row_strict, row_hard でハード制約
+        if (level === 'strict' || level === 'row_strict' || level === 'row_hard') {
             if (oneAgoRowHistory.get(taskLabelId)?.has(memberId)) return true;
         }
         return false;
@@ -223,12 +226,12 @@ export const calculateAssignment = (
 
     /** ペアの連続チェック（ハード制約） */
     const hasPairConflict = (group: string[], level: ConstraintLevel): boolean => {
-        // minimal のみペアをソフト制約に降格
-        if (level === 'minimal') return false;
+        // minimal, row_hard, row_only ではペアをソフト制約に降格
+        if (level === 'minimal' || level === 'row_hard' || level === 'row_only') return false;
         for (let i = 0; i < group.length; i++) {
             for (let j = i + 1; j < group.length; j++) {
                 const pairKey = makePairKey(group[i], group[j]);
-                // 現在のペア回避: minimal以外で常にハード制約
+                // 現在のペア回避: 上記以外で常にハード制約
                 if (currentPairHistory.has(pairKey)) return true;
                 // 1回前のペア回避: strict, pair_strict, pair_hard でハード制約
                 if (level === 'strict' || level === 'pair_strict' || level === 'pair_hard') {
@@ -326,7 +329,9 @@ export const calculateAssignment = (
     };
 
     // 7. 制約レベルを段階的に緩和して解を探す
-    const levels: ConstraintLevel[] = ['strict', 'pair_strict', 'pair_hard', 'balanced', 'pair_only', 'minimal'];
+    const pairFirstLevels: ConstraintLevel[] = ['strict', 'pair_strict', 'pair_hard', 'balanced', 'pair_only', 'minimal'];
+    const rowFirstLevels: ConstraintLevel[] = ['strict', 'row_strict', 'row_hard', 'balanced', 'row_only', 'minimal'];
+    const levels = priority === 'row' ? rowFirstLevels : pairFirstLevels;
     let solution: Map<string, string[]> | null = null;
 
     for (const level of levels) {

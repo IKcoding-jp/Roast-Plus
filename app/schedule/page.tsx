@@ -56,8 +56,8 @@ export default function SchedulePage() {
     <div className="h-screen md:h-[100dvh] lg:h-screen pt-14 sm:pt-3 pb-4 px-4 sm:px-4 lg:px-6 flex flex-col overflow-hidden bg-page">
       <FloatingNav backHref="/" />
       {/* モバイル版：日付ナビ（戻るボタンの右〜画面右端で中央配置） */}
-      <div className="sm:hidden fixed top-3 left-16 right-3 z-50 flex justify-center">
-        <div className="flex items-center gap-1 rounded-2xl px-3 py-2 bg-surface/80 backdrop-blur-sm border border-edge shadow-md">
+      <div className="sm:hidden fixed top-3 left-14 right-3 z-50 flex">
+        <div className="w-full flex items-center justify-between rounded-2xl px-3 py-2 bg-surface/80 backdrop-blur-sm border border-edge shadow-md">
           <IconButton
             variant="ghost"
             size="sm"
@@ -159,7 +159,7 @@ export default function SchedulePage() {
             <nav className="flex-1 flex relative items-center rounded-2xl shadow-xl p-1 sm:p-1.5 bg-surface border border-edge">
               <button
                 onClick={() => setActiveTab('today')}
-                className={`relative flex-1 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl z-10 transition-colors ${
+                className={`relative flex-1 py-3.5 sm:py-4 text-xs sm:text-sm font-semibold rounded-xl z-10 transition-colors ${
                   activeTab === 'today' ? 'text-on-spot' : 'text-ink-sub'
                 }`}
               >
@@ -184,7 +184,7 @@ export default function SchedulePage() {
               </button>
               <button
                 onClick={() => setActiveTab('roast')}
-                className={`relative flex-1 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl z-10 transition-colors ${
+                className={`relative flex-1 py-3.5 sm:py-4 text-xs sm:text-sm font-semibold rounded-xl z-10 transition-colors ${
                   activeTab === 'roast' ? 'text-on-spot' : 'text-ink-sub'
                 }`}
               >

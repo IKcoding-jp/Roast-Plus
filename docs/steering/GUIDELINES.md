@@ -301,7 +301,8 @@ const DIFFICULTY_STYLES = {
 | `text-ink-muted` | 薄いテキスト |
 | `border-edge` | 通常ボーダー |
 | `border-edge-strong` | 強調ボーダー |
-| `bg-spot` / `text-spot` | アクセントカラー |
+| `bg-spot` / `text-spot` | アクセントカラー（ボタン・タブ等のアクション要素） |
+| `bg-header-bg` / `text-header-text` | コーヒー色アクセント（空状態アイコン・ホバー効果等の装飾要素） |
 
 ---
 
@@ -315,6 +316,7 @@ const DIFFICULTY_STYLES = {
 - **テーマ対応はCSS変数で自動** → `data-theme` 属性で7テーマ自動切替、テーマprop不要
 - **モーダル背景は `bg-overlay`** → `bg-surface` はダークテーマで半透明のため禁止
 - **ハードコード色（`bg-white`, `text-gray-800`等）禁止** → セマンティックトークン（`bg-page`, `text-ink`等）を使用
+- **コーヒー色アクセントは `header-bg`** → `#4E3526` / `#211714` 等のハードコード禁止、`bg-header-bg` CSS変数を使用（7テーマ自動対応）
 - **新規コンポーネント追加時は `registry.tsx` への登録必須** → `/dev/design-lab` に自動表示
 
 ---

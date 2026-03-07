@@ -37,6 +37,15 @@ export function ScheduleCard({
   const isAfterPurge = schedule.isAfterPurge;
   const isChaffCleaning = schedule.isChaffCleaning;
 
+  // タイプ別カラーバー
+  const getColorBarClass = () => {
+    if (isRoasterOn) return 'border-l-2 border-l-orange-500';
+    if (isRoast) return 'border-l-2 border-l-amber-700';
+    if (isAfterPurge) return 'border-l-2 border-l-blue-500';
+    if (isChaffCleaning) return 'border-l-2 border-l-gray-400';
+    return '';
+  };
+
   // アイコンの取得
   const getIcon = () => {
     if (isRoasterOn) return <HiFire className="text-xl md:text-xl flex-shrink-0 text-orange-500" />;
@@ -177,15 +186,15 @@ export function ScheduleCard({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onClick={handleCardClick}
-      className={`rounded-md border p-3 md:p-2.5 cursor-move hover:shadow-sm transition-all select-none touch-none border-edge bg-ground hover:bg-amber-50 hover:border-amber-300 ${isDragging ? 'opacity-50' : ''} ${
-        isDragOver ? 'border-amber-500 border-2 bg-amber-50' : ''
+      className={`rounded-lg border p-3 md:p-2.5 cursor-move hover:shadow-md transition-all select-none touch-none border-edge bg-ground hover:bg-header-bg/[0.04] hover:border-header-bg/30 ${getColorBarClass()} ${isDragging ? 'opacity-50' : ''} ${
+        isDragOver ? 'border-header-bg border-2 bg-header-bg/[0.06]' : ''
       }`}
     >
       <div className="flex items-center gap-2 md:gap-2.5">
         {/* 左側：時間バッジまたはアイコン */}
         <div className="flex items-center gap-1.5 md:gap-1.5 flex-shrink-0">
           {schedule.time ? (
-            <div className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-md text-sm md:text-base font-semibold tabular-nums shadow-sm bg-surface text-ink">
+            <div className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-lg text-sm md:text-base font-semibold tabular-nums shadow-sm bg-surface text-ink border border-edge">
               {schedule.time}
             </div>
           ) : (
@@ -199,7 +208,7 @@ export function ScheduleCard({
           <div className="text-base md:text-base font-medium flex items-center gap-1.5 md:gap-1.5 flex-wrap text-ink">
             <span className="whitespace-nowrap">{memoContent.firstLine}</span>
             {memoContent.beanName && (
-              <span className="inline-flex items-center rounded px-1.5 md:px-2 py-0.5 md:py-1 text-sm md:text-xs font-medium border whitespace-nowrap bg-ground text-ink-sub border-edge">
+              <span className="inline-flex items-center rounded px-1.5 md:px-2 py-0.5 md:py-1 text-sm md:text-xs font-medium border whitespace-nowrap bg-surface text-ink-sub border-edge">
                 {memoContent.beanName2 && memoContent.blendRatio ? (
                   <>
                     <span className="whitespace-nowrap">{memoContent.beanName}</span>

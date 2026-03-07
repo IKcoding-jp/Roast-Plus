@@ -14,6 +14,24 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.16.1',
+    version: '0.16.1',
+    date: '2026-03-07',
+    type: 'style',
+    title: 'スケジュールページのデザインを刷新しました',
+    content: `
+- 日付ナビゲーションのデザインを軽やかに改善しました
+- タブ切替をセグメントコントロール風にリニューアルしました
+- 読み取りボタンをタブ中央に配置して使いやすくしました
+- スケジュールカードに種類別のカラーバーを追加しました
+- 空状態の表示をガイドカード形式にリニューアルしました
+- 時間バッジのデザインをクリーンホワイトに統一しました
+    `.trim(),
+    tags: ['スケジュール', 'UI', 'デザイン'],
+    createdAt: '2026-03-07T22:00:00.000Z',
+    updatedAt: '2026-03-07T22:00:00.000Z',
+  },
+  {
     id: 'v0.16.0',
     version: '0.16.0',
     date: '2026-03-07',

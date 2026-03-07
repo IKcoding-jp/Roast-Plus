@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { AssignmentTable } from './components/assignment-table';
 import { RouletteOverlay } from './components/RouletteOverlay';
 import { ManagerDialog } from './components/ManagerDialog';
-import { PairExclusionSettingsModal } from './components/PairExclusionSettingsModal';
+import { AssignmentSettingsModal } from './components/AssignmentSettingsModal';
 import { Loading } from '@/components/Loading';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { useAuth } from '@/lib/auth';
-import { setManager, deleteManager, addPairExclusion, deletePairExclusion } from './lib/firebase';
+import { setManager, deleteManager, addPairExclusion, deletePairExclusion, updateShuffleSettings } from './lib/firebase';
 import { useAssignmentData, useShuffleExecution, useAssignmentHandlers } from './hooks';
 import { FaUserTie } from "react-icons/fa";
 import { HiPlus, HiCog } from "react-icons/hi";
@@ -20,8 +20,8 @@ export default function AssignmentPage() {
     const { isEnabled: isDeveloperMode } = useDeveloperMode();
     // 管理者ダイアログ
     const [isManagerDialogOpen, setIsManagerDialogOpen] = useState(false);
-    // ペア除外設定
-    const [isPairExclusionModalOpen, setIsPairExclusionModalOpen] = useState(false);
+    // 詳細設定モーダル
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
     const data = useAssignmentData(userId, authLoading);
 
@@ -31,6 +31,7 @@ export default function AssignmentPage() {
         taskLabels: data.taskLabels,
         members: data.members,
         pairExclusions: data.pairExclusions,
+        shuffleSettings: data.shuffleSettings,
         activeDate: data.activeDate,
         displayAssignments: data.displayAssignments,
         setTodayDate: data.setTodayDate,
@@ -57,17 +58,17 @@ export default function AssignmentPage() {
         <div className="min-h-screen flex flex-col bg-page">
             <FloatingNav
                 backHref="/"
-                right={isDeveloperMode ? (
+                right={
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setIsPairExclusionModalOpen(true)}
+                        onClick={() => setIsSettingsModalOpen(true)}
                         className="!rounded-full !px-3 !py-2 shadow-md !bg-surface !text-ink-sub hover:!bg-ground !border !border-edge-strong"
-                        title="ペア除外設定"
+                        title="詳細設定"
                     >
                         <HiCog className="w-5 h-5" />
                     </Button>
-                ) : undefined}
+                }
             />
 
             <main className="flex-1 w-full px-2 md:px-4 pt-14 pb-4 flex flex-col items-center justify-center min-h-[calc(100vh-56px)]">
@@ -144,17 +145,23 @@ export default function AssignmentPage() {
                 }}
             />
 
-            {/* ペア除外設定モーダル */}
-            <PairExclusionSettingsModal
-                isOpen={isPairExclusionModalOpen}
+            {/* 詳細設定モーダル */}
+            <AssignmentSettingsModal
+                isOpen={isSettingsModalOpen}
+                onClose={() => setIsSettingsModalOpen(false)}
+                shuffleSettings={data.shuffleSettings}
+                onUpdateShuffleSettings={async (settings) => {
+                    if (!userId) return;
+                    await updateShuffleSettings(userId, settings);
+                }}
+                isDeveloperMode={isDeveloperMode}
                 members={data.members}
                 pairExclusions={data.pairExclusions}
-                onClose={() => setIsPairExclusionModalOpen(false)}
-                onAdd={async (memberId1: string, memberId2: string) => {
+                onAddPairExclusion={async (memberId1: string, memberId2: string) => {
                     if (!userId) return;
                     await addPairExclusion(userId, memberId1, memberId2);
                 }}
-                onDelete={async (exclusionId: string) => {
+                onDeletePairExclusion={async (exclusionId: string) => {
                     if (!userId) return;
                     await deletePairExclusion(userId, exclusionId);
                 }}

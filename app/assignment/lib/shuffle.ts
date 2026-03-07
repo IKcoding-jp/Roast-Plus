@@ -140,7 +140,8 @@ export const calculateAssignment = (
     history: Assignment[][], // history[0] = 1回前、history[1] = 2回前
     targetDate: string,
     currentAssignments?: Assignment[],
-    pairExclusions?: PairExclusion[]
+    pairExclusions?: PairExclusion[],
+    crossTeamShuffle?: boolean
 ): Assignment[] => {
     // 1. 対象メンバーの抽出（アクティブなメンバーのみ）
     const eligibleMembers = members.filter(m => m.active !== false);
@@ -281,10 +282,14 @@ export const calculateAssignment = (
         const row = sortedRows[rowIdx];
         const neededCount = row.slots.length;
 
+        // この行のスロットが属する班のセット
+        const rowTeamIds = new Set(row.slots.map(s => s.teamId));
+
         // この行に割り当て可能な候補メンバー
         const available = eligibleMembers
             .filter(m => !assigned.has(m.id))
             .filter(m => !m.excludedTaskLabelIds.includes(row.taskLabelId))
+            .filter(m => crossTeamShuffle || rowTeamIds.has(m.teamId))
             .map(m => m.id);
 
         const fillCount = Math.min(neededCount, available.length);
@@ -339,15 +344,34 @@ export const calculateAssignment = (
         for (const row of rows) {
             if (row.slots.length === 0) continue;
             const memberIds = solution.get(row.taskLabelId) ?? [];
-            // チーム配置をランダム化（どのメンバーがどの班に入るかをシャッフル）
-            const shuffledIds = shuffleArray(memberIds);
-            for (let i = 0; i < row.slots.length; i++) {
-                finalAssignments.push({
-                    teamId: row.slots[i].teamId,
-                    taskLabelId: row.taskLabelId,
-                    memberId: shuffledIds[i] ?? null,
-                    assignedDate: targetDate
-                });
+
+            if (!crossTeamShuffle) {
+                // 班内制約: メンバーを自身のteamIdに一致するスロットに配置
+                const remaining = [...memberIds];
+                for (let i = 0; i < row.slots.length; i++) {
+                    const slotTeamId = row.slots[i].teamId;
+                    const matchIdx = remaining.findIndex(id => {
+                        const member = eligibleMembers.find(m => m.id === id);
+                        return member?.teamId === slotTeamId;
+                    });
+                    finalAssignments.push({
+                        teamId: slotTeamId,
+                        taskLabelId: row.taskLabelId,
+                        memberId: matchIdx >= 0 ? remaining.splice(matchIdx, 1)[0] : null,
+                        assignedDate: targetDate
+                    });
+                }
+            } else {
+                // チーム配置をランダム化（どのメンバーがどの班に入るかをシャッフル）
+                const shuffledIds = shuffleArray(memberIds);
+                for (let i = 0; i < row.slots.length; i++) {
+                    finalAssignments.push({
+                        teamId: row.slots[i].teamId,
+                        taskLabelId: row.taskLabelId,
+                        memberId: shuffledIds[i] ?? null,
+                        assignedDate: targetDate
+                    });
+                }
             }
         }
     } else {

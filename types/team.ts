@@ -78,6 +78,11 @@ export interface PairExclusion {
   createdAt: FirestoreTimestamp; // Firestore Timestamp
 }
 
+// シャッフル設定
+export interface ShuffleSettings {
+  crossTeamShuffle: boolean; // 班をまたいでシャッフルするか（デフォルト: false）
+}
+
 // ペアのメンバーIDを正規化するヘルパー関数
 export const normalizePairIds = (id1: string, id2: string): [string, string] => {
   return id1 < id2 ? [id1, id2] : [id2, id1];

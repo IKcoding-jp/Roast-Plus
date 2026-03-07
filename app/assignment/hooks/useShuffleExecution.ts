@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Team, Member, TaskLabel, Assignment, PairExclusion } from '@/types';
+import { Team, Member, TaskLabel, Assignment, PairExclusion, ShuffleSettings } from '@/types';
 import {
     getServerTodayDate,
     updateAssignmentDay, createShuffleEvent, updateShuffleEventState,
@@ -16,6 +16,7 @@ type UseShuffleExecutionParams = {
     taskLabels: TaskLabel[];
     members: Member[];
     pairExclusions: PairExclusion[];
+    shuffleSettings: ShuffleSettings;
     activeDate: string;
     displayAssignments: Assignment[];
     setTodayDate: (date: string) => void;
@@ -30,6 +31,7 @@ export function useShuffleExecution({
     taskLabels,
     members,
     pairExclusions,
+    shuffleSettings,
     activeDate,
     displayAssignments,
     setTodayDate,
@@ -54,7 +56,7 @@ export function useShuffleExecution({
             const history: Assignment[][] = shuffleHistoryList.map(h => h.assignments);
 
             // 2. Run calculation
-            const result = calculateAssignment(teams, taskLabels, members, history, targetDate, displayAssignments, pairExclusions);
+            const result = calculateAssignment(teams, taskLabels, members, history, targetDate, displayAssignments, pairExclusions, shuffleSettings.crossTeamShuffle);
 
             // 3. Broadcast event to other clients
             const eventId = uuidv4();
@@ -119,7 +121,7 @@ export function useShuffleExecution({
         } finally {
             setIsLocalShuffling(false);
         }
-    }, [userId, teams, taskLabels, members, pairExclusions, activeDate, displayAssignments, setTodayDate, setActiveDate, setIsLocalShuffling, setMembers]);
+    }, [userId, teams, taskLabels, members, pairExclusions, shuffleSettings, activeDate, displayAssignments, setTodayDate, setActiveDate, setIsLocalShuffling, setMembers]);
 
     return { handleShuffle };
 }

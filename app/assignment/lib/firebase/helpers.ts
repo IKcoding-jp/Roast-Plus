@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import {
     Assignment,
     TableSettings,
+    ShuffleSettings,
     FirestoreTimestamp
 } from '@/types';
 
@@ -68,6 +69,10 @@ export const toMillisSafe = (value?: FirestoreTimestamp | null): number => {
     const seconds = typeof candidate.seconds === 'number' ? candidate.seconds : 0;
     const nanoseconds = typeof candidate.nanoseconds === 'number' ? candidate.nanoseconds : 0;
     return seconds * 1000 + Math.floor(nanoseconds / 1_000_000);
+};
+
+export const DEFAULT_SHUFFLE_SETTINGS: ShuffleSettings = {
+    crossTeamShuffle: false,
 };
 
 export const DEFAULT_TABLE_SETTINGS: TableSettings = {

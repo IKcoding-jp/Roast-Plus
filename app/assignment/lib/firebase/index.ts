@@ -2,6 +2,7 @@
 export {
     toMillisSafe,
     DEFAULT_TABLE_SETTINGS,
+    DEFAULT_SHUFFLE_SETTINGS,
     normalizeAssignmentsForDate,
     sortAssignmentsStable,
     areAssignmentsEqual,
@@ -48,6 +49,8 @@ export {
 export {
     subscribeTableSettings,
     updateTableSettings,
+    subscribeShuffleSettings,
+    updateShuffleSettings,
     subscribeManager,
     setManager,
     deleteManager,

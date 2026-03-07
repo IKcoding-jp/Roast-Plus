@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import {
     Team, Member, TaskLabel, Assignment, AssignmentDay, ShuffleEvent, TableSettings, Manager, PairExclusion,
+    ShuffleSettings,
 } from '@/types';
 import {
     fetchTeams, fetchMembers, fetchTaskLabels,
@@ -9,6 +10,8 @@ import {
     mutateAssignmentDay, getServerTodayDate,
     subscribeManager,
     subscribePairExclusions,
+    subscribeShuffleSettings,
+    DEFAULT_SHUFFLE_SETTINGS,
 } from '../lib/firebase';
 
 export function useAssignmentData(userId: string | null, authLoading: boolean) {
@@ -25,6 +28,9 @@ export function useAssignmentData(userId: string | null, authLoading: boolean) {
 
     // ペア除外設定
     const [pairExclusions, setPairExclusions] = useState<PairExclusion[]>([]);
+
+    // シャッフル設定
+    const [shuffleSettings, setShuffleSettings] = useState<ShuffleSettings>(DEFAULT_SHUFFLE_SETTINGS);
 
     // 状態
     const [todayDate, setTodayDate] = useState<string>("");
@@ -129,11 +135,16 @@ export function useAssignmentData(userId: string | null, authLoading: boolean) {
             setPairExclusions(exclusions);
         });
 
+        const unsubShuffleSettings = subscribeShuffleSettings(userId, (settings) => {
+            setShuffleSettings(settings);
+        });
+
         return () => {
             unsubAssignment();
             unsubSettings();
             unsubManager();
             unsubPairExclusions();
+            unsubShuffleSettings();
         };
     }, [userId, authLoading]);
 
@@ -185,6 +196,7 @@ export function useAssignmentData(userId: string | null, authLoading: boolean) {
         tableSettings,
         manager, setManagerState,
         pairExclusions,
+        shuffleSettings,
         todayDate, setTodayDate,
         activeDate, setActiveDate,
         isRouletteVisible,

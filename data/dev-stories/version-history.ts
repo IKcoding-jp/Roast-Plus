@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.15.0',
+    date: '2026-03-07',
+    summary: '担当表に詳細設定モーダルと班内シャッフル機能を追加しました',
+  },
+  {
     version: '0.14.6',
     date: '2026-03-07',
     summary: '担当表のモーダルデザインを統一しました',

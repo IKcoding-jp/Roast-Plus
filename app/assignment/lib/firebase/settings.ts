@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import {
     TableSettings,
+    ShuffleSettings,
     Manager,
     PairExclusion,
     normalizePairIds,
@@ -21,6 +22,7 @@ import {
     getPairExclusionsCollection,
     toMillisSafe,
     DEFAULT_TABLE_SETTINGS,
+    DEFAULT_SHUFFLE_SETTINGS,
 } from './helpers';
 
 // テーブル設定管理
@@ -56,6 +58,35 @@ export const updateTableSettings = async (userId: string, settings: TableSetting
         await setDoc(docRef, settings, { merge: true });
     } catch (error) {
         console.error('Failed to update table settings:', error);
+        throw error;
+    }
+};
+
+// ===== シャッフル設定管理 =====
+
+export const subscribeShuffleSettings = (userId: string, callback: (settings: ShuffleSettings) => void) => {
+    const settingsCol = getAssignmentSettingsCollection(userId);
+    const docRef = doc(settingsCol, 'shuffle');
+    return onSnapshot(docRef, (snap) => {
+        if (snap.exists()) {
+            const data = snap.data() as Partial<ShuffleSettings>;
+            callback({
+                ...DEFAULT_SHUFFLE_SETTINGS,
+                ...data,
+            });
+        } else {
+            callback(DEFAULT_SHUFFLE_SETTINGS);
+        }
+    });
+};
+
+export const updateShuffleSettings = async (userId: string, settings: Partial<ShuffleSettings>) => {
+    try {
+        const settingsCol = getAssignmentSettingsCollection(userId);
+        const docRef = doc(settingsCol, 'shuffle');
+        await setDoc(docRef, settings, { merge: true });
+    } catch (error) {
+        console.error('Failed to update shuffle settings:', error);
         throw error;
     }
 };

@@ -1,5 +1,8 @@
 # tasklist.md — #289 担当表UIの微調整
 
+**ステータス**: ✅ 完了
+**完了日**: 2026-03-07
+
 ## ブランチ
 
 ```
@@ -12,14 +15,14 @@ git checkout -b style/#289-assignment-ui-fix
 
 **対象**: `app/assignment/components/assignment-table/TableModals.tsx`
 
-- [ ] L567付近: 高さ設定モーダルの削除ボタンから `!bg-ground hover:!bg-red-50` を削除
+- [x] L567付近: 高さ設定モーダルの削除ボタンから `!bg-ground hover:!bg-red-50` を削除
   ```tsx
   // Before
   className="flex-1 !flex !items-center !justify-center !gap-1 !bg-ground hover:!bg-red-50"
   // After
   className="flex-1 !flex !items-center !justify-center !gap-1"
   ```
-- [ ] L438付近: チーム編集モーダルの削除ボタンから `!bg-ground hover:!bg-red-50` を削除
+- [x] L438付近: チーム編集モーダルの削除ボタンから `!bg-ground hover:!bg-red-50` を削除
   ```tsx
   // Before
   className="!flex !items-center !justify-center !gap-2 !bg-ground hover:!bg-red-50"
@@ -31,7 +34,7 @@ git checkout -b style/#289-assignment-ui-fix
 
 **対象**: `app/assignment/components/assignment-table/TableModals.tsx` (高さ設定モーダル L516-592)
 
-- [ ] 3ボタン行のレイアウトを変更
+- [x] 3ボタン行のレイアウトを変更
   - 削除ボタンを独立した行に移動（上部）
   - 下段: キャンセル + 保存の2ボタン（幅が確保されて折り返しなし）
   ```tsx
@@ -50,23 +53,23 @@ git checkout -b style/#289-assignment-ui-fix
 
 **対象**: `app/assignment/components/assignment-table/DesktopTableView.tsx`
 
-- [ ] 左ラベルセル (L266): 右ラベルセルと同じパディング設定に揃える
+- [x] 左ラベルセル (L266): 右ラベルセルと同じパディング設定に揃える
   - 左: `p-3 md:p-4 py-2 border-r` → borderを考慮してpaddingを統一
   - または左の `border-r` を維持しつつ右にも同等のスタイルを追加
-- [ ] 新規追加行の左input (L350-358): 右inputとの幅の視覚差を確認・調整
+- [x] 新規追加行の左input (L350-358): 右inputとの幅の視覚差を確認・調整
 
 ### Phase 4: 検証
 
-- [ ] `npm run lint` — エラー0
-- [ ] `npm run build` — エラー0
-- [ ] ブラウザで担当表を開き、3バグが修正されていることを目視確認
+- [x] `npm run lint` — エラー0
+- [x] `npm run build` — エラー0
+- [x] ブラウザで担当表を開き、3バグが修正されていることを目視確認
   - 高さ設定モーダルを開いて削除ボタンが赤いか確認
   - 高さ設定モーダルでキャンセルが1行か確認
   - 同じpx幅を設定して左右が揃っているか確認
 
 ### Phase 5: PR作成
 
-- [ ] コミット・PR作成
+- [x] コミット・PR作成
   ```
   git add app/assignment/components/assignment-table/TableModals.tsx
   git add app/assignment/components/assignment-table/DesktopTableView.tsx

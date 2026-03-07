@@ -3,10 +3,10 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import type { AppData, RoastSchedule } from '@/types';
-import { HiPlus, HiCalendar } from 'react-icons/hi';
+import { HiPlus, HiCalendar, HiCamera } from 'react-icons/hi';
 import { RoastScheduleMemoDialog } from './RoastScheduleMemoDialog';
 import { ScheduleCard } from './roast-scheduler/ScheduleCard';
-import { Button } from '@/components/ui';
+import { Button, Card } from '@/components/ui';
 
 interface RoastSchedulerTabProps {
   data: AppData | null;
@@ -261,7 +261,7 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
 
   if (!data) {
     return (
-      <div className="rounded-2xl p-6 shadow-xl bg-surface border-2 border-edge-strong">
+      <div className="rounded-2xl p-6 shadow-lg bg-surface border border-edge">
         <p className="text-center text-ink-sub">データがありません</p>
       </div>
     );
@@ -269,12 +269,13 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
 
   return (
     <div
-      className="relative rounded-2xl p-4 md:p-6 shadow-xl h-full flex flex-col backdrop-blur-sm bg-surface border-2 border-edge-strong"
+      className="relative rounded-2xl p-4 md:p-6 shadow-lg h-full flex flex-col bg-surface border border-edge"
       data-is-today={_isToday}
     >
       {/* デスクトップ版：タイトルと追加ボタンを横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex items-center justify-between">
         <h2 className="text-base md:text-lg font-semibold text-ink">
+          <span className="inline-block w-1 h-5 rounded-full bg-spot mr-2 align-middle" />
           ローストスケジュール
         </h2>
         <Button
@@ -282,21 +283,33 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
           size="sm"
           onClick={handleAdd}
           aria-label="スケジュールを追加"
+          className="!min-h-0 !py-1.5 !px-3 !text-sm !gap-1"
         >
-          <HiPlus className="h-4 w-4" />
+          <HiPlus className="h-3.5 w-3.5" />
           <span>追加</span>
         </Button>
       </div>
 
       {sortedSchedules.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-center text-ink-sub">
-          <div>
-            <div className="mb-3 md:mb-5 flex justify-center">
-              <HiCalendar className="h-12 w-12 md:h-20 md:w-20 text-ink-muted" />
+        <div className="flex-1 flex items-center justify-center">
+          <Card variant="guide" className="max-w-xs mx-auto">
+            <div className="flex justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-header-bg flex items-center justify-center shadow-md">
+                <HiCalendar className="h-7 w-7 text-white" />
+              </div>
             </div>
-            <p className="text-sm md:text-lg font-medium">スケジュールがありません</p>
-            <p className="mt-1.5 md:mt-3 text-xs md:text-base text-ink-muted">ボタンから新しいスケジュールを作成してください</p>
-          </div>
+            <p className="text-base font-semibold text-ink mb-3">スケジュールがありません</p>
+            <div className="space-y-2.5 text-sm text-ink-muted text-left">
+              <div className="flex items-center gap-2.5">
+                <HiCamera className="h-4 w-4 flex-shrink-0" />
+                <span>画像からAIで読み取る</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <HiPlus className="h-4 w-4 flex-shrink-0" />
+                <span>手動でスケジュールを追加する</span>
+              </div>
+            </div>
+          </Card>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
@@ -319,12 +332,13 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
             <div className="mt-4 flex lg:hidden items-center justify-center pb-2">
               <Button
                 variant="primary"
-                size="md"
+                size="sm"
                 onClick={handleAdd}
                 aria-label="スケジュールを追加"
+                className="!min-h-0 !py-1.5 !px-3 !text-sm !gap-1"
               >
-                <HiPlus className="h-4 w-4" />
-                <span className="hidden sm:inline">追加</span>
+                <HiPlus className="h-3.5 w-3.5" />
+                <span>追加</span>
               </Button>
             </div>
           </div>
@@ -336,12 +350,13 @@ export function RoastSchedulerTab({ data, onUpdate, selectedDate, isToday: _isTo
         <div className="mt-4 flex lg:hidden items-center justify-center">
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={handleAdd}
             aria-label="スケジュールを追加"
+            className="!min-h-0 !py-1.5 !px-3 !text-sm !gap-1"
           >
-            <HiPlus className="h-4 w-4" />
-            <span className="hidden sm:inline">追加</span>
+            <HiPlus className="h-3.5 w-3.5" />
+            <span>追加</span>
           </Button>
         </div>
       )}

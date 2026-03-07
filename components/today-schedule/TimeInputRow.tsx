@@ -49,8 +49,9 @@ export function TimeInputRow({
         size="sm"
         onClick={onAdd}
         aria-label="時間ラベルを追加"
+        className="!min-h-0 !py-1.5 !px-3 !text-sm !gap-1"
       >
-        <HiPlus className="h-4 w-4" />
+        <HiPlus className="h-3.5 w-3.5" />
         <span>追加</span>
       </Button>
     </div>

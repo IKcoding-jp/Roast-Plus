@@ -3,10 +3,11 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import type { AppData, TodaySchedule as TodayScheduleType, TimeLabel } from '@/types';
-import { HiClock, HiUser, HiArrowDown } from 'react-icons/hi';
+import { HiClock, HiUser, HiArrowDown, HiCamera, HiPlusCircle } from 'react-icons/hi';
 import { useTodayScheduleSync } from '@/hooks/useTodayScheduleSync';
 import { TimeInputRow } from '@/components/today-schedule/TimeInputRow';
 import { TimeEditDialog } from '@/components/today-schedule/TimeEditDialog';
+import { Card } from '@/components/ui';
 
 interface TodayScheduleProps {
   data: AppData | null;
@@ -111,10 +112,13 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
   }
 
   return (
-    <div className="rounded-2xl p-4 md:p-6 shadow-xl h-full flex flex-col backdrop-blur-sm bg-surface border-2 border-edge-strong">
+    <div className="rounded-2xl p-4 md:p-6 shadow-lg h-full flex flex-col bg-surface border border-edge">
       {/* デスクトップ版：タイトルと時間入力欄を横並び */}
       <div className="mb-3 md:mb-4 hidden lg:flex flex-row items-center justify-between gap-2">
-        <h2 className="hidden lg:block text-base md:text-lg font-semibold whitespace-nowrap text-ink">本日のスケジュール</h2>
+        <h2 className="hidden lg:block text-base md:text-lg font-semibold whitespace-nowrap text-ink">
+          <span className="inline-block w-1 h-5 rounded-full bg-spot mr-2 align-middle" />
+          本日のスケジュール
+        </h2>
         <TimeInputRow
           newHour={newHour}
           newMinute={newMinute}
@@ -127,14 +131,25 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
       </div>
 
       {localTimeLabels.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-center text-ink-sub">
-          <div>
-            <div className="mb-3 md:mb-5 flex justify-center">
-              <HiClock className="h-12 w-12 md:h-20 md:w-20 text-ink-muted" />
+        <div className="flex-1 flex items-center justify-center">
+          <Card variant="guide" className="max-w-xs mx-auto">
+            <div className="flex justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-header-bg flex items-center justify-center shadow-md">
+                <HiClock className="h-7 w-7 text-white" />
+              </div>
             </div>
-            <p className="text-base md:text-lg font-medium">時間ラベルがありません</p>
-            <p className="mt-1.5 md:mt-3 text-base md:text-base text-ink-muted">時間を入力して「追加」ボタンから時間ラベルを追加してください</p>
-          </div>
+            <p className="text-base font-semibold text-ink mb-3">時間ラベルがありません</p>
+            <div className="space-y-2.5 text-sm text-ink-muted text-left">
+              <div className="flex items-center gap-2.5">
+                <HiCamera className="h-4 w-4 flex-shrink-0" />
+                <span>画像からAIで読み取る</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <HiPlusCircle className="h-4 w-4 flex-shrink-0" />
+                <span>手動で時間を追加する</span>
+              </div>
+            </div>
+          </Card>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto min-h-0">
@@ -142,12 +157,12 @@ function TodayScheduleInner({ data, onUpdate, selectedDate, currentSchedule }: T
             {groupedTimeLabels.map((group) => (
               <div
                 key={group.time}
-                className="group flex items-baseline gap-3 md:gap-4 py-2.5 md:py-2 px-3 md:px-2.5 rounded-lg border transition-all duration-200 bg-ground hover:bg-spot-subtle border-edge hover:border-spot"
+                className="group flex items-baseline gap-3 md:gap-4 py-2.5 md:py-2 px-3 md:px-2.5 rounded-lg border transition-all duration-200 bg-ground hover:bg-header-bg/[0.04] border-edge hover:border-header-bg/30"
               >
                 {/* 時間表示 */}
                 <div
                   onClick={() => handleEditGroup(group.time)}
-                  className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-md text-sm md:text-base font-semibold cursor-pointer transition-colors tabular-nums shadow-sm bg-surface text-ink group-hover:text-spot group-hover:bg-spot-subtle"
+                  className="flex-shrink-0 w-16 md:w-18 text-center px-2 py-1 rounded-lg text-sm md:text-base font-semibold cursor-pointer transition-colors tabular-nums shadow-sm bg-surface text-ink border border-edge group-hover:border-header-bg/40 group-hover:text-header-bg"
                 >
                   {group.time || '--:--'}
                 </div>

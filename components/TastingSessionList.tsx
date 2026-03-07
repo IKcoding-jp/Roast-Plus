@@ -218,7 +218,7 @@ export function TastingSessionList({
           onApply={handleApplyFilters}
         />
 
-        <div className="flex-1 min-h-0 overflow-y-hidden pt-4 pb-8">
+        <div className="flex-1 min-h-0 overflow-y-hidden pt-4 pb-2">
           <TastingSessionCarousel
             sessions={filteredAndSortedSessions}
             tastingRecords={tastingRecords}

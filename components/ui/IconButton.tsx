@@ -49,7 +49,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     // サイズスタイル
     const sizeStyles = {
       sm: 'p-1.5',
-      md: 'p-2',
+      md: 'p-2 min-w-12 min-h-12',
       lg: 'p-3',
     };
 

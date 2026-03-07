@@ -155,7 +155,7 @@ export function TastingSessionCarousel({
       </div>
 
       {/* モバイル向けレイアウト (md未満で表示) */}
-      <div className="md:hidden relative w-full h-[calc(100dvh-160px)] overflow-hidden flex flex-col">
+      <div className="md:hidden relative w-full h-[calc(100dvh-130px)] overflow-hidden flex flex-col">
         {/* 横スクロールコンテナ */}
         <div
           ref={scrollContainerRef}
@@ -181,7 +181,7 @@ export function TastingSessionCarousel({
         </div>
 
         {/* ページインジケーター */}
-        <div className="flex-shrink-0 flex justify-center gap-1.5 py-4">
+        <div className="flex-shrink-0 flex justify-center gap-1.5 py-2">
           {sessionData.map((_, index) => (
             <div
               key={index}

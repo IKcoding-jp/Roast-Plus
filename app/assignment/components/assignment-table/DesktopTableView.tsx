@@ -296,7 +296,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                 return (
                                     <div key={team.id} className="p-2 md:p-4 py-2 border-r h-full flex items-center justify-center relative border-edge">
                                         <Button
-                                            variant="ghost"
+                                            variant={isSelected ? (member ? 'primary' : 'outline') : 'surface'}
                                             onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                             onMouseUp={handleCellTouchEnd}
                                             onMouseMove={handleCellTouchMove}
@@ -307,13 +307,9 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                             onClick={() => handleCellClick(team.id, label.id)}
                                             className={`
                                                 !min-h-0 w-full py-2 md:py-3 px-1 !rounded-lg text-sm md:text-base !font-bold text-center transition-all truncate select-none
-                                                ${member
-                                                    ? isSelected
-                                                        ? 'bg-primary text-white shadow-md scale-105'
-                                                        : 'text-ink bg-surface border border-edge shadow-sm hover:shadow'
-                                                    : isSelected
-                                                        ? 'bg-spot/20 text-spot border border-spot'
-                                                        : 'text-ink-muted bg-ground border border-dashed border-edge-strong hover:bg-ground/80'}
+                                                ${member && isSelected ? 'shadow-md scale-105' : ''
+                                                } ${!member && isSelected ? '!bg-spot/20' : ''
+                                                } ${!member && !isSelected ? '!text-ink-muted !bg-ground !border-dashed !border-edge-strong hover:!bg-ground/80 !shadow-none' : ''}
                                             `}
                                         >
                                             {member ? member.name : '未割当'}

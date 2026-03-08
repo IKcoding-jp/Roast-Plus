@@ -318,15 +318,7 @@ gh pr merge --merge --delete-branch
 ```
 
 ⚠️ **`--auto` は不使用。lint/build/unit/E2Eはローカルで完了済み。**
-⚠️ **ブランチ保護ルールに required status checks がある場合は事前に削除が必要。**
-
-### 4. ブランチクリーンアップ
-
-```bash
-FEATURE_BRANCH=$(git branch --show-current)
-git switch main && git pull origin main
-git branch -D "$FEATURE_BRANCH"
-```
+⚠️ **`--delete-branch` がローカル・リモートブランチのクリーンアップとmainへの切り替えを自動実行する。**
 
 ---
 

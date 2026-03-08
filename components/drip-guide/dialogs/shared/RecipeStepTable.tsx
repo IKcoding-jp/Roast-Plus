@@ -3,6 +3,7 @@
 import React from 'react';
 import { DripStep } from '@/lib/drip-guide/types';
 import { formatTime } from '@/lib/drip-guide/formatTime';
+import { Button } from '@/components/ui';
 
 interface RecipeStepTableProps {
     steps: DripStep[];
@@ -55,13 +56,15 @@ export const RecipeStepTable: React.FC<RecipeStepTableProps> = ({
                                 </td>
                                 {onStepDetailClick && (
                                     <td className="py-2 px-2 text-center">
-                                        <button
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
                                             type="button"
                                             onClick={() => onStepDetailClick(step.id, step.title)}
-                                            className="text-spot hover:text-spot-hover text-xs underline"
+                                            className="!min-h-0 !px-1 !py-0.5 !text-xs underline !text-spot hover:!text-spot-hover"
                                         >
                                             詳細
-                                        </button>
+                                        </Button>
                                     </td>
                                 )}
                             </tr>

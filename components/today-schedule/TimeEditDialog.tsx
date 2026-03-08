@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { HiX } from 'react-icons/hi';
 import type { TimeLabel } from '@/types';
+import { Button, IconButton } from '@/components/ui';
 
 interface TimeEditDialogProps {
   initialHour: string;
@@ -36,13 +37,15 @@ export function TimeEditDialog({
         {/* ヘッダー */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-5 flex items-center justify-between">
           <h3 className="text-2xl md:text-2xl font-semibold text-gray-800">時間を編集</h3>
-          <button
+          <IconButton
+            variant="ghost"
+            size="md"
             onClick={onCancel}
-            className="rounded-md bg-gray-200 p-1.5 md:p-2.5 text-gray-700 transition-colors hover:bg-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="bg-gray-200 text-gray-700 hover:bg-gray-300"
             aria-label="閉じる"
           >
             <HiX className="h-6 w-6 md:h-7 md:w-7" />
-          </button>
+          </IconButton>
         </div>
 
         {/* フォーム */}
@@ -100,13 +103,15 @@ export function TimeEditDialog({
                       <div className="flex-1 text-sm md:text-base text-gray-800 truncate">
                         {label.content || '内容なし'}
                       </div>
-                      <button
+                      <Button
                         type="button"
+                        variant="danger"
+                        size="sm"
                         onClick={() => onDeleteLabel(label.id)}
-                        className="px-2 md:px-3 py-1 md:py-1.5 text-sm md:text-sm bg-white text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors min-h-[36px]"
+                        className="!min-h-[36px] bg-white text-red-600 border border-red-200 hover:bg-red-50"
                       >
                         削除
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -115,20 +120,24 @@ export function TimeEditDialog({
 
             {/* フッター */}
             <div className="flex gap-2 md:gap-4 pt-3 md:pt-5 border-t border-gray-200 justify-center">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="md"
                 onClick={onCancel}
-                className="px-3 md:px-5 py-1.5 md:py-2.5 text-base md:text-lg text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors min-h-[44px]"
+                className="text-gray-700 bg-gray-100 hover:bg-gray-200"
               >
                 キャンセル
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                variant="primary"
+                size="md"
                 disabled={!hour}
-                className="px-4 md:px-6 py-1.5 md:py-2.5 text-base md:text-lg bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors font-medium min-h-[44px] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="bg-amber-600 hover:bg-amber-700"
               >
                 保存
-              </button>
+              </Button>
             </div>
           </div>
         </form>

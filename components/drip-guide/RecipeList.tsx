@@ -4,9 +4,9 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DripRecipe } from '@/lib/drip-guide/types';
-import { Timer, Coffee, Drop, Trash, Pencil, Play, CaretDown } from 'phosphor-react';
+import { Timer, Coffee, Drop, Trash, Pencil, Play } from 'phosphor-react';
 import { clsx } from 'clsx';
-import { Dialog, Card, Button, IconButton } from '@/components/ui';
+import { Dialog, Card, Button, IconButton, Select } from '@/components/ui';
 import { StartHintDialog } from './StartHintDialog';
 import { Start46Dialog } from './Start46Dialog';
 import { StartHoffmannDialog } from './StartHoffmannDialog';
@@ -168,27 +168,17 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes, onDelete }) => 
 
                             {/* 人前選択UI */}
                             <div className="mb-4">
-                                <label htmlFor={`servings-${recipe.id}`} className="sr-only">
-                                    人前を選択
-                                </label>
-                                <div className="relative">
-                                    <select
-                                        id={`servings-${recipe.id}`}
-                                        value={servings}
-                                        onChange={(e) => handleServingsChange(recipe.id, parseInt(e.target.value, 10))}
-                                        className="w-full py-2 px-3 pr-10 rounded-lg text-sm font-medium transition-colors min-h-[44px] bg-field border border-edge text-ink hover:border-edge-strong focus:outline-none focus:ring-2 focus:ring-spot focus:border-spot appearance-none cursor-pointer"
-                                        aria-label="人前を選択"
-                                    >
-                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((serving) => (
-                                            <option key={serving} value={serving}>
-                                                {serving}人前
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                        <CaretDown size={16} className="text-ink-muted" />
-                                    </div>
-                                </div>
+                                <Select
+                                    id={`servings-${recipe.id}`}
+                                    value={String(servings)}
+                                    onChange={(e) => handleServingsChange(recipe.id, parseInt(e.target.value, 10))}
+                                    options={[1, 2, 3, 4, 5, 6, 7, 8].map((serving) => ({
+                                        value: String(serving),
+                                        label: `${serving}人前`,
+                                    }))}
+                                    className="!text-sm !font-medium !py-2 !px-3 cursor-pointer"
+                                    aria-label="人前を選択"
+                                />
                             </div>
 
                             <Button

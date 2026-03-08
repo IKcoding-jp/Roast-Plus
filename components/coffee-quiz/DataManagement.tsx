@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { exportQuizProgress, importQuizProgress } from '@/lib/localStorage';
+import { Button } from '@/components/ui';
 
 interface DataManagementProps {
   onImportSuccess?: () => void;
@@ -117,21 +118,25 @@ export function DataManagement({ onImportSuccess }: DataManagementProps) {
       </p>
 
       <div className="flex gap-3">
-        <button
+        <Button
           onClick={handleExport}
-          className="flex-1 flex items-center justify-center gap-2 bg-edge-subtle hover:bg-edge text-ink-sub py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-edge"
+          variant="surface"
+          size="sm"
+          className="flex-1 gap-2 !rounded-xl bg-edge-subtle hover:bg-edge text-ink-sub border-edge"
         >
           <DownloadIcon />
           エクスポート
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={() => fileInputRef.current?.click()}
-          className="flex-1 flex items-center justify-center gap-2 bg-edge-subtle hover:bg-edge text-ink-sub py-2.5 px-4 rounded-xl text-sm font-medium transition-colors border border-edge"
+          variant="surface"
+          size="sm"
+          className="flex-1 gap-2 !rounded-xl bg-edge-subtle hover:bg-edge text-ink-sub border-edge"
         >
           <UploadIcon />
           インポート
-        </button>
+        </Button>
 
         <input
           ref={fileInputRef}

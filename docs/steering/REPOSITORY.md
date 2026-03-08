@@ -17,6 +17,7 @@ roastplus/
 ├── __tests__/              # ユニットテスト（Node環境が必要なスクリプト等）
 │   └── scripts/            # GitHub Actionsスクリプトのテスト
 ├── docs/                   # ドキュメント（Steering / Working）
+├── eslint-rules/           # ESLintカスタムルール（no-raw-button等）
 ├── e2e/                    # Playwright E2Eテスト
 ├── .claude/                # Claude Code設定・スキル
 ├── .github/                # GitHub設定

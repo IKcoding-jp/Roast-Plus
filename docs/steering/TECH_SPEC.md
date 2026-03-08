@@ -263,8 +263,9 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 |---------|----------|------|
 | `lib/` テスト | 28 | ビジネスロジックのユニットテスト |
 | `hooks/` テスト | 6 | カスタムフックのテスト |
-| `components/` テスト | 21 | UIコンポーネントテスト |
+| `components/` テスト | 24 | UIコンポーネントテスト |
 | `__tests__/scripts/` テスト | 1 | GitHub Actionsスクリプトのユニットテスト（Node環境） |
+| `eslint-rules/` テスト | 6 | ESLintカスタムルールのテスト |
 
 ### カバレッジ目標・実績
 
@@ -274,7 +275,7 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 | lib/ | 90%以上 | 89.44% |
 | hooks/ | 85%以上 | 87.9% |
 
-- **総テスト数**: 1136テスト（100%合格）
+- **総テスト数**: 1158テスト（100%合格）
 
 ### E2Eテスト（Playwright）
 
@@ -308,6 +309,10 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 - **バージョン**: ESLint ^9
 - **設定**: `eslint-config-next`（core-web-vitals + typescript）
 - **ポリシー**: Lintエラー・warningは常にゼロを維持
+- **カスタムルール**: `eslint-rules/` ディレクトリに独自ルールを実装
+  - `no-raw-button`: 生の `<button>` 要素の使用を検出（`Button` / `IconButton` を使用すべき）
+  - `no-raw-checkbox`: 生の `<input type="checkbox">` の使用を検出（`Checkbox` を使用すべき）
+  - `no-raw-select`: 生の `<select>` 要素の使用を検出（`Select` を使用すべき）
 
 #### Knip
 - **バージョン**: ^5.82.1

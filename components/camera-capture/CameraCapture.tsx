@@ -3,6 +3,7 @@
 import { HiCamera, HiX, HiCheck } from 'react-icons/hi';
 import { useToastContext } from '@/components/Toast';
 import { useCameraCapture } from '@/hooks/useCameraCapture';
+import { Button, IconButton } from '@/components/ui';
 import { CameraPreview } from './CameraPreview';
 
 interface CameraCaptureProps {
@@ -31,12 +32,15 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
       {/* ヘッダー */}
       <div className="flex items-center justify-between p-4 bg-black bg-opacity-50 text-white">
-        <button
+        <IconButton
           onClick={onCancel}
-          className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+          variant="ghost"
+          rounded
+          className="text-white hover:bg-white/20"
+          aria-label="キャンセル"
         >
           <HiX className="h-6 w-6" />
-        </button>
+        </IconButton>
         <h2 className="text-lg font-semibold">写真を撮影</h2>
         <div className="w-10" /> {/* スペーサー */}
       </div>
@@ -57,31 +61,35 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       <div className="p-6 bg-black bg-opacity-50 flex items-center justify-center gap-4">
         {capturedImage ? (
           <>
-            <button
+            <Button
               onClick={retakePhoto}
-              className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+              variant="secondary"
+              className="gap-2"
             >
               <HiX className="h-5 w-5" />
               やり直す
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={confirmCapture}
-              className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+              variant="coffee"
+              className="gap-2 bg-amber-600 hover:bg-amber-700"
             >
               <HiCheck className="h-5 w-5" />
               確定
-            </button>
+            </Button>
           </>
         ) : (
-          <button
+          <IconButton
             onClick={capturePhoto}
             disabled={!canCapture}
-            className={`w-20 h-20 bg-white rounded-full border-4 border-gray-300 transition-colors flex items-center justify-center min-h-[80px] min-w-[80px] ${
-              canCapture ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'
+            rounded
+            className={`w-20 h-20 bg-white border-4 border-gray-300 min-h-[80px] min-w-[80px] ${
+              canCapture ? 'hover:bg-gray-100' : ''
             }`}
+            aria-label="撮影"
           >
             <HiCamera className="h-10 w-10 text-gray-800" />
-          </button>
+          </IconButton>
         )}
       </div>
     </div>

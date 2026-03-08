@@ -73,6 +73,7 @@ export function Calendar({
               const isSelectable = !isWeekendDay && !isFuture && day.isCurrentMonth;
 
               return (
+                // eslint-disable-next-line local/no-raw-button
                 <button
                   key={index}
                   onClick={() => onDateClick(day.dateString)}
@@ -108,6 +109,7 @@ export function Calendar({
             const isFuture = year > currentYear;
 
             return (
+              // eslint-disable-next-line local/no-raw-button
               <button
                 key={year}
                 onClick={() => onYearSelect(year)}
@@ -143,6 +145,7 @@ export function Calendar({
             const isSelectable = !isFuture;
 
             return (
+              // eslint-disable-next-line local/no-raw-button
               <button
                 key={month}
                 onClick={() => onMonthSelect(month)}

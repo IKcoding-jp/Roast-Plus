@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Modal } from '@/components/ui';
+import { Modal, IconButton } from '@/components/ui';
 
 interface LevelUpModalProps {
   show: boolean;
@@ -30,12 +30,15 @@ export function LevelUpModal({ show, newLevel, onClose }: LevelUpModalProps) {
       <>
         {/* ヘッダー - ローストプラスカラー */}
             <div className="bg-gradient-to-r from-spot via-spot-hover to-spot px-6 py-8 text-center relative">
-              <button
+              <IconButton
                 onClick={onClose}
-                className="absolute top-3 right-3 text-white/70 hover:text-white transition-colors"
+                variant="ghost"
+                size="sm"
+                className="absolute top-3 right-3 text-white/70 hover:text-white !min-h-0 !min-w-0"
+                aria-label="閉じる"
               >
                 <XIcon />
-              </button>
+              </IconButton>
 
               {/* 星のアニメーション */}
               <motion.div

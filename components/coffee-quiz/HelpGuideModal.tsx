@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Modal, Button } from '@/components/ui';
+import { Modal, Button, IconButton } from '@/components/ui';
 
 interface HelpGuideModalProps {
   show: boolean;
@@ -223,16 +223,19 @@ export function HelpGuideModal({ show, onClose }: HelpGuideModalProps) {
     >
       <div className="relative flex flex-col">
         {/* 閉じるボタン */}
-        <button
+        <IconButton
           onClick={handleClose}
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface/80 text-ink-muted hover:text-ink transition-colors"
+          variant="ghost"
+          size="sm"
+          rounded
+          className="absolute top-3 right-3 z-10 w-8 h-8 !p-0 !min-h-0 !min-w-0 bg-surface/80 text-ink-muted hover:text-ink"
           aria-label="閉じる"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
-        </button>
+        </IconButton>
 
         {/* ステップコンテンツ - 固定高さで高さぶれを防止 */}
         <div className="relative overflow-hidden" style={{ height: '340px' }}>
@@ -302,11 +305,13 @@ export function HelpGuideModal({ show, onClose }: HelpGuideModalProps) {
         {/* ドットインジケーター */}
         <div className="flex justify-center gap-1.5 py-4">
           {STEPS.map((_, i) => (
-            <button
+            <IconButton
               key={i}
               onClick={() => goTo(i)}
+              variant="ghost"
+              size="sm"
               aria-label={`ステップ ${i + 1}`}
-              className="flex items-center"
+              className="!p-0 !min-h-0 !min-w-0 flex items-center"
             >
               <div
                 className={`h-2 rounded-full transition-all duration-300 ${
@@ -315,7 +320,7 @@ export function HelpGuideModal({ show, onClose }: HelpGuideModalProps) {
                     : 'w-2 bg-edge hover:bg-ink-muted'
                 }`}
               />
-            </button>
+            </IconButton>
           ))}
         </div>
 

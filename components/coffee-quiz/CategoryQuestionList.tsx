@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { QuizQuestion, QuizCard, QuizCategory } from '@/lib/coffee-quiz/types';
 import { getCardMastery } from '@/lib/coffee-quiz/fsrs';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
+import { Button } from '@/components/ui';
 import { QuestionListItem } from './QuestionListItem';
 
 // インラインSVGアイコン
@@ -192,11 +193,13 @@ export function CategoryQuestionList({
             { value: 'difficulty', label: '難易度' },
 
           ].map((option) => (
-            <button
+            <Button
               key={option.value}
               onClick={() => setSortBy(option.value as SortOption)}
+              variant="ghost"
+              size="sm"
               className={`
-                text-xs px-2 py-1 rounded-md transition-colors
+                !text-xs !px-2 !py-1 !rounded-md !min-h-0 !font-normal
                 ${sortBy === option.value
                   ? 'bg-spot/20 text-spot'
                   : 'bg-edge-subtle text-ink-muted hover:text-ink-sub'
@@ -204,7 +207,7 @@ export function CategoryQuestionList({
               `}
             >
               {option.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

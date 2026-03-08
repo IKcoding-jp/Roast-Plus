@@ -3,7 +3,7 @@ import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdAdd, MdDelete, MdPersonOff, MdBlock, MdPerson, MdClose, MdCheck, MdKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md';
 import { DEFAULT_TABLE_SETTINGS, WidthConfig, HeightConfig } from './types';
-import { Button, Input, IconButton, NumberInput } from '@/components/ui';
+import { Button, Input, IconButton, NumberInput, Checkbox } from '@/components/ui';
 import { MAX_MEMBERS } from '../../lib/constants';
 
 type TableModalsProps = {
@@ -241,21 +241,14 @@ export const TableModals: React.FC<TableModalsProps> = ({
                                                                                 }
                                                                             `}
                                                                         >
-                                                                            <div className="relative flex items-center justify-center w-5 h-5">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    checked={isExcluded}
-                                                                                    onChange={async (e) => {
-                                                                                        if (contextMenu.memberId) {
-                                                                                            await onUpdateMemberExclusion(contextMenu.memberId, label.id, e.target.checked);
-                                                                                        }
-                                                                                    }}
-                                                                                    className="appearance-none w-5 h-5 border rounded checked:bg-red-500 checked:border-red-500 transition-colors cursor-pointer border-edge-strong focus:ring-2 focus:ring-red-200"
-                                                                                />
-                                                                                {isExcluded && (
-                                                                                    <MdClose className="absolute text-white pointer-events-none" size={14} />
-                                                                                )}
-                                                                            </div>
+                                                                            <Checkbox
+                                                                                checked={isExcluded}
+                                                                                onChange={async (e) => {
+                                                                                    if (contextMenu.memberId) {
+                                                                                        await onUpdateMemberExclusion(contextMenu.memberId, label.id, e.target.checked);
+                                                                                    }
+                                                                                }}
+                                                                            />
                                                                             <div className="text-sm flex-1 truncate">
                                                                                 <span className={
                                                                                     isExcluded

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Notification, NotificationType } from '@/types';
+import { Button, Select } from '@/components/ui';
 
 interface NotificationModalProps {
   notification: Notification | null;
@@ -132,42 +133,39 @@ export function NotificationModal({ notification, onSave, onCancel }: Notificati
               </div>
 
               {/* 種類 */}
-              <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  種類 <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="type"
-                  value={type}
-                  onChange={(e) => setType(e.target.value as NotificationType)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="announcement">お知らせ</option>
-                  <option value="update">アップデート</option>
-                  <option value="improvement">改善</option>
-                  <option value="request">お願い</option>
-                  <option value="bugfix">バグ修正</option>
-                </select>
-              </div>
+              <Select
+                id="type"
+                label="種類 *"
+                value={type}
+                onChange={(e) => setType(e.target.value as NotificationType)}
+                options={[
+                  { value: 'announcement', label: 'お知らせ' },
+                  { value: 'update', label: 'アップデート' },
+                  { value: 'improvement', label: '改善' },
+                  { value: 'request', label: 'お願い' },
+                  { value: 'bugfix', label: 'バグ修正' },
+                ]}
+                className="text-gray-900 bg-white"
+              />
             </div>
 
             <div className="flex gap-3 justify-end mt-6">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
                 onClick={onCancel}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 キャンセル
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                variant="primary"
+                size="sm"
+                className="bg-orange-500 hover:bg-orange-600"
               >
                 {notification ? '更新' : '追加'}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

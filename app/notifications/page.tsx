@@ -10,7 +10,7 @@ import { NotificationModal } from '@/components/notifications/NotificationModal'
 import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { DeleteConfirmDialog } from '@/components/notifications/DeleteConfirmDialog';
 import { IoAdd } from 'react-icons/io5';
-import { FloatingNav } from '@/components/ui';
+import { FloatingNav, Button } from '@/components/ui';
 import type { Notification } from '@/types';
 
 export default function NotificationsPage() {
@@ -154,13 +154,15 @@ export default function NotificationsPage() {
           {/* 開発者モード時のみ表示：通知追加ボタン */}
           {isDeveloperMode && (
             <div className="mb-6">
-              <button
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={handleAddClick}
-                className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                className="!bg-orange-500 hover:!bg-orange-600 gap-2"
               >
                 <IoAdd className="h-5 w-5" />
                 通知を追加
-              </button>
+              </Button>
             </div>
           )}
 

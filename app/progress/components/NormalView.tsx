@@ -99,13 +99,15 @@ export function NormalView({
             </Button>
           </div>
           {archivedCount > 0 && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onShowArchived}
-              className="mt-8 text-ink-muted hover:text-ink-sub text-sm flex items-center gap-1 transition-colors"
+              className="mt-8 !text-ink-muted hover:!text-ink-sub !text-sm !min-h-0 gap-1"
             >
               <HiArchive className="h-4 w-4" />
               アーカイブ済みの作業を見る
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -117,12 +119,14 @@ export function NormalView({
             <HiSearch className="h-12 w-12 mx-auto" />
           </div>
           <p className="text-ink-sub font-medium">条件に一致する作業が見つかりませんでした</p>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onClearFilters}
-            className="mt-4 text-spot hover:text-spot-hover font-medium transition-colors"
+            className="mt-4 !min-h-0 !font-medium"
           >
             フィルタを解除
-          </button>
+          </Button>
         </div>
       )}
 
@@ -185,13 +189,15 @@ export function NormalView({
 
             {/* グループ内追加ボタン */}
             <div className="px-4 pb-4">
-              <button
+              <Button
+                variant="ghost"
+                fullWidth
                 onClick={() => onAddToGroup(group.groupName)}
-                className="w-full py-2 border-2 border-dashed border-edge rounded-lg text-ink-muted hover:text-spot hover:border-spot-subtle hover:bg-spot-surface transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                className="!min-h-0 !py-2 !border-2 !border-dashed !border-edge !rounded-lg !text-ink-muted hover:!text-spot hover:!border-spot-subtle hover:!bg-spot-surface !text-sm !font-medium gap-2"
               >
                 <HiPlus className="h-4 w-4" />
                 作業を追加
-              </button>
+              </Button>
             </div>
           </div>
         ))}

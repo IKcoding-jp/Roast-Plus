@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@/components/ui';
+
 interface DeleteConfirmDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
@@ -14,18 +16,20 @@ export function DeleteConfirmDialog({ onConfirm, onCancel }: DeleteConfirmDialog
           この通知を削除してもよろしいですか？この操作は取り消せません。
         </p>
         <div className="flex gap-3 justify-end">
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={onCancel}
-            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
           >
             キャンセル
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
           >
             削除
-          </button>
+          </Button>
         </div>
       </div>
     </div>

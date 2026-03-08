@@ -319,6 +319,8 @@ const DIFFICULTY_STYLES = {
 - **コーヒー色アクセントは `header-bg`** → `#4E3526` / `#211714` 等のハードコード禁止、`bg-header-bg` CSS変数を使用（7テーマ自動対応）
 - **新規コンポーネント追加時は `registry.tsx` への登録必須** → `/dev/design-lab` に自動表示
 
+> **自動チェック**: ESLintカスタムルール（`no-raw-button`, `no-raw-checkbox`, `no-raw-select`）により、生のHTML要素の使用はlint時に自動検出される。共通UIコンポーネントの使用漏れを防止する。
+
 ---
 
 ### レスポンシブデザイン

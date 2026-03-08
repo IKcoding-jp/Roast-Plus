@@ -30,6 +30,7 @@ export function ScheduleTypeSelector({
             isRoasterOn ? 'border-orange-500 bg-orange-50' : 'border-edge bg-surface hover:border-edge-strong'
           }`}
         >
+          {/* eslint-disable-next-line local/no-raw-checkbox -- sr-onlyのトグルUI。Checkboxコンポーネントは視覚的表示が異なるため不適合 */}
           <input
             type="checkbox"
             checked={isRoasterOn}
@@ -50,6 +51,7 @@ export function ScheduleTypeSelector({
             isRoast ? 'border-amber-500 bg-amber-50' : 'border-edge bg-surface hover:border-edge-strong'
           }`}
         >
+          {/* eslint-disable-next-line local/no-raw-checkbox -- sr-onlyのトグルUI。Checkboxコンポーネントは視覚的表示が異なるため不適合 */}
           <input
             type="checkbox"
             checked={isRoast}
@@ -70,6 +72,7 @@ export function ScheduleTypeSelector({
             isAfterPurge ? 'border-blue-500 bg-blue-50' : 'border-edge bg-surface hover:border-edge-strong'
           }`}
         >
+          {/* eslint-disable-next-line local/no-raw-checkbox -- sr-onlyのトグルUI。Checkboxコンポーネントは視覚的表示が異なるため不適合 */}
           <input
             type="checkbox"
             checked={isAfterPurge}
@@ -90,6 +93,7 @@ export function ScheduleTypeSelector({
             isChaffCleaning ? 'border-gray-500 bg-gray-50' : 'border-edge bg-surface hover:border-edge-strong'
           }`}
         >
+          {/* eslint-disable-next-line local/no-raw-checkbox -- sr-onlyのトグルUI。Checkboxコンポーネントは視覚的表示が異なるため不適合 */}
           <input
             type="checkbox"
             checked={isChaffCleaning}

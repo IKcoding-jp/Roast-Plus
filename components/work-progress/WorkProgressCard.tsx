@@ -1,6 +1,7 @@
 import React from 'react';
 import { HiPlus, HiArchive, HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import { WorkProgress, WorkProgressStatus } from '@/types';
+import { Button, IconButton } from '@/components/ui';
 
 interface WorkProgressCardProps {
     workProgress: WorkProgress;
@@ -46,16 +47,19 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
         return (
             <div className="text-center py-6 px-4 bg-ground/50 border-2 border-dashed border-edge-strong rounded-lg">
                 <p className="text-sm text-ink-sub mb-3">新しく作業を追加してください</p>
-                <button
+                <Button
+                    variant="outline"
+                    size="sm"
+                    fullWidth
                     onClick={(e) => {
                         e.stopPropagation();
                         onEdit(wp.id);
                     }}
-                    className="w-full px-3 py-1.5 text-xs font-medium text-spot bg-spot-subtle border border-spot rounded-lg hover:bg-spot-surface transition-colors flex items-center justify-center gap-1.5 min-h-[44px]"
+                    className="text-xs bg-spot-subtle"
                 >
-                    <HiPlus className="h-3.5 w-3.5" />
+                    <HiPlus className="h-3.5 w-3.5 mr-1.5" />
                     <span>作業を追加</span>
-                </button>
+                </Button>
             </div>
         );
     }
@@ -75,6 +79,7 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                         {wp.taskName && (
                             <h3 className="text-base font-bold text-ink leading-tight">{wp.taskName}</h3>
                         )}
+                        {/* eslint-disable-next-line local/no-raw-select -- インラインステータスバッジ。Selectコンポーネントはフォーム用で、このコンパクトなUI（32px高、条件付き背景色）には不適合 */}
                         <select
                             value={wp.status}
                             onChange={(e) => {
@@ -99,16 +104,19 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
 
                 {/* Archive Button */}
                 {wp.status === 'completed' && (
-                    <button
+                    <IconButton
+                        variant="ghost"
+                        size="sm"
+                        rounded
                         onClick={(e) => {
                             e.stopPropagation();
                             onArchive(wp.id);
                         }}
-                        className="p-2 text-ink-muted hover:text-ink-sub hover:bg-ground rounded-full transition-colors"
                         title="アーカイブ"
+                        aria-label="アーカイブ"
                     >
                         <HiArchive className="h-5 w-5" />
-                    </button>
+                    </IconButton>
                 )}
             </div>
 
@@ -136,16 +144,18 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                 <span className="text-sm font-normal text-ink-muted ml-1">/ {formatAmount(wp.targetAmount, unit)}{unit}</span>
                             </div>
                         </div>
-                        <button
+                        <Button
+                            variant="primary"
+                            size="sm"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onAddProgress(wp.id);
                             }}
-                            className="px-3 py-1.5 text-xs font-bold text-white bg-btn-primary rounded-lg hover:bg-btn-primary-hover active:bg-btn-primary-hover transition-colors flex items-center gap-1 shadow-sm"
+                            className="!min-h-0 px-3 py-1.5 text-xs shadow-sm"
                         >
-                            <HiPlus className="h-4 w-4" />
+                            <HiPlus className="h-4 w-4 mr-1" />
                             記録
-                        </button>
+                        </Button>
                     </div>
 
                     {/* Progress Bar */}
@@ -171,16 +181,18 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
                                 {wp.completedCount || 0}<span className="text-sm font-normal text-ink-muted ml-1">個</span>
                             </span>
                         </div>
-                        <button
+                        <Button
+                            variant="primary"
+                            size="sm"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onAddProgress(wp.id);
                             }}
-                            className="px-3 py-1.5 text-xs font-bold text-white bg-btn-primary rounded-lg hover:bg-btn-primary-hover active:bg-btn-primary-hover transition-colors flex items-center gap-1 shadow-sm"
+                            className="!min-h-0 px-3 py-1.5 text-xs shadow-sm"
                         >
-                            <HiPlus className="h-4 w-4" />
+                            <HiPlus className="h-4 w-4 mr-1" />
                             記録
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
@@ -203,16 +215,19 @@ export const WorkProgressCard: React.FC<WorkProgressCardProps> = ({
             {/* History Toggle */}
             {hasProgressHistory && (
                 <div className="mt-3 pt-2 border-t border-edge">
-                    <button
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        fullWidth
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleHistory(wp.id);
                         }}
-                        className="w-full flex items-center justify-between text-xs text-ink-muted hover:text-ink-sub py-1 transition-colors"
+                        className="!min-h-0 flex items-center justify-between text-xs text-ink-muted hover:text-ink-sub py-1"
                     >
                         <span>履歴 ({wp.progressHistory!.length})</span>
                         {isHistoryExpanded ? <HiChevronUp className="h-3 w-3" /> : <HiChevronDown className="h-3 w-3" />}
-                    </button>
+                    </Button>
 
                     {isHistoryExpanded && (
                         <div className="mt-2 space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">

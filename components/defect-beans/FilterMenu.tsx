@@ -122,19 +122,21 @@ export function FilterMenu({
             <p className="text-xs font-medium text-ink-sub uppercase tracking-wide">ソート</p>
             <div className="flex flex-col gap-1">
               {SORT_OPTIONS.map((option) => (
-                <button
+                <Button
                   key={option}
+                  variant="ghost"
+                  size="sm"
                   onClick={() => onSortChange(option)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${
+                  className={`!min-h-0 w-full !justify-start !px-3 !py-2 !text-sm !rounded-lg gap-2 ${
                     sortOption === option
-                      ? 'bg-spot-subtle text-spot font-medium'
-                      : 'text-ink-sub hover:bg-ground'
+                      ? 'bg-spot-subtle !text-spot !font-medium'
+                      : '!text-ink-sub hover:bg-ground'
                   }`}
                 >
                   {getSortIcon(option)}
                   <span>{getSortLabel(option)}</span>
                   {sortOption === option && <HiCheckCircle className="h-4 w-4 text-spot ml-auto" />}
-                </button>
+                </Button>
               ))}
             </div>
           </div>

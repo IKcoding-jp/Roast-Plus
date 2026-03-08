@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { HiX, HiTrash, HiCheck, HiXCircle } from 'react-icons/hi';
+import { Button, IconButton } from '@/components/ui';
 import type { DefectBean } from '@/types';
 
 interface DefectBeanDetailProps {
@@ -100,51 +101,61 @@ export function DefectBeanDetail({
         {/* 設定切り替え */}
         {onToggleSetting && (
           <div className="flex gap-2 pt-2 border-t border-gray-200">
-            <button
+            <Button
               onClick={() => handleToggleSetting(true)}
-              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
+              variant={shouldRemove === true ? 'danger' : 'secondary'}
+              size="sm"
+              className={`flex-1 gap-2 ${
                 shouldRemove === true
-                  ? 'bg-red-500 text-white'
+                  ? 'bg-red-500 hover:bg-red-600'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
               <HiXCircle className="h-5 w-5" />
               省く
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleToggleSetting(false)}
-              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
+              variant={shouldRemove === false ? 'success' : 'secondary'}
+              size="sm"
+              className={`flex-1 gap-2 ${
                 shouldRemove === false
-                  ? 'bg-green-500 text-white'
+                  ? ''
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
               <HiCheck className="h-5 w-5" />
               省かない
-            </button>
+            </Button>
           </div>
         )}
 
         {/* 削除ボタン（ユーザー追加データのみ） */}
         {onDelete && (
-          <button
+          <Button
             onClick={() => setShowDeleteConfirm(true)}
-            className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+            variant="danger"
+            size="sm"
+            fullWidth
+            className="gap-2"
           >
             <HiTrash className="h-5 w-5" />
             削除
-          </button>
+          </Button>
         )}
 
         {/* 閉じるボタン */}
         {onClose && (
-          <button
+          <Button
             onClick={onClose}
-            className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+            variant="secondary"
+            size="sm"
+            fullWidth
+            className="gap-2 bg-gray-200 text-gray-700 hover:bg-gray-300"
           >
             <HiX className="h-5 w-5" />
             閉じる
-          </button>
+          </Button>
         )}
       </div>
 
@@ -154,12 +165,14 @@ export function DefectBeanDetail({
           className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
           onClick={() => setShowImageModal(false)}
         >
-          <button
+          <IconButton
             onClick={() => setShowImageModal(false)}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            variant="ghost"
+            className="absolute top-4 right-4 text-white hover:text-gray-300"
+            aria-label="閉じる"
           >
             <HiX className="h-8 w-8" />
-          </button>
+          </IconButton>
           <div className="relative max-w-full max-h-full">
             <Image
               src={defectBean.imageUrl}
@@ -184,18 +197,22 @@ export function DefectBeanDetail({
               この欠点豆を削除しますか？この操作は取り消せません。
             </p>
             <div className="flex gap-3">
-              <button
+              <Button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors min-h-[44px]"
+                variant="secondary"
+                size="sm"
+                className="flex-1 bg-gray-200 text-gray-700 hover:bg-gray-300"
               >
                 キャンセル
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleDelete}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors min-h-[44px]"
+                variant="danger"
+                size="sm"
+                className="flex-1"
               >
                 削除
-              </button>
+              </Button>
             </div>
           </div>
         </div>

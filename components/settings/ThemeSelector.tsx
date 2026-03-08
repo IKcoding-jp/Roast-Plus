@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import type { ThemePreset, ThemeAnimationType } from '@/lib/theme';
 import { HiCheck } from 'react-icons/hi';
+import { Button } from '@/components/ui';
 import {
   TbCoffee,
   TbFlame,
@@ -413,12 +414,14 @@ function ThemePreviewCard({
   const Icon = THEME_ICONS[preset.id] ?? TbCoffee;
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onSelect}
       aria-pressed={isSelected}
       className={`
-        relative w-full text-left rounded-xl overflow-hidden
+        relative w-full text-left !rounded-xl overflow-hidden
+        !p-0 !min-h-0
         transition-all duration-200 ease-out
         border-2
         ${
@@ -501,7 +504,7 @@ function ThemePreviewCard({
           </div>
         </div>
       </div>
-    </button>
+    </Button>
   );
 }
 

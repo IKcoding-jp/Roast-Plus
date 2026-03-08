@@ -295,7 +295,8 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
 
                                 return (
                                     <div key={team.id} className="p-2 md:p-4 py-2 border-r h-full flex items-center justify-center relative border-edge">
-                                        <button
+                                        <Button
+                                            variant="ghost"
                                             onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                             onMouseUp={handleCellTouchEnd}
                                             onMouseMove={handleCellTouchMove}
@@ -305,7 +306,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                             onTouchMove={handleCellTouchMove}
                                             onClick={() => handleCellClick(team.id, label.id)}
                                             className={`
-                                                w-full py-2 md:py-3 px-1 rounded-lg text-sm md:text-base font-bold text-center transition-all truncate select-none
+                                                !min-h-0 w-full py-2 md:py-3 px-1 !rounded-lg text-sm md:text-base !font-bold text-center transition-all truncate select-none
                                                 ${member
                                                     ? isSelected
                                                         ? 'bg-primary text-white shadow-md scale-105'
@@ -316,7 +317,7 @@ export const DesktopTableView: React.FC<DesktopTableViewProps> = ({
                                             `}
                                         >
                                             {member ? member.name : '未割当'}
-                                        </button>
+                                        </Button>
                                     </div>
                                 );
                             })

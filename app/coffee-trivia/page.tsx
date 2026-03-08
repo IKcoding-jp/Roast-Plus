@@ -5,7 +5,7 @@ import { Loading } from '@/components/Loading';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { QuizDashboard, HelpGuideModal } from '@/components/coffee-quiz';
 import { useQuizData } from '@/hooks/useQuizData';
-import { FloatingNav } from '@/components/ui';
+import { FloatingNav, IconButton } from '@/components/ui';
 
 // ヘルプアイコン
 const HelpCircleIcon = () => (
@@ -32,14 +32,17 @@ export default function CoffeeTriviaPage() {
       <FloatingNav
         backHref="/"
         right={
-          <button
+          <IconButton
+            variant="surface"
+            size="sm"
+            rounded
             onClick={() => setShowHelpGuide(true)}
-            className="w-11 h-11 flex items-center justify-center bg-surface/80 backdrop-blur-sm shadow-md rounded-full text-ink-sub hover:text-ink hover:bg-surface transition-colors"
+            className="!w-11 !h-11 bg-surface/80 backdrop-blur-sm shadow-md text-ink-sub hover:text-ink hover:bg-surface"
             title="使い方ガイド"
             aria-label="使い方ガイド"
           >
             <HelpCircleIcon />
-          </button>
+          </IconButton>
         }
       />
 

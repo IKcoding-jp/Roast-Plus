@@ -2,7 +2,7 @@ import React from 'react';
 import { Team, TaskLabel, Assignment, Member, TableSettings } from '@/types';
 import { MdDelete, MdCheck } from 'react-icons/md';
 import { DEFAULT_TABLE_SETTINGS } from './types';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, Badge } from '@/components/ui';
 
 type MobileListViewProps = {
     teams: Team[];
@@ -94,19 +94,23 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 w-full flex-wrap">
-                                    <div
-                                        className="text-sm px-2 py-1 rounded cursor-pointer font-bold text-ink bg-ground border border-edge"
+                                    <Badge
+                                        variant="default"
+                                        size="md"
+                                        className="cursor-pointer !rounded border border-edge !font-bold"
                                         onClick={() => startEditLabel(label)}
                                     >
                                         {label.leftLabel}
-                                    </div>
+                                    </Badge>
                                     {label.rightLabel && (
-                                        <div
-                                            className="text-sm px-2 py-1 rounded cursor-pointer font-bold text-ink bg-ground border border-edge"
+                                        <Badge
+                                            variant="default"
+                                            size="md"
+                                            className="cursor-pointer !rounded border border-edge !font-bold"
                                             onClick={() => startEditLabel(label)}
                                         >
                                             {label.rightLabel}
-                                        </div>
+                                        </Badge>
                                     )}
                                 </div>
                             )}
@@ -127,7 +131,10 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
                                     return (
                                         <div key={team.id} className="flex flex-col gap-1">
                                             <div className="text-[10px] font-bold px-1 text-ink-muted">{formatTeamTitle(team.name)}</div>
-                                            <button
+                                            <Button
+                                                variant={isSelected ? (member ? 'primary' : 'outline') : 'surface'}
+                                                size="sm"
+                                                fullWidth
                                                 onMouseDown={(e) => handleCellTouchStart(team.id, label.id, member?.id || null, e)}
                                                 onMouseUp={handleCellTouchEnd}
                                                 onMouseMove={handleCellTouchMove}
@@ -136,19 +143,13 @@ export const MobileListView: React.FC<MobileListViewProps> = ({
                                                 onTouchEnd={handleCellTouchEnd}
                                                 onTouchMove={handleCellTouchMove}
                                                 onClick={() => handleCellClick(team.id, label.id)}
-                                                className={`
-                                                    w-full py-3 px-2 rounded-lg text-sm font-bold text-center transition-all truncate select-none
-                                                    ${member
-                                                        ? isSelected
-                                                            ? 'bg-primary text-white shadow-md scale-105'
-                                                            : 'text-ink bg-ground border border-edge shadow-sm'
-                                                        : isSelected
-                                                            ? 'bg-spot/20 text-spot border border-spot'
-                                                            : 'text-ink-muted bg-ground border border-dashed border-edge-strong'}
-                                                `}
+                                                className={`!min-h-0 !py-3 !px-2 truncate select-none ${
+                                                    member && isSelected ? 'shadow-md scale-105' : ''
+                                                } ${!member && isSelected ? '!bg-spot/20' : ''
+                                                } ${!member && !isSelected ? '!border-dashed !border-edge-strong !text-ink-muted' : ''}`}
                                             >
                                                 {member ? member.name : '未割当'}
-                                            </button>
+                                            </Button>
                                         </div>
                                     );
                                 })}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HiX, HiCheck, HiTrash } from 'react-icons/hi';
-import { IconButton } from '@/components/ui';
+import { Button, IconButton } from '@/components/ui';
 import { ProgressEntry } from '@/types';
 import { useToastContext } from '@/components/Toast';
 
@@ -144,37 +144,41 @@ export const ProgressHistoryEditDialog: React.FC<ProgressHistoryEditDialogProps>
 
                     {/* Actions */}
                     <div className="flex gap-3">
-                        <button
+                        <Button
                             type="button"
+                            variant="danger"
+                            size="md"
                             onClick={handleDelete}
                             disabled={isSubmitting}
-                            className={`px-4 py-3 rounded-xl font-bold text-white shadow-md flex items-center justify-center gap-2 transition-all flex-1 ${
+                            className={`flex-1 !rounded-xl shadow-md active:scale-[0.98] ${
                                 showDeleteConfirm
-                                    ? 'bg-danger hover:bg-danger/90 active:scale-[0.98]'
-                                    : 'bg-danger/80 hover:bg-danger active:scale-[0.98]'
-                            } disabled:opacity-70 disabled:cursor-not-allowed`}
+                                    ? ''
+                                    : 'bg-danger/80 hover:bg-danger'
+                            }`}
                         >
-                            <HiTrash className="h-5 w-5" />
+                            <HiTrash className="h-5 w-5 mr-2" />
                             {showDeleteConfirm ? '本当に削除' : '削除'}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
+                            variant="primary"
+                            size="md"
                             disabled={!amount || parseFloat(amount) === 0 || isNaN(parseFloat(amount)) || isSubmitting}
-                            className={`flex-1 px-4 py-3 rounded-xl font-bold text-white shadow-md flex items-center justify-center gap-2 transition-all ${
+                            className={`flex-1 !rounded-xl shadow-md active:scale-[0.98] ${
                                 !amount || parseFloat(amount) === 0 || isNaN(parseFloat(amount)) || isSubmitting
-                                    ? 'bg-ground text-ink-muted cursor-not-allowed'
-                                    : 'bg-btn-primary hover:bg-btn-primary-hover active:scale-[0.98]'
+                                    ? '!bg-ground !text-ink-muted'
+                                    : ''
                             }`}
                         >
                             {isSubmitting ? (
                                 <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
-                                    <HiCheck className="h-5 w-5" />
+                                    <HiCheck className="h-5 w-5 mr-2" />
                                     保存
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

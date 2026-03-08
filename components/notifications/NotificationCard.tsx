@@ -2,7 +2,7 @@
 
 import { IoCreateOutline, IoTrashOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import type { Notification } from '@/types';
-import { Card } from '@/components/ui/Card';
+import { Card, IconButton } from '@/components/ui';
 
 interface NotificationCardProps {
   notification: Notification;
@@ -74,26 +74,26 @@ export function NotificationCard({
           {/* 開発者モード時のみ表示:上/下移動ボタン */}
           {isDeveloperMode && (
             <div className="flex flex-col gap-1">
-              <button
+              <IconButton
+                variant="ghost"
+                size="sm"
                 onClick={() => onMoveUp(notification.id)}
                 disabled={isFirst}
-                className={`p-1 text-ink-muted hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
-                  isFirst ? 'opacity-30 cursor-not-allowed' : ''
-                }`}
+                className="hover:text-orange-500 hover:bg-orange-50"
                 aria-label="上に移動"
               >
                 <IoChevronUp className="h-4 w-4" />
-              </button>
-              <button
+              </IconButton>
+              <IconButton
+                variant="ghost"
+                size="sm"
                 onClick={() => onMoveDown(notification.id)}
                 disabled={isLast}
-                className={`p-1 text-ink-muted hover:text-orange-500 hover:bg-orange-50 rounded transition-colors ${
-                  isLast ? 'opacity-30 cursor-not-allowed' : ''
-                }`}
+                className="hover:text-orange-500 hover:bg-orange-50"
                 aria-label="下に移動"
               >
                 <IoChevronDown className="h-4 w-4" />
-              </button>
+              </IconButton>
             </div>
           )}
           <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(notification.type)}`}>
@@ -104,20 +104,23 @@ export function NotificationCard({
         {/* 開発者モード時のみ表示:編集・削除ボタン */}
         {isDeveloperMode && (
           <div className="flex items-center gap-2">
-            <button
+            <IconButton
+              variant="ghost"
+              size="sm"
               onClick={() => onEdit(notification)}
-              className="p-2 text-ink-sub hover:text-orange-500 hover:bg-orange-50 rounded transition-colors"
+              className="text-ink-sub hover:text-orange-500 hover:bg-orange-50"
               aria-label="編集"
             >
               <IoCreateOutline className="h-5 w-5" />
-            </button>
-            <button
+            </IconButton>
+            <IconButton
+              variant="danger"
+              size="sm"
               onClick={() => onDelete(notification.id)}
-              className="p-2 text-ink-sub hover:text-red-500 hover:bg-red-50 rounded transition-colors"
               aria-label="削除"
             >
               <IoTrashOutline className="h-5 w-5" />
-            </button>
+            </IconButton>
           </div>
         )}
       </div>

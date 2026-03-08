@@ -735,6 +735,10 @@ function NewComponentDemo() {
 2. **`useAppTheme().isChristmasTheme`**: JSX内の条件レンダリングが必要な場合
 3. **用途限定**: 条件レンダリングのみ。コンポーネントへのテーマprop渡しには使わない
 
+#### ESLintカスタムルールによる自動検出
+
+ESLintカスタムルール（`no-raw-button`, `no-raw-checkbox`, `no-raw-select`）が、生のHTML要素（`<button>`, `<input type="checkbox">`, `<select>`）の使用を自動で検出する。共通UIコンポーネント（`Button`, `Checkbox`, `Select`）の使用漏れを防止する仕組み。
+
 #### 共通UIの禁止事項
 1. ❌ 共通コンポーネントの重複作成（既存コンポーネントを必ず確認）
 2. ❌ 生のTailwindでのボタン/カード/入力作成

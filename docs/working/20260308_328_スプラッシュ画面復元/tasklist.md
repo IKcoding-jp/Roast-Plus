@@ -2,23 +2,23 @@
 
 ## Phase 1: ファイル復元
 
-- [ ] `components/splash/patterns.tsx` を作成（git履歴 1a0660d から復元）
+- [x] `components/splash/patterns.tsx` を作成（git履歴 1a0660d から復元）
   - PatternFadeUp, PatternScaleBreathe, PatternLetterStagger, PatternSlideReveal, PatternGlowPulse
   - splashPatterns 配列をエクスポート
-- [ ] `components/SplashScreen.tsx` を作成（git履歴 1a0660d から復元）
+- [x] `components/SplashScreen.tsx` を作成（git履歴 1a0660d から復元）
   - sessionStorage で初回起動のみ表示ロジック
   - 5パターンからランダム選択
   - フェードアウトアニメーション（SPLASH_DISPLAY_TIME = 2800ms）
-- [ ] `components/SplashScreenWrapper.tsx` を作成（git履歴 から復元）
+- [x] `components/SplashScreenWrapper.tsx` を作成（git履歴 から復元）
   - dynamic import で SSR 無効化
 
 ## Phase 2: 既存ファイル更新
 
-- [ ] `app/layout.tsx`
+- [x] `app/layout.tsx`
   - `SplashScreenWrapper` を import
   - `<body>` 内の `<ServiceWorkerRegistration />` の前後に `<SplashScreenWrapper />` を追加
 
-- [ ] `app/page.tsx`
+- [x] `app/page.tsx`
   - `splashVisible` 状態管理を再追加（`useState(true)` で初期値 true）
   - `SPLASH_DISPLAY_TIME + 300` ms 後に `splashVisible = false` にするタイマーを useEffect で追加
   - Loading の表示条件を `(loading || checkingConsent) && !splashVisible` に変更
@@ -26,10 +26,13 @@
 
 ## Phase 3: 検証
 
-- [ ] `npm run lint` でエラー 0
-- [ ] `npm run build` が成功
-- [ ] `npm run test:run` が全テストパス
-- [ ] ブラウザで動作確認（スプラッシュ → ホーム画面への遷移）
+- [x] `npm run lint` でエラー 0
+- [x] `npm run build` が成功
+- [x] `npm run test:run` が全テストパス（1167テスト 100%合格）
+- [x] E2Eテスト通過（個別スイートで全通過）
+
+**ステータス**: ✅ 完了
+**完了日**: 2026-03-08
 
 ## 参考コミット
 

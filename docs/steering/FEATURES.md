@@ -576,6 +576,36 @@ interface UserStats {
 
 ## 10. その他
 
+### スプラッシュ画面（Splash Screen）
+
+#### 目的
+PWA起動時のブランドアニメーション表示、OSネイティブスプラッシュとのシームレス接続
+
+#### 仕様
+- **表示条件**: セッション中の初回起動のみ（sessionStorage `roastplus_splash_shown` キーで制御）
+- **表示時間**: 2800ms（フェードアウト500ms含め計3300ms）
+- **アニメーションパターン**: 5種類からランダム選択
+  - Fade Up: ロゴが下から浮き上がりフェードイン
+  - Scale Breathe: ロゴが拡大出現後、微呼吸パルス
+  - Letter Stagger: 文字が1文字ずつ順番にフェードイン
+  - Slide Reveal: 「Roast」左から、「Plus」右からスライドして合流
+  - Glow Pulse: ブラーから出現+オレンジグロー
+- **背景色**: `#261a14`（manifest.json の `background_color` と一致でシームレス遷移）
+
+#### 実装ファイル
+| ファイル | 役割 |
+|---------|------|
+| `components/splash/patterns.tsx` | 5パターンのアニメーションコンポーネント定義 |
+| `components/SplashScreen.tsx` | 表示制御・タイマー管理・フェードアウト |
+| `components/SplashScreenWrapper.tsx` | `dynamic import { ssr: false }` でSSR無効化 |
+
+#### 実装上の注意
+- **SSR無効化必須**: `SplashScreenWrapper` を `app/layout.tsx` 内で使用（sessionStorageにSSRからアクセス不可のため）
+- **`breathe` keyframes**: `app/globals.css` に定義（`<style jsx global>` は Next.js 15+で動作しないため）
+- **page.tsx の splashVisible**: スプラッシュ表示中に `<Loading />` を非表示にするためのタイマー制御（SplashScreen の実際の表示状態とは非同期）
+
+---
+
 ### 共通UI（UI Components）
 
 #### 目的

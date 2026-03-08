@@ -90,7 +90,7 @@ export default function ConsentPage() {
           {/* チェックボックス */}
           <div className="space-y-4 mb-6">
             {/* 利用規約 */}
-            <div className="flex items-start gap-3 cursor-pointer group" onClick={() => setTermsAgreed(!termsAgreed)}>
+            <label className="flex items-start gap-3 cursor-pointer group">
               <Checkbox
                 checked={termsAgreed}
                 onChange={(e) => setTermsAgreed(e.target.checked)}
@@ -107,10 +107,10 @@ export default function ConsentPage() {
                 </Link>
                 に同意する
               </span>
-            </div>
+            </label>
 
             {/* プライバシーポリシー */}
-            <div className="flex items-start gap-3 cursor-pointer group" onClick={() => setPrivacyAgreed(!privacyAgreed)}>
+            <label className="flex items-start gap-3 cursor-pointer group">
               <Checkbox
                 checked={privacyAgreed}
                 onChange={(e) => setPrivacyAgreed(e.target.checked)}
@@ -127,7 +127,7 @@ export default function ConsentPage() {
                 </Link>
                 に同意する
               </span>
-            </div>
+            </label>
           </div>
 
           {/* 同意ボタン */}

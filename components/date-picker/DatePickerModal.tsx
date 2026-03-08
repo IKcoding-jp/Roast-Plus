@@ -3,6 +3,7 @@
 import { HiX, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { useDatePicker } from './useDatePicker';
 import { Calendar } from './Calendar';
+import { IconButton, Button } from '@/components/ui';
 
 interface DatePickerModalProps {
   selectedDate: string; // YYYY-MM-DD形式
@@ -56,71 +57,72 @@ export function DatePickerModal({
           {viewMode === 'calendar' && (
             <>
               <div className="flex items-center gap-4">
-                <button
+                <IconButton
                   onClick={handlePreviousMonth}
-                  className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
+                  className="min-w-[44px] text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                   aria-label="前月"
                 >
                   <HiChevronLeft className="h-5 w-5" />
-                </button>
-                <button
+                </IconButton>
+                <Button
+                  variant="ghost"
                   onClick={handleYearMonthClick}
-                  className="text-xl md:text-2xl font-semibold text-gray-800 hover:text-amber-600 transition-colors cursor-pointer px-2 py-1 rounded-md hover:bg-gray-50"
+                  className="!min-h-0 !px-2 !py-1 !text-xl md:!text-2xl !font-semibold text-gray-800 hover:text-amber-600 hover:bg-gray-50"
                   aria-label="年月を選択"
                 >
                   {currentMonth.year}年{monthNames[currentMonth.month]}
-                </button>
-                <button
+                </Button>
+                <IconButton
                   onClick={handleNextMonth}
                   disabled={!canGoToNextMonth}
-                  className={`flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md transition-colors ${
+                  className={`min-w-[44px] ${
                     !canGoToNextMonth
-                      ? 'text-gray-300 cursor-not-allowed'
+                      ? 'text-gray-300'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                   aria-label="次月"
                 >
                   <HiChevronRight className="h-5 w-5" />
-                </button>
+                </IconButton>
               </div>
             </>
           )}
           {viewMode === 'year' && (
             <div className="flex items-center gap-4">
-              <button
+              <IconButton
                 onClick={() => setViewMode('calendar')}
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
+                className="min-w-[44px] text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                 aria-label="戻る"
               >
                 <HiChevronLeft className="h-5 w-5" />
-              </button>
+              </IconButton>
               <h3 className="text-xl md:text-2xl font-semibold text-gray-800">年を選択</h3>
             </div>
           )}
           {viewMode === 'month' && (
             <div className="flex items-center gap-4">
-              <button
+              <IconButton
                 onClick={() => {
                   setViewMode('year');
                   setSelectedYear(null);
                 }}
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
+                className="min-w-[44px] text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                 aria-label="戻る"
               >
                 <HiChevronLeft className="h-5 w-5" />
-              </button>
+              </IconButton>
               <h3 className="text-xl md:text-2xl font-semibold text-gray-800">
                 {selectedYear}年の月を選択
               </h3>
             </div>
           )}
-          <button
+          <IconButton
             onClick={onCancel}
-            className="rounded-md bg-gray-200 p-1.5 md:p-2.5 text-gray-700 transition-colors hover:bg-gray-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="bg-gray-200 p-1.5 md:p-2.5 text-gray-700 hover:bg-gray-300 min-w-[44px]"
             aria-label="閉じる"
           >
             <HiX className="h-6 w-6 md:h-7 md:w-7" />
-          </button>
+          </IconButton>
         </div>
 
         {/* コンテンツ */}

@@ -4,7 +4,7 @@ import React from 'react';
 import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import { Coffee, Timer, Drop } from 'phosphor-react';
 import { RECIPE46_DESCRIPTION_SECTIONS } from '@/lib/drip-guide/recipe46Content';
-import { Button } from '@/components/ui';
+import { Button, IconButton } from '@/components/ui';
 
 const overlayMotion = {
     initial: { opacity: 0 },
@@ -51,13 +51,16 @@ export const Dialog46DescriptionModal: React.FC<Dialog46DescriptionModalProps> =
                                 <h3 className="text-xl font-bold text-ink">
                                     4:6メソッドのポイント
                                 </h3>
-                                <button
-                                    type="button"
+                                <IconButton
+                                    variant="ghost"
+                                    size="sm"
+                                    rounded
                                     onClick={onClose}
-                                    className="p-2 text-ink-muted hover:text-ink hover:bg-ground rounded-full transition-colors"
+                                    className="text-ink-muted hover:text-ink hover:bg-ground"
+                                    aria-label="閉じる"
                                 >
                                     <span className="text-2xl leading-none">×</span>
-                                </button>
+                                </IconButton>
                             </div>
 
                             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">

@@ -8,7 +8,7 @@ import { useQuizData } from '@/hooks/useQuizData';
 import { useDeveloperMode } from '@/hooks/useDeveloperMode';
 import { LevelDisplay } from '@/components/coffee-quiz/LevelDisplay';
 import { StreakCounter } from '@/components/coffee-quiz/StreakCounter';
-import { Dialog } from '@/components/ui';
+import { Dialog, Button } from '@/components/ui';
 import { DebugPanel } from '@/components/coffee-quiz/DebugPanel';
 import { DataManagement } from '@/components/coffee-quiz/DataManagement';
 import { CATEGORY_LABELS, DIFFICULTY_LABELS } from '@/lib/coffee-quiz/types';
@@ -301,13 +301,15 @@ export default function StatsPage() {
                 学習データをリセットして、最初からやり直すことができます。
               </p>
 
-              <button
+              <Button
+                variant="danger"
+                fullWidth
                 onClick={() => setShowResetDialog(true)}
-                className="w-full bg-rose-500/10 hover:bg-rose-500/15 text-rose-600 py-3 px-4 rounded-xl font-semibold transition-colors border border-rose-500/20 flex items-center justify-center gap-2"
+                className="!bg-rose-500/10 hover:!bg-rose-500/15 !text-rose-600 !rounded-xl !border !border-rose-500/20 gap-2"
               >
                 <TrashIcon />
                 データをリセット
-              </button>
+              </Button>
             </motion.div>
 
             {/* デバッグパネル（開発者モード時のみ表示） */}

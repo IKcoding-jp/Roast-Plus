@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import type { IconType } from 'react-icons';
 import { BsStars } from 'react-icons/bs';
+import { Button } from '@/components/ui';
 
 interface ActionCardProps {
   title: string;
@@ -26,9 +27,10 @@ export function ActionCard({
   const router = useRouter();
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={() => router.push(href)}
-      className="group relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl p-5 shadow-2xl transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 animate-home-card bg-surface text-ink border border-edge-strong hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-primary"
+      className="group relative flex h-full flex-col items-center justify-center gap-3 !rounded-2xl p-5 shadow-2xl transition-all hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 animate-home-card bg-surface text-ink border border-edge-strong hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] focus-visible:ring-primary !min-h-0"
       style={{
         ...(cardHeight ? { height: `${cardHeight}px` } : {}),
         animationDelay: `${index * 60}ms`,
@@ -66,6 +68,6 @@ export function ActionCard({
           {description}
         </p>
       </div>
-    </button>
+    </Button>
   );
 }

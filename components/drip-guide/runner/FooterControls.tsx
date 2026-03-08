@@ -5,6 +5,7 @@ import { Play, Pause, ArrowCounterClockwise, X, ArrowLeft, ArrowRight, CheckCirc
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import type { DripStep } from '@/lib/drip-guide/types';
+import { IconButton } from '@/components/ui';
 
 interface FooterControlsProps {
     isManualMode: boolean;
@@ -37,68 +38,79 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
             {isManualMode ? (
                 // Manual mode controls
                 <div className="flex items-center justify-center gap-4 sm:gap-6">
-                    <button
+                    <IconButton
+                        variant="ghost"
                         onClick={onResetTimer}
-                        className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
+                        className="!p-2 flex-col gap-1 text-ink-muted hover:text-ink-sub active:scale-95 min-h-[44px] min-w-[44px]"
+                        aria-label="リセット"
                     >
                         <div className="p-3 rounded-full bg-ground">
                             <ArrowCounterClockwise size={24} />
                         </div>
                         <span className="text-xs font-medium">リセット</span>
-                    </button>
+                    </IconButton>
 
-                    <button
+                    <IconButton
+                        variant="ghost"
                         onClick={onGoToPrevStep}
                         disabled={manualStepIndex === 0}
                         className={clsx(
-                            'flex flex-col items-center gap-1 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]',
+                            '!p-2 flex-col gap-1 active:scale-95 min-h-[44px] min-w-[44px]',
                             manualStepIndex === 0
-                                ? 'text-ink-muted/50 cursor-not-allowed'
+                                ? 'text-ink-muted/50'
                                 : 'text-ink-muted hover:text-ink-sub'
                         )}
+                        aria-label="前へ"
                     >
                         <div className="p-3 rounded-full bg-ground">
                             <ArrowLeft size={24} />
                         </div>
                         <span className="text-xs font-medium">前へ</span>
-                    </button>
+                    </IconButton>
 
-                    <button
+                    <IconButton
+                        variant="ghost"
+                        rounded
                         onClick={onToggleTimer}
                         className={clsx(
-                            'w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation',
+                            'w-16 h-16 sm:w-20 sm:h-20 !p-0 shadow-xl active:scale-95 touch-manipulation',
                             isRunning
                                 ? 'bg-surface border-2 border-spot/20 text-spot'
                                 : 'bg-spot text-white shadow-spot/30'
                         )}
+                        aria-label={isRunning ? '一時停止' : '再生'}
                     >
                         {isRunning ? (
                             <Pause size={28} weight="fill" className="sm:w-9 sm:h-9" />
                         ) : (
                             <Play size={28} weight="fill" className="ml-1 sm:w-9 sm:h-9" />
                         )}
-                    </button>
+                    </IconButton>
 
                     {currentStepIndex === stepsLength - 1 ? (
-                        <button
+                        <IconButton
+                            variant="ghost"
                             onClick={onComplete}
-                            className="flex flex-col items-center gap-1 text-success hover:text-success/80 transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
+                            className="!p-2 flex-col gap-1 text-success hover:text-success/80 active:scale-95 min-h-[44px] min-w-[44px]"
+                            aria-label="完了"
                         >
                             <div className="p-3 rounded-full bg-success-subtle">
                                 <CheckCircle size={24} weight="fill" />
                             </div>
                             <span className="text-xs font-medium">完了</span>
-                        </button>
+                        </IconButton>
                     ) : (
-                        <button
+                        <IconButton
+                            variant="ghost"
                             onClick={onGoToNextStep}
-                            className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95 min-h-[44px] min-w-[44px]"
+                            className="!p-2 flex-col gap-1 text-ink-muted hover:text-ink-sub active:scale-95 min-h-[44px] min-w-[44px]"
+                            aria-label="次へ"
                         >
                             <div className="p-3 rounded-full bg-ground">
                                 <ArrowRight size={24} />
                             </div>
                             <span className="text-xs font-medium">次へ</span>
-                        </button>
+                        </IconButton>
                     )}
 
                     <Link
@@ -114,31 +126,36 @@ export const FooterControls: React.FC<FooterControlsProps> = ({
             ) : (
                 // Auto mode controls
                 <div className="flex items-center justify-center gap-10">
-                    <button
+                    <IconButton
+                        variant="ghost"
                         onClick={onResetTimer}
-                        className="flex flex-col items-center gap-1 text-ink-muted hover:text-ink-sub transition-colors p-2 active:scale-95"
+                        className="!p-2 flex-col gap-1 text-ink-muted hover:text-ink-sub active:scale-95"
+                        aria-label="リセット"
                     >
                         <div className="p-3 rounded-full bg-ground">
                             <ArrowCounterClockwise size={24} />
                         </div>
                         <span className="text-xs font-medium">リセット</span>
-                    </button>
+                    </IconButton>
 
-                    <button
+                    <IconButton
+                        variant="ghost"
+                        rounded
                         onClick={onToggleTimer}
                         className={clsx(
-                            'w-20 h-20 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-95 touch-manipulation',
+                            'w-20 h-20 !p-0 shadow-xl active:scale-95 touch-manipulation',
                             isRunning
                                 ? 'bg-surface border-2 border-spot/20 text-spot'
                                 : 'bg-spot text-white shadow-spot/30'
                         )}
+                        aria-label={isRunning ? '一時停止' : '再生'}
                     >
                         {isRunning ? (
                             <Pause size={36} weight="fill" />
                         ) : (
                             <Play size={36} weight="fill" className="ml-1" />
                         )}
-                    </button>
+                    </IconButton>
 
                     <Link
                         href="/drip-guide"

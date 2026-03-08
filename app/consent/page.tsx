@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { saveUserData, getUserData } from '@/lib/firestore';
 import { createConsentData, needsConsent } from '@/lib/consent';
 import { Loading } from '@/components/Loading';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, Checkbox } from '@/components/ui';
 
 export default function ConsentPage() {
   const { user, loading: authLoading } = useAuth();
@@ -90,15 +90,12 @@ export default function ConsentPage() {
           {/* チェックボックス */}
           <div className="space-y-4 mb-6">
             {/* 利用規約 */}
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <div className="flex items-center h-6">
-                <input
-                  type="checkbox"
-                  checked={termsAgreed}
-                  onChange={(e) => setTermsAgreed(e.target.checked)}
-                  className="w-5 h-5 rounded border-2 border-edge-strong bg-field text-spot focus:ring-2 focus:ring-spot/30 focus:ring-offset-0 checked:bg-spot checked:border-spot cursor-pointer"
-                />
-              </div>
+            <div className="flex items-start gap-3 cursor-pointer group" onClick={() => setTermsAgreed(!termsAgreed)}>
+              <Checkbox
+                checked={termsAgreed}
+                onChange={(e) => setTermsAgreed(e.target.checked)}
+                className="!gap-0"
+              />
               <span className="text-ink group-hover:text-ink">
                 <Link
                   href="/terms"
@@ -110,18 +107,15 @@ export default function ConsentPage() {
                 </Link>
                 に同意する
               </span>
-            </label>
+            </div>
 
             {/* プライバシーポリシー */}
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <div className="flex items-center h-6">
-                <input
-                  type="checkbox"
-                  checked={privacyAgreed}
-                  onChange={(e) => setPrivacyAgreed(e.target.checked)}
-                  className="w-5 h-5 rounded border-2 border-edge-strong bg-field text-spot focus:ring-2 focus:ring-spot/30 focus:ring-offset-0 checked:bg-spot checked:border-spot cursor-pointer"
-                />
-              </div>
+            <div className="flex items-start gap-3 cursor-pointer group" onClick={() => setPrivacyAgreed(!privacyAgreed)}>
+              <Checkbox
+                checked={privacyAgreed}
+                onChange={(e) => setPrivacyAgreed(e.target.checked)}
+                className="!gap-0"
+              />
               <span className="text-ink group-hover:text-ink">
                 <Link
                   href="/privacy-policy"
@@ -133,7 +127,7 @@ export default function ConsentPage() {
                 </Link>
                 に同意する
               </span>
-            </label>
+            </div>
           </div>
 
           {/* 同意ボタン */}

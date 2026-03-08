@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect } from 'react';
 import { useToast, type Toast as ToastType } from '@/hooks/useToast';
 import { IoCheckmarkCircle, IoCloseCircle, IoInformationCircle, IoWarning } from 'react-icons/io5';
+import { IconButton } from '@/components/ui';
 
 const ToastContext = createContext<ReturnType<typeof useToast> | null>(null);
 
@@ -89,14 +90,16 @@ function ToastItem({ toast, onClose }: { toast: ToastType; onClose: () => void }
     >
       <div className="flex-shrink-0 mt-0.5">{getIcon()}</div>
       <div className="flex-1 text-sm font-medium">{toast.message}</div>
-      <button
+      <IconButton
         onClick={onClose}
-        className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+        variant="ghost"
+        size="sm"
+        className="flex-shrink-0 opacity-60 hover:opacity-100 !min-h-0 !min-w-0 !p-0"
         style={{ color: styles.text }}
         aria-label="閉じる"
       >
         <IoCloseCircle className="w-5 h-5" />
-      </button>
+      </IconButton>
     </div>
   );
 }

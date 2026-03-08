@@ -4,7 +4,7 @@ import React from 'react';
 import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import { Drop, Timer, SpinnerGap } from 'phosphor-react';
 import { RECIPE_HOFFMANN_STEP_DETAILS } from '@/lib/drip-guide/recipeHoffmannContent';
-import { Button } from '@/components/ui';
+import { Button, IconButton } from '@/components/ui';
 
 type StepDetailKey = keyof typeof RECIPE_HOFFMANN_STEP_DETAILS;
 
@@ -79,13 +79,16 @@ export const HoffmannStepDetailModal: React.FC<HoffmannStepDetailModalProps> = (
                                         </p>
                                     </div>
                                 </div>
-                                <button
-                                    type="button"
+                                <IconButton
+                                    variant="ghost"
+                                    size="sm"
+                                    rounded
                                     onClick={onClose}
-                                    className="p-2 text-ink-muted hover:text-ink hover:bg-ground rounded-full transition-colors"
+                                    className="text-ink-muted hover:text-ink hover:bg-ground"
+                                    aria-label="閉じる"
                                 >
                                     <span className="text-2xl leading-none">×</span>
-                                </button>
+                                </IconButton>
                             </div>
 
                             <div className="px-6 py-5 space-y-4">

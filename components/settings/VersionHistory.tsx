@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { VersionHistoryEntry } from '@/types';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
+import { Button } from '@/components/ui';
 
 interface VersionHistoryProps {
   entries: VersionHistoryEntry[];
@@ -51,22 +52,24 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
       </ul>
 
       {hasMore && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-3 flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors"
+          className="mt-3 !min-h-0 text-amber-600 hover:text-amber-700"
         >
           {isExpanded ? (
             <>
-              <IoChevronUp className="h-4 w-4" />
+              <IoChevronUp className="h-4 w-4 mr-1" />
               閉じる
             </>
           ) : (
             <>
-              <IoChevronDown className="h-4 w-4" />
+              <IoChevronDown className="h-4 w-4 mr-1" />
               もっと見る ({entries.length - maxDisplay}件)
             </>
           )}
-        </button>
+        </Button>
       )}
     </div>
   );

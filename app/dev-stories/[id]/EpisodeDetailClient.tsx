@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { RiLightbulbFlashFill } from 'react-icons/ri';
-import { BackLink } from '@/components/ui';
+import { BackLink, Button } from '@/components/ui';
 import { DialogueSection } from '@/components/dev-stories/DialogueSection';
 import { DetailSection } from '@/components/dev-stories/DetailSection';
 import { getEpisodeById, getSortedEpisodes } from '@/data/dev-stories/episodes';
@@ -78,24 +78,28 @@ export default function EpisodeDetailClient({ id }: EpisodeDetailClientProps) {
                 {/* 前後ナビゲーション */}
                 <div className="mt-8 flex justify-between items-center gap-4">
                     {prevEpisode ? (
-                        <button
+                        <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => router.push(`/dev-stories/${prevEpisode.id}`)}
-                            className="flex items-center gap-2 text-ink-sub hover:text-ink transition-colors p-2 -ml-2 min-h-[44px]"
+                            className="!text-ink-sub hover:!text-ink -ml-2"
                         >
                             <HiChevronLeft className="h-5 w-5" />
                             <span className="text-sm">前のエピソード</span>
-                        </button>
+                        </Button>
                     ) : (
                         <div />
                     )}
                     {nextEpisode ? (
-                        <button
+                        <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => router.push(`/dev-stories/${nextEpisode.id}`)}
-                            className="flex items-center gap-2 text-ink-sub hover:text-ink transition-colors p-2 -mr-2 min-h-[44px]"
+                            className="!text-ink-sub hover:!text-ink -mr-2"
                         >
                             <span className="text-sm">次のエピソード</span>
                             <HiChevronRight className="h-5 w-5" />
-                        </button>
+                        </Button>
                     ) : (
                         <div />
                     )}

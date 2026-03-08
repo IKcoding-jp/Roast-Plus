@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import type { QuizQuestion, QuizCategory } from '@/lib/coffee-quiz/types';
 import { CATEGORY_LABELS } from '@/lib/coffee-quiz/types';
 import { getQuestionsByCategory } from '@/lib/coffee-quiz/questions';
 import { useQuizData } from '@/hooks/useQuizData';
 import { CategoryQuestionList } from '@/components/coffee-quiz/CategoryQuestionList';
+import { Button, IconButton } from '@/components/ui';
 
 // インラインSVGアイコン
 const ArrowLeftIcon = ({ size = 24, className }: { size?: number; className?: string }) => (
@@ -73,12 +73,13 @@ export function CategoryPageContent({ category }: CategoryPageContentProps) {
       <div className="min-h-screen bg-page p-4">
         <div className="max-w-md mx-auto pt-20 text-center">
           <p className="text-ink-muted">カテゴリが見つかりません</p>
-          <button
+          <Button
+            variant="ghost"
             onClick={() => router.push('/coffee-trivia')}
-            className="mt-4 text-spot hover:underline"
+            className="mt-4 !min-h-0 hover:underline"
           >
             トップに戻る
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -100,13 +101,14 @@ export function CategoryPageContent({ category }: CategoryPageContentProps) {
       {/* ヘッダー */}
       <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-xl border-b border-edge">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
+          <IconButton
+            variant="ghost"
+            size="sm"
             onClick={() => router.push('/coffee-trivia')}
-            className="p-2 -ml-2 rounded-lg hover:bg-edge-subtle transition-colors"
+            className="-ml-2"
           >
             <ArrowLeftIcon size={24} className="text-ink-sub" />
-          </motion.button>
+          </IconButton>
           <div>
             <h1 className="text-lg font-bold text-ink">
               {CATEGORY_LABELS[category]}

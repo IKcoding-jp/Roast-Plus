@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { FaTree, FaStar } from 'react-icons/fa';
 import { HiClock } from 'react-icons/hi';
 import { useChristmasMode } from '@/hooks/useChristmasMode';
+import { IconButton } from '@/components/ui';
 
 export function HomeHeader() {
   const router = useRouter();
@@ -49,14 +50,16 @@ export function HomeHeader() {
 
         {/* ボタン群 */}
         <div className="flex items-center gap-2">
-          <button
+          <IconButton
+            variant="ghost"
+            size="md"
             onClick={() => router.push('/clock')}
-            className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl p-2 transition-all text-header-text/70 hover:text-header-text hover:bg-header-btn-hover active:scale-95"
+            className="!rounded-xl text-header-text/70 hover:text-header-text hover:bg-header-btn-hover active:scale-95"
             aria-label="デジタル時計を表示"
             title="デジタル時計"
           >
             <HiClock className="h-5 w-5" />
-          </button>
+          </IconButton>
         </div>
       </div>
 

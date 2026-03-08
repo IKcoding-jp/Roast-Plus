@@ -1,7 +1,7 @@
 import React from 'react';
 import { MdClose } from 'react-icons/md';
 import { Member, TaskLabel } from '../../../types';
-import { Button, IconButton } from '@/components/ui';
+import { Button, IconButton, Checkbox } from '@/components/ui';
 
 type Props = {
     member: Member;
@@ -56,11 +56,9 @@ export const MemberSettingsDialog: React.FC<Props> = ({
                             const isExcluded = member.excludedTaskLabelIds?.includes(task.id);
                             return (
                                 <label key={task.id} className="flex items-center p-3 rounded-lg border cursor-pointer transition-colors border-edge hover:bg-ground">
-                                    <input
-                                        type="checkbox"
+                                    <Checkbox
                                         checked={isExcluded}
                                         onChange={() => handleToggle(task.id)}
-                                        className="w-5 h-5 rounded focus:ring-2 text-primary border-edge-strong focus:ring-primary"
                                     />
                                     <span className={`ml-3 font-medium ${
                                         isExcluded

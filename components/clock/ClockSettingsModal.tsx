@@ -63,10 +63,12 @@ export function ClockSettingsModal({ show, settings, onUpdate, onReset, onClose 
                 const colors = theme.colors;
                 const isSelected = settings.theme === key;
                 return (
-                  <button
+                  <IconButton
                     key={key}
                     onClick={() => onUpdate({ theme: key })}
-                    className="flex flex-col items-center gap-1.5 min-w-[52px]"
+                    variant="ghost"
+                    size="sm"
+                    className="flex flex-col items-center gap-1.5 min-w-[52px] !p-1 !min-h-0 !min-w-0 h-auto"
                     aria-label={`テーマ: ${theme.label}`}
                   >
                     <div
@@ -90,7 +92,7 @@ export function ClockSettingsModal({ show, settings, onUpdate, onReset, onClose 
                     >
                       {theme.label}
                     </span>
-                  </button>
+                  </IconButton>
                 );
               })}
             </div>
@@ -104,10 +106,12 @@ export function ClockSettingsModal({ show, settings, onUpdate, onReset, onClose 
                 const font = CLOCK_FONTS[key];
                 const isSelected = settings.fontKey === key;
                 return (
-                  <button
+                  <Button
                     key={key}
                     onClick={() => onUpdate({ fontKey: key })}
-                    className="flex items-center justify-between px-4 py-3 rounded-xl transition-all text-left"
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center justify-between px-4 py-3 !rounded-xl text-left !min-h-0 w-full !font-normal"
                     style={{
                       backgroundColor: isSelected ? `${themeColors.accent}18` : themeColors.uiBg,
                       borderWidth: '1.5px',
@@ -143,7 +147,7 @@ export function ClockSettingsModal({ show, settings, onUpdate, onReset, onClose 
                         ✓
                       </div>
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HiX, HiCheck } from 'react-icons/hi';
-import { IconButton } from '@/components/ui';
+import { Button, IconButton } from '@/components/ui';
 import { WorkProgress } from '@/types';
 import { useToastContext } from '@/components/Toast';
 
@@ -119,23 +119,26 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                     </div>
 
                     {/* Actions */}
-                    <button
+                    <Button
                         type="submit"
+                        variant="primary"
+                        size="md"
+                        fullWidth
                         disabled={!amount || parseFloat(amount) === 0 || isNaN(parseFloat(amount)) || isSubmitting}
-                        className={`w-full py-3.5 px-4 rounded-xl font-bold text-white shadow-md flex items-center justify-center gap-2 transition-all ${!amount || parseFloat(amount) === 0 || isNaN(parseFloat(amount)) || isSubmitting
-                                ? 'bg-ground text-ink-muted cursor-not-allowed'
-                                : 'bg-btn-primary hover:bg-btn-primary-hover active:scale-[0.98]'
+                        className={`!rounded-xl shadow-md active:scale-[0.98] ${!amount || parseFloat(amount) === 0 || isNaN(parseFloat(amount)) || isSubmitting
+                                ? '!bg-ground !text-ink-muted'
+                                : ''
                             }`}
                     >
                         {isSubmitting ? (
                             <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
                             <>
-                                <HiCheck className="h-5 w-5" />
+                                <HiCheck className="h-5 w-5 mr-2" />
                                 記録する
                             </>
                         )}
-                    </button>
+                    </Button>
                 </form>
             </div>
         </div>

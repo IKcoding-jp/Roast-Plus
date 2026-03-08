@@ -51,16 +51,15 @@ export function FilterDialog({
                 { value: 'in_progress', label: '作業中' },
                 { value: 'completed', label: '完了' },
               ].map((option) => (
-                <button
+                <Button
                   key={option.value}
+                  variant={filterStatus === option.value ? 'outline' : 'surface'}
+                  size="sm"
                   onClick={() => setFilterStatus(option.value as WorkProgressStatus | 'all')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-all ${filterStatus === option.value
-                    ? 'bg-spot-subtle text-spot border-spot ring-1 ring-spot'
-                    : 'bg-surface text-ink-sub border-edge hover:bg-ground'
-                    }`}
+                  className="!min-h-0 !px-3 !py-1.5"
                 >
                   {option.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>

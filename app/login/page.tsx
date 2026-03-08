@@ -94,33 +94,37 @@ function LoginForm() {
 
         {/* タブ */}
         <div className="mb-6 flex rounded-lg bg-ground p-1">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => {
               setActiveTab('signup');
               setError(null);
             }}
-            className={`flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${activeTab === 'signup'
-              ? 'bg-spot text-white'
-              : 'text-ink-sub hover:text-ink'
+            className={`flex-1 !rounded-lg !py-2.5 text-center !text-sm !min-h-0 ${activeTab === 'signup'
+              ? '!bg-spot !text-white'
+              : '!text-ink-sub hover:!text-ink'
               }`}
           >
             新規登録
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => {
               setActiveTab('login');
               setError(null);
               setConfirmPassword('');
             }}
-            className={`flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${activeTab === 'login'
-              ? 'bg-spot text-white'
-              : 'text-ink-sub hover:text-ink'
+            className={`flex-1 !rounded-lg !py-2.5 text-center !text-sm !min-h-0 ${activeTab === 'login'
+              ? '!bg-spot !text-white'
+              : '!text-ink-sub hover:!text-ink'
               }`}
           >
             ログイン
-          </button>
+          </Button>
         </div>
 
         {/* フォーム */}

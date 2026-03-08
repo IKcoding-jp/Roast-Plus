@@ -176,9 +176,11 @@ export function OCRConfirmModal({
 
         {/* タブ */}
         <div className="flex border-b flex-shrink-0 border-edge">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab('timeLabels')}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
+            className={`flex-1 !rounded-none !min-h-[44px] flex items-center justify-center gap-2 ${
               activeTab === 'timeLabels'
                 ? 'bg-spot-subtle text-spot border-b-2 border-spot'
                 : 'bg-surface text-ink-sub hover:bg-ground'
@@ -189,10 +191,12 @@ export function OCRConfirmModal({
             <span className="rounded-full px-2 py-0.5 text-xs bg-ground text-ink">
               {timeLabels.length}
             </span>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab('roastSchedules')}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center gap-2 ${
+            className={`flex-1 !rounded-none !min-h-[44px] flex items-center justify-center gap-2 ${
               activeTab === 'roastSchedules'
                 ? 'bg-spot-subtle text-spot border-b-2 border-spot'
                 : 'bg-surface text-ink-sub hover:bg-ground'
@@ -203,7 +207,7 @@ export function OCRConfirmModal({
             <span className="rounded-full px-2 py-0.5 text-xs bg-ground text-ink">
               {roastSchedules.length}
             </span>
-          </button>
+          </Button>
         </div>
 
         {/* コンテンツ */}

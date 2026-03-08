@@ -3,7 +3,7 @@
 import React from 'react';
 import type { ChangelogEntryType } from '@/types';
 import { CHANGE_TYPE_CONFIG, FILTER_TYPES } from '@/data/dev-stories/detailed-changelog';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui';
 
 interface ChangeTypeFilterProps {
   selectedTypes: ChangelogEntryType[];
@@ -23,17 +23,19 @@ export const ChangeTypeFilter: React.FC<ChangeTypeFilterProps> = ({
         const config = CHANGE_TYPE_CONFIG[type];
         const isSelected = selectedTypes.includes(type);
         return (
-          <button
+          <Button
             key={type}
             onClick={() => onToggle(type)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+            variant="ghost"
+            size="sm"
+            className={`!rounded-full !px-3 !py-1.5 !min-h-0 text-sm font-medium ${
               isSelected
                 ? `${config.bgColor} ${config.color} ring-2 ring-offset-1 ring-current`
                 : 'bg-ground text-ink-muted hover:opacity-80'
             }`}
           >
             {config.label}
-          </button>
+          </Button>
         );
       })}
       {selectedTypes.length > 0 && (

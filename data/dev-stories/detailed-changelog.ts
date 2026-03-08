@@ -14,6 +14,20 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.16.4',
+    version: '0.16.4',
+    date: '2026-03-08',
+    type: 'style',
+    title: 'モーダルの開閉アニメーションを改善しました',
+    content: `
+- モーダルの開閉がスムーズなスライドアップアニメーションに変わりました
+- デザインラボにアニメーション比較セクションを追加しました
+    `.trim(),
+    tags: ['UI', 'アニメーション', 'モーダル'],
+    createdAt: '2026-03-08T10:00:00.000Z',
+    updatedAt: '2026-03-08T10:00:00.000Z',
+  },
+  {
     id: 'v0.16.3',
     version: '0.16.3',
     date: '2026-03-08',

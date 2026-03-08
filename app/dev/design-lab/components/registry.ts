@@ -26,6 +26,11 @@ export const labSections: LabSection[] = [
     description: 'フォント・サイズ・ウェイト',
   },
   {
+    id: 'modal-animations',
+    title: 'Modalアニメーション',
+    description: 'モーダル開閉アニメーション比較',
+  },
+  {
     id: 'variations',
     title: 'バリエーション',
     description: 'デザインパターン比較',

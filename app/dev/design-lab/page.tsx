@@ -11,6 +11,7 @@ import PageMockups from './components/sections/PageMockups';
 import ColorPalette from './components/sections/ColorPalette';
 import Typography from './components/sections/Typography';
 import ComponentVariations from './components/sections/ComponentVariations';
+import ModalAnimations from './components/sections/ModalAnimations';
 import ResponsivePreview from './components/ResponsivePreview';
 
 const sectionComponents: Record<string, React.ComponentType> = {
@@ -18,6 +19,7 @@ const sectionComponents: Record<string, React.ComponentType> = {
   'page-mockups': PageMockups,
   colors: ColorPalette,
   typography: Typography,
+  'modal-animations': ModalAnimations,
   variations: ComponentVariations,
 };
 

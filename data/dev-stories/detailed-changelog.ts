@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.17.0',
+    version: '0.17.0',
+    date: '2026-03-08',
+    type: 'feature',
+    title: 'スプラッシュ画面が復活しました',
+    content: `
+- アプリ起動時にブランドロゴのアニメーションが表示されるようになりました
+- 5種類のアニメーション（フェードアップ・スケール・文字送り・スライド・グロー）からランダムで表示されます
+- セッション中は初回起動時のみ表示されます（2回目以降は表示しません）
+    `.trim(),
+    tags: ['スプラッシュ', 'アニメーション', 'UI'],
+    createdAt: '2026-03-08T12:00:00.000Z',
+    updatedAt: '2026-03-08T12:00:00.000Z',
+  },
+  {
     id: 'v0.16.4',
     version: '0.16.4',
     date: '2026-03-08',

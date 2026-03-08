@@ -511,6 +511,17 @@ select option {
   background-color: white;
 }
 
+/* スプラッシュ画面: Scale Breatheパターンで使用 */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+}
+
 /* New!ラベルのアニメーション */
 @keyframes pulse-scale {
 

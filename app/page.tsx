@@ -48,6 +48,8 @@ const CHRISTMAS_ICONS: Record<string, IconType> = {
   settings: IoSettings,
 };
 
+const SPLASH_DISPLAY_TIME = 2800; // スプラッシュ画面の表示時間（SplashScreen.tsx と同値）
+
 const ACTIONS: Action[] = [
   {
     key: 'assignment',
@@ -135,9 +137,19 @@ export default function HomePage(_props: HomePageProps = {}) {
 
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [splashVisible, setSplashVisible] = useState(true);
   const [cardHeight, setCardHeight] = useState<number | null>(null);
   const [checkingConsent, setCheckingConsent] = useState(true);
   const { isChristmasMode } = useChristmasMode();
+
+  // スプラッシュ画面の表示時間を管理（フェードアウト時間を加味）
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSplashVisible(false);
+    }, SPLASH_DISPLAY_TIME + 300);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -213,7 +225,8 @@ export default function HomePage(_props: HomePageProps = {}) {
     };
   }, []);
 
-  if (loading || checkingConsent) {
+  // スプラッシュ表示中はLoadingを出さない（スプラッシュが前面に表示されるため）
+  if ((loading || checkingConsent) && !splashVisible) {
     return <Loading />;
   }
 

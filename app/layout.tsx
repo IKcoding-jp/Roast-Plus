@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { SplashScreenWrapper } from "@/components/SplashScreenWrapper";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -98,6 +99,7 @@ export default function RootLayout({
           src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js"
           strategy="afterInteractive"
         />
+        <SplashScreenWrapper />
         <ServiceWorkerRegistration />
         <ThemeProvider>
           <ToastProvider>

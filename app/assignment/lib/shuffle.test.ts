@@ -355,3 +355,156 @@ describe('calculateAssignment - priority（制約優先順位）', () => {
     });
   });
 });
+
+// ヘルパー: 全アクティブメンバーが結果に含まれることを検証
+const expectAllMembersAssigned = (result: Assignment[], members: Member[]) => {
+  const assignedMemberIds = new Set(
+    result.filter(a => a.memberId !== null).map(a => a.memberId)
+  );
+  const activeMemberIds = new Set(
+    members.filter(m => m.active !== false).map(m => m.id)
+  );
+  expect(assignedMemberIds).toEqual(activeMemberIds);
+};
+
+describe('calculateAssignment - メンバー完全配置保証（#330）', () => {
+  describe('班内シャッフルで全メンバーが配置される', () => {
+    it('2班×2タスク×4人: 全メンバーが配置される', () => {
+      const { teams, taskLabels, members } = createTestData();
+
+      // ランダム性があるため50回試行して全回パスを確認
+      for (let i = 0; i < 50; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, [], '2026-03-11',
+          undefined, undefined, false
+        );
+        expectAllMembersAssigned(result, members);
+      }
+    });
+
+    it('3班×2タスク×6人: 全メンバーが配置される', () => {
+      const { teams, taskLabels, members } = createThreeTeamData();
+
+      for (let i = 0; i < 50; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, [], '2026-03-11',
+          undefined, undefined, false
+        );
+        expectAllMembersAssigned(result, members);
+      }
+    });
+
+    it('タスク除外設定ありでもメンバーが消失しない', () => {
+      const teams: Team[] = [
+        { id: 'teamA', name: '班A' },
+        { id: 'teamB', name: '班B' },
+      ];
+      const taskLabels: TaskLabel[] = [
+        { id: 'task1', leftLabel: 'タスク1' },
+        { id: 'task2', leftLabel: 'タスク2' },
+      ];
+      // m1はtask1を除外 → task2にのみ配置可能
+      const members: Member[] = [
+        { id: 'm1', name: 'メンバー1', teamId: 'teamA', excludedTaskLabelIds: ['task1'], active: true },
+        { id: 'm2', name: 'メンバー2', teamId: 'teamA', excludedTaskLabelIds: [], active: true },
+        { id: 'm3', name: 'メンバー3', teamId: 'teamB', excludedTaskLabelIds: [], active: true },
+        { id: 'm4', name: 'メンバー4', teamId: 'teamB', excludedTaskLabelIds: [], active: true },
+      ];
+
+      for (let i = 0; i < 50; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, [], '2026-03-11',
+          undefined, undefined, false
+        );
+        expectAllMembersAssigned(result, members);
+      }
+    });
+
+    it('ペア除外設定ありでもメンバーが消失しない', () => {
+      const { teams, taskLabels, members } = createTestData();
+      // m1とm2のペア除外（同じ班A内）
+      const pairExclusions = [
+        { id: 'ex1', memberId1: 'm1', memberId2: 'm2', createdAt: { seconds: 0, nanoseconds: 0 } },
+      ];
+
+      for (let i = 0; i < 50; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, [], '2026-03-11',
+          undefined, pairExclusions, false
+        );
+        expectAllMembersAssigned(result, members);
+      }
+    });
+
+    it('班間人数差（3人 vs 1人）でも全メンバーが配置される', () => {
+      const teams: Team[] = [
+        { id: 'teamA', name: '班A' },
+        { id: 'teamB', name: '班B' },
+      ];
+      const taskLabels: TaskLabel[] = [
+        { id: 'task1', leftLabel: 'タスク1' },
+        { id: 'task2', leftLabel: 'タスク2' },
+        { id: 'task3', leftLabel: 'タスク3' },
+      ];
+      // 班A: 3人, 班B: 1人（班Bスロットは2つ空になる可能性がある）
+      const members: Member[] = [
+        { id: 'm1', name: 'メンバー1', teamId: 'teamA', excludedTaskLabelIds: [], active: true },
+        { id: 'm2', name: 'メンバー2', teamId: 'teamA', excludedTaskLabelIds: [], active: true },
+        { id: 'm3', name: 'メンバー3', teamId: 'teamA', excludedTaskLabelIds: [], active: true },
+        { id: 'm4', name: 'メンバー4', teamId: 'teamB', excludedTaskLabelIds: [], active: true },
+      ];
+
+      for (let i = 0; i < 50; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, [], '2026-03-11',
+          undefined, undefined, false
+        );
+        expectAllMembersAssigned(result, members);
+      }
+    });
+
+    it('履歴制約が厳しい場合でも全メンバーが配置される', () => {
+      const { teams, taskLabels, members } = createTestData();
+
+      // 厳しい履歴: 全メンバーが全タスクに過去配置されている
+      const history: Assignment[][] = [
+        // 1回前: task1→[m1,m3], task2→[m2,m4]
+        [
+          { teamId: 'teamA', taskLabelId: 'task1', memberId: 'm1', assignedDate: '2026-03-10' },
+          { teamId: 'teamB', taskLabelId: 'task1', memberId: 'm3', assignedDate: '2026-03-10' },
+          { teamId: 'teamA', taskLabelId: 'task2', memberId: 'm2', assignedDate: '2026-03-10' },
+          { teamId: 'teamB', taskLabelId: 'task2', memberId: 'm4', assignedDate: '2026-03-10' },
+        ],
+        // 2回前: task1→[m2,m4], task2→[m1,m3]
+        [
+          { teamId: 'teamA', taskLabelId: 'task1', memberId: 'm2', assignedDate: '2026-03-09' },
+          { teamId: 'teamB', taskLabelId: 'task1', memberId: 'm4', assignedDate: '2026-03-09' },
+          { teamId: 'teamA', taskLabelId: 'task2', memberId: 'm1', assignedDate: '2026-03-09' },
+          { teamId: 'teamB', taskLabelId: 'task2', memberId: 'm3', assignedDate: '2026-03-09' },
+        ],
+      ];
+
+      for (let i = 0; i < 50; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, history, '2026-03-11',
+          undefined, undefined, false
+        );
+        expectAllMembersAssigned(result, members);
+      }
+    });
+  });
+
+  describe('班またぎシャッフルへの影響なし', () => {
+    it('crossTeamShuffle=true時も全メンバーが配置される', () => {
+      const { teams, taskLabels, members } = createTestData();
+
+      for (let i = 0; i < 50; i++) {
+        const result = calculateAssignment(
+          teams, taskLabels, members, [], '2026-03-11',
+          undefined, undefined, true
+        );
+        expectAllMembersAssigned(result, members);
+      }
+    });
+  });
+});

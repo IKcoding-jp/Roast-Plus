@@ -14,6 +14,20 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.17.1',
+    version: '0.17.1',
+    date: '2026-03-11',
+    type: 'bugfix',
+    title: '担当表のシャッフルで一部メンバーが未割当になる問題を修正しました',
+    content: `
+- シャッフル後に一部のメンバーが表から消えてしまう問題を修正しました
+- 班の人数が異なる場合やタスク除外設定がある場合でも、全員が正しく配置されるようになりました
+    `.trim(),
+    tags: ['担当表', 'シャッフル', 'バグ修正'],
+    createdAt: '2026-03-11T11:00:00.000Z',
+    updatedAt: '2026-03-11T11:00:00.000Z',
+  },
+  {
     id: 'v0.17.0',
     version: '0.17.0',
     date: '2026-03-08',

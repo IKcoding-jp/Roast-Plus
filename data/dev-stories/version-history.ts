@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.17.1',
+    date: '2026-03-11',
+    summary: '担当表のシャッフルで一部のメンバーが未割当になる問題を修正しました',
+  },
+  {
     version: '0.17.0',
     date: '2026-03-08',
     summary: 'アプリ起動時にカスタムスプラッシュアニメーションが表示されるようになりました',

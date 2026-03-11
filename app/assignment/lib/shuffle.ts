@@ -288,6 +288,14 @@ export const calculateAssignment = (
         // この行のスロットが属する班のセット
         const rowTeamIds = new Set(row.slots.map(s => s.teamId));
 
+        // 班別スロット数を事前計算（班内モード時の分布バリデーション用）
+        const teamSlotCounts = new Map<string, number>();
+        if (!crossTeamShuffle) {
+            row.slots.forEach(s => {
+                teamSlotCounts.set(s.teamId, (teamSlotCounts.get(s.teamId) ?? 0) + 1);
+            });
+        }
+
         // この行に割り当て可能な候補メンバー
         const available = eligibleMembers
             .filter(m => !assigned.has(m.id))
@@ -295,7 +303,25 @@ export const calculateAssignment = (
             .filter(m => crossTeamShuffle || rowTeamIds.has(m.teamId))
             .map(m => m.id);
 
-        const fillCount = Math.min(neededCount, available.length);
+        // fillCount: 班内モード時は班別に利用可能メンバー数を考慮
+        let fillCount: number;
+        if (!crossTeamShuffle) {
+            const availablePerTeam = new Map<string, number>();
+            for (const id of available) {
+                const member = eligibleMembers.find(m => m.id === id);
+                if (member) {
+                    availablePerTeam.set(member.teamId, (availablePerTeam.get(member.teamId) ?? 0) + 1);
+                }
+            }
+            let maxFillable = 0;
+            for (const [teamId, needed] of teamSlotCounts) {
+                maxFillable += Math.min(needed, availablePerTeam.get(teamId) ?? 0);
+            }
+            fillCount = Math.min(neededCount, maxFillable);
+        } else {
+            fillCount = Math.min(neededCount, available.length);
+        }
+
         if (fillCount === 0) {
             // 候補なし → 空スロットのまま次の行へ
             result.set(row.taskLabelId, []);
@@ -304,12 +330,29 @@ export const calculateAssignment = (
             return false;
         }
 
+        // 班分布バリデーション: 組み合わせが各班のスロット数を満たすか検証
+        const isTeamDistributionValid = (combo: string[]): boolean => {
+            if (crossTeamShuffle) return true;
+            const dist = new Map<string, number>();
+            for (const id of combo) {
+                const member = eligibleMembers.find(m => m.id === id);
+                if (member) {
+                    dist.set(member.teamId, (dist.get(member.teamId) ?? 0) + 1);
+                }
+            }
+            for (const [teamId, needed] of teamSlotCounts) {
+                if ((dist.get(teamId) ?? 0) < needed) return false;
+            }
+            return true;
+        };
+
         // 全組み合わせ生成（入力をシャッフルしてランダム性を確保）
         const combos = getCombinations(shuffleArray(available), fillCount);
 
         // ハード制約フィルタ → ソフトスコアでソート
         const validCombos = combos
             .filter(c => !hasAnyPairExclusion(c))
+            .filter(c => isTeamDistributionValid(c))
             .filter(c => c.every(id => !hasRowConflict(id, row.taskLabelId, level)))
             .filter(c => !hasPairConflict(c, level))
             .map(c => ({ combo: c, score: calcSoftScore(c, row.taskLabelId) }))

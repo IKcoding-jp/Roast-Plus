@@ -237,6 +237,7 @@ interface TastingSession {
 - **ヘッダー**: FloatingNav（戻るボタン）+ 設定ボタン（pill型）— 全ステートで固定
 - **リングセクション**: `flex:1` で残りスペースを使い垂直中央配置 — 全ステートで同じ位置
 - **下部パネル**: `flex-shrink:0; height:230px` で固定 — ステートごとにコンテンツが切替
+- **レスポンシブ（768px以上）**: `flex-col md:flex-row` で左右分割。左パネル（50%）にリング（幅85%, max 340px）、右パネル（50%）にコントロール。`useMediaQuery` でFramer Motionアニメーション分岐
   - idle: 重量カード3択 + スタートボタン（SetupPanel）
   - running: 経過バー + 情報バッジ + 一時停止/スキップ（TimerControls）
   - completed: 完了メッセージ + 統計 + リセット（TimerControls）

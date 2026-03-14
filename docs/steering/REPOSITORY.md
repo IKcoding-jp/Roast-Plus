@@ -199,6 +199,7 @@ roastplus/
 | `useTastingAIAnalysis.ts` | テイスティングAI分析操作 |
 | `useScheduleDateNavigation.ts` | スケジュール日付ナビゲーション |
 | `useScheduleImageProcessing.ts` | スケジュール画像処理 |
+| `useMediaQuery.ts` | メディアクエリ判定（レスポンシブ対応） |
 | `useRoastTimer.ts` | 焙煎タイマー操作 |
 | `useRoastTimerDialogs.ts` | タイマーダイアログ管理 |
 | `useCameraCapture.ts` | カメラキャプチャ操作 |

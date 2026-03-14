@@ -37,7 +37,7 @@ export function TimerControls({
     const weight = state?.weight;
 
     return (
-      <div className="flex flex-col flex-1 min-h-0 justify-end">
+      <div className="flex flex-col flex-1 min-h-0 justify-end md:justify-center md:py-8">
         {/* 経過バー */}
         <div className="flex items-center gap-[10px] mb-4">
           <span
@@ -163,7 +163,7 @@ export function TimerControls({
     const duration = state?.duration ?? 0;
 
     return (
-      <div className="flex flex-col flex-1 min-h-0 justify-end">
+      <div className="flex flex-col flex-1 min-h-0 justify-end md:justify-center md:py-8">
         {/* 完了メッセージ */}
         <div className="text-center mb-3">
           <div

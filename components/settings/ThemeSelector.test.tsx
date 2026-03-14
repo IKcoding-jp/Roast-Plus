@@ -68,22 +68,20 @@ describe('ThemeSelector', () => {
     expect(checkIcon).toBeInTheDocument();
   });
 
-  it('lightテーマにLIGHTバッジが表示される', () => {
+  it('各カードにカラードットが表示される', () => {
     render(<ThemeSelector />);
-    // デフォルト（light）カードにLIGHTバッジがある
-    expect(screen.getByTestId('badge-default')).toHaveTextContent('LIGHT');
+    const dots = screen.getAllByTestId('theme-dot');
+    // 7テーマ × 1ドット = 7個
+    expect(dots).toHaveLength(7);
   });
 
-  it('darkテーマにDARKバッジが表示される', () => {
+  it('LIGHTバッジが表示されない', () => {
     render(<ThemeSelector />);
-    // ダークロースト（dark）カードにDARKバッジがある
-    expect(screen.getByTestId('badge-dark-roast')).toHaveTextContent('DARK');
+    expect(screen.queryByTestId('badge-default')).not.toBeInTheDocument();
   });
 
-  it('各カードに3色スウォッチが表示される', () => {
+  it('色スウォッチが表示されない', () => {
     render(<ThemeSelector />);
-    const swatches = screen.getAllByTestId('color-swatch');
-    // 7テーマ × 3色 = 21個
-    expect(swatches).toHaveLength(21);
+    expect(screen.queryByTestId('color-swatch')).not.toBeInTheDocument();
   });
 });

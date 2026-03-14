@@ -784,7 +784,7 @@ ESLintカスタムルール（`no-raw-button`, `no-raw-checkbox`, `no-raw-select
 - **目的**: 開発者モード、テーマ設定、アプリバージョン管理
 - **パス**: `/settings`（設定一覧）、`/settings/theme`（テーマ設定専用ページ）
 - **技術**: localStorage（テーマ）、Firestore（開発者モード）
-- **テーマ設定UI**: 2カラムグリッド形式で7テーマプリセットから選択。各カードはテーマ固有の3色グラデーション背景（`bgGradient`）、右下に大型装飾アイコン（size=90, opacity=10%）、テーマ名大タイポグラフィ、LIGHT/DARKバッジ（下部バー左端）、カラースウォッチ、テーマ固有アンビエントアニメーション（steam/flame/particles/leaf/glow/snow/stars）付き
+- **テーマ設定UI**: パターンBデザイン（デスクトップ4列/モバイル2列）で7テーマプリセットから選択。各カードはwhite背景+border、テーマカラーの48px丸カラードット（`previewGradient`グラデーション）、テーマ名（15px bold）、説明文（12.5px）、選択時は右上に黄金チェックマーク（20px丸）。アニメーションなし・LIGHT/DARKバッジなし・色スウォッチなし
 
 ### Developer Design Lab
 - **目的**: 開発者向けデザインモック検証ツール

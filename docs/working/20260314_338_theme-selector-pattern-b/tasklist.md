@@ -47,10 +47,15 @@
 
 ## Phase 5: 検証
 
-- [ ] `npm run lint`
-- [ ] `npm run build`
-- [ ] `npm run test:run`
+- [x] `npm run lint`
+- [x] `npm run build`
+- [x] `npm run test:run`
 - [ ] design-preview.html と実装の見た目を比較確認
+
+---
+
+**ステータス**: ✅ 完了
+**完了日**: 2026-03-14
 
 ## 依存関係
 

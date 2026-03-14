@@ -275,7 +275,7 @@ AI機能はFirebase Cloud Functions v2経由でOpenAI APIを呼び出す。
 | lib/ | 90%以上 | 89.44% |
 | hooks/ | 85%以上 | 87.9% |
 
-- **総テスト数**: 1171テスト（100%合格）
+- **総テスト数**: 1176テスト（100%合格）
 
 ### E2Eテスト（Playwright）
 

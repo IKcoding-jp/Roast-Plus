@@ -86,8 +86,10 @@ npm run remotion:studio        # Remotion Studio起動
 ### 検証コマンド（実装完了時に必ず実行）
 
 ```bash
-npm run lint && npm run build && npm run test:run
+npm run build && npm run test:run
 ```
+
+※ lintはHuskyのpre-commitフックが自動実行。E2EはGitHub Actions CI（`ci.yml`）が担当。
 
 ## Workflows
 
@@ -232,7 +234,7 @@ import {
 1. **Lintエラー・warningは常にゼロを維持** — 発見次第すべて修正
 2. **新規コード変更にはテストを書く**（TDD必須: lib/, hooks/, components/のロジック部分）
 3. **型チェック通過** — `strict: true` を維持
-4. **コミット前に `npm run lint && npm run build && npm run test:run` を実行**
+4. **コミット前に `npm run build && npm run test:run` を実行**（lintはpre-commitフック自動実行）
 
 ### カバレッジ目標
 | 対象 | 目標 |
@@ -307,7 +309,7 @@ import {
 ## Interaction Rules
 
 - **ファイルは自動的に読む** — コードや設定の内容が必要な場合は、Readツールで直接読み込む。「コードを貼り付けてください」「ファイルを見せてください」と聞かない
-- **ファイル削除・依存関係削除後は一括検証** — 削除後は `npm run lint && npm run build && npm run test:run` を1パスで実行し、すべてのカスケードエラーをコミット前に修正する
+- **ファイル削除・依存関係削除後は一括検証** — 削除後は `npm run build && npm run test:run` を1パスで実行し、すべてのカスケードエラーをコミット前に修正する
 
 ## Ignored Directories
 

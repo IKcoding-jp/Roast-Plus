@@ -14,6 +14,22 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.17.3',
+    version: '0.17.3',
+    date: '2026-03-14',
+    type: 'style',
+    title: 'ローストタイマーのデザインを全面刷新しました',
+    content: `
+- 画面遷移なしの1画面で操作が完結するようになりました
+- 重さ（200g / 300g / 500g）をタップするだけでタイマー時間が自動設定されます
+- 時計のような丸いプログレスリングが常に表示されるようになりました
+- 焙煎完了時に「焙煎室に戻るタイミングです」とお知らせが表示されます
+    `.trim(),
+    tags: ['ローストタイマー', 'デザイン', 'UI'],
+    createdAt: '2026-03-14T20:20:00.000Z',
+    updatedAt: '2026-03-14T20:20:00.000Z',
+  },
+  {
     id: 'v0.17.2',
     version: '0.17.2',
     date: '2026-03-14',

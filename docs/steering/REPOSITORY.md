@@ -110,7 +110,7 @@ roastplus/
 | ディレクトリ | 機能 | 主なコンポーネント |
 |------------|------|------------------|
 | `home/` | ホーム画面 | ダッシュボードカード等 |
-| `roast-timer/` | 焙煎タイマー | タイマー表示、操作パネル |
+| `roast-timer/` | 焙煎タイマー | TimerDisplay（リング）、TimerControls（操作）、SetupPanel（重量カード） |
 | `roast-scheduler/` | 焙煎スケジュール | スケジュール表示・編集 |
 | `roast-record-list/` | 焙煎記録一覧 | 記録リスト表示 |
 | `drip-guide/` | ドリップガイド | レシピ表示、ステップ実行 |

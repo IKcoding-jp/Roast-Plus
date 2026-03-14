@@ -5,9 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IoSettings } from 'react-icons/io5';
 import { useAppData } from '@/hooks/useAppData';
 import { useRoastTimer } from '@/hooks/useRoastTimer';
-import { useRoastTimerDialogs } from '@/hooks/useRoastTimerDialogs';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
 import { RoastTimerSettings } from './RoastTimerSettings';
 import { TimerDisplay, TimerControls, SetupPanel } from './roast-timer';
 import { Modal } from '@/components/ui';
@@ -51,19 +49,6 @@ export function RoastTimer() {
 
   const [showSettings, setShowSettings] = useState(false);
   const [idleDuration, setIdleDuration] = useState(DEFAULT_DURATIONS[200] * 60);
-
-  const {
-    showCompletionDialog,
-    showContinuousRoastDialog,
-    showAfterPurgeDialog,
-    handleCompletionClose,
-    handleCompletionOk,
-    handleContinuousRoastClose,
-    handleContinuousRoastYes,
-    handleContinuousRoastNo,
-    handleAfterPurgeRecord,
-    handleAfterPurgeClose,
-  } = useRoastTimerDialogs({ state, resetTimer, stopSound, updateData });
 
   // ページ離脱時に音停止
   useEffect(() => {
@@ -121,24 +106,6 @@ export function RoastTimer() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* ダイアログ */}
-      <CompletionDialog
-        isOpen={showCompletionDialog}
-        onClose={handleCompletionClose}
-        onContinue={handleCompletionOk}
-      />
-      <ContinuousRoastDialog
-        isOpen={showContinuousRoastDialog}
-        onClose={handleContinuousRoastClose}
-        onYes={handleContinuousRoastYes}
-        onNo={handleContinuousRoastNo}
-      />
-      <AfterPurgeDialog
-        isOpen={showAfterPurgeDialog}
-        onClose={handleAfterPurgeClose}
-        onRecord={handleAfterPurgeRecord}
-      />
-
       {/* ヘッダー: 設定ボタン（FloatingNavはpage.tsxが提供） */}
       <div
         className="flex items-center justify-end shrink-0"

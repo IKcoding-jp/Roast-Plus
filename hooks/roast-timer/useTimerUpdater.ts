@@ -66,7 +66,6 @@ export function useTimerUpdater({
       remaining: 0,
       elapsed: currentState.duration,
       completedByDeviceId: currentDeviceId,
-      dialogState: 'completion', // 完了ダイアログを表示
       lastUpdatedAt: getSyncedIsoString(),
     };
 

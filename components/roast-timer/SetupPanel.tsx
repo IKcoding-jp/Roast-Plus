@@ -58,7 +58,7 @@ export function SetupPanel({ onStart, isLoading, onWeightSelect }: SetupPanelPro
   };
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 justify-end">
+    <div className="flex flex-col flex-1 min-h-0 justify-end md:justify-center md:py-8">
       {/* 重量カードグリッド */}
       <div className="grid grid-cols-3 gap-[10px] mb-4">
         {WEIGHT_OPTIONS.map((option) => {

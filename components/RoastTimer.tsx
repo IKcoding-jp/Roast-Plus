@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoSettings } from 'react-icons/io5';
 import { useAppData } from '@/hooks/useAppData';
 import { useRoastTimer } from '@/hooks/useRoastTimer';
 import { useRoastTimerDialogs } from '@/hooks/useRoastTimerDialogs';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { CompletionDialog, ContinuousRoastDialog, AfterPurgeDialog } from './RoastTimerDialogs';
 import { RoastTimerSettings } from './RoastTimerSettings';
 import { TimerDisplay, TimerControls, SetupPanel } from './roast-timer';
@@ -14,14 +15,25 @@ import { DEFAULT_DURATIONS } from '@/lib/constants';
 import type { BeanName } from '@/lib/beanConfig';
 import type { RoastLevel, Weight } from '@/lib/constants';
 
-const panelVariants = {
+const MOBILE_PANEL_VARIANTS = {
   initial: { opacity: 0, y: 10 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -10 },
 };
 
-const panelTransition = {
+const MOBILE_PANEL_TRANSITION = {
   duration: 0.25,
+  ease: [0.16, 1, 0.3, 1] as const,
+};
+
+const DESKTOP_PANEL_VARIANTS = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+};
+
+const DESKTOP_PANEL_TRANSITION = {
+  duration: 0.4,
   ease: [0.16, 1, 0.3, 1] as const,
 };
 
@@ -82,6 +94,17 @@ export function RoastTimer() {
   const handleWeightSelect = useCallback((weight: Weight) => {
     setIdleDuration(DEFAULT_DURATIONS[weight] * 60);
   }, []);
+
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
+  const panelVariants = useMemo(
+    () => isDesktop ? DESKTOP_PANEL_VARIANTS : MOBILE_PANEL_VARIANTS,
+    [isDesktop]
+  );
+  const panelTransition = useMemo(
+    () => isDesktop ? DESKTOP_PANEL_TRANSITION : MOBILE_PANEL_TRANSITION,
+    [isDesktop]
+  );
 
   const isRunning = state?.status === 'running';
   const isPaused = state?.status === 'paused';
@@ -144,87 +167,96 @@ export function RoastTimer() {
         </button>
       </div>
 
-      {/* リングセクション（全ステートで固定位置） */}
-      <div className="flex-1 flex flex-col items-center justify-center min-h-0" style={{ padding: '0 24px' }}>
-        <TimerDisplay
-          state={state}
-          isRunning={isRunning}
-          isPaused={isPaused}
-          isCompleted={isCompleted}
-          idleDuration={idleDuration}
-        />
-      </div>
+      {/* メインコンテンツ: スマホ=縦型、md以上=左右分割 */}
+      <div className="flex-1 flex flex-col md:flex-row min-h-0">
+        {/* 左パネル: タイマーリング */}
+        <div
+          className="flex-1 flex flex-col items-center justify-center min-h-0 md:border-r"
+          style={{ padding: '0 24px', borderColor: 'var(--edge)' }}
+        >
+          <TimerDisplay
+            state={state}
+            isRunning={isRunning}
+            isPaused={isPaused}
+            isCompleted={isCompleted}
+            idleDuration={idleDuration}
+          />
+        </div>
 
-      {/* 下部パネル（ステートで切替） */}
-      <div
-        className="shrink-0 flex flex-col"
-        style={{ height: 230, padding: '0 24px 28px' }}
-      >
-        <AnimatePresence mode="wait">
-          {isIdle && (
-            <motion.div
-              key="idle"
-              variants={panelVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={panelTransition}
-              className="flex-1 flex flex-col min-h-0"
-            >
-              <SetupPanel
-                onStart={handleStart}
-                isLoading={isLoading}
-                onWeightSelect={handleWeightSelect}
-              />
-            </motion.div>
-          )}
+        {/* 右パネル: ステート別コントロール */}
+        <div
+          className="shrink-0 md:shrink md:flex-1 flex flex-col overflow-hidden"
+          style={{
+            height: isDesktop ? 'auto' : 230,
+            padding: isDesktop ? '0 40px' : '0 24px 28px',
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {isIdle && (
+              <motion.div
+                key="idle"
+                variants={panelVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={panelTransition}
+                className="flex-1 flex flex-col min-h-0"
+              >
+                <SetupPanel
+                  onStart={handleStart}
+                  isLoading={isLoading}
+                  onWeightSelect={handleWeightSelect}
+                />
+              </motion.div>
+            )}
 
-          {(isRunning || isPaused) && (
-            <motion.div
-              key="running"
-              variants={panelVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={panelTransition}
-              className="flex-1 flex flex-col min-h-0"
-            >
-              <TimerControls
-                state={state}
-                isRunning={isRunning}
-                isPaused={isPaused}
-                isCompleted={false}
-                onPause={handlePause}
-                onResume={handleResume}
-                onSkip={handleSkip}
-                onReset={handleReset}
-              />
-            </motion.div>
-          )}
+            {(isRunning || isPaused) && (
+              <motion.div
+                key="running"
+                variants={panelVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={panelTransition}
+                className="flex-1 flex flex-col min-h-0"
+              >
+                <TimerControls
+                  state={state}
+                  isRunning={isRunning}
+                  isPaused={isPaused}
+                  isCompleted={false}
+                  onPause={handlePause}
+                  onResume={handleResume}
+                  onSkip={handleSkip}
+                  onReset={handleReset}
+                />
+              </motion.div>
+            )}
 
-          {isCompleted && (
-            <motion.div
-              key="completed"
-              variants={panelVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={panelTransition}
-              className="flex-1 flex flex-col min-h-0"
-            >
-              <TimerControls
-                state={state}
-                isRunning={false}
-                isPaused={false}
-                isCompleted={true}
-                onPause={handlePause}
-                onResume={handleResume}
-                onSkip={handleSkip}
-                onReset={handleReset}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {isCompleted && (
+              <motion.div
+                key="completed"
+                variants={panelVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={panelTransition}
+                className="flex-1 flex flex-col min-h-0"
+              >
+                <TimerControls
+                  state={state}
+                  isRunning={false}
+                  isPaused={false}
+                  isCompleted={true}
+                  onPause={handlePause}
+                  onResume={handleResume}
+                  onSkip={handleSkip}
+                  onReset={handleReset}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* 設定モーダル */}

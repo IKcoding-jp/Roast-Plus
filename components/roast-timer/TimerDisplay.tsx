@@ -151,7 +151,7 @@ export function TimerDisplay({
   };
 
   return (
-    <div className="relative" style={{ width: 290, height: 290 }}>
+    <div className="relative w-[290px] h-[290px] md:w-[85%] md:max-w-[340px] md:h-auto md:aspect-square">
       <svg
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
         className="w-full h-full overflow-visible"
@@ -220,9 +220,8 @@ export function TimerDisplay({
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         <div
           ref={remainingTextRef}
-          className="font-sans text-ink tabular-nums select-none"
+          className="font-sans text-ink tabular-nums select-none text-[64px] md:text-[72px]"
           style={{
-            fontSize: 64,
             fontWeight: 300,
             lineHeight: 1,
             letterSpacing: '-2px',
@@ -232,8 +231,8 @@ export function TimerDisplay({
           {getDisplayTime()}
         </div>
         <div
-          className="text-ink-muted uppercase tracking-[0.16em] font-semibold"
-          style={{ fontSize: 10, marginTop: 6, transition: 'color 0.25s' }}
+          className="text-ink-muted uppercase tracking-[0.16em] font-semibold text-[10px] md:text-[13px]"
+          style={{ marginTop: 6, transition: 'color 0.25s' }}
         >
           {getLabel()}
         </div>

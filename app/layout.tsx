@@ -60,7 +60,7 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'ローストプラス',
+  title: 'RoastPlus',
   description: 'コーヒー豆加工業務をサポートするWebアプリ',
   icons: {
     icon: [
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'ローストプラス',
+    title: 'RoastPlus',
   },
 };
 

@@ -14,6 +14,22 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.17.2',
+    version: '0.17.2',
+    date: '2026-03-14',
+    type: 'style',
+    title: 'テーマ設定画面のデザインをシンプルなカラードット表示に刷新しました',
+    content: `
+- テーマ選択画面がすっきりしたシンプルなデザインに生まれ変わりました
+- 各テーマをそのテーマカラーの丸いドットで一目で確認できるようになりました
+- アニメーションを廃止し、画面全体が軽く・見やすくなりました
+- デスクトップでは4列、スマホでは2列で表示されるようになりました
+    `.trim(),
+    tags: ['テーマ', 'デザイン', '設定'],
+    createdAt: '2026-03-14T13:40:00.000Z',
+    updatedAt: '2026-03-14T13:40:00.000Z',
+  },
+  {
     id: 'v0.17.1',
     version: '0.17.1',
     date: '2026-03-11',

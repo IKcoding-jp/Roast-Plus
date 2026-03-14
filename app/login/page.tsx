@@ -190,7 +190,7 @@ export default function LoginPage() {
       <div className="flex min-h-screen items-center justify-center bg-page px-4">
         <div className="w-full max-w-md rounded-lg bg-surface p-8 shadow-md border border-edge">
           <h1 className="mb-8 text-center text-2xl font-bold text-ink">
-            ローストプラス
+            RoastPlus
           </h1>
           <Loading fullScreen={false} />
         </div>

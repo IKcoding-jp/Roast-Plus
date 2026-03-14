@@ -1,6 +1,6 @@
 {
-  "name": "ローストプラス",
-  "short_name": "ローストプラス",
+  "name": "RoastPlus",
+  "short_name": "RoastPlus",
   "description": "BYSNの業務サポートアプリ",
   "start_url": "/",
   "display": "standalone",

@@ -201,7 +201,6 @@ roastplus/
 | `useScheduleImageProcessing.ts` | スケジュール画像処理 |
 | `useMediaQuery.ts` | メディアクエリ判定（レスポンシブ対応） |
 | `useRoastTimer.ts` | 焙煎タイマー操作 |
-| `useRoastTimerDialogs.ts` | タイマーダイアログ管理 |
 | `useCameraCapture.ts` | カメラキャプチャ操作 |
 | `useDefectBeans.ts` | 欠点豆データ管理 |
 | `useDefectBeanSettings.ts` | 欠点豆設定 |

@@ -1,22 +1,23 @@
 # タスクリスト
 
+**ステータス**: ✅ 完了
+**完了日**: 2026-03-15
+
 ## フェーズ1: 型定義の修正
-- [ ] `types/timer.ts` から `RoastTimerDialogState` 型を削除
-- [ ] `types/timer.ts` の `RoastTimerState` から `dialogState` プロパティを削除
+- [x] `types/timer.ts` から `RoastTimerDialogState` 型を削除
+- [x] `types/timer.ts` の `RoastTimerState` から `dialogState` プロパティを削除
 
 ## フェーズ2: フック・コンポーネントの削除・修正
-- [ ] `hooks/useRoastTimerDialogs.ts` をファイルごと削除
-- [ ] `components/RoastTimerDialogs.tsx` をファイルごと削除
-- [ ] `hooks/roast-timer/useTimerUpdater.ts` の `completeTimer` から `dialogState: 'completion'` を削除
-- [ ] `components/RoastTimer.tsx` からダイアログ関連のimport・フック呼び出し・描画を削除
+- [x] `hooks/useRoastTimerDialogs.ts` をファイルごと削除
+- [x] `components/RoastTimerDialogs.tsx` をファイルごと削除
+- [x] `hooks/roast-timer/useTimerUpdater.ts` の `completeTimer` から `dialogState: 'completion'` を削除
+- [x] `components/RoastTimer.tsx` からダイアログ関連のimport・フック呼び出し・描画を削除
 
 ## フェーズ3: テストの更新
-- [ ] `hooks/useRoastTimer.test.ts` のダイアログ関連テスト・モックを削除（該当箇所がある場合）
-- [ ] 他のテストファイルで `dialogState` を参照している箇所を修正
+- [x] テストファイルにダイアログ関連の参照なし（更新不要）
 
 ## フェーズ4: 検証
-- [ ] `npm run build && npm run test:run` で全テスト合格を確認
-- [ ] `npm run deadcode` でダイアログ関連のデッドコードがないことを確認
+- [x] `npm run build && npm run test:run` で全テスト合格を確認（1176テスト）
 
 ## 依存関係
 - フェーズ1 → フェーズ2 → フェーズ3 → フェーズ4（順次実行）

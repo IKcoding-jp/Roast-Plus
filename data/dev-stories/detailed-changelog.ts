@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.17.4',
+    version: '0.17.4',
+    date: '2026-03-14',
+    type: 'style',
+    title: 'ローストタイマーがiPad・PCの広い画面に対応しました',
+    content: `
+- iPadやPCの広い画面で、タイマーリングとコントロールが左右に並ぶレイアウトになりました
+- タイマーリングが画面サイズに合わせて自動的に拡大されるようになりました
+- スマホでの表示はこれまで通り変わりません
+    `.trim(),
+    tags: ['ローストタイマー', 'レスポンシブ', 'iPad'],
+    createdAt: '2026-03-14T21:30:00.000Z',
+    updatedAt: '2026-03-14T21:30:00.000Z',
+  },
+  {
     id: 'v0.17.3',
     version: '0.17.3',
     date: '2026-03-14',

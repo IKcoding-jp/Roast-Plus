@@ -3,6 +3,11 @@ import type { VersionHistoryEntry } from '@/types';
 // 更新履歴データ
 export const VERSION_HISTORY: VersionHistoryEntry[] = [
   {
+    version: '0.17.4',
+    date: '2026-03-14',
+    summary: 'ローストタイマーがiPad・PCの広い画面で左右分割レイアウトに対応しました',
+  },
+  {
     version: '0.17.3',
     date: '2026-03-14',
     summary: 'ローストタイマーのデザインを全面刷新しました（1画面で操作が完結する新UIに変更）',

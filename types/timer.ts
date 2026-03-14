@@ -26,7 +26,6 @@ export interface RoastTimerRecord {
 }
 
 export type RoastTimerStatus = 'idle' | 'running' | 'paused' | 'completed';
-export type RoastTimerDialogState = 'completion' | 'continuousRoast' | 'afterPurge' | null;
 
 export interface RoastTimerState {
   status: RoastTimerStatus;
@@ -43,5 +42,4 @@ export interface RoastTimerState {
   notificationId?: number;
   triggeredByDeviceId?: string;
   completedByDeviceId?: string;
-  dialogState?: RoastTimerDialogState;
 }

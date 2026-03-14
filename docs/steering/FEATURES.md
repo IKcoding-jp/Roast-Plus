@@ -227,26 +227,41 @@ interface TastingSession {
 焙煎時間の正確な計測、温度記録のOCR読み取り
 
 ### 主要ユースケース
-1. タイマー開始/停止/リセット
+1. 重量カード（200g/300g/500g）からタイマー時間を自動設定してスタート
 2. 温度ラベルOCR（Firebase Cloud Functions経由でGPT-4o Vision）
 3. 焙煎記録の保存（Firestore）
 4. 焙煎履歴の閲覧
 
+### UI構造（1画面3ステート）
+- **1画面で idle → running → completed がシームレスに遷移**（画面切替なし）
+- **ヘッダー**: FloatingNav（戻るボタン）+ 設定ボタン（pill型）— 全ステートで固定
+- **リングセクション**: `flex:1` で残りスペースを使い垂直中央配置 — 全ステートで同じ位置
+- **下部パネル**: `flex-shrink:0; height:230px` で固定 — ステートごとにコンテンツが切替
+  - idle: 重量カード3択 + スタートボタン（SetupPanel）
+  - running: 経過バー + 情報バッジ + 一時停止/スキップ（TimerControls）
+  - completed: 完了メッセージ + 統計 + リセット（TimerControls）
+
+### リングデザイン
+- SVG円形プログレス（r=116, strokeWidth=10, viewBox 290x290）
+- 60本のティックマーク（6°間隔、5目盛りごとにメジャーティック）
+- ステート別リング色: idle=`--edge-strong` / running=`--spot` / completed=`--success`
+- rAFベースの60fpsアニメーション（DOM直接操作）
+
 ### UI実装ルール
 
 #### 共通コンポーネント使用
-- ✅ **必須**: `Button`, `Card`, `Input` を使用
+- ✅ **必須**: `Button`, `Modal`, `FloatingNav` を使用
 - ❌ **禁止**: 独自のタイマー表示コンポーネント作成（既存の`TimerDisplay`を使用）
 
 #### テーマ対応
-- CSS変数による自動テーマ適用。ハードコード色は使用禁止
+- CSS変数（セマンティックトークン）による自動テーマ適用。ハードコード色は使用禁止
 
 ### 技術要素
 
 | 要素 | 内容 |
 |-----|------|
 | **ページ** | `app/roast-timer/page.tsx` |
-| **コンポーネント** | `components/roast-timer/`（サブモジュール分割済み）<br>`TimerDisplay.tsx`, `PhaseButtons.tsx` |
+| **コンポーネント** | `components/roast-timer/`（サブモジュール分割済み）<br>`TimerDisplay.tsx`, `TimerControls.tsx`, `SetupPanel.tsx` |
 | **フック** | `hooks/roast-timer/useRoastTimer.ts` |
 | **音声設定** | `lib/soundFiles.ts`（自動生成）← `scripts/generate-sound-list.ts`が`public/sounds/roasttimer/`をスキャン<br>`components/RoastTimerSettings.tsx`（音声選択UI） |
 | **OCR** | Firebase Cloud Functions v2 `ocrScheduleFromImage`（GPT-4o Vision）<br>クライアント: `httpsCallable(functions, 'ocrScheduleFromImage')` |

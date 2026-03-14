@@ -57,6 +57,7 @@ NUL
 .agents/
 .cursor/
 .playwright-mcp/
+.superpowers/
 
 # Remotion (別管理)
 remotion/

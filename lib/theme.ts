@@ -3,15 +3,6 @@
  * 全テーマのメタデータを集約管理
  */
 
-export type ThemeAnimationType =
-  | 'steam'
-  | 'flame'
-  | 'particles'
-  | 'leaf'
-  | 'glow'
-  | 'snow'
-  | 'stars';
-
 export interface ThemePreset {
   id: string;
   name: string;
@@ -25,12 +16,8 @@ export interface ThemePreset {
     accent: string;
     text: string;
   };
-  /** プレビューカード内のフォントスタイル（Tailwindクラス文字列） */
-  fontStyle: string;
-  /** アンビエントアニメーションの種別 */
-  animationType: ThemeAnimationType;
-  /** プレビューカード背景グラデーション (CSS background プロパティ値) */
-  bgGradient: string;
+  /** カラードット用グラデーション (CSS background プロパティ値) */
+  previewGradient: string;
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
@@ -46,9 +33,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d97706',
       text: '#f5e6d0',
     },
-    fontStyle: 'font-bold tracking-normal',
-    animationType: 'steam',
-    bgGradient: 'linear-gradient(135deg, #1c0d00 0%, #5c2800 50%, #8b4513 100%)',
+    previewGradient: 'linear-gradient(135deg, #8b6530, #c9a06a)',
   },
   {
     id: 'dark-roast',
@@ -62,9 +47,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#c8a050',
       text: '#f5f0e8',
     },
-    fontStyle: 'font-black tracking-tight',
-    animationType: 'flame',
-    bgGradient: 'linear-gradient(135deg, #050505 0%, #1a0a00 50%, #2d1500 100%)',
+    previewGradient: 'linear-gradient(135deg, #3d2815, #7a5530)',
   },
   {
     id: 'light-roast',
@@ -78,9 +61,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d4a535',
       text: '#3d3229',
     },
-    fontStyle: 'font-light tracking-wide',
-    animationType: 'particles',
-    bgGradient: 'linear-gradient(135deg, #fff9f2 0%, #f5e6c8 50%, #e8d0a0 100%)',
+    previewGradient: 'linear-gradient(135deg, #f5e8cc, #e5cf98)',
   },
   {
     id: 'matcha',
@@ -94,9 +75,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#7db358',
       text: '#f0ebe0',
     },
-    fontStyle: 'font-semibold tracking-widest',
-    animationType: 'leaf',
-    bgGradient: 'linear-gradient(135deg, #0a1a0d 0%, #1a3520 50%, #2a4a30 100%)',
+    previewGradient: 'linear-gradient(135deg, #2d5a3a, #5a9a60)',
   },
   {
     id: 'caramel',
@@ -110,9 +89,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d4923a',
       text: '#f5ebe0',
     },
-    fontStyle: 'font-bold tracking-normal',
-    animationType: 'glow',
-    bgGradient: 'linear-gradient(135deg, #180900 0%, #3d1200 50%, #6b2d00 100%)',
+    previewGradient: 'linear-gradient(135deg, #8a5520, #c88a40)',
   },
   {
     id: 'christmas',
@@ -126,9 +103,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d4af37',
       text: '#f8f1e7',
     },
-    fontStyle: 'font-extrabold tracking-tight',
-    animationType: 'snow',
-    bgGradient: 'linear-gradient(135deg, #030f07 0%, #0a2010 50%, #1a0828 100%)',
+    previewGradient: 'linear-gradient(135deg, #1a4028, #356a42)',
   },
   {
     id: 'dark',
@@ -142,9 +117,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       accent: '#d97706',
       text: '#e8e8e8',
     },
-    fontStyle: 'font-black tracking-tight',
-    animationType: 'stars',
-    bgGradient: 'linear-gradient(135deg, #000000 0%, #0a0a14 50%, #141428 100%)',
+    previewGradient: 'linear-gradient(135deg, #252530, #454560)',
   },
 ];
 

@@ -55,37 +55,12 @@ describe('THEME_IDS', () => {
   });
 });
 
-describe('ThemePreset フィールド拡張', () => {
-  it('全テーマに fontStyle が定義されている', () => {
+describe('ThemePreset フィールド', () => {
+  it('全テーマに previewGradient が定義されている', () => {
     THEME_PRESETS.forEach((preset) => {
-      expect(preset.fontStyle).toBeDefined();
-      expect(typeof preset.fontStyle).toBe('string');
-    });
-  });
-
-  it('全テーマに animationType が定義されている', () => {
-    const validTypes = ['steam', 'flame', 'particles', 'leaf', 'glow', 'snow', 'stars'];
-    THEME_PRESETS.forEach((preset) => {
-      expect(validTypes).toContain(preset.animationType);
-    });
-  });
-
-  it('全テーマに bgGradient が定義されている', () => {
-    THEME_PRESETS.forEach((preset) => {
-      expect(preset.bgGradient).toBeDefined();
-      expect(typeof preset.bgGradient).toBe('string');
-      expect(preset.bgGradient).toMatch(/linear-gradient/);
-    });
-  });
-
-  it('fontStyle が有効な Tailwind クラスを含む', () => {
-    THEME_PRESETS.forEach((preset) => {
-      expect(preset.fontStyle).toMatch(
-        /font-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)/,
-      );
-      expect(preset.fontStyle).toMatch(
-        /tracking-(tighter|tight|normal|wide|wider|widest)/,
-      );
+      expect(preset.previewGradient).toBeDefined();
+      expect(typeof preset.previewGradient).toBe('string');
+      expect(preset.previewGradient).toMatch(/linear-gradient/);
     });
   });
 });

@@ -156,6 +156,7 @@ roastplus/
 | `emailjs.ts` | EmailJS設定（お問い合わせ） |
 | `sounds.ts` | サウンド再生ユーティリティ |
 | `soundFiles.ts` | サウンドファイル定義 |
+| `imageCompression.ts` | Canvas APIベースの画像圧縮（リサイズ・JPEG品質調整） |
 | `storage.ts` | Firebase Storage操作 |
 | `notifications.ts` | 通知管理 |
 | `utils.ts` | 汎用ユーティリティ（`cn()` 等） |

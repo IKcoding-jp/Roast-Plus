@@ -14,7 +14,12 @@ interface DefectBeanCardProps {
   onToggleSetting?: (id: string, shouldRemove: boolean) => void;
   onEdit?: (id: string) => void;
   compareMode?: boolean;
+  /** グリッド内のインデックス（画像の優先度制御に使用） */
+  index?: number;
 }
+
+/** 1行目の最大カード数（lg: 5列） */
+const PRIORITY_THRESHOLD = 5;
 
 export function DefectBeanCard({
   defectBean,
@@ -24,8 +29,11 @@ export function DefectBeanCard({
   onToggleSetting,
   onEdit,
   compareMode = false,
+  index,
 }: DefectBeanCardProps) {
   const [showImageModal, setShowImageModal] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const isPriority = index !== undefined && index < PRIORITY_THRESHOLD;
 
   const handleCardClick = () => {
     if (compareMode && onSelect) {
@@ -64,14 +72,17 @@ export function DefectBeanCard({
           {/* 内側の細い枠（上品なゴールド、光沢感） */}
           <div className="absolute inset-2 border-[1.5px] border-amber-500/70 rounded-lg shadow-[inset_0_1px_2px_rgba(255,255,255,0.3),inset_0_-1px_2px_rgba(0,0,0,0.1)]"></div>
           {/* 画像コンテナ */}
-          <div className="absolute inset-[10px] bg-gray-100 rounded-lg overflow-hidden shadow-inner">
+          <div className="absolute inset-[10px] bg-surface-alt rounded-lg overflow-hidden shadow-inner">
             <Image
               src={defectBean.imageUrl}
               alt={defectBean.name}
               fill
-              className="object-cover"
+              className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               sizes="(max-width: 768px) 50vw, 25vw"
               unoptimized
+              priority={isPriority}
+              loading={isPriority ? undefined : 'lazy'}
+              onLoad={() => setImageLoaded(true)}
             />
           </div>
           {/* 選択バッジ */}
@@ -174,6 +185,7 @@ export function DefectBeanCard({
               height={1200}
               className="max-w-full max-h-[90vh] object-contain"
               unoptimized
+              priority
             />
           </div>
         </div>

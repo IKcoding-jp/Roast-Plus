@@ -336,8 +336,9 @@ interface RoastRecord {
 | 要素 | 内容 |
 |-----|------|
 | **ページ** | `app/defect-beans/page.tsx`（一覧）<br>`app/defect-beans/[id]/page.tsx`（詳細） |
-| **コンポーネント** | `components/defect-beans/FilterMenu.tsx`（検索・絞り込み・ソートを統合したモーダル）<br>`components/defect-beans/EmptyState.tsx` |
-| **フック** | `hooks/useDefectBeans.ts`<br>`hooks/useDefectBeanSettings.ts` |
+| **コンポーネント** | `components/defect-beans/FilterMenu.tsx`（検索・絞り込み・ソートを統合したモーダル）<br>`components/defect-beans/EmptyState.tsx`<br>`components/DefectBeanCard.tsx`（フェードインアニメーション・優先度制御対応） |
+| **フック** | `hooks/useDefectBeans.ts`（アップロード前の画像圧縮を統合）<br>`hooks/useDefectBeanSettings.ts` |
+| **ユーティリティ** | `lib/imageCompression.ts`（Canvas APIベースのクライアントサイド画像圧縮） |
 | **Firestore** | `defectBeans` コレクション（共有データ、全ユーザー共通） |
 | **画像** | `public/images/`（静的コンテンツ） |
 
@@ -346,6 +347,11 @@ interface RoastRecord {
 #### データアクセス
 - **共有データ**: `defectBeans` コレクションは全ユーザー共通（`users/{userId}` 配下ではない）
 - **読み取り専用**: クライアントからの書き込みは禁止。Firebase Consoleまたは管理スクリプトで管理
+
+#### 画像最適化
+- **アップロード時圧縮**: Canvas APIで最大800px・JPEG品質80%に圧縮してからFirebase Storageにアップロード（`lib/imageCompression.ts`）
+- **フェードイン表示**: 画像読み込み完了時に`opacity: 0→1`のトランジションで表示のばらつきを解消
+- **優先度制御**: グリッド1行目（最大5枚）は`priority`で即時読み込み、2行目以降は遅延読み込み
 
 ### 禁止事項
 1. ❌ クライアントからの欠点豆データ書き込み（読み取り専用）

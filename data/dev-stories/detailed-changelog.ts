@@ -14,6 +14,21 @@ export const CHANGE_TYPE_CONFIG: Record<ChangelogEntryType, { label: string; col
 // 詳細な更新履歴データ
 export const DETAILED_CHANGELOG: ChangelogEntry[] = [
   {
+    id: 'v0.17.5',
+    version: '0.17.5',
+    date: '2026-03-15',
+    type: 'improvement',
+    title: 'コーヒー豆図鑑の画像表示が速くなりました',
+    content: `
+- 画像がふわっと表示されるようになり、表示のちらつきが軽減されました
+- 画面に見えている画像を優先して読み込むようになりました
+- 新しく追加する画像が自動的に圧縮され、読み込みが速くなりました
+    `.trim(),
+    tags: ['欠点豆カタログ', 'パフォーマンス', '画像'],
+    createdAt: '2026-03-15T21:00:00.000Z',
+    updatedAt: '2026-03-15T21:00:00.000Z',
+  },
+  {
     id: 'v0.17.4',
     version: '0.17.4',
     date: '2026-03-14',

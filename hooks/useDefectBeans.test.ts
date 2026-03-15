@@ -12,6 +12,7 @@ const mockUploadDefectBeanImage = vi.fn();
 const mockDeleteDefectBeanImage = vi.fn();
 const mockUseAppData = vi.fn();
 const mockUpdateData = vi.fn();
+const mockCompressImage = vi.fn();
 
 vi.mock('@/lib/auth', () => ({
   useAuth: () => mockUseAuth(),
@@ -30,6 +31,10 @@ vi.mock('@/lib/storage', () => ({
 
 vi.mock('./useAppData', () => ({
   useAppData: () => mockUseAppData(),
+}));
+
+vi.mock('@/lib/imageCompression', () => ({
+  compressImage: (...args: unknown[]) => mockCompressImage(...args),
 }));
 
 // テストフィクスチャ
@@ -346,6 +351,7 @@ describe('useDefectBeans - addDefectBean', () => {
     mockGetDefectBeanMasterData.mockResolvedValue([]);
     mockUpdateData.mockResolvedValue(undefined);
     mockUploadDefectBeanImage.mockResolvedValue('https://example.com/uploaded.jpg');
+    mockCompressImage.mockImplementation((file: File) => Promise.resolve(file));
     mockUseAppData.mockReturnValue({
       data: INITIAL_APP_DATA,
       updateData: mockUpdateData,
@@ -561,6 +567,7 @@ describe('useDefectBeans - updateDefectBean', () => {
     mockUpdateDefectBeanMaster.mockResolvedValue(undefined);
     mockUploadDefectBeanImage.mockResolvedValue('https://example.com/new-image.jpg');
     mockDeleteDefectBeanImage.mockResolvedValue(undefined);
+    mockCompressImage.mockImplementation((file: File) => Promise.resolve(file));
     mockUseAppData.mockReturnValue({
       data: { ...INITIAL_APP_DATA, defectBeans: [USER_BEAN] },
       updateData: mockUpdateData,

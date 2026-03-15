@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth';
 import { getDefectBeanMasterData, updateDefectBeanMaster, deleteDefectBeanMaster } from '@/lib/firestore';
 import { uploadDefectBeanImage, deleteDefectBeanImage } from '@/lib/storage';
+import { compressImage } from '@/lib/imageCompression';
 import { useAppData } from './useAppData';
 import type { DefectBean } from '@/types';
 
@@ -63,8 +64,9 @@ export function useDefectBeans() {
         const id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const now = new Date().toISOString();
 
-        // 画像をアップロード
-        const imageUrl = await uploadDefectBeanImage(user.uid, id, imageFile);
+        // 画像を圧縮してからアップロード
+        const compressedFile = await compressImage(imageFile);
+        const imageUrl = await uploadDefectBeanImage(user.uid, id, compressedFile);
 
         // 欠点豆データを作成
         const newDefectBean: DefectBean = {
@@ -115,12 +117,13 @@ export function useDefectBeans() {
 
         // 画像が変更された場合
         if (imageFile) {
-          // 新しい画像をアップロード
+          // 画像を圧縮してからアップロード
+          const compressedFile = await compressImage(imageFile);
           if (existingBean.isMaster) {
             // マスターデータの場合は、userIdとして空文字列を使用（パスを統一するため）
-            newImageUrl = await uploadDefectBeanImage('', defectBeanId, imageFile);
+            newImageUrl = await uploadDefectBeanImage('', defectBeanId, compressedFile);
           } else {
-            newImageUrl = await uploadDefectBeanImage(user.uid, defectBeanId, imageFile);
+            newImageUrl = await uploadDefectBeanImage(user.uid, defectBeanId, compressedFile);
           }
 
           // アップロード成功後、既存画像を削除

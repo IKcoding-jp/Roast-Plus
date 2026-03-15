@@ -289,7 +289,7 @@ export default function DefectBeansPage() {
           />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            {filteredDefectBeans.map((defectBean) => {
+            {filteredDefectBeans.map((defectBean, index) => {
               return (
                 <DefectBeanCard
                   key={defectBean.id}
@@ -300,7 +300,7 @@ export default function DefectBeansPage() {
                   onToggleSetting={handleToggleSetting}
                   onEdit={!compareMode ? handleEditDefectBean : undefined}
                   compareMode={compareMode}
-      
+                  index={index}
                 />
               );
             })}
